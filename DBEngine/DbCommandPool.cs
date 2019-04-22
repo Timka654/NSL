@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Text;
@@ -9,7 +10,7 @@ namespace DBEngine
 {
     public class DbCommandQueue<T> where T : DbConnection
     {
-        public delegate void ExecutedDbCommandDelegate(Action<DBCommand> command);
+        public delegate void ExecutedDbCommandDelegate(long index);
 
         public event ExecutedDbCommandDelegate ExecutedDbCommandEvent;
 
@@ -17,24 +18,29 @@ namespace DBEngine
 
         private int DelayCommandTime = 20000;
 
-        protected List<Action<DBCommand>> WaitList;
+        private long CurrentIndex = 1;
 
-        protected AutoResetEvent wait_list_locker = new AutoResetEvent(true);
+        protected ConcurrentDictionary<long,Action<DBCommand>> WaitList = new ConcurrentDictionary<long, Action<DBCommand>>();
+
+        protected AutoResetEvent invoker_locker = new AutoResetEvent(true);
 
         public DbCommandQueue(DbConnectionPool<T> connection_pool)
         {
             this.connection_pool = connection_pool;
 
-            WaitList = new List<Action<DBCommand>>();
-
             FlushWhile();
         }
 
-        public void AppendCommand(Action<DBCommand> command)
+        public long AppendCommand(Action<DBCommand> command)
         {
-            wait_list_locker.WaitOne();
-            WaitList.Add(command);
-            wait_list_locker.Set();
+            long index = Interlocked.Increment(ref CurrentIndex);
+
+            if (index == long.MaxValue - 10000)
+                CurrentIndex = 1;
+
+            WaitList.TryAdd(index,command);
+
+            return index;
         }
 
         public void SetDelayTime(int seconds)
@@ -45,27 +51,28 @@ namespace DBEngine
         private void FlushWhile()
         {
             Task.Run(new Action(async () =>
-          {
-              while (true)
-              {
-                  await Task.Delay(DelayCommandTime);
-                  wait_list_locker.WaitOne();
-                  try
-                  {
-                      while (WaitList.Count > 0)
-                      {
-                          var e = WaitList[0];
-                          e.Invoke(connection_pool.GetCommand());
-                          WaitList.Remove(e);
-                          ExecutedDbCommandEvent?.Invoke(e);
-                      }
-                  }
-                  catch (Exception)
-                  {
-                  }
-                  wait_list_locker.Set();
-              }
-          }));
+            {
+                while (true)
+                {
+                    await Task.Delay(DelayCommandTime);
+                    try
+                    {
+                        invoker_locker.WaitOne();
+                        foreach (var item in WaitList)
+                        {
+                            item.Value.Invoke(connection_pool.GetCommand());
+
+                            ExecutedDbCommandEvent?.Invoke(item.Key);
+
+                            WaitList.TryRemove(item.Key, out var temp);
+                        }
+                        invoker_locker.Set();
+                    }
+                    catch (Exception)
+                    {
+                    }
+                }
+            }));
         }
     }
 }
