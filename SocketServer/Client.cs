@@ -90,6 +90,8 @@ namespace SocketServer
         /// </summary>
         private Socket sclient;
 
+        private bool disconnected = false;
+
         /// <summary>
         /// Текущее состояние подключения
         /// </summary>
@@ -97,7 +99,7 @@ namespace SocketServer
         {
             if (sclient == null)
                 return false;
-            return sclient.Connected;
+            return sclient.Connected && !disconnected;
         }
 
         public IPEndPoint GetRemovePoint()
@@ -306,6 +308,10 @@ namespace SocketServer
         /// </summary>
         public void Disconnect()
         {
+            if (disconnected == true)
+                return;
+
+            disconnected = true;
             this.serverOptions.RunClientDisconnect(Data);
             //проверяем возможно клиент и не был инициализирован, в случае дос атак, такое возможно
             if (sclient != null)

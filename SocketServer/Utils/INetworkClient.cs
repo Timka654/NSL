@@ -85,10 +85,11 @@ namespace SocketServer.Utils
 
         public async void RunAliveChecker()
         {
+            await Task.Delay(AliveCheckTimeOut);
             while (Network.GetState())
             {
-                await Task.Delay(AliveCheckTimeOut);
                 AliveConnection<INetworkClient>.Send(this);
+                await Task.Delay(AliveCheckTimeOut);
             }
         }
 
