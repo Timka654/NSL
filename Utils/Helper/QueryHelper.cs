@@ -17,7 +17,7 @@ namespace Utils.Helper
                 throw new Exception($"{selectAttrbuteType.FullName} must be assignable from {typeof(Query.StaticQueryAttribute).FullName}");
             }
 
-            var querys = System.Reflection.Assembly.GetExecutingAssembly()
+            var querys = System.Reflection.Assembly.GetCallingAssembly()
                 .GetTypes()
                 .Select(x => new
                 {

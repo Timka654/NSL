@@ -18,7 +18,7 @@ namespace Utils.Helper
                 throw new Exception($"{selectAttrbuteType.FullName} must be assignable from {typeof(Manager.ManagerLoadAttribute).FullName}");
             }
 
-            var types = Assembly.GetExecutingAssembly()
+            var types = Assembly.GetCallingAssembly()
                 .GetTypes()
                 .Select(x=> new {
                     type = x,

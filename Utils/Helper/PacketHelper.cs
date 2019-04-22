@@ -19,7 +19,7 @@ namespace Utils.Helper
                 throw new Exception($"{selectAttrbuteType.FullName} must be assignable from {typeof(Packet.PacketAttribute).FullName}");
             }
 
-            var types = Assembly.GetExecutingAssembly()
+            var types = Assembly.GetCallingAssembly()
                 .GetTypes()
                 .Select(x => new {
                     type = x,
@@ -35,7 +35,7 @@ namespace Utils.Helper
                 if (!r)
                     serverOptions.Packets.Add((ushort)item.attr.PacketId, (IPacket<T>)Activator.CreateInstance(item.type));
 
-                Debug.WriteLine($"Loading Packet: packet: {item.attr.PacketId} type: {item.type.FullName} result: {r}");
+                Debug.WriteLine($"Loading Packet: packet: {item.attr.PacketId} type: {item.type.FullName} result: {!r}");
             }
 
             return types.Count();
