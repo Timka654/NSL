@@ -20,11 +20,11 @@ namespace DBEngine.DBMigrator
     {
         private static DbConnectionPool<T> connPool;
 
-        public static void UpdateDb(Assembly assembly, DbConnectionPool<T> connect_pool)
+        public static void UpdateDb(DbConnectionPool<T> connect_pool)
         {
             connPool = connect_pool;
 
-            var classes = assembly.GetTypes()
+            var classes = Assembly.GetCallingAssembly().GetTypes()
                 .Select(x => new { type = x, attr = x.GetCustomAttribute<TSelectAttribute>() })
                 .Where(x => x.attr != null)
                 .OrderBy(x => x.attr.Order != 0)
