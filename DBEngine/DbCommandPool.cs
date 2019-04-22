@@ -8,13 +8,13 @@ using System.Threading.Tasks;
 
 namespace DBEngine
 {
-    public class DbCommandQueue<T> where T : DbConnection
+    public class DbCommandQueue
     {
         public delegate void ExecutedDbCommandDelegate(long index);
 
         public event ExecutedDbCommandDelegate ExecutedDbCommandEvent;
 
-        protected DbConnectionPool<T> connection_pool;
+        protected DbConnectionPool connection_pool;
 
         private int DelayCommandTime = 20000;
 
@@ -24,7 +24,7 @@ namespace DBEngine
 
         protected AutoResetEvent invoker_locker = new AutoResetEvent(true);
 
-        public DbCommandQueue(DbConnectionPool<T> connection_pool)
+        public DbCommandQueue(DbConnectionPool connection_pool)
         {
             this.connection_pool = connection_pool;
 

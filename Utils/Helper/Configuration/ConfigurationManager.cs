@@ -11,14 +11,10 @@ namespace Utils.Helper.Configuration
 {
     public class ConfigurationManager : ConfigurationStorage
     {
-        public static ConfigurationManager Instance { get; private set; }
-
         private List<ConfigurationInfo> DefaultConfigurationList { get; set; }
 
         public ConfigurationManager(List<ConfigurationInfo> defaultConfigurationList)
         {
-            Instance = this;
-
             SetDefaults(defaultConfigurationList);
             ReLoadData();
 

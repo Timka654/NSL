@@ -8,11 +8,21 @@ using System.Threading.Tasks;
 
 namespace DBEngine
 {
+    public abstract class DbConnectionPool
+    {
+
+        public abstract DBEngine.DBCommand GetCommand();
+
+        public abstract DBEngine.DBCommand GetStorageCommand(string storage_name = "");
+
+        public abstract DBEngine.DBCommand GetQueryCommand(string query = "");
+    }
+
     /// <summary>
     /// Пул подключений к базе данных
     /// </summary>
     /// <typeparam name="T">Тип подключения</typeparam>
-    public class DbConnectionPool<T> where T : DbConnection
+    public class DbConnectionPool<T> : DbConnectionPool where T : DbConnection
     {
         /// <summary>
         /// Событие генерируемое при возникновении ошибок
@@ -86,7 +96,7 @@ namespace DBEngine
             return connection;
         }
 
-        public DBEngine.DBCommand GetCommand()
+        public override DBEngine.DBCommand GetCommand()
         {
             T connection = GetConnection();
 
@@ -98,7 +108,7 @@ namespace DBEngine
             return dbc;
         }
 
-        public DBEngine.DBCommand GetStorageCommand(string storage_name = "")
+        public override DBEngine.DBCommand GetStorageCommand(string storage_name = "")
         {
             var dbc = GetCommand();
 
@@ -107,7 +117,7 @@ namespace DBEngine
 
             return dbc;
         }
-        public DBEngine.DBCommand GetQueryCommand(string query = "")
+        public override DBEngine.DBCommand GetQueryCommand(string query = "")
         {
             var dbc = GetCommand();
 

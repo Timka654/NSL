@@ -8,13 +8,13 @@ using System.Collections.Concurrent;
 
 namespace Utils.Helper.DbCmdQueue
 {
-    public class UserDbCmdQueueStorage<T> : DbCommandQueue<T> where T : DbConnection
+    public class UserDbCmdQueueStorage<T> : DbCommandQueue
     {
         private ConcurrentDictionary<int, List<long>> UserActionListMap = new ConcurrentDictionary<int, List<long>>();
 
         private ConcurrentDictionary<long, int> ActionUserMap = new ConcurrentDictionary<long, int>();
 
-        public UserDbCmdQueueStorage(DbConnectionPool<T> connection_pool) : base(connection_pool)
+        public UserDbCmdQueueStorage(DbConnectionPool connection_pool) : base(connection_pool)
         {
             base.ExecutedDbCommandEvent += UserDbCmdQueueStorage_ExecutedDbCommandEvent;
         }
