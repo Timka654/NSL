@@ -34,8 +34,9 @@ namespace DBEngine.DBMigrator
             { typeof(string), new SQLTypeData("[nvarchar](max)", "NULL",(v)=>{ return v == null ? "NULL" : $"'{((string)v)}'"; }, ()=>{ return 0; }) },
 
             { typeof(Enum), new SQLTypeData("[int]", "NOT NULL",(v)=>{ return ((int)v).ToString(); }, ()=>{ return 0; }) },
-            { typeof(DateTime), new SQLTypeData("[smalldatetime]", "NOT NULL",(v)=>{ return ((DateTime)v).ToString(); }, ()=>{ return DateTime.MinValue; }) },
-            { typeof(TimeSpan), new SQLTypeData("[bigint]", "NOT NULL",(v)=>{ return ((TimeSpan)v).TotalMilliseconds.ToString(); }, ()=>{ return default(TimeSpan); }) },
+            { typeof(DateTime), new SQLTypeData("[smalldatetime]", "NOT NULL",(v)=>{ return ((DateTime)v).ToString(); }, ()=>{ return "" +
+                "'1900-01-01 00:00:00'"; }) },
+            { typeof(TimeSpan), new SQLTypeData("[bigint]", "NOT NULL",(v)=>{ return ((TimeSpan)v).TotalMilliseconds.ToString(); }, ()=>{ return 0; }) },
         };
 
         private static Dictionary<KeyValuePair<string, bool>, Type> SqlTypes = new Dictionary<KeyValuePair<string, bool>, Type>()
@@ -63,6 +64,8 @@ namespace DBEngine.DBMigrator
 
             { new KeyValuePair<string,bool>("nvarchar",false),typeof(string)},
             { new KeyValuePair<string,bool>("nvarchar",true),typeof(string)},
+            { new KeyValuePair<string,bool>("smalldatetime",true), typeof(DateTime) },
+            { new KeyValuePair<string,bool>("smalldatetime",false), typeof(DateTime) },
         };
 
         public static SQLTypeData GetSQLTypeData(CollumnInfo collumn)

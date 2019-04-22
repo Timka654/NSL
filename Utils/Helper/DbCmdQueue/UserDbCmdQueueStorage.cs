@@ -8,7 +8,7 @@ using System.Collections.Concurrent;
 
 namespace Utils.Helper.DbCmdQueue
 {
-    public class UserDbCmdQueueStorage<T> : DbCommandQueue
+    public class UserDbCmdQueueStorage : DbCommandQueue
     {
         private ConcurrentDictionary<int, List<long>> UserActionListMap = new ConcurrentDictionary<int, List<long>>();
 

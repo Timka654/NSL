@@ -62,7 +62,7 @@ namespace DBEngine.DBMigrator
                 type.ExistCollumns.Add(CollumnInfo.GetSqlCollumnInfo(reader.GetString(0), reader.GetString(1), reader.GetBoolean(2)));
             });
 
-            var filtred = type.ExistCollumns.Where(x => type.Collumns.Exists(y => y.CollumnAttribute.Name == x.CollumnAttribute.Name)).ToList();
+            var filtred = type.ExistCollumns.Where(x => type.Collumns.Exists(y => y.CollumnAttribute?.Name == x.CollumnAttribute.Name)).ToList();
 
             if (filtred.Count != type.ExistCollumns.Count)
                 mustMigrate = true;
@@ -72,7 +72,7 @@ namespace DBEngine.DBMigrator
             string migrateCollumns = string.Join(",", type.ExistCollumns.Select(x => $"{x.CollumnAttribute.Name}"));
             
             List<string> existCols = type.ExistCollumns.Select((e) => {
-                var t1 = type.Collumns.FirstOrDefault(x => x.CollumnAttribute.Name == e.CollumnAttribute.Name);
+                var t1 = type.Collumns.FirstOrDefault(x => x.CollumnAttribute?.Name == e.CollumnAttribute.Name);
                 if (t1.SqlType.Type == e.SqlType.Type)
                     return t1.CollumnAttribute.Name;
                 mustMigrate = true;
