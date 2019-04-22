@@ -14,7 +14,9 @@ namespace DBEngine.DBMigrator
 
         public List<CollumnInfo> Collumns { get; private set; }
 
-        public List<CollumnInfo> ExistCollumns { get; set; } = new List<CollumnInfo>();
+        public List<CollumnInfo> ExistDbCollumns { get; set; } = new List<CollumnInfo>();
+
+        public List<CollumnInfo> DbCollumns { get; set; } = new List<CollumnInfo>();
 
         public bool HaveId { get; private set; }
 
@@ -112,9 +114,15 @@ namespace DBEngine.DBMigrator
             return collumn;
         }
 
+
         private static List<CollumnInfo> GetCollumns(Type t, DBCollumnForeignAttribute foreignKey, DBSealedCollumnAttribute[] append_collumns, string[] prefixes, DBCollumnForeignKeyAttribute[] foreignKeys)
         {
             List<CollumnInfo> r = new List<CollumnInfo>();
+
+            if (t.BaseType != typeof(object))
+            {
+                r.AddRange(GetCollumns(t.BaseType, foreignKey,null,prefixes, foreignKeys));
+            }
 
             if (foreignKey?.Sealed != true)
             {

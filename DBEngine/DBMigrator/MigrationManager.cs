@@ -46,40 +46,73 @@ namespace DBEngine.DBMigrator
             UpdateDbGeneric<TQ>(type, 0);
         }
 
+
+        private static void SelectExistCollumns(MigrationTypeInfo type)
+        {
+            DBCommand cm = connPool.GetQueryCommand($@"Select c.name, t.name, c.is_nullable from sys.columns as c
+            left join sys.types as t on t.system_type_id = c.system_type_id and t.name not like 'sysname'
+            where c.object_id = OBJECT_ID('dbo.{type.TableName}')");
+            cm.ExecuteAndRead((reader) =>
+            {
+                type.ExistDbCollumns.Add(CollumnInfo.GetSqlCollumnInfo(reader.GetString(0), "[" + reader.GetString(1) + "]", reader.GetBoolean(2)));
+            });
+            cm.CloseConnection();
+        }
+
+        private static List<CollumnInfo> SelectNewCollumns(MigrationTypeInfo type)
+        {
+            List<CollumnInfo> _result = new List<CollumnInfo>();
+            foreach (var item in type.Collumns)
+            {
+                if (item.CollumnAttribute != null)
+                {
+                    var sqlType = DBCollumnType.GetSQLTypeData(item).Type;
+                    if(sqlType.Contains('('))
+                        _result.Add(CollumnInfo.GetSqlCollumnInfo(item.CollumnAttribute.Name, sqlType.Substring(0, sqlType.IndexOf("(")), IsOfNullableType(item.CollumnAttribute.Type ?? item.Type)));
+                    else
+                        _result.Add(CollumnInfo.GetSqlCollumnInfo(item.CollumnAttribute.Name, sqlType, IsOfNullableType(item.CollumnAttribute.Type ?? item.Type)));
+                }
+                else if (item.IsAppendTable)
+                    _result.AddRange(SelectNewCollumns(item.MigrationTypeInfo));
+            }
+
+            return _result;
+        }
+
+         static bool IsOfNullableType(Type type)
+        {
+            return Nullable.GetUnderlyingType(type) != null;
+        }
+
         private static void UpdateDbGeneric<TQ>(MigrationTypeInfo type, object foreignValue)
         {
             if (type.Collumns.Count == 0)
                 return;
+            SelectExistCollumns(type);
 
-            DBCommand cm = connPool.GetQueryCommand($@"Select c.name, t.name, c.is_nullable from sys.columns as c
-            left join sys.types as t on t.system_type_id = c.system_type_id and t.name not like 'sysname'
-            where c.object_id = OBJECT_ID('dbo.{type.TableName}')");
+            type.DbCollumns = SelectNewCollumns(type);
+            DBCommand cm = connPool.GetQueryCommand();
 
             bool mustMigrate = false;
+            
+            var filtred = type.ExistDbCollumns.Where(x => type.DbCollumns.Exists(y => y.CollumnAttribute?.Name == x.CollumnAttribute.Name)).ToList();
 
-            cm.ExecuteAndRead((reader) =>
-            {
-                type.ExistCollumns.Add(CollumnInfo.GetSqlCollumnInfo(reader.GetString(0), reader.GetString(1), reader.GetBoolean(2)));
-            });
-
-            var filtred = type.ExistCollumns.Where(x => type.Collumns.Exists(y => y.CollumnAttribute?.Name == x.CollumnAttribute.Name)).ToList();
-
-            if (filtred.Count != type.ExistCollumns.Count)
+            if (filtred.Count != type.ExistDbCollumns.Count || filtred.Count != type.DbCollumns.Count)
                 mustMigrate = true;
 
-            type.ExistCollumns = filtred;
+            type.ExistDbCollumns = filtred;
             
-            string migrateCollumns = string.Join(",", type.ExistCollumns.Select(x => $"{x.CollumnAttribute.Name}"));
+            string migrateCollumns = string.Join(",", type.ExistDbCollumns.Select(x => $"{x.CollumnAttribute.Name}"));
             
-            List<string> existCols = type.ExistCollumns.Select((e) => {
-                var t1 = type.Collumns.FirstOrDefault(x => x.CollumnAttribute?.Name == e.CollumnAttribute.Name);
+            List<string> existCols = type.ExistDbCollumns.Select((e) => {
+                var t1 = type.DbCollumns.FirstOrDefault(x => x.CollumnAttribute?.Name == e.CollumnAttribute.Name);
                 if (t1.SqlType.Type == e.SqlType.Type)
                     return t1.CollumnAttribute.Name;
                 mustMigrate = true;
                 return $"CAST({t1.CollumnAttribute.Name} as {e.SqlType})";
             }).ToList();
 
-            string copyQuery = type.ExistCollumns.Count == 0 || !mustMigrate ? "" : $"INSERT INTO dbo.tmp_{type.TableName} ({migrateCollumns}) \r\n Select {string.Join(",", existCols)} from dbo.{type.TableName}";
+            string copyQuery = type.ExistDbCollumns.Count == 0 || !mustMigrate ? "" : $"INSERT INTO dbo.tmp_{type.TableName} ({migrateCollumns}) \r\n Select {string.Join(",", existCols)} from dbo.{type.TableName}";
 
             string query = !mustMigrate ? "" : $@"IF (EXISTS (SELECT * 
                  FROM INFORMATION_SCHEMA.TABLES
@@ -103,25 +136,6 @@ namespace DBEngine.DBMigrator
                 "\r\n\r\n\r\n" +
                 $"EXEC sp_rename 'tmp_{type.TableName}', '{type.TableName}'" +
                 "\r\n\r\n\r\n";
-
-            if (type.HaveForeign && !type.HaveId)
-            {
-                if (type.ForeignCollumn != null)
-                {
-                    List<string> segments = new List<string>();
-
-                    segments.Add($"{type.ForeignKey} = {(type.ForeignCollumn.SqlType.Getter(foreignValue))}");
-
-                    if(type.SourceKeys != null)
-                    foreach (var item in type.SourceKeys)
-                    {
-                        segments.Add($"{item.DestinationCollumnName} = {(DBCollumnType.GetSQLTypeData(item.SourceValue.GetType()).Getter(item.SourceValue))}");
-                    }
-                    string where = string.Join(" and ", segments);
-
-                    query += $"Delete from dbo.{type.TableName} where {where}\r\n";
-                }
-            }
 
             var insert_collumn_fragment = GetInsertCollumns(type);
             if (type.HaveForeign && type.ForeignCollumn == null)
@@ -297,7 +311,7 @@ namespace DBEngine.DBMigrator
                     if (collumn.CollumnAttribute.Type == null)
                         collumn.CollumnAttribute.Type = collumn.Type;
 
-                    create_fragment.Add($"[{collumn.CollumnAttribute.Name}] {collumn.SqlType.Type} {collumn.SqlType.NullSegment} {(t.ExistCollumns.Exists(x => x.CollumnAttribute.Name == collumn.CollumnAttribute.Name) ? "" : "DEFAULT " + collumn.SqlType.DefaultValue())}");
+                    create_fragment.Add($"[{collumn.CollumnAttribute.Name}] {collumn.SqlType.Type} {collumn.SqlType.NullSegment} {(t.ExistDbCollumns.Exists(x => x.CollumnAttribute.Name == collumn.CollumnAttribute.Name) ? "" : "DEFAULT " + collumn.SqlType.DefaultValue())}");
                 }
                 else if (collumn.IsAppendTable)
                     create_fragment.AddRange(GetCreateCollumns(collumn.MigrationTypeInfo));

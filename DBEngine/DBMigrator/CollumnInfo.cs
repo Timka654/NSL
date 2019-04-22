@@ -49,6 +49,7 @@ namespace DBEngine.DBMigrator
             };
         }
 
+
         public override string ToString()
         {
             return $"{CollumnAttribute?.Name} ({Property?.Name})";

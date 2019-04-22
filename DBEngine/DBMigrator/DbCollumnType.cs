@@ -41,31 +41,32 @@ namespace DBEngine.DBMigrator
 
         private static Dictionary<KeyValuePair<string, bool>, Type> SqlTypes = new Dictionary<KeyValuePair<string, bool>, Type>()
         {
-            { new KeyValuePair<string,bool>("tinyint",false),typeof(byte)},
-            { new KeyValuePair<string,bool>("tinyint",true),typeof(byte?)},
+            { new KeyValuePair<string,bool>("[tinyint]",false),typeof(byte)},
+            { new KeyValuePair<string,bool>("[tinyint]",true),typeof(byte?)},
 
-            { new KeyValuePair<string,bool>("smallint",false),typeof(short)},
-            { new KeyValuePair<string,bool>("smallint",true),typeof(short?)},
+            { new KeyValuePair<string,bool>("[smallint]",false),typeof(short)},
+            { new KeyValuePair<string,bool>("[smallint]",true),typeof(short?)},
 
-            { new KeyValuePair<string,bool>("int",false),typeof(int)},
-            { new KeyValuePair<string,bool>("int",true),typeof(int?)},
+            { new KeyValuePair<string,bool>("[int]",false),typeof(int)},
+            { new KeyValuePair<string,bool>("[int]",true),typeof(int?)},
 
-            { new KeyValuePair<string,bool>("bigint",false),typeof(long)},
-            { new KeyValuePair<string,bool>("bigint",true),typeof(long?)},
+            { new KeyValuePair<string,bool>("[bigint]",false),typeof(long)},
+            { new KeyValuePair<string,bool>("[bigint]",true),typeof(long?)},
 
-            { new KeyValuePair<string,bool>("bit",false),typeof(bool)},
-            { new KeyValuePair<string,bool>("bit",true),typeof(bool?)},
+            { new KeyValuePair<string,bool>("[bit]",false),typeof(bool)},
+            { new KeyValuePair<string,bool>("[bit]",true),typeof(bool?)},
 
-            { new KeyValuePair<string,bool>("float",false),typeof(float)},
-            { new KeyValuePair<string,bool>("float",true),typeof(float?)},
+            { new KeyValuePair<string,bool>("[float]",false),typeof(float)},
+            { new KeyValuePair<string,bool>("[float]",true),typeof(float?)},
 
-            { new KeyValuePair<string,bool>("decimal",false),typeof(double)},
-            { new KeyValuePair<string,bool>("decimal",true),typeof(double?)},
+            { new KeyValuePair<string,bool>("[decimal]",false),typeof(double)},
+            { new KeyValuePair<string,bool>("[decimal]",true),typeof(double?)},
 
-            { new KeyValuePair<string,bool>("nvarchar",false),typeof(string)},
-            { new KeyValuePair<string,bool>("nvarchar",true),typeof(string)},
-            { new KeyValuePair<string,bool>("smalldatetime",true), typeof(DateTime) },
-            { new KeyValuePair<string,bool>("smalldatetime",false), typeof(DateTime) },
+            { new KeyValuePair<string,bool>("[nvarchar]",false),typeof(string)},
+            { new KeyValuePair<string,bool>("[nvarchar]",true),typeof(string)},
+
+            { new KeyValuePair<string,bool>("[smalldatetime]",true), typeof(DateTime) },
+            { new KeyValuePair<string,bool>("[smalldatetime]",false), typeof(DateTime) },
         };
 
         public static SQLTypeData GetSQLTypeData(CollumnInfo collumn)
