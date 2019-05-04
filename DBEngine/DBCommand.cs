@@ -197,7 +197,7 @@ namespace DBEngine
         /// <param name="type">Тип параметра</param>
         /// <param name="lenght">Размер типа</param>
         /// <param name="value">Значение параметра</param>
-        public void AddParameter(string name, System.Data.DbType type = System.Data.DbType.Object, int lenght = 0, object value = null)
+        public DBCommand AddParameter(string name, System.Data.DbType type = System.Data.DbType.Object, int lenght = 0, object value = null)
         {
             var param = cmd.CreateParameter();
 
@@ -209,16 +209,18 @@ namespace DBEngine
 
             cmd.Parameters.Add(param);
             ParameterList.Add(param);
+            return this;
         }
 
         /// <summary>
         /// Добавление параметров к запросу
         /// </summary>
         /// <param name="param">Параметр запроса</param>
-        public void AddParameter(DbParameter param)
+        public DBCommand AddParameter(DbParameter param)
         {
             cmd.Parameters.Add(param);
             ParameterList.Add(param);
+            return this;
         }
 
         /// <summary>
