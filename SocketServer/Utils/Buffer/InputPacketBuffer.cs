@@ -365,7 +365,7 @@ namespace SocketServer.Utils.Buffer
 
         public T Deserialize<T>(string schemeName = "")
         {
-            BinarySerializer.BinarySerializer bs = new BinarySerializer.BinarySerializer(TypeStorage.Instance);
+            BinarySerializer.BinarySerializer bs = new BinarySerializer.BinarySerializer(coding, TypeStorage.Instance);
 
             var result = bs.Deserialize<T>(schemeName, buffer, offset);
 

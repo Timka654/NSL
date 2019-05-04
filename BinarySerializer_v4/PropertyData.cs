@@ -297,12 +297,19 @@ namespace BinarySerializer
             {
                 if (arr_len < ++q)
                     break;
+
+                WriteValueTypeNull(bs, item == null);
+
+                if (item == null)
+                    continue;
+
                 bs.Serialize(bs.SchemeName, item);
             }
 
             for (; q < arr_len; q++)
             {
-                bs.Serialize(bs.SchemeName, CreateInstance());
+                WriteValueTypeNull(bs, true);
+                //bs.Serialize(bs.SchemeName, CreateInstance());
             }
 
             bs.ProcessObject = oldProcessObject;
@@ -316,6 +323,8 @@ namespace BinarySerializer
             var oldProcessObject = bs.ProcessObject;
             for (int i = 0; i < arr_len; i++)
             {
+                if (ReadValueTypeNull(bs))
+                    continue;
                 r[i] = (bs.Deserialize(bs.SchemeName, Attrib.Type, bs.TypeStorage.GetTypeInfo(bs.SchemeName, Attrib.Type, bs.TypeInstanceMap)));
             }
             bs.ProcessObject = oldProcessObject;
@@ -331,6 +340,8 @@ namespace BinarySerializer
             var oldProcessObject = bs.ProcessObject;
             for (int i = 0; i < arr_len; i++)
             {
+                if (ReadValueTypeNull(bs))
+                    continue;
                 r.Add(bs.Deserialize(bs.SchemeName, Attrib.Type, bs.TypeStorage.GetTypeInfo(bs.SchemeName, Attrib.Type, bs.TypeInstanceMap)));
             }
             bs.ProcessObject = oldProcessObject;
@@ -341,15 +352,40 @@ namespace BinarySerializer
         private void WriteType(BinarySerializer bs)
         {
             var oldProcessObject = bs.ProcessObject;
-            bs.Serialize(bs.SchemeName, Getter(bs.ProcessObject));
+            var value = Getter(bs.ProcessObject);
+
+            WriteValueTypeNull(bs, value == null);
+            if (value == null)
+                return;
+            bs.Serialize(bs.SchemeName, value);
             bs.ProcessObject = oldProcessObject;
         }
 
         private void ReadType(BinarySerializer bs)
         {
+            if (ReadValueTypeNull(bs))
+                return;
             var oldProcessObject = bs.ProcessObject;
             Setter(bs.ProcessObject, bs.Deserialize(bs.SchemeName, Attrib.Type, bs.TypeStorage.GetTypeInfo(bs.SchemeName, Attrib.Type, bs.TypeInstanceMap)));
             bs.ProcessObject = oldProcessObject;
+        }
+
+        private void WriteValueTypeNull(BinarySerializer bs, bool _null)
+        {
+            while (bs.Buffer.Length - bs.Offset < 1)
+            {
+                Array.Resize(ref bs.Buffer, bs.Buffer.Length * 2);
+            }
+
+            bs.BoolTypeInstance.GetBytes(ref bs.Buffer, bs.Offset, _null);
+            bs.Offset += 1;
+        }
+
+        private bool ReadValueTypeNull(BinarySerializer bs)
+        {
+            bool val = (bool)bs.BoolTypeInstance.GetValue(ref bs.Buffer, bs.Offset);
+            bs.Offset += 1;
+            return val;
         }
 
         public void SetMethods(Action<object, object> setter, Func<object, object> getter)

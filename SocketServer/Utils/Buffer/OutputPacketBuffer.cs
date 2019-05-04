@@ -362,14 +362,14 @@ namespace SocketServer.Utils.Buffer
 
         public void Serialize(object obj, string schemeName = "")
         {
-            BinarySerializer.BinarySerializer bs = new BinarySerializer.BinarySerializer(TypeStorage.Instance);
+            BinarySerializer.BinarySerializer bs = new BinarySerializer.BinarySerializer(coding,TypeStorage.Instance);
 
             Write(bs.Serialize(schemeName,obj), 0, bs.Length);
         }
 
         public void Serialize<T>(T obj, string schemeName = "")
         {
-            BinarySerializer.BinarySerializer bs = new BinarySerializer.BinarySerializer(TypeStorage.Instance);
+            BinarySerializer.BinarySerializer bs = new BinarySerializer.BinarySerializer(coding,TypeStorage.Instance);
             var r = bs.Serialize<T>(schemeName, obj);
             Write(r, 0, bs.Length);
         }

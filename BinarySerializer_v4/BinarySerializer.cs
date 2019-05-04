@@ -15,6 +15,8 @@ namespace BinarySerializer
 
         internal Dictionary<Type, BasicType> TypeInstanceMap { get; set; }
 
+        internal BasicType BoolTypeInstance;
+
         internal TypeStorage TypeStorage { get;set; }
 
         internal int Offset;
@@ -52,15 +54,18 @@ namespace BinarySerializer
                 { typeof(BinaryVector2), new BinaryVector2() },
                 { typeof(BinaryVector3), new BinaryVector3() },
             };
-
+            
             foreach (var item in TypeInstanceMap)
             {
                 item.Value.SetSerializer(this);
             }
 
+            BoolTypeInstance = TypeInstanceMap[typeof(BinaryBool)];
+
             TypeStorage = storage;
         }
-        
+
+
         public BinarySerializer() : this(new TypeStorage())
         {
             
