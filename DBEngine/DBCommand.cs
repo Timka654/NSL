@@ -71,6 +71,14 @@ namespace DBEngine
             cmd = connection.CreateCommand();
         }
 
+        public DBCommand GetStorageCommand(string storageName)
+        {
+            Query = storageName;
+            CommandType = CommandType.StoredProcedure;
+
+            return this;
+        }
+
         /// <summary>
         /// Выполнить запрос безрезультатно
         /// </summary>
