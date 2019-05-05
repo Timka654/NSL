@@ -74,7 +74,7 @@ namespace DBEngine
         /// <summary>
         /// Выполнить запрос безрезультатно
         /// </summary>
-        public void Execute([System.Runtime.CompilerServices.CallerMemberName] string memberName = "",
+        public DBCommand Execute([System.Runtime.CompilerServices.CallerMemberName] string memberName = "",
             [System.Runtime.CompilerServices.CallerFilePath] string sourceFilePath = "")
         {
             Stopwatch sw = new Stopwatch();
@@ -90,6 +90,30 @@ namespace DBEngine
                 DbExceptionEvent?.Invoke(ex);
                 throw ex;
             }
+            return this;
+        }
+
+        /// <summary>
+        /// Выполнить запрос, и получить кол-во строк, к примеру при (Insert = кол-во добавленных строк, Update = кол-во измененных строк)
+        /// </summary>
+        /// <returns>кол-во строк</returns>
+        public DBCommand ExecuteGetCount(out int count, [System.Runtime.CompilerServices.CallerMemberName] string memberName = "",
+            [System.Runtime.CompilerServices.CallerFilePath] string sourceFilePath = "")
+        {
+            Stopwatch sw = new Stopwatch();
+            try
+            {
+                sw.Start();
+                count = cmd.ExecuteNonQuery();
+                sw.Stop();
+                DbPerformanceEvent?.Invoke(sourceFilePath, memberName, sw.Elapsed);
+            }
+            catch (Exception ex)
+            {
+                DbExceptionEvent?.Invoke(ex);
+                throw ex;
+            }
+            return this;
         }
 
         /// <summary>
@@ -113,6 +137,28 @@ namespace DBEngine
                 DbExceptionEvent?.Invoke(ex);
                 throw ex;
             }
+        }
+        /// <summary>
+        /// Выполнить запрос, и получить значение первой строки, первого столбца
+        /// </summary>
+        /// <returns>значение первой строки, первого столбца</returns>
+        public DBCommand ExecuteGetFirstValue(out object result, [System.Runtime.CompilerServices.CallerMemberName] string memberName = "",
+            [System.Runtime.CompilerServices.CallerFilePath] string sourceFilePath = "")
+        {
+            Stopwatch sw = new Stopwatch();
+            try
+            {
+                sw.Start();
+                result = cmd.ExecuteScalar();
+                sw.Stop();
+                DbPerformanceEvent?.Invoke(sourceFilePath, memberName, sw.Elapsed);
+            }
+            catch (Exception ex)
+            {
+                DbExceptionEvent?.Invoke(ex);
+                throw ex;
+            }
+            return this;
         }
 
         /// <summary>
