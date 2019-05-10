@@ -25,6 +25,7 @@ namespace BinarySerializer
 
             foreach (var item in props)
             {
+                CurrentProperty = item;
                 item.Deserialize(this);
             }
 

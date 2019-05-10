@@ -22,6 +22,7 @@ namespace BinarySerializer
             Buffer = new byte[len];
             Offset = 0;
 
+            
             Serialize(schemeName, value, TypeStorage.GetTypeInfo(schemeName, typeof(T), TypeInstanceMap));
 
             return Buffer;
@@ -41,6 +42,7 @@ namespace BinarySerializer
         {
             foreach (var item in props)
             {
+                CurrentProperty = item;
                 item.Serialize(this);
             }
         }

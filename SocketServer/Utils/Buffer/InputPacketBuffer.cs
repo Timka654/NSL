@@ -13,8 +13,8 @@ namespace SocketServer.Utils.Buffer
     {
         private static readonly DateTime MinDatetimeValue = new DateTime(1, 1, 1);
         /// <summary>
-     /// Текущая кодировка типа String
-     /// </summary>
+        /// Текущая кодировка типа String
+        /// </summary>
         Encoding coding = Encoding.UTF8;
 
         /// <summary>
@@ -366,12 +366,18 @@ namespace SocketServer.Utils.Buffer
         public T Deserialize<T>(string schemeName = "")
         {
             BinarySerializer.BinarySerializer bs = new BinarySerializer.BinarySerializer(coding, TypeStorage.Instance);
+            try
+            {
+                var result = bs.Deserialize<T>(schemeName, buffer, offset);
 
-            var result = bs.Deserialize<T>(schemeName, buffer, offset);
+                offset = bs.Length;
 
-            offset = bs.Length;
-
-            return (T)result;
+                return (T)result;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Serializer Exception  Type = {bs.CurrentSerializedType.ToString()} Property = {bs.CurrentProperty.Property.Name}", ex);
+            }
         }
 
         /// <summary>

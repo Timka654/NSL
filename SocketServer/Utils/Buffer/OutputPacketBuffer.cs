@@ -362,16 +362,31 @@ namespace SocketServer.Utils.Buffer
 
         public void Serialize(object obj, string schemeName = "")
         {
-            BinarySerializer.BinarySerializer bs = new BinarySerializer.BinarySerializer(coding,TypeStorage.Instance);
+            BinarySerializer.BinarySerializer bs = new BinarySerializer.BinarySerializer(coding, TypeStorage.Instance);
+            try
+            {
+                Write(bs.Serialize(schemeName, obj), 0, bs.Length);
 
-            Write(bs.Serialize(schemeName,obj), 0, bs.Length);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Serializer Exception  Type = {bs.CurrentSerializedType.ToString()} Property = {bs.CurrentProperty.Property.Name}", ex);
+            }
         }
 
         public void Serialize<T>(T obj, string schemeName = "")
         {
-            BinarySerializer.BinarySerializer bs = new BinarySerializer.BinarySerializer(coding,TypeStorage.Instance);
-            var r = bs.Serialize<T>(schemeName, obj);
-            Write(r, 0, bs.Length);
+            BinarySerializer.BinarySerializer bs = new BinarySerializer.BinarySerializer(coding, TypeStorage.Instance);
+            try
+            {
+                var r = bs.Serialize<T>(schemeName, obj);
+                Write(r, 0, bs.Length);
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Serializer Exception  Type = {bs.CurrentSerializedType.ToString()} Property = {bs.CurrentProperty.Property.Name}", ex);
+            }
         }
 
         /// <summary>

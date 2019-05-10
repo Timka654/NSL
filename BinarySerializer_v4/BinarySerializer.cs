@@ -23,6 +23,10 @@ namespace BinarySerializer
 
         public int Length => Offset;
 
+        public Type CurrentSerializedType => ProcessObject.GetType();
+
+        public PropertyData CurrentProperty { get; private set; }
+
         private BinarySerializer(BinarySerializer bs)
         {
             this.Buffer = bs.Buffer;
