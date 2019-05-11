@@ -23,10 +23,15 @@ namespace BinarySerializer
 
             ProcessObject = Activator.CreateInstance(type);
 
+            string s = "";
+
             foreach (var item in props)
             {
                 CurrentProperty = item;
+                s = $"{CurrentSerializedType} {CurrentProperty} -->\r\n";
+                Stack += s;
                 item.Deserialize(this);
+                Stack = Stack.Substring(0, Stack.Length - s.Length);
             }
 
             return ProcessObject;

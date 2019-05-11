@@ -40,10 +40,15 @@ namespace BinarySerializer
 
         private void Serialize(string schemeName, object value, List<PropertyData> props)
         {
+            string s = "";
+
             foreach (var item in props)
             {
                 CurrentProperty = item;
+                s = $"{CurrentSerializedType} {CurrentProperty} -->\r\n";
+                Stack += s;
                 item.Serialize(this);
+                Stack = Stack.Substring(0, Stack.Length - s.Length);
             }
         }
     }

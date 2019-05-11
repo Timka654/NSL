@@ -109,7 +109,7 @@ namespace DBEngine.DBMigrator
                 if (t1.SqlType.Type == e.SqlType.Type)
                     return t1.CollumnAttribute.Name;
                 mustMigrate = true;
-                return $"CAST({t1.CollumnAttribute.Name} as {e.SqlType})";
+                return $"CAST({t1.CollumnAttribute.Name} as {e.SqlType.Type})";
             }).ToList();
 
             string copyQuery = type.ExistDbCollumns.Count == 0 || !mustMigrate ? "" : $"INSERT INTO dbo.tmp_{type.TableName} ({migrateCollumns}) \r\n Select {string.Join(",", existCols)} from dbo.{type.TableName}";

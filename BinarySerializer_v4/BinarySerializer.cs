@@ -27,6 +27,8 @@ namespace BinarySerializer
 
         public PropertyData CurrentProperty { get; private set; }
 
+        public string Stack { get; private set; } = "";
+
         private BinarySerializer(BinarySerializer bs)
         {
             this.Buffer = bs.Buffer;

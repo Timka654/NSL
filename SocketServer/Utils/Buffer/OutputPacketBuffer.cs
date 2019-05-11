@@ -370,7 +370,7 @@ namespace SocketServer.Utils.Buffer
             }
             catch (Exception ex)
             {
-                throw new Exception($"Serializer Exception  Type = {bs.CurrentSerializedType.ToString()} Property = {bs.CurrentProperty.Property.Name}", ex);
+                throw new Exception($"Serializer Stack\r\n{bs.Stack}", ex);
             }
         }
 
@@ -385,7 +385,7 @@ namespace SocketServer.Utils.Buffer
             }
             catch (Exception ex)
             {
-                throw new Exception($"Serializer Exception  Type = {bs.CurrentSerializedType.ToString()} Property = {bs.CurrentProperty.Property.Name}", ex);
+                throw new Exception($"Serializer Stack\r\n{bs.Stack}", ex);
             }
         }
 
