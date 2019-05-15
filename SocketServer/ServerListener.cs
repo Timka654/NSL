@@ -40,6 +40,10 @@ namespace SocketServer
             serverOptions = options;
             serverOptions.AddPacket((ushort)Utils.SystemPackets.Enums.ClientPacketEnum.AliveConnection,
                 new AliveConnection<T>());
+            serverOptions.AddPacket((ushort)Utils.SystemPackets.Enums.ClientPacketEnum.RecoverySession,
+                new RecoverySession<T>());
+            serverOptions.AddPacket((ushort)Utils.SystemPackets.Enums.ClientPacketEnum.Version,
+                new Version<T>());
         }
 
         /// <summary>

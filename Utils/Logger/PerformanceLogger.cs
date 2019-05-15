@@ -66,7 +66,7 @@ namespace Utils.Logger
 
             CurrentDate = DateTime.Now.Date;
 
-            stream = new StreamWriter($"{LogsPath}\\performance {CurrentDate:dd-MM-yyyy}.log", true);
+            stream = new StreamWriter(Path.Combine(LogsPath, $"performance {CurrentDate:dd-MM-yyyy}.log"), true);
             
             ConsoleLogger.WriteFormat(LoggerLevel.Info, "Initialization Performance Logger");
 

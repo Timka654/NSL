@@ -215,6 +215,7 @@ namespace DBEngine
             catch (Exception ex)
             {
                 DbExceptionEvent?.Invoke(ex);
+                CloseConnection();
                 throw ex;
             }
             return this;
@@ -251,13 +252,35 @@ namespace DBEngine
         /// <param name="type">Тип параметра</param>
         /// <param name="lenght">Размер типа</param>
         /// <param name="value">Значение параметра</param>
-        public DBCommand AddParameter(string name, System.Data.DbType type = System.Data.DbType.Object, int lenght = 0, object value = null)
+        public DBCommand AddInputParameter(string name, System.Data.DbType type = System.Data.DbType.Object, int lenght = 0, object value = null)
         {
             var param = cmd.CreateParameter();
 
             param.ParameterName = name;
             param.DbType = type;
-            param.Direction = value == null ? ParameterDirection.Output : ParameterDirection.Input;
+            param.Direction = ParameterDirection.Input;
+            param.Size = lenght;
+            param.Value = value;
+
+            cmd.Parameters.Add(param);
+            ParameterList.Add(param);
+            return this;
+        }
+
+        /// <summary>
+        /// Добавление параметров к запросу
+        /// </summary>
+        /// <param name="name">Название параметра</param>
+        /// <param name="type">Тип параметра</param>
+        /// <param name="lenght">Размер типа</param>
+        /// <param name="value">Значение параметра</param>
+        public DBCommand AddOutputParameter(string name, System.Data.DbType type = System.Data.DbType.Object, int lenght = 0, object value = null)
+        {
+            var param = cmd.CreateParameter();
+
+            param.ParameterName = name;
+            param.DbType = type;
+            param.Direction = ParameterDirection.Output;
             param.Size = lenght;
             param.Value = value;
 
@@ -318,10 +341,11 @@ namespace DBEngine
             ParameterList.Clear();
         }
 
-        public void CloseConnection()
+        public DBCommand CloseConnection()
         {
             cmd.Connection.Close();
             cmd.Dispose();
+            return this;
         }
     }
 }

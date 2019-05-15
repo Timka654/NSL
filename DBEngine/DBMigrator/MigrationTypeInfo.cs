@@ -86,6 +86,18 @@ namespace DBEngine.DBMigrator
                 r.ForeignCollumn = r.Collumns.FirstOrDefault(x => x.CollumnAttribute?.Name == foreignKey.Name || x.AppendCollumnAttribute?.Name == foreignKey.Name);
             }
 
+            DBCollumnAttribute dbCol = null;
+            if (!r.Collumns.All(x =>
+            {
+                if (x.CollumnAttribute == null)
+                    return true;
+                dbCol = x.CollumnAttribute;
+                return r.Collumns.Count(y => y.CollumnAttribute != null && y.CollumnAttribute.Name == x.CollumnAttribute.Name) == 1;
+            }))
+            {
+                throw new Exception($"{dbCol.Name} have duplicate");
+            }
+
             return r;
         }
 

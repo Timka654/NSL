@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using SocketServer.Utils.Buffer;
 using SocketServer.Utils.SystemPackets;
 
 namespace SocketServer.Utils
@@ -17,14 +18,18 @@ namespace SocketServer.Utils
         public bool AliveState { get; set; }
 
         public ulong PingCount { get; set; }
-        
+
         public int AliveWaitTime { get; set; } = 3000;
 
         public int AliveCheckTimeOut { get; set; } = 3000;
 
         public int TimeSyncTimeOut { get; set; } = 300000;
 
+        public long Version { get; set; }
+
         public ManualResetEvent Alive_locker { get; set; } = new ManualResetEvent(true);
+
+        public string[] RecoverySessionKeyArray { get; set; }
 
         /// <summary>
         /// Клиент для отправки данных, эта переменная обязательна
@@ -58,6 +63,12 @@ namespace SocketServer.Utils
             WaitPacketBuffer.Enqueue(packet_data);
         }
 
+
+        internal void Send(OutputPacketBuffer packet)
+        {
+            Network.Send(packet);
+        }
+
         /// <summary>
         /// Получить пакет из списка ожидания
         /// </summary>
@@ -73,9 +84,9 @@ namespace SocketServer.Utils
         /// Копировать пакеты в буффер с новым подключением
         /// </summary>
         /// <param name="other_client"></param>
-        public void CopyWaitPacketBuffer(INetworkClient other_client)
+        public void CopyWaitPacketBuffer(INetworkClient otherClient)
         {
-            other_client.WaitPacketBuffer = WaitPacketBuffer;
+            otherClient.WaitPacketBuffer = WaitPacketBuffer;
         }
 
         public virtual void ChangeOwner(INetworkClient client)

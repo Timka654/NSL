@@ -4,8 +4,11 @@ using System.Text;
 
 namespace SocketServer.Utils.SystemPackets.Enums
 {
+
     public enum ServerPacketEnum : ushort
     {
-        AliveConnection = 65535
+        RecoverySessionResult = 65533,
+        SystemTime = 65534,
+        AliveConnection = 65535,
     }
 }

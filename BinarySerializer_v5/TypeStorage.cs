@@ -1,0 +1,99 @@
+﻿using BinarySerializer.DefaultTypes;
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
+using System.Text;
+using System.Threading;
+
+namespace BinarySerializer
+{
+    public class TypeStorage
+    {
+        public static TypeStorage Instance { get; } = new TypeStorage();
+
+        private ConcurrentDictionary<Type, ConcurrentDictionary<string, BinaryStruct>> TypeCacheMap { get; set; }
+
+        private Dictionary<Type, IBasicType> TypeInstanceMap = new Dictionary<Type, IBasicType>()
+            {
+                //{ typeof(BinaryByte), new BinaryByte() },
+                //{ typeof(BinaryBool), new BinaryBool() },
+                //{ typeof(BinaryInt16), new BinaryInt16() },
+                //{ typeof(BinaryUInt16), new BinaryUInt16() },
+                { typeof(BinaryInt32), new BinaryInt32() },
+                //{ typeof(BinaryUInt32), new BinaryUInt32() },
+                //{ typeof(BinaryInt64), new BinaryInt64() },
+                //{ typeof(BinaryUInt64), new BinaryUInt64() },
+                //{ typeof(BinaryFloat32), new BinaryFloat32() },
+                //{ typeof(BinaryFloat64), new BinaryFloat64() },
+                //{ typeof(BinaryString), new BinaryString() },
+                //{ typeof(BinaryString16), new BinaryString16() },
+                //{ typeof(BinaryString32), new BinaryString32() },
+                //{ typeof(BinaryDateTime), new BinaryDateTime() },
+                //{ typeof(BinaryTimeSpan), new BinaryTimeSpan() },
+                //{ typeof(BinaryVector2), new BinaryVector2() },
+                //{ typeof(BinaryVector3), new BinaryVector3() },
+            };
+
+        public TypeStorage()
+        {
+            TypeCacheMap = new ConcurrentDictionary<Type, ConcurrentDictionary<string, BinaryStruct>>();
+        }
+        
+        public BinaryStruct GetTypeInfo(Type type, string schemeName)
+        {
+            if (!TypeCacheMap.ContainsKey(type) || !TypeCacheMap[type].ContainsKey(""))
+            {
+                TypeCacheMap.TryAdd(type, new ConcurrentDictionary<string, BinaryStruct>());
+                LoadType(type);
+            }
+
+            if (!TypeCacheMap[type].ContainsKey(schemeName))
+            {
+                TypeCacheMap[type].TryAdd(schemeName, TypeCacheMap[type][""].GetSchemeData(schemeName));
+            }
+
+            return TypeCacheMap[type][schemeName];
+        }
+
+        private void LoadType(Type type)
+        {
+            List<PropertyData> t = GetProperties(type);
+
+            TypeCacheMap[type].TryAdd("", new BinaryStruct(type, "", t.ToList()));
+
+            foreach (var item in t)
+            {
+                //item.FillSize(t);
+                //item.SetMethods(CreateSetter(type, item.Property), CreateGetter(type, item.Property));
+                if (item.BinaryAttr.Type.BaseType != typeof(IBasicType))
+                {
+                    GetTypeInfo(item.BinaryAttr.Type, "");
+                }
+            }
+        }
+
+        private List<PropertyData> GetProperties(Type type)
+        {
+            var r = type.GetProperties(
+                BindingFlags.Public |
+                BindingFlags.NonPublic |
+                BindingFlags.Instance |
+                BindingFlags.DeclaredOnly).Where(x =>
+                Attribute.GetCustomAttribute(x, typeof(BinaryAttribute)) != null).Select(x =>
+                    new PropertyData(x,TypeInstanceMap)).ToList();
+
+            if (type.BaseType != typeof(Object))
+                r.AddRange(GetProperties(type.BaseType));
+
+            return r;
+        }
+
+        private void LoadAllTypes()
+        {
+
+        }
+    }
+}
