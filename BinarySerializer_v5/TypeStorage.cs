@@ -12,9 +12,11 @@ namespace BinarySerializer
 {
     public class TypeStorage
     {
-        public static TypeStorage Instance { get; } = new TypeStorage();
+        public static TypeStorage Instance { get; } = new TypeStorage(UTF8Encoding.UTF8);
 
         private ConcurrentDictionary<Type, ConcurrentDictionary<string, BinaryStruct>> TypeCacheMap { get; set; }
+
+        private Encoding Coding { get; set; }
 
         private Dictionary<Type, IBasicType> TypeInstanceMap = new Dictionary<Type, IBasicType>()
             {
@@ -30,16 +32,17 @@ namespace BinarySerializer
                 //{ typeof(BinaryFloat64), new BinaryFloat64() },
                 //{ typeof(BinaryString), new BinaryString() },
                 //{ typeof(BinaryString16), new BinaryString16() },
-                //{ typeof(BinaryString32), new BinaryString32() },
+                { typeof(BinaryString32), new BinaryString32() },
                 //{ typeof(BinaryDateTime), new BinaryDateTime() },
                 //{ typeof(BinaryTimeSpan), new BinaryTimeSpan() },
                 //{ typeof(BinaryVector2), new BinaryVector2() },
                 //{ typeof(BinaryVector3), new BinaryVector3() },
             };
 
-        public TypeStorage()
+        public TypeStorage(Encoding coding)
         {
             TypeCacheMap = new ConcurrentDictionary<Type, ConcurrentDictionary<string, BinaryStruct>>();
+            Coding = coding;
         }
         
         public BinaryStruct GetTypeInfo(Type type, string schemeName)
@@ -52,7 +55,7 @@ namespace BinarySerializer
 
             if (!TypeCacheMap[type].ContainsKey(schemeName))
             {
-                TypeCacheMap[type].TryAdd(schemeName, TypeCacheMap[type][""].GetSchemeData(schemeName));
+                TypeCacheMap[type].TryAdd(schemeName, TypeCacheMap[type][""].GetSchemeData(schemeName,Coding, this));
             }
 
             return TypeCacheMap[type][schemeName];
@@ -62,15 +65,13 @@ namespace BinarySerializer
         {
             List<PropertyData> t = GetProperties(type);
 
-            TypeCacheMap[type].TryAdd("", new BinaryStruct(type, "", t.ToList()));
+            TypeCacheMap[type].TryAdd("", new BinaryStruct(type, "", t.ToList(), Coding, this));
 
             foreach (var item in t)
             {
-                //item.FillSize(t);
-                //item.SetMethods(CreateSetter(type, item.Property), CreateGetter(type, item.Property));
-                if (item.BinaryAttr.Type.BaseType != typeof(IBasicType))
+                if (!typeof(IBasicType).IsAssignableFrom(item.BinaryAttr.Type))
                 {
-                    GetTypeInfo(item.BinaryAttr.Type, "");
+                    item.BinaryStruct = GetTypeInfo(item.BinaryAttr.Type, "");
                 }
             }
         }

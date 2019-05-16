@@ -17,11 +17,12 @@ namespace BinarySerializer
 
         public IBasicType BinaryType { get; set; }
 
-        public Func<object, byte[]> WriteMethod { get; set; }
-
         public BinaryAttribute BinaryAttr { get; set; }
 
         public BinarySchemeAttribute[] BinarySchemeAttrList { get; set; }
+
+        public bool IsBaseType { get; set; }
+        public BinaryStruct BinaryStruct { get; internal set; }
 
         public PropertyData(PropertyInfo propertyInfo, Dictionary<Type, IBasicType> instanceMap)
         {
@@ -31,11 +32,15 @@ namespace BinarySerializer
 
             BinarySchemeAttrList = propertyInfo.GetCustomAttributes<BinarySchemeAttribute>().ToArray();
 
+            IsBaseType = typeof(IBasicType).IsAssignableFrom(BinaryAttr.Type);
+
+            if(IsBaseType)
             BinaryType = instanceMap[BinaryAttr.Type];
 
             Getter = propertyInfo.GetMethod;
 
             Setter = propertyInfo.SetMethod;
+
         }
     }
 }

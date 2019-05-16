@@ -11,40 +11,65 @@ namespace BinarySerializer.DefaultTypes
 {
     public class BinaryInt32 : IBasicType
     {
-        public int TypeSize { get;  set; }
-
         public string SizeProperty { get; set; }
 
         private MethodInfo writeBitConverterMethodInfo;
 
+        private MethodInfo readBitConverterMethodInfo;
+
         public BinaryInt32()
         {
             writeBitConverterMethodInfo = typeof(BitConverter).GetMethod("GetBytes",new Type[] { typeof(int) });
+            readBitConverterMethodInfo = typeof(BitConverter).GetMethod("ToInt32", new Type[] { typeof(byte[]), typeof(int) });
+                
         }
 
-        public void GetReadILCode(PropertyData prop, Type currentType, GroboIL il)
+        public void GetReadILCode(PropertyData prop, BinaryStruct currentStruct, GroboIL il, GroboIL.Local buffer, GroboIL.Local result, GroboIL.Local typeSize, GroboIL.Local offset)
         {
-            //var val = il.DeclareLocal(typeof(int));
+            var r = il.DeclareLocal(typeof(int));
 
-            //il.Ldarg(0);
-            //il.Call(prop.Getter);
-            //il.Stloc(val);
+            il.Ldloc(buffer);
+            il.Ldloc(offset);
+            il.Call(readBitConverterMethodInfo);
+            il.Stloc(r);
 
-            //il.Ldloc(val);
-            //il.Call(writeBitConverterMethodInfo);
-
+            il.Ldloc(result);
+            il.Ldloc(r);
+            il.Call(prop.Setter, isVirtual: true);
+            BinaryStruct.WriteOffsetAppend(il, offset, 4);
         }
 
-        public void GetWriteILCode(PropertyData prop, Type currentType, GroboIL il)
+        public void GetWriteILCode(PropertyData prop, BinaryStruct currentStruct, GroboIL il, GroboIL.Local value, GroboIL.Local typeSize, GroboIL.Local buffer, GroboIL.Local offset)
         {
-            var val = il.DeclareLocal(typeof(int));
+            BinaryStruct.WriteSizeChecker(il, buffer, offset, 4);
+            var arr = il.DeclareLocal(typeof(byte[]));
 
-            il.Ldarg(0);
+            il.Ldloc(value);
             il.Call(prop.Getter);
-            il.Stloc(val);
-
-            il.Ldloc(val);
+            il.Dup();
+            il.Pop();
             il.Call(writeBitConverterMethodInfo);
+            il.Stloc(arr);
+
+            il.Ldloc(buffer);
+            il.Ldloc(offset);
+            il.Ldloc(arr);
+            il.Ldc_I4(0);
+            il.Ldelem(typeof(byte));
+            il.Stelem(typeof(byte));
+
+            for (int i = 1; i < 4; i++)
+            {
+                il.Ldloc(buffer);
+                il.Ldloc(offset);
+                il.Ldc_I4(i);
+                il.Add();
+                il.Ldloc(arr);
+                il.Ldc_I4(i);
+                il.Ldelem(typeof(byte));
+                il.Stelem(typeof(byte));
+            }
+            BinaryStruct.WriteOffsetAppend(il, offset, 4);
         }
     }
 }
