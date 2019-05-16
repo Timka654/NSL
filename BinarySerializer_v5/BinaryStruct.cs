@@ -25,6 +25,7 @@ namespace BinarySerializer
         public int InitLen { get; set; } = 32;
 
         private static MethodInfo resizeMethod;
+
         private TypeStorage CurrentStorage;
 
         public BinaryStruct(Type type, string scheme, List<PropertyData> propertyList, Encoding coding, TypeStorage currentStorage)
@@ -42,10 +43,9 @@ namespace BinarySerializer
             if (resizeMethod == null)
                 resizeMethod = this.GetType().GetMethod("Resize", BindingFlags.Public | BindingFlags.Static);
 
-            Compile();
         }
 
-        private void Compile()
+        internal void Compile()
         {
             CompileWriter();
             CompileReader();
@@ -53,7 +53,7 @@ namespace BinarySerializer
 
         public BinaryStruct GetSchemeData(string schemeName, Encoding coding, TypeStorage currentStorage)
         {
-            return new BinaryStruct(Type, schemeName, PropertyList, coding,currentStorage);
+            return new BinaryStruct(Type, schemeName, PropertyList, coding, currentStorage);
         }
 
         private void CompileWriter()
@@ -70,6 +70,11 @@ namespace BinarySerializer
 
                 var value = il.DeclareLocal(Type);
 
+                var binaryStruct = il.DeclareLocal(typeof(BinaryStruct));
+
+                il.Ldarg(1);
+                il.Stloc(binaryStruct);
+
                 il.Ldarg(0);
                 il.Stloc(value);
 
@@ -77,13 +82,13 @@ namespace BinarySerializer
                 il.Newarr(typeof(byte));
                 il.Stloc(arr);
 
-                CompileWriter(this, il, value, arr, offset, typeSize);
+                CompileWriter(this, il, binaryStruct, value, arr, offset, typeSize);
             }
 
             WriteMethod = CreateWriter(dm);
         }
 
-        public static void CompileWriter(BinaryStruct bs, GroboIL il, GroboIL.Local value, GroboIL.Local buffer, GroboIL.Local offset, GroboIL.Local typeSize)
+        public static void CompileWriter(BinaryStruct bs, GroboIL il, GroboIL.Local binaryStruct, GroboIL.Local value, GroboIL.Local buffer, GroboIL.Local offset, GroboIL.Local typeSize)
         {
             if (bs.PropertyList.Count > 0)
             {
@@ -91,9 +96,25 @@ namespace BinarySerializer
                 {
                     if (item.IsBaseType)
                     {
-                        item.BinaryType.GetWriteILCode(item, bs, il, value, typeSize, buffer, offset);
+                        item.BinaryType.GetWriteILCode(item, bs, il,binaryStruct, value, typeSize, buffer, offset);
                         continue;
                     }
+
+                    var in_value = il.DeclareLocal(item.PropertyInfo.PropertyType);
+                    //var in_binary = il.DeclareLocal(typeof(BinaryStruct));
+
+                    //значение вложенного класса
+                    il.Ldloc(value);
+                    il.Call(item.PropertyInfo.GetGetMethod());
+                    il.Stloc(in_value);
+
+                    // Бинарная структура которая относится к этому вложеному классу
+                    //il.Ldloc(value);
+                    //il.Call(item.GetType().GetProperty("BinaryStruct").GetGetMethod());
+                    //il.Stloc(in_binary);
+
+                    CompileWriter(item.BinaryStruct, il, binaryStruct, in_value, buffer, offset, typeSize);
+
 
                     //CompileWriter(TypeStorage.Instance.GetTypeInfo(item.PropertyInfo.PropertyType, bs.Scheme), il, buffer, offset, typeSize);
                 }
@@ -125,6 +146,12 @@ namespace BinarySerializer
                 var typeSize = il.DeclareLocal(typeof(int));
                 var buffer = il.DeclareLocal(typeof(byte[]));
 
+
+                var binaryStruct = il.DeclareLocal(typeof(BinaryStruct));
+
+                il.Ldarg(1);
+                il.Stloc(binaryStruct);
+
                 var constr = result.Type.GetConstructor(new Type[] { });
                 if (constr == null)
                     throw new Exception($"Type {result.Type} not have constructor with not parameters");
@@ -135,31 +162,45 @@ namespace BinarySerializer
                 il.Newobj(constr);
                 il.Stloc(result);
 
-                CompileReader(this, il, buffer, offset, result, typeSize);
+                CompileReader(this, il, binaryStruct, buffer, offset, result, typeSize);
+
+                il.Ldloc(result);
+                il.Ret();
             }
 
             ReadMethod = CreateReader(dm);
         }
 
-        public static void CompileReader(BinaryStruct bs, GroboIL il, GroboIL.Local buffer, GroboIL.Local offset, GroboIL.Local result, GroboIL.Local typeSize)
+        public static void CompileReader(BinaryStruct bs, GroboIL il, GroboIL.Local binaryStruct, GroboIL.Local buffer, GroboIL.Local offset, GroboIL.Local result, GroboIL.Local typeSize)
         {
             if (bs.PropertyList.Count > 0)
             {
                 foreach (var item in bs.PropertyList)
                 {
                     if (item.IsBaseType)
-                        item.BinaryType.GetReadILCode(item, bs, il, buffer, result, typeSize, offset);
-                    //else
-                    //    CompileReader(TypeStorage.Instance.GetTypeInfo(item.PropertyInfo.PropertyType, bs.Scheme), il, offset, result, typeSize);
-                }
+                    {
+                        item.BinaryType.GetReadILCode(item, bs, il, binaryStruct, buffer, result, typeSize, offset);
+                        continue;
+                    }
 
-                il.Ldloc(result);
-                il.Ret();
-            }
-            else
-            {
-                il.Ldloc(result);
-                il.Ret();
+                    var in_value = il.DeclareLocal(item.PropertyInfo.PropertyType);
+
+                    var constr = item.PropertyInfo.PropertyType.GetConstructor(new Type[] { });
+
+                    if (constr == null)
+                        throw new Exception($"Type {item.PropertyInfo.PropertyType} not have constructor with not parameters");
+
+                    il.Newobj(constr);
+                    il.Stloc(in_value);
+
+
+                    CompileReader(item.BinaryStruct, il, binaryStruct, buffer, offset, in_value, typeSize);
+
+                    il.Ldloc(result);
+                    il.Ldloc(in_value);
+                    il.Call(item.Setter, isVirtual: true);
+
+                }
             }
         }
 

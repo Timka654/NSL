@@ -12,41 +12,61 @@ namespace BinarySerializer
     {
 
     }
+
+    public class InputClass
+    {
+        [Binary(typeof(BinaryInt32))]
+        public int v1 { get; set; }
+    }
     public class BinarySerializer
     {
         [Binary(typeof(BinaryInt32))]
-        public int v1 { get; set; } = int.MaxValue;
+        public int v1 { get; set; }
 
         [Binary(typeof(BinaryString32))]
-        public string s1 { get; set; } = "43";
+        public string s1 { get; set; }
 
         [Binary(typeof(BinaryInt32))]
-        public int v2 { get; set; } = int.MaxValue / 2;
+        public int v2 { get; set; }
 
         [Binary(typeof(BinaryInt32))]
-        public int v3 { get; set; } = int.MaxValue / 2;
+        public int v3 { get; set; }
 
         [Binary(typeof(BinaryInt32))]
-        public int v4 { get; set; } = int.MaxValue / 2;
+        public int v4 { get; set; }
 
         [Binary(typeof(BinaryInt32))]
-        public int v5 { get; set; } = int.MaxValue / 2;
+        public int v5 { get; set; }
 
         [Binary(typeof(BinaryInt32))]
-        public int v6 { get; set; } = int.MaxValue / 2;
+        public int v6 { get; set; }
+
+        [Binary(typeof(InputClass))]
+        public InputClass i1 { get; set; }
+
+        [Binary(typeof(BinaryInt32))]
+        public int v7 { get; set; }
 
         public void TestType()
         {
             var t1 = TypeStorage.Instance.GetTypeInfo(typeof(BinarySerializer), "");
-            //var w2 = TypeStorage.Instance.GetTypeInfo(typeof(WithNotBinaryObjects), "").WriteMethod;
-            //var r2 = TypeStorage.Instance.GetTypeInfo(typeof(WithNotBinaryObjects), "").ReadMethod;
-
-
-            /*ystem.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();*/
-
             Tuple<int, byte[]> r;
 
-            var inst1 = new BinarySerializer();
+            var inst1 = new BinarySerializer()
+            {
+                i1 = new InputClass()
+                {
+                    v1 = 54
+                },
+                s1 = "53",
+                v1 = int.MaxValue,
+                v2 = int.MaxValue / 2,
+                v3 = int.MaxValue / 3,
+                v4 = int.MaxValue / 4,
+                v5 = int.MaxValue / 5,
+                v6 = int.MaxValue / 6,
+                v7 = int.MaxValue / 7,
+            };
             r = t1.WriteMethod(inst1,t1);
 
             var q = t1.ReadMethod(r.Item2,t1);

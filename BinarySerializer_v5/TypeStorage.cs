@@ -64,8 +64,8 @@ namespace BinarySerializer
         private void LoadType(Type type)
         {
             List<PropertyData> t = GetProperties(type);
-
-            TypeCacheMap[type].TryAdd("", new BinaryStruct(type, "", t.ToList(), Coding, this));
+            var s = new BinaryStruct(type, "", t.ToList(), Coding, this);
+            TypeCacheMap[type].TryAdd("", s);
 
             foreach (var item in t)
             {
@@ -74,6 +74,7 @@ namespace BinarySerializer
                     item.BinaryStruct = GetTypeInfo(item.BinaryAttr.Type, "");
                 }
             }
+            s.Compile();
         }
 
         private List<PropertyData> GetProperties(Type type)

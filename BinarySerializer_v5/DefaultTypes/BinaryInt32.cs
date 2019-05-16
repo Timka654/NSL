@@ -24,7 +24,7 @@ namespace BinarySerializer.DefaultTypes
                 
         }
 
-        public void GetReadILCode(PropertyData prop, BinaryStruct currentStruct, GroboIL il, GroboIL.Local buffer, GroboIL.Local result, GroboIL.Local typeSize, GroboIL.Local offset)
+        public void GetReadILCode(PropertyData prop, BinaryStruct currentStruct, GroboIL il, GroboIL.Local binaryStruct, GroboIL.Local buffer, GroboIL.Local result, GroboIL.Local typeSize, GroboIL.Local offset)
         {
             var r = il.DeclareLocal(typeof(int));
 
@@ -39,7 +39,7 @@ namespace BinarySerializer.DefaultTypes
             BinaryStruct.WriteOffsetAppend(il, offset, 4);
         }
 
-        public void GetWriteILCode(PropertyData prop, BinaryStruct currentStruct, GroboIL il, GroboIL.Local value, GroboIL.Local typeSize, GroboIL.Local buffer, GroboIL.Local offset)
+        public void GetWriteILCode(PropertyData prop, BinaryStruct currentStruct, GroboIL il, GroboIL.Local binaryStruct, GroboIL.Local value, GroboIL.Local typeSize, GroboIL.Local buffer, GroboIL.Local offset)
         {
             BinaryStruct.WriteSizeChecker(il, buffer, offset, 4);
             var arr = il.DeclareLocal(typeof(byte[]));
