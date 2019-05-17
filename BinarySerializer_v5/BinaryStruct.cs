@@ -99,6 +99,19 @@ namespace BinarySerializer
             {
                 foreach (var item in bs.PropertyList)
                 {
+                    if (!string.IsNullOrEmpty(item.BinaryAttr.ArraySizeName))
+                    {
+                        item.ArraySizeProperty = bs.PropertyList.Find(x => x.PropertyInfo.Name == item.BinaryAttr.ArraySizeName);
+                        if (item.TypeSizeProperty == null)
+                            throw new Exception($"ArraySizeProperty \"{item.BinaryAttr.ArraySizeName}\" for {item.PropertyInfo.Name} in Struct {bs.Type}:{item.PropertyInfo.DeclaringType} not found(Scheme: {bs.Scheme})");
+                    }
+                    if (!string.IsNullOrEmpty(item.BinaryAttr.TypeSizeName))
+                    {
+                        item.TypeSizeProperty = bs.PropertyList.Find(x => x.PropertyInfo.Name == item.BinaryAttr.TypeSizeName);
+                        if (item.TypeSizeProperty == null)
+                            throw new Exception($"TypeSizeProperty \"{item.BinaryAttr.TypeSizeName}\" for {item.PropertyInfo.Name} in Struct {bs.Type}:{item.PropertyInfo.DeclaringType} not found(Scheme: {bs.Scheme})");
+                    }
+
                     if (item.IsBaseType)
                     {
                         item.BinaryType.GetWriteILCode(item, bs, il,binaryStruct, value, typeSize, buffer, offset,false);

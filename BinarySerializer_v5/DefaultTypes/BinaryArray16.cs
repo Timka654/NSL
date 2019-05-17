@@ -7,7 +7,7 @@ using GrEmit;
 
 namespace BinarySerializer.DefaultTypes
 {
-    public class BinaryArray32<T> : IBasicType
+    public class BinaryArray16<T> : IBasicType
     {
         public string SizeProperty { get; set; }
 
@@ -17,16 +17,16 @@ namespace BinarySerializer.DefaultTypes
 
         private MethodInfo codingMethodInfo;
 
-        public BinaryArray32()
+        public BinaryArray16()
         {
-            writeBitConverterMethodInfo = typeof(BitConverter).GetMethod("GetBytes", new Type[] { typeof(int) });
-            readBitConverterMethodInfo = typeof(BitConverter).GetMethod("ToInt32", new Type[] { typeof(byte[]), typeof(int) });
+            writeBitConverterMethodInfo = typeof(BitConverter).GetMethod("GetBytes", new Type[] { typeof(short) });
+            readBitConverterMethodInfo = typeof(BitConverter).GetMethod("ToInt16", new Type[] { typeof(byte[]), typeof(int) });
             codingMethodInfo = typeof(BinaryStruct).GetProperty("Coding").GetMethod;
         }
 
         public void GetReadILCode(PropertyData prop, BinaryStruct currentStruct, GroboIL il, GroboIL.Local binaryStruct, GroboIL.Local buffer, GroboIL.Local result, GroboIL.Local typeSize, GroboIL.Local offset, bool listValue)
         {
-            var len = il.DeclareLocal(typeof(int));
+            var len = il.DeclareLocal(typeof(short));
             var list = il.DeclareLocal(prop.PropertyInfo.PropertyType);
 
             il.Ldloc(buffer);
@@ -34,7 +34,7 @@ namespace BinarySerializer.DefaultTypes
             il.Call(readBitConverterMethodInfo);
             il.Stloc(len);
 
-            BinaryStruct.WriteOffsetAppend(il, offset, 4);
+            BinaryStruct.WriteOffsetAppend(il, offset, 2);
 
             var type = prop.PropertyInfo.PropertyType.GetElementType();
             il.Ldloc(len);
@@ -100,11 +100,11 @@ namespace BinarySerializer.DefaultTypes
 
         public void GetWriteILCode(PropertyData prop, BinaryStruct currentStruct, GroboIL il, GroboIL.Local binaryStruct, GroboIL.Local value, GroboIL.Local typeSize, GroboIL.Local buffer, GroboIL.Local offset, bool listValue)
         {
-            BinaryStruct.WriteSizeChecker(il, buffer, offset, 4);
+            BinaryStruct.WriteSizeChecker(il, buffer, offset, 2);
 
             var arr = il.DeclareLocal(prop.PropertyInfo.PropertyType);
             var arrSize = il.DeclareLocal(typeof(byte[]));
-            var len = il.DeclareLocal(typeof(int));
+            var len = il.DeclareLocal(typeof(short));
             il.Ldloc(value);
             il.Call(prop.Getter);
             il.Call(typeof(ICollection).GetProperty("Count").GetMethod);
@@ -125,7 +125,7 @@ namespace BinarySerializer.DefaultTypes
             il.Ldelem(typeof(byte));
             il.Stelem(typeof(byte));
 
-            for (int i = 1; i < 4; i++)
+            for (int i = 1; i < 2; i++)
             {
                 il.Ldloc(buffer);
                 il.Ldloc(offset);
@@ -137,7 +137,7 @@ namespace BinarySerializer.DefaultTypes
                 il.Stelem(typeof(byte));
             }
 
-            BinaryStruct.WriteOffsetAppend(il, offset, 4);
+            BinaryStruct.WriteOffsetAppend(il, offset, 2);
 
             var type = prop.PropertyInfo.PropertyType.GetElementType();
 

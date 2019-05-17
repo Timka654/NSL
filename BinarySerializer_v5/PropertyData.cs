@@ -22,7 +22,12 @@ namespace BinarySerializer
         public BinarySchemeAttribute[] BinarySchemeAttrList { get; set; }
 
         public bool IsBaseType { get; set; }
+
         public BinaryStruct BinaryStruct { get; internal set; }
+
+        public PropertyData ArraySizeProperty { get; internal set; }
+
+        public PropertyData TypeSizeProperty { get; internal set; }
 
         public PropertyData(PropertyInfo propertyInfo)
         {

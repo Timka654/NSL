@@ -7,7 +7,7 @@ using GrEmit;
 
 namespace BinarySerializer.DefaultTypes
 {
-    public class BinaryArray32<T> : IBasicType
+    public class BinaryList16<T> : IBasicType
     {
         public string SizeProperty { get; set; }
 
@@ -17,16 +17,16 @@ namespace BinarySerializer.DefaultTypes
 
         private MethodInfo codingMethodInfo;
 
-        public BinaryArray32()
+        public BinaryList16()
         {
-            writeBitConverterMethodInfo = typeof(BitConverter).GetMethod("GetBytes", new Type[] { typeof(int) });
-            readBitConverterMethodInfo = typeof(BitConverter).GetMethod("ToInt32", new Type[] { typeof(byte[]), typeof(int) });
+            writeBitConverterMethodInfo = typeof(BitConverter).GetMethod("GetBytes", new Type[] { typeof(short) });
+            readBitConverterMethodInfo = typeof(BitConverter).GetMethod("ToInt16", new Type[] { typeof(byte[]), typeof(int) });
             codingMethodInfo = typeof(BinaryStruct).GetProperty("Coding").GetMethod;
         }
 
         public void GetReadILCode(PropertyData prop, BinaryStruct currentStruct, GroboIL il, GroboIL.Local binaryStruct, GroboIL.Local buffer, GroboIL.Local result, GroboIL.Local typeSize, GroboIL.Local offset, bool listValue)
         {
-            var len = il.DeclareLocal(typeof(int));
+            var len = il.DeclareLocal(typeof(short));
             var list = il.DeclareLocal(prop.PropertyInfo.PropertyType);
 
             il.Ldloc(buffer);
@@ -34,17 +34,16 @@ namespace BinarySerializer.DefaultTypes
             il.Call(readBitConverterMethodInfo);
             il.Stloc(len);
 
-            BinaryStruct.WriteOffsetAppend(il, offset, 4);
+            BinaryStruct.WriteOffsetAppend(il, offset, 2);
 
-            var type = prop.PropertyInfo.PropertyType.GetElementType();
-            il.Ldloc(len);
-            il.Newarr(type);
+            il.Newobj(prop.PropertyInfo.PropertyType.GetConstructor(new Type[] { }));
 
             il.Stloc(list);
             il.Ldloc(result);
             il.Ldloc(list);
             il.Call(prop.Setter, isVirtual: true);
 
+            var type = prop.PropertyInfo.PropertyType.GetGenericArguments()[0];
 
             var ivar = il.DeclareLocal(typeof(int));
             var point = il.DefineLabel("for_label");
@@ -63,9 +62,8 @@ namespace BinarySerializer.DefaultTypes
                 IBasicType t = (IBasicType)Activator.CreateInstance(prop.BinaryAttr.Type.GetGenericArguments()[0]);
                 t.GetReadILCode(prop, currentStruct, il, binaryStruct,buffer, tempVar, typeSize, offset,true);
                 il.Ldloc(list);
-                il.Ldloc(ivar);
                 il.Ldloc(tempVar);
-                il.Stelem(type);
+                il.Call(prop.PropertyInfo.PropertyType.GetMethod("Add"), isVirtual: true);
             }
             else
             {
@@ -79,9 +77,8 @@ namespace BinarySerializer.DefaultTypes
                 BinaryStruct.CompileReader(currentStruct.CurrentStorage.GetTypeInfo(type, currentStruct.Scheme), il, binaryStruct, buffer, offset, tempVar, typeSize);
 
                 il.Ldloc(list);
-                il.Ldloc(ivar);
                 il.Ldloc(tempVar);
-                il.Stelem(type);
+                il.Call(prop.PropertyInfo.PropertyType.GetMethod("Add"), isVirtual:true);
             }
 
             //end body
@@ -100,11 +97,11 @@ namespace BinarySerializer.DefaultTypes
 
         public void GetWriteILCode(PropertyData prop, BinaryStruct currentStruct, GroboIL il, GroboIL.Local binaryStruct, GroboIL.Local value, GroboIL.Local typeSize, GroboIL.Local buffer, GroboIL.Local offset, bool listValue)
         {
-            BinaryStruct.WriteSizeChecker(il, buffer, offset, 4);
+            BinaryStruct.WriteSizeChecker(il, buffer, offset, 2);
 
             var arr = il.DeclareLocal(prop.PropertyInfo.PropertyType);
             var arrSize = il.DeclareLocal(typeof(byte[]));
-            var len = il.DeclareLocal(typeof(int));
+            var len = il.DeclareLocal(typeof(short));
             il.Ldloc(value);
             il.Call(prop.Getter);
             il.Call(typeof(ICollection).GetProperty("Count").GetMethod);
@@ -125,7 +122,7 @@ namespace BinarySerializer.DefaultTypes
             il.Ldelem(typeof(byte));
             il.Stelem(typeof(byte));
 
-            for (int i = 1; i < 4; i++)
+            for (int i = 1; i < 2; i++)
             {
                 il.Ldloc(buffer);
                 il.Ldloc(offset);
@@ -137,9 +134,9 @@ namespace BinarySerializer.DefaultTypes
                 il.Stelem(typeof(byte));
             }
 
-            BinaryStruct.WriteOffsetAppend(il, offset, 4);
+            BinaryStruct.WriteOffsetAppend(il, offset, 2);
 
-            var type = prop.PropertyInfo.PropertyType.GetElementType();
+            var type = prop.PropertyInfo.PropertyType.GetGenericArguments()[0];
 
             var ivar = il.DeclareLocal(typeof(int));
             var currentValue = il.DeclareLocal(type);
@@ -155,7 +152,7 @@ namespace BinarySerializer.DefaultTypes
 
             il.Ldloc(arr);
             il.Ldloc(ivar);
-            il.Call(prop.PropertyInfo.PropertyType.GetMethod("Get"), isVirtual: true);
+            il.Call(prop.PropertyInfo.PropertyType.GetMethod("get_Item"), isVirtual: true);
             il.Stloc(currentValue);
 
             if (typeof(IBasicType).IsAssignableFrom(prop.BinaryAttr.Type.GetGenericArguments()[0]))
