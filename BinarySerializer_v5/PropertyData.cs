@@ -24,7 +24,7 @@ namespace BinarySerializer
         public bool IsBaseType { get; set; }
         public BinaryStruct BinaryStruct { get; internal set; }
 
-        public PropertyData(PropertyInfo propertyInfo, Dictionary<Type, IBasicType> instanceMap)
+        public PropertyData(PropertyInfo propertyInfo)
         {
             PropertyInfo = propertyInfo;
 

@@ -18,28 +18,6 @@ namespace BinarySerializer
 
         private Encoding Coding { get; set; }
 
-        private Dictionary<Type, IBasicType> TypeInstanceMap = new Dictionary<Type, IBasicType>()
-            {
-                //{ typeof(BinaryByte), new BinaryByte() },
-                //{ typeof(BinaryBool), new BinaryBool() },
-                //{ typeof(BinaryInt16), new BinaryInt16() },
-                //{ typeof(BinaryUInt16), new BinaryUInt16() },
-                { typeof(BinaryInt32), new BinaryInt32() },
-                //{ typeof(BinaryUInt32), new BinaryUInt32() },
-                //{ typeof(BinaryInt64), new BinaryInt64() },
-                //{ typeof(BinaryUInt64), new BinaryUInt64() },
-                //{ typeof(BinaryFloat32), new BinaryFloat32() },
-                //{ typeof(BinaryFloat64), new BinaryFloat64() },
-                //{ typeof(BinaryString), new BinaryString() },
-                //{ typeof(BinaryString16), new BinaryString16() },
-                { typeof(BinaryString32), new BinaryString32() },
-                //{ typeof(BinaryDateTime), new BinaryDateTime() },
-                //{ typeof(BinaryTimeSpan), new BinaryTimeSpan() },
-                //{ typeof(BinaryVector2), new BinaryVector2() },
-                //{ typeof(BinaryVector3), new BinaryVector3() },
-                { typeof(BinaryList32<>), new BinaryList32<object>() },
-            };
-
         public TypeStorage(Encoding coding)
         {
             TypeCacheMap = new ConcurrentDictionary<Type, ConcurrentDictionary<string, BinaryStruct>>();
@@ -70,7 +48,7 @@ namespace BinarySerializer
 
             foreach (var item in t)
             {
-                if (!typeof(IBasicType).IsAssignableFrom(item.BinaryAttr.Type))
+                if (!item.IsBaseType)
                 {
                     item.BinaryStruct = GetTypeInfo(item.BinaryAttr.Type, "");
                 }
@@ -86,8 +64,9 @@ namespace BinarySerializer
                 BindingFlags.Instance |
                 BindingFlags.DeclaredOnly).Where(x =>
                 Attribute.GetCustomAttribute(x, typeof(BinaryAttribute)) != null).Select(x =>
-                    new PropertyData(x,TypeInstanceMap)).ToList();
+                    new PropertyData(x)).ToList();
 
+            //все наследуемые классы
             if (type.BaseType != typeof(Object))
                 r.AddRange(GetProperties(type.BaseType));
 
