@@ -1,6 +1,7 @@
 ﻿using GrEmit;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -99,18 +100,18 @@ namespace BinarySerializer
             {
                 foreach (var item in bs.PropertyList)
                 {
-                    if (!string.IsNullOrEmpty(item.BinaryAttr.ArraySizeName))
-                    {
-                        item.ArraySizeProperty = bs.PropertyList.Find(x => x.PropertyInfo.Name == item.BinaryAttr.ArraySizeName);
-                        if (item.TypeSizeProperty == null)
-                            throw new Exception($"ArraySizeProperty \"{item.BinaryAttr.ArraySizeName}\" for {item.PropertyInfo.Name} in Struct {bs.Type}:{item.PropertyInfo.DeclaringType} not found(Scheme: {bs.Scheme})");
-                    }
-                    if (!string.IsNullOrEmpty(item.BinaryAttr.TypeSizeName))
-                    {
-                        item.TypeSizeProperty = bs.PropertyList.Find(x => x.PropertyInfo.Name == item.BinaryAttr.TypeSizeName);
-                        if (item.TypeSizeProperty == null)
-                            throw new Exception($"TypeSizeProperty \"{item.BinaryAttr.TypeSizeName}\" for {item.PropertyInfo.Name} in Struct {bs.Type}:{item.PropertyInfo.DeclaringType} not found(Scheme: {bs.Scheme})");
-                    }
+                    //if (!string.IsNullOrEmpty(item.BinaryAttr.ArraySizeName))
+                    //{
+                    //    item.ArraySizeProperty = bs.PropertyList.Find(x => x.PropertyInfo.Name == item.BinaryAttr.ArraySizeName);
+                    //    if (item.TypeSizeProperty == null)
+                    //        throw new Exception($"ArraySizeProperty \"{item.BinaryAttr.ArraySizeName}\" for {item.PropertyInfo.Name} in Struct {bs.Type}:{item.PropertyInfo.DeclaringType} not found(Scheme: {bs.Scheme})");
+                    //}
+                    //if (!string.IsNullOrEmpty(item.BinaryAttr.TypeSizeName))
+                    //{
+                    //    item.TypeSizeProperty = bs.PropertyList.Find(x => x.PropertyInfo.Name == item.BinaryAttr.TypeSizeName);
+                    //    if (item.TypeSizeProperty == null)
+                    //        throw new Exception($"TypeSizeProperty \"{item.BinaryAttr.TypeSizeName}\" for {item.PropertyInfo.Name} in Struct {bs.Type}:{item.PropertyInfo.DeclaringType} not found(Scheme: {bs.Scheme})");
+                    //}
 
                     if (item.IsBaseType)
                     {
@@ -132,6 +133,7 @@ namespace BinarySerializer
                     CompileWriter(item.BinaryStruct, il, binaryStruct, in_value, buffer, offset, typeSize);
 
                     il.MarkLabel(methodBreak);
+                    il.Pop();
                     il.Pop();
                 }
             }
@@ -253,7 +255,7 @@ namespace BinarySerializer
             il.Ldnull();
             il.Ceq();
             il.Stloc(_null);
-            
+
             il.Ldloc(buffer);
             il.Ldloc(offset);
 
@@ -264,19 +266,17 @@ namespace BinarySerializer
             WriteOffsetAppend(il, offset, 1);
 
             il.Ldloc(_null);
-            il.Ldc_I4(1);
-
             il.Brtrue(finishMethod);
 
         }
 
         public static void ReadObjectNull(GroboIL il, GroboIL.Label finishMethod, GroboIL.Local buffer, GroboIL.Local offset, GroboIL.Local typeSize)
         {
+            //var _null = il.DeclareLocal(typeof(bool));
             il.Ldloc(buffer);
             il.Ldloc(offset);
-            WriteOffsetAppend(il, offset, 1);
             il.Ldelem(typeof(byte));
-            il.Ldc_I4(1);
+            WriteOffsetAppend(il, offset, 1);
             il.Brtrue(finishMethod);
 
         }
@@ -314,7 +314,7 @@ namespace BinarySerializer
 
         public static void Resize(ref byte[] buffer, int offset, int applen)
         {
-            while (buffer.Length < offset + applen)
+            while (buffer.Length <= offset + applen)
             {
                 Array.Resize(ref buffer, buffer.Length * 2);
             }

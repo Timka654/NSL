@@ -24,21 +24,21 @@ namespace BinarySerializer_v5.Test.Structs
 
             r.fl32 = new List<float>();
 
-            for (int i = 0; i < Utils.GetRandomI32(); i++)
+            for (int i = 0; i < Utils.GetSize(); i++)
             {
                 r.fl32.Add(Utils.GetRandomF32());
             }
 
             r.il32 = new List<int>();
 
-            for (int i = 0; i < Utils.GetRandomI32(); i++)
+            for (int i = 0; i < Utils.GetSize(); i++)
             {
                 r.il32.Add(Utils.GetRandomI32());
             }
 
             r.isl = new List<IntegerStruct>();
 
-            for (int i = 0; i < Utils.GetRandomI32(); i++)
+            for (int i = 0; i < Utils.GetSize(); i++)
             {
                 r.isl.Add(IntegerStruct.GetRandomValue());
             }

@@ -24,21 +24,21 @@ namespace BinarySerializer_v5.Test.Structs
 
             r.d16 = new Dictionary<float, int>();
 
-            for (int i = 0; i < Utils.GetRandomI32(); i++)
+            for (int i = 0; i < Utils.GetSize(); i++)
             {
                 r.d16.Add(Utils.GetRandomF32(),Utils.GetRandomI32());
             }
 
             r.d32 = new Dictionary<int, float>();
 
-            for (int i = 0; i < Utils.GetRandomI32(); i++)
+            for (int i = 0; i < Utils.GetSize(); i++)
             {
                 r.d32.Add(Utils.GetRandomI32(), Utils.GetRandomF32());
             }
 
             r.isd = new Dictionary<int, IntegerStruct>();
 
-            for (int i = 0; i < Utils.GetRandomI32(); i++)
+            for (int i = 0; i < Utils.GetSize(); i++)
             {
                 r.isd.Add(Utils.GetRandomI32(), IntegerStruct.GetRandomValue());
             }

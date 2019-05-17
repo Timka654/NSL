@@ -66,7 +66,6 @@ namespace BinarySerializer.DefaultTypes
             BinaryStruct.WriteSizeChecker(il, buffer, offset, 4);
 
             var arr = il.DeclareLocal(typeof(byte[]));
-            var arrSize = il.DeclareLocal(typeof(byte[]));
 
             il.Ldarg(1);
             il.Call(codingMethodInfo);
@@ -77,10 +76,6 @@ namespace BinarySerializer.DefaultTypes
 
             il.Call(currentStruct.Coding.GetType().GetMethod("GetBytes", new Type[] { typeof(string) }));
             il.Stloc(arr);
-
-            //il.Ldloc(arr);
-            //il.Call(typeof(byte[]).GetProperty("Length").GetMethod);
-            //il.Stloc(typeSize);
 
 
             if (prop.PropertyInfo != null)
@@ -95,31 +90,6 @@ namespace BinarySerializer.DefaultTypes
                 il.Stloc(typeSize);
             }
 
-
-            il.Ldloc(typeSize);
-            il.Call(writeBitConverterMethodInfo);
-            il.Stloc(arrSize);
-
-            il.Ldloc(buffer);
-            il.Ldloc(offset);
-            il.Ldloc(arrSize);
-            il.Ldc_I4(0);
-            il.Ldelem(typeof(byte));
-            il.Stelem(typeof(byte));
-
-            for (int i = 1; i < 4; i++)
-            {
-                il.Ldloc(buffer);
-                il.Ldloc(offset);
-                il.Ldc_I4(i);
-                il.Add();
-                il.Ldloc(arrSize);
-                il.Ldc_I4(i);
-                il.Ldelem(typeof(byte));
-                il.Stelem(typeof(byte));
-            }
-
-            BinaryStruct.WriteOffsetAppend(il, offset, 4);
             BinaryStruct.WriteSizeChecker(il, buffer, offset, typeSize);
 
             var ivar = il.DeclareLocal(typeof(int));

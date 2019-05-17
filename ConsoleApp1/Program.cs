@@ -9,14 +9,14 @@ namespace BinarySerializer_v5.Test
 
             Test t = new Test();
 
-            t.Run(2, "Integer Serialize", Structs.IntegerStruct.bsSerializeAction);
-            t.Run(2, "Integer Desserialize", Structs.IntegerStruct.bsDesserilize);
+            t.Run(1000, "String Serialize", Structs.StringStruct.bsSerializeAction);
+            t.Run(1000, "String Desserialize", Structs.StringStruct.bsDesserilize);
 
-            t.Run(2, "Float Serialize", Structs.FloatStruct.bsSerializeAction);
-            t.Run(2, "Float Desserialize", Structs.FloatStruct.bsDesserilize);
+            t.Run(1000, "Integer Serialize", Structs.IntegerStruct.bsSerializeAction);
+            t.Run(1000, "Integer Desserialize", Structs.IntegerStruct.bsDesserilize);
 
-            t.Run(2, "String Serialize", Structs.StringStruct.bsSerializeAction);
-            t.Run(2, "String Desserialize", Structs.StringStruct.bsDesserilize);
+            t.Run(1000, "Float Serialize", Structs.FloatStruct.bsSerializeAction);
+            t.Run(1000, "Float Desserialize", Structs.FloatStruct.bsDesserilize);
 
             t.Run(1000, "Array Serialize", Structs.ArrayStruct.bsSerializeAction);
             t.Run(1000, "Array Desserialize", Structs.ArrayStruct.bsDesserilize);

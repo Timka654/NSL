@@ -68,6 +68,28 @@ namespace BinarySerializer.DefaultTypes
             var arr = il.DeclareLocal(typeof(byte[]));
             var arrSize = il.DeclareLocal(typeof(byte[]));
 
+            var len0 = il.DeclareLocal(typeof(bool));
+
+            var len0label = il.DefineLabel("existlen");
+
+            var exitlabel = il.DefineLabel("exit");
+
+
+            il.Ldloc(value);
+
+            if (!listValue)
+                il.Call(prop.Getter);
+            il.Call(typeof(string).GetProperty("Length").GetMethod);
+            il.Stloc(typeSize);
+
+            il.Ldloc(typeSize);
+            il.Ldc_I4(0);
+            il.Ceq();
+            il.Dup();
+            il.Stloc(len0);
+            il.Brtrue(len0label);
+
+
             il.Ldarg(1);
             il.Call(codingMethodInfo);
             il.Ldloc(value);
@@ -82,6 +104,8 @@ namespace BinarySerializer.DefaultTypes
             il.Call(typeof(byte[]).GetProperty("Length").GetMethod);
             il.Stloc(typeSize);
 
+
+            il.MarkLabel(len0label);
 
             il.Ldloc(typeSize);
             il.Call(writeBitConverterMethodInfo);
@@ -107,6 +131,10 @@ namespace BinarySerializer.DefaultTypes
             }
 
             BinaryStruct.WriteOffsetAppend(il, offset, 2);
+
+            il.Ldloc(len0);
+            il.Brtrue(exitlabel);
+
             BinaryStruct.WriteSizeChecker(il, buffer, offset, typeSize);
 
             var ivar = il.DeclareLocal(typeof(int));
@@ -143,7 +171,7 @@ namespace BinarySerializer.DefaultTypes
             il.Brtrue(point);
 
             BinaryStruct.WriteOffsetAppend(il, offset, typeSize);
-
+            il.MarkLabel(exitlabel);
         }
     }
 }

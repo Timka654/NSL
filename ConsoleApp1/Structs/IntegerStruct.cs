@@ -11,6 +11,7 @@ namespace BinarySerializer_v5.Test.Structs
     {
         [Binary(typeof(BinaryInt8))]
         public byte i8 { get; set; }
+
         [Binary(typeof(BinarySInt8))]
         public sbyte si8 { get; set; }
 

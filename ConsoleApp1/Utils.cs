@@ -42,8 +42,16 @@ namespace BinarySerializer_v5.Test
         {
             unchecked
             {
-                return (uint)(((int.MinValue * -1) + rand.Next(int.MinValue, int.MaxValue)));
+                return (uint)(rand.Next(0, int.MaxValue) * 2);
             }
+        }
+
+
+        public static int GetSize()
+        {
+            uint r = GetRandomUI32();
+
+            return Convert.ToInt32(r % int.MaxValue) % 20;
         }
 
         public static long GetRandomI64()
@@ -55,7 +63,7 @@ namespace BinarySerializer_v5.Test
         {
             unchecked
             {
-                return (ulong)(((int.MinValue * -1) + rand.Next(int.MinValue, int.MaxValue)) * rand.Next(1, 5));
+                return (ulong)((rand.Next(0, int.MaxValue)) * rand.Next(1, 5));
             }
         }
 

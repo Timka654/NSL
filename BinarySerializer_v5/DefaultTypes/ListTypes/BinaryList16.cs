@@ -26,6 +26,9 @@ namespace BinarySerializer.DefaultTypes
 
         public void GetReadILCode(PropertyData prop, BinaryStruct currentStruct, GroboIL il, GroboIL.Local binaryStruct, GroboIL.Local buffer, GroboIL.Local result, GroboIL.Local typeSize, GroboIL.Local offset, bool listValue)
         {
+            var exitLabel = il.DefineLabel("exit");
+            BinaryStruct.ReadObjectNull(il, exitLabel, buffer, offset, typeSize);
+
             var len = il.DeclareLocal(typeof(short));
             var list = il.DeclareLocal(prop.PropertyInfo.PropertyType);
 
@@ -93,23 +96,29 @@ namespace BinarySerializer.DefaultTypes
 
             il.Clt(false);
             il.Brtrue(point);
+
+            il.MarkLabel(exitLabel);
         }
 
         public void GetWriteILCode(PropertyData prop, BinaryStruct currentStruct, GroboIL il, GroboIL.Local binaryStruct, GroboIL.Local value, GroboIL.Local typeSize, GroboIL.Local buffer, GroboIL.Local offset, bool listValue)
         {
+            var arr = il.DeclareLocal(prop.PropertyInfo.PropertyType);
+
+            il.Ldloc(value);
+            il.Call(prop.Getter);
+            il.Stloc(arr);
+
+            var exitLabel = il.DefineLabel("exit");
+            BinaryStruct.WriteObjectNull(il, exitLabel, arr, buffer, offset, typeSize);
+
             BinaryStruct.WriteSizeChecker(il, buffer, offset, 2);
 
-            var arr = il.DeclareLocal(prop.PropertyInfo.PropertyType);
             var arrSize = il.DeclareLocal(typeof(byte[]));
             var len = il.DeclareLocal(typeof(short));
             il.Ldloc(value);
             il.Call(prop.Getter);
             il.Call(typeof(ICollection).GetProperty("Count").GetMethod);
             il.Stloc(len);
-
-            il.Ldloc(value);
-            il.Call(prop.Getter);
-            il.Stloc(arr);
 
             il.Ldloc(len);
             il.Call(writeBitConverterMethodInfo);
@@ -135,6 +144,12 @@ namespace BinarySerializer.DefaultTypes
             }
 
             BinaryStruct.WriteOffsetAppend(il, offset, 2);
+
+
+            il.Ldloc(len);
+            il.Ldc_I4(0);
+            il.Ceq();
+            il.Brtrue(exitLabel);
 
             var type = prop.PropertyInfo.PropertyType.GetGenericArguments()[0];
 
@@ -177,7 +192,7 @@ namespace BinarySerializer.DefaultTypes
             il.Clt(false);
             il.Brtrue(point);
 
-
+            il.MarkLabel(exitLabel);
         }
     }
 }

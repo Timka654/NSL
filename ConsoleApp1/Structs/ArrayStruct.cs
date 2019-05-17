@@ -25,23 +25,24 @@ namespace BinarySerializer_v5.Test.Structs
         {
             ArrayStruct r = new ArrayStruct();
 
+            int temp = 0;
 
-            r.fa32 = new float[Utils.GetRandomI32()];
+            r.fa32 = new float[temp = Utils.GetSize()];
 
             for (int i = 0; i < r.fa32.Length; i++)
             {
                 r.fa32[i] = Utils.GetRandomF32();
             }
 
-            r.ia32 = new int[Utils.GetRandomI32()];
+            r.ia32 = new int[temp = Utils.GetSize()];
 
-            for (int i = 0; i < r.fa32.Length; i++)
+            for (int i = 0; i < r.ia32.Length; i++)
             {
                 r.ia32[i] = Utils.GetRandomI32();
             }
 
 
-            r.isa = new IntegerStruct[Utils.GetRandomI32()];
+            r.isa = new IntegerStruct[temp = Utils.GetSize()];
 
             for (int i = 0; i < r.isa.Length; i++)
             {
