@@ -9,7 +9,7 @@ using GrEmit.Utils;
 
 namespace BinarySerializer.DefaultTypes
 {
-    public class BinaryFloat32 : IBasicType
+    public class BinaryUInt64 : IBasicType
     {
         public string SizeProperty { get; set; }
 
@@ -17,16 +17,16 @@ namespace BinarySerializer.DefaultTypes
 
         private MethodInfo readBitConverterMethodInfo;
 
-        public BinaryFloat32()
+        public BinaryUInt64()
         {
-            writeBitConverterMethodInfo = typeof(BitConverter).GetMethod("GetBytes",new Type[] { typeof(float) });
-            readBitConverterMethodInfo = typeof(BitConverter).GetMethod("ToSingle", new Type[] { typeof(byte[]), typeof(int) });
-
+            writeBitConverterMethodInfo = typeof(BitConverter).GetMethod("GetBytes",new Type[] { typeof(ulong) });
+            readBitConverterMethodInfo = typeof(BitConverter).GetMethod("ToUInt64", new Type[] { typeof(byte[]), typeof(int) });
+                
         }
 
         public void GetReadILCode(PropertyData prop, BinaryStruct currentStruct, GroboIL il, GroboIL.Local binaryStruct, GroboIL.Local buffer, GroboIL.Local result, GroboIL.Local typeSize, GroboIL.Local offset, bool listValue)
         {
-            var r = il.DeclareLocal(typeof(float));
+            var r = il.DeclareLocal(typeof(ulong));
 
             il.Ldloc(buffer);
             il.Ldloc(offset);
@@ -36,7 +36,7 @@ namespace BinarySerializer.DefaultTypes
             else
                 il.Stloc(r);
 
-            BinaryStruct.WriteOffsetAppend(il, offset, 4);
+            BinaryStruct.WriteOffsetAppend(il, offset, 8);
             if (!listValue)
             {
                 il.Ldloc(result);
@@ -47,7 +47,7 @@ namespace BinarySerializer.DefaultTypes
 
         public void GetWriteILCode(PropertyData prop, BinaryStruct currentStruct, GroboIL il, GroboIL.Local binaryStruct, GroboIL.Local value, GroboIL.Local typeSize, GroboIL.Local buffer, GroboIL.Local offset, bool listValue)
         {
-            BinaryStruct.WriteSizeChecker(il, buffer, offset, 4);
+            BinaryStruct.WriteSizeChecker(il, buffer, offset, 8);
             var arr = il.DeclareLocal(typeof(byte[]));
 
             il.Ldloc(value);
@@ -65,7 +65,7 @@ namespace BinarySerializer.DefaultTypes
             il.Ldelem(typeof(byte));
             il.Stelem(typeof(byte));
 
-            for (int i = 1; i < 4; i++)
+            for (int i = 1; i < 8; i++)
             {
                 il.Ldloc(buffer);
                 il.Ldloc(offset);
@@ -76,7 +76,7 @@ namespace BinarySerializer.DefaultTypes
                 il.Ldelem(typeof(byte));
                 il.Stelem(typeof(byte));
             }
-            BinaryStruct.WriteOffsetAppend(il, offset, 4);
+            BinaryStruct.WriteOffsetAppend(il, offset, 8);
         }
     }
 }

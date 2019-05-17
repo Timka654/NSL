@@ -20,7 +20,7 @@ namespace BinarySerializer
 
         public Func<object, BinaryStruct, Tuple<int, byte[]>> WriteMethod { get; set; }
 
-        public Func<byte[], BinaryStruct, object> ReadMethod { get; set; }
+        public Func<byte[], BinaryStruct, int, object> ReadMethod { get; set; }
 
         public int InitLen { get; set; } = 32;
 
@@ -139,7 +139,7 @@ namespace BinarySerializer
 
         private void CompileReader()
         {
-            DynamicMethod dm = new DynamicMethod(Guid.NewGuid().ToString(), this.Type, new[] { typeof(byte[]), typeof(BinaryStruct) });
+            DynamicMethod dm = new DynamicMethod(Guid.NewGuid().ToString(), this.Type, new[] { typeof(byte[]), typeof(BinaryStruct), typeof(int) });
 
             using (var il = new GroboIL(dm))
             {
@@ -162,6 +162,9 @@ namespace BinarySerializer
 
                 il.Ldarg(0);
                 il.Stloc(buffer);
+
+                il.Ldarg(2);
+                il.Stloc(offset);
 
                 il.Newobj(constr);
                 il.Stloc(result);
@@ -230,13 +233,14 @@ namespace BinarySerializer
             return getterExpression.Compile();
         }
 
-        private static Func<byte[], BinaryStruct, object> CreateReader(MethodInfo method)
+        private static Func<byte[], BinaryStruct, int, object> CreateReader(MethodInfo method)
         {
             var param = Expression.Parameter(typeof(byte[]), "e");
             var param1 = Expression.Parameter(typeof(BinaryStruct), "e1");
+            var param2 = Expression.Parameter(typeof(int), "e2");
 
-            Expression body = Expression.Convert(Expression.Call(method, param, param1), typeof(object));
-            var getterExpression = Expression.Lambda<Func<byte[], BinaryStruct, object>>(body, param, param1);
+            Expression body = Expression.Convert(Expression.Call(method, param, param1, param2), typeof(object));
+            var getterExpression = Expression.Lambda<Func<byte[], BinaryStruct, int, object>>(body, param, param1, param2);
             return getterExpression.Compile();
         }
 

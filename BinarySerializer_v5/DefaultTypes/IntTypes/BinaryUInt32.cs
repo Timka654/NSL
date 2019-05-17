@@ -9,7 +9,7 @@ using GrEmit.Utils;
 
 namespace BinarySerializer.DefaultTypes
 {
-    public class BinaryFloat32 : IBasicType
+    public class BinaryUInt32 : IBasicType
     {
         public string SizeProperty { get; set; }
 
@@ -17,16 +17,16 @@ namespace BinarySerializer.DefaultTypes
 
         private MethodInfo readBitConverterMethodInfo;
 
-        public BinaryFloat32()
+        public BinaryUInt32()
         {
-            writeBitConverterMethodInfo = typeof(BitConverter).GetMethod("GetBytes",new Type[] { typeof(float) });
-            readBitConverterMethodInfo = typeof(BitConverter).GetMethod("ToSingle", new Type[] { typeof(byte[]), typeof(int) });
-
+            writeBitConverterMethodInfo = typeof(BitConverter).GetMethod("GetBytes",new Type[] { typeof(uint) });
+            readBitConverterMethodInfo = typeof(BitConverter).GetMethod("ToUInt32", new Type[] { typeof(byte[]), typeof(int) });
+                
         }
 
         public void GetReadILCode(PropertyData prop, BinaryStruct currentStruct, GroboIL il, GroboIL.Local binaryStruct, GroboIL.Local buffer, GroboIL.Local result, GroboIL.Local typeSize, GroboIL.Local offset, bool listValue)
         {
-            var r = il.DeclareLocal(typeof(float));
+            var r = il.DeclareLocal(typeof(uint));
 
             il.Ldloc(buffer);
             il.Ldloc(offset);

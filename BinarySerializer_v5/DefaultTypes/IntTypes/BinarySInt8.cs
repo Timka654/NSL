@@ -9,17 +9,17 @@ using GrEmit.Utils;
 
 namespace BinarySerializer.DefaultTypes
 {
-    public class BinaryInt8 : IBasicType
+    public class BinarySInt8 : IBasicType
     {
 
-        public BinaryInt8()
+        public BinarySInt8()
         {
                 
         }
 
         public void GetReadILCode(PropertyData prop, BinaryStruct currentStruct, GroboIL il, GroboIL.Local binaryStruct, GroboIL.Local buffer, GroboIL.Local result, GroboIL.Local typeSize, GroboIL.Local offset, bool listValue)
         {
-            var r = il.DeclareLocal(typeof(byte));
+            var r = il.DeclareLocal(typeof(sbyte));
 
             il.Ldloc(buffer);
             il.Ldloc(offset);
