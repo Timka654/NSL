@@ -68,11 +68,17 @@ namespace BinarySerializer
         [Binary(typeof(BinaryArray16<InputClass>))]
         public InputClass[] a2 { get; set; }
 
+        [Binary(typeof(InputClass))]
+        public InputClass nv1 { get; set; }
+
         [Binary(typeof(BinaryInt8))]
         public byte b1 { get; set; }
 
         [Binary(typeof(BinaryInt64))]
         public long lo1 { get; set; }
+
+        //[Binary(typeof(InputClass))]
+        //public InputClass nv2 { get; set; }
 
         public void TestType()
         {

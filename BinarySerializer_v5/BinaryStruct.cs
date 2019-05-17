@@ -118,23 +118,21 @@ namespace BinarySerializer
                         continue;
                     }
 
+                    var methodBreak = il.DefineLabel("breakWriteMethod");
+
                     var in_value = il.DeclareLocal(item.PropertyInfo.PropertyType);
-                    //var in_binary = il.DeclareLocal(typeof(BinaryStruct));
 
                     //значение вложенного класса
                     il.Ldloc(value);
                     il.Call(item.PropertyInfo.GetGetMethod());
                     il.Stloc(in_value);
 
-                    // Бинарная структура которая относится к этому вложеному классу
-                    //il.Ldloc(value);
-                    //il.Call(item.GetType().GetProperty("BinaryStruct").GetGetMethod());
-                    //il.Stloc(in_binary);
+                    WriteObjectNull(il, methodBreak, in_value, buffer, offset, typeSize);
 
                     CompileWriter(item.BinaryStruct, il, binaryStruct, in_value, buffer, offset, typeSize);
 
-
-                    //CompileWriter(TypeStorage.Instance.GetTypeInfo(item.PropertyInfo.PropertyType, bs.Scheme), il, buffer, offset, typeSize);
+                    il.MarkLabel(methodBreak);
+                    il.Pop();
                 }
             }
         }
@@ -188,6 +186,9 @@ namespace BinarySerializer
                         item.BinaryType.GetReadILCode(item, bs, il, binaryStruct, buffer, result, typeSize, offset,false);
                         continue;
                     }
+                    var methodBreak = il.DefineLabel("breakReadMethod");
+
+                    ReadObjectNull(il, methodBreak, buffer, offset, typeSize);
 
                     var in_value = il.DeclareLocal(item.PropertyInfo.PropertyType);
 
@@ -206,6 +207,8 @@ namespace BinarySerializer
                     il.Ldloc(in_value);
                     il.Call(item.Setter, isVirtual: true);
 
+                    il.MarkLabel(methodBreak);
+                    il.Pop();
                 }
             }
         }
@@ -237,6 +240,42 @@ namespace BinarySerializer
             return getterExpression.Compile();
         }
 
+
+        public static void WriteObjectNull(GroboIL il, GroboIL.Label finishMethod, GroboIL.Local value, GroboIL.Local buffer, GroboIL.Local offset, GroboIL.Local typeSize)
+        {
+            var _null = il.DeclareLocal(typeof(bool));
+
+            il.Ldloc(value);
+            il.Ldnull();
+            il.Ceq();
+            il.Stloc(_null);
+            
+            il.Ldloc(buffer);
+            il.Ldloc(offset);
+
+            il.Ldloc(_null);
+
+            il.Stelem(typeof(byte));
+
+            WriteOffsetAppend(il, offset, 1);
+
+            il.Ldloc(_null);
+            il.Ldc_I4(1);
+
+            il.Brtrue(finishMethod);
+
+        }
+
+        public static void ReadObjectNull(GroboIL il, GroboIL.Label finishMethod, GroboIL.Local buffer, GroboIL.Local offset, GroboIL.Local typeSize)
+        {
+            il.Ldloc(buffer);
+            il.Ldloc(offset);
+            WriteOffsetAppend(il, offset, 1);
+            il.Ldelem(typeof(byte));
+            il.Ldc_I4(1);
+            il.Brtrue(finishMethod);
+
+        }
 
         public static void WriteSizeChecker(GroboIL il, GroboIL.Local buffer, GroboIL.Local offset, GroboIL.Local typeSize)
         {
