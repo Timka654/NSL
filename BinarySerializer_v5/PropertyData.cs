@@ -29,6 +29,10 @@ namespace BinarySerializer
 
         public PropertyData TypeSizeProperty { get; internal set; }
 
+        public int ArraySize => BinaryAttr.ArraySize;
+
+        public int TypeSize => BinaryAttr.TypeSize;
+
         public PropertyData(PropertyInfo propertyInfo)
         {
             PropertyInfo = propertyInfo;

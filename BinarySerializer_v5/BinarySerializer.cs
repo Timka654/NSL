@@ -68,7 +68,11 @@ namespace BinarySerializer
         [Binary(typeof(BinaryArray16<InputClass>))]
         public InputClass[] a2 { get; set; }
 
+        [Binary(typeof(BinaryInt8))]
+        public byte b1 { get; set; }
 
+        [Binary(typeof(BinaryInt64))]
+        public long lo1 { get; set; }
 
         public void TestType()
         {
@@ -91,11 +95,11 @@ namespace BinarySerializer
                 v7 = int.MaxValue / 7,
                 l1 = new List<InputClass>()
                 {
-                    new InputClass(){ v1 = 11 },
-                    new InputClass(){ v1 = 22 },
-                    new InputClass(){ v1 = 33 },
-                    new InputClass(){ v1 = 44 },
-                    new InputClass(){ v1 = 55 },
+                    new InputClass() { v1 = 11 },
+                    new InputClass() { v1 = 22 },
+                    new InputClass() { v1 = 33 },
+                    new InputClass() { v1 = 44 },
+                    new InputClass() { v1 = 55 },
                 },
                 l2 = new List<string>()
                 {
@@ -121,10 +125,10 @@ namespace BinarySerializer
                 },
                 d2 = new Dictionary<int, InputClass>()
                 {
-                    { 100, new InputClass(){ v1 = 110 } },
-                    { 120, new InputClass(){ v1 = 130 } },
-                    { 140, new InputClass(){ v1 = 150 } },
-                    { 160, new InputClass(){ v1 = 170 } },
+                    { 100, new InputClass() { v1 = 110 } },
+                    { 120, new InputClass() { v1 = 130 } },
+                    { 140, new InputClass() { v1 = 150 } },
+                    { 160, new InputClass() { v1 = 170 } },
                 },
                 a1 = new int[7]
                 {
@@ -138,10 +142,12 @@ namespace BinarySerializer
                 },
                 a2 = new InputClass[3]
                 {
-                    new InputClass{ v1 = 77 },
-                    new InputClass{ v1 = 88 },
-                    new InputClass{ v1 = 99 },
-                }
+                    new InputClass { v1 = 77 },
+                    new InputClass { v1 = 88 },
+                    new InputClass { v1 = 99 },
+                },
+                b1 = 32,
+                lo1 = long.MaxValue / 3
             };
 
             r = t1.WriteMethod(inst1,t1);
