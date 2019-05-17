@@ -20,52 +20,83 @@ namespace BinarySerializer
     }
     public class BinarySerializer
     {
-        [Binary(typeof(BinaryInt32))]
-        public int v1 { get; set; }
+        //[Binary(typeof(BinaryInt32))]
+        //public int v1 { get; set; }
 
-        [Binary(typeof(BinaryString32))]
-        public string s1 { get; set; }
+        //[Binary(typeof(BinaryString32))]
+        //public string s1 { get; set; }
 
-        [Binary(typeof(BinaryInt32))]
-        public int v2 { get; set; }
+        //[Binary(typeof(BinaryInt32))]
+        //public int v2 { get; set; }
 
-        [Binary(typeof(BinaryInt32))]
-        public int v3 { get; set; }
+        //[Binary(typeof(BinaryInt32))]
+        //public int v3 { get; set; }
 
-        [Binary(typeof(BinaryInt32))]
-        public int v4 { get; set; }
+        //[Binary(typeof(BinaryInt32))]
+        //public int v4 { get; set; }
 
-        [Binary(typeof(BinaryInt32))]
-        public int v5 { get; set; }
+        //[Binary(typeof(BinaryInt32))]
+        //public int v5 { get; set; }
 
-        [Binary(typeof(BinaryInt32))]
-        public int v6 { get; set; }
+        //[Binary(typeof(BinaryInt32))]
+        //public int v6 { get; set; }
 
-        [Binary(typeof(InputClass))]
-        public InputClass i1 { get; set; }
+        //[Binary(typeof(InputClass))]
+        //public InputClass i1 { get; set; }
 
-        [Binary(typeof(BinaryInt32))]
-        public int v7 { get; set; }
+        //[Binary(typeof(BinaryInt32))]
+        //public int v7 { get; set; }
+
+        [Binary(typeof(BinaryList32<InputClass>))]
+        public List<InputClass> l1 { get; set; }
+
+        [Binary(typeof(BinaryList32<BinaryString32>))]
+        public List<string> l2 { get; set; }
+
+        [Binary(typeof(BinaryList32<BinaryInt32>))]
+        public List<int> l3 { get; set; }
 
         public void TestType()
         {
             var t1 = TypeStorage.Instance.GetTypeInfo(typeof(BinarySerializer), "");
             Tuple<int, byte[]> r;
-
+            
             var inst1 = new BinarySerializer()
             {
-                i1 = new InputClass()
+                //i1 = new InputClass()
+                //{
+                //    v1 = 54
+                //},
+                //s1 = "53",
+                //v1 = int.MaxValue,
+                //v2 = int.MaxValue / 2,
+                //v3 = int.MaxValue / 3,
+                //v4 = int.MaxValue / 4,
+                //v5 = int.MaxValue / 5,
+                //v6 = int.MaxValue / 6,
+                //v7 = int.MaxValue / 7,
+                l1 = new List<InputClass>()
                 {
-                    v1 = 54
+                    new InputClass(){ v1 = 11 },
+                    new InputClass(){ v1 = 22 },
+                    new InputClass(){ v1 = 33 },
+                    new InputClass(){ v1 = 44 },
+                    new InputClass(){ v1 = 55 },
                 },
-                s1 = "53",
-                v1 = int.MaxValue,
-                v2 = int.MaxValue / 2,
-                v3 = int.MaxValue / 3,
-                v4 = int.MaxValue / 4,
-                v5 = int.MaxValue / 5,
-                v6 = int.MaxValue / 6,
-                v7 = int.MaxValue / 7,
+                l2 = new List<string>()
+                {
+                    "66",
+                    "77",
+                    "88",
+                    "99",
+                },
+                l3 = new List<int>()
+                {
+                    100,
+                    110,
+                    120,
+                    130,
+                }
             };
             r = t1.WriteMethod(inst1,t1);
 

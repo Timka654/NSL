@@ -37,6 +37,7 @@ namespace BinarySerializer
                 //{ typeof(BinaryTimeSpan), new BinaryTimeSpan() },
                 //{ typeof(BinaryVector2), new BinaryVector2() },
                 //{ typeof(BinaryVector3), new BinaryVector3() },
+                { typeof(BinaryList32<>), new BinaryList32<object>() },
             };
 
         public TypeStorage(Encoding coding)

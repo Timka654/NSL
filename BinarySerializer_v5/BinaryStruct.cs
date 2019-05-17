@@ -26,7 +26,7 @@ namespace BinarySerializer
 
         private static MethodInfo resizeMethod;
 
-        private TypeStorage CurrentStorage;
+        internal TypeStorage CurrentStorage;
 
         public BinaryStruct(Type type, string scheme, List<PropertyData> propertyList, Encoding coding, TypeStorage currentStorage)
         {
@@ -62,7 +62,7 @@ namespace BinarySerializer
 
             using (var il = new GroboIL(dm))
             {
-                var arr = il.DeclareLocal(typeof(byte[]));
+                var buffer = il.DeclareLocal(typeof(byte[]));
 
                 var offset = il.DeclareLocal(typeof(int));
 
@@ -80,9 +80,14 @@ namespace BinarySerializer
 
                 il.Ldc_I4(InitLen);
                 il.Newarr(typeof(byte));
-                il.Stloc(arr);
+                il.Stloc(buffer);
 
-                CompileWriter(this, il, binaryStruct, value, arr, offset, typeSize);
+                CompileWriter(this, il, binaryStruct, value, buffer, offset, typeSize);
+
+                il.Ldloc(offset);
+                il.Ldloc(buffer);
+                il.Newobj(typeof(Tuple<int, byte[]>).GetConstructor(new Type[] { typeof(int), typeof(byte[]) }));
+                il.Ret();
             }
 
             WriteMethod = CreateWriter(dm);
@@ -96,7 +101,7 @@ namespace BinarySerializer
                 {
                     if (item.IsBaseType)
                     {
-                        item.BinaryType.GetWriteILCode(item, bs, il,binaryStruct, value, typeSize, buffer, offset);
+                        item.BinaryType.GetWriteILCode(item, bs, il,binaryStruct, value, typeSize, buffer, offset,false);
                         continue;
                     }
 
@@ -118,18 +123,6 @@ namespace BinarySerializer
 
                     //CompileWriter(TypeStorage.Instance.GetTypeInfo(item.PropertyInfo.PropertyType, bs.Scheme), il, buffer, offset, typeSize);
                 }
-
-                il.Ldloc(offset);
-                il.Ldloc(buffer);
-                il.Newobj(typeof(Tuple<int, byte[]>).GetConstructor(new Type[] { typeof(int), typeof(byte[]) }));
-                il.Ret();
-            }
-            else
-            {
-                il.Ldc_I4(0);
-                il.Ldloc(buffer);
-                il.Newobj(typeof(Tuple<int, byte[]>).GetConstructor(new Type[] { typeof(int), typeof(byte[]) }));
-                il.Ret();
             }
         }
 
@@ -179,7 +172,7 @@ namespace BinarySerializer
                 {
                     if (item.IsBaseType)
                     {
-                        item.BinaryType.GetReadILCode(item, bs, il, binaryStruct, buffer, result, typeSize, offset);
+                        item.BinaryType.GetReadILCode(item, bs, il, binaryStruct, buffer, result, typeSize, offset,false);
                         continue;
                     }
 

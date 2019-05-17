@@ -35,7 +35,7 @@ namespace BinarySerializer
             IsBaseType = typeof(IBasicType).IsAssignableFrom(BinaryAttr.Type);
 
             if(IsBaseType)
-            BinaryType = instanceMap[BinaryAttr.Type];
+                BinaryType = (IBasicType)Activator.CreateInstance(BinaryAttr.Type);
 
             Getter = propertyInfo.GetMethod;
 

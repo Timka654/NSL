@@ -24,28 +24,35 @@ namespace BinarySerializer.DefaultTypes
                 
         }
 
-        public void GetReadILCode(PropertyData prop, BinaryStruct currentStruct, GroboIL il, GroboIL.Local binaryStruct, GroboIL.Local buffer, GroboIL.Local result, GroboIL.Local typeSize, GroboIL.Local offset)
+        public void GetReadILCode(PropertyData prop, BinaryStruct currentStruct, GroboIL il, GroboIL.Local binaryStruct, GroboIL.Local buffer, GroboIL.Local result, GroboIL.Local typeSize, GroboIL.Local offset, bool listValue)
         {
             var r = il.DeclareLocal(typeof(int));
 
             il.Ldloc(buffer);
             il.Ldloc(offset);
             il.Call(readBitConverterMethodInfo);
-            il.Stloc(r);
+            if (listValue)
+                il.Stloc(result);
+            else
+                il.Stloc(r);
 
-            il.Ldloc(result);
-            il.Ldloc(r);
-            il.Call(prop.Setter, isVirtual: true);
             BinaryStruct.WriteOffsetAppend(il, offset, 4);
+            if (!listValue)
+            {
+                il.Ldloc(result);
+                il.Ldloc(r);
+                il.Call(prop.Setter, isVirtual: true);
+            }
         }
 
-        public void GetWriteILCode(PropertyData prop, BinaryStruct currentStruct, GroboIL il, GroboIL.Local binaryStruct, GroboIL.Local value, GroboIL.Local typeSize, GroboIL.Local buffer, GroboIL.Local offset)
+        public void GetWriteILCode(PropertyData prop, BinaryStruct currentStruct, GroboIL il, GroboIL.Local binaryStruct, GroboIL.Local value, GroboIL.Local typeSize, GroboIL.Local buffer, GroboIL.Local offset, bool listValue)
         {
             BinaryStruct.WriteSizeChecker(il, buffer, offset, 4);
             var arr = il.DeclareLocal(typeof(byte[]));
 
             il.Ldloc(value);
-            il.Call(prop.Getter);
+            if (!listValue)
+                il.Call(prop.Getter);
             il.Dup();
             il.Pop();
             il.Call(writeBitConverterMethodInfo);
