@@ -39,6 +39,7 @@ namespace BinarySerializer.DefaultTypes
 
             BinaryStruct.WriteOffsetAppend(il, offset, 2);
 
+
             var type = prop.PropertyInfo.PropertyType.GetElementType();
             il.Ldloc(len);
             il.Newarr(type);
@@ -48,6 +49,12 @@ namespace BinarySerializer.DefaultTypes
             il.Ldloc(list);
             il.Call(prop.Setter, isVirtual: true);
 
+
+
+            il.Ldloc(len);
+            il.Ldc_I4(0);
+            il.Ceq();
+            il.Brtrue(exitLabel);
 
             var ivar = il.DeclareLocal(typeof(int));
             var point = il.DefineLabel("for_label");
@@ -65,10 +72,6 @@ namespace BinarySerializer.DefaultTypes
             {
                 IBasicType t = (IBasicType)Activator.CreateInstance(prop.BinaryAttr.Type.GetGenericArguments()[0]);
                 t.GetReadILCode(prop, currentStruct, il, binaryStruct,buffer, tempVar, typeSize, offset,true);
-                il.Ldloc(list);
-                il.Ldloc(ivar);
-                il.Ldloc(tempVar);
-                il.Stelem(type);
             }
             else
             {
@@ -80,12 +83,12 @@ namespace BinarySerializer.DefaultTypes
                 il.Stloc(tempVar);
 
                 BinaryStruct.CompileReader(currentStruct.CurrentStorage.GetTypeInfo(type, currentStruct.Scheme), il, binaryStruct, buffer, offset, tempVar, typeSize);
-
-                il.Ldloc(list);
-                il.Ldloc(ivar);
-                il.Ldloc(tempVar);
-                il.Stelem(type);
             }
+
+            il.Ldloc(list);
+            il.Ldloc(ivar);
+            il.Ldloc(tempVar);
+            il.Stelem(type);
 
             //end body
 
@@ -112,9 +115,10 @@ namespace BinarySerializer.DefaultTypes
             il.Stloc(arr);
 
             var exitLabel = il.DefineLabel("exit");
-            BinaryStruct.WriteObjectNull(il, exitLabel, arr, buffer, offset, typeSize);
 
-            BinaryStruct.WriteSizeChecker(il, buffer, offset, 2);
+            BinaryStruct.WriteSizeChecker(il, buffer, offset, 3);
+
+            BinaryStruct.WriteObjectNull(il, exitLabel, arr, buffer, offset, typeSize);
 
             var arrSize = il.DeclareLocal(typeof(byte[]));
             var len = il.DeclareLocal(typeof(short));

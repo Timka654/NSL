@@ -9,8 +9,24 @@ namespace BinarySerializer_v5.Test.Structs
 {
     public class ArrayStruct
     {
+        [Binary(typeof(BinaryArray16<BinaryString16>))]
+        public string[] nullsv1 { get; set; }
+
+        [Binary(typeof(BinaryArray32<BinaryInt32>))]
+        public int[] nullia32 { get; set; }
+
+        [Binary(typeof(BinaryArray16<BinaryString16>))]
+        public string[] emptysv1 { get; set; }
+
+        [Binary(typeof(BinaryArray32<BinaryInt32>))]
+        public int[] emptyia32 { get; set; }
+
+
         [Binary(typeof(BinaryArray16<BinaryFloat32>))]
         public float[] fa32 { get; set; }
+
+        [Binary(typeof(BinaryArray16<BinaryString16>))]
+        public string[] sv1 { get; set; }
 
         [Binary(typeof(BinaryArray32<BinaryInt32>))]
         public int[] ia32 { get; set; }
@@ -18,23 +34,21 @@ namespace BinarySerializer_v5.Test.Structs
         [Binary(typeof(BinaryArray16<IntegerStruct>))]
         public IntegerStruct[] isa { get; set; }
 
-        [Binary(typeof(BinaryArray16<BinaryString16>))]
-        public string[] sv { get; set; }
-
         public static ArrayStruct GetRandomValue()
         {
             ArrayStruct r = new ArrayStruct();
 
-            int temp = 0;
+            r.emptyia32 = new int[0];
+            r.emptysv1 = new string[0];
 
-            r.fa32 = new float[temp = Utils.GetSize()];
+            r.fa32 = new float[Utils.GetSize()];
 
             for (int i = 0; i < r.fa32.Length; i++)
             {
                 r.fa32[i] = Utils.GetRandomF32();
             }
 
-            r.ia32 = new int[temp = Utils.GetSize()];
+            r.ia32 = new int[Utils.GetSize()];
 
             for (int i = 0; i < r.ia32.Length; i++)
             {
@@ -42,11 +56,18 @@ namespace BinarySerializer_v5.Test.Structs
             }
 
 
-            r.isa = new IntegerStruct[temp = Utils.GetSize()];
+            r.isa = new IntegerStruct[Utils.GetSize()];
 
             for (int i = 0; i < r.isa.Length; i++)
             {
                 r.isa[i] = IntegerStruct.GetRandomValue();
+            }
+
+            r.sv1 = new string[Utils.GetSize()];
+
+            for (int i = 0; i < r.sv1.Length; i++)
+            {
+                r.sv1[i] = Utils.GetRandomS();
             }
 
             return r;
@@ -62,10 +83,11 @@ namespace BinarySerializer_v5.Test.Structs
         public static Action<Stopwatch> bsSerializeAction = new Action<Stopwatch>((sw) =>
         {
             var r = GetRandomValue();
-
+            desValue = r;
             if (buffer == null)
+            {
                 buffer = bs.Serialize(r, "");
-
+            }
             sw.Start();
             bs.Serialize(r, "");
             sw.Stop();

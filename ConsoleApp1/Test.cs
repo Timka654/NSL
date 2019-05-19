@@ -45,7 +45,7 @@ namespace BinarySerializer_v5.Test
 
         public void ShowTestData()
         {
-            Console.WriteLine($"Test - {testName}, Iterations - {iteration}, First result - {firstIteration} ms, Min value {TimeTable.Min()} ms, Max value {TimeTable.Max()} ms, Average value {TimeTable.Average()} ms");
+            Console.WriteLine($"Test - {testName}, Iterations - {iteration}, First result - {firstIteration} ms, Min value {TimeTable.Min()} ms, Max value {TimeTable.Max()} ms, Average value {TimeTable.Average()} ms, Total value {TimeTable.Sum()} ms");
         }
     }
 }

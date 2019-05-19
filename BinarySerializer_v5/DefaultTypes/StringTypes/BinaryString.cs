@@ -63,6 +63,7 @@ namespace BinarySerializer.DefaultTypes
 
         public void GetWriteILCode(PropertyData prop, BinaryStruct currentStruct, GroboIL il, GroboIL.Local binaryStruct, GroboIL.Local value, GroboIL.Local typeSize, GroboIL.Local buffer, GroboIL.Local offset, bool listValue)
         {
+            var exitLabel = il.DefineLabel("exit");
             BinaryStruct.WriteSizeChecker(il, buffer, offset, 4);
 
             var arr = il.DeclareLocal(typeof(byte[]));
@@ -73,6 +74,9 @@ namespace BinarySerializer.DefaultTypes
 
             if (!listValue)
                 il.Call(prop.Getter);
+
+            il.Dup();
+            BinaryStruct.WriteObjectNull(il, exitLabel, buffer, offset, typeSize);
 
             il.Call(currentStruct.Coding.GetType().GetMethod("GetBytes", new Type[] { typeof(string) }));
             il.Stloc(arr);

@@ -47,7 +47,12 @@ namespace BinarySerializer.DefaultTypes
             il.Ldloc(result);
             il.Ldloc(list);
             il.Call(prop.Setter, isVirtual: true);
-            
+
+
+            il.Ldloc(len);
+            il.Ldc_I4(0);
+            il.Ceq();
+            il.Brtrue(exitLabel);
 
             var ivar = il.DeclareLocal(typeof(int));
             var point = il.DefineLabel("for_label");

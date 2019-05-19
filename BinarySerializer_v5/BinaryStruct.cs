@@ -29,6 +29,9 @@ namespace BinarySerializer
 
         internal TypeStorage CurrentStorage;
 
+        public string IlReadCode;
+        public string IlWriteCode;
+
         public BinaryStruct(Type type, string scheme, List<PropertyData> propertyList, Encoding coding, TypeStorage currentStorage)
         {
             Type = type;
@@ -59,7 +62,7 @@ namespace BinarySerializer
 
         private void CompileWriter()
         {
-            DynamicMethod dm = new DynamicMethod(Guid.NewGuid().ToString(), typeof(Tuple<int, byte[]>), new[] { Type, typeof(BinaryStruct) });
+            DynamicMethod dm = new DynamicMethod(Guid.NewGuid().ToString(), typeof(Tuple<int, byte[]>), new[] { Type, typeof(BinaryStruct) },typeof(BinaryStruct));
 
             using (var il = new GroboIL(dm))
             {
@@ -89,6 +92,7 @@ namespace BinarySerializer
                 il.Ldloc(buffer);
                 il.Newobj(typeof(Tuple<int, byte[]>).GetConstructor(new Type[] { typeof(int), typeof(byte[]) }));
                 il.Ret();
+                IlWriteCode = il.GetILCode();
             }
 
             WriteMethod = CreateWriter(dm);
@@ -134,7 +138,6 @@ namespace BinarySerializer
 
                     il.MarkLabel(methodBreak);
                     il.Pop();
-                    il.Pop();
                 }
             }
         }
@@ -175,6 +178,7 @@ namespace BinarySerializer
 
                 il.Ldloc(result);
                 il.Ret();
+                IlReadCode = il.GetILCode();
             }
 
             ReadMethod = CreateReader(dm);
@@ -246,12 +250,17 @@ namespace BinarySerializer
             return getterExpression.Compile();
         }
 
-
         public static void WriteObjectNull(GroboIL il, GroboIL.Label finishMethod, GroboIL.Local value, GroboIL.Local buffer, GroboIL.Local offset, GroboIL.Local typeSize)
+        {
+            il.Ldloc(value);
+            WriteObjectNull(il, finishMethod, buffer, offset, typeSize);
+
+        }
+
+        public static void WriteObjectNull(GroboIL il, GroboIL.Label finishMethod, GroboIL.Local buffer, GroboIL.Local offset, GroboIL.Local typeSize)
         {
             var _null = il.DeclareLocal(typeof(bool));
 
-            il.Ldloc(value);
             il.Ldnull();
             il.Ceq();
             il.Stloc(_null);
@@ -268,6 +277,21 @@ namespace BinarySerializer
             il.Ldloc(_null);
             il.Brtrue(finishMethod);
 
+
+            //il.Ldloc(buffer);
+            //il.Ldloc(offset);
+
+            //il.Ldnull();
+            //il.Ceq();
+            //il.Dup();
+
+            //il.Stelem(typeof(byte));
+
+
+            //WriteOffsetAppend(il, offset, 1);
+
+            //il.Brtrue(finishMethod);
+
         }
 
         public static void ReadObjectNull(GroboIL il, GroboIL.Label finishMethod, GroboIL.Local buffer, GroboIL.Local offset, GroboIL.Local typeSize)
@@ -276,6 +300,7 @@ namespace BinarySerializer
             il.Ldloc(buffer);
             il.Ldloc(offset);
             il.Ldelem(typeof(byte));
+            //OutputValue(il);
             WriteOffsetAppend(il, offset, 1);
             il.Brtrue(finishMethod);
 
@@ -288,6 +313,14 @@ namespace BinarySerializer
             il.Ldloc(typeSize);
             il.Call(resizeMethod);
         }
+
+
+        //public static void OutputValue(GroboIL il)
+        //{
+        //    il.Dup();
+        //    il.Box(typeof(byte));
+        //    il.Call(typeof(Debug).GetMethod("WriteLine",new Type[] { typeof(object) }));
+        //}
 
         public static void WriteSizeChecker(GroboIL il, GroboIL.Local buffer, GroboIL.Local offset, int len)
         {

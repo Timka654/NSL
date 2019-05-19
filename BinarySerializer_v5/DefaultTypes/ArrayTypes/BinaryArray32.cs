@@ -48,6 +48,13 @@ namespace BinarySerializer.DefaultTypes
             il.Ldloc(list);
             il.Call(prop.Setter, isVirtual: true);
 
+
+
+            il.Ldloc(len);
+            il.Ldc_I4(0);
+            il.Ceq();
+            il.Brtrue(exitLabel);
+
             var ivar = il.DeclareLocal(typeof(int));
             var point = il.DefineLabel("for_label");
 
@@ -111,9 +118,10 @@ namespace BinarySerializer.DefaultTypes
             il.Stloc(arr);
 
             var exitLabel = il.DefineLabel("exit");
-            BinaryStruct.WriteObjectNull(il, exitLabel, arr, buffer, offset, typeSize);
 
-            BinaryStruct.WriteSizeChecker(il, buffer, offset, 4);
+            BinaryStruct.WriteSizeChecker(il, buffer, offset, 5);
+
+            BinaryStruct.WriteObjectNull(il, exitLabel, arr, buffer, offset, typeSize);
 
             var arrSize = il.DeclareLocal(typeof(byte[]));
             var len = il.DeclareLocal(typeof(int));

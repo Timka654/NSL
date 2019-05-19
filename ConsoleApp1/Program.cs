@@ -21,8 +21,8 @@ namespace BinarySerializer_v5.Test
             t.Run(1000, "Array Serialize", Structs.ArrayStruct.bsSerializeAction);
             t.Run(1000, "Array Desserialize", Structs.ArrayStruct.bsDesserilize);
 
-            t.Run(1000, "List Serialize", Structs.ListStruct.bsSerializeAction);
-            t.Run(1000, "List Desserialize", Structs.ListStruct.bsDesserilize);
+            t.Run(100, "List Serialize", Structs.ListStruct.bsSerializeAction);
+            t.Run(100000, "List Desserialize", Structs.ListStruct.bsDesserilize);
 
             t.Run(1000, "Dictionary Serialize", Structs.DictionaryStruct.bsSerializeAction);
             t.Run(1000, "Dictionary Desserialize", Structs.DictionaryStruct.bsDesserilize);

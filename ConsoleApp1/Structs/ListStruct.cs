@@ -10,6 +10,18 @@ namespace BinarySerializer_v5.Test.Structs
     public class ListStruct
     {
         [Binary(typeof(BinaryList16<BinaryFloat32>))]
+        public List<float> nullfl32 { get; set; }
+
+        [Binary(typeof(BinaryList32<BinaryInt32>))]
+        public List<int> nullil32 { get; set; }
+
+        [Binary(typeof(BinaryList16<BinaryFloat32>))]
+        public List<float> emptyfl32 { get; set; }
+
+        [Binary(typeof(BinaryList32<BinaryInt32>))]
+        public List<int> emptyil32 { get; set; }
+
+        [Binary(typeof(BinaryList16<BinaryFloat32>))]
         public List<float> fl32 { get; set; }
 
         [Binary(typeof(BinaryList32<BinaryInt32>))]
@@ -21,6 +33,9 @@ namespace BinarySerializer_v5.Test.Structs
         public static ListStruct GetRandomValue()
         {
             ListStruct r = new ListStruct();
+
+            r.emptyfl32 = new List<float>();
+            r.emptyil32 = new List<int>();
 
             r.fl32 = new List<float>();
 

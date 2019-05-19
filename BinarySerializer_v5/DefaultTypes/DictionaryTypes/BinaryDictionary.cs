@@ -45,6 +45,11 @@ namespace BinarySerializer.DefaultTypes
             il.Ldloc(list);
             il.Call(prop.Setter, isVirtual: true);
 
+            il.Ldloc(len);
+            il.Ldc_I4(0);
+            il.Ceq();
+            il.Brtrue(exitLabel);
+
             var typeKey = prop.PropertyInfo.PropertyType.GetGenericArguments()[0];
             var typeValue = prop.PropertyInfo.PropertyType.GetGenericArguments()[1];
 

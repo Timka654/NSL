@@ -10,17 +10,32 @@ namespace BinarySerializer_v5.Test.Structs
     class StringStruct
     {
         [Binary(typeof(BinaryString16))]
+        public string nulls16 { get; set; }
+
+        [Binary(typeof(BinaryString32))]
+        public string nulls32 { get; set; }
+        [Binary(typeof(BinaryString16))]
+        public string emptys16 { get; set; }
+
+        [Binary(typeof(BinaryString32))]
+        public string emptys32 { get; set; }
+
+        [Binary(typeof(BinaryString16))]
         public string s16 { get; set; }
 
-        //[Binary(typeof(BinaryString32))]
-        //public string s32 { get; set; }
+        [Binary(typeof(BinaryString32))]
+        public string s32 { get; set; }
 
         public static StringStruct GetRandomValue()
         {
             StringStruct r = new StringStruct();
 
+            r.emptys16 = "";
+            r.emptys32 = "";
+
+
             r.s16 = Utils.GetRandomS();
-            //r.s32 = Utils.GetRandomS();
+            r.s32 = Utils.GetRandomS();
 
             return r;
         }
