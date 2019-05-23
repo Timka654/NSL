@@ -81,6 +81,8 @@ namespace BinarySerializer_v5.Test.Structs
 
         public override void streamWriteFunc(Stopwatch sw)
         {
+            base.binaryWritedValue = base.serializedValue;
+
             MemoryStream ms = new MemoryStream();
             BinaryWriter bw = new BinaryWriter(ms);
 
@@ -94,6 +96,8 @@ namespace BinarySerializer_v5.Test.Structs
         {
             MemoryStream ms = new MemoryStream(base.streamWriteBuffer);
             BinaryWriter bw = new BinaryWriter(ms);
+
+
         }
     }
 }

@@ -33,12 +33,13 @@ namespace BinarySerializer_v5.Test.Structs
 
         public override void streamWriteFunc(Stopwatch sw)
         {
+            binaryWritedValue = base.serializedValue;
             sw.Start();
             MemoryStream ms = new MemoryStream();
             BinaryWriter bw = new BinaryWriter(ms);
 
-            bw.Write(f32);
-            bw.Write(f64);
+            bw.Write(base.serializedValue.f32);
+            bw.Write(base.serializedValue.f64);
 
             base.streamWriteBuffer = ms.ToArray();
             sw.Stop();
@@ -57,6 +58,8 @@ namespace BinarySerializer_v5.Test.Structs
             r.f64 = br.ReadDouble();
 
             sw.Stop();
+
+            base.binaryReadedValue = r;
         }
     }
 }

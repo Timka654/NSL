@@ -51,26 +51,29 @@ namespace BinarySerializer_v5.Test.Structs
 
         public override void streamWriteFunc(Stopwatch sw)
         {
-            MemoryStream ms = new MemoryStream();
-            BinaryWriter bw = new BinaryWriter(ms);
+            binaryWritedValue = base.serializedValue;
 
             sw.Start();
 
-            WriteString16(bw, nulls16);
-            WriteString32(bw, nulls32);
-            WriteString16(bw, emptys16);
-            WriteString32(bw, emptys32);
-            WriteString16(bw, s16);
-            WriteString32(bw, s32);
+            MemoryStream ms = new MemoryStream();
+            BinaryWriter bw = new BinaryWriter(ms);
+
+            WriteString16(bw, base.serializedValue.nulls16);
+            WriteString32(bw, base.serializedValue.nulls32);
+            WriteString16(bw, base.serializedValue.emptys16);
+            WriteString32(bw, base.serializedValue.emptys32);
+            WriteString16(bw, base.serializedValue.s16);
+            WriteString32(bw, base.serializedValue.s32);
+
+            base.streamWriteBuffer = ms.ToArray();
 
             sw.Stop();
 
-            base.streamWriteBuffer = ms.ToArray();
         }
 
         public void WriteString32(BinaryWriter bw, string v)
         {
-            if (nulls16 != null)
+            if (v != null)
             {
                 bw.Write(false);
                 var arr = encoding.GetBytes(v);
@@ -97,7 +100,7 @@ namespace BinarySerializer_v5.Test.Structs
 
         public void WriteString16(BinaryWriter bw, string v)
         {
-            if (nulls16 != null)
+            if (v != null)
             {
                 bw.Write(false);
                 var arr = encoding.GetBytes(v);
@@ -141,6 +144,7 @@ namespace BinarySerializer_v5.Test.Structs
             r.s32 = ReadString32(br);
 
             sw.Stop();
+            base.binaryReadedValue = r;
         }
     }
 }
