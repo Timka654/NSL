@@ -177,7 +177,8 @@ namespace BinarySerializer.DefaultTypes
 
             il.Ldloc(arr);
             il.Ldloc(ivar);
-            il.Call(prop.PropertyInfo.PropertyType.GetMethod("Get"), isVirtual: true);
+            il.Ldelem(type);
+            //il.Call(prop.PropertyInfo.PropertyType.GetMethod("Get"), isVirtual: true);
             il.Stloc(currentValue);
 
             if (typeof(IBasicType).IsAssignableFrom(prop.BinaryAttr.Type.GetGenericArguments()[0]))

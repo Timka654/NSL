@@ -110,6 +110,60 @@ namespace BinarySerializer_v5.Test
             {
                 return CompareItem(item.PropertyType, value1, value2);
             }
+            else if (typeof(IDictionary).IsAssignableFrom(item.PropertyType))
+            {
+                var v = value1 as IDictionary;
+                var v1 = value2 as IDictionary;
+
+                if (v == null && v1 == null)
+                {
+                    return true;
+                }
+                else if (v == null || v1 == null)
+                {
+                    return false;
+                }
+
+                if (v1.Count != v.Count)
+                    return false;
+
+                var typeKey = item.PropertyType.GetGenericArguments()[0];
+                var typeValue = item.PropertyType.GetGenericArguments()[1];
+
+                var v1KeyEnumerator = v.Keys.GetEnumerator();
+                var v2KeyEnumerator = v1.Keys.GetEnumerator();
+
+                var v1ValueEnumerator = v.Values.GetEnumerator();
+                var v2ValueEnumerator = v1.Values.GetEnumerator();
+
+                for (int i = 0; i < v1.Count; i++)
+                {
+                    v1KeyEnumerator.MoveNext();
+                    v2KeyEnumerator.MoveNext();
+                    v1ValueEnumerator.MoveNext();
+                    v2ValueEnumerator.MoveNext();
+
+                    if (typeof(string).IsAssignableFrom(typeKey) || typeKey.IsPrimitive)
+                    {
+                        if (!CompareItem(typeKey, v1KeyEnumerator.Current, v2KeyEnumerator.Current))
+                            return false;
+                    }
+                    else if (!ComparePropertyType(typeKey, v1KeyEnumerator.Current, v2KeyEnumerator.Current))
+                        return false;
+
+                    if (typeof(string).IsAssignableFrom(typeValue) || typeValue.IsPrimitive)
+                    {
+
+                        if (!CompareItem(typeValue, v1ValueEnumerator.Current, v2ValueEnumerator.Current))
+                            return false;
+                    }
+                    else if (!ComparePropertyType(typeValue, v1ValueEnumerator.Current, v2ValueEnumerator.Current))
+                        return false;
+
+                }
+
+                return true;
+            }
             else if (typeof(Array).IsAssignableFrom(item.PropertyType))
             {
                 var v = (value1 as Array);
@@ -142,6 +196,7 @@ namespace BinarySerializer_v5.Test
                     if (!ComparePropertyType(type, v.GetValue(i), v1.GetValue(i)))
                         return false;
                 }
+                return true;
             }
             else if (typeof(IList).IsAssignableFrom(item.PropertyType))
             {
@@ -175,9 +230,10 @@ namespace BinarySerializer_v5.Test
                     if (!ComparePropertyType(type, v[i], v1[i]))
                         return false;
                 }
+                return true;
             }
 
-            return true;
+            return false;
         }
 
         private bool CompareItem(Type item, object value1, object value2)
@@ -198,6 +254,7 @@ namespace BinarySerializer_v5.Test
 
                 if (v.Length != v1.Length || v != v1)
                     return false;
+                return true;
             }
             else if (value1?.Equals(value2) != true)
                 return false;
