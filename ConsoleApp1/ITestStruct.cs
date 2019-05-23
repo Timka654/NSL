@@ -68,12 +68,9 @@ namespace BinarySerializer_v5.Test
 
         public virtual void Compare()
         {
-            bool wbr = CompareStreamBuffers();
-
             bool compareSerializerValues = CompareSerializerValues();
 
             bool compareStreamValues = CompareStreamValues();
-
 
             bool compareSerializerBuffers = CompareSerializerBuffers();
 
@@ -88,8 +85,6 @@ namespace BinarySerializer_v5.Test
             Console.WriteLine($"Compare stream buffers: {compareStreamBuffers}");
 
             Console.WriteLine($"Compare result: {compareSerializerValues & compareStreamValues & compareSerializerBuffers & compareStreamBuffers}");
-
-            //Console.WriteLine($"Serialize/Write buffer compare: {sbsb}");
         }
 
         private bool CompareSerializerValues()
@@ -177,7 +172,7 @@ namespace BinarySerializer_v5.Test
                         continue;
                     }
 
-                    if (!ComparePropertyType(type, item.GetValue(value1, new object[] { i }), item.GetValue(value2, new object[] { i })))
+                    if (!ComparePropertyType(type, v[i], v1[i]))
                         return false;
                 }
             }
@@ -210,7 +205,6 @@ namespace BinarySerializer_v5.Test
             return true;
         }
 
-
         private bool CompareStreamValues()
         {
             return ComparePropertyType(typeof(T), binaryWritedValue, binaryReadedValue);
@@ -221,7 +215,6 @@ namespace BinarySerializer_v5.Test
 
             return true;
         }
-
 
         private bool CompareStreamBuffers()
         {

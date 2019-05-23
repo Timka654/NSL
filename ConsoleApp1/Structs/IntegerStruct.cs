@@ -72,15 +72,7 @@ namespace BinarySerializer_v5.Test.Structs
             MemoryStream ms = new MemoryStream();
             BinaryWriter bw = new BinaryWriter(ms);
 
-            bw.Write(base.serializedValue.b);
-            bw.Write(base.serializedValue.i8);
-            bw.Write(base.serializedValue.si8);
-            bw.Write(base.serializedValue.i16);
-            bw.Write(base.serializedValue.ui16);
-            bw.Write(base.serializedValue.i32);
-            bw.Write(base.serializedValue.ui32);
-            bw.Write(base.serializedValue.i64);
-            bw.Write(base.serializedValue.ui64);
+            Write(bw, base.serializedValue);
 
             bw.Close();
 
@@ -88,19 +80,23 @@ namespace BinarySerializer_v5.Test.Structs
             sw.Stop();
         }
 
-        private void Write()
+        public static void Write(BinaryWriter bw, IntegerStruct ist)
         {
 
+            bw.Write(ist.b);
+            bw.Write(ist.i8);
+            bw.Write(ist.si8);
+            bw.Write(ist.i16);
+            bw.Write(ist.ui16);
+            bw.Write(ist.i32);
+            bw.Write(ist.ui32);
+            bw.Write(ist.i64);
+            bw.Write(ist.ui64);
         }
 
-        public override void streamReadFunc(Stopwatch sw)
+        public static IntegerStruct Read(BinaryReader br)
         {
-            sw.Start();
-            MemoryStream ms = new MemoryStream(base.streamWriteBuffer);
-            BinaryReader br = new BinaryReader(ms);
-
             IntegerStruct r = new IntegerStruct();
-
             r.b = br.ReadBoolean();
 
             r.i8 = br.ReadByte();
@@ -114,6 +110,17 @@ namespace BinarySerializer_v5.Test.Structs
 
             r.i64 = br.ReadInt64();
             r.ui64 = br.ReadUInt64();
+
+            return r;
+        }
+
+        public override void streamReadFunc(Stopwatch sw)
+        {
+            sw.Start();
+            MemoryStream ms = new MemoryStream(base.streamWriteBuffer);
+            BinaryReader br = new BinaryReader(ms);
+
+            IntegerStruct r = Read(br);
 
             sw.Stop();
             if(binaryReadedValue == null)

@@ -71,7 +71,7 @@ namespace BinarySerializer_v5.Test.Structs
 
         }
 
-        public void WriteString32(BinaryWriter bw, string v)
+        public static void WriteString32(BinaryWriter bw, string v)
         {
             if (v != null)
             {
@@ -86,7 +86,7 @@ namespace BinarySerializer_v5.Test.Structs
             }
         }
 
-        public string ReadString32(BinaryReader br)
+        public static string ReadString32(BinaryReader br)
         {
             bool isNull = br.ReadBoolean();
 
@@ -98,7 +98,7 @@ namespace BinarySerializer_v5.Test.Structs
             return encoding.GetString(br.ReadBytes(len), 0, len);
         }
 
-        public void WriteString16(BinaryWriter bw, string v)
+        public static void WriteString16(BinaryWriter bw, string v)
         {
             if (v != null)
             {
@@ -113,7 +113,7 @@ namespace BinarySerializer_v5.Test.Structs
             }
         }
 
-        public string ReadString16(BinaryReader br)
+        public static string ReadString16(BinaryReader br)
         {
             bool isNull = br.ReadBoolean();
 
