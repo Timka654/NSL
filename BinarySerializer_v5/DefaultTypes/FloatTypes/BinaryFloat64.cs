@@ -27,7 +27,7 @@ namespace BinarySerializer.DefaultTypes
 
         public void GetReadILCode(PropertyData prop, BinaryStruct currentStruct, GroboIL il, GroboIL.Local binaryStruct, GroboIL.Local buffer, GroboIL.Local result, GroboIL.Local typeSize, GroboIL.Local offset, bool listValue)
         {
-            var r = il.DeclareLocal(typeof(long));
+            var r = il.DeclareLocal(typeof(double));
 
             il.Ldloc(buffer);
             il.Ldloc(offset);

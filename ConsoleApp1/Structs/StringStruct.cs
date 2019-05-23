@@ -3,17 +3,21 @@ using BinarySerializer.DefaultTypes;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Text;
 
 namespace BinarySerializer_v5.Test.Structs
 {
-    class StringStruct
+    public class StringStruct : ITestStruct<StringStruct>
     {
+        private static UTF8Encoding encoding = new UTF8Encoding();
+
         [Binary(typeof(BinaryString16))]
         public string nulls16 { get; set; }
 
         [Binary(typeof(BinaryString32))]
         public string nulls32 { get; set; }
+
         [Binary(typeof(BinaryString16))]
         public string emptys16 { get; set; }
 
@@ -26,7 +30,12 @@ namespace BinarySerializer_v5.Test.Structs
         [Binary(typeof(BinaryString32))]
         public string s32 { get; set; }
 
-        public static StringStruct GetRandomValue()
+        public static StringStruct GetRndValue()
+        {
+            return new StringStruct().GetRandomValue();
+        }
+
+        public override StringStruct GetRandomValue()
         {
             StringStruct r = new StringStruct();
 
@@ -40,34 +49,98 @@ namespace BinarySerializer_v5.Test.Structs
             return r;
         }
 
-        private static
-            BinarySerializer.BinarySerializer bs = new BinarySerializer.BinarySerializer();
-
-        private static byte[] buffer;
-
-        private static StringStruct desValue;
-
-        public static Action<Stopwatch> bsSerializeAction = new Action<Stopwatch>((sw) =>
+        public override void streamWriteFunc(Stopwatch sw)
         {
-            var r = GetRandomValue();
-
-            if (buffer == null)
-                buffer = bs.Serialize(r, "");
+            MemoryStream ms = new MemoryStream();
+            BinaryWriter bw = new BinaryWriter(ms);
 
             sw.Start();
-            bs.Serialize(r, "");
+
+            WriteString16(bw, nulls16);
+            WriteString32(bw, nulls32);
+            WriteString16(bw, emptys16);
+            WriteString32(bw, emptys32);
+            WriteString16(bw, s16);
+            WriteString32(bw, s32);
+
             sw.Stop();
-        });
 
-        public static Action<Stopwatch> bsDesserilize = new Action<Stopwatch>((sw) =>
+            base.streamWriteBuffer = ms.ToArray();
+        }
+
+        public void WriteString32(BinaryWriter bw, string v)
         {
-            if (desValue == null)
-                desValue = bs.Desserialize<StringStruct>(buffer, "");
+            if (nulls16 != null)
+            {
+                bw.Write(false);
+                var arr = encoding.GetBytes(v);
+                bw.Write(arr.Length);
+                bw.Write(arr);
+            }
+            else
+            {
+                bw.Write(true);
+            }
+        }
 
+        public string ReadString32(BinaryReader br)
+        {
+            bool isNull = br.ReadBoolean();
+
+            if (isNull)
+                return null;
+
+            int len = br.ReadInt32();
+
+            return encoding.GetString(br.ReadBytes(len), 0, len);
+        }
+
+        public void WriteString16(BinaryWriter bw, string v)
+        {
+            if (nulls16 != null)
+            {
+                bw.Write(false);
+                var arr = encoding.GetBytes(v);
+                bw.Write((short)arr.Length);
+                bw.Write(arr);
+            }
+            else
+            {
+                bw.Write(true);
+            }
+        }
+
+        public string ReadString16(BinaryReader br)
+        {
+            bool isNull = br.ReadBoolean();
+
+            if (isNull)
+                return null;
+
+            short len = br.ReadInt16();
+
+            return encoding.GetString(br.ReadBytes(len), 0, len);
+        }
+
+        public override void streamReadFunc(Stopwatch sw)
+        {
+            MemoryStream ms = new MemoryStream(base.streamWriteBuffer);
+            BinaryReader br = new BinaryReader(ms);
+
+            StringStruct r = new StringStruct();
 
             sw.Start();
-            bs.Desserialize<StringStruct>(buffer, "");
+
+            r.nulls16 = ReadString16(br);
+            r.nulls32 = ReadString32(br);
+
+            r.emptys16 = ReadString16(br);
+            r.emptys32 = ReadString32(br);
+
+            r.s16 = ReadString16(br);
+            r.s32 = ReadString32(br);
+
             sw.Stop();
-        });
+        }
     }
 }

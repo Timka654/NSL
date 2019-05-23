@@ -3,12 +3,16 @@ using BinarySerializer.DefaultTypes;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Text;
 
 namespace BinarySerializer_v5.Test.Structs
 {
-    public class IntegerStruct
+    public class IntegerStruct : ITestStruct<IntegerStruct>
     {
+        [Binary(typeof(BinaryBool))]
+        public bool b { get; set; }
+
         [Binary(typeof(BinaryInt8))]
         public byte i8 { get; set; }
 
@@ -33,9 +37,16 @@ namespace BinarySerializer_v5.Test.Structs
         [Binary(typeof(BinaryUInt64))]
         public ulong ui64 { get; set; }
 
-        public static IntegerStruct GetRandomValue()
+        public static IntegerStruct GetRndValue()
+        {
+            return new IntegerStruct().GetRandomValue();
+        }
+
+        public override IntegerStruct GetRandomValue()
         {
             IntegerStruct r = new IntegerStruct();
+
+            r.b = Utils.GetRandomBool();
 
             r.i8 = Utils.GetRandomI8();
             r.si8 = Utils.GetRandomSI8();
@@ -49,37 +60,57 @@ namespace BinarySerializer_v5.Test.Structs
             r.i64 = Utils.GetRandomI64();
             r.ui64 = Utils.GetRandomUI64();
 
+            normalValue = r;
+
             return r;
         }
 
-        private static
-            BinarySerializer.BinarySerializer bs = new BinarySerializer.BinarySerializer();
-
-        public static byte[] buffer;
-
-        public static IntegerStruct desValue;
-
-        public static Action<Stopwatch> bsSerializeAction = new Action<Stopwatch>((sw) =>
+        public override void streamWriteFunc(Stopwatch sw)
         {
-            var r = GetRandomValue();
-
-            if (buffer == null)
-                buffer = bs.Serialize(r, "");
 
             sw.Start();
-            bs.Serialize(r, "");
-            sw.Stop();
-        });
+            MemoryStream ms = new MemoryStream();
+            BinaryWriter bw = new BinaryWriter(ms);
 
-        public static Action<Stopwatch> bsDesserilize = new Action<Stopwatch>((sw) =>
+            bw.Write(b);
+            bw.Write(i8);
+            bw.Write(si8);
+            bw.Write(i16);
+            bw.Write(ui16);
+            bw.Write(i32);
+            bw.Write(ui32);
+            bw.Write(i64);
+            bw.Write(ui64);
+
+            bw.Close();
+
+            base.streamWriteBuffer = ms.ToArray();
+            sw.Stop();
+        }
+
+        public override void streamReadFunc(Stopwatch sw)
         {
-            if (desValue == null)
-                desValue = bs.Desserialize<IntegerStruct>(buffer, "");
-
-
             sw.Start();
-            bs.Desserialize<IntegerStruct>(buffer, "");
+            MemoryStream ms = new MemoryStream(base.streamWriteBuffer);
+            BinaryReader br = new BinaryReader(ms);
+
+            IntegerStruct r = new IntegerStruct();
+
+            r.b = br.ReadBoolean();
+
+            r.i8 = br.ReadByte();
+            r.si8 = br.ReadSByte();
+
+            r.i16 = br.ReadInt16();
+            r.ui16 = br.ReadUInt16();
+
+            r.i32 = br.ReadInt32();
+            r.ui32 = br.ReadUInt32();
+
+            r.i64 = br.ReadInt64();
+            r.ui64 = br.ReadUInt64();
+
             sw.Stop();
-        });
+        }
     }
 }

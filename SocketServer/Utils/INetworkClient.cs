@@ -31,6 +31,8 @@ namespace SocketServer.Utils
 
         public string[] RecoverySessionKeyArray { get; set; }
 
+        public DateTime DisconnectTime { get; set; }
+
         /// <summary>
         /// Клиент для отправки данных, эта переменная обязательна
         /// </summary>
@@ -111,6 +113,16 @@ namespace SocketServer.Utils
                 ServerTime.Send(this);
                 await Task.Delay(TimeSyncTimeOut);
             }
+        }
+
+        public virtual long GetId()
+        {
+            return 0;
+        }
+
+        public virtual void SetRecoveryData(long id, string[] recoveryKeys)
+        {
+
         }
     }
 }

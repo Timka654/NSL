@@ -4,6 +4,7 @@ using System.Net.Sockets;
 using System.Text;
 using SocketServer.Utils;
 using SocketServer.Utils.Buffer;
+using SocketServer.Utils.SystemPackets;
 
 namespace SocketServer
 {
@@ -139,6 +140,12 @@ namespace SocketServer
             if (!r)
                 Packets.Add(packetId, packet);
             return !r;
+        }
+
+        public event OnRecoverySessionReceiveDelegate<T> OnRecoverySessionReceiveEvent
+        {
+            add { RecoverySession<T>.Instance.OnRecoverySessionReceiveEvent += value; }
+            remove { RecoverySession<T>.Instance.OnRecoverySessionReceiveEvent -= value; }
         }
     }
 }

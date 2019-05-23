@@ -13,6 +13,11 @@ namespace BinarySerializer_v5.Test
                 'q','w','e','r','t','y','u','i','o','p','[',']','a','s','d','f','g','h','j','k','l',';','z','x','c','v','b','n','m',',','.','/','1','2','3','4','5','6','7','8','9','0','-','='
             };
 
+        public static bool GetRandomBool()
+        {
+            return GetRandomI8() % 2 == 1;
+        }
+
         public static byte GetRandomI8()
         {
             return ((byte)rand.Next(byte.MinValue, byte.MaxValue));

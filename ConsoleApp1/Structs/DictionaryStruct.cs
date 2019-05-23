@@ -7,7 +7,7 @@ using System.Text;
 
 namespace BinarySerializer_v5.Test.Structs
 {
-    public class DictionaryStruct
+    public class DictionaryStruct : ITestStruct<DictionaryStruct>
     {
         [Binary(typeof(BinaryDictionary16<BinaryFloat32, BinaryInt32>))]
         public Dictionary<float, int> nulld16 { get; set; }
@@ -36,7 +36,12 @@ namespace BinarySerializer_v5.Test.Structs
         [Binary(typeof(BinaryDictionary32<BinaryInt32, BinaryInt32>))]
         public Dictionary<int, int> nv2 { get; set; }
 
-        public static DictionaryStruct GetRandomValue()
+        public static DictionaryStruct GetRndValue()
+        {
+            return new DictionaryStruct().GetRandomValue();
+        }
+
+        public override DictionaryStruct GetRandomValue()
         {
             DictionaryStruct r = new DictionaryStruct();
 
@@ -61,40 +66,10 @@ namespace BinarySerializer_v5.Test.Structs
 
             for (int i = 0; i < Utils.GetSize(); i++)
             {
-                r.isd.Add(Utils.GetRandomI32(), IntegerStruct.GetRandomValue());
+                r.isd.Add(Utils.GetRandomI32(), IntegerStruct.GetRndValue());
             }
 
             return r;
         }
-
-        private static
-            BinarySerializer.BinarySerializer bs = new BinarySerializer.BinarySerializer();
-
-        private static byte[] buffer;
-
-        private static DictionaryStruct desValue;
-
-        public static Action<Stopwatch> bsSerializeAction = new Action<Stopwatch>((sw) =>
-        {
-            var r = GetRandomValue();
-
-            if (buffer == null)
-                buffer = bs.Serialize(r, "");
-
-            sw.Start();
-            bs.Serialize(r, "");
-            sw.Stop();
-        });
-
-        public static Action<Stopwatch> bsDesserilize = new Action<Stopwatch>((sw) =>
-        {
-            if (desValue == null)
-                desValue = bs.Desserialize<DictionaryStruct>(buffer, "");
-
-
-            sw.Start();
-            bs.Desserialize<DictionaryStruct>(buffer, "");
-            sw.Stop();
-        });
     }
 }

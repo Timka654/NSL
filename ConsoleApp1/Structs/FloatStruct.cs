@@ -3,19 +3,25 @@ using BinarySerializer.DefaultTypes;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Text;
 
 namespace BinarySerializer_v5.Test.Structs
 {
-    public class FloatStruct
+    public class FloatStruct : ITestStruct<FloatStruct>
     {
         [Binary(typeof(BinaryFloat32))]
         public float f32 { get; set; }
 
-        [Binary(typeof(BinaryFloat32))]
+        [Binary(typeof(BinaryFloat64))]
         public double f64 { get; set; }
 
-        public static FloatStruct GetRandomValue()
+        public static FloatStruct GetRndValue()
+        {
+            return new FloatStruct().GetRandomValue();
+        }
+
+        public override FloatStruct GetRandomValue()
         {
             FloatStruct r = new FloatStruct();
 
@@ -25,34 +31,32 @@ namespace BinarySerializer_v5.Test.Structs
             return r;
         }
 
-        private static
-            BinarySerializer.BinarySerializer bs = new BinarySerializer.BinarySerializer();
-
-        private static byte[] buffer;
-
-        private static FloatStruct desValue;
-
-        public static Action<Stopwatch> bsSerializeAction = new Action<Stopwatch>((sw) =>
+        public override void streamWriteFunc(Stopwatch sw)
         {
-            var r = GetRandomValue();
-
-            if (buffer == null)
-                buffer = bs.Serialize(r, "");
-
             sw.Start();
-            bs.Serialize(r, "");
-            sw.Stop();
-        });
+            MemoryStream ms = new MemoryStream();
+            BinaryWriter bw = new BinaryWriter(ms);
 
-        public static Action<Stopwatch> bsDesserilize = new Action<Stopwatch>((sw) =>
+            bw.Write(f32);
+            bw.Write(f64);
+
+            base.streamWriteBuffer = ms.ToArray();
+            sw.Stop();
+        }
+
+        public override void streamReadFunc(Stopwatch sw)
         {
-            if (desValue == null)
-                desValue = bs.Desserialize<FloatStruct>(buffer, "");
-
-
             sw.Start();
-            bs.Desserialize<FloatStruct>(buffer, "");
+
+            MemoryStream ms = new MemoryStream(base.streamWriteBuffer);
+            BinaryReader br = new BinaryReader(ms);
+
+            FloatStruct r = new FloatStruct();
+
+            r.f32 = br.ReadSingle();
+            r.f64 = br.ReadDouble();
+
             sw.Stop();
-        });
+        }
     }
 }

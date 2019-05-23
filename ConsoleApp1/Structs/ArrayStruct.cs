@@ -3,11 +3,12 @@ using BinarySerializer.DefaultTypes;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Text;
 
 namespace BinarySerializer_v5.Test.Structs
 {
-    public class ArrayStruct
+    public class ArrayStruct : ITestStruct<ArrayStruct>
     {
         [Binary(typeof(BinaryArray16<BinaryString16>))]
         public string[] nullsv1 { get; set; }
@@ -34,9 +35,14 @@ namespace BinarySerializer_v5.Test.Structs
         [Binary(typeof(BinaryArray16<IntegerStruct>))]
         public IntegerStruct[] isa { get; set; }
 
-        public static ArrayStruct GetRandomValue()
+        public static ArrayStruct GetRndValue()
         {
-            ArrayStruct r = new ArrayStruct();
+            return new ArrayStruct().GetRandomValue();
+        }
+
+        public override ArrayStruct GetRandomValue()
+        {
+            var r = new ArrayStruct();
 
             r.emptyia32 = new int[0];
             r.emptysv1 = new string[0];
@@ -60,7 +66,7 @@ namespace BinarySerializer_v5.Test.Structs
 
             for (int i = 0; i < r.isa.Length; i++)
             {
-                r.isa[i] = IntegerStruct.GetRandomValue();
+                r.isa[i] = IntegerStruct.GetRndValue();
             }
 
             r.sv1 = new string[Utils.GetSize()];
@@ -73,35 +79,21 @@ namespace BinarySerializer_v5.Test.Structs
             return r;
         }
 
-        private static
-            BinarySerializer.BinarySerializer bs = new BinarySerializer.BinarySerializer();
-
-        private static byte[] buffer;
-
-        private static ArrayStruct desValue;
-
-        public static Action<Stopwatch> bsSerializeAction = new Action<Stopwatch>((sw) =>
+        public override void streamWriteFunc(Stopwatch sw)
         {
-            var r = GetRandomValue();
-            desValue = r;
-            if (buffer == null)
-            {
-                buffer = bs.Serialize(r, "");
-            }
-            sw.Start();
-            bs.Serialize(r, "");
-            sw.Stop();
-        });
+            MemoryStream ms = new MemoryStream();
+            BinaryWriter bw = new BinaryWriter(ms);
 
-        public static Action<Stopwatch> bsDesserilize = new Action<Stopwatch>((sw) =>
+
+
+
+            base.streamWriteBuffer = ms.ToArray();
+        }
+
+        public override void streamReadFunc(Stopwatch sw)
         {
-            if (desValue == null)
-                desValue = bs.Desserialize<ArrayStruct>(buffer, "");
-
-
-            sw.Start();
-            bs.Desserialize<ArrayStruct>(buffer, "");
-            sw.Stop();
-        });
+            MemoryStream ms = new MemoryStream(base.streamWriteBuffer);
+            BinaryWriter bw = new BinaryWriter(ms);
+        }
     }
 }

@@ -7,7 +7,7 @@ using System.Text;
 
 namespace BinarySerializer_v5.Test.Structs
 {
-    public class ListStruct
+    public class ListStruct : ITestStruct<ListStruct>
     {
         [Binary(typeof(BinaryList16<BinaryFloat32>))]
         public List<float> nullfl32 { get; set; }
@@ -30,7 +30,12 @@ namespace BinarySerializer_v5.Test.Structs
         [Binary(typeof(BinaryList16<IntegerStruct>))]
         public List<IntegerStruct> isl { get; set; }
 
-        public static ListStruct GetRandomValue()
+        public static ListStruct GetRndValue()
+        {
+            return new ListStruct().GetRandomValue();
+        }
+
+        public override ListStruct GetRandomValue()
         {
             ListStruct r = new ListStruct();
 
@@ -55,40 +60,10 @@ namespace BinarySerializer_v5.Test.Structs
 
             for (int i = 0; i < Utils.GetSize(); i++)
             {
-                r.isl.Add(IntegerStruct.GetRandomValue());
+                r.isl.Add(IntegerStruct.GetRndValue());
             }
 
             return r;
         }
-
-        private static
-            BinarySerializer.BinarySerializer bs = new BinarySerializer.BinarySerializer();
-
-        private static byte[] buffer;
-
-        private static ListStruct desValue;
-
-        public static Action<Stopwatch> bsSerializeAction = new Action<Stopwatch>((sw) =>
-        {
-            var r = GetRandomValue();
-
-            if (buffer == null)
-                buffer = bs.Serialize(r, "");
-
-            sw.Start();
-            bs.Serialize(r, "");
-            sw.Stop();
-        });
-
-        public static Action<Stopwatch> bsDesserilize = new Action<Stopwatch>((sw) =>
-        {
-            if (desValue == null)
-                desValue = bs.Desserialize<ListStruct>(buffer, "");
-
-
-            sw.Start();
-            bs.Desserialize<ListStruct>(buffer, "");
-            sw.Stop();
-        });
     }
 }

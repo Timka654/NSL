@@ -6,6 +6,8 @@ using System.Text;
 
 namespace BinarySerializer_v5.Test
 {
+    public delegate void TestDelegate(Stopwatch sw);
+
     public class Test
     {
         private List<double> TimeTable = new List<double>();
@@ -16,7 +18,7 @@ namespace BinarySerializer_v5.Test
 
         private double firstIteration;
 
-        public void Run(int iteration, string testName, Action<Stopwatch> func)
+        public void Run(int iteration, string testName, TestDelegate func)
         {
             TimeTable.Clear();
 
