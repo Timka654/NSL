@@ -8,6 +8,7 @@ using System.Text;
 
 namespace BinarySerializer_v5.Test.Structs
 {
+    [BinarySerializer.BinaryPreCompile(500, "")]
     public class ArrayStruct : ITestStruct<ArrayStruct>
     {
         [Binary(typeof(BinaryArray16<BinaryString16>))]

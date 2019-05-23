@@ -8,6 +8,7 @@ using System.Text;
 
 namespace BinarySerializer_v5.Test.Structs
 {
+    [BinarySerializer.BinaryPreCompile(30, "")]
     public class IntegerStruct : ITestStruct<IntegerStruct>
     {
         [Binary(typeof(BinaryBool))]

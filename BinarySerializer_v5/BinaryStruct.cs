@@ -23,7 +23,7 @@ namespace BinarySerializer
 
         public Func<byte[], BinaryStruct, int, object> ReadMethod { get; set; }
 
-        public int InitLen { get; set; } = 32;
+        public int InitLen { get; set; } = 64;
 
         //private static MethodInfo resizeMethod;
 

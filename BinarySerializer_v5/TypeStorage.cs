@@ -24,12 +24,12 @@ namespace BinarySerializer
             Coding = coding;
         }
         
-        public BinaryStruct GetTypeInfo(Type type, string schemeName)
+        public BinaryStruct GetTypeInfo(Type type, string schemeName, int initialSize = 32)
         {
             if (!TypeCacheMap.ContainsKey(type) || !TypeCacheMap[type].ContainsKey(""))
             {
                 TypeCacheMap.TryAdd(type, new ConcurrentDictionary<string, BinaryStruct>());
-                LoadType(type);
+                LoadType(type,initialSize);
             }
 
             if (!TypeCacheMap[type].ContainsKey(schemeName))
@@ -40,11 +40,12 @@ namespace BinarySerializer
             return TypeCacheMap[type][schemeName];
         }
 
-        private void LoadType(Type type)
+        private void LoadType(Type type, int initialSize )
         {
             List<PropertyData> t = GetProperties(type);
             var s = new BinaryStruct(type, "", t.ToList(), Coding, this);
             TypeCacheMap[type].TryAdd("", s);
+            s.InitLen = initialSize;
 
             foreach (var item in t)
             {
@@ -73,9 +74,17 @@ namespace BinarySerializer
             return r;
         }
 
-        private void LoadAllTypes()
+        public void PreCompileBinaryStructs(Assembly assembly)
         {
+            var classes = assembly.GetTypes().Select(x => new { x, attr = x.GetCustomAttribute<BinaryPreCompileAttribute>() }).Where(x => x.attr != null);
 
+            foreach (var item in classes)
+            {
+                foreach (var scheme in item.attr.Schemes)
+                {
+                    GetTypeInfo(item.x, scheme, item.attr.InitialSize);
+                }
+            }
         }
     }
 }

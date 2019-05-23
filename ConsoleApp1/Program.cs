@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 using BinarySerializer;
 namespace BinarySerializer_v5.Test
 {
@@ -7,6 +8,8 @@ namespace BinarySerializer_v5.Test
         static void Main(string[] args)
         {
             Test t = new Test();
+
+            BinarySerializer.TypeStorage.Instance.PreCompileBinaryStructs(Assembly.GetExecutingAssembly());
 
             Structs.StringStruct _ss = new Structs.StringStruct();
             Structs.IntegerStruct _is = new Structs.IntegerStruct();

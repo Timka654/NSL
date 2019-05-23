@@ -8,6 +8,7 @@ using System.Text;
 
 namespace BinarySerializer_v5.Test.Structs
 {
+    [BinarySerializer.BinaryPreCompile(500, "")]
     public class StringStruct : ITestStruct<StringStruct>
     {
         private static UTF8Encoding encoding = new UTF8Encoding();
