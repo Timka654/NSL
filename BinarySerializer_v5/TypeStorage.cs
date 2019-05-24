@@ -86,5 +86,10 @@ namespace BinarySerializer
                 }
             }
         }
+
+        public void SetCoding(Encoding coding)
+        {
+            Coding = coding;
+        }
     }
 }

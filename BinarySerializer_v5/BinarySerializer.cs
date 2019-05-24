@@ -23,12 +23,14 @@ namespace BinarySerializer
         }
 
 
-        public T Deserialize<T>(string scheme,byte[] buffer, int offset = 0)
+        public T Deserialize<T>(string scheme, byte[] buffer, ref int offset)
         {
             var type = storage.GetTypeInfo(typeof(T), scheme);
             var result = type.ReadMethod(buffer,type, offset);
 
-            return (T)result;
+            offset = result.Item1;
+
+            return (T)result.Item2;
         }
 
         public byte[] Serialize<T>(string scheme, T obj)

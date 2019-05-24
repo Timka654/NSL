@@ -365,18 +365,17 @@ namespace SocketServer.Utils.Buffer
 
         public T Deserialize<T>(string schemeName = "")
         {
-            BinarySerializer.BinarySerializer bs = new BinarySerializer.BinarySerializer(coding, TypeStorage.Instance);
+            BinarySerializer.BinarySerializer bs = new BinarySerializer.BinarySerializer(TypeStorage.Instance);
             try
             {
-                var result = bs.Deserialize<T>(schemeName, buffer, offset);
-
-                offset = bs.Length;
+                var result = bs.Deserialize<T>(schemeName, buffer, ref offs);
 
                 return (T)result;
             }
             catch (Exception ex)
             {
-                throw new Exception($"Serializer Stack\r\n{bs.Stack}", ex);
+                throw ex;
+                //throw new Exception($"Serializer Stack\r\n{bs.Stack}", ex);
             }
         }
 

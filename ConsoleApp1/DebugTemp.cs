@@ -34,8 +34,9 @@ namespace BinarySerializer_v5.Test
                 BinarySerializer.BinarySerializer bs = new BinarySerializer.BinarySerializer();
 
                 var buf = bs.Serialize("", ts);
+                int offset = 0;
 
-                var res = bs.Deserialize<TStruct>("", buf);
+                var res = bs.Deserialize<TStruct>("", buf,ref offset);
             }
         }
     }

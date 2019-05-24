@@ -42,13 +42,15 @@ namespace BinarySerializer_v5.Test
 
         public virtual void bsDesserializeAction(Stopwatch sw)
         {
+            int offset = 0;
             if (deserializedValue == null)
             {
-                deserializedValue = bs.Deserialize<T>("", serializerWriteBuffer);
+                deserializedValue = bs.Deserialize<T>("", serializerWriteBuffer,ref offset);
+                offset = 0;
             }
 
             sw.Start();
-            bs.Deserialize<T>("", serializerWriteBuffer);
+            bs.Deserialize<T>("", serializerWriteBuffer, ref offset);
             sw.Stop();
         }
 

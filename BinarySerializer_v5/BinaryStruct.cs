@@ -21,11 +21,9 @@ namespace BinarySerializer
 
         public Func<object, BinaryStruct, Tuple<int, byte[]>> WriteMethod { get; set; }
 
-        public Func<byte[], BinaryStruct, int, object> ReadMethod { get; set; }
+        public Func<byte[], BinaryStruct, int, Tuple<int,object>> ReadMethod { get; set; }
 
         public int InitLen { get; set; } = 64;
-
-        //private static MethodInfo resizeMethod;
 
         internal TypeStorage CurrentStorage;
 
@@ -43,9 +41,6 @@ namespace BinarySerializer
                 PropertyList = propertyList;
             else
                 PropertyList = propertyList.Where(x => x.BinarySchemeAttrList.FirstOrDefault(y => y.SchemeName == scheme) != null).ToList();
-
-            //if (resizeMethod == null)
-            //    resizeMethod = this.GetType().GetMethod("Resize", BindingFlags.Public | BindingFlags.Static);
 
         }
 
@@ -151,7 +146,7 @@ namespace BinarySerializer
 
         private void CompileReader()
         {
-            DynamicMethod dm = new DynamicMethod(Guid.NewGuid().ToString(), typeof(object), new[] { typeof(byte[]), typeof(BinaryStruct), typeof(int) });
+            DynamicMethod dm = new DynamicMethod(Guid.NewGuid().ToString(), typeof(Tuple<int, object>), new[] { typeof(byte[]), typeof(BinaryStruct), typeof(int) });
 
             using (var il = new GroboIL(dm))
             {
@@ -183,7 +178,9 @@ namespace BinarySerializer
 
                 CompileReader(this, il, binaryStruct, buffer, offset, result, typeSize);
 
+                il.Ldloc(offset);
                 il.Ldloc(result);
+                il.Newobj(typeof(Tuple<int, object>).GetConstructor(new Type[] { typeof(int), typeof(object) }));
                 il.Ret();
                 IlReadCode = il.GetILCode();
             }
@@ -415,14 +412,14 @@ namespace BinarySerializer
             return getterExpression.Compile();
         }
 
-        private static Func<byte[], BinaryStruct, int, object> CreateReader(MethodInfo method)
+        private static Func<byte[], BinaryStruct, int, Tuple<int, object>> CreateReader(MethodInfo method)
         {
             var param = Expression.Parameter(typeof(byte[]), "e");
             var param1 = Expression.Parameter(typeof(BinaryStruct), "e1");
             var param2 = Expression.Parameter(typeof(int), "e2");
 
-            Expression body = Expression.Convert(Expression.Call(method, param, param1, param2), typeof(object));
-            var getterExpression = Expression.Lambda<Func<byte[], BinaryStruct, int, object>>(body, param, param1, param2);
+            Expression body = Expression.Convert(Expression.Call(method, param, param1, param2), typeof(Tuple<int, object>));
+            var getterExpression = Expression.Lambda<Func<byte[], BinaryStruct, int, Tuple<int, object>>>(body, param, param1, param2);
             return getterExpression.Compile();
         }
 
