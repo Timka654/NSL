@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Numerics;
 using System.Reflection;
 using System.Text;
 
@@ -76,6 +77,11 @@ namespace BinarySerializer_v5.Test
 
             bool compareStreamBuffers = CompareStreamBuffers();
 
+            if ((compareSerializerValues & compareStreamValues & compareSerializerBuffers & compareStreamBuffers) == false)
+                Console.ForegroundColor = ConsoleColor.Red;
+            else
+                Console.ForegroundColor = ConsoleColor.Green;
+
             Console.WriteLine($"Compare serialize values: {compareSerializerValues}");
 
             Console.WriteLine($"Compare stream values: {compareStreamValues}");
@@ -85,6 +91,8 @@ namespace BinarySerializer_v5.Test
             Console.WriteLine($"Compare stream buffers: {compareStreamBuffers}");
 
             Console.WriteLine($"Compare result: {compareSerializerValues & compareStreamValues & compareSerializerBuffers & compareStreamBuffers}");
+
+            Console.ForegroundColor = ConsoleColor.Gray;
         }
 
         private bool CompareSerializerValues()
@@ -230,6 +238,37 @@ namespace BinarySerializer_v5.Test
                     if (!ComparePropertyType(type, v[i], v1[i]))
                         return false;
                 }
+                return true;
+            }
+            else if (typeof(Vector2).IsAssignableFrom(item.PropertyType))
+            {
+                var v = ((Vector2)value1);
+                var v1 = ((Vector2)value2);
+
+                if (v.X != v1.X || v.Y != v1.Y)
+                    return false;
+
+                return true;
+            }
+            else if (typeof(Vector3).IsAssignableFrom(item.PropertyType))
+            {
+                var v = ((Vector3)value1);
+                var v1 = ((Vector3)value2);
+
+                if (v.X != v1.X || v.Y != v1.Y || v.Z != v1.Z)
+                    return false;
+
+                return true;
+            }
+            else if (typeof(DateTime).IsAssignableFrom(item.PropertyType))
+            {
+                var v = ((DateTime)value1);
+                var v1 = ((DateTime)value2);
+
+
+                if (v.Year != v1.Year || v.Month != v1.Month || v.Day != v1.Day || v.Hour != v1.Hour || v.Minute != v1.Minute || v.Second != v1.Second || v.Millisecond != v1.Millisecond || v.Ticks != v1.Ticks)
+                    return false;
+
                 return true;
             }
 

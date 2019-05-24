@@ -10,8 +10,4 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
   </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\BinarySerializer_v4\BinarySerializer_v4.csproj" />
-  </ItemGroup>
-
 </Project>

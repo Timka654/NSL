@@ -430,8 +430,13 @@ namespace BinarySerializer
         public static void OutputValue(GroboIL il,Type t)
         {
             il.Dup();
-            il.Box(t);
-            il.Call(typeof(Debug).GetMethod("WriteLine", new Type[] { t }));
+            //il.Box(t);
+            il.Call(typeof(BinaryStruct).GetMethod("OutputBuffer", BindingFlags.NonPublic | BindingFlags.Static));
+        }
+
+        private static void OutputBuffer(byte[] buf)
+        {
+
         }
     }
 }

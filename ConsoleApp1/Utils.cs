@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Numerics;
 using System.Text;
 
 namespace BinarySerializer_v5.Test
@@ -86,6 +87,36 @@ namespace BinarySerializer_v5.Test
             {
                 return rand.NextDouble();
             }
+        }
+
+        public static DateTime GetRandomD()
+        {
+            int yyyy;
+            int MM;
+            int dd;
+            int hh;
+            int mm;
+            int ss;
+            int ms;
+            return new DateTime(
+                yyyy = 1970 + GetRandomI8(),
+                MM = (GetRandomI8() % 11) + 1,
+                dd = (GetRandomI8() % 28) + 1,
+                hh = GetRandomI8() % 23,
+                mm = GetRandomI8() % 40,
+                ss = GetRandomI8() % 59,
+                ms = GetRandomI8()
+            );
+        }
+
+        public static Vector2 GetRandomV2()
+        {
+            return new Vector2(GetRandomI8(), GetRandomI8());
+        }
+
+        public static Vector3 GetRandomV3()
+        {
+            return new Vector3(GetRandomI8(), GetRandomI8(), GetRandomI8());
         }
 
         public static string GetRandomS()

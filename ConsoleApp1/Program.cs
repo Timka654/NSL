@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Numerics;
 using System.Reflection;
 using BinarySerializer;
+using BinarySerializer.DefaultTypes;
+
 namespace BinarySerializer_v5.Test
 {
     class Program
@@ -17,6 +20,8 @@ namespace BinarySerializer_v5.Test
             Structs.ArrayStruct _as = new Structs.ArrayStruct();
             Structs.ListStruct _ls = new Structs.ListStruct();
             Structs.DictionaryStruct _ds = new Structs.DictionaryStruct();
+            Structs.OtherStruct _os = new Structs.OtherStruct();
+
             int iteration = 1000;
 
             Console.WriteLine("BinarySerializer");
@@ -93,6 +98,19 @@ namespace BinarySerializer_v5.Test
             t.Run(iteration, "Dictionary Read", _ds.streamReadFunc);
 
             _ds.Compare();
+
+            Console.WriteLine();
+            Console.WriteLine("BinarySerializer");
+
+            t.Run(iteration, "Other Serialize", _os.bsSerializeAction);
+            t.Run(iteration, "Other Desserialize", _os.bsDesserializeAction);
+
+            Console.WriteLine();
+            Console.WriteLine("Stream");
+            t.Run(iteration, "Other Write", _os.streamWriteFunc);
+            t.Run(iteration, "Other Read", _os.streamReadFunc);
+
+            _os.Compare();
 
             Console.ReadKey();
         }
