@@ -7,7 +7,7 @@ using GrEmit;
 
 namespace BinarySerializer.DefaultTypes
 {
-    public class BinaryArray32<T> : IBasicType
+    public class BinaryConcurrentDictionary32<TKey,TValue> : IBasicType
     {
         public Type CompareType => null;
 
@@ -17,7 +17,7 @@ namespace BinarySerializer.DefaultTypes
 
         private MethodInfo codingMethodInfo;
 
-        public BinaryArray32()
+        public BinaryConcurrentDictionary32()
         {
             writeBitConverterMethodInfo = typeof(BitConverter).GetMethod("GetBytes", new Type[] { typeof(int) });
             readBitConverterMethodInfo = typeof(BitConverter).GetMethod("ToInt32", new Type[] { typeof(byte[]), typeof(int) });
@@ -31,7 +31,6 @@ namespace BinarySerializer.DefaultTypes
 
             var len = il.DeclareLocal(typeof(int));
             var list = il.DeclareLocal(prop.PropertyInfo.PropertyType);
-
             il.Ldloc(buffer);
             il.Ldloc(offset);
             il.Call(readBitConverterMethodInfo);
@@ -39,9 +38,7 @@ namespace BinarySerializer.DefaultTypes
 
             BinaryStruct.WriteOffsetAppend(il, offset, 4);
 
-            var type = prop.PropertyInfo.PropertyType.GetElementType();
-            il.Ldloc(len);
-            il.Newarr(type);
+            il.Newobj(prop.PropertyInfo.PropertyType.GetConstructor(new Type[] { }));
 
             il.Stloc(list);
             il.Ldloc(result);
@@ -55,7 +52,13 @@ namespace BinarySerializer.DefaultTypes
             il.Ceq();
             il.Brtrue(exitLabel);
 
+            var typeKey = prop.PropertyInfo.PropertyType.GetGenericArguments()[0];
+            var typeValue = prop.PropertyInfo.PropertyType.GetGenericArguments()[1];
+
             var ivar = il.DeclareLocal(typeof(int));
+            var currentItemKey = il.DeclareLocal(typeKey);
+            var currentItemValue = il.DeclareLocal(typeValue);
+
             var point = il.DefineLabel("for_label");
 
             il.Ldc_I4(0);
@@ -64,35 +67,50 @@ namespace BinarySerializer.DefaultTypes
             il.MarkLabel(point);
 
             //body
+            
 
-            var tempVar = il.DeclareLocal(type);
-
+            //key
             if (typeof(IBasicType).IsAssignableFrom(prop.BinaryAttr.Type.GetGenericArguments()[0]))
             {
                 IBasicType t = (IBasicType)Activator.CreateInstance(prop.BinaryAttr.Type.GetGenericArguments()[0]);
-                t.GetReadILCode(prop, currentStruct, il, binaryStruct,buffer, tempVar, typeSize, offset,true);
-                il.Ldloc(list);
-                il.Ldloc(ivar);
-                il.Ldloc(tempVar);
-                il.Stelem(type);
+                t.GetReadILCode(prop, currentStruct, il, binaryStruct, buffer, currentItemKey, typeSize, offset, true);
             }
             else
             {
-                var constr = type.GetConstructor(new Type[] { });
+                var constr = typeKey.GetConstructor(new Type[] { });
                 if (constr == null)
-                    throw new Exception($"Type {type} not have constructor with not parameters");
+                    throw new Exception($"Type {typeKey} not have constructor with not parameters");
 
                 il.Newobj(constr);
-                il.Stloc(tempVar);
+                il.Stloc(currentItemKey);
 
-                BinaryStruct.CompileReader(currentStruct.CurrentStorage.GetTypeInfo(type, currentStruct.Scheme), il, binaryStruct, buffer, offset, tempVar, typeSize);
+                BinaryStruct.CompileReader(currentStruct.CurrentStorage.GetTypeInfo(typeKey, currentStruct.Scheme), il, binaryStruct, buffer, offset, currentItemKey, typeSize);
 
-                il.Ldloc(list);
-                il.Ldloc(ivar);
-                il.Ldloc(tempVar);
-                il.Stelem(type);
             }
 
+            //value
+            if (typeof(IBasicType).IsAssignableFrom(prop.BinaryAttr.Type.GetGenericArguments()[1]))
+            {
+                IBasicType t = (IBasicType)Activator.CreateInstance(prop.BinaryAttr.Type.GetGenericArguments()[1]);
+                t.GetReadILCode(prop, currentStruct, il, binaryStruct, buffer, currentItemValue, typeSize, offset, true);
+            }
+            else
+            {
+                var constr = typeValue.GetConstructor(new Type[] { });
+                if (constr == null)
+                    throw new Exception($"Type {typeValue} not have constructor with not parameters");
+
+                il.Newobj(constr);
+                il.Stloc(currentItemValue);
+
+                BinaryStruct.CompileReader(currentStruct.CurrentStorage.GetTypeInfo(typeValue, currentStruct.Scheme), il, binaryStruct, buffer, offset, currentItemValue, typeSize);
+            }
+
+            il.Ldloc(list);
+            il.Ldloc(currentItemKey);
+            il.Ldloc(currentItemValue);
+            il.Call(prop.PropertyInfo.PropertyType.GetMethod("TryAdd"), isVirtual: true);
+            il.Pop();
             //end body
 
             il.Ldc_I4(1);
@@ -118,9 +136,7 @@ namespace BinarySerializer.DefaultTypes
             il.Stloc(arr);
 
             var exitLabel = il.DefineLabel("exit");
-
             BinaryStruct.WriteSizeChecker(il, buffer, offset, 5);
-
             BinaryStruct.WriteObjectNull(il, exitLabel, arr, buffer, offset, typeSize);
 
             var arrSize = il.DeclareLocal(typeof(byte[]));
@@ -161,36 +177,74 @@ namespace BinarySerializer.DefaultTypes
             il.Ceq();
             il.Brtrue(exitLabel);
 
-            var type = prop.PropertyInfo.PropertyType.GetElementType();
+            var typeKey = prop.PropertyInfo.PropertyType.GetGenericArguments()[0];
+            var typeValue = prop.PropertyInfo.PropertyType.GetGenericArguments()[1];
 
             var ivar = il.DeclareLocal(typeof(int));
-            var currentValue = il.DeclareLocal(type);
+            var currentItemKey = il.DeclareLocal(typeKey);
+            var currentItemValue = il.DeclareLocal(typeValue);
+
             var point = il.DefineLabel("for_label");
 
             il.Ldc_I4(0);
             il.Stloc(ivar);
 
+            var enumeratorMethod = prop.PropertyInfo.PropertyType.GetMethod("GetEnumerator");
+
+            var enumerator = il.DeclareLocal(enumeratorMethod.ReturnType);
+
+            var moveNext = typeof(IEnumerator).GetMethod("MoveNext");
+            var getCurrent = enumerator.Type.GetMethod("get_Current");
+
+            var temp = il.DeclareLocal(getCurrent.ReturnType);
+            var exist = il.DeclareLocal(typeof(bool));
+
+            il.Ldloc(arr);
+            il.Call(enumeratorMethod, isVirtual: true);
+            il.Stloc(enumerator);
+
+            var keyGetter = getCurrent.ReturnType.GetMethod("get_Key");
+            var valueGetter = getCurrent.ReturnType.GetMethod("get_Value");
+
             il.MarkLabel(point);
 
             //body
 
+            il.Ldloc(enumerator);
+            il.Call(moveNext);
+            il.Stloc(exist);
 
-            il.Ldloc(arr);
-            il.Ldloc(ivar);
-            il.Ldelem(type);
-            //il.Call(prop.PropertyInfo.PropertyType.GetMethod("Get"), isVirtual: true);
-            il.Stloc(currentValue);
+            il.Ldloc(enumerator);
+            il.Call(getCurrent, enumerator.Type);
+            il.Stloc(temp);
+
+            il.Ldloca(temp);
+            il.Call(keyGetter, typeof(int));
+            il.Stloc(currentItemKey);
 
             if (typeof(IBasicType).IsAssignableFrom(prop.BinaryAttr.Type.GetGenericArguments()[0]))
             {
                 IBasicType t = (IBasicType)Activator.CreateInstance(prop.BinaryAttr.Type.GetGenericArguments()[0]);
-                t.GetWriteILCode(prop, currentStruct, il, binaryStruct, currentValue, typeSize, buffer, offset, true);
+                t.GetWriteILCode(prop, currentStruct, il, binaryStruct, currentItemKey, typeSize, buffer, offset, true);
             }
             else
             {
-                BinaryStruct.CompileWriter(currentStruct.CurrentStorage.GetTypeInfo(type, currentStruct.Scheme), il, binaryStruct, currentValue, buffer, offset, typeSize);
+                BinaryStruct.CompileWriter(currentStruct.CurrentStorage.GetTypeInfo(typeKey, currentStruct.Scheme), il, binaryStruct, currentItemKey, buffer, offset, typeSize);
             }
 
+            il.Ldloca(temp);
+            il.Call(valueGetter);
+            il.Stloc(currentItemValue);
+
+            if (typeof(IBasicType).IsAssignableFrom(prop.BinaryAttr.Type.GetGenericArguments()[1]))
+            {
+                IBasicType t = (IBasicType)Activator.CreateInstance(prop.BinaryAttr.Type.GetGenericArguments()[1]);
+                t.GetWriteILCode(prop, currentStruct, il, binaryStruct, currentItemValue, typeSize, buffer, offset, true);
+            }
+            else
+            {
+                BinaryStruct.CompileWriter(currentStruct.CurrentStorage.GetTypeInfo(typeValue, currentStruct.Scheme), il, binaryStruct, currentItemValue, buffer, offset, typeSize);
+            }
             //end body
 
             il.Ldc_I4(1);
@@ -203,6 +257,7 @@ namespace BinarySerializer.DefaultTypes
 
             il.Clt(false);
             il.Brtrue(point);
+
 
             il.MarkLabel(exitLabel);
         }

@@ -9,7 +9,7 @@ namespace BinarySerializer.DefaultTypes
 {
     public class BinaryList32<T> : IBasicType
     {
-        public string SizeProperty { get; set; }
+        public Type CompareType => null;
 
         private MethodInfo writeBitConverterMethodInfo;
 

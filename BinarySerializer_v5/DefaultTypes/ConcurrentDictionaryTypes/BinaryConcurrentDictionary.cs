@@ -7,7 +7,7 @@ using GrEmit;
 
 namespace BinarySerializer.DefaultTypes
 {
-    public class BinaryDictionary<TKey,TValue> : IBasicType
+    public class BinaryConcurrentDictionary<TKey,TValue> : IBasicType
     {
         public Type CompareType => null;
 
@@ -17,7 +17,7 @@ namespace BinarySerializer.DefaultTypes
 
         private MethodInfo codingMethodInfo;
 
-        public BinaryDictionary()
+        public BinaryConcurrentDictionary()
         {
             writeBitConverterMethodInfo = typeof(BitConverter).GetMethod("GetBytes", new Type[] { typeof(int) });
             readBitConverterMethodInfo = typeof(BitConverter).GetMethod("ToInt32", new Type[] { typeof(byte[]), typeof(int) });
@@ -107,7 +107,8 @@ namespace BinarySerializer.DefaultTypes
             il.Ldloc(list);
             il.Ldloc(currentItemKey);
             il.Ldloc(currentItemValue);
-            il.Call(prop.PropertyInfo.PropertyType.GetMethod("Add"), isVirtual: true);
+            il.Call(prop.PropertyInfo.PropertyType.GetMethod("TryAdd"), isVirtual: true);
+            il.Pop();
 
             //end body
 
@@ -162,7 +163,7 @@ namespace BinarySerializer.DefaultTypes
 
             var enumerator = il.DeclareLocal(enumeratorMethod.ReturnType);
 
-            var moveNext = enumerator.Type.GetMethod("MoveNext");
+            var moveNext = typeof(IEnumerator).GetMethod("MoveNext");
             var getCurrent = enumerator.Type.GetMethod("get_Current");
 
             var temp = il.DeclareLocal(getCurrent.ReturnType);
@@ -179,11 +180,12 @@ namespace BinarySerializer.DefaultTypes
 
             //body
 
-            il.Ldloca(enumerator);
-            il.Call(moveNext, enumerator.Type);
+            //il.Ldloc(arr);
+            il.Ldloc(enumerator);
+            il.Call(moveNext);
             il.Stloc(exist);
-            
-            il.Ldloca(enumerator);
+
+            il.Ldloc(enumerator);
             //il.Calli(CallingConventions.Any, typeof(KeyValuePair<int, int>),new Type[] { typeof(int),typeof(int) });
             il.Call(getCurrent, enumerator.Type);
             il.Stloc(temp);
@@ -209,7 +211,7 @@ namespace BinarySerializer.DefaultTypes
             if (typeof(IBasicType).IsAssignableFrom(prop.BinaryAttr.Type.GetGenericArguments()[1]))
             {
                 IBasicType t = (IBasicType)Activator.CreateInstance(prop.BinaryAttr.Type.GetGenericArguments()[1]);
-                t.GetWriteILCode(prop, currentStruct, il, binaryStruct, currentItemValue, typeSize, buffer, offset,true);
+                t.GetWriteILCode(prop, currentStruct, il, binaryStruct, currentItemValue, typeSize, buffer, offset, true);
             }
             else
             {
@@ -228,6 +230,8 @@ namespace BinarySerializer.DefaultTypes
             il.Clt(false);
             il.Brtrue(point);
 
+
+            il.MarkLabel(exitLabel);
 
         }
     }

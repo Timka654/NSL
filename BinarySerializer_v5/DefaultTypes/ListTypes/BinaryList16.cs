@@ -9,6 +9,8 @@ namespace BinarySerializer.DefaultTypes
 {
     public class BinaryList16<T> : IBasicType
     {
+        public Type CompareType => typeof(IList);
+
         public string SizeProperty { get; set; }
 
         private MethodInfo writeBitConverterMethodInfo;

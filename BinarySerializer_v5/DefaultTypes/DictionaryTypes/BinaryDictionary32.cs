@@ -9,7 +9,7 @@ namespace BinarySerializer.DefaultTypes
 {
     public class BinaryDictionary32<TKey,TValue> : IBasicType
     {
-        public string SizeProperty { get; set; }
+        public Type CompareType => null;
 
         private MethodInfo writeBitConverterMethodInfo;
 

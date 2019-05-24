@@ -11,6 +11,7 @@ namespace BinarySerializer.DefaultTypes
 {
     public class BinaryBool : IBasicType
     {
+        public Type CompareType => typeof(bool);
 
         public BinaryBool()
         {

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
@@ -9,7 +10,7 @@ namespace BinarySerializer.DefaultTypes
 {
     public class BinaryDictionary16<TKey,TValue> : IBasicType
     {
-        public string SizeProperty { get; set; }
+        public Type CompareType => typeof(IDictionary);
 
         private MethodInfo writeBitConverterMethodInfo;
 
@@ -215,7 +216,6 @@ namespace BinarySerializer.DefaultTypes
             il.Stloc(exist);
             
             il.Ldloca(enumerator);
-            //il.Calli(CallingConventions.Any, typeof(KeyValuePair<int, int>),new Type[] { typeof(int),typeof(int) });
             il.Call(getCurrent, enumerator.Type);
             il.Stloc(temp);
 

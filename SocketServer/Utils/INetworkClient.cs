@@ -31,7 +31,7 @@ namespace SocketServer.Utils
 
         public string[] RecoverySessionKeyArray { get; set; }
 
-        public DateTime DisconnectTime { get; set; }
+        public DateTime? DisconnectTime { get; set; }
 
         /// <summary>
         /// Клиент для отправки данных, эта переменная обязательна

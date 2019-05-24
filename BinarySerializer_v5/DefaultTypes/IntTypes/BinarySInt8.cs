@@ -11,6 +11,7 @@ namespace BinarySerializer.DefaultTypes
 {
     public class BinarySInt8 : IBasicType
     {
+        public Type CompareType => typeof(sbyte);
 
         public BinarySInt8()
         {

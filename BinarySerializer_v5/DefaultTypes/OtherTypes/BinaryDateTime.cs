@@ -11,7 +11,7 @@ namespace BinarySerializer.DefaultTypes
 {
     public class BinaryDateTime : IBasicType
     {
-        public string SizeProperty { get; set; }
+        public Type CompareType => typeof(DateTime);
 
         private MethodInfo writeBitConverterMethodInfo;
 

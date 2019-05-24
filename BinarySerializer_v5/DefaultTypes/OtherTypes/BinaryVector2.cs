@@ -16,7 +16,7 @@ namespace BinarySerializer.DefaultTypes
 {
     public class BinaryVector2 : IBasicType
     {
-        public string SizeProperty { get; set; }
+        public Type CompareType => typeof(Vector2);
 
         private MethodInfo writeBitConverterMethodInfo;
 

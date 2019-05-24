@@ -11,7 +11,7 @@ namespace BinarySerializer.DefaultTypes
 {
     public class BinaryUInt16 : IBasicType
     {
-        public string SizeProperty { get; set; }
+        public Type CompareType => typeof(ushort);
 
         private MethodInfo writeBitConverterMethodInfo;
 

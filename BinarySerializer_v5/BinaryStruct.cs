@@ -102,42 +102,48 @@ namespace BinarySerializer
             {
                 foreach (var item in bs.PropertyList)
                 {
-                    if (!string.IsNullOrEmpty(item.BinaryAttr.ArraySizeName))
-                    {
-                        item.ArraySizeProperty = bs.PropertyList.Find(x => x.PropertyInfo.Name == item.BinaryAttr.ArraySizeName);
-                        if (item.TypeSizeProperty == null)
-                            throw new Exception($"ArraySizeProperty \"{item.BinaryAttr.ArraySizeName}\" for {item.PropertyInfo.Name} in Struct {bs.Type}:{item.PropertyInfo.DeclaringType} not found(Scheme: {bs.Scheme})");
-                    }
-                    if (!string.IsNullOrEmpty(item.BinaryAttr.TypeSizeName))
-                    {
-                        item.TypeSizeProperty = bs.PropertyList.Find(x => x.PropertyInfo.Name == item.BinaryAttr.TypeSizeName);
-                        if (item.TypeSizeProperty == null)
-                            throw new Exception($"TypeSizeProperty \"{item.BinaryAttr.TypeSizeName}\" for {item.PropertyInfo.Name} in Struct {bs.Type}:{item.PropertyInfo.DeclaringType} not found(Scheme: {bs.Scheme})");
-                    }
-
-                    if (item.IsBaseType)
-                    {
-                        item.BinaryType.GetWriteILCode(item, bs, il,binaryStruct, value, typeSize, buffer, offset,false);
-                        continue;
-                    }
-
-                    var methodBreak = il.DefineLabel("breakWriteMethod");
-
-                    var in_value = il.DeclareLocal(item.PropertyInfo.PropertyType);
-
-                    //значение вложенного класса
-                    il.Ldloc(value);
-                    il.Call(item.PropertyInfo.GetGetMethod());
-                    il.Stloc(in_value);
-
-                    WriteObjectNull(il, methodBreak, in_value, buffer, offset, typeSize);
-
-                    CompileWriter(item.BinaryStruct, il, binaryStruct, in_value, buffer, offset, typeSize);
-
-                    il.MarkLabel(methodBreak);
-                    il.Pop();
+                    ProcessWrite(item, bs, il, binaryStruct, value, buffer, offset, typeSize);
                 }
+                return;
             }
+        }
+
+        public static void ProcessWrite(PropertyData item, BinaryStruct bs, GroboIL il, GroboIL.Local binaryStruct, GroboIL.Local value, GroboIL.Local buffer, GroboIL.Local offset, GroboIL.Local typeSize)
+        {
+            if (!string.IsNullOrEmpty(item.BinaryAttr?.ArraySizeName))
+            {
+                item.ArraySizeProperty = bs.PropertyList.Find(x => x.PropertyInfo.Name == item.BinaryAttr.ArraySizeName);
+                if (item.TypeSizeProperty == null)
+                    throw new Exception($"ArraySizeProperty \"{item.BinaryAttr.ArraySizeName}\" for {item.PropertyInfo.Name} in Struct {bs.Type}:{item.PropertyInfo.DeclaringType} not found(Scheme: {bs.Scheme})");
+            }
+            if (!string.IsNullOrEmpty(item.BinaryAttr?.TypeSizeName))
+            {
+                item.TypeSizeProperty = bs.PropertyList.Find(x => x.PropertyInfo.Name == item.BinaryAttr.TypeSizeName);
+                if (item.TypeSizeProperty == null)
+                    throw new Exception($"TypeSizeProperty \"{item.BinaryAttr.TypeSizeName}\" for {item.PropertyInfo.Name} in Struct {bs.Type}:{item.PropertyInfo.DeclaringType} not found(Scheme: {bs.Scheme})");
+            }
+
+            if (item.IsBaseType)
+            {
+                item.BinaryType.GetWriteILCode(item, bs, il, binaryStruct, value, typeSize, buffer, offset, false);
+                return;
+            }
+
+            var methodBreak = il.DefineLabel("breakWriteMethod");
+
+            var in_value = il.DeclareLocal(item.PropertyInfo.PropertyType);
+
+            //значение вложенного класса
+            il.Ldloc(value);
+            il.Call(item.PropertyInfo.GetGetMethod());
+            il.Stloc(in_value);
+
+            WriteObjectNull(il, methodBreak, in_value, buffer, offset, typeSize);
+
+            CompileWriter(item.BinaryStruct, il, binaryStruct, in_value, buffer, offset, typeSize);
+
+            il.MarkLabel(methodBreak);
+            il.Pop();
         }
 
         #endregion
@@ -424,6 +430,7 @@ namespace BinarySerializer
         }
 
         #endregion        
+
         public static void OutputValue(GroboIL il,Type t)
         {
             il.Dup();

@@ -10,6 +10,9 @@ namespace BinarySerializer_v5.Test
     {
         static void Main(string[] args)
         {
+
+            DebugTemp.TStruct.Debug();
+
             Test t = new Test();
 
             BinarySerializer.TypeStorage.Instance.PreCompileBinaryStructs(Assembly.GetExecutingAssembly());

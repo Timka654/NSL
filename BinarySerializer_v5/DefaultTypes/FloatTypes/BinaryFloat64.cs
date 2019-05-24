@@ -11,7 +11,7 @@ namespace BinarySerializer.DefaultTypes
 {
     public class BinaryFloat64 : IBasicType
     {
-        public string SizeProperty { get; set; }
+        public Type CompareType => typeof(double);
 
         private MethodInfo writeBitConverterMethodInfo;
 

@@ -8,7 +8,7 @@ namespace BinarySerializer.DefaultTypes
 {
     public class BinaryString16 : IBasicType
     {
-        public string SizeProperty { get; set; }
+        public Type CompareType => typeof(string);
 
         private MethodInfo writeBitConverterMethodInfo;
 
