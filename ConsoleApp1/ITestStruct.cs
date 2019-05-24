@@ -18,7 +18,7 @@ namespace BinarySerializer_v5.Test
 
         protected T serializedValue;
 
-        protected T desserializedValue;
+        protected T deserializedValue;
 
         protected T binaryWritedValue;
 
@@ -33,22 +33,22 @@ namespace BinarySerializer_v5.Test
             if (serializerWriteBuffer == null)
             {
                 serializedValue = r;
-                serializerWriteBuffer = bs.Serialize(r, "");
+                serializerWriteBuffer = bs.Serialize("", r);
             }
             sw.Start();
-            bs.Serialize(r, "");
+            bs.Serialize("", r);
             sw.Stop();
         }
 
         public virtual void bsDesserializeAction(Stopwatch sw)
         {
-            if (desserializedValue == null)
+            if (deserializedValue == null)
             {
-                desserializedValue = bs.Desserialize<T>(serializerWriteBuffer, "");
+                deserializedValue = bs.Deserialize<T>("", serializerWriteBuffer);
             }
 
             sw.Start();
-            bs.Desserialize<T>(serializerWriteBuffer, "");
+            bs.Deserialize<T>("", serializerWriteBuffer);
             sw.Stop();
         }
 
@@ -97,7 +97,7 @@ namespace BinarySerializer_v5.Test
 
         private bool CompareSerializerValues()
         {
-            return ComparePropertyType(typeof(T), serializedValue, desserializedValue);
+            return ComparePropertyType(typeof(T), serializedValue, deserializedValue);
         }
 
         private bool ComparePropertyType(Type prop, object value1, object value2)
