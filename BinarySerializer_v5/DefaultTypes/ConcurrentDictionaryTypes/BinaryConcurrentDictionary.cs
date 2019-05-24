@@ -230,9 +230,6 @@ namespace BinarySerializer.DefaultTypes
             il.Clt(false);
             il.Brtrue(point);
 
-
-            il.MarkLabel(exitLabel);
-
         }
     }
 }
