@@ -146,6 +146,7 @@ namespace DBEngine
                 throw ex;
             }
         }
+
         /// <summary>
         /// Выполнить запрос, и получить значение первой строки, первого столбца
         /// </summary>
@@ -158,6 +159,29 @@ namespace DBEngine
             {
                 sw.Start();
                 result = cmd.ExecuteScalar();
+                sw.Stop();
+                DbPerformanceEvent?.Invoke(sourceFilePath, memberName, sw.Elapsed);
+            }
+            catch (Exception ex)
+            {
+                DbExceptionEvent?.Invoke(ex);
+                throw ex;
+            }
+            return this;
+        }
+
+        /// <summary>
+        /// Выполнить запрос, и получить значение первой строки, первого столбца
+        /// </summary>
+        /// <returns>значение первой строки, первого столбца</returns>
+        public DBCommand ExecuteGetFirstValue(Action<object> getter, [System.Runtime.CompilerServices.CallerMemberName] string memberName = "",
+            [System.Runtime.CompilerServices.CallerFilePath] string sourceFilePath = "")
+        {
+            Stopwatch sw = new Stopwatch();
+            try
+            {
+                sw.Start();
+                getter?.Invoke(cmd.ExecuteScalar());
                 sw.Stop();
                 DbPerformanceEvent?.Invoke(sourceFilePath, memberName, sw.Elapsed);
             }
