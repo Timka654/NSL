@@ -52,7 +52,9 @@ namespace BinarySerializer
 
         public BinaryStruct GetSchemeData(string schemeName, Encoding coding, TypeStorage currentStorage)
         {
-            return new BinaryStruct(Type, schemeName, PropertyList, coding, currentStorage);
+            var s = new BinaryStruct(Type, schemeName, PropertyList, coding, currentStorage);
+            s.Compile();
+            return s;
         }
 
         #region Writer
@@ -143,7 +145,7 @@ namespace BinarySerializer
             CompileWriter(item.BinaryStruct, il, binaryStruct, in_value, buffer, offset, typeSize);
 
             il.MarkLabel(methodBreak);
-            il.Pop();
+            //il.Pop();
         }
 
         #endregion
@@ -228,7 +230,7 @@ namespace BinarySerializer
                     il.Call(item.Setter, isVirtual: true);
 
                     il.MarkLabel(methodBreak);
-                    il.Pop();
+                    //il.Pop();
                 }
             }
         }
