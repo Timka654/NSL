@@ -20,7 +20,7 @@ namespace SocketServer
 #endif
 
 #if DEBUG
-        void SendSerialize(ushort packetId, object obj, [System.Runtime.CompilerServices.CallerMemberName] string memberName = "",
+        void SendSerialize(ushort packetId, object obj, string scheme, [System.Runtime.CompilerServices.CallerMemberName] string memberName = "",
             [System.Runtime.CompilerServices.CallerFilePath] string sourceFilePath = "",
             [System.Runtime.CompilerServices.CallerLineNumber] int sourceLineNumber = 0);
 #else

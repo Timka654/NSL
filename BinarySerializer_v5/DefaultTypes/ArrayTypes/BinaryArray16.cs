@@ -75,7 +75,7 @@ namespace BinarySerializer.DefaultTypes
             }
             else
             {
-                var constr = type.GetConstructor(new Type[] { });
+                var constr = BinaryStruct.GetConstructor(type,null);
                 if (constr == null)
                     throw new Exception($"Type {type} not have constructor with not parameters");
 

@@ -12,30 +12,39 @@ namespace BinarySerializer_v5.Test.Structs
     public class DictionaryStruct : ITestStruct<DictionaryStruct>
     {
         [Binary(typeof(BinaryDictionary16<BinaryFloat32, BinaryInt32>))]
+        [BinaryScheme("default")]
         public Dictionary<float, int> nulld16 { get; set; }
 
         [Binary(typeof(BinaryDictionary32<BinaryInt32, BinaryFloat32>))]
+        [BinaryScheme("default")]
         public Dictionary<int, float> nulld32 { get; set; }
 
         [Binary(typeof(BinaryDictionary16<BinaryFloat32, BinaryInt32>))]
+        [BinaryScheme("default")]
         public Dictionary<float, int> emptyd16 { get; set; }
 
         [Binary(typeof(BinaryDictionary32<BinaryInt32, BinaryFloat32>))]
+        [BinaryScheme("default")]
         public Dictionary<int, float> emptyd32 { get; set; }
 
         [Binary(typeof(BinaryDictionary16<BinaryFloat32,BinaryInt32>))]
+        [BinaryScheme("default")]
         public Dictionary<float,int> d16 { get; set; }
 
         [Binary(typeof(BinaryDictionary32<BinaryInt32,BinaryFloat32>))]
+        [BinaryScheme("default")]
         public Dictionary<int, float> d32 { get; set; }
 
         [Binary(typeof(BinaryDictionary32<BinaryInt32, BinaryInt32>))]
+        [BinaryScheme("default")]
         public Dictionary<int, int> nv1 { get; set; }
 
         [Binary(typeof(BinaryDictionary16<BinaryInt32, IntegerStruct>))]
+        [BinaryScheme("default")]
         public Dictionary<int, IntegerStruct> isd { get; set; }
 
         [Binary(typeof(BinaryDictionary32<BinaryInt32, BinaryInt32>))]
+        [BinaryScheme("default")]
         public Dictionary<int, int> nv2 { get; set; }
 
         public static DictionaryStruct GetRndValue()

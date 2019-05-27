@@ -9,16 +9,19 @@ using System.Text;
 
 namespace BinarySerializer_v5.Test.Structs
 {
-    [BinarySerializer.BinaryPreCompile(28, "")]
+    [BinarySerializer.BinaryPreCompile("default", 28)]
     public class OtherStruct : ITestStruct<OtherStruct>
     {
         [Binary(typeof(BinaryVector2))]
+        [BinaryScheme("default")]
         public Vector2 v2 { get; set; }
 
         [Binary(typeof(BinaryVector3))]
+        [BinaryScheme("default")]
         public Vector3 v3 { get; set; }
 
         [Binary(typeof(BinaryDateTime))]
+        [BinaryScheme("default")]
         public DateTime d1 { get; set; }
 
         public static OtherStruct GetRndValue()

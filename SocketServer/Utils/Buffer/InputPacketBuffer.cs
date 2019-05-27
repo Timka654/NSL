@@ -363,7 +363,7 @@ namespace SocketServer.Utils.Buffer
             return await ReadByteAsync() == 1;
         }
 
-        public T Deserialize<T>(string schemeName = "")
+        public T Deserialize<T>(string schemeName)
         {
             BinarySerializer.BinarySerializer bs = new BinarySerializer.BinarySerializer(TypeStorage.Instance);
             try

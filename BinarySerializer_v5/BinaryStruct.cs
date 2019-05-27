@@ -1,5 +1,6 @@
 ﻿using GrEmit;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -40,8 +41,18 @@ namespace BinarySerializer
             if (string.IsNullOrEmpty(scheme))
                 PropertyList = propertyList;
             else
+            //{
+
                 PropertyList = propertyList.Where(x => x.BinarySchemeAttrList.FirstOrDefault(y => y.SchemeName == scheme) != null).ToList();
 
+            //    foreach (var item in PropertyList)
+            //    {
+            //        if (!item.IsBaseType)
+            //        {
+
+            //        }
+            //    }
+            //}
         }
 
         internal void Compile()
@@ -115,7 +126,7 @@ namespace BinarySerializer
             if (!string.IsNullOrEmpty(item.BinaryAttr?.ArraySizeName))
             {
                 item.ArraySizeProperty = bs.PropertyList.Find(x => x.PropertyInfo.Name == item.BinaryAttr.ArraySizeName);
-                if (item.TypeSizeProperty == null)
+                if (item.ArraySizeProperty == null)
                     throw new Exception($"ArraySizeProperty \"{item.BinaryAttr.ArraySizeName}\" for {item.PropertyInfo.Name} in Struct {bs.Type}:{item.PropertyInfo.DeclaringType} not found(Scheme: {bs.Scheme})");
             }
             if (!string.IsNullOrEmpty(item.BinaryAttr?.TypeSizeName))
@@ -171,7 +182,7 @@ namespace BinarySerializer
                 il.Ldarg(1);
                 il.Stloc(binaryStruct);
 
-                var constr = result.Type.GetConstructor(new Type[] { });
+                var constr = GetConstructor(result.Type, null);
                 if (constr == null)
                     throw new Exception($"Type {result.Type} not have constructor with not parameters");
 
@@ -214,7 +225,7 @@ namespace BinarySerializer
 
                     var in_value = il.DeclareLocal(item.PropertyInfo.PropertyType);
 
-                    var constr = item.PropertyInfo.PropertyType.GetConstructor(new Type[] { });
+                    var constr = BinaryStruct.GetConstructor(item.PropertyInfo.PropertyType,null);
 
                     if (constr == null)
                         throw new Exception($"Type {item.PropertyInfo.PropertyType} not have constructor with not parameters");
@@ -240,6 +251,46 @@ namespace BinarySerializer
         #region HelpWriterMethods
 
         #region NULL
+        public static void WriteNullableType<T>(GroboIL il, GroboIL.Label finishMethod, GroboIL.Local value, GroboIL.Local buffer, GroboIL.Local offset, GroboIL.Local typeSize) 
+            where T : struct
+        {
+            il.Ldloca(value);
+            WriteNullableType<T>(il, finishMethod, buffer, offset, typeSize);
+        }
+
+        public static void WriteNullableType<T>(GroboIL il, GroboIL.Label finishMethod, GroboIL.Local buffer, GroboIL.Local offset, GroboIL.Local typeSize)
+            where T: struct
+        {
+            var _null = il.DeclareLocal(typeof(bool));
+
+            il.Call(typeof(Nullable<T>).GetProperty("HasValue").GetGetMethod());
+            il.Ldc_I4(0);
+            //il.Ldnull();
+            il.Ceq();
+            il.Stloc(_null);
+
+            il.Ldloc(buffer);
+            il.Ldloc(offset);
+
+            il.Ldloc(_null);
+
+            il.Stelem(typeof(byte));
+
+            WriteOffsetAppend(il, offset, 1);
+
+            il.Ldloc(_null);
+            il.Brtrue(finishMethod);
+        }
+
+        public static void ReadNullableType(GroboIL il, GroboIL.Label finishMethod, GroboIL.Local buffer, GroboIL.Local offset, GroboIL.Local typeSize)
+        {
+            il.Ldloc(buffer);
+            il.Ldloc(offset);
+            il.Ldelem(typeof(byte));
+            WriteOffsetAppend(il, offset, 1);
+            il.Brtrue(finishMethod);
+
+        }
 
         public static void WriteObjectNull(GroboIL il, GroboIL.Label finishMethod, GroboIL.Local value, GroboIL.Local buffer, GroboIL.Local offset, GroboIL.Local typeSize)
         {
@@ -443,6 +494,19 @@ namespace BinarySerializer
         private static void OutputBuffer(byte[] buf)
         {
 
+        }
+
+        internal static ConstructorInfo GetConstructor(Type type, Type[] args)
+        {
+           var construct = type.GetConstructors(BindingFlags.Public |
+                BindingFlags.NonPublic |
+                BindingFlags.Instance |
+                BindingFlags.DeclaredOnly);
+
+            if (args == null)
+                return construct.OrderBy(x => x.GetParameters().Count() != 0).First();
+
+            return construct.First(x => x.GetParameters().Select(y=>y.ParameterType).SequenceEqual(args));
         }
     }
 }

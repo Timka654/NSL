@@ -8,31 +8,39 @@ using System.Text;
 
 namespace BinarySerializer_v5.Test.Structs
 {
-    [BinarySerializer.BinaryPreCompile(500, "")]
+    [BinarySerializer.BinaryPreCompile("default", 500)]
     public class ArrayStruct : ITestStruct<ArrayStruct>
     {
         [Binary(typeof(BinaryArray16<BinaryString16>))]
+        [BinaryScheme("default")]
         public string[] nullsv1 { get; set; }
 
         [Binary(typeof(BinaryArray32<BinaryInt32>))]
+        [BinaryScheme("default")]
         public int[] nullia32 { get; set; }
 
         [Binary(typeof(BinaryArray16<BinaryString16>))]
+        [BinaryScheme("default")]
         public string[] emptysv1 { get; set; }
 
         [Binary(typeof(BinaryArray32<BinaryInt32>))]
+        [BinaryScheme("default")]
         public int[] emptyia32 { get; set; }
 
         [Binary(typeof(BinaryArray16<BinaryFloat32>))]
+        [BinaryScheme("default")]
         public float[] fa32 { get; set; }
 
         [Binary(typeof(BinaryArray16<BinaryString16>))]
+        [BinaryScheme("default")]
         public string[] sv1 { get; set; }
 
         [Binary(typeof(BinaryArray32<BinaryInt32>))]
+        [BinaryScheme("default")]
         public int[] ia32 { get; set; }
 
         [Binary(typeof(BinaryArray16<IntegerStruct>))]
+        [BinaryScheme("default")]
         public IntegerStruct[] isa { get; set; }
 
         public static ArrayStruct GetRndValue()

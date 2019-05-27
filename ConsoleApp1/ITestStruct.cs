@@ -33,7 +33,7 @@ namespace BinarySerializer_v5.Test
             if (serializerWriteBuffer == null)
             {
                 serializedValue = r;
-                serializerWriteBuffer = bs.Serialize("", r);
+                serializerWriteBuffer = bs.Serialize("default", r);
             }
             sw.Start();
             bs.Serialize("", r);
@@ -45,7 +45,7 @@ namespace BinarySerializer_v5.Test
             int offset = 0;
             if (deserializedValue == null)
             {
-                deserializedValue = bs.Deserialize<T>("", serializerWriteBuffer,ref offset);
+                deserializedValue = bs.Deserialize<T>("default", serializerWriteBuffer,ref offset);
                 offset = 0;
             }
 

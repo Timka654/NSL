@@ -53,6 +53,5 @@ namespace BinarySerializer
 
             return buffer;
         }
-
     }
 }

@@ -9,7 +9,7 @@ using GrEmit.Utils;
 
 namespace BinarySerializer.DefaultTypes
 {
-    public class BinaryInt32 : IBasicType
+    public class BinaryNullableInt32 : IBasicType
     {
         public Type CompareType => typeof(int);
 
@@ -17,7 +17,7 @@ namespace BinarySerializer.DefaultTypes
 
         private MethodInfo readBitConverterMethodInfo;
 
-        public BinaryInt32()
+        public BinaryNullableInt32()
         {
             writeBitConverterMethodInfo = typeof(BitConverter).GetMethod("GetBytes",new Type[] { typeof(int) });
             readBitConverterMethodInfo = typeof(BitConverter).GetMethod("ToInt32", new Type[] { typeof(byte[]), typeof(int) });
@@ -27,6 +27,9 @@ namespace BinarySerializer.DefaultTypes
         public void GetReadILCode(PropertyData prop, BinaryStruct currentStruct, GroboIL il, GroboIL.Local binaryStruct, GroboIL.Local buffer, GroboIL.Local result, GroboIL.Local typeSize, GroboIL.Local offset, bool listValue)
         {
             var r = il.DeclareLocal(typeof(int));
+            var finish = il.DefineLabel("null_finish");
+
+            BinaryStruct.ReadNullableType(il, finish, buffer, offset, typeSize);
 
             il.Ldloc(buffer);
             il.Ldloc(offset);
@@ -43,19 +46,20 @@ namespace BinarySerializer.DefaultTypes
                 il.Ldloc(r);
                 il.Call(prop.Setter, isVirtual: true);
             }
+            il.MarkLabel(finish);
         }
 
         public void GetWriteILCode(PropertyData prop, BinaryStruct currentStruct, GroboIL il, GroboIL.Local binaryStruct, GroboIL.Local value, GroboIL.Local typeSize, GroboIL.Local buffer, GroboIL.Local offset, bool listValue)
         {
-
-            BinaryStruct.WriteSizeChecker(il, buffer, offset, 4);
+            BinaryStruct.WriteSizeChecker(il, buffer, offset, 5);
             var arr = il.DeclareLocal(typeof(byte[]));
-
+            var finish = il.DefineLabel("null_finish");
             il.Ldloc(value);
             if (!listValue)
                 il.Call(prop.Getter);
             il.Dup();
             il.Pop();
+            BinaryStruct.WriteNullableType<int>(il, finish, buffer, offset, typeSize);
             il.Call(writeBitConverterMethodInfo);
             il.Stloc(arr);
 
@@ -78,6 +82,7 @@ namespace BinarySerializer.DefaultTypes
                 il.Stelem(typeof(byte));
             }
             BinaryStruct.WriteOffsetAppend(il, offset, 4);
+            il.MarkLabel(finish);
         }
     }
 }

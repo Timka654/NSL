@@ -1,6 +1,7 @@
 ﻿using BinarySerializer.DefaultTypes;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -33,7 +34,7 @@ namespace BinarySerializer
 
         public int TypeSize => BinaryAttr.TypeSize;
 
-        public PropertyData(PropertyInfo propertyInfo)
+        public PropertyData(PropertyInfo propertyInfo, TypeStorage storage)
         {
             PropertyInfo = propertyInfo;
 
@@ -43,13 +44,44 @@ namespace BinarySerializer
 
             IsBaseType = typeof(IBasicType).IsAssignableFrom(BinaryAttr.Type);
 
-            if(IsBaseType)
+            //if (PropertyInfo.Name == "CharacterPart")
+            //    Debugger.Break();
+
+            if (IsBaseType)
                 BinaryType = (IBasicType)Activator.CreateInstance(BinaryAttr.Type);
+            //else
+            //    BinaryStruct = storage.GetTypeInfo(BinaryAttr.Type,"");
+
 
             Getter = propertyInfo.GetMethod;
 
             Setter = propertyInfo.SetMethod;
 
         }
+
+        //public PropertyData(PropertyData propertyData)
+        //{
+        //    PropertyInfo = propertyInfo;
+
+        //    BinaryAttr = propertyInfo.GetCustomAttribute<BinaryAttribute>();
+
+        //    BinarySchemeAttrList = propertyInfo.GetCustomAttributes<BinarySchemeAttribute>().ToArray();
+
+        //    IsBaseType = typeof(IBasicType).IsAssignableFrom(BinaryAttr.Type);
+
+        //    //if (PropertyInfo.Name == "CharacterPart")
+        //    //    Debugger.Break();
+
+        //    if (IsBaseType)
+        //        BinaryType = (IBasicType)Activator.CreateInstance(BinaryAttr.Type);
+        //    //else
+        //    //    BinaryStruct = storage.GetTypeInfo(BinaryAttr.Type,"");
+
+
+        //    Getter = propertyInfo.GetMethod;
+
+        //    Setter = propertyInfo.SetMethod;
+
+        //}
     }
 }

@@ -39,7 +39,7 @@ namespace BinarySerializer.DefaultTypes
 
             BinaryStruct.WriteOffsetAppend(il, offset, 2);
 
-            il.Newobj(prop.PropertyInfo.PropertyType.GetConstructor(new Type[] { }));
+            il.Newobj(BinaryStruct.GetConstructor(prop.PropertyInfo.PropertyType, null));
 
             il.Stloc(list);
             il.Ldloc(result);
@@ -77,7 +77,7 @@ namespace BinarySerializer.DefaultTypes
             }
             else
             {
-                var constr = typeKey.GetConstructor(new Type[] { });
+                var constr = BinaryStruct.GetConstructor(typeKey, null);
                 if (constr == null)
                     throw new Exception($"Type {typeKey} not have constructor with not parameters");
 
@@ -96,7 +96,7 @@ namespace BinarySerializer.DefaultTypes
             }
             else
             {
-                var constr = typeValue.GetConstructor(new Type[] { });
+                var constr = BinaryStruct.GetConstructor(typeValue, null);
                 if (constr == null)
                     throw new Exception($"Type {typeValue} not have constructor with not parameters");
 

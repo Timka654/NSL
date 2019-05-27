@@ -4,6 +4,7 @@ using System.Text;
 
 namespace BinarySerializer
 {
+    [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
     public class BinaryAttribute : Attribute
     {
         public int TypeSize { get; set; } = 0;

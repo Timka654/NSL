@@ -231,7 +231,7 @@ namespace SocketServer
         }
 
 #if DEBUG
-        public void SendSerialize(ushort packetId, object obj, [System.Runtime.CompilerServices.CallerMemberName] string memberName = "",
+        public void SendSerialize(ushort packetId, object obj, string scheme, [System.Runtime.CompilerServices.CallerMemberName] string memberName = "",
             [System.Runtime.CompilerServices.CallerFilePath] string sourceFilePath = "",
             [System.Runtime.CompilerServices.CallerLineNumber] int sourceLineNumber = 0)
 #else
@@ -239,7 +239,7 @@ namespace SocketServer
 #endif
         {
             var rbuff = new OutputPacketBuffer { PacketId = packetId };
-            rbuff.Serialize(obj);
+            rbuff.Serialize(obj,scheme);
 
 #if DEBUG
             OnSendPacket?.Invoke(this, rbuff.PacketId, rbuff.PacketLenght, memberName, sourceFilePath, sourceLineNumber);

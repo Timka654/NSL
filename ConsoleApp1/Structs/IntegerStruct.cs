@@ -8,34 +8,43 @@ using System.Text;
 
 namespace BinarySerializer_v5.Test.Structs
 {
-    [BinarySerializer.BinaryPreCompile(30, "")]
+    [BinarySerializer.BinaryPreCompile("default", 30)]
     public class IntegerStruct : ITestStruct<IntegerStruct>
     {
         [Binary(typeof(BinaryBool))]
+        [BinaryScheme("default")]
         public bool b { get; set; }
 
         [Binary(typeof(BinaryInt8))]
+        [BinaryScheme("default")]
         public byte i8 { get; set; }
 
         [Binary(typeof(BinarySInt8))]
+        [BinaryScheme("default")]
         public sbyte si8 { get; set; }
 
         [Binary(typeof(BinaryInt16))]
+        [BinaryScheme("default")]
         public short i16 { get; set; }
 
         [Binary(typeof(BinaryUInt16))]
+        [BinaryScheme("default")]
         public ushort ui16 { get; set; }
 
         [Binary(typeof(BinaryInt32))]
+        [BinaryScheme("default")]
         public int i32 { get; set; }
 
         [Binary(typeof(BinaryUInt32))]
+        [BinaryScheme("default")]
         public uint ui32 { get; set; }
 
         [Binary(typeof(BinaryInt64))]
+        [BinaryScheme("default")]
         public long i64 { get; set; }
 
         [Binary(typeof(BinaryUInt64))]
+        [BinaryScheme("default")]
         public ulong ui64 { get; set; }
 
         public static IntegerStruct GetRndValue()

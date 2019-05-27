@@ -360,7 +360,7 @@ namespace SocketServer.Utils.Buffer
             });
         }
 
-        public void Serialize(object obj, string schemeName = "")
+        public void Serialize(object obj, string schemeName)
         {
             BinarySerializer.BinarySerializer bs = new BinarySerializer.BinarySerializer(TypeStorage.Instance);
             try
@@ -376,7 +376,7 @@ namespace SocketServer.Utils.Buffer
             }
         }
 
-        public void Serialize<T>(T obj, string schemeName = "")
+        public void Serialize<T>(T obj, string schemeName)
         {
             BinarySerializer.BinarySerializer bs = new BinarySerializer.BinarySerializer(TypeStorage.Instance);
             try

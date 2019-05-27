@@ -8,27 +8,33 @@ using System.Text;
 
 namespace BinarySerializer_v5.Test.Structs
 {
-    [BinarySerializer.BinaryPreCompile(500, "")]
+    [BinarySerializer.BinaryPreCompile("default", 500)]
     public class StringStruct : ITestStruct<StringStruct>
     {
         private static UTF8Encoding encoding = new UTF8Encoding();
 
         [Binary(typeof(BinaryString16))]
+        [BinaryScheme("default")]
         public string nulls16 { get; set; }
 
         [Binary(typeof(BinaryString32))]
+        [BinaryScheme("default")]
         public string nulls32 { get; set; }
 
         [Binary(typeof(BinaryString16))]
+        [BinaryScheme("default")]
         public string emptys16 { get; set; }
 
         [Binary(typeof(BinaryString32))]
+        [BinaryScheme("default")]
         public string emptys32 { get; set; }
 
         [Binary(typeof(BinaryString16))]
+        [BinaryScheme("default")]
         public string s16 { get; set; }
 
         [Binary(typeof(BinaryString32))]
+        [BinaryScheme("default")]
         public string s32 { get; set; }
 
         public static StringStruct GetRndValue()

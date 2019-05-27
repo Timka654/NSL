@@ -8,13 +8,15 @@ using System.Text;
 
 namespace BinarySerializer_v5.Test.Structs
 {
-    [BinarySerializer.BinaryPreCompile(12, "")]
+    [BinarySerializer.BinaryPreCompile("default", 12)]
     public class FloatStruct : ITestStruct<FloatStruct>
     {
         [Binary(typeof(BinaryFloat32))]
+        [BinaryScheme("default")]
         public float f32 { get; set; }
 
         [Binary(typeof(BinaryFloat64))]
+        [BinaryScheme("default")]
         public double f64 { get; set; }
 
         public static FloatStruct GetRndValue()

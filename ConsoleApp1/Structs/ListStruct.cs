@@ -9,28 +9,35 @@ using System.Text;
 
 namespace BinarySerializer_v5.Test.Structs
 {
-    [BinarySerializer.BinaryPreCompile(500, "")]
+    [BinarySerializer.BinaryPreCompile("default", 500)]
     public class ListStruct : ITestStruct<ListStruct>
     {
         [Binary(typeof(BinaryList16<BinaryFloat32>))]
+        [BinaryScheme("default")]
         public List<float> nullfl32 { get; set; }
 
         [Binary(typeof(BinaryList32<BinaryInt32>))]
+        [BinaryScheme("default")]
         public List<int> nullil32 { get; set; }
 
         [Binary(typeof(BinaryList16<BinaryFloat32>))]
+        [BinaryScheme("default")]
         public List<float> emptyfl32 { get; set; }
 
         [Binary(typeof(BinaryList32<BinaryInt32>))]
+        [BinaryScheme("default")]
         public List<int> emptyil32 { get; set; }
 
         [Binary(typeof(BinaryList16<BinaryFloat32>))]
+        [BinaryScheme("default")]
         public List<float> fl32 { get; set; }
 
         [Binary(typeof(BinaryList32<BinaryInt32>))]
+        [BinaryScheme("default")]
         public List<int> il32 { get; set; }
 
         [Binary(typeof(BinaryList16<IntegerStruct>))]
+        [BinaryScheme("default")]
         public List<IntegerStruct> isl { get; set; }
 
         public static ListStruct GetRndValue()

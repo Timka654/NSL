@@ -23,14 +23,11 @@ namespace BinarySerializer
             TypeCacheMap = new ConcurrentDictionary<Type, ConcurrentDictionary<string, BinaryStruct>>();
             Coding = coding;
         }
-        
+
         public BinaryStruct GetTypeInfo(Type type, string schemeName, int initialSize = 32)
         {
-            if (!TypeCacheMap.ContainsKey(type) || !TypeCacheMap[type].ContainsKey(""))
-            {
-                TypeCacheMap.TryAdd(type, new ConcurrentDictionary<string, BinaryStruct>());
-                LoadType(type,initialSize);
-            }
+            var result = CheckExist(type, initialSize);
+
 
             if (!TypeCacheMap[type].ContainsKey(schemeName))
             {
@@ -38,6 +35,17 @@ namespace BinarySerializer
             }
 
             return TypeCacheMap[type][schemeName];
+        }
+
+        private BinaryStruct CheckExist(Type type, int initialSize = 32)
+        {
+            if (!TypeCacheMap.ContainsKey(type) || !TypeCacheMap[type].ContainsKey(""))
+            {
+                TypeCacheMap.TryAdd(type, new ConcurrentDictionary<string, BinaryStruct>());
+                LoadType(type, initialSize);
+            }
+
+            return TypeCacheMap[type][""];
         }
 
         private void LoadType(Type type, int initialSize )
@@ -51,10 +59,10 @@ namespace BinarySerializer
             {
                 if (!item.IsBaseType)
                 {
-                    item.BinaryStruct = GetTypeInfo(item.BinaryAttr.Type, "");
+                    item.BinaryStruct = CheckExist(item.BinaryAttr.Type);
                 }
             }
-            s.Compile();
+            //s.Compile();
         }
 
         private List<PropertyData> GetProperties(Type type)
@@ -65,7 +73,7 @@ namespace BinarySerializer
                 BindingFlags.Instance |
                 BindingFlags.DeclaredOnly).Where(x =>
                 Attribute.GetCustomAttribute(x, typeof(BinaryAttribute)) != null).Select(x =>
-                    new PropertyData(x)).ToList();
+                    new PropertyData(x,this)).ToList();
 
             //все наследуемые классы
             if (type.BaseType != typeof(Object))
@@ -76,13 +84,13 @@ namespace BinarySerializer
 
         public void PreCompileBinaryStructs(Assembly assembly)
         {
-            var classes = assembly.GetTypes().Select(x => new { x, attr = x.GetCustomAttribute<BinaryPreCompileAttribute>() }).Where(x => x.attr != null);
+            var classes = assembly.GetTypes().Select(x => new { x, attr = x.GetCustomAttributes<BinaryPreCompileAttribute>() }).Where(x => x.attr != null);
 
             foreach (var item in classes)
             {
-                foreach (var scheme in item.attr.Schemes)
+                foreach (var scheme in item.attr)
                 {
-                    GetTypeInfo(item.x, scheme, item.attr.InitialSize);
+                    GetTypeInfo(item.x, scheme.Scheme, scheme.InitialSize);
                 }
             }
         }

@@ -54,7 +54,7 @@ namespace DBEngine
         /// Тип базы данных MySQl, MsSql
         /// </summary>
         [XmlElement(ElementName = "type")]
-        public DBType DbType { get; set; }
+        public DBType DbType { get; set; } = DBType.MsSql;
 
         /// <summary>
         /// Размер пула подключений (используется для инициализации определенного кол-ва подключений для паралельных запросов)

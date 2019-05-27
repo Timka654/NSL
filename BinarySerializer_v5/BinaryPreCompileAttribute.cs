@@ -5,19 +5,17 @@ using System.Text;
 
 namespace BinarySerializer
 {
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
     public class BinaryPreCompileAttribute : Attribute
     {
         public int InitialSize { get; private set; } = 32;
 
-        public string[] Schemes { get; private set; }
+        public string Scheme { get; private set; }
 
-        public BinaryPreCompileAttribute(int initialSize = 32, params string[] schemes)
+        public BinaryPreCompileAttribute(string scheme, int initialSize = 32)
         {
             InitialSize = initialSize;
-            if (schemes.Contains(""))
-                Schemes = schemes.ToArray();
-            else
-                Schemes = schemes.Append("").ToArray();
+            Scheme = scheme;
 
         }
     }
