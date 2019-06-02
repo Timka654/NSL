@@ -59,29 +59,26 @@ namespace BinarySerializer
 
         }
 
-        //public PropertyData(PropertyData propertyData)
-        //{
-        //    PropertyInfo = propertyInfo;
+        public PropertyData(PropertyData propertyData, string scheme, TypeStorage storage)
+        {
+            PropertyInfo = propertyData.PropertyInfo;
 
-        //    BinaryAttr = propertyInfo.GetCustomAttribute<BinaryAttribute>();
+            BinaryAttr = propertyData.BinaryAttr;
 
-        //    BinarySchemeAttrList = propertyInfo.GetCustomAttributes<BinarySchemeAttribute>().ToArray();
+            BinarySchemeAttrList = propertyData.BinarySchemeAttrList;
 
-        //    IsBaseType = typeof(IBasicType).IsAssignableFrom(BinaryAttr.Type);
+            IsBaseType = typeof(IBasicType).IsAssignableFrom(BinaryAttr.Type);
 
-        //    //if (PropertyInfo.Name == "CharacterPart")
-        //    //    Debugger.Break();
-
-        //    if (IsBaseType)
-        //        BinaryType = (IBasicType)Activator.CreateInstance(BinaryAttr.Type);
-        //    //else
-        //    //    BinaryStruct = storage.GetTypeInfo(BinaryAttr.Type,"");
+            if (IsBaseType)
+                BinaryType = (IBasicType)Activator.CreateInstance(BinaryAttr.Type);
+            else
+                BinaryStruct = storage.GetTypeInfo(BinaryAttr.Type, scheme);
 
 
-        //    Getter = propertyInfo.GetMethod;
+            Getter = propertyData.PropertyInfo.GetMethod;
 
-        //    Setter = propertyInfo.SetMethod;
+            Setter = propertyData.PropertyInfo.SetMethod;
 
-        //}
+        }
     }
 }

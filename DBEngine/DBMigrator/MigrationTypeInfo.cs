@@ -162,6 +162,8 @@ namespace DBEngine.DBMigrator
                 {
                     if (item.Type.IsGenericType && item.Type.GetGenericTypeDefinition() == typeof(List<>))
                         item.Type = item.Type.GetGenericArguments()[0];
+                    else if(item.Type.IsGenericType && item.Type.GetGenericTypeDefinition() == typeof(Dictionary<,>))
+                        item.Type = item.Type.GetGenericArguments()[1];
 
                     if (item.Type.BaseType == typeof(Enum))
                         item.Type = typeof(Enum);

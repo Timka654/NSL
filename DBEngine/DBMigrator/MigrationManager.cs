@@ -88,6 +88,7 @@ namespace DBEngine.DBMigrator
         {
             if (type.Collumns.Count == 0)
                 return;
+
             SelectExistCollumns(type);
 
             type.DbCollumns = SelectNewCollumns(type);
@@ -217,7 +218,7 @@ namespace DBEngine.DBMigrator
                     continue;
 
 
-                collumn.MigrationTypeInfo.Values = (IEnumerable)collumn.Getter(item);
+                collumn.MigrationTypeInfo.Values = (IEnumerable)( typeof(IDictionary).IsAssignableFrom(collumn.Type) ? ((IDictionary)collumn.Getter(item)).Values : collumn.Getter(item));
 
                 if (collumn.MigrationTypeInfo.SourceKeys != null && collumn.MigrationTypeInfo.Values != null)
                     foreach (var sourceKey in collumn.MigrationTypeInfo.SourceKeys)

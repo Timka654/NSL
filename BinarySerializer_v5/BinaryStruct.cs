@@ -41,18 +41,15 @@ namespace BinarySerializer
             if (string.IsNullOrEmpty(scheme))
                 PropertyList = propertyList;
             else
-            //{
+            {
+                PropertyList = propertyList.Where(x => x.BinarySchemeAttrList.FirstOrDefault(y => y.SchemeName == scheme) != null).Select(y => new PropertyData(y, scheme, CurrentStorage)).ToList();
 
-                PropertyList = propertyList.Where(x => x.BinarySchemeAttrList.FirstOrDefault(y => y.SchemeName == scheme) != null).ToList();
-
-            //    foreach (var item in PropertyList)
-            //    {
-            //        if (!item.IsBaseType)
-            //        {
-
-            //        }
-            //    }
-            //}
+                foreach (var item in PropertyList)
+                {
+                    if (!item.IsBaseType)
+                        item.BinaryStruct = item.BinaryStruct.GetSchemeData(scheme, Coding, CurrentStorage);
+                }
+            }
         }
 
         internal void Compile()
@@ -251,14 +248,14 @@ namespace BinarySerializer
         #region HelpWriterMethods
 
         #region NULL
-        public static void WriteNullableType<T>(GroboIL il, GroboIL.Label finishMethod, GroboIL.Local value, GroboIL.Local buffer, GroboIL.Local offset, GroboIL.Local typeSize) 
+        public static void WriteNullableType<T>(GroboIL il, GroboIL.Label finishMethod, GroboIL.Local value, GroboIL.Local buffer, GroboIL.Local offset) 
             where T : struct
         {
             il.Ldloca(value);
-            WriteNullableType<T>(il, finishMethod, buffer, offset, typeSize);
+            WriteNullableType<T>(il, finishMethod, buffer, offset);
         }
 
-        public static void WriteNullableType<T>(GroboIL il, GroboIL.Label finishMethod, GroboIL.Local buffer, GroboIL.Local offset, GroboIL.Local typeSize)
+        public static void WriteNullableType<T>(GroboIL il, GroboIL.Label finishMethod, GroboIL.Local buffer, GroboIL.Local offset)
             where T: struct
         {
             var _null = il.DeclareLocal(typeof(bool));
