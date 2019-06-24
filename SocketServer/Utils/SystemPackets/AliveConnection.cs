@@ -11,12 +11,12 @@ namespace SocketServer.Utils.SystemPackets
         public void Receive(T client, InputPacketBuffer data)
         {
             client.AliveState = true;
-            client.Alive_locker.Set();
-            //if (client.PingCount == ulong.MaxValue)
-            //    client.PingCount = 0;
+            //client.Alive_locker.Set();
+            if (client.PingCount == ulong.MaxValue)
+                client.PingCount = 0;
 
-            //if(client.PingCount++ % 60 == 0)
-            //    ServerTime.Send(client);
+            if (client.PingCount++ % 60 == 0)
+                ServerTime.Send(client);
         }
 
         public static void Send(INetworkClient client)
@@ -30,9 +30,9 @@ namespace SocketServer.Utils.SystemPackets
             };
             client.Network.Send(packet);
 
-            client.Alive_locker.WaitOne(client.AliveWaitTime);
-            if (!client.AliveState)
-                client.Network.Disconnect();
+            //client.Alive_locker.WaitOne(client.AliveWaitTime);
+            //if (!client.AliveState)
+            //    client.Network.Disconnect();
         }
     }
 }

@@ -24,6 +24,7 @@ namespace BinarySerializer
             Coding = coding;
         }
 
+
         public BinaryStruct GetTypeInfo(Type type, string schemeName, int initialSize = 32)
         {
             var result = CheckExist(type, initialSize);
@@ -93,6 +94,10 @@ namespace BinarySerializer
                     GetTypeInfo(item.x, scheme.Scheme, scheme.InitialSize);
                 }
             }
+        }
+        public class CompileFromBuilder
+        {
+
         }
 
         public void SetCoding(Encoding coding)

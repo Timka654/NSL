@@ -12,7 +12,7 @@ namespace DBEngine
     /// </summary>
     public class DBCommand
     {
-        public delegate void DbExceptionEventHandle(Exception ex);
+        public delegate void DbExceptionEventHandle(DBCommand command, Exception ex);
 
         public delegate void DbPerformanceEventHandle(string filename, string methodname, TimeSpan time);
 
@@ -95,7 +95,7 @@ namespace DBEngine
             }
             catch (Exception ex)
             {
-                DbExceptionEvent?.Invoke(ex);
+                DbExceptionEvent?.Invoke(this, ex);
                 throw ex;
             }
             return this;
@@ -118,7 +118,7 @@ namespace DBEngine
             }
             catch (Exception ex)
             {
-                DbExceptionEvent?.Invoke(ex);
+                DbExceptionEvent?.Invoke(this, ex);
                 throw ex;
             }
             return this;
@@ -142,7 +142,7 @@ namespace DBEngine
             }
             catch (Exception ex)
             {
-                DbExceptionEvent?.Invoke(ex);
+                DbExceptionEvent?.Invoke(this, ex);
                 throw ex;
             }
         }
@@ -164,7 +164,30 @@ namespace DBEngine
             }
             catch (Exception ex)
             {
-                DbExceptionEvent?.Invoke(ex);
+                DbExceptionEvent?.Invoke(this, ex);
+                throw ex;
+            }
+            return this;
+        }
+
+        /// <summary>
+        /// Выполнить запрос, и получить значение первой строки, первого столбца
+        /// </summary>
+        /// <returns>значение первой строки, первого столбца</returns>
+        public DBCommand ExecuteGetFirstValue<T>(out T result, [System.Runtime.CompilerServices.CallerMemberName] string memberName = "",
+            [System.Runtime.CompilerServices.CallerFilePath] string sourceFilePath = "")
+        {
+            Stopwatch sw = new Stopwatch();
+            try
+            {
+                sw.Start();
+                result = (T)cmd.ExecuteScalar();
+                sw.Stop();
+                DbPerformanceEvent?.Invoke(sourceFilePath, memberName, sw.Elapsed);
+            }
+            catch (Exception ex)
+            {
+                DbExceptionEvent?.Invoke(this, ex);
                 throw ex;
             }
             return this;
@@ -187,7 +210,7 @@ namespace DBEngine
             }
             catch (Exception ex)
             {
-                DbExceptionEvent?.Invoke(ex);
+                DbExceptionEvent?.Invoke(this, ex);
                 throw ex;
             }
             return this;
@@ -211,7 +234,7 @@ namespace DBEngine
             }
             catch (Exception ex)
             {
-                DbExceptionEvent?.Invoke(ex);
+                DbExceptionEvent?.Invoke(this, ex);
                 throw ex;
             }
         }
@@ -220,7 +243,7 @@ namespace DBEngine
         /// Выполнить запрос и получить результат
         /// </summary>
         /// <param name="action"></param>
-        public DBCommand ExecuteAndRead(Action<DbDataReader> action,[System.Runtime.CompilerServices.CallerMemberName] string memberName = "",
+        public DBCommand ExecuteAndRead(Action<DbDataReader> action, [System.Runtime.CompilerServices.CallerMemberName] string memberName = "",
             [System.Runtime.CompilerServices.CallerFilePath] string sourceFilePath = "")
         {
             Stopwatch sw = new Stopwatch();
@@ -238,7 +261,38 @@ namespace DBEngine
             }
             catch (Exception ex)
             {
-                DbExceptionEvent?.Invoke(ex);
+                DbExceptionEvent?.Invoke(this, ex);
+                CloseConnection();
+                throw ex;
+            }
+            return this;
+        }
+
+        /// <summary>
+        /// Выполнить запрос и получить результат
+        /// </summary>
+        /// <param name="action"></param>
+        public DBCommand ExecuteAndRead(Action<DbDataReader, byte> action, [System.Runtime.CompilerServices.CallerMemberName] string memberName = "",
+            [System.Runtime.CompilerServices.CallerFilePath] string sourceFilePath = "")
+        {
+            Stopwatch sw = new Stopwatch();
+            try
+            {
+                sw.Start();
+                var reader = cmd.ExecuteReader();
+                byte i = 0;
+                while (reader.Read())
+                {
+                    i = 0;
+                    action.Invoke(reader, i);
+                }
+                reader.Close();
+                sw.Stop();
+                DbPerformanceEvent?.Invoke(sourceFilePath, memberName, sw.Elapsed);
+            }
+            catch (Exception ex)
+            {
+                DbExceptionEvent?.Invoke(this, ex);
                 CloseConnection();
                 throw ex;
             }
@@ -264,7 +318,7 @@ namespace DBEngine
             }
             catch (Exception ex)
             {
-                DbExceptionEvent?.Invoke(ex);
+                DbExceptionEvent?.Invoke(this, ex);
                 throw ex;
             }
         }

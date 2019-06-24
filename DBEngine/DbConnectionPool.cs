@@ -61,7 +61,7 @@ namespace DBEngine
             }
             catch (Exception ex)
             {
-                DbExceptionEvent?.Invoke(ex);
+                DbExceptionEvent?.Invoke(null, ex);
             }
         }
         
@@ -88,7 +88,7 @@ namespace DBEngine
             }
             catch (Exception ex)
             {
-                DbExceptionEvent?.Invoke(ex);
+                DbExceptionEvent?.Invoke(null, ex);
             }
 
             are.Set();
@@ -127,9 +127,9 @@ namespace DBEngine
             return dbc;
         }
 
-        private void Dbc_DbExceptionEvent(Exception ex)
+        private void Dbc_DbExceptionEvent(DBCommand command, Exception ex)
         {
-            DbExceptionEvent?.Invoke(ex);
+            DbExceptionEvent?.Invoke(command, ex);
         }
 
         /// <summary>
