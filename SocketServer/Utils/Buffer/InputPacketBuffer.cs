@@ -11,7 +11,7 @@ namespace SocketServer.Utils.Buffer
 {
     public class InputPacketBuffer
     {
-        private static readonly DateTime MinDatetimeValue = new DateTime(1, 1, 1);
+        private static readonly DateTime MinDatetimeValue = new DateTime(1970, 1, 1);
         /// <summary>
         /// Текущая кодировка типа String
         /// </summary>
@@ -313,7 +313,7 @@ namespace SocketServer.Utils.Buffer
 
         public DateTime? ReadDateTime()
         {
-            var r = ReadUInt64();
+            var r = ReadDouble();
             if (r == 0)
                 return null;
             return MinDatetimeValue.AddMilliseconds(r);

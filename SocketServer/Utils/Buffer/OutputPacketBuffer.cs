@@ -10,7 +10,7 @@ namespace SocketServer.Utils.Buffer
 {
     public class OutputPacketBuffer
     {
-        private static readonly DateTime MinDatetimeValue = new DateTime(1, 1, 1);
+        private static readonly DateTime MinDatetimeValue = new DateTime(1970, 1, 1);
 
         /// <summary>
         /// Текущая кодировка типа String
@@ -304,12 +304,12 @@ namespace SocketServer.Utils.Buffer
             if (value.HasValue)
                 await WriteDateTimeAsync(value.Value);
             else
-                await WriteUInt64Async(0);
+                await WriteDoubleAsync(0);
         }
 
         public async Task WriteDateTimeAsync(DateTime value)
         {
-            await WriteUInt64Async((ulong)(value - MinDatetimeValue).TotalMilliseconds);
+            await WriteDoubleAsync((value - MinDatetimeValue).TotalMilliseconds);
         }
 
         public void WriteDateTime(DateTime? value)
@@ -317,12 +317,12 @@ namespace SocketServer.Utils.Buffer
             if (value.HasValue)
                 WriteDateTime(value.Value);
             else
-                WriteUInt64(0);
+                WriteDouble(0);
         }
 
         public void WriteDateTime(DateTime value)
         {
-            WriteUInt64((ulong)(value - MinDatetimeValue).TotalMilliseconds);
+            WriteDouble((value - MinDatetimeValue).TotalMilliseconds);
         }
 
         /// <summary>
