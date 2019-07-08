@@ -1,4 +1,5 @@
-﻿using BinarySerializer.DefaultTypes;
+﻿using BinarySerializer.Builder;
+using BinarySerializer.DefaultTypes;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -24,7 +25,6 @@ namespace BinarySerializer
             Coding = coding;
         }
 
-
         public BinaryStruct GetTypeInfo(Type type, string schemeName, int initialSize = 32)
         {
             var result = CheckExist(type, initialSize);
@@ -49,7 +49,18 @@ namespace BinarySerializer
             return TypeCacheMap[type][""];
         }
 
-        private void LoadType(Type type, int initialSize )
+        internal BinaryStruct AppendPreCompile(StructBuilder builder)
+        {
+            if (!TypeCacheMap.ContainsKey(builder.CurrentType) || !TypeCacheMap[builder.CurrentType].ContainsKey(""))
+            {
+                TypeCacheMap.TryAdd(builder.CurrentType, new ConcurrentDictionary<string, BinaryStruct>());
+                TypeCacheMap[builder.CurrentType].TryAdd("", builder.CurrentStruct);
+            }
+
+            return TypeCacheMap[builder.CurrentType][""];
+        }
+
+        private void LoadType(Type type, int initialSize)
         {
             List<PropertyData> t = GetProperties(type);
             var s = new BinaryStruct(type, "", t.ToList(), Coding, this);
@@ -94,10 +105,6 @@ namespace BinarySerializer
                     GetTypeInfo(item.x, scheme.Scheme, scheme.InitialSize);
                 }
             }
-        }
-        public class CompileFromBuilder
-        {
-
         }
 
         public void SetCoding(Encoding coding)

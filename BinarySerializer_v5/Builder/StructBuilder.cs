@@ -9,11 +9,17 @@ namespace BinarySerializer.Builder
 {
     public class StructBuilder
     {
+        internal Encoding coding = UTF8Encoding.UTF8;
+
         internal List<StructBuilderProperty> Propertyes;
 
         internal TypeStorage CurrentStorage;
 
         internal List<string> Schemes = new List<string>();
+
+        internal Type CurrentType;
+
+        internal BinaryStruct CurrentStruct;
 
         internal List<BinaryPreCompileAttribute> PreCompiled = new List<BinaryPreCompileAttribute>();
 
@@ -26,8 +32,8 @@ namespace BinarySerializer.Builder
 
         public BinaryStruct Compile()
         {
-
-            return null;
+            CurrentStruct = new BinaryStruct(CurrentType, "", Propertyes.Select(x => (PropertyData)x.property).ToList(), coding, CurrentStorage);
+            return CurrentStorage.AppendPreCompile(this);
         }
     }
 
@@ -35,6 +41,12 @@ namespace BinarySerializer.Builder
     {
         protected StructBuilder(TypeStorage storage) : base(storage)
         {
+            CurrentType = typeof(T);
+        }
+
+        public void SetEncoding(Encoding coding)
+        {
+            base.coding = coding;
         }
 
         public static StructBuilder<T> GetStruct(TypeStorage storage = null)
@@ -43,6 +55,14 @@ namespace BinarySerializer.Builder
                 storage = TypeStorage.Instance;
 
             return new StructBuilder<T>(storage);
+        }
+
+        public StructBuilderProperty<T> GetProperty(string propertyName)
+        {
+            return new StructBuilderProperty<T>(this, typeof(T).GetProperty(propertyName, BindingFlags.Public |
+                BindingFlags.NonPublic |
+                BindingFlags.Instance |
+                BindingFlags.DeclaredOnly));
         }
 
         public StructBuilderProperty<T> GetProperty(Expression<Func<T, object>> GetPropertyLambda)
