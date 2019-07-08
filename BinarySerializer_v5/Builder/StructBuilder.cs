@@ -59,10 +59,14 @@ namespace BinarySerializer.Builder
 
         public StructBuilderProperty<T> GetProperty(string propertyName)
         {
-            return new StructBuilderProperty<T>(this, typeof(T).GetProperty(propertyName, BindingFlags.Public |
+            var prop = typeof(T).GetProperty(propertyName, BindingFlags.Public |
                 BindingFlags.NonPublic |
                 BindingFlags.Instance |
-                BindingFlags.DeclaredOnly));
+                BindingFlags.DeclaredOnly);
+            if (prop == null)
+                throw new NullReferenceException();
+
+            return new StructBuilderProperty<T>(this, prop);
         }
 
         public StructBuilderProperty<T> GetProperty(Expression<Func<T, object>> GetPropertyLambda)
@@ -156,5 +160,9 @@ namespace BinarySerializer.Builder
             return prevProp;
         }
 
+        public StructBuilderProperty<PrevT> Back()
+        {
+            return prevProp;
+        }
     }
 }
