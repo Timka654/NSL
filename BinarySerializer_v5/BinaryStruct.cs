@@ -148,6 +148,8 @@ namespace BinarySerializer
             il.Call(item.PropertyInfo.GetGetMethod());
             il.Stloc(in_value);
 
+            WriteSizeChecker(il, buffer, offset, 2);
+
             WriteObjectNull(il, methodBreak, in_value, buffer, offset, typeSize);
 
             CompileWriter(item.BinaryStruct, il, binaryStruct, in_value, buffer, offset, typeSize);

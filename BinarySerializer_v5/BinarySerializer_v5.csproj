@@ -27,6 +27,30 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x86'">
+    <DefineConstants>TRACE;NOT_UNITY</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
+    <DefineConstants>TRACE;NOT_UNITY</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='PublishDebug|x86'">
+    <DefineConstants>TRACE;NOT_UNITY</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='PublishDebug|x64'">
+    <DefineConstants>TRACE;DEBUG;NOT_UNITY</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <DefineConstants>TRACE;NOT_UNITY</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <DefineConstants>TRACE;NOT_UNITY</DefineConstants>
+  </PropertyGroup>
+
   <ItemGroup>
     <Compile Remove="Deserializer.cs" />
     <Compile Remove="Serializer.cs" />
@@ -35,7 +59,7 @@
 
   <ItemGroup>
     <PackageReference Include="GrEmit" Version="3.1.1" />
-    <PackageReference Include="System.Reflection.Emit.ILGeneration" Version="4.6.0-preview5.19224.8" />
+    <PackageReference Include="System.Reflection.Emit.ILGeneration" Version="4.3.0" />
   </ItemGroup>
 
 </Project>

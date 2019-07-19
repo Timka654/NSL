@@ -7,6 +7,10 @@
     <Configurations>Debug;Release;PublishDebug;PublishDebug</Configurations>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='PublishDebug|x64'">
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+  </PropertyGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\SocketServer\SocketServer.csproj" />
   </ItemGroup>

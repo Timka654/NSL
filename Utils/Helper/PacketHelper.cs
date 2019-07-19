@@ -31,6 +31,9 @@ namespace Utils.Helper
             {
                 Debug.WriteLine($"Loading Packet: packet: {item.attr.PacketId} type: {item.type.FullName}");
 
+                if (!typeof(IPacket<T>).IsAssignableFrom(item.type))
+                    throw new Exception($"Packet type {typeof(IPacket<T>)} is not assignable from {item.type}");
+
                 var r = serverOptions.Packets.ContainsKey(item.attr.PacketId);
                 if (!r)
                     serverOptions.Packets.Add((ushort)item.attr.PacketId, (IPacket<T>)Activator.CreateInstance(item.type));
