@@ -49,7 +49,7 @@ namespace Utils
             if (result == null)
                 return "";
 
-            return Encoding.ASCII.GetString(result);
+            return Encoding.UTF8.GetString(result);
         }
 
         public object GetJson(string method)
