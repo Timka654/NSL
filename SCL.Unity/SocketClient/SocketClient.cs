@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
 
 namespace SCL.SocketClient
 {
@@ -20,8 +21,6 @@ namespace SCL.SocketClient
             try
             {
                 client = new Socket(clientOptions.AddressFamily, SocketType.Stream, clientOptions.ProtocolType);
-                client.Connect(clientOptions.IpAddress, clientOptions.Port);
-
                 Reconnect(client);
                 return true;
             }
@@ -53,7 +52,9 @@ namespace SCL.SocketClient
 
                     bool success = result.AsyncWaitHandle.WaitOne(3000, true);
 
-                    if (success && client.Connected)
+                    success = success && client.Connected;
+
+                    if (success)
                         Reconnect(client);
                     return success;
                 }

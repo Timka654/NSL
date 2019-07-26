@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace SCL.SocketClient
 {
-    public class SingletoneBaseNetwork<T, TType> : BaseNetwork<T> where T : BaseSocketNetworkClient
+    public class SingletonBaseNetwork<T, TType> : BaseNetwork<T> where T : BaseSocketNetworkClient
         where TType : MonoBehaviour
     {
         #region Singletone
@@ -21,7 +21,7 @@ namespace SCL.SocketClient
                 if (instance == null)
                     instance = (TType)Resources.FindObjectsOfTypeAll(typeof(TType)).FirstOrDefault();
                 if (instance == null)
-                    Debug.LogError("Singleton<" + typeof(TType) + "> instance has been not found.");
+                    Debug.Log("Singleton<" + typeof(TType) + "> instance has been not found.");
                 return instance;
             }
         }
@@ -35,12 +35,13 @@ namespace SCL.SocketClient
             {
                 instance = this as TType;
             }
-            else if (instance != this && !dontDestroyOnLoad)
+            else if (instance != this)
+            {
                 DestroySelf();
-            else if (instance != this && dontDestroyOnLoad)
-                instance = this as TType;
+                return;
+            }
 
-                if (dontDestroyOnLoad)
+            if (dontDestroyOnLoad)
                 DontDestroyOnLoad(this.gameObject);
 
             base.Awake();
@@ -50,7 +51,7 @@ namespace SCL.SocketClient
         {
             if (this.GetType() != typeof(TType)) //Change to solve the problem
             {
-                Debug.LogError("Singleton<" + typeof(TType) + "> has a wrong Type Parameter. " +
+                Debug.Log("Singleton<" + typeof(TType) + "> has a wrong Type Parameter. " +
                     "Try Singleton<" + this.GetType() + "> instead.");
 #if UNITY_EDITOR
                 UnityEditor.EditorApplication.delayCall -= DestroySelf;
@@ -60,24 +61,22 @@ namespace SCL.SocketClient
 
             if (instance == null)
                 instance = this as TType;
-            else if (instance != this && !dontDestroyOnLoad)
+            else if (instance != this)
             {
-                Debug.LogError("Singleton<" + this.GetType() + "> already has an instance on scene. Component will be destroyed.");
+                Debug.Log("Singleton<" + this.GetType() + "> already has an instance on scene. Component will be destroyed.");
 #if UNITY_EDITOR
                 UnityEditor.EditorApplication.delayCall -= DestroySelf;
                 UnityEditor.EditorApplication.delayCall += DestroySelf;
 #endif
             }
-            else if (instance != this && dontDestroyOnLoad)
-                instance = this as TType;
         }
 
         private void DestroySelf()
         {
             if (Application.isPlaying)
-                Destroy(this);
+                Destroy(this.gameObject);
             else
-                DestroyImmediate(this);
+                DestroyImmediate(this.gameObject);
         }
 
         #endregion

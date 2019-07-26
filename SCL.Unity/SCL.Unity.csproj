@@ -7,8 +7,8 @@
     <ProjectGuid>{87AF60B0-3254-4353-9CA0-FBC4B90275C7}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>SCL.Unity.Net4._6</RootNamespace>
-    <AssemblyName>SCL.Unity.Net4.6</AssemblyName>
+    <RootNamespace>SCL.Unity</RootNamespace>
+    <AssemblyName>SCL.Unity</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -254,7 +254,7 @@
     <Compile Include="SocketClient\BaseSocketNetworkClient.cs" />
     <Compile Include="SocketClient\Client.cs" />
     <Compile Include="SocketClient\ClientOptions.cs" />
-    <Compile Include="SocketClient\SingletoneBaseNetwork.cs" />
+    <Compile Include="SocketClient\SingletonBaseNetwork.cs" />
     <Compile Include="SocketClient\SocketClient.cs" />
     <Compile Include="SocketClient\Utils\Buffer\InputPacketBuffer.cs" />
     <Compile Include="SocketClient\Utils\Buffer\OutputPacketBuffer.cs" />

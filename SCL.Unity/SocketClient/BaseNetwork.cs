@@ -25,7 +25,7 @@ namespace SCL.SocketClient
 
         public long Version = 0;
 
-        public bool PacketDebug = false;
+        public bool LogEnabled = false;
 
         public bool InitializeOnAwake = true;
 
@@ -79,13 +79,13 @@ namespace SCL.SocketClient
 
         protected virtual void NetworkClient_OnSendPacket(Client<T> client, ushort pid, int len)
         {
-            if(PacketDebug)
+            if(LogEnabled)
                 Debug.Log($"{ClientType} packet send pid:{pid} len:{len}");
         }
 
         protected virtual void NetworkClient_OnReceivePacket(Client<T> client, ushort pid, int len)
         {
-            if (PacketDebug)
+            if (LogEnabled)
                 Debug.Log($"{ClientType} packet receive pid:{pid} len:{len}");
         }
 
@@ -110,7 +110,7 @@ namespace SCL.SocketClient
             Debug.LogError($"{ClientType} server connection lost");
         }
 
-        private void OnApplicationQuit()
+        protected virtual void OnApplicationQuit()
         {
             if (SocketOptions?.NetworkClient != null)
             {
