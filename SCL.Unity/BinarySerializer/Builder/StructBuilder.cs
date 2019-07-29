@@ -32,7 +32,7 @@ namespace BinarySerializer.Builder
 
         public BinaryStruct Compile()
         {
-            CurrentStruct = new BinaryStruct(CurrentType, "", Propertyes.Select(x => (PropertyData)x.property).ToList(), coding, CurrentStorage);
+            CurrentStruct = new BinaryStruct(CurrentType, "", Propertyes.Select(x => (PropertyData)x.property).ToList(), coding, CurrentStorage, true);
             return CurrentStorage.AppendPreCompile(this);
         }
     }

@@ -51,13 +51,17 @@ namespace BinarySerializer
 
         internal BinaryStruct AppendPreCompile(StructBuilder builder)
         {
-            if (!TypeCacheMap.ContainsKey(builder.CurrentType) || !TypeCacheMap[builder.CurrentType].ContainsKey(""))
+            if (!TypeCacheMap.ContainsKey(builder.CurrentType))
             {
                 TypeCacheMap.TryAdd(builder.CurrentType, new ConcurrentDictionary<string, BinaryStruct>());
-                TypeCacheMap[builder.CurrentType].TryAdd("", builder.CurrentStruct);
             }
+            else
+            {
+                TypeCacheMap[builder.CurrentType].Clear();
+            }
+            TypeCacheMap[builder.CurrentType].TryAdd("", builder.CurrentStruct);
 
-            return TypeCacheMap[builder.CurrentType][""];
+            return builder.CurrentStruct;
         }
 
         private void LoadType(Type type, int initialSize)

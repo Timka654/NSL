@@ -31,7 +31,50 @@ namespace BinarySerializer
         public string IlReadCode;
         public string IlWriteCode;
 
-        public BinaryStruct(Type type, string scheme, List<PropertyData> propertyList, Encoding coding, TypeStorage currentStorage)
+        private List<PropertyData> FillPropertyes(BinaryStruct old, List<PropertyData> propertyList)
+        {
+            List<PropertyData> result = old.PropertyList.ToList();
+
+            PropertyData tempPropData = null;
+
+            foreach (var item in propertyList)
+            {
+                if ((tempPropData = result.FirstOrDefault(x => x.PropertyInfo.Name == item.PropertyInfo.Name)) == null)
+                {
+                    result.Add(item);
+                }
+                else
+                {
+                    if (tempPropData.BinaryAttr.Type != item.BinaryAttr.Type)
+                        throw new Exception($"Cannot fill property \"{tempPropData.PropertyInfo.Name}\" in struct {Type} because of old binary type ({tempPropData.BinaryAttr.Type}) not compared new type ({item.BinaryAttr.Type})");
+
+                    if (tempPropData.BinaryAttr.ArraySize != item.BinaryAttr.ArraySize)
+                        throw new Exception($"Cannot fill property \"{tempPropData.PropertyInfo.Name}\" in struct {Type} because of old array size ({tempPropData.BinaryAttr.ArraySize}) not compared new array size ({item.BinaryAttr.ArraySize})");
+
+                    if (tempPropData.BinaryAttr.ArraySizeName != item.BinaryAttr.ArraySizeName)
+                        throw new Exception($"Cannot fill property \"{tempPropData.PropertyInfo.Name}\" in struct {Type} because of old array size name ({tempPropData.BinaryAttr.ArraySizeName}) not compared new array size name ({item.BinaryAttr.ArraySizeName})");
+
+
+                    if (tempPropData.BinaryAttr.TypeSize != item.BinaryAttr.TypeSize)
+                        throw new Exception($"Cannot fill property \"{tempPropData.PropertyInfo.Name}\" in struct {Type} because of old type size ({tempPropData.BinaryAttr.TypeSize}) not compared new type size ({item.BinaryAttr.TypeSize})");
+
+                    if (tempPropData.BinaryAttr.TypeSizeName != item.BinaryAttr.TypeSizeName)
+                        throw new Exception($"Cannot fill property \"{tempPropData.PropertyInfo.Name}\" in struct {Type} because of old type size name ({tempPropData.BinaryAttr.TypeSizeName}) not compared new type size name ({item.BinaryAttr.TypeSizeName})");
+
+                    foreach (var scheme in item.BinarySchemeAttrList)
+                    {
+                        if (tempPropData.BinarySchemeAttrList.Exists(x => x.SchemeName == scheme.SchemeName))
+                            continue;
+                        tempPropData.BinarySchemeAttrList.Add(scheme);
+                    }
+
+                }
+            }
+
+            return result;
+        }
+
+        public BinaryStruct(Type type, string scheme, List<PropertyData> propertyList, Encoding coding, TypeStorage currentStorage, bool builderCompile = false)
         {
             Type = type;
             Scheme = scheme;
@@ -39,7 +82,18 @@ namespace BinarySerializer
             CurrentStorage = currentStorage;
 
             if (string.IsNullOrEmpty(scheme))
-                PropertyList = propertyList;
+            {
+                var existOldType = builderCompile? currentStorage.GetTypeInfo(type, "") : null;
+                if (existOldType == null)
+                {
+                    PropertyList = propertyList;
+                }
+                else
+                {
+                    PropertyList = FillPropertyes(existOldType, propertyList);
+                }
+                PropertyList = PropertyList.OrderBy(x => x.PropertyInfo.Name).ToList();
+            }
             else
             {
                 PropertyList = propertyList.Where(x => x.BinarySchemeAttrList.FirstOrDefault(y => y.SchemeName == scheme) != null).Select(y => new PropertyData(y, scheme, CurrentStorage)).ToList();

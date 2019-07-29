@@ -29,7 +29,6 @@ namespace SCL.SocketClient.Utils
             return Receive;
         }
 
-
         protected void Send(OutputPacketBuffer packet)
         {
             if (Client.Network?.GetState() == true)
@@ -43,7 +42,7 @@ namespace SCL.SocketClient.Utils
             SuccessSend = false;
         }
 
-        protected void SendSerialize<O>(ushort packetId, O obj, string scheme)
+        protected void Send<O>(ushort packetId, O obj, string scheme)
         {
             if (Client.Network?.GetState() == true)
             {
