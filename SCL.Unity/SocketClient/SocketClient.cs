@@ -21,6 +21,7 @@ namespace SCL.SocketClient
             try
             {
                 client = new Socket(clientOptions.AddressFamily, SocketType.Stream, clientOptions.ProtocolType);
+                client.Connect(clientOptions.IpAddress, clientOptions.Port);
                 Reconnect(client);
                 return true;
             }
@@ -55,7 +56,14 @@ namespace SCL.SocketClient
                     success = success && client.Connected;
 
                     if (success)
+                    {
                         Reconnect(client);
+                    }
+                    else
+                    {
+                        clientOptions.RunClientDisconnect();
+                    }
+
                     return success;
                 }
                 catch (Exception ex)

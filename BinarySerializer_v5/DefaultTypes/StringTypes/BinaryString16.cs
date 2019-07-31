@@ -36,6 +36,11 @@ namespace BinarySerializer.DefaultTypes
 
             BinaryStruct.WriteOffsetAppend(il, offset, 2);
 
+            il.Ldloc(len);
+            il.Ldc_I4(0);
+            il.Ceq();
+            il.Brtrue(exitLabel);
+
             if (!listValue)
             {
                 il.Ldloc(result);

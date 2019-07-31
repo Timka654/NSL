@@ -51,6 +51,8 @@
     <Compile Include="BinarySerializer\BinaryStruct.cs" />
     <Compile Include="BinarySerializer\Builder\BuilderPropertyData.cs" />
     <Compile Include="BinarySerializer\Builder\StructBuilder.cs" />
+    <Compile Include="BinarySerializer\Builder\StructBuilderPartialType.cs" />
+    <Compile Include="BinarySerializer\Builder\StructBuilderPartialTypeProperty.cs" />
     <Compile Include="BinarySerializer\Builder\StructBuilderProperty.cs" />
     <Compile Include="BinarySerializer\DefaultTypes\ArrayTypes\BinaryArray.cs" />
     <Compile Include="BinarySerializer\DefaultTypes\ArrayTypes\BinaryArray16.cs" />

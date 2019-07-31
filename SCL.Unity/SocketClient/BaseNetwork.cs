@@ -46,7 +46,7 @@ namespace SCL.SocketClient
                 StartClient();
         }
 
-        public void StartClient()
+        public async void StartClient()
         {
             if (SocketOptions.NetworkClient != null)
             {
@@ -71,8 +71,10 @@ namespace SCL.SocketClient
             SocketOptions.NetworkClient.OnReceivePacket += NetworkClient_OnReceivePacket;
             SocketOptions.NetworkClient.OnSendPacket += NetworkClient_OnSendPacket;
 #endif
-            if(ConnectOnAwake)
-                SocketOptions.NetworkClient.Connect();
+            if (ConnectOnAwake)
+            {
+                await ConnectAsync();
+            }
         }
 
 #if DEBUG
@@ -97,7 +99,7 @@ namespace SCL.SocketClient
 
         protected virtual void SocketOptions_OnExtensionEvent(Exception ex, T client)
         {
-            Debug.Log(ex.ToString());
+            Debug.LogError(ex.ToString());
         }
 
         protected virtual void SocketOptions_OnClientConnectEvent(T client)
