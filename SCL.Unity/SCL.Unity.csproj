@@ -212,6 +212,14 @@
     <Compile Include="Cipher\RC\RC4\XRC4Cipher.cs" />
     <Compile Include="Cipher\RC\RC5\RC5Cipher.cs" />
     <Compile Include="Cipher\RSA\RSACipher.cs" />
+    <Compile Include="NAT\Proxy\ProxyNetwork\Data\Info\Enums\ProxySignInResultEnum.cs" />
+    <Compile Include="NAT\Proxy\ProxyNetwork\Data\Packets\PacketData\ProxySignInPacketData.cs" />
+    <Compile Include="NAT\Proxy\ProxyNetwork\Data\Packets\PacketData\ProxySignInPacketResultData.cs" />
+    <Compile Include="NAT\Proxy\ProxyNetwork\Data\Packets\SignIn.cs" />
+    <Compile Include="NAT\Proxy\ProxyNetwork\SimpleNetworkProxy.cs" />
+    <Compile Include="NAT\Proxy\ProxyNetwork\SingletonNetworkProxy.cs" />
+    <Compile Include="NAT\Proxy\ProxyNetwork\NetworkProxy.cs" />
+    <Compile Include="NAT\Proxy\ProxyNetwork\NetworkProxyClient.cs" />
     <Compile Include="NAT\uPnP\AbstractNatDevice.cs" />
     <Compile Include="NAT\uPnP\AsyncResults\AsyncResult.cs" />
     <Compile Include="NAT\uPnP\Enums\MapState.cs" />
@@ -243,6 +251,7 @@
     <Compile Include="NAT\uPnP\Upnp\Messages\Responses\GetGenericPortMappingEntryResponseMessage.cs" />
     <Compile Include="NAT\uPnP\Upnp\Messages\UpnpMessage.cs" />
     <Compile Include="NAT\uPnP\Upnp\UpnpNatDevice.cs" />
+    <Compile Include="Node\NodeIPEndPoint.cs" />
     <Compile Include="Node\TCPNode\TCPNode.cs" />
     <Compile Include="Node\TCPNode\TCPNodePlayer.cs" />
     <Compile Include="Node\UDPNode\UDPNode.cs" />
@@ -274,5 +283,6 @@
     <Compile Include="SocketClient\Utils\SystemPackets\Version.cs" />
     <Compile Include="ThreadHelper.cs" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -9,15 +9,16 @@ using System.Text;
 
 namespace Utils
 {
-    public class IRecoverySessionManager<T> where T : INetworkClient
+    public class IRecoverySessionManager<T> 
+        where T : INetworkClient
     {
-        protected ConcurrentDictionary<long, Tuple<string[], T>> keyStorage;
+        protected ConcurrentDictionary<string, Tuple<string[], T>> keyStorage;
 
         protected TimeSpan WaitTime = TimeSpan.FromSeconds(20);
 
         public IRecoverySessionManager()
         {
-            keyStorage = new ConcurrentDictionary<long, Tuple<string[], T>>();
+            keyStorage = new ConcurrentDictionary<string, Tuple<string[], T>>();
         }
 
         public void RegisterServer(ServerOptions<T> server)
@@ -26,52 +27,47 @@ namespace Utils
             server.OnRecoverySessionReceiveEvent += Server_OnRecoverySessionReceiveEvent;
         }
 
-        private void Server_OnRecoverySessionReceiveEvent(T client, long id, string[] keys)
+        private void Server_OnRecoverySessionReceiveEvent(T client, string session, string[] keys)
         {
-            if (!keyStorage.TryRemove(id, out var result))
+            if (!keyStorage.TryRemove(session, out var result))
             {
                 RecoverySession<T>.Send(client, RecoverySessionResultEnum.NotFound, null, null);
                 return;
             }
 
-            keys = GenerateKeys(id);
+            keys = GenerateKeys();
 
             result.Item2.ChangeOwner(client);
-            result.Item2.SetRecoveryData(id, keys);
+            result.Item2.SetRecoveryData(session, keys);
 
-            keyStorage.TryAdd(id, new Tuple<string[], T>(keys, client));
+            keyStorage.TryAdd(session, new Tuple<string[], T>(keys, client));
 
-            RecoverySession<T>.Send(client, RecoverySessionResultEnum.Ok, id, keys);
+            RecoverySession<T>.Send(client, RecoverySessionResultEnum.Ok, session, keys);
         }
 
         protected virtual void Server_OnClientDisconnectEvent(SocketServer.Utils.INetworkClient client)
         {
-            long id = client.GetId();
+            string session = client.GetSession();
 
-            if (id == 0)
+            if (string.IsNullOrEmpty(session))
                 return;
 
             client.DisconnectTime = DateTime.Now + WaitTime;
         }
 
-        protected virtual string[] GenerateKeys(long id)
+        protected virtual string[] GenerateKeys()
         {
-            Random rnd = new Random();
-
             int count = rnd.Next(4, 8);
 
             string[] result = new string[count];
 
-            byte[] buffer = new byte[22];
-
             for (int i = 0; i < count; i++)
             {
-                rnd.NextBytes(buffer);
-                result[i] = string.Join("", buffer.Select(x => x.ToString("x2")));
+                result[i] = Token.GenerateToken(24).ToString();
             }
 
             return result;
         }
-
+        protected static Random rnd = new Random();
     }
 }

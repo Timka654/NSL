@@ -7,9 +7,19 @@ using System.Text;
 using System.Threading;
 using SocketServer.Utils;
 using SocketServer.Utils.Buffer;
+using SocketServer.Utils.Exceptions;
 
 namespace SocketServer
 {
+    internal class SendAsyncState
+    {
+        public byte[] buf { get; set; }
+
+        public int offset { get; set; }
+
+        public int len { get; set; }
+    }
+
 #if DEBUG
     public delegate void ReceivePacketDebugInfo<T>(Client<T> client, ushort pid, int len) where T : INetworkClient;
     public delegate void SendPacketDebugInfo<T>(Client<T> client, ushort pid, int len, string memberName, string sourceFilePath, int sourceLineNumber) where T : INetworkClient;
@@ -162,7 +172,7 @@ namespace SocketServer
                 int rlen = sclient.EndReceive(result);
                 //при некоторых ошибках размер возвращает 0 или -1, проверяем
                 if (rlen < 1)
-                    throw new Exception();
+                    throw new ConnectionLostException(sclient.RemoteEndPoint, true);
                 //добавляем offset для дальнейшей считки пакета
                 offset += rlen;
                 //если полученный размер меньше размера пакета, дополучаем данные
@@ -198,16 +208,19 @@ namespace SocketServer
 
                     //ищем пакет и выполняем его, передаем ему данные сессии, полученные данные, и просим у него данные для передачи
                     serverOptions.Packets[pbuff.PacketId].Receive(Data, pbuff);
-                    
+
                     data = false;
                     //перезапускаем последовательность
                 }
                 sclient.BeginReceive(receiveBuffer, offset, lenght - offset, SocketFlags.None, Receive, sclient);
             }
-            catch(Exception ex)
+            catch (ConnectionLostException clex)
+            {
+                serverOptions.RunExtension(clex, Data);
+            }
+            catch (Exception ex)
             {
                 serverOptions.RunExtension(ex, Data);
-                //отключаем клиента, в случае ошибки не в транспортном потоке а где-то в пакете, что-бы клиент не завис 
                 Disconnect();
             }
         }
@@ -216,7 +229,6 @@ namespace SocketServer
         /// Отправка пакета
         /// </summary>
         /// <param name="rbuff">спец буффер содержащий в себе данные пакета</param>
-
         public void Send(OutputPacketBuffer rbuff
 #if DEBUG
             , [System.Runtime.CompilerServices.CallerMemberName] string memberName = "",
@@ -262,20 +274,16 @@ namespace SocketServer
             _sendLocker.WaitOne();
             try
             {
-
                 //шифруем данные
                 byte[] sndBuffer = outputCipher.Encode(buf, offset, lenght);
                 
-
                 //начинаем отправку данных
-                sclient.BeginSend(sndBuffer, 0, lenght, SocketFlags.None, EndSend, sclient);
+                sclient.BeginSend(sndBuffer, 0, lenght, SocketFlags.None, EndSend, new SendAsyncState { buf =  buf, offset = offset, len = lenght });
                 
             }
             catch
             {
-                Data?.AddWaitPacket(buf, lenght);
-
-                //отключаем клиента, в случае ошибки не в транспортном потоке а где-то в пакете, что-бы клиент не завис 
+                Data?.AddWaitPacket(buf, offset, lenght);
                 Disconnect();
             }
             _sendLocker.Set();
@@ -295,12 +303,17 @@ namespace SocketServer
                 //при некоторых ошибках размер возвращает 0 или -1, проверяем
                 if (len < 1)
                 {
-                    throw new Exception();
+                    throw new ConnectionLostException(sclient.RemoteEndPoint, false);
                 }
+            }
+            catch (ConnectionLostException clex)
+            {
+                var sas = ((SendAsyncState)r.AsyncState);
+                Data?.AddWaitPacket(sas.buf, sas.offset, sas.len);
+                serverOptions.RunExtension(clex, Data);
             }
             catch
             {
-                //отключаем клиента, лишним не будет
                 Disconnect();
             }
         }
@@ -608,5 +621,4 @@ namespace SocketServer
 
         #endregion
     }
-
 }

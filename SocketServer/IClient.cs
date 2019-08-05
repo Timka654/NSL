@@ -8,7 +8,6 @@ using System.Text;
 
 namespace SocketServer
 {
-
     public interface IClient
     {
         void Send(OutputPacketBuffer packet

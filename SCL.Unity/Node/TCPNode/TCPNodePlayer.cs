@@ -39,6 +39,10 @@ namespace SCL.Node.TCPNode
 
         public bool header = true;
 
+        public string PlayerIpAddr { get; private set; }
+
+        public int PlayerPort { get; private set; }
+
         public TCPNodePlayer(TCPNode node, IPEndPoint ipPoint)
         {
             this.node = node;

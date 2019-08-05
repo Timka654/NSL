@@ -12,7 +12,7 @@ namespace SocketServer.Utils
         NotFound
     }
 
-    public delegate void OnRecoverySessionReceiveDelegate<T>(T client,long id, string[] keys);
+    public delegate void OnRecoverySessionReceiveDelegate<T>(T client,string key, string[] keys);
 }
 
 namespace SocketServer.Utils.SystemPackets
@@ -30,7 +30,7 @@ namespace SocketServer.Utils.SystemPackets
 
         public void Receive(T client, InputPacketBuffer data)
         {
-            long id = data.ReadInt64();
+            string id = data.ReadString16();
 
             int count = data.ReadInt32();
 
@@ -44,7 +44,7 @@ namespace SocketServer.Utils.SystemPackets
             OnRecoverySessionReceiveEvent?.Invoke(client, id, keys);
         }
 
-        public static void Send(INetworkClient client, RecoverySessionResultEnum result, long? id, string[] newKeys)
+        public static void Send(INetworkClient client, RecoverySessionResultEnum result, string id, string[] newKeys)
         {
                var packet = new OutputPacketBuffer()
             {
@@ -53,9 +53,9 @@ namespace SocketServer.Utils.SystemPackets
 
             packet.WriteByte((byte)result);
 
-            if (id.HasValue)
+            if (!string.IsNullOrEmpty(id))
             {
-                packet.WriteInt64(id.Value);
+                packet.WriteString16(id);
                 packet.WriteInt32(newKeys.Length);
 
                 for (int i = 0; i < newKeys.Length; i++)
