@@ -10,13 +10,6 @@ namespace ps.Data.NodeHostClient.Info.Enums.Packets
     public enum ClientPacketsEnum
     {
         SignInResult = 1,
-        PlayerConnectedResult,
-        PlayerInfoResult,
-        MapInfoDataResult,
-        ServerInfoDataResult,
-        RoomDestroy,
-        PlayerDisconnected,
-        RoomInfoResult,
-        ConfigurationDataResult,
+        PlayerConnectedResult
     }
 }

@@ -35,6 +35,7 @@ namespace ps.Data
 
 
             new ConfigurationInfo ("network/node_host_client/access/token", "7AAEAC313C8778E6C3B489898A497F15", ""),
+            new ConfigurationInfo ("network/node_host_client/access/id", "1", ""),
             new ConfigurationInfo ("network/node_host_client/io.ip", "127.0.0.1", ""),
             new ConfigurationInfo ("network/node_host_client/io.port", "5680", ""),
             new ConfigurationInfo ("network/node_host_client/io.buffer.size", "8196", ""),

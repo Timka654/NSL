@@ -14,9 +14,9 @@ namespace SocketServer.Utils.SystemPackets
             //client.Alive_locker.Set();
             if (client.PingCount == ulong.MaxValue)
                 client.PingCount = 0;
-
+            
             if (client.PingCount++ % 60 == 0)
-                ServerTime.Send(client);
+                SocketServer.Utils.SystemPackets.SystemTime<T>.Send(client);
         }
 
         public static void Send(INetworkClient client)

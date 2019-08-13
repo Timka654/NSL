@@ -1,6 +1,5 @@
 ﻿using DBEngine;
 using phs.Data.NodeHostServer.Network;
-using phs.Data.GameServer.Managers;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -12,9 +11,9 @@ namespace phs.Data.NodeHostServer
 {
     public class StaticData
     {
-        public static ConsoleManager<NetworkClientData> ConsoleManager => Misc.console;
+        public static ConsoleManager<NetworkNodeServerData> ConsoleManager => Misc.console;
 
-        public static GameServer.Managers.NodePlayerManager NodePlayerManager => GameServer.Managers.NodePlayerManager.Instance;
+        public static Managers.ProxyServerManager ProxyServerManager => Managers.ProxyServerManager.Instance;
 
         public static ConfigurationManager ConfigurationManager => Misc.config;
     }

@@ -24,28 +24,27 @@ namespace phs.Data
     {
         private static readonly List<ConfigurationInfo> defaultConfigValues = new List<ConfigurationInfo>()
         {
-            new ConfigurationInfo ("proxy/public.ip", "127.0.0.1", ""),
-            new ConfigurationInfo ("proxy/max.client.count", "30", ""),
-            new ConfigurationInfo ("network/node_server/io.ip", "0.0.0.0", ""),
-            new ConfigurationInfo ("network/node_server/io.port", "5693", ""),
-            new ConfigurationInfo ("network/node_server/io.buffer.size", "8196", ""),
-            new ConfigurationInfo ("network/node_server/io.backlog", "100", ""),
-            new ConfigurationInfo ("network/node_server/io.protocol", "TCP", ""),
-            new ConfigurationInfo ("network/node_server/io.ipv", "4", ""),
+            new ConfigurationInfo ("network/game_server/access/token", "7AAEAC313C8778E6C3B489898A497F15", ""),
+            new ConfigurationInfo ("network/game_server/io.ip", "0.0.0.0", ""),
+            new ConfigurationInfo ("network/game_server/io.port", "5693", ""),
+            new ConfigurationInfo ("network/game_server/io.buffer.size", "8196", ""),
+            new ConfigurationInfo ("network/game_server/io.backlog", "100", ""),
+            new ConfigurationInfo ("network/game_server/io.protocol", "TCP", ""),
+            new ConfigurationInfo ("network/game_server/io.ipv", "4", ""),
 
 
-            new ConfigurationInfo ("network/node_host_client/access/token", "7AAEAC313C8778E6C3B489898A497F15", ""),
-            new ConfigurationInfo ("network/node_host_client/io.ip", "127.0.0.1", ""),
-            new ConfigurationInfo ("network/node_host_client/io.port", "5680", ""),
-            new ConfigurationInfo ("network/node_host_client/io.buffer.size", "8196", ""),
-            new ConfigurationInfo ("network/node_host_client/io.backlog", "100", ""),
-            new ConfigurationInfo ("network/node_host_client/io.protocol", "TCP", ""),
-            new ConfigurationInfo ("network/node_host_client/io.ipv", "4", "")
+            new ConfigurationInfo ("network/node_host_server/access/token", "7AAEAC313C8778E6C3B489898A497F15", ""),
+            new ConfigurationInfo ("network/node_host_server/io.ip", "127.0.0.1", ""),
+            new ConfigurationInfo ("network/node_host_server/io.port", "5680", ""),
+            new ConfigurationInfo ("network/node_host_server/io.buffer.size", "8196", ""),
+            new ConfigurationInfo ("network/node_host_server/io.backlog", "100", ""),
+            new ConfigurationInfo ("network/node_host_server/io.protocol", "TCP", ""),
+            new ConfigurationInfo ("network/node_host_server/io.ipv", "4", "")
         };
 
         public static ConfigurationManager config;
 
-        public static ConsoleManager<NetworkClientData> console;
+        public static ConsoleManager<NetworkNodeServerData> console;
 
         /// <summary>
         /// Входная точка сервера, инициализация
@@ -58,12 +57,12 @@ namespace phs.Data
             LoggerStorage.Instance.main.AppendInfo($"Initialization Server v{GetVersion()} - Proxy Server");
             LoggerStorage.Instance.main.AppendInfo("==================================================================================");
 
-            console = new ConsoleManager<NetworkClientData>();
+            console = new ConsoleManager<NetworkNodeServerData>();
             config = new ConfigurationManager(defaultConfigValues);
 
             LoggerStorage.Instance.main.AppendInfo("==================================================================================");
 
-            Data.GameServer.Network.Client.Load();
+            Data.GameServer.Network.Server.Load();
             LoggerStorage.Instance.main.AppendInfo("==================================================================================");
             Data.NodeHostServer.Network.Server.Load();
 

@@ -13,10 +13,10 @@ namespace phs.Data.GameServer.Packets.Auth
     /// <summary>
     /// Авторизация сервера
     /// </summary>
-    [NodeHostPacket(ClientPacketsEnum.SignInResult)]
-    public class SignIn : IPacket<NetworkNodeHostClientData>
+    [GamePacket(ServerPacketsEnum.SignIn)]
+    public class SignIn : IPacket<NetworkGameServerData>
     {
-        public void Receive(NetworkNodeHostClientData client, InputPacketBuffer data)
+        public void Receive(NetworkGameServerData client, InputPacketBuffer data)
         {
             var result = data.ReadBool();
 
@@ -30,21 +30,15 @@ namespace phs.Data.GameServer.Packets.Auth
             LoggerStorage.Instance.main.AppendInfo($"Host success connected!");
         }
 
-        public static void Send()
+        public static void Send(NetworkGameServerData client, bool result)
         {
             var packet = new OutputPacketBuffer();
 
-            packet.SetPacketId(ServerPacketsEnum.SignIn);
+            packet.SetPacketId(ClientPacketsEnum.SignInResult);
 
-            packet.WriteString16(StaticData.NodePlayerManager.PublicIp);
+            packet.WriteBool(result);
 
-            packet.WriteInt32(NodeHostServer.Network.Server.options.Port);
-
-            packet.WriteInt32(StaticData.NodePlayerManager.MaxPlayerCount);
-
-            packet.WriteString16(StaticData.ConfigurationManager.GetValue<string>("network/node_host_client/access/token"));
-
-            StaticData.NodeHostNetwork?.Send(packet);
+            client.Network?.Send(packet);
         }
     }
 }

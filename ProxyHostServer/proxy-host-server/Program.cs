@@ -5,7 +5,7 @@ using phs.Data.GameServer.Info;
 using System;
 using System.Threading;
 
-namespace ps
+namespace phs
 {
     class Program
     {

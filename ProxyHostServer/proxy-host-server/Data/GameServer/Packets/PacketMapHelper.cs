@@ -8,50 +8,27 @@ using System.Reflection;
 using System.Text;
 using phs.Data.NodeHostServer.Packets;
 using SocketServer.Utils.Buffer;
+using Utils.Helper.Packet;
 
 namespace phs.Data.GameServer.Packets
 {
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
-    public class NodeHostPacketAttribute : Attribute
+    public class GamePacketAttribute : PacketAttribute
     {
-        public ClientPacketsEnum PacketId { get; set; }
-
-        public NodeHostPacketAttribute(ClientPacketsEnum packetId)
+        public GamePacketAttribute(ServerPacketsEnum packetId) : base((ushort)packetId)
         {
-            PacketId = packetId;
         }
     }
 
     public static class PacketMapHelper
     {
         /// <summary>
-        /// Автоматический поиск пакетов по проект с аттрибутом LobbyPacketAttribute
-        /// </summary>
-        /// <param name="options"></param>
-        public static void LoadPackets(this ServerOptions<NetworkNodeHostClientData> options)
-        {
-            var packets = from t in System.Reflection.Assembly.GetExecutingAssembly().GetTypes()
-                where typeof(IPacket<NetworkNodeHostClientData>).IsAssignableFrom(t)
-                select t;
-
-            NodeHostPacketAttribute attr = null;
-
-            foreach (var item in packets)
-            {
-                if ((attr = (NodeHostPacketAttribute) Attribute.GetCustomAttribute(item, typeof(NodeHostPacketAttribute))) ==
-                    null)
-                    throw new Exception($"Packet {item.ToString()} not have RoomPacketAttribute");
-                options.AddPacket((ushort) attr.PacketId,(IPacket<NetworkNodeHostClientData>)Activator.CreateInstance(item));
-            }
-        }
-
-        /// <summary>
         /// Добавить пакет для обработки сервером
         /// </summary>
         /// <param name="packetId">Идентификатор пакета в системе</param>
         /// <param name="packet">Обработчик пакета</param>
         /// <returns></returns>
-        public static bool AddPacket(this ServerOptions<NetworkNodeHostClientData> options, ClientPacketsEnum packetId, IPacket<NetworkNodeHostClientData> packet)
+        public static bool AddPacket(this ServerOptions<NetworkGameServerData> options, ServerPacketsEnum packetId, IPacket<NetworkGameServerData> packet)
         {
             var r = options.Packets.ContainsKey((ushort)packetId);
             if (!r)
@@ -59,7 +36,7 @@ namespace phs.Data.GameServer.Packets
             return !r;
         }
 
-        public static void SetPacketId(this OutputPacketBuffer packet, ServerPacketsEnum packetId)
+        public static void SetPacketId(this OutputPacketBuffer packet, ClientPacketsEnum packetId)
         {
             packet.PacketId = (ushort)packetId;
         }

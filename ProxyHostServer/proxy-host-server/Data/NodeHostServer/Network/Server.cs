@@ -8,6 +8,9 @@ using System.Net;
 using phs.Data.GameServer.Managers;
 using Utils.Logger;
 using Utils.Helper.Network;
+using Cipher;
+using Utils.Helper;
+using phs.Data.NodeHostServer.Managers;
 
 namespace phs.Data.NodeHostServer.Network
 {
@@ -19,12 +22,12 @@ namespace phs.Data.NodeHostServer.Network
         /// <summary>
         /// Глобальные настройки сервера
         /// </summary>
-        public static ServerOptions<NetworkClientData> options;
+        public static ServerOptions<NetworkNodeServerData> options;
 
         /// <summary>
         /// Слушатель подключений
         /// </summary>
-        public static ServerListener<NetworkClientData> listener;
+        public static ServerListener<NetworkNodeServerData> listener;
 
         #region Load
 
@@ -55,10 +58,10 @@ namespace phs.Data.NodeHostServer.Network
         {
             LoggerStorage.Instance.main.AppendInfo($"-> Configuration Loading");
 
-            options = StaticData.ConfigurationManager.LoadConfigurationServerOptions<NetworkClientData>("network/node_server");
+            options = StaticData.ConfigurationManager.LoadConfigurationServerOptions<NetworkNodeServerData>("network/node_host_server");
 
-            options.inputCipher = new XRC4Cipher("}h79q~B%al;k'y $E");
-            options.outputCipher = new XRC4Cipher("}h79q~B%al;k'y $E");
+            options.inputCipher = new PacketNoneCipher();
+            options.outputCipher = new PacketNoneCipher();
 
 
             options.OnClientConnectEvent += SocketOptions_OnClientConnectEvent;
@@ -74,6 +77,8 @@ namespace phs.Data.NodeHostServer.Network
         private static void LoadManagers()
         {
             LoggerStorage.Instance.main.AppendInfo($"-> Managers Loading");
+
+            options.LoadManagers(typeof(NodeHostManagerLoadAttribute));
 
             LoggerStorage.Instance.main.AppendInfo($"-> Managers Loaded");
         }
@@ -97,7 +102,7 @@ namespace phs.Data.NodeHostServer.Network
         {
             LoggerStorage.Instance.main.AppendInfo($"-> Client Socket Listener Loading");
 
-            listener = new SocketServer.ServerListener<NetworkClientData>(options);
+            listener = new SocketServer.ServerListener<NetworkNodeServerData>(options);
 
 #if DEBUG
             listener.OnReceivePacket += Listener_OnReceivePacket;
@@ -122,32 +127,32 @@ namespace phs.Data.NodeHostServer.Network
 
 #if DEBUG
 
-        private static void Listener_OnSendPacket(Client<NetworkClientData> client, ushort pid, int len, string memberName, string sourceFilePath, int sourceLineNumber)
+        private static void Listener_OnSendPacket(Client<NetworkNodeServerData> client, ushort pid, int len, string memberName, string sourceFilePath, int sourceLineNumber)
         {
-            NetworkClientData c = null;
+            NetworkNodeServerData c = null;
             IPEndPoint ipep = null;
 
             if (client != null)
             {
-                c = (NetworkClientData)client.GetUserData();
+                c = (NetworkNodeServerData)client.GetUserData();
                 ipep = client.GetRemovePoint();
             }
 
-            LoggerStorage.Instance.main.AppendInfo($"Client packet send pid:{pid}({(Info.Enums.Packets.ClientPacketsEnum)pid}) len:{len} to {ipep?.ToString()} ({c?.NodePlayer?.Id}) from {sourceFilePath}:{sourceLineNumber}");
+            LoggerStorage.Instance.main.AppendInfo($"Client packet send pid:{pid}({(Info.Enums.Packets.ClientPacketsEnum)pid}) len:{len} to {ipep?.ToString()} ({c?.ServerInfo?.Id}) from {sourceFilePath}:{sourceLineNumber}");
         }
 
-        private static void Listener_OnReceivePacket(Client<NetworkClientData> client, ushort pid, int len)
+        private static void Listener_OnReceivePacket(Client<NetworkNodeServerData> client, ushort pid, int len)
         {
-            NetworkClientData c = null;
+            NetworkNodeServerData c = null;
             IPEndPoint ipep = null;
 
             if (client != null)
             {
-                c = (NetworkClientData)client.GetUserData();
+                c = (NetworkNodeServerData)client.GetUserData();
                 ipep = client.GetRemovePoint();
             }
 
-            LoggerStorage.Instance.main.AppendInfo($"Client packet receive pid:{pid}({(Info.Enums.Packets.ServerPacketsEnum)pid}) len:{len} from {ipep?.ToString()} ({c?.NodePlayer?.Id})");
+            LoggerStorage.Instance.main.AppendInfo($"Client packet receive pid:{pid}({(Info.Enums.Packets.ServerPacketsEnum)pid}) len:{len} from {ipep?.ToString()} ({c?.ServerInfo?.Id})");
         }
 
 #endif
@@ -157,7 +162,7 @@ namespace phs.Data.NodeHostServer.Network
         /// </summary>
         /// <param name="ex">Данные об ошибке</param>
         /// <param name="s">Подключение</param>
-        private static void SocketOptions_OnExtensionEvent(Exception ex, NetworkClientData client)
+        private static void SocketOptions_OnExtensionEvent(Exception ex, NetworkNodeServerData client)
         {
             try
             {
@@ -174,14 +179,14 @@ namespace phs.Data.NodeHostServer.Network
         /// Событие возникающее при отключении клиента
         /// </summary>
         /// <param name="client">Текущий клиент</param>
-        private static void SocketOptions_OnClientDisconnectEvent(NetworkClientData client)
+        private static void SocketOptions_OnClientDisconnectEvent(NetworkNodeServerData client)
         {
             LoggerStorage.Instance.main.AppendInfo($"Client disconnected ({client?.Network?.GetRemovePoint()})");
             if (client != null)
             {
                 client.DisconnectTime = DateTime.Now;
-                if (client.NodePlayer != null)
-                    StaticData.NodePlayerManager.DisconnectPlayer(client.NodePlayer);
+                if (client.ServerInfo != null)
+                    StaticData.ProxyServerManager.DisconnectServer(client.ServerInfo);
             }
         }
 
@@ -189,7 +194,7 @@ namespace phs.Data.NodeHostServer.Network
         /// Событие возникающее при подключении клиента
         /// </summary>
         /// <param name="client">Текущий клиент</param>
-        private static void SocketOptions_OnClientConnectEvent(NetworkClientData client)
+        private static void SocketOptions_OnClientConnectEvent(NetworkNodeServerData client)
         {
             LoggerStorage.Instance.main.AppendInfo($"New client connection ({client?.Network?.GetRemovePoint()})");
         }

@@ -13,23 +13,24 @@ namespace phs.Data.NodeHostServer.Info
     /// <summary>
     /// Общие данные для игроков в лобби разных типов боя
     /// </summary>
-    public class NodePlayerInfo
+    public class ProxyServerInfo
     {
-        public Guid Id { get; private set; }
+        public short Id { get; set; }
 
-        protected NetworkClientData _client;
+        public string Ip { get; set; }
 
-        public bool Confirmed { get; set; }
+        public int Port { get; set; }
+
+        public int MaxPlayerCount { get; set; }
 
         /// <summary>
         /// Текущий клиент для передачи данных
         /// </summary>
-        public NetworkClientData Client => _client;
+        public NetworkNodeServerData Client { get; private set; }
 
-        public NodePlayerInfo(NetworkClientData client)
+        public ProxyServerInfo(NetworkNodeServerData client)
         {
-            _client = client;
-            Id = Guid.NewGuid();
+            Client = client;
         }
     }
 }

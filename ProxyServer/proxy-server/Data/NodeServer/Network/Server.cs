@@ -8,6 +8,7 @@ using System.Net;
 using ps.Data.NodeHostClient.Managers;
 using Utils.Logger;
 using Utils.Helper.Network;
+using Cipher;
 
 namespace ps.Data.NodeServer.Network
 {
@@ -57,8 +58,8 @@ namespace ps.Data.NodeServer.Network
 
             options = StaticData.ConfigurationManager.LoadConfigurationServerOptions<NetworkClientData>("network/node_server");
 
-            options.inputCipher = new XRC4Cipher("}h79q~B%al;k'y $E");
-            options.outputCipher = new XRC4Cipher("}h79q~B%al;k'y $E");
+            options.inputCipher = new PacketNoneCipher();
+            options.outputCipher = new PacketNoneCipher();
 
 
             options.OnClientConnectEvent += SocketOptions_OnClientConnectEvent;

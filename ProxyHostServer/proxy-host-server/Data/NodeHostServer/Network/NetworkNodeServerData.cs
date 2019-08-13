@@ -13,22 +13,18 @@ namespace phs.Data.NodeHostServer.Network
     /// <summary>
     /// Вся информация по текущему клиенту
     /// </summary>
-    public class NetworkClientData : INetworkClient
+    public class NetworkNodeServerData : INetworkClient
     {
-        public NodePlayerInfo NodePlayer { get; set; }
+        public ProxyServerInfo ServerInfo { get; set; }
 
-        public int UserId { get; set; }
-
-        public int RoomId { get; set; }
-
-        public NetworkClientData()
+        public NetworkNodeServerData()
         {
         }
 
         public override void ChangeOwner(INetworkClient client)
         {
-            var c = (NetworkClientData) client;
-            c.NodePlayer = NodePlayer;
+            var c = (NetworkNodeServerData) client;
+            c.ServerInfo = ServerInfo;
 
             base.ChangeOwner(client);
         }

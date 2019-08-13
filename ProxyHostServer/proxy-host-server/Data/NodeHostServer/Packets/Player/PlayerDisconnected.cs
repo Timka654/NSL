@@ -10,7 +10,7 @@ using phs.Data.GameServer.Managers;
 using Utils.Logger;
 using phs.Data.NodeHostServer.Info;
 
-namespace phs.Data.GameServer.Packets.Player
+namespace phs.Data.NodeHostServer.Packets.Player
 {
     public class PlayerDisconnected
     {
@@ -18,7 +18,7 @@ namespace phs.Data.GameServer.Packets.Player
         //{
         //    var packet = new OutputPacketBuffer();
 
-        //    packet.SetPacketId(ServerPacketsEnum.PlayerDisconnected);
+        //    //packet.SetPacketId(ServerPacketsEnum.PlayerDisconnected);
 
         //    var arr = player.Id.ToByteArray();
 

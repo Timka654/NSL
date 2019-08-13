@@ -8,8 +8,8 @@ using System.Threading.Tasks;
 using System.Linq;
 using System.Threading;
 using phs.Data.GameServer.Info.Enums.Packets;
-using phs.Data.NodeHostServer.Info;
-using phs.Data.NodeHostServer.Network;
+using phs.Data.GameServer.Info;
+using phs.Data.GameServer.Network;
 using phs.Data.GameServer.Info.Enums;
 using Utils.Logger;
 
@@ -18,45 +18,39 @@ namespace phs.Data.GameServer.Managers
     /// <summary>
     /// Контроллер для обработки комнат
     /// </summary>
-    public class NodePlayerManager : NodePlayerStorage
+    public class GameServerManager : GameServerStorage
     {
-        public static NodePlayerManager Instance { get; private set; }
+        public static GameServerManager Instance { get; private set; }
 
-        public string PublicIp { get; private set; }
-
-        public int MaxPlayerCount { get; private set; }
-
-        public NodePlayerManager()
+        public GameServerManager()
         {
             Instance = this;
-            PublicIp = StaticData.ConfigurationManager.GetValue<string>("proxy/public.ip");
-            MaxPlayerCount = StaticData.ConfigurationManager.GetValue<int>("proxy/max.client.count");
 
             LoggerStorage.Instance.main.AppendInfo( $"RoomManager Loaded");
         }
 
-        public bool ConnectPlayer(NetworkClientData client)
+        public bool ConnectServer(NetworkGameServerData client)
         {
-            var player = new NodePlayerInfo(client);
-            AddPlayer(player);
-            Packets.Player.PlayerConnected.Send(player);
+            var player = new GameServerInfo(client);
+            AddServer(player);
+            //Packets.Player.PlayerConnected.Send(player);
             return true;
         }
 
-        public void ConfirmPlayer(Guid guid, bool result)
+        public void ConfirmPlayer(short id, bool result)
         {
-            var player = GetPlayer(guid);
-            if (player != null)
+            var server = GetServer(id);
+            if (server != null)
             {
-                NodeHostServer.Packets.Profile.LogIn.Send(player.Client, result ? LoginResultEnum.Ok : LoginResultEnum.Error);
+                //NodeHostServer.Packets.Profile.LogIn.Send(player.Client, result ? LoginResultEnum.Ok : LoginResultEnum.Error);
 
-                if (result)
-                    player.Confirmed = true;
-                else
-                {
-                    RemovePlayer(guid);
-                    player.Client?.Network?.Disconnect();
-                }
+                //if (result)
+                //    //server.Confirmed = true;
+                //else
+                //{
+                    RemoveServer(id);
+                    server.Client?.Network?.Disconnect();
+                //}
             }
         }
 
@@ -70,11 +64,11 @@ namespace phs.Data.GameServer.Managers
         /// <param name="death_count">Кол-во смертей</param>
         /// <param name="score">Очки</param>
         /// <param name="item_list">Список с данными об износе вещей</param>
-        public NodePlayerInfo DisconnectPlayer(NodePlayerInfo player_info)
+        public GameServerInfo DisconnectServer(GameServerInfo player_info)
         {
-            var player = RemovePlayer(player_info.Id);
-            if (player != null)
-                Packets.Player.PlayerDisconnected.Send(player);
+            var player = RemoveServer(player_info.Id);
+            //if (player != null)
+            //    Packets.Player.PlayerDisconnected.Send(player);
 
             return player;
         }

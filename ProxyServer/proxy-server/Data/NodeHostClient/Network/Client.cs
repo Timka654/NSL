@@ -13,6 +13,7 @@ using ps.Data.NodeHostClient.Managers;
 using Utils.Logger;
 using Utils.Helper.Network;
 using SocketServer.Utils;
+using System.Threading.Tasks;
 
 namespace ps.Data.NodeHostClient.Network
 {
@@ -159,7 +160,7 @@ namespace ps.Data.NodeHostClient.Network
         /// </summary>
         /// <param name="ex">Данные об ошибке</param>
         /// <param name="client">Текущий клиент</param>
-        private static void SocketOptions_OnExtensionEvent(Exception ex, NetworkNodeHostClientData client)
+        private static async void SocketOptions_OnExtensionEvent(Exception ex, NetworkNodeHostClientData client)
         {
             try
             {
@@ -168,9 +169,11 @@ namespace ps.Data.NodeHostClient.Network
             }
             catch
             {
-            LoggerStorage.Instance.main.AppendError( $"Node Host socket Error  {ex.ToString()}");
+                LoggerStorage.Instance.main.AppendError( $"Node Host socket Error  {ex.ToString()}");
 
             }
+            await Task.Delay(5000);
+            Connect();
         }
 
         /// <summary>

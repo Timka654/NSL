@@ -44,6 +44,7 @@ namespace SocketServer.Utils
         /// Буффер для хранения отправленных пакетов во время разрыва соединения
         /// </summary>
         private Queue<byte[]> WaitPacketBuffer { get; set; }
+        public TimeSpan ServerDateTimeOffset { get; internal set; }
 
         /// <summary>
         /// Инициализация хранилища пакетов во время разрыва соединения
@@ -120,7 +121,7 @@ namespace SocketServer.Utils
         {
             while (Network.GetState())
             {
-                ServerTime.Send(this);
+                SocketServer.Utils.SystemPackets.SystemTime<INetworkClient>.Send(this);
                 await Task.Delay(TimeSyncTimeOut);
             }
         }

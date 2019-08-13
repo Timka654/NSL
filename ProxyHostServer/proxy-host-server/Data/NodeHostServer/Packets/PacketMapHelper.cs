@@ -13,9 +13,9 @@ using Utils.Helper.Packet;
 
 namespace phs.Data.NodeHostServer.Packets
 {
-    public class LobbyPacketAttribute : PacketAttribute
+    public class NodeHostPacketAttribute : PacketAttribute
     {
-        public LobbyPacketAttribute(ServerPacketsEnum packetId) : base((ushort)packetId)
+        public NodeHostPacketAttribute(ServerPacketsEnum packetId) : base((ushort)packetId)
         {
         }
     }
@@ -26,9 +26,9 @@ namespace phs.Data.NodeHostServer.Packets
         /// Автоматический поиск пакетов по проект с аттрибутом LobbyPacketAttribute
         /// </summary>
         /// <param name="options"></param>
-        public static void LoadPackets(this ServerOptions<NetworkClientData> options)
+        public static void LoadPackets(this ServerOptions<NetworkNodeServerData> options)
         {
-            options.LoadPackets(typeof(LobbyPacketAttribute));
+            options.LoadPackets(typeof(NodeHostPacketAttribute));
         }
 
         /// <summary>
@@ -37,7 +37,7 @@ namespace phs.Data.NodeHostServer.Packets
         /// <param name="packetId">Идентификатор пакета в системе</param>
         /// <param name="packet">Обработчик пакета</param>
         /// <returns></returns>
-        public static bool AddPacket(this ServerOptions<NetworkClientData> options, ServerPacketsEnum packetId, IPacket<NetworkClientData> packet)
+        public static bool AddPacket(this ServerOptions<NetworkNodeServerData> options, ServerPacketsEnum packetId, IPacket<NetworkNodeServerData> packet)
         {
             var r = options.Packets.ContainsKey((ushort)packetId);
             if (!r)

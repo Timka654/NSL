@@ -12,11 +12,5 @@ namespace ps.Data.NodeHostClient.Info.Enums.Packets
         SignIn = 1,
         PlayerConnected,
         PlayerDisconnected,
-        PlayerDisconnectedError,
-        PlayerInfo,
-        MapInfoData,
-        ServerInfoData,
-        RoomInfo,
-        ConfigurationData,
     }
 }

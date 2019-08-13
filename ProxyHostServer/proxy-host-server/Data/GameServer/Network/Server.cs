@@ -13,20 +13,24 @@ using phs.Data.GameServer.Managers;
 using Utils.Logger;
 using Utils.Helper.Network;
 using SocketServer.Utils;
+using Utils.Helper;
 
 namespace phs.Data.GameServer.Network
 {
     /// <summary>
     /// Клиент приема подключений Node Host серверов
     /// </summary>
-    public class Client
+    public class Server
     {
         /// <summary>
         /// Глобальные настройки сервера
         /// </summary>
-        public static ServerOptions<NetworkNodeHostClientData> options;
+        public static ServerOptions<NetworkGameServerData> options;
 
-        public static NetworkClient<NetworkNodeHostClientData> NetworkClient;
+        /// <summary>
+        /// Слушатель подключений
+        /// </summary>
+        public static ServerListener<NetworkGameServerData> listener;
 
         #region Load
 
@@ -35,7 +39,7 @@ namespace phs.Data.GameServer.Network
         /// </summary>
         public static void Load()
         {
-            LoggerStorage.Instance.main.AppendInfo( $"---> Node Host Client Loading");
+            LoggerStorage.Instance.main.AppendInfo( $"---> Game Server Network Loading");
 
             LoadConfiguration();
 
@@ -45,9 +49,9 @@ namespace phs.Data.GameServer.Network
 
             LoadReceivePackets();
 
-            LoadClient();
+            LoadListener();
 
-            LoggerStorage.Instance.main.AppendInfo( $"---> Node Host Client Loaded");
+            LoggerStorage.Instance.main.AppendInfo( $"---> Game Server Network Loaded");
         }
 
         /// <summary>
@@ -57,7 +61,7 @@ namespace phs.Data.GameServer.Network
         {
             LoggerStorage.Instance.main.AppendInfo( $"-> Configuration Loading");
 
-            options = StaticData.ConfigurationManager.LoadConfigurationServerOptions<NetworkNodeHostClientData>("network/node_host_client");
+            options = StaticData.ConfigurationManager.LoadConfigurationServerOptions<NetworkGameServerData>("network/game_server");
 
             options.inputCipher = new PacketNoneCipher();
             options.outputCipher = new PacketNoneCipher();
@@ -76,7 +80,7 @@ namespace phs.Data.GameServer.Network
         {
             LoggerStorage.Instance.main.AppendInfo( $"-> Managers Loading");
 
-            new NodePlayerManager();
+            new GameServerManager();
 
             LoggerStorage.Instance.main.AppendInfo( $"-> Managers Loaded");
         }
@@ -86,35 +90,35 @@ namespace phs.Data.GameServer.Network
         /// </summary>
         private static void LoadReceivePackets()
         {
-            LoggerStorage.Instance.main.AppendInfo( $"-> Node Host Client Packets Loading");
+            LoggerStorage.Instance.main.AppendInfo( $"-> Game Server Network Packets Loading");
 
-            options.LoadPackets();
+            options.LoadPackets(typeof(GamePacketAttribute));
 
-            LoggerStorage.Instance.main.AppendInfo( $"-> Node Host Client Packets Loaded");
+            LoggerStorage.Instance.main.AppendInfo( $"-> Game Server Network Packets Loaded");
         }
-
         /// <summary>
         /// Настройка слушателя подключений
         /// </summary>
-        private static void LoadClient()
+        private static void LoadListener()
         {
-            LoggerStorage.Instance.main.AppendInfo( $"-> Node Host Socket Listener Loading");
+            LoggerStorage.Instance.main.AppendInfo($"-> Game Server Network Socket Listener Loading");
 
-            NetworkClient = new NetworkClient<NetworkNodeHostClientData>(options);
+            listener = new SocketServer.ServerListener<NetworkGameServerData>(options);
 
 #if DEBUG
-            NetworkClient.OnReceivePacket += Listener_OnReceivePacket;
-            NetworkClient.OnSendPacket += Listener_OnSendPacket;
+            listener.OnReceivePacket += Listener_OnReceivePacket;
+            listener.OnSendPacket += Listener_OnSendPacket;
 #endif
-            Connect();
-        }
-
-        private static async void Connect()
-        {
-            while (!NetworkClient.Connect())
+            try
             {
-                LoggerStorage.Instance.main.AppendInfo($"-> Node Host client ({options.IpAddress}:{options.Port}) Error connection");
-                await System.Threading.Tasks.Task.Delay(2000);
+                listener.Run();
+
+                LoggerStorage.Instance.main.AppendInfo($"-> Game Server Network Socket Listener  ({options.IpAddress}:{options.Port}) Loaded");
+
+            }
+            catch (Exception e)
+            {
+                LoggerStorage.Instance.main.AppendInfo($"-> Game Server Network Socket Listener  ({options.IpAddress}:{options.Port}) Error:{e.ToString()}");
             }
         }
 
@@ -124,32 +128,32 @@ namespace phs.Data.GameServer.Network
 
 #if DEBUG
 
-        private static void Listener_OnSendPacket(Client<NetworkNodeHostClientData> client, ushort pid, int len, string memberName, string sourceFilePath, int sourceLineNumber)
+        private static void Listener_OnSendPacket(Client<NetworkGameServerData> client, ushort pid, int len, string memberName, string sourceFilePath, int sourceLineNumber)
         {
-            NetworkNodeHostClientData c = null;
+            NetworkGameServerData c = null;
             IPEndPoint ipep = null;
 
             if (client != null)
             {
-                c = (NetworkNodeHostClientData)client.GetUserData();
+                c = (NetworkGameServerData)client.GetUserData();
                 ipep = client.GetRemovePoint();
             }
 
-            LoggerStorage.Instance.main.AppendInfo( $"Node Host packet send pid:{pid}({(Info.Enums.Packets.ServerPacketsEnum)pid}) len:{len} to {ipep?.ToString()} from {sourceFilePath}:{sourceLineNumber}");
+            LoggerStorage.Instance.main.AppendInfo( $"Game Server packet send pid:{pid}({(Info.Enums.Packets.ServerPacketsEnum)pid}) len:{len} to {ipep?.ToString()} from {sourceFilePath}:{sourceLineNumber}");
         }
 
-        private static void Listener_OnReceivePacket(Client<NetworkNodeHostClientData> client, ushort pid, int len)
+        private static void Listener_OnReceivePacket(Client<NetworkGameServerData> client, ushort pid, int len)
         {
-            NetworkNodeHostClientData c = null;
+            NetworkGameServerData c = null;
             IPEndPoint ipep = null;
 
             if (client != null)
             {
-                c = (NetworkNodeHostClientData)client.GetUserData();
+                c = (NetworkGameServerData)client.GetUserData();
                 ipep = client.GetRemovePoint();
             }
 
-            LoggerStorage.Instance.main.AppendInfo( $"Node Host packet receive pid:{pid}({(Info.Enums.Packets.ClientPacketsEnum)pid}) len:{len} from {ipep?.ToString()}");
+            LoggerStorage.Instance.main.AppendInfo( $"Node Server packet receive pid:{pid}({(Info.Enums.Packets.ClientPacketsEnum)pid}) len:{len} from {ipep?.ToString()}");
         }
 
 #endif
@@ -158,17 +162,16 @@ namespace phs.Data.GameServer.Network
         /// Событие возникающее при ошибке в подключении
         /// </summary>
         /// <param name="ex">Данные об ошибке</param>
-        /// <param name="client">Текущий клиент</param>
-        private static void SocketOptions_OnExtensionEvent(Exception ex, NetworkNodeHostClientData client)
+        /// <param name="s">Подключение</param>
+        private static void SocketOptions_OnExtensionEvent(Exception ex, NetworkGameServerData client)
         {
             try
             {
-            LoggerStorage.Instance.main.AppendError( $"Node Host socket Error ({client?.Network?.GetSocket()?.RemoteEndPoint}) - {ex.ToString()}");
-
+                LoggerStorage.Instance.main.AppendError($"Node Server socket Error ({client.Network.GetSocket()?.RemoteEndPoint}) - {ex.ToString()}");
             }
             catch
             {
-            LoggerStorage.Instance.main.AppendError( $"Node Host socket Error  {ex.ToString()}");
+                LoggerStorage.Instance.main.AppendError($"Node Server socket Error  {ex.ToString()}");
 
             }
         }
@@ -177,19 +180,18 @@ namespace phs.Data.GameServer.Network
         /// Событие возникающее при отключении клиента
         /// </summary>
         /// <param name="client">Текущий клиент</param>
-        private static void SocketOptions_OnClientDisconnectEvent(NetworkNodeHostClientData client)
+        private static void SocketOptions_OnClientDisconnectEvent(NetworkGameServerData client)
         {
-            LoggerStorage.Instance.main.AppendInfo( $"Node Host network client disconnected ({client?.Network?.GetRemovePoint()})");
+            LoggerStorage.Instance.main.AppendInfo($"Node Server disconnected ({client?.Network?.GetRemovePoint()})");
         }
 
         /// <summary>
         /// Событие возникающее при подключении клиента
         /// </summary>
         /// <param name="client">Текущий клиент</param>
-        private static void SocketOptions_OnClientConnectEvent(NetworkNodeHostClientData client)
+        private static void SocketOptions_OnClientConnectEvent(NetworkGameServerData client)
         {
-            LoggerStorage.Instance.main.AppendInfo($"Node Host network client connected ({client?.Network?.GetRemovePoint()})");
-            Packets.Auth.SignIn.Send();
+            LoggerStorage.Instance.main.AppendInfo($"New Node Server connection ({client?.Network?.GetRemovePoint()})");
         }
 
         #endregion

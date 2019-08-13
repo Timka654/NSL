@@ -16,6 +16,7 @@
       "io.buffer.size": 8196,
       "io.backlog": 1000,
       "access": {
+        "id": 1,
         "token": "7AAEAC313C8778E6C3B489898A497F15"
       }
     }

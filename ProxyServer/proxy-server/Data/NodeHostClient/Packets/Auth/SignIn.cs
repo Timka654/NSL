@@ -23,7 +23,7 @@ namespace ps.Data.NodeHostClient.Packets.Auth
             if (!result)
             {
                 LoggerStorage.Instance.main.AppendError("Invalid connection host data... Disconnect!");
-                client.Network?.Disconnect();
+                Network.Client.NetworkClient.Disconnect();
                 return;
             }
 
@@ -41,6 +41,8 @@ namespace ps.Data.NodeHostClient.Packets.Auth
             packet.WriteInt32(NodeServer.Network.Server.options.Port);
 
             packet.WriteInt32(StaticData.NodePlayerManager.MaxPlayerCount);
+
+            packet.WriteInt16(StaticData.ConfigurationManager.GetValue<short>("network/node_host_client/access/id"));
 
             packet.WriteString16(StaticData.ConfigurationManager.GetValue<string>("network/node_host_client/access/token"));
 

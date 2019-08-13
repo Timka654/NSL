@@ -42,6 +42,8 @@ namespace SocketServer
                 new AliveConnection<T>());
             serverOptions.AddPacket((ushort)Utils.SystemPackets.Enums.ClientPacketEnum.RecoverySession,
                 new RecoverySession<T>());
+            serverOptions.AddPacket((ushort)Utils.SystemPackets.Enums.ClientPacketEnum.ServerTime,
+                new SocketServer.Utils.SystemPackets.SystemTime<T>());
             serverOptions.AddPacket((ushort)Utils.SystemPackets.Enums.ClientPacketEnum.Version,
                 new Version<T>());
         }

@@ -9,11 +9,11 @@ namespace phs.Data.GameServer.Network
     /// <summary>
     /// Вся информация по текущему серверу
     /// </summary>
-    public class NetworkNodeHostClientData : INetworkClient
+    public class NetworkGameServerData : INetworkClient
     {
         /// <summary>
         /// Данные о сервере
         /// </summary>
-        public NodeHostClientInfo ServerData { get;set; }
+        public GameServerInfo ServerData { get;set; }
     }
 }
