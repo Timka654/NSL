@@ -40,7 +40,6 @@ namespace SocketServer.Utils
                     new Version<TData>());
 
                 Initialize(socket, serverOptions);
-
                 RunPacketReceiver();
                 return true;
             }

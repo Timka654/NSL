@@ -84,6 +84,7 @@ namespace SocketServer
             //Bug fix, отключение буфферизации пакетов для уменьшения трафика, если не отключить то получим фризы, в случае с игровым соединением эту опцию обычно нужно отключать
             sclient.NoDelay = true;
 
+            disconnected = false;
             //Начало приема пакетов от клиента
             options.RunClientConnect(Data);
         }

@@ -26,7 +26,7 @@ namespace ps.Data.NodeHostClient.Packets.Auth
                 Network.Client.NetworkClient.Disconnect();
                 return;
             }
-
+            client.RunAliveChecker();
             LoggerStorage.Instance.main.AppendInfo($"Host success connected!");
         }
 
