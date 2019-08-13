@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using Utils.Helper.Query;
+using Utils.Logger;
 
 namespace Utils.Helper
 {
@@ -42,7 +43,7 @@ namespace Utils.Helper
 
                 Debug.WriteLine($"Loading Query: query: {item.attr.Name} type: {item.type.FullName}");
 
-                Utils.Logger.ConsoleLogger.WriteFormat(Utils.Logger.LoggerLevel.Info, $"{item.attr.Name} Loaded");
+                LoggerStorage.Instance.main.AppendInfo( $"{item.attr.Name} Loaded");
             }
 
             return querys.Count;

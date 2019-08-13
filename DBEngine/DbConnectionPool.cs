@@ -8,6 +8,21 @@ using System.Threading.Tasks;
 
 namespace DBEngine
 {
+    public class ConnectionOptions
+    {
+        public DbOptions CSOptions { get; set; }
+
+        public string ConnectionString { get; set; }
+
+        public bool RecoveryWhenFailedTry { get; set; }
+
+        public short RecoveryTryCount { get; set; } = 1;
+
+        public short RecoveryTryDelay { get; set; }
+
+        public bool DropApplicationWhenFailed { get; set; } = true;
+    }
+
     public abstract class DbConnectionPool
     {
 
@@ -41,28 +56,40 @@ namespace DBEngine
         /// </summary>
         private System.Threading.AutoResetEvent are = new System.Threading.AutoResetEvent(true);
 
-        private string ConnectionString;
+        private ConnectionOptions ConnectionOptions;
 
         /// <summary>
         /// Добавить подключение
         /// </summary>
-        /// <param name="connectionString">Строка подключения</param>
-        /// <param name="pool_size">Размер пула</param>
-        public async void Add(string connectionString, int pool_size)
+        public async Task Add(ConnectionOptions options)
         {
-            ConnectionString = connectionString;
-            try
-            {
-                for (int i = 0; i < pool_size; i++)
-                {
-                    await CreateConnection();
-                }
+            if (ConnectionOptions != null)
+                throw new Exception("You can initialize pool only one time");
 
-            }
-            catch (Exception ex)
+            ConnectionOptions = options;
+
+            for (int i = 0; (i < options.RecoveryTryCount && options.RecoveryWhenFailedTry) || !options.RecoveryWhenFailedTry; i++)
             {
-                DbExceptionEvent?.Invoke(null, ex);
+                try
+                {
+                    for (int h = 0; h < options.CSOptions.PoolSize; h++)
+                    {
+                        await CreateConnection();
+                    }
+
+                    return;
+                }
+                catch (Exception ex)
+                {
+                    DbExceptionEvent?.Invoke(null, ex);
+                    if (!options.RecoveryWhenFailedTry)
+                        break;
+                    await Task.Delay(options.RecoveryTryDelay * 1000);
+
+                }
             }
+            if (options.DropApplicationWhenFailed)
+                new Exception("Drop application by DbConnectionPool");
         }
         
 
@@ -155,7 +182,7 @@ namespace DBEngine
         {
             T connection = Activator.CreateInstance<T>();
 
-            connection.ConnectionString = ConnectionString;
+            connection.ConnectionString = ConnectionOptions.ConnectionString;
             await connection.OpenAsync();
             connection.Close();
 

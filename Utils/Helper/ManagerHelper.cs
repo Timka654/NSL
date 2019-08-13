@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using Utils.Logger;
 
 namespace Utils.Helper
 {
@@ -31,7 +32,7 @@ namespace Utils.Helper
             {
                 Debug.WriteLine($"Loading Manager: name: {item.attr.ManagerName ?? item.type.Name} type: {item.type.FullName}");
                 Activator.CreateInstance(item.type);
-                Utils.Logger.ConsoleLogger.WriteFormat(Utils.Logger.LoggerLevel.Info, $"{item.attr.ManagerName ?? item.type.Name} Loaded");
+                LoggerStorage.Instance.main.AppendInfo($"{item.attr.ManagerName ?? item.type.Name} Loaded");
             }
 
             return types.Count();

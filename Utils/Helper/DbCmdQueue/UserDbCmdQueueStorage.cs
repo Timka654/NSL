@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Data.Common;
 using System.Collections.Concurrent;
+using Utils.Logger;
 
 namespace Utils.Helper.DbCmdQueue
 {
@@ -54,7 +55,7 @@ namespace Utils.Helper.DbCmdQueue
                     }
                     catch(Exception ex)
                     {
-                        Utils.Logger.ConsoleLogger.WriteFormat(Utils.Logger.LoggerLevel.Error, ex.ToString());
+                        LoggerStorage.Instance.main.AppendError(ex.ToString());
                     }
                 }
 

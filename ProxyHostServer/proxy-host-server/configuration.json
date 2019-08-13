@@ -1,0 +1,23 @@
+{
+  "proxy": {
+    "public.ip": "127.0.0.1",
+    "max.client.count": 30
+  },
+  "network": {
+    "node_server": {
+      "io.ip": "0.0.0.0",
+      "io.port": 7559,
+      "io.buffer.size": 8196,
+      "io.backlog": 1000
+    },
+    "node_host_client": {
+      "io.ip": "127.0.0.1",
+      "io.port": 8475,
+      "io.buffer.size": 8196,
+      "io.backlog": 1000,
+      "access": {
+        "token": "7AAEAC313C8778E6C3B489898A497F15"
+      }
+    }
+  }
+}

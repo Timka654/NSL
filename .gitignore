@@ -3,3 +3,5 @@ bin/
 /BinarySerializerTest_v5/.vs
 /SCL.Unity/.vs/
 /.vs/
+/ProxyHostServer/.vs
+/ProxyServer/.vs

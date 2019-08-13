@@ -14,15 +14,9 @@ namespace Utils.Helper.Configuration
         /// </summary>
         protected ConcurrentDictionary<string, ConfigurationInfo> config_map;
 
-        /// <summary>
-        /// Список конфигураций для клиента
-        /// </summary>
-        protected List<ConfigurationInfo> clientValues;
-
         public ConfigurationStorage()
         {
             config_map = new ConcurrentDictionary<string, ConfigurationInfo>();
-            clientValues = new List<ConfigurationInfo>();
         }
 
         /// <summary>
@@ -34,13 +28,11 @@ namespace Utils.Helper.Configuration
             if (config_map.TryGetValue(config.Name, out ConfigurationInfo c))
             {
                 c.Value = config.Value;
-                c.ClientValue = config.ClientValue;
+                c.Flags = config.Flags;
                 return;
             }
 
             config_map.TryAdd(config.Name, config);
-            if (config.ClientValue)
-                clientValues.Add(config);
         }
 
         /// <summary>
@@ -49,13 +41,7 @@ namespace Utils.Helper.Configuration
         /// <param name="name">Путь</param>
         public void RemoveValue(string name)
         {
-            if (config_map.Remove(name, out ConfigurationInfo c))
-            {
-                if (c.ClientValue)
-                {
-                    clientValues.Remove(c);
-                }
-            }
+            config_map.Remove(name, out ConfigurationInfo c);
         }
 
         /// <summary>
@@ -105,7 +91,6 @@ namespace Utils.Helper.Configuration
         public void ClearStorage()
         {
             config_map.Clear();
-            clientValues.Clear();
         }
     }
 }

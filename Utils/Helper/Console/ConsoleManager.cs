@@ -5,17 +5,19 @@ using System.Threading.Tasks;
 using gls.Data.Basic.Storages;
 using SocketServer.Utils;
 using SocketServer.Utils.Buffer;
+using Utils.Logger;
 
 namespace Utils.Helper.Console
 {
-    public class ConsoleManager : ConsoleStorage
+    public class ConsoleManager<T> : ConsoleStorage<T>
+        where T : INetworkClient
     {
         public ConsoleManager()
         {
-            Utils.Logger.ConsoleLogger.WriteFormat(Utils.Logger.LoggerLevel.Info, $"ConsoleManager Loaded");
+            LoggerStorage.Instance.main.AppendInfo($"ConsoleManager Loaded");
         }
 
-        public string InvokeCommand(INetworkClient client, string text)
+        public string InvokeCommand(T client, string text)
         {
             var cmd = ParseCommand(text);
             var act = GetValue(cmd[0].ToLower());

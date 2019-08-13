@@ -22,79 +22,26 @@ namespace Utils.Helper.Configuration.Info
         /// <summary>
         /// Необходимо отправить клиенту
         /// </summary>
-        public bool ClientValue { get; set; }
+        public string Flags { get => flags; set { flags = value; compiledFlag = null; } }
 
-        /// <summary>
-        /// Получить тип базы данных
-        /// </summary>
-        /// <param name="name">название базы данных(сокр.)</param>
-        /// <returns></returns>
-        public static DBType GetDbType(string name)
-        {
-            switch (name.ToLower())
-            {
-                case "mysql":
-                    return DBType.MySql;
-                case "mssql":
-                    return DBType.MsSql;
-                default:
-                    return DBType.None;
-            }
-        }
+        private string compiledFlag;
+        private string flags;
 
-        /// <summary>
-        /// Получить версию ип протокола
-        /// </summary>
-        /// <param name="ver">Номер версии ип протокола</param>
-        /// <returns></returns>
-        public static AddressFamily GetIPv(byte ver)
-        {
-            switch (ver)
-            {
-                case 6:
-                    return AddressFamily.InterNetworkV6;
-                case 4:
-                default:
-                    return AddressFamily.InterNetwork;
-            }
-        }
+        private string CompiledFlag => compiledFlag ?? (compiledFlag = Flags.EndsWith("%") ? Flags : Flags + "%");
 
-        /// <summary>
-        /// Получить тип протокола Network
-        /// </summary>
-        /// <param name="name">Название протокола</param>
-        /// <returns></returns>
-        public static ProtocolType GetProtocolType(string name)
+        public bool ExistFlag(string flag)
         {
-            switch (name.ToLower())
-            {
-                case "udp":
-                    return ProtocolType.Udp;
-                case "tcp":
-                default:
-                    return ProtocolType.Tcp;
-            }
-        }
-
-        /// <summary>
-        /// Запись конфигурации в исходящий буффер
-        /// </summary>
-        /// <param name="packet">Исходящий пакетный буффер</param>
-        /// <param name="config">Данные конфигурации</param>
-        public static void WriteConfigurationPacketData(ref OutputPacketBuffer packet, ConfigurationInfo config)
-        {
-            packet.WriteString16(config.Name);
-            packet.WriteString16(config.Value);
+            return CompiledFlag.Contains(flag + "%");
         }
 
         public ConfigurationInfo()
         { }
 
-        public ConfigurationInfo(string name, string value, bool clientValue = false)
+        public ConfigurationInfo(string name, string value, string flags)
         {
             Name = name;
             Value = value;
-            clientValue = ClientValue;
+            Flags = flags;
         }
     }
 }

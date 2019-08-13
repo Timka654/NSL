@@ -2,13 +2,11 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Utils.Logger
+namespace phs.Data.NodeHostServer.Info
 {
-    public enum LoggerLevel
+    public enum LoginResultEnum
     {
-        Info,
         Error,
-        Log,
-        Debug
+        Ok
     }
 }

@@ -6,6 +6,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading.Tasks;
 using BinarySerializer;
+using SocketServer.Utils.Exceptions;
 
 namespace SocketServer.Utils.Buffer
 {

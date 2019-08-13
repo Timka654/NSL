@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Utils.Helper.Configuration.Info;
+using Utils.Logger;
 
 namespace Utils.Helper.Configuration
 {
@@ -18,7 +19,12 @@ namespace Utils.Helper.Configuration
             SetDefaults(defaultConfigurationList);
             ReLoadData();
 
-            Utils.Logger.ConsoleLogger.WriteFormat(Utils.Logger.LoggerLevel.Info, $"ConfigurationManager Loaded");
+            LoggerStorage.Instance.main.AppendInfo( $"ConfigurationManager Loaded");
+        }
+
+        protected ConfigurationManager()
+        {
+
         }
 
         /// <summary>
@@ -46,12 +52,12 @@ namespace Utils.Helper.Configuration
 
                 foreach (var item in result)
                 {
-                    AddValue(new Info.ConfigurationInfo() { Name = item.Key.ToLower(), Value = item.Value, ClientValue = false });
+                    AddValue(new Info.ConfigurationInfo() { Name = item.Key.ToLower(), Value = item.Value });
                 }
             }
             catch (Exception ex)
             {
-                Utils.Logger.ConsoleLogger.WriteFormat(Utils.Logger.LoggerLevel.Error, $"ConfigurationManager Exception: {ex.ToString()}");
+                LoggerStorage.Instance.main.AppendError($"ConfigurationManager Exception: {ex.ToString()}");
             }
             return this;
         }
@@ -62,9 +68,9 @@ namespace Utils.Helper.Configuration
         /// <param name="name">Путь</param>
         /// <param name="value">Значение</param>
         /// <param name="client_value">Необходимо отправить клиенту</param>
-        public void AddValue(string name, object value, bool client_value)
+        public void AddValue(string name, object value, string flags = "")
         {
-            base.AddValue(new Info.ConfigurationInfo() { Name = name.ToLower(), Value = value.ToString(), ClientValue = client_value });
+            base.AddValue(new Info.ConfigurationInfo() { Name = name.ToLower(), Value = value.ToString(), Flags = flags });
         }
 
         /// <summary>
@@ -73,14 +79,14 @@ namespace Utils.Helper.Configuration
         /// <param name="name">Путь</param>
         /// <param name="only_client_value">Только клиенские значения</param>
         /// <returns></returns>
-        public string GetValue(string path, bool only_client_value = false)
+        public string GetValue(string path, string existFlag = "")
         {
             var v = base.GetValue(path.ToLower());
 
             if (v == null)
                 return "";
 
-            if (only_client_value && v.ClientValue == false)
+            if (!string.IsNullOrEmpty(existFlag) && !v.ExistFlag(existFlag))
                 return null;
             return v.Value;
         }
@@ -91,23 +97,16 @@ namespace Utils.Helper.Configuration
         /// <param name="name">Путь</param>
         /// <param name="only_client_value">Только клиенские значения</param>
         /// <returns></returns>
-        public T GetValue<T>(string path, bool only_client_value = false)
+        public T GetValue<T>(string path, string existFlag = "")
         {
-            return (T)Convert.ChangeType(GetValue(path, only_client_value), typeof(T));
+            return (T)Convert.ChangeType(GetValue(path, existFlag), typeof(T));
         }
 
-        /// <summary>
-        /// Генерация данных пакета с клиенскими конфигурациями
-        /// </summary>
-        /// <param name="packet">Исходящий пакетный буффер</param>
-        public void WriteClientConfigPacketData(ref OutputPacketBuffer packet)
+        public List<ConfigurationInfo> GetAllValues(string existFlag = "")
         {
-            var arr = clientValues.Where(x => x.ClientValue).ToArray();
-            packet.WriteInt32(arr.Length);
-            foreach (var item in arr)
-            {
-                Info.ConfigurationInfo.WriteConfigurationPacketData(ref packet, item);
-            }
+            if (string.IsNullOrEmpty(existFlag))
+                return config_map.Values.ToList();
+            return config_map.Values.Where(x => x.ExistFlag(existFlag)).ToList();
         }
 
         /// <summary>

@@ -42,12 +42,23 @@ namespace SocketServer
         /// </summary>
         private ServerOptions<T> serverOptions;
 
+
+        protected Client()
+        {
+
+        }
+
         /// <summary>
         /// Инициализация прослушивания клиента
         /// </summary>
         /// <param name="client">клиент</param>
         /// <param name="options">общие настройки сервера</param>
         public Client(Socket client, ServerOptions<T> options)
+        {
+            Initialize(client, options);
+        }
+
+        protected void Initialize(Socket client, ServerOptions<T> options)
         {
             Data = Activator.CreateInstance<T>();
 
