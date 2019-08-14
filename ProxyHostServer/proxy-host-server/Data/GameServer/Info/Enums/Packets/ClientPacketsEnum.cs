@@ -10,6 +10,7 @@ namespace phs.Data.GameServer.Info.Enums.Packets
     public enum ClientPacketsEnum
     {
         SignInResult = 1,
-        PlayerConnectedResult
+        PlayerConnected,
+        PlayerDisconnected,
     }
 }

@@ -2,46 +2,42 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using phs.Data.GameServer.Info;
-using phs.Data.GameServer.Storages;
-using System.Threading.Tasks;
 using System.Linq;
 using System.Threading;
-using phs.Data.GameServer.Info.Enums.Packets;
-using phs.Data.GameServer.Network;
-using phs.Data.GameServer.Info.Enums;
+using phs.Data.NodeHostServer.Info;
+using phs.Data.NodeHostServer.Network;
 using Utils.Logger;
+using phs.Data.NodeHostServer.Storages;
 
-namespace phs.Data.GameServer.Managers
+namespace phs.Data.NodeHostServer.Managers
 {
     /// <summary>
     /// Контроллер для обработки комнат
     /// </summary>
-    public class GameServerManager : GameServerStorage
+    [NodeHostManagerLoad(2)]
+    public class NodePlayerManager : NodePlayerStorage
     {
-        public static GameServerManager Instance { get; private set; }
+        public static NodePlayerManager Instance { get; private set; }
 
         private string accessToken { get; set; }
 
-        public GameServerManager()
+        public NodePlayerManager()
         {
             Instance = this;
-
             accessToken = StaticData.ConfigurationManager.GetValue<string>("network/node_host_server/access/token");
 
-            LoggerStorage.Instance.main.AppendInfo( $"RoomManager Loaded");
+            LoggerStorage.Instance.main.AppendInfo($"NodePlayerManager Loaded");
         }
 
-        public bool ConnectServer(NetworkGameServerData client, string connectionToken)
+        internal void AppendPlayer(NetworkNodeServerData client, NodePlayerInfo player)
         {
-            if (accessToken != connectionToken)
-                return false;
+            player.Server = client.ServerInfo;
 
-            client.RunAliveChecker();
-            AddServer(client.ServerData);
+            AddPlayer(player);
 
-            return true;
+            client.ServerInfo.AddPlayer(player);
         }
+
 
         /// <summary>
         /// Отключение пользователя (выход из боя)
@@ -53,11 +49,18 @@ namespace phs.Data.GameServer.Managers
         /// <param name="death_count">Кол-во смертей</param>
         /// <param name="score">Очки</param>
         /// <param name="item_list">Список с данными об износе вещей</param>
-        public GameServerInfo DisconnectServer(GameServerInfo player_info)
+        public NodePlayerInfo DisconnectPlayer(Guid id)
         {
-            var player = RemoveServer(player_info.Id);
+            var player = RemovePlayer(id);
+            if (player != null)
+                player.Server.RemovePlayer(player);
 
             return player;
+        }
+
+        public NodePlayerInfo DisconnectPlayer(NodePlayerInfo playerInfo)
+        {
+            return DisconnectPlayer(playerInfo.Id);
         }
     }
 }

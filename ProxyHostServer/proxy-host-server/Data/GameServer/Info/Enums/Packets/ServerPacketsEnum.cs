@@ -10,13 +10,7 @@ namespace phs.Data.GameServer.Info.Enums.Packets
     public enum ServerPacketsEnum
     {
         SignIn = 1,
-        PlayerConnected,
-        PlayerDisconnected,
-        PlayerDisconnectedError,
-        PlayerInfo,
-        MapInfoData,
-        ServerInfoData,
-        RoomInfo,
-        ConfigurationData,
+        PlayerConnectedResult,
+        PlayerDisconnected
     }
 }

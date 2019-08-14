@@ -1,4 +1,5 @@
 ﻿using DBEngine;
+using phs.Data.NodeHostServer.Managers;
 using phs.Data.NodeHostServer.Network;
 using System;
 using System.Collections.Generic;
@@ -13,8 +14,10 @@ namespace phs.Data.NodeHostServer
     {
         public static ConsoleManager<NetworkNodeServerData> ConsoleManager => Misc.console;
 
-        public static Managers.ProxyServerManager ProxyServerManager => Managers.ProxyServerManager.Instance;
-
         public static ConfigurationManager ConfigurationManager => Misc.config;
+
+        public static ProxyServerManager ProxyServerManager => ProxyServerManager.Instance;
+
+        public static NodePlayerManager NodePlayerManager => NodePlayerManager.Instance;
     }
 }

@@ -14,10 +14,10 @@ namespace phs.Data.GameServer
 {
     public class StaticData
     {
-        public static ConsoleManager<NodeHostServer.Network.NetworkNodeServerData> ConsoleManager => Misc.console;
+        public static ConsoleManager<NetworkNodeServerData> ConsoleManager => Misc.console;
 
         public static ConfigurationManager ConfigurationManager => Misc.config;
         
-        public static GameServerManager NodePlayerManager => GameServerManager.Instance;
+        public static GameServerManager GameServerManager => GameServerManager.Instance;
     }
 }

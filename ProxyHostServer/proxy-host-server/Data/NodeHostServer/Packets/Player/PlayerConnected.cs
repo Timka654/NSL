@@ -17,29 +17,28 @@ namespace phs.Data.NodeHostServer.Packets.Player
     {
         public void Receive(NetworkNodeServerData client, InputPacketBuffer data)
         {
-            //var guid = new Guid(data.Read(data.ReadByte()));
-            //bool result = data.ReadBool();
-
-            //StaticData.NodePlayerManager.ConfirmPlayer(guid, result);
+            StaticData.NodePlayerManager.AppendPlayer(client, new NodePlayerInfo()
+            {
+                UserId = data.ReadInt32(),
+                RoomId = data.ReadInt32(),
+                ServerId = data.ReadInt32(),
+                Id = new Guid(data.Read(data.ReadByte())),
+            });
         }
 
-        //public static void Send(NodePlayerInfo player)
-        //{
-        //    var packet = new OutputPacketBuffer();
+        public static void Send(NodePlayerInfo player, bool result)
+        {
+            var packet = new OutputPacketBuffer();
 
-        //    //packet.SetPacketId(ServerPacketsEnum.PlayerConnected);
+            packet.SetPacketId( ClientPacketsEnum.PlayerConnectedResult);
 
-        //    packet.WriteInt32(player.Client?.UserId ?? 0);
+            var arr = player.Id.ToByteArray();
 
-        //    packet.WriteInt32(player.Client?.RoomId ?? 0);
+            packet.WriteByte((byte)arr.Length);
 
-        //    var arr = player.Id.ToByteArray();
+            packet.Write(arr, 0, arr.Length);
 
-        //    packet.WriteByte((byte)arr.Length);
-
-        //    packet.Write(arr, 0, arr.Length);
-
-        //    //StaticData.NodeHostNetwork.Send(packet);
-        //}
+            player.Server?.Client.Network.Send(packet);
+        }
     }
 }

@@ -18,16 +18,14 @@ namespace phs.Data.GameServer.Packets.Auth
     {
         public void Receive(NetworkGameServerData client, InputPacketBuffer data)
         {
-            var result = data.ReadBool();
-
-            if (!result)
+            client.ServerData = new Info.GameServerInfo(client)
             {
-                LoggerStorage.Instance.main.AppendError("Invalid connection host data... Disconnect!");
-                client.Network?.Disconnect();
-                return;
-            }
+                Id = data.ReadInt16()
+            };
 
-            LoggerStorage.Instance.main.AppendInfo($"Host success connected!");
+            string connectionToken = data.ReadString16();
+
+            Send(client, StaticData.GameServerManager.ConnectServer(client, connectionToken));
         }
 
         public static void Send(NetworkGameServerData client, bool result)

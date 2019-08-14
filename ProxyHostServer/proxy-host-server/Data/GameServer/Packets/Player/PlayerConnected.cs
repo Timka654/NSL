@@ -12,7 +12,7 @@ namespace phs.Data.GameServer.Packets.Player
     /// <summary>
     /// Подключение игрока к room серверу
     /// </summary>
-    [GamePacket( ServerPacketsEnum.PlayerConnected)]
+    [GamePacket( ServerPacketsEnum.PlayerConnectedResult)]
     public class PlayerConnected : IPacket<NetworkGameServerData>
     {
         public void Receive(NetworkGameServerData client, InputPacketBuffer data)
@@ -23,23 +23,23 @@ namespace phs.Data.GameServer.Packets.Player
             //StaticData.NodePlayerManager.ConfirmPlayer(guid, result);
         }
 
-        //public static void Send(NetworkGameServerData player)
-        //{
-        //    var packet = new OutputPacketBuffer();
+        public static void Send(NetworkGameServerData server, NodePlayerInfo player)
+        {
+            var packet = new OutputPacketBuffer();
 
-        //    packet.SetPacketId(ServerPacketsEnum.PlayerConnected);
+            packet.SetPacketId(ClientPacketsEnum.PlayerConnected);
 
-        //    packet.WriteInt32(player.Client?.UserId ?? 0);
+            //packet.WriteInt32(player.Client?.UserId ?? 0);
 
-        //    packet.WriteInt32(player.Client?.RoomId ?? 0);
+            //packet.WriteInt32(player.Client?.RoomId ?? 0);
 
-        //    var arr = player.Id.ToByteArray();
+            var arr = player.Id.ToByteArray();
 
-        //    packet.WriteByte((byte)arr.Length);
+            packet.WriteByte((byte)arr.Length);
 
-        //    packet.Write(arr, 0, arr.Length);
+            packet.Write(arr, 0, arr.Length);
 
-        //    //StaticData.NodeHostNetwork.Send(packet);
-        //}
+            server.Network.Send(packet);
+        }
     }
 }

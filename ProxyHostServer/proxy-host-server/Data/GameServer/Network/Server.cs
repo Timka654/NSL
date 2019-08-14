@@ -183,6 +183,10 @@ namespace phs.Data.GameServer.Network
         private static void SocketOptions_OnClientDisconnectEvent(NetworkGameServerData client)
         {
             LoggerStorage.Instance.main.AppendInfo($"Node Server disconnected ({client?.Network?.GetRemovePoint()})");
+            if(client.ServerData != null)
+                {
+                StaticData.GameServerManager.DisconnectServer(client.ServerData);
+            }
         }
 
         /// <summary>

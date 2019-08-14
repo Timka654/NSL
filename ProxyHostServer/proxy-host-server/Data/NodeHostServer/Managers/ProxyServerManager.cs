@@ -14,7 +14,7 @@ namespace phs.Data.NodeHostServer.Managers
     /// <summary>
     /// Контроллер для обработки комнат
     /// </summary>
-    [NodeHostManagerLoadAttribute(1)]
+    [NodeHostManagerLoad(1)]
     public class ProxyServerManager : ProxyServerStorage
     {
         public static ProxyServerManager Instance { get; private set; }
@@ -24,7 +24,8 @@ namespace phs.Data.NodeHostServer.Managers
         public ProxyServerManager()
         {
             Instance = this;
-            accessToken= StaticData.ConfigurationManager.GetValue<string>("network/node_host_server/access/token");
+
+            accessToken = StaticData.ConfigurationManager.GetValue<string>("network/node_host_server/access/token");
 
             LoggerStorage.Instance.main.AppendInfo( $"RoomManager Loaded");
         }

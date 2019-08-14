@@ -23,6 +23,8 @@ namespace phs.Data.NodeHostServer.Info
 
         public int MaxPlayerCount { get; set; }
 
+        private Dictionary<Guid, NodePlayerInfo> playerMap = new Dictionary<Guid, NodePlayerInfo>();
+
         /// <summary>
         /// Текущий клиент для передачи данных
         /// </summary>
@@ -31,6 +33,24 @@ namespace phs.Data.NodeHostServer.Info
         public ProxyServerInfo(NetworkNodeServerData client)
         {
             Client = client;
+        }
+
+        internal void AddPlayer(NodePlayerInfo player)
+        {
+            playerMap.Add(player.Id, player);
+        }
+
+        internal void RemovePlayer(NodePlayerInfo player)
+        {
+            playerMap.Remove(player.Id, out player);
+        }
+
+        internal void DisconnectAll()
+        {
+            foreach (var item in playerMap)
+            {
+                StaticData.NodePlayerManager.DisconnectPlayer(item.Value);
+            }
         }
     }
 }

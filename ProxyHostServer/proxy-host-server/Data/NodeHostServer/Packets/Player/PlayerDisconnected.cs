@@ -1,31 +1,21 @@
-﻿using phs.Data.GameServer.Info;
-using phs.Data.GameServer.Info.Enums.Packets;
-using phs.Data.GameServer.Network;
-using SocketServer.Utils.Buffer;
+﻿using SocketServer.Utils.Buffer;
 using System;
 using System.Collections.Generic;
 using System.Text;
-using phs.Data.GameServer.Info.Enums;
-using phs.Data.GameServer.Managers;
 using Utils.Logger;
 using phs.Data.NodeHostServer.Info;
+using phs.Data.NodeHostServer.Network;
+using phs.Data.NodeHostServer.Info.Enums.Packets;
 
 namespace phs.Data.NodeHostServer.Packets.Player
 {
-    public class PlayerDisconnected
+    [NodeHostPacket(ServerPacketsEnum.PlayerDisconnected)]
+    public class PlayerDisconnected : IPacket<NetworkNodeServerData>
     {
-        //public static void Send(NodePlayerInfo player)
-        //{
-        //    var packet = new OutputPacketBuffer();
-
-        //    //packet.SetPacketId(ServerPacketsEnum.PlayerDisconnected);
-
-        //    var arr = player.Id.ToByteArray();
-
-        //    packet.WriteByte((byte)arr.Length);
-        //    packet.Write(arr, 0, arr.Length);
-
-        //    //StaticData.NodeHostNetwork.Send(packet);
-        //}
+        public void Receive(NetworkNodeServerData client, InputPacketBuffer data)
+        {
+            var id = new Guid(data.Read(data.ReadByte()));
+            StaticData.NodePlayerManager.DisconnectPlayer(id);
+        }
     }
 }
