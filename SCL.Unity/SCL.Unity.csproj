@@ -44,50 +44,171 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BinarySerializer\BinaryAttribute.cs" />
-    <Compile Include="BinarySerializer\BinaryPreCompileAttribute.cs" />
-    <Compile Include="BinarySerializer\BinarySchemeAttribute.cs" />
-    <Compile Include="BinarySerializer\BinarySerializer.cs" />
-    <Compile Include="BinarySerializer\BinaryStruct.cs" />
-    <Compile Include="BinarySerializer\Builder\BuilderPropertyData.cs" />
-    <Compile Include="BinarySerializer\Builder\StructBuilder.cs" />
-    <Compile Include="BinarySerializer\Builder\StructBuilderPartialType.cs" />
-    <Compile Include="BinarySerializer\Builder\StructBuilderPartialTypeProperty.cs" />
-    <Compile Include="BinarySerializer\Builder\StructBuilderProperty.cs" />
-    <Compile Include="BinarySerializer\DefaultTypes\ArrayTypes\BinaryArray.cs" />
-    <Compile Include="BinarySerializer\DefaultTypes\ArrayTypes\BinaryArray16.cs" />
-    <Compile Include="BinarySerializer\DefaultTypes\ArrayTypes\BinaryArray32.cs" />
-    <Compile Include="BinarySerializer\DefaultTypes\ConcurrentDictionaryTypes\BinaryConcurrentDictionary.cs" />
-    <Compile Include="BinarySerializer\DefaultTypes\ConcurrentDictionaryTypes\BinaryConcurrentDictionary16.cs" />
-    <Compile Include="BinarySerializer\DefaultTypes\ConcurrentDictionaryTypes\BinaryConcurrentDictionary32.cs" />
-    <Compile Include="BinarySerializer\DefaultTypes\DictionaryTypes\BinaryDictionary.cs" />
-    <Compile Include="BinarySerializer\DefaultTypes\DictionaryTypes\BinaryDictionary16.cs" />
-    <Compile Include="BinarySerializer\DefaultTypes\DictionaryTypes\BinaryDictionary32.cs" />
-    <Compile Include="BinarySerializer\DefaultTypes\FloatTypes\BinaryFloat32.cs" />
-    <Compile Include="BinarySerializer\DefaultTypes\FloatTypes\BinaryFloat64.cs" />
-    <Compile Include="BinarySerializer\DefaultTypes\IBasicType.cs" />
-    <Compile Include="BinarySerializer\DefaultTypes\IntTypes\BinaryBool.cs" />
-    <Compile Include="BinarySerializer\DefaultTypes\IntTypes\BinaryByte.cs" />
-    <Compile Include="BinarySerializer\DefaultTypes\IntTypes\BinaryInt16.cs" />
-    <Compile Include="BinarySerializer\DefaultTypes\IntTypes\BinaryInt32.cs" />
-    <Compile Include="BinarySerializer\DefaultTypes\IntTypes\BinaryInt64.cs" />
-    <Compile Include="BinarySerializer\DefaultTypes\IntTypes\BinaryInt8.cs" />
-    <Compile Include="BinarySerializer\DefaultTypes\IntTypes\BinarySByte.cs" />
-    <Compile Include="BinarySerializer\DefaultTypes\IntTypes\BinarySInt8.cs" />
-    <Compile Include="BinarySerializer\DefaultTypes\IntTypes\BinaryUInt16.cs" />
-    <Compile Include="BinarySerializer\DefaultTypes\IntTypes\BinaryUInt32.cs" />
-    <Compile Include="BinarySerializer\DefaultTypes\IntTypes\BinaryUInt64.cs" />
-    <Compile Include="BinarySerializer\DefaultTypes\ListTypes\BinaryList.cs" />
-    <Compile Include="BinarySerializer\DefaultTypes\ListTypes\BinaryList16.cs" />
-    <Compile Include="BinarySerializer\DefaultTypes\ListTypes\BinaryList32.cs" />
-    <Compile Include="BinarySerializer\DefaultTypes\OtherTypes\BinaryDateTime.cs" />
-    <Compile Include="BinarySerializer\DefaultTypes\OtherTypes\BinaryNullable.cs" />
-    <Compile Include="BinarySerializer\DefaultTypes\OtherTypes\BinaryTimeSpan.cs" />
-    <Compile Include="BinarySerializer\DefaultTypes\OtherTypes\BinaryVector2.cs" />
-    <Compile Include="BinarySerializer\DefaultTypes\OtherTypes\BinaryVector3.cs" />
-    <Compile Include="BinarySerializer\DefaultTypes\StringTypes\BinaryString.cs" />
-    <Compile Include="BinarySerializer\DefaultTypes\StringTypes\BinaryString16.cs" />
-    <Compile Include="BinarySerializer\DefaultTypes\StringTypes\BinaryString32.cs" />
+    <Compile Include="..\BinarySerializer_v5\BinaryAttribute.cs">
+      <Link>BinarySerializer\BinaryAttribute.cs</Link>
+    </Compile>
+    <Compile Include="..\BinarySerializer_v5\BinaryPreCompileAttribute.cs">
+      <Link>BinarySerializer\BinaryPreCompileAttribute.cs</Link>
+    </Compile>
+    <Compile Include="..\BinarySerializer_v5\BinarySchemeAttribute.cs">
+      <Link>BinarySerializer\BinarySchemeAttribute.cs</Link>
+    </Compile>
+    <Compile Include="..\BinarySerializer_v5\BinarySerializer.cs">
+      <Link>BinarySerializer\BinarySerializer.cs</Link>
+    </Compile>
+    <Compile Include="..\BinarySerializer_v5\BinaryStruct.cs">
+      <Link>BinarySerializer\BinaryStruct.cs</Link>
+    </Compile>
+    <Compile Include="..\BinarySerializer_v5\Builder\BuilderPropertyData.cs">
+      <Link>BinarySerializer\Builder\BuilderPropertyData.cs</Link>
+    </Compile>
+    <Compile Include="..\BinarySerializer_v5\Builder\StructBuilder.cs">
+      <Link>BinarySerializer\Builder\StructBuilder.cs</Link>
+    </Compile>
+    <Compile Include="..\BinarySerializer_v5\Builder\StructBuilderPartialType.cs">
+      <Link>BinarySerializer\Builder\StructBuilderPartialType.cs</Link>
+    </Compile>
+    <Compile Include="..\BinarySerializer_v5\Builder\StructBuilderPartialTypeProperty.cs">
+      <Link>BinarySerializer\Builder\StructBuilderPartialTypeProperty.cs</Link>
+    </Compile>
+    <Compile Include="..\BinarySerializer_v5\Builder\StructBuilderProperty.cs">
+      <Link>BinarySerializer\Builder\StructBuilderProperty.cs</Link>
+    </Compile>
+    <Compile Include="..\BinarySerializer_v5\DefaultTypes\ArrayTypes\BinaryArray.cs">
+      <Link>BinarySerializer\DefaultTypes\ArrayTypes\BinaryArray.cs</Link>
+    </Compile>
+    <Compile Include="..\BinarySerializer_v5\DefaultTypes\ArrayTypes\BinaryArray16.cs">
+      <Link>BinarySerializer\DefaultTypes\ArrayTypes\BinaryArray16.cs</Link>
+    </Compile>
+    <Compile Include="..\BinarySerializer_v5\DefaultTypes\ArrayTypes\BinaryArray32.cs">
+      <Link>BinarySerializer\DefaultTypes\ArrayTypes\BinaryArray32.cs</Link>
+    </Compile>
+    <Compile Include="..\BinarySerializer_v5\DefaultTypes\ConcurrentDictionaryTypes\BinaryConcurrentDictionary.cs">
+      <Link>BinarySerializer\DefaultTypes\ConcurrentDictionaryTypes\BinaryConcurrentDictionary.cs</Link>
+    </Compile>
+    <Compile Include="..\BinarySerializer_v5\DefaultTypes\ConcurrentDictionaryTypes\BinaryConcurrentDictionary16.cs">
+      <Link>BinarySerializer\DefaultTypes\ConcurrentDictionaryTypes\BinaryConcurrentDictionary16.cs</Link>
+    </Compile>
+    <Compile Include="..\BinarySerializer_v5\DefaultTypes\ConcurrentDictionaryTypes\BinaryConcurrentDictionary32.cs">
+      <Link>BinarySerializer\DefaultTypes\ConcurrentDictionaryTypes\BinaryConcurrentDictionary32.cs</Link>
+    </Compile>
+    <Compile Include="..\BinarySerializer_v5\DefaultTypes\DictionaryTypes\BinaryDictionary.cs">
+      <Link>BinarySerializer\DefaultTypes\DictionaryTypes\BinaryDictionary.cs</Link>
+    </Compile>
+    <Compile Include="..\BinarySerializer_v5\DefaultTypes\DictionaryTypes\BinaryDictionary16.cs">
+      <Link>BinarySerializer\DefaultTypes\DictionaryTypes\BinaryDictionary16.cs</Link>
+    </Compile>
+    <Compile Include="..\BinarySerializer_v5\DefaultTypes\DictionaryTypes\BinaryDictionary32.cs">
+      <Link>BinarySerializer\DefaultTypes\DictionaryTypes\BinaryDictionary32.cs</Link>
+    </Compile>
+    <Compile Include="..\BinarySerializer_v5\DefaultTypes\FloatTypes\BinaryFloat32.cs">
+      <Link>BinarySerializer\DefaultTypes\FloatTypes\BinaryFloat32.cs</Link>
+    </Compile>
+    <Compile Include="..\BinarySerializer_v5\DefaultTypes\FloatTypes\BinaryFloat64.cs">
+      <Link>BinarySerializer\DefaultTypes\FloatTypes\BinaryFloat64.cs</Link>
+    </Compile>
+    <Compile Include="..\BinarySerializer_v5\DefaultTypes\IBasicType.cs">
+      <Link>BinarySerializer\DefaultTypes\IBasicType.cs</Link>
+    </Compile>
+    <Compile Include="..\BinarySerializer_v5\DefaultTypes\IntTypes\BinaryBool.cs">
+      <Link>BinarySerializer\DefaultTypes\IntTypes\BinaryBool.cs</Link>
+    </Compile>
+    <Compile Include="..\BinarySerializer_v5\DefaultTypes\IntTypes\BinaryByte.cs">
+      <Link>BinarySerializer\DefaultTypes\IntTypes\BinaryByte.cs</Link>
+    </Compile>
+    <Compile Include="..\BinarySerializer_v5\DefaultTypes\IntTypes\BinaryInt16.cs">
+      <Link>BinarySerializer\DefaultTypes\IntTypes\BinaryInt16.cs</Link>
+    </Compile>
+    <Compile Include="..\BinarySerializer_v5\DefaultTypes\IntTypes\BinaryInt32.cs">
+      <Link>BinarySerializer\DefaultTypes\IntTypes\BinaryInt32.cs</Link>
+    </Compile>
+    <Compile Include="..\BinarySerializer_v5\DefaultTypes\IntTypes\BinaryInt64.cs">
+      <Link>BinarySerializer\DefaultTypes\IntTypes\BinaryInt64.cs</Link>
+    </Compile>
+    <Compile Include="..\BinarySerializer_v5\DefaultTypes\IntTypes\BinaryInt8.cs">
+      <Link>BinarySerializer\DefaultTypes\IntTypes\BinaryInt8.cs</Link>
+    </Compile>
+    <Compile Include="..\BinarySerializer_v5\DefaultTypes\IntTypes\BinarySByte.cs">
+      <Link>BinarySerializer\DefaultTypes\IntTypes\BinarySByte.cs</Link>
+    </Compile>
+    <Compile Include="..\BinarySerializer_v5\DefaultTypes\IntTypes\BinarySInt8.cs">
+      <Link>BinarySerializer\DefaultTypes\IntTypes\BinarySInt8.cs</Link>
+    </Compile>
+    <Compile Include="..\BinarySerializer_v5\DefaultTypes\IntTypes\BinaryUInt16.cs">
+      <Link>BinarySerializer\DefaultTypes\IntTypes\BinaryUInt16.cs</Link>
+    </Compile>
+    <Compile Include="..\BinarySerializer_v5\DefaultTypes\IntTypes\BinaryUInt32.cs">
+      <Link>BinarySerializer\DefaultTypes\IntTypes\BinaryUInt32.cs</Link>
+    </Compile>
+    <Compile Include="..\BinarySerializer_v5\DefaultTypes\IntTypes\BinaryUInt64.cs">
+      <Link>BinarySerializer\DefaultTypes\IntTypes\BinaryUInt64.cs</Link>
+    </Compile>
+    <Compile Include="..\BinarySerializer_v5\DefaultTypes\ListTypes\BinaryList.cs">
+      <Link>BinarySerializer\DefaultTypes\ListTypes\BinaryList.cs</Link>
+    </Compile>
+    <Compile Include="..\BinarySerializer_v5\DefaultTypes\ListTypes\BinaryList16.cs">
+      <Link>BinarySerializer\DefaultTypes\ListTypes\BinaryList16.cs</Link>
+    </Compile>
+    <Compile Include="..\BinarySerializer_v5\DefaultTypes\ListTypes\BinaryList32.cs">
+      <Link>BinarySerializer\DefaultTypes\ListTypes\BinaryList32.cs</Link>
+    </Compile>
+    <Compile Include="..\BinarySerializer_v5\DefaultTypes\OtherTypes\BinaryDateTime.cs">
+      <Link>BinarySerializer\DefaultTypes\OtherTypes\BinaryDateTime.cs</Link>
+    </Compile>
+    <Compile Include="..\BinarySerializer_v5\DefaultTypes\OtherTypes\BinaryNullable.cs">
+      <Link>BinarySerializer\DefaultTypes\OtherTypes\BinaryNullable.cs</Link>
+    </Compile>
+    <Compile Include="..\BinarySerializer_v5\DefaultTypes\OtherTypes\BinaryTimeSpan.cs">
+      <Link>BinarySerializer\DefaultTypes\OtherTypes\BinaryTimeSpan.cs</Link>
+    </Compile>
+    <Compile Include="..\BinarySerializer_v5\DefaultTypes\OtherTypes\BinaryVector2.cs">
+      <Link>BinarySerializer\DefaultTypes\OtherTypes\BinaryVector2.cs</Link>
+    </Compile>
+    <Compile Include="..\BinarySerializer_v5\DefaultTypes\OtherTypes\BinaryVector3.cs">
+      <Link>BinarySerializer\DefaultTypes\OtherTypes\BinaryVector3.cs</Link>
+    </Compile>
+    <Compile Include="..\BinarySerializer_v5\DefaultTypes\StringTypes\BinaryString.cs">
+      <Link>BinarySerializer\DefaultTypes\StringTypes\BinaryString.cs</Link>
+    </Compile>
+    <Compile Include="..\BinarySerializer_v5\DefaultTypes\StringTypes\BinaryString16.cs">
+      <Link>BinarySerializer\DefaultTypes\StringTypes\BinaryString16.cs</Link>
+    </Compile>
+    <Compile Include="..\BinarySerializer_v5\DefaultTypes\StringTypes\BinaryString32.cs">
+      <Link>BinarySerializer\DefaultTypes\StringTypes\BinaryString32.cs</Link>
+    </Compile>
+    <Compile Include="..\BinarySerializer_v5\PropertyData.cs">
+      <Link>BinarySerializer\PropertyData.cs</Link>
+    </Compile>
+    <Compile Include="..\BinarySerializer_v5\TypeStorage.cs">
+      <Link>BinarySerializer\TypeStorage.cs</Link>
+    </Compile>
+    <Compile Include="..\Cipher\AES\AESCipher.cs">
+      <Link>Cipher\AES\AESCipher.cs</Link>
+    </Compile>
+    <Compile Include="..\Cipher\CipherConfiguration.cs">
+      <Link>Cipher\CipherConfiguration.cs</Link>
+    </Compile>
+    <Compile Include="..\Cipher\DES\DESCipher.cs">
+      <Link>Cipher\DES\DESCipher.cs</Link>
+    </Compile>
+    <Compile Include="..\Cipher\MD5\MD5Cipher.cs">
+      <Link>Cipher\MD5\MD5Cipher.cs</Link>
+    </Compile>
+    <Compile Include="..\Cipher\RC\RC4\RC4Cipher.cs">
+      <Link>Cipher\RC\RC4\RC4Cipher.cs</Link>
+    </Compile>
+    <Compile Include="..\Cipher\RC\RC4\XRC4Cipher.cs">
+      <Link>Cipher\RC\RC4\XRC4Cipher.cs</Link>
+    </Compile>
+    <Compile Include="..\Cipher\RC\RC5\RC5Cipher.cs">
+      <Link>Cipher\RC\RC5\RC5Cipher.cs</Link>
+    </Compile>
+    <Compile Include="..\Cipher\RSA\RSACipher.cs">
+      <Link>Cipher\RSA\RSACipher.cs</Link>
+    </Compile>
+    <Compile Include="..\Cipher\SHA\SHA1Cipher.cs">
+      <Link>Cipher\SHA\SHA1Cipher.cs</Link>
+    </Compile>
     <Compile Include="BinarySerializer\GrEmit\FieldsExtractor.cs" />
     <Compile Include="BinarySerializer\GrEmit\GroboIL.cs" />
     <Compile Include="BinarySerializer\GrEmit\ILCode.cs" />
@@ -201,17 +322,6 @@
     <Compile Include="BinarySerializer\GrEmit\Utils\HackHelpers.cs" />
     <Compile Include="BinarySerializer\GrEmit\Utils\ReflectionExtensions.cs" />
     <Compile Include="BinarySerializer\GrEmit\Utils\TypeExtensions.cs" />
-    <Compile Include="BinarySerializer\PropertyData.cs" />
-    <Compile Include="BinarySerializer\TypeStorage.cs" />
-    <Compile Include="Cipher\AES\AESCipher.cs" />
-    <Compile Include="Cipher\CipherConfiguration.cs" />
-    <Compile Include="Cipher\DES\DESCipher.cs" />
-    <Compile Include="Cipher\MD5\MD5Cipher.cs" />
-    <Compile Include="Cipher\PacketNoneCipher.cs" />
-    <Compile Include="Cipher\RC\RC4\RC4Cipher.cs" />
-    <Compile Include="Cipher\RC\RC4\XRC4Cipher.cs" />
-    <Compile Include="Cipher\RC\RC5\RC5Cipher.cs" />
-    <Compile Include="Cipher\RSA\RSACipher.cs" />
     <Compile Include="NAT\Proxy\ProxyNetwork\Data\Info\Enums\ProxySignInResultEnum.cs" />
     <Compile Include="NAT\Proxy\ProxyNetwork\Data\Packets\PacketData\ProxySignInPacketData.cs" />
     <Compile Include="NAT\Proxy\ProxyNetwork\Data\Packets\PacketData\ProxySignInPacketResultData.cs" />
