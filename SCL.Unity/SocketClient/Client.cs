@@ -1,5 +1,6 @@
 ﻿using SCL.SocketClient.Utils;
 using SCL.SocketClient.Utils.Buffer;
+using SCL.SocketClient.Utils.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -10,6 +11,15 @@ using UnityEngine;
 
 namespace SCL.SocketClient
 {
+    internal class SendAsyncState
+    {
+        public byte[] buf { get; set; }
+
+        public int offset { get; set; }
+
+        public int len { get; set; }
+    }
+
 #if DEBUG
     public delegate void ReceivePacketDebugInfo<T>(Client<T> client, ushort pid, int len) where T : BaseSocketNetworkClient;
     public delegate void SendPacketDebugInfo<T>(Client<T> client, ushort pid, int len) where T : BaseSocketNetworkClient;
@@ -60,6 +70,8 @@ namespace SCL.SocketClient
 
         private bool data = false;
 
+        private IPEndPoint currentPoint;
+
         /// <summary>
         /// Общие настройки сервера
         /// </summary>
@@ -92,11 +104,12 @@ namespace SCL.SocketClient
             if(waitBuffer != null)
                 foreach (var item in waitBuffer)
                 {
-                    clientOptions.ClientData.AddWaitPacket(item, item.Length);
+                    clientOptions.ClientData.AddWaitPacket(item, 0, item.Length);
                 }
             
             //установка переменной содержащую поток клиента
             this.sclient = client;
+            currentPoint = (IPEndPoint)client.RemoteEndPoint;
 
             //установка массива для приема данных, размер указан в общих настройках сервера
             this.receiveBuffer = new byte[clientOptions.ReceiveBufferSize];
@@ -131,14 +144,13 @@ namespace SCL.SocketClient
             //замыкаем это все в блок try, если клиент отключился то EndReceive может вернуть ошибку
             try
             {
+                if(sclient == null)
+                    throw new ConnectionLostException(currentPoint, true);
                 //принимаем размер данных которые удалось считать
                 int rlen = sclient.EndReceive(result);
                 //при некоторых ошибках размер возвращает 0 или -1, проверяем
                 if (rlen < 1)
-                {
-                    Disconnect();
-                    return;
-                }
+                    throw new ConnectionLostException(currentPoint, true);
 
                 //добавляем offset для дальнейшей считки пакета
                 offset += rlen;
@@ -188,6 +200,11 @@ namespace SCL.SocketClient
                     }
                 }
                 sclient.BeginReceive(receiveBuffer, offset, lenght - offset, SocketFlags.None, Receive, sclient);
+            }
+            catch (ConnectionLostException clex)
+            {
+                clientOptions.RunExtension(clex);
+                Disconnect();
             }
             catch (Exception ex)
             {
@@ -242,11 +259,11 @@ namespace SCL.SocketClient
                 byte[] sndBuffer = outputCipher.Encode(buf, offset, lenght);
 
                 //начинаем отправку данных
-                sclient.BeginSend(sndBuffer, 0, lenght, SocketFlags.None, EndSend, sclient);
+                sclient.BeginSend(sndBuffer, 0, lenght, SocketFlags.None, EndSend, new SendAsyncState { buf = buf, offset = offset, len = lenght });
             }
             catch (Exception ex)
             {
-                clientOptions.ClientData.AddWaitPacket(buf, lenght);
+                clientOptions.ClientData.AddWaitPacket(buf, offset, lenght);
                 clientOptions.RunExtension(ex);
 
                 //отключаем клиента, лишним не будет
@@ -269,15 +286,17 @@ namespace SCL.SocketClient
                 int len = sclient.EndSend(r);
                 //при некоторых ошибках размер возвращает 0 или -1, проверяем
                 if (len < 1)
-                {
-                    throw new Exception();
-                }
+                    throw new ConnectionLostException(sclient.RemoteEndPoint, false);
             }
-            catch (Exception ex)
+            catch (ConnectionLostException clex)
             {
-                clientOptions.RunExtension(ex);
-
-                //отключаем клиента, лишним не будет
+                var sas = ((SendAsyncState)r.AsyncState);
+                this.clientOptions.ClientData?.AddWaitPacket(sas.buf, sas.offset, sas.len);
+                clientOptions.RunExtension(clex);
+                Disconnect();
+            }
+            catch
+            {
                 Disconnect();
             }
         }

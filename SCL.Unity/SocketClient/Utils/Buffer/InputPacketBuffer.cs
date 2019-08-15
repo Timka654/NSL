@@ -6,6 +6,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading.Tasks;
 using BinarySerializer;
+using SCL.SocketClient.Utils.Exceptions;
 
 namespace SCL.SocketClient.Utils.Buffer
 {

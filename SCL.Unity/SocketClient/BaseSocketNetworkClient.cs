@@ -58,12 +58,19 @@ namespace SCL.SocketClient
         /// </summary>
         /// <param name="packet_data"></param>
         /// <param name="lenght"></param>
-        internal void AddWaitPacket(byte[] packet_data, int lenght)
+        internal void AddWaitPacket(byte[] packet_data, int offset, int lenght)
         {
             if (WaitPacketBuffer == null)
                 return;
-            Array.Resize(ref packet_data, lenght);
-            WaitPacketBuffer.Enqueue(packet_data);
+
+            if (offset == 0 && lenght == packet_data.Length)
+                WaitPacketBuffer.Enqueue(packet_data);
+            else
+            {
+                var packet = new byte[lenght - offset];
+                Array.Copy(packet_data, offset, packet, 0, lenght);
+                WaitPacketBuffer.Enqueue(packet);
+            }
         }
 
         /// <summary>

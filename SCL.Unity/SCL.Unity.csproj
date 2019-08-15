@@ -269,8 +269,9 @@
     <Compile Include="SocketClient\SocketClient.cs" />
     <Compile Include="SocketClient\Utils\Buffer\InputPacketBuffer.cs" />
     <Compile Include="SocketClient\Utils\Buffer\OutputPacketBuffer.cs" />
+    <Compile Include="SocketClient\Utils\Exceptions\ConnectionLostException.cs" />
     <Compile Include="SocketClient\Utils\ILockedPacket.cs" />
-    <Compile Include="SocketClient\Utils\InvalidPacketHashException.cs" />
+    <Compile Include="SocketClient\Utils\Exceptions\InvalidPacketHashException.cs" />
     <Compile Include="SocketClient\Utils\IPacket.cs" />
     <Compile Include="SocketClient\Utils\IPacketCipher.cs" />
     <Compile Include="SocketClient\Utils\IPacketMessage.cs" />

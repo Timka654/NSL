@@ -10,7 +10,8 @@ namespace SCL.SocketClient.Utils
     public enum RecoverySessionResultEnum
     {
         Ok,
-        NotFound
+        NotFound,
+        NoData
     }
 }
 
@@ -45,7 +46,7 @@ namespace SCL.SocketClient.Utils.SystemPackets
         {
             if (client.RecoverySessionKeyArray == null || client.Session == null)
             {
-                Instance.InvokeEvent(RecoverySessionResultEnum.NotFound);
+                Instance.InvokeEvent(RecoverySessionResultEnum.NoData);
                 return; 
             }
 

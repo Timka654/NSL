@@ -314,9 +314,7 @@ namespace SocketServer
                 int len = sclient.EndSend(r);
                 //при некоторых ошибках размер возвращает 0 или -1, проверяем
                 if (len < 1)
-                {
                     throw new ConnectionLostException(sclient.RemoteEndPoint, false);
-                }
             }
             catch (ConnectionLostException clex)
             {

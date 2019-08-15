@@ -236,5 +236,14 @@ namespace SCL.SocketClient
             return !r;
         }
 
+        public void ClearRecoveryData()
+        {
+            if (ClientData != null)
+            {
+                ClientData.Session = null;
+                ClientData.RecoverySessionKeyArray = null;
+            }
+        }
+
     }
 }
