@@ -31,7 +31,7 @@ namespace SocketServer.Utils
 
         internal string Session { get; set; }
 
-        public string[] RecoverySessionKeyArray { get; set; }
+        public string[] RecoverySessionKeyArray { get; private set; }
 
         public DateTime? DisconnectTime { get; set; }
 

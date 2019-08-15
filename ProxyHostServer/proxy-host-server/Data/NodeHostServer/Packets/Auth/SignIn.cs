@@ -25,10 +25,10 @@ namespace phs.Data.NodeHostServer.Packets.Auth
                 MaxPlayerCount = data.ReadInt32(),
                 Id = data.ReadInt16()
             };
-
+            bool firstLoading = data.ReadBool();
             string connectionToken = data.ReadString16();
 
-            Send(client, StaticData.ProxyServerManager.ConnectServer(client, connectionToken));
+            Send(client, StaticData.ProxyServerManager.ConnectServer(client, firstLoading, connectionToken));
         }
 
         public static void Send(NetworkNodeServerData client, bool result)

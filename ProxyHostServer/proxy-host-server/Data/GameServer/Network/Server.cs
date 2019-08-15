@@ -18,7 +18,7 @@ using Utils.Helper;
 namespace phs.Data.GameServer.Network
 {
     /// <summary>
-    /// Клиент приема подключений Node Host серверов
+    /// Клиент приема подключений Game Host серверов
     /// </summary>
     public class Server
     {
@@ -153,7 +153,7 @@ namespace phs.Data.GameServer.Network
                 ipep = client.GetRemovePoint();
             }
 
-            LoggerStorage.Instance.main.AppendInfo( $"Node Server packet receive pid:{pid}({(Info.Enums.Packets.ClientPacketsEnum)pid}) len:{len} from {ipep?.ToString()}");
+            LoggerStorage.Instance.main.AppendInfo( $"Game Server packet receive pid:{pid}({(Info.Enums.Packets.ClientPacketsEnum)pid}) len:{len} from {ipep?.ToString()}");
         }
 
 #endif
@@ -167,11 +167,11 @@ namespace phs.Data.GameServer.Network
         {
             try
             {
-                LoggerStorage.Instance.main.AppendError($"Node Server socket Error ({client.Network.GetSocket()?.RemoteEndPoint}) - {ex.ToString()}");
+                LoggerStorage.Instance.main.AppendError($"Game Server socket Error ({client.Network.GetSocket()?.RemoteEndPoint}) - {ex.ToString()}");
             }
             catch
             {
-                LoggerStorage.Instance.main.AppendError($"Node Server socket Error  {ex.ToString()}");
+                LoggerStorage.Instance.main.AppendError($"Game Server socket Error  {ex.ToString()}");
 
             }
         }
@@ -182,7 +182,7 @@ namespace phs.Data.GameServer.Network
         /// <param name="client">Текущий клиент</param>
         private static void SocketOptions_OnClientDisconnectEvent(NetworkGameServerData client)
         {
-            LoggerStorage.Instance.main.AppendInfo($"Node Server disconnected ({client?.Network?.GetRemovePoint()})");
+            LoggerStorage.Instance.main.AppendInfo($"Game Server disconnected ({client?.Network?.GetRemovePoint()})");
             if(client.ServerData != null)
                 {
                 StaticData.GameServerManager.DisconnectServer(client.ServerData);
@@ -195,7 +195,7 @@ namespace phs.Data.GameServer.Network
         /// <param name="client">Текущий клиент</param>
         private static void SocketOptions_OnClientConnectEvent(NetworkGameServerData client)
         {
-            LoggerStorage.Instance.main.AppendInfo($"New Node Server connection ({client?.Network?.GetRemovePoint()})");
+            LoggerStorage.Instance.main.AppendInfo($"New Game Server connection ({client?.Network?.GetRemovePoint()})");
         }
 
         #endregion

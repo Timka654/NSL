@@ -30,7 +30,7 @@ namespace SocketServer.Utils.SystemPackets
 
         public void Receive(T client, InputPacketBuffer data)
         {
-            string id = data.ReadString16();
+            string session = data.ReadString16();
 
             int count = data.ReadInt32();
 
@@ -41,10 +41,10 @@ namespace SocketServer.Utils.SystemPackets
                 keys[i] = data.ReadString16();
             }
 
-            OnRecoverySessionReceiveEvent?.Invoke(client, id, keys);
+            OnRecoverySessionReceiveEvent?.Invoke(client, session, keys);
         }
 
-        public static void Send(INetworkClient client, RecoverySessionResultEnum result, string id, string[] newKeys)
+        public static void Send(INetworkClient client, RecoverySessionResultEnum result, string session, string[] newKeys)
         {
                var packet = new OutputPacketBuffer()
             {
@@ -53,9 +53,9 @@ namespace SocketServer.Utils.SystemPackets
 
             packet.WriteByte((byte)result);
 
-            if (!string.IsNullOrEmpty(id))
+            if (result == RecoverySessionResultEnum.Ok)
             {
-                packet.WriteString16(id);
+                packet.WriteString16(session);
                 packet.WriteInt32(newKeys.Length);
 
                 for (int i = 0; i < newKeys.Length; i++)

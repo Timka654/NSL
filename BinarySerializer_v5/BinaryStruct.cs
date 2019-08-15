@@ -166,6 +166,8 @@ namespace BinarySerializer
             {
                 foreach (var item in bs.PropertyList)
                 {
+                    if (item.Setter == null)
+                        continue;
                     ProcessWrite(item, bs, il, binaryStruct, value, buffer, offset, typeSize);
                 }
                 return;
@@ -267,6 +269,9 @@ namespace BinarySerializer
             {
                 foreach (var item in bs.PropertyList)
                 {
+                    if (item.Getter == null)
+                        continue;
+
                     if (item.IsBaseType)
                     {
                         item.BinaryType.GetReadILCode(item, bs, il, binaryStruct, buffer, result, typeSize, offset,false);

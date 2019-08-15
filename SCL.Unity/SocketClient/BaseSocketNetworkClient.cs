@@ -15,6 +15,8 @@ namespace SCL.SocketClient
         /// </summary>
         public IClient Network;
 
+        public string Session { get; set; }
+
         public string[] RecoverySessionKeyArray { get; set; }
 
         /// <summary>

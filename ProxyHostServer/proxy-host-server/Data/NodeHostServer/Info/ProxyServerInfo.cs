@@ -7,6 +7,7 @@ using System.Text;
 using SocketServer.Utils.Buffer;
 using BinarySerializer;
 using BinarySerializer.DefaultTypes;
+using System.Collections.Concurrent;
 
 namespace phs.Data.NodeHostServer.Info
 {
@@ -23,7 +24,7 @@ namespace phs.Data.NodeHostServer.Info
 
         public int MaxPlayerCount { get; set; }
 
-        private Dictionary<Guid, NodePlayerInfo> playerMap = new Dictionary<Guid, NodePlayerInfo>();
+        private ConcurrentDictionary<Guid, NodePlayerInfo> playerMap = new ConcurrentDictionary<Guid, NodePlayerInfo>();
 
         /// <summary>
         /// Текущий клиент для передачи данных
@@ -37,7 +38,7 @@ namespace phs.Data.NodeHostServer.Info
 
         internal void AddPlayer(NodePlayerInfo player)
         {
-            playerMap.Add(player.Id, player);
+            playerMap.TryAdd(player.Id, player);
         }
 
         internal void RemovePlayer(NodePlayerInfo player)
@@ -51,6 +52,12 @@ namespace phs.Data.NodeHostServer.Info
             {
                 StaticData.NodePlayerManager.DisconnectPlayer(item.Value);
             }
+            playerMap.Clear();
+        }
+
+        public void ChangeClient(NetworkNodeServerData client)
+        {
+            Client = client;
         }
     }
 }

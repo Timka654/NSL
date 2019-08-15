@@ -73,13 +73,6 @@ namespace SCL.SocketClient
         {
             //установка переменной с общими настройками сервера
             this.clientOptions = options;
-
-            options.AddPacket((ushort) Utils.SystemPackets.Enums.ServerPacketEnum.SystemTime,
-                new Utils.SystemPackets.SystemTime<T>(clientOptions));
-            options.AddPacket((ushort)Utils.SystemPackets.Enums.ServerPacketEnum.AliveConnection,
-                new Utils.SystemPackets.AliveConnection<T>(clientOptions));
-            options.AddPacket((ushort)Utils.SystemPackets.Enums.ServerPacketEnum.RecoverySessionResult,
-                new Utils.SystemPackets.RecoverySession<T>(clientOptions));
         }
 
         /// <summary>

@@ -52,7 +52,7 @@ namespace Utils.Helper.Configuration
 
                 foreach (var item in result)
                 {
-                    AddValue(new Info.ConfigurationInfo() { Name = item.Key.ToLower(), Value = item.Value });
+                    AddValue(new Info.ConfigurationInfo(item.Key.ToLower(), item.Value, ""));
                 }
             }
             catch (Exception ex)
@@ -70,7 +70,7 @@ namespace Utils.Helper.Configuration
         /// <param name="client_value">Необходимо отправить клиенту</param>
         public void AddValue(string name, object value, string flags = "")
         {
-            base.AddValue(new Info.ConfigurationInfo() { Name = name.ToLower(), Value = value.ToString(), Flags = flags });
+            base.AddValue(new Info.ConfigurationInfo(name.ToLower(), value.ToString(), flags));
         }
 
         /// <summary>

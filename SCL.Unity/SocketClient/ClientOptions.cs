@@ -32,7 +32,7 @@ namespace SCL.SocketClient
         /// </summary>
         /// <param name="ex"></param>
         /// <param name="client"></param>
-        public delegate void RecoverySessionDelegate(int currentTry, bool result);
+        public delegate void ReconnectDelegate(int currentTry, bool result);
 
         /// <summary>
         /// Делегат для регистрации события перехвата подключения клиента
@@ -65,9 +65,27 @@ namespace SCL.SocketClient
         /// </summary>
         public event ClientDisconnectedDelegate OnClientDisconnectEvent;
 
-        public event RecoverySessionDelegate OnRecoverySessionEvent;
+        public event ReconnectDelegate OnReconnectEvent;
+
+        public event Utils.SystemPackets.RecoverySession<T>.OnReceiveEventHandle OnRecoverySessionEvent;
 
         #endregion
+
+        public ClientOptions()
+        {
+            var recoverySession = new Utils.SystemPackets.RecoverySession<T>(this);
+
+            recoverySession.OnReceiveEvent += RunRecoverySession;
+
+            AddPacket((ushort)Utils.SystemPackets.Enums.ServerPacketEnum.SystemTime,
+                    new Utils.SystemPackets.SystemTime<T>(this));
+
+            AddPacket((ushort)Utils.SystemPackets.Enums.ServerPacketEnum.AliveConnection,
+                new Utils.SystemPackets.AliveConnection<T>(this));
+
+            AddPacket((ushort)Utils.SystemPackets.Enums.ServerPacketEnum.RecoverySessionResult,
+                recoverySession);
+        }
 
         /// <summary>
         /// Вызов события ошибка
@@ -104,6 +122,11 @@ namespace SCL.SocketClient
                 RunRecovery();
         }
 
+        internal void RunRecoverySession(RecoverySessionResultEnum result)
+        {
+            OnRecoverySessionEvent?.Invoke(result);
+        }
+
         #region Recovery
 
         public bool EnableAutoRecovery { get; set; }
@@ -116,7 +139,7 @@ namespace SCL.SocketClient
         {
             if (NetworkClient == null || ClientData == null)
             {
-                OnRecoverySessionEvent?.Invoke(MaxRecoveryTryTime, false);
+                OnReconnectEvent?.Invoke(MaxRecoveryTryTime, false);
                 return;
             }
 
@@ -124,7 +147,7 @@ namespace SCL.SocketClient
             {
                 var result = await NetworkClient.ConnectAsync();
 
-                OnRecoverySessionEvent?.Invoke(currentTry + 1, result);
+                OnReconnectEvent?.Invoke(currentTry + 1, result);
 
                 if (result)
                     break;

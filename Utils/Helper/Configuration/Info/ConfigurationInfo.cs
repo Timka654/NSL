@@ -34,14 +34,14 @@ namespace Utils.Helper.Configuration.Info
             return CompiledFlag.Contains(flag + "%");
         }
 
-        public ConfigurationInfo()
+        protected ConfigurationInfo()
         { }
 
         public ConfigurationInfo(string name, string value, string flags)
         {
             Name = name;
             Value = value;
-            Flags = flags;
+            Flags = flags ?? "";
         }
     }
 }

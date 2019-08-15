@@ -36,7 +36,7 @@ namespace phs.Data.NodeHostServer.Network
         /// </summary>
         public static void Load()
         {
-            LoggerStorage.Instance.main.AppendInfo($"---> Client Server Loading");
+            LoggerStorage.Instance.main.AppendInfo($"---> Node Host Server Loading");
 
             LoadConfiguration();
 
@@ -48,7 +48,7 @@ namespace phs.Data.NodeHostServer.Network
 
             LoadListener();
 
-            LoggerStorage.Instance.main.AppendInfo($"---> Client Server Loaded");
+            LoggerStorage.Instance.main.AppendInfo($"---> Node Host Server Loaded");
         }
 
         /// <summary>
@@ -88,11 +88,11 @@ namespace phs.Data.NodeHostServer.Network
         /// </summary>
         private static void LoadReceivePackets()
         {
-            LoggerStorage.Instance.main.AppendInfo($"-> Client Server Packets Loading");
+            LoggerStorage.Instance.main.AppendInfo($"-> Node Host Server Packets Loading");
 
             options.LoadPackets();
 
-            LoggerStorage.Instance.main.AppendInfo($"-> Client Server Packets Loaded");
+            LoggerStorage.Instance.main.AppendInfo($"-> Node Host Server Packets Loaded");
         }
 
         /// <summary>
@@ -100,7 +100,7 @@ namespace phs.Data.NodeHostServer.Network
         /// </summary>
         private static void LoadListener()
         {
-            LoggerStorage.Instance.main.AppendInfo($"-> Client Socket Listener Loading");
+            LoggerStorage.Instance.main.AppendInfo($"-> Node Host Socket Listener Loading");
 
             listener = new SocketServer.ServerListener<NetworkNodeServerData>(options);
 
@@ -112,12 +112,12 @@ namespace phs.Data.NodeHostServer.Network
             {
                 listener.Run();
 
-                LoggerStorage.Instance.main.AppendInfo($"-> Client Socket Listener  ({options.IpAddress}:{options.Port}) Loaded");
+                LoggerStorage.Instance.main.AppendInfo($"-> Node Host Socket Listener  ({options.IpAddress}:{options.Port}) Loaded");
 
             }
             catch (Exception e)
             {
-                LoggerStorage.Instance.main.AppendInfo($"-> Client Socket Listener  ({options.IpAddress}:{options.Port}) Error:{e.ToString()}");
+                LoggerStorage.Instance.main.AppendInfo($"-> Node Host Socket Listener  ({options.IpAddress}:{options.Port}) Error:{e.ToString()}");
             }
         }
 
@@ -138,7 +138,7 @@ namespace phs.Data.NodeHostServer.Network
                 ipep = client.GetRemovePoint();
             }
 
-            LoggerStorage.Instance.main.AppendInfo($"Client packet send pid:{pid}({(Info.Enums.Packets.ClientPacketsEnum)pid}) len:{len} to {ipep?.ToString()} ({c?.ServerInfo?.Id}) from {sourceFilePath}:{sourceLineNumber}");
+            LoggerStorage.Instance.main.AppendInfo($"Proxy server packet send pid:{pid}({(Info.Enums.Packets.ClientPacketsEnum)pid}) len:{len} to {ipep?.ToString()} ({c?.ServerInfo?.Id}) from {sourceFilePath}:{sourceLineNumber}");
         }
 
         private static void Listener_OnReceivePacket(Client<NetworkNodeServerData> client, ushort pid, int len)
@@ -152,7 +152,7 @@ namespace phs.Data.NodeHostServer.Network
                 ipep = client.GetRemovePoint();
             }
 
-            LoggerStorage.Instance.main.AppendInfo($"Client packet receive pid:{pid}({(Info.Enums.Packets.ServerPacketsEnum)pid}) len:{len} from {ipep?.ToString()} ({c?.ServerInfo?.Id})");
+            LoggerStorage.Instance.main.AppendInfo($"Proxy server packet receive pid:{pid}({(Info.Enums.Packets.ServerPacketsEnum)pid}) len:{len} from {ipep?.ToString()} ({c?.ServerInfo?.Id})");
         }
 
 #endif
@@ -166,11 +166,11 @@ namespace phs.Data.NodeHostServer.Network
         {
             try
             {
-                LoggerStorage.Instance.main.AppendError($"Client socket Error ({client.Network.GetSocket()?.RemoteEndPoint}) - {ex.ToString()}");
+                LoggerStorage.Instance.main.AppendError($"Node Host socket Error ({client.Network.GetSocket()?.RemoteEndPoint}) - {ex.ToString()}");
             }
             catch
             {
-                LoggerStorage.Instance.main.AppendError($"Client socket Error  {ex.ToString()}");
+                LoggerStorage.Instance.main.AppendError($"Node Host socket Error  {ex.ToString()}");
 
             }
         }
@@ -181,7 +181,7 @@ namespace phs.Data.NodeHostServer.Network
         /// <param name="client">Текущий клиент</param>
         private static void SocketOptions_OnClientDisconnectEvent(NetworkNodeServerData client)
         {
-            LoggerStorage.Instance.main.AppendInfo($"Client disconnected ({client?.Network?.GetRemovePoint()})");
+            LoggerStorage.Instance.main.AppendInfo($"Proxy server disconnected ({client?.Network?.GetRemovePoint()})");
             if (client != null)
             {
                 client.DisconnectTime = DateTime.Now;
@@ -196,7 +196,7 @@ namespace phs.Data.NodeHostServer.Network
         /// <param name="client">Текущий клиент</param>
         private static void SocketOptions_OnClientConnectEvent(NetworkNodeServerData client)
         {
-            LoggerStorage.Instance.main.AppendInfo($"New client connection ({client?.Network?.GetRemovePoint()})");
+            LoggerStorage.Instance.main.AppendInfo($"New Proxy server connection ({client?.Network?.GetRemovePoint()})");
         }
 
         #endregion

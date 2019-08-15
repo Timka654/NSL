@@ -139,10 +139,10 @@ namespace SCL.SocketClient
             remove { SocketOptions.OnClientDisconnectEvent -= value; }
         }
 
-        public static event ClientOptions<T>.RecoverySessionDelegate OnRecoverySessionEvent
+        public static event ClientOptions<T>.ReconnectDelegate OnRecoverySessionEvent
         {
-            add { SocketOptions.OnRecoverySessionEvent += value; }
-            remove { SocketOptions.OnRecoverySessionEvent -= value; }
+            add { SocketOptions.OnReconnectEvent += value; }
+            remove { SocketOptions.OnReconnectEvent -= value; }
         }
 
         public static bool Connect()

@@ -126,7 +126,13 @@ namespace SocketServer
         /// <summary>
         /// Пакеты которые будет принимать и обрабатывать сервер
         /// </summary>
-        public Dictionary<ushort, IPacket<T>> Packets = new Dictionary<ushort, IPacket<T>>();
+        public Dictionary<ushort, IPacket<T>> Packets = new Dictionary<ushort, IPacket<T>>()
+        {
+            { (ushort)Utils.SystemPackets.Enums.ClientPacketEnum.AliveConnection, new AliveConnection<T>() },
+            { (ushort)Utils.SystemPackets.Enums.ClientPacketEnum.RecoverySession, new RecoverySession<T>() },
+            { (ushort)Utils.SystemPackets.Enums.ClientPacketEnum.ServerTime, new SystemTime<T>() },
+            { (ushort)Utils.SystemPackets.Enums.ClientPacketEnum.Version, new Version<T>() },
+        };
 
         /// <summary>
         /// Добавить пакет для обработки сервером
