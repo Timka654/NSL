@@ -36,8 +36,8 @@ namespace SCL.SocketClient
             AddressFamily = System.Net.Sockets.AddressFamily.InterNetwork,
             ProtocolType = System.Net.Sockets.ProtocolType.Tcp,
             ReceiveBufferSize = 81960,
-            inputCipher = new SCL.Cipher.PacketNoneCipher(),
-            outputCipher = new SCL.Cipher.PacketNoneCipher(),
+            inputCipher = new Cipher.PacketNoneCipher(),
+            outputCipher = new Cipher.PacketNoneCipher(),
         };
 
         protected virtual void Awake()

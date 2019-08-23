@@ -25,7 +25,7 @@ namespace ps.Data.NodeServer.Packets.Profile
             StaticData.NodePlayerManager.ConnectPlayer(client);
         }
 
-        public static void Send(NetworkClientData client, LoginResultEnum result)
+        public static void Send(NodePlayerInfo player, LoginResultEnum result)
         {
             var packet = new OutputPacketBuffer();
 
@@ -33,7 +33,12 @@ namespace ps.Data.NodeServer.Packets.Profile
 
             packet.WriteByte((byte)result);
 
-            client.Network.Send(packet);
+            if (result == LoginResultEnum.Ok)
+            {
+                packet.WriteString16(player.ProxyIp);
+            }
+
+            player.Client.Network.Send(packet);
         }
     }
 }

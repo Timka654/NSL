@@ -463,7 +463,7 @@ namespace SCL.Node.Utils
         /// <summary>
         /// Сборка пакета в финальный вид перед отправкой
         /// </summary>
-        /// <param name="appendHash">добавить хеш в пакет</param>
+        /// <param name="cpid">Идентификатор текущего пользователя</param>
         /// <returns></returns>
         public byte[] GetBuffer(uint cpid)
         {
@@ -481,6 +481,15 @@ namespace SCL.Node.Utils
 
             offs = off;
 
+            return buffer;
+        }
+
+        /// <summary>
+        /// Используеться после компиляции методом GetBuffer(uint cpid)
+        /// </summary>
+        /// <returns></returns>
+        internal byte[] GetBuffer()
+        {
             return buffer;
         }
     }

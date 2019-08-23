@@ -325,6 +325,15 @@ namespace SocketServer.Utils.Buffer
             WriteDouble((value - MinDatetimeValue).TotalMilliseconds);
         }
 
+        public void WriteGuid(Guid value)
+        {
+            var arr = value.ToByteArray();
+
+            WriteByte((byte)arr.Length);
+
+            Write(arr, 0, arr.Length);
+        }
+
         /// <summary>
         /// Запись массива байт
         /// </summary>

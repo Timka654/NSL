@@ -1,6 +1,7 @@
 ﻿using SCL.SocketClient;
 using SCL.SocketClient.Utils;
 using SCL.SocketClient.Utils.Buffer;
+using SCL.Unity.NAT.Proxy.ProxyNetwork.Data.Packets.Enums;
 using SCL.Unity.NAT.Proxy.ProxyNetwork.Data.Packets.PacketData;
 using System;
 using System.Collections.Generic;
@@ -10,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace SCL.Unity.NAT.Proxy.ProxyNetwork.Data.Packets
 {
-    public class SignIn<T> : IPacketReceive<T, ProxySignInPacketResultData>
+    internal class SignIn<T> : IPacketReceive<T, ProxySignInPacketResultData>
         where T : NetworkProxyClient
     {
         internal static SignIn<T> Instance { get; set; }
@@ -25,11 +26,12 @@ namespace SCL.Unity.NAT.Proxy.ProxyNetwork.Data.Packets
             Data = ProxySignInPacketResultData.ReadPacketData(data);
         }
 
-        internal static async Task<ProxySignInPacketResultData> Send(ProxySignInPacketData data)
+        public static async Task<ProxySignInPacketResultData> Send(ProxySignInPacketData data)
         {
-            OutputPacketBuffer packet = new OutputPacketBuffer();
-
-            packet.PacketId = 1;
+            OutputPacketBuffer packet = new OutputPacketBuffer
+            {
+                PacketId = (ushort)ServerPacketsEnum.SignIn
+            };
 
             ProxySignInPacketData.WritePacketData(packet, data);
 

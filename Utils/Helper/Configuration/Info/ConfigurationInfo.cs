@@ -37,6 +37,12 @@ namespace Utils.Helper.Configuration.Info
         protected ConfigurationInfo()
         { }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="value"></param>
+        /// <param name="flags">Флаги указываются с разделителем % (прим. %c%d)</param>
         public ConfigurationInfo(string name, string value, string flags)
         {
             Name = name;

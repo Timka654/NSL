@@ -1,4 +1,10 @@
-﻿using SocketServer.Utils;
+﻿#if !SCL
+using SocketServer.Utils;
+using SocketServer.Utils.Buffer;
+#else
+using SCL.SocketClient.Utils;
+using SCL.SocketClient.Utils.Buffer;
+#endif
 using System;
 using System.Collections.Generic;
 using System.Text;

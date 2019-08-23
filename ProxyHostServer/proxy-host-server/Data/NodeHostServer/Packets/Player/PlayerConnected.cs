@@ -22,7 +22,7 @@ namespace phs.Data.NodeHostServer.Packets.Player
                 UserId = data.ReadInt32(),
                 RoomId = data.ReadInt32(),
                 ServerId = data.ReadInt32(),
-                Id = new Guid(data.Read(data.ReadByte())),
+                Id = data.ReadGuid(),
             });
         }
 
@@ -30,13 +30,11 @@ namespace phs.Data.NodeHostServer.Packets.Player
         {
             var packet = new OutputPacketBuffer();
 
-            packet.SetPacketId( ClientPacketsEnum.PlayerConnectedResult);
+            packet.SetPacketId(ClientPacketsEnum.PlayerConnectedResult);
 
-            var arr = player.Id.ToByteArray();
+            packet.WriteBool(result);
 
-            packet.WriteByte((byte)arr.Length);
-
-            packet.Write(arr, 0, arr.Length);
+            packet.WriteGuid(player.Id);
 
             player.Server?.Client.Network.Send(packet);
         }

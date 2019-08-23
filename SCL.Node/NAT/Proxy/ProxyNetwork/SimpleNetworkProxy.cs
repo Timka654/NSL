@@ -11,6 +11,7 @@ namespace SCL.Unity.NAT.Proxy.ProxyNetwork
     {
         protected override void LoadPackets()
         {
+            SocketOptions.AddPacket((ushort)Data.Packets.Enums.ClientPacketsEnum.SignInResult, new SignIn<NetworkProxyClient>(SocketOptions));
             SocketOptions.AddPacket(1, new SignIn<NetworkProxyClient>(SocketOptions));
         }
     }

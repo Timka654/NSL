@@ -16,12 +16,15 @@ namespace SCL.Unity.NAT.Proxy.ProxyNetwork.Data.Packets.PacketData
 
         public ulong GameId { get; set; }
 
+        internal bool Proxy { get; set; }
+
         public static void WritePacketData(OutputPacketBuffer packet, ProxySignInPacketData data)
         {
             packet.WriteInt32(data.UserId);
             packet.WriteUInt64(data.GameId);
-
             packet.WriteString16(data.Session);
+
+            packet.WriteBool(data.Proxy);
         }
     }
 }

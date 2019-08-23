@@ -14,18 +14,27 @@ namespace phs.Data.GameServer.Packets.Player
 {
     public class PlayerDisconnected
     {
-        //public static void Send(NodePlayerInfo player)
-        //{
-        //    var packet = new OutputPacketBuffer();
+        [GamePacket(ServerPacketsEnum.PlayerDisconnected)]
+        public class PlayerConnected : IPacket<NetworkGameServerData>
+        {
+            public void Receive(NetworkGameServerData client, InputPacketBuffer data)
+            {
+                var guid = data.ReadGuid();
 
-        //    packet.SetPacketId(ServerPacketsEnum.PlayerDisconnected);
+                throw new NotImplementedException();
+                //StaticData.GameServerManager.ConfirmPlayer(guid, result);
+            }
 
-        //    var arr = player.Id.ToByteArray();
+            public static void Send(NetworkGameServerData server, NodePlayerInfo player)
+            {
+                var packet = new OutputPacketBuffer();
 
-        //    packet.WriteByte((byte)arr.Length);
-        //    packet.Write(arr, 0, arr.Length);
+                packet.SetPacketId(ClientPacketsEnum.PlayerDisconnected);
 
-        //    //StaticData.NodeHostNetwork.Send(packet);
-        //}
+                packet.WriteGuid(player.Id);
+
+                server.Network.Send(packet);
+            }
+        }
     }
 }

@@ -1,10 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using SocketServer.Utils;
 using System.Security;
 using System.Security.Cryptography;
+#if !SCL
+using SocketServer.Utils;
 using SocketServer.Utils.Buffer;
+#else
+using SCL.SocketClient.Utils;
+using SCL.SocketClient.Utils.Buffer;
+#endif
 
 namespace Cipher.AES
 {

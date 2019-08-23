@@ -21,6 +21,10 @@ namespace ps.Data.NodeServer.Info
 
         public bool Confirmed { get; set; }
 
+        public bool Proxy { get; set; }
+
+        public string ProxyIp { get; set; }
+
         /// <summary>
         /// Текущий клиент для передачи данных
         /// </summary>

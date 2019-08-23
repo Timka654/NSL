@@ -320,6 +320,11 @@ namespace SocketServer.Utils.Buffer
             return MinDatetimeValue.AddMilliseconds(r);
         }
 
+        public Guid ReadGuid()
+        {
+            return new Guid(Read(ReadByte()));
+        }
+
         /// <summary>
         /// Чтения массива байт
         /// </summary>
@@ -413,6 +418,14 @@ namespace SocketServer.Utils.Buffer
         public void AppendBody(byte[] buffer, int off)
         {
             Array.Copy(buffer, off, this.buffer, 7, this.lenght - 7);
+        }
+
+        public byte[] GetBody()
+        {
+            byte[] buf = new byte[DataLength];
+            Array.Copy(buffer, headerLenght, buf, 0, DataLength);
+
+            return buf;
         }
     }
 }

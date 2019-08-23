@@ -14,8 +14,11 @@ namespace Utils.Helper.Configuration
     {
         private List<ConfigurationInfo> DefaultConfigurationList { get; set; }
 
-        public ConfigurationManager(List<ConfigurationInfo> defaultConfigurationList)
+        public string FileName { get; set; }
+
+        public ConfigurationManager(List<ConfigurationInfo> defaultConfigurationList, string fileName = "configuration.json")
         {
+            FileName = fileName;
             SetDefaults(defaultConfigurationList);
             ReLoadData();
 
@@ -46,7 +49,7 @@ namespace Utils.Helper.Configuration
                 ClearStorage();
                 DefaultConfigurationList?.ForEach(x => AddValue(x));
 
-                var json_text = File.ReadAllText(System.IO.Directory.GetCurrentDirectory() + "/configuration.json");
+                var json_text = File.ReadAllText(Path.Combine(System.IO.Directory.GetCurrentDirectory(), FileName));
                 var json_data = JObject.Parse(json_text);
                 var result = ParseArray("", json_data.Values());
 

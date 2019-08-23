@@ -5,3 +5,4 @@ bin/
 /.vs/
 /ProxyHostServer/.vs
 /ProxyServer/.vs
+/UnityDebug/

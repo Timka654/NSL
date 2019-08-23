@@ -320,6 +320,11 @@ namespace SCL.SocketClient.Utils.Buffer
             return MinDatetimeValue.AddMilliseconds(r);
         }
 
+        public Guid ReadGuid()
+        {
+            return new Guid(Read(ReadByte()));
+        }
+
         /// <summary>
         /// Чтения массива байт
         /// </summary>

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace SCL.Unity.Node
 {
-    class NodeIPEndPoint
+    public class NodeIPEndPoint
     {
         public string Ip { get; private set; }
 

@@ -103,7 +103,7 @@ namespace SCL.Node.Utils
         public bool CheckHash()
         {
             //проверяем хеш по спец формуле
-            if (buffer[9] != ((PlayerId - PacketId) + Cpid) % 14)
+            if (buffer[0] != ((PlayerId - PacketId) + Cpid) % 14)
             {
                 return false;
             }

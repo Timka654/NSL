@@ -2,7 +2,13 @@
 using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Text;
+#if !SCL
 using SocketServer.Utils;
+using SocketServer.Utils.Buffer;
+#else
+using SCL.SocketClient.Utils;
+using SCL.SocketClient.Utils.Buffer;
+#endif
 
 namespace Cipher.MD5
 {

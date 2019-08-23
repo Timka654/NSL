@@ -7,6 +7,7 @@ using ps.Data.NodeServer.Info;
 using ps.Data.NodeServer.Info.Enums;
 using BinarySerializer;
 using BinarySerializer.DefaultTypes;
+using System.Collections.Concurrent;
 
 namespace ps.Data.NodeServer.Network
 {
@@ -22,6 +23,8 @@ namespace ps.Data.NodeServer.Network
         public int RoomId { get; set; }
 
         public int ServerId { get; set; }
+
+        public ConcurrentBag<NetworkClientData> FavorList { get; set; }
 
         public NetworkClientData()
         {

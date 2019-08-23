@@ -17,8 +17,8 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <OutputPath>..\UnityDebug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;SCL</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -194,6 +194,9 @@
     <Compile Include="..\Cipher\MD5\MD5Cipher.cs">
       <Link>Cipher\MD5\MD5Cipher.cs</Link>
     </Compile>
+    <Compile Include="..\Cipher\PacketNoneCipher.cs">
+      <Link>Cipher\PacketNoneCipher.cs</Link>
+    </Compile>
     <Compile Include="..\Cipher\RC\RC4\RC4Cipher.cs">
       <Link>Cipher\RC\RC4\RC4Cipher.cs</Link>
     </Compile>
@@ -322,14 +325,6 @@
     <Compile Include="BinarySerializer\GrEmit\Utils\HackHelpers.cs" />
     <Compile Include="BinarySerializer\GrEmit\Utils\ReflectionExtensions.cs" />
     <Compile Include="BinarySerializer\GrEmit\Utils\TypeExtensions.cs" />
-    <Compile Include="NAT\Proxy\ProxyNetwork\Data\Info\Enums\ProxySignInResultEnum.cs" />
-    <Compile Include="NAT\Proxy\ProxyNetwork\Data\Packets\PacketData\ProxySignInPacketData.cs" />
-    <Compile Include="NAT\Proxy\ProxyNetwork\Data\Packets\PacketData\ProxySignInPacketResultData.cs" />
-    <Compile Include="NAT\Proxy\ProxyNetwork\Data\Packets\SignIn.cs" />
-    <Compile Include="NAT\Proxy\ProxyNetwork\SimpleNetworkProxy.cs" />
-    <Compile Include="NAT\Proxy\ProxyNetwork\SingletonNetworkProxy.cs" />
-    <Compile Include="NAT\Proxy\ProxyNetwork\NetworkProxy.cs" />
-    <Compile Include="NAT\Proxy\ProxyNetwork\NetworkProxyClient.cs" />
     <Compile Include="NAT\uPnP\AbstractNatDevice.cs" />
     <Compile Include="NAT\uPnP\AsyncResults\AsyncResult.cs" />
     <Compile Include="NAT\uPnP\Enums\MapState.cs" />
@@ -361,15 +356,6 @@
     <Compile Include="NAT\uPnP\Upnp\Messages\Responses\GetGenericPortMappingEntryResponseMessage.cs" />
     <Compile Include="NAT\uPnP\Upnp\Messages\UpnpMessage.cs" />
     <Compile Include="NAT\uPnP\Upnp\UpnpNatDevice.cs" />
-    <Compile Include="Node\NodeIPEndPoint.cs" />
-    <Compile Include="Node\TCPNode\TCPNode.cs" />
-    <Compile Include="Node\TCPNode\TCPNodePlayer.cs" />
-    <Compile Include="Node\UDPNode\UDPNode.cs" />
-    <Compile Include="Node\UDPNode\UDPNodePlayer.cs" />
-    <Compile Include="Node\Utils\INodePlayer.cs" />
-    <Compile Include="Node\Utils\NodeInputPacketBuffer.cs" />
-    <Compile Include="Node\Utils\NodeOutputPacketBuffer.cs" />
-    <Compile Include="Node\Utils\SystemPackets\InvalidPid.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SocketClient\BaseNetwork.cs" />
     <Compile Include="SocketClient\BaseSocketNetworkClient.cs" />

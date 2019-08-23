@@ -12,6 +12,8 @@ using ps.Data.NodeServer.Info;
 using ps.Data.NodeServer.Network;
 using ps.Data.NodeHostClient.Info.Enums;
 using Utils.Logger;
+using System.Net;
+using System.Collections.Concurrent;
 
 namespace ps.Data.NodeHostClient.Managers
 {
@@ -32,7 +34,7 @@ namespace ps.Data.NodeHostClient.Managers
             PublicIp = StaticData.ConfigurationManager.GetValue<string>("proxy/public.ip");
             MaxPlayerCount = StaticData.ConfigurationManager.GetValue<int>("proxy/max.client.count");
 
-            LoggerStorage.Instance.main.AppendInfo( $"RoomManager Loaded");
+            LoggerStorage.Instance.main.AppendInfo($"RoomManager Loaded");
         }
 
         public bool ConnectPlayer(NetworkClientData client)
@@ -48,11 +50,15 @@ namespace ps.Data.NodeHostClient.Managers
             var player = GetPlayer(guid);
             if (player != null)
             {
-                NodeServer.Packets.Profile.LogIn.Send(player.Client, result ? LoginResultEnum.Ok : LoginResultEnum.Error);
-
                 if (result)
+                {
                     player.Confirmed = true;
-                else
+                    player.ProxyIp = GenerateIPv6();
+                }
+
+                NodeServer.Packets.Profile.LogIn.Send(player, result ? LoginResultEnum.Ok : LoginResultEnum.Error);
+
+                if (!result)
                 {
                     RemovePlayer(guid);
                     player.Client?.Network?.Disconnect();
@@ -70,13 +76,32 @@ namespace ps.Data.NodeHostClient.Managers
         /// <param name="death_count">Кол-во смертей</param>
         /// <param name="score">Очки</param>
         /// <param name="item_list">Список с данными об износе вещей</param>
-        public NodePlayerInfo DisconnectPlayer(NodePlayerInfo player_info)
+        public NodePlayerInfo DisconnectPlayer(NodePlayerInfo playerInfo)
         {
-            var player = RemovePlayer(player_info.Id);
+            var player = RemovePlayer(playerInfo.Id);
             if (player != null)
                 Packets.Player.PlayerDisconnected.Send(player);
 
             return player;
+        }
+
+        private string GenerateIPv6()
+        {
+            byte[] bytes = new byte[16];
+            new Random().NextBytes(bytes);
+            IPAddress ipv6Address = new IPAddress(bytes);
+            return ipv6Address.ToString();
+        }
+
+        internal void Transport(NetworkClientData client, InputPacketBuffer data)
+        {
+            if (client.FavorList == null)
+                client.FavorList = new ConcurrentBag<NetworkClientData>(PlayersWhere(x => x.Client.RoomId == client.RoomId && x.Client.ServerId == client.ServerId && ).Select(x => x.Client));
+            byte[] body = data.GetBody();
+            foreach (var item in client.FavorList)
+            {
+                item.Network.Send(body, 0, body.Length);
+            }
         }
     }
 }

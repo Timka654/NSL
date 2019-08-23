@@ -17,8 +17,8 @@ namespace ps.Data.NodeHostClient.Packets.Player
     {
         public void Receive(NetworkNodeHostClientData client, InputPacketBuffer data)
         {
-            var guid = new Guid(data.Read(data.ReadByte()));
             bool result = data.ReadBool();
+            var guid = new Guid(data.Read(data.ReadByte()));
 
             StaticData.NodePlayerManager.ConfirmPlayer(guid, result);
         }
