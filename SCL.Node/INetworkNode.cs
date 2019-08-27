@@ -40,7 +40,7 @@ namespace SCL.Node
 
         protected readonly ConcurrentDictionary<int, T> _players = new ConcurrentDictionary<int, T>();
 
-        protected readonly Dictionary<byt8e, CommandHandle> _commands = new Dictionary<byte, CommandHandle>();
+        protected readonly Dictionary<byte, CommandHandle> _commands = new Dictionary<byte, CommandHandle>();
 
         public int MyPlayerId { get; set; }
 

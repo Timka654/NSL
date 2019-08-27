@@ -10,9 +10,4 @@
     <ProjectReference Include="..\Utils\Utils.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Network\" />
-    <Folder Include="Storages\" />
-  </ItemGroup>
-
 </Project>

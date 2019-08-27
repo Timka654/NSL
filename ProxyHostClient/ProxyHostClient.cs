@@ -3,7 +3,6 @@ using SocketServer;
 using System;
 using ProxyHostClient.Packets;
 using System.Net;
-using ProxyHostClient.Managers;
 using Utils.Logger;
 using Utils.Helper.Network;
 using SocketServer.Utils;
@@ -70,7 +69,7 @@ namespace ProxyHostClient
 
             LoadConfiguration();
 
-            LoadManagers();
+            //LoadManagers();
 
             LoadReceivePackets();
 
@@ -98,17 +97,15 @@ namespace ProxyHostClient
             LoggerStorage.Instance.main.AppendInfo($"-> Configuration Loaded");
         }
 
-        /// <summary>
-        /// Загрузка менеджеров(Обработчиков)
-        /// </summary>
-        private void LoadManagers()
-        {
-            LoggerStorage.Instance.main.AppendInfo($"-> Managers Loading");
+        ///// <summary>
+        ///// Загрузка менеджеров(Обработчиков)
+        ///// </summary>
+        //private void LoadManagers()
+        //{
+        //    LoggerStorage.Instance.main.AppendInfo($"-> Managers Loading");
 
-            new NodePlayerManager();
-
-            LoggerStorage.Instance.main.AppendInfo($"-> Managers Loaded");
-        }
+        //    LoggerStorage.Instance.main.AppendInfo($"-> Managers Loaded");
+        //}
 
         /// <summary>
         /// Загрузка пакетов для приема с клиента
@@ -143,7 +140,7 @@ namespace ProxyHostClient
             if (!result)
                 LoggerStorage.Instance.main.AppendError($"-> {PublicName} client ({options.IpAddress}:{options.Port}) Error connection");
             else
-            SignIn(Config.GetValue<short>($"{NetworkNodePath}/signin/server.id"), Config.GetValue<string>($"{NetworkNodePath}/signin/access.key"));
+            SignIn(Config.GetValue<int>($"{NetworkNodePath}/signin/server.id"), Config.GetValue<string>($"{NetworkNodePath}/signin/access.key"));
 
             return result;
         }
@@ -156,12 +153,10 @@ namespace ProxyHostClient
 
         private void Listener_OnSendPacket(Client<ProxyHostClientData> client, ushort pid, int len, string memberName, string sourceFilePath, int sourceLineNumber)
         {
-            ProxyHostClientData c = null;
             IPEndPoint ipep = null;
 
             if (client != null)
             {
-                c = (ProxyHostClientData)client.GetUserData();
                 ipep = client.GetRemovePoint();
             }
 
@@ -170,12 +165,10 @@ namespace ProxyHostClient
 
         private void Listener_OnReceivePacket(Client<ProxyHostClientData> client, ushort pid, int len)
         {
-            ProxyHostClientData c = null;
             IPEndPoint ipep = null;
 
             if (client != null)
             {
-                c = (ProxyHostClientData)client.GetUserData();
                 ipep = client.GetRemovePoint();
             }
 
@@ -227,7 +220,7 @@ namespace ProxyHostClient
 
         #region UserMethods
 
-        public void SignIn(short serverId, string password)
+        public void SignIn(int serverId, string password)
         {
             Packets.Auth.SignIn.Send((ProxyHostClientData)NetworkClient.GetUserData(),serverId, password);
         }
