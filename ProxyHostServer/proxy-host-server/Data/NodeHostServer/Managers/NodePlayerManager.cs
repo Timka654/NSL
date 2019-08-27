@@ -8,6 +8,7 @@ using phs.Data.NodeHostServer.Info;
 using phs.Data.NodeHostServer.Network;
 using Utils.Logger;
 using phs.Data.NodeHostServer.Storages;
+using phs.Data.NodeHostServer.Packets.Player;
 
 namespace phs.Data.NodeHostServer.Managers
 {
@@ -29,13 +30,32 @@ namespace phs.Data.NodeHostServer.Managers
             LoggerStorage.Instance.main.AppendInfo($"NodePlayerManager Loaded");
         }
 
+        internal void ConfirmPlayer(Guid guid, bool result)
+        {
+            var player = base.GetPlayer(guid);
+
+            if (result)
+                player.Server.ConfirmPlayer(player);
+            else
+                player.Server.RemovePlayer(player);
+        }
+
         internal void AppendPlayer(NetworkNodeServerData client, NodePlayerInfo player)
         {
+            var server = StaticData.GameServerManager.GetServer(player.ServerId);
+            if (server == null)
+            {
+                PlayerConnected.Send(player, false);
+                return;
+            }
             player.Server = client.ServerInfo;
 
             AddPlayer(player);
 
             client.ServerInfo.AddPlayer(player);
+            
+
+            StaticData.GameServerManager.PlayerConnect(server.Client, player);
         }
 
 

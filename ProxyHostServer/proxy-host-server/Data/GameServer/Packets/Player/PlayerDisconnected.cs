@@ -12,29 +12,25 @@ using phs.Data.NodeHostServer.Info;
 
 namespace phs.Data.GameServer.Packets.Player
 {
-    public class PlayerDisconnected
+    [GamePacket(ServerPacketsEnum.PlayerDisconnected)]
+    public class PlayerDisconnected : IPacket<NetworkGameServerData>
     {
-        [GamePacket(ServerPacketsEnum.PlayerDisconnected)]
-        public class PlayerConnected : IPacket<NetworkGameServerData>
+        public void Receive(NetworkGameServerData client, InputPacketBuffer data)
         {
-            public void Receive(NetworkGameServerData client, InputPacketBuffer data)
-            {
-                var guid = data.ReadGuid();
+            var guid = data.ReadGuid();
 
-                throw new NotImplementedException();
-                //StaticData.GameServerManager.ConfirmPlayer(guid, result);
-            }
+            StaticData.NodePlayerManager.DisconnectPlayer(guid);
+        }
 
-            public static void Send(NetworkGameServerData server, NodePlayerInfo player)
-            {
-                var packet = new OutputPacketBuffer();
+        public static void Send(NetworkGameServerData server, Guid id)
+        {
+            var packet = new OutputPacketBuffer();
 
-                packet.SetPacketId(ClientPacketsEnum.PlayerDisconnected);
+            packet.SetPacketId(ClientPacketsEnum.PlayerDisconnected);
 
-                packet.WriteGuid(player.Id);
+            packet.WriteGuid(id);
 
-                server.Network.Send(packet);
-            }
+            server.Network.Send(packet);
         }
     }
 }

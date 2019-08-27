@@ -148,6 +148,12 @@ namespace SocketServer
             return !r;
         }
 
+        public IPacket<T> GetPacket(ushort packetId)
+        {
+            Packets.TryGetValue(packetId, out var result);
+            return result;
+        }
+
         public event OnRecoverySessionReceiveDelegate<T> OnRecoverySessionReceiveEvent
         {
             add { RecoverySession<T>.Instance.OnRecoverySessionReceiveEvent += value; }

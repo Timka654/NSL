@@ -9,6 +9,8 @@ namespace ProxyHostClient.Packets.Player
     [ProxyHostPacket(Enums.ClientPacketsEnum.PlayerConnected)]
     internal class PlayerConnected : IPacket<ProxyHostClientData>
     {
+        public event ProxyHostClient.OnPlayerConnectedDelegate OnReceive;
+
         public void Receive(ProxyHostClientData client, InputPacketBuffer data)
         {
             PlayerConnectedPacketData result = new PlayerConnectedPacketData();
@@ -18,6 +20,8 @@ namespace ProxyHostClient.Packets.Player
             result.RoomId = data.ReadInt32();
 
             result.Id = data.ReadGuid();
+
+            OnReceive?.Invoke(result);
         }
 
         public static void Send(ProxyHostClientData client, Guid id, bool result)

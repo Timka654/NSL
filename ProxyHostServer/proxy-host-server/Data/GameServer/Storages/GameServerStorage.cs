@@ -20,11 +20,11 @@ namespace phs.Data.GameServer.Storages
         /// <summary>
         /// Список комнат
         /// </summary>
-        protected ConcurrentDictionary<short, GameServerInfo> server_map;
+        protected ConcurrentDictionary<int, GameServerInfo> server_map;
 
         public GameServerStorage()
         {
-            server_map = new ConcurrentDictionary<short, GameServerInfo>();
+            server_map = new ConcurrentDictionary<int, GameServerInfo>();
         }
 
         /// <summary>
@@ -40,7 +40,7 @@ namespace phs.Data.GameServer.Storages
         /// Удалить комнату
         /// </summary>
         /// <param name="id">Идентификатор комнаты</param>
-        public virtual GameServerInfo RemoveServer(short id)
+        public virtual GameServerInfo RemoveServer(int id)
         {
             server_map.TryRemove(id, out GameServerInfo r);
             return r;
@@ -51,7 +51,7 @@ namespace phs.Data.GameServer.Storages
         /// </summary>
         /// <param name="id">Идентификатор комнаты</param>
         /// <returns></returns>
-        public virtual GameServerInfo GetServer(short id)
+        public virtual GameServerInfo GetServer(int id)
         {
             server_map.TryGetValue(id, out GameServerInfo r);
             return r;

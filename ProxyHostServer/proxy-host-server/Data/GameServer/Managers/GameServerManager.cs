@@ -11,6 +11,7 @@ using phs.Data.GameServer.Info.Enums.Packets;
 using phs.Data.GameServer.Network;
 using phs.Data.GameServer.Info.Enums;
 using Utils.Logger;
+using phs.Data.NodeHostServer.Info;
 
 namespace phs.Data.GameServer.Managers
 {
@@ -29,7 +30,7 @@ namespace phs.Data.GameServer.Managers
 
             accessToken = StaticData.ConfigurationManager.GetValue<string>("network/node_host_server/access/token");
 
-            LoggerStorage.Instance.main.AppendInfo( $"RoomManager Loaded");
+            LoggerStorage.Instance.main.AppendInfo($"RoomManager Loaded");
         }
 
         public bool ConnectServer(NetworkGameServerData client, string connectionToken)
@@ -41,6 +42,11 @@ namespace phs.Data.GameServer.Managers
             AddServer(client.ServerData);
 
             return true;
+        }
+
+        internal void PlayerDisconnect(NetworkGameServerData server, Guid guid)
+        {
+            Packets.Player.PlayerDisconnected.Send(server, guid);
         }
 
         /// <summary>
@@ -58,6 +64,11 @@ namespace phs.Data.GameServer.Managers
             var player = RemoveServer(player_info.Id);
 
             return player;
+        }
+
+        public void PlayerConnect(NetworkGameServerData server, NodePlayerInfo player)
+        {
+            Packets.Player.PlayerConnected.Send(server, player);
         }
     }
 }

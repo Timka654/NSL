@@ -1,4 +1,5 @@
 ﻿using DBEngine;
+using phs.Data.GameServer.Managers;
 using phs.Data.NodeHostServer.Managers;
 using phs.Data.NodeHostServer.Network;
 using System;
@@ -19,5 +20,7 @@ namespace phs.Data.NodeHostServer
         public static ProxyServerManager ProxyServerManager => ProxyServerManager.Instance;
 
         public static NodePlayerManager NodePlayerManager => NodePlayerManager.Instance;
+
+        public static GameServerManager GameServerManager => GameServerManager.Instance;
     }
 }

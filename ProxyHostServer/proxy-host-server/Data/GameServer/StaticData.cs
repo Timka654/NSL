@@ -9,6 +9,7 @@ using System.Text;
 using Utils.Helper.Configuration;
 using Utils.Helper.Console;
 using Utils.Helper.DbCmdQueue;
+using phs.Data.NodeHostServer.Managers;
 
 namespace phs.Data.GameServer
 {
@@ -17,7 +18,9 @@ namespace phs.Data.GameServer
         public static ConsoleManager<NetworkNodeServerData> ConsoleManager => Misc.console;
 
         public static ConfigurationManager ConfigurationManager => Misc.config;
-        
+
         public static GameServerManager GameServerManager => GameServerManager.Instance;
+
+        public static NodePlayerManager NodePlayerManager => NodePlayerManager.Instance;
     }
 }

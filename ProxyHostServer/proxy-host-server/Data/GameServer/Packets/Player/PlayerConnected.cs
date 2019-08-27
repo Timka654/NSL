@@ -20,8 +20,7 @@ namespace phs.Data.GameServer.Packets.Player
             var guid = data.ReadGuid();
             bool result = data.ReadBool();
 
-            throw new NotImplementedException();
-            //StaticData.GameServerManager.ConfirmPlayer(guid, result);
+            StaticData.NodePlayerManager.ConfirmPlayer(guid, result);
         }
 
         public static void Send(NetworkGameServerData server, NodePlayerInfo player)

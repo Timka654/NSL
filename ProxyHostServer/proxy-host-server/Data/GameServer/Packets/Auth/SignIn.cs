@@ -20,7 +20,7 @@ namespace phs.Data.GameServer.Packets.Auth
         {
             client.ServerData = new Info.GameServerInfo(client)
             {
-                Id = data.ReadInt16()
+                Id = data.ReadInt32()
             };
 
             string connectionToken = data.ReadString16();

@@ -13,49 +13,25 @@ using UnityEngine;
 
 namespace SCL.Node.TCPNode
 {
-    public class TCPNode : MonoBehaviour
+    public class TCPNode : INetworkNode<TCPNodePlayer>
     {
-        public delegate void CommandHandle(TCPNodePlayer player, NodeInputPacketBuffer buffer);
-
         public delegate void AppendClientHandle(TCPNodePlayer player);
 
-#if DEBUG
-        public event CommandHandle OnReceivePacket;
-#endif
-
-        public event AppendClientHandle OnAppendClienEvent;
-
-        private Socket _socket;
-
-        public int Port { get; private set; }
-
-        public int MyPlayerId { get; set; }
+        public event AppendClientHandle OnAppendClientEvent;
 
         public ConcurrentDictionary<string, TCPNodePlayer> WaitPlayerMap = new ConcurrentDictionary<string, TCPNodePlayer>();
 
-        private ManualResetEvent _uPnPLocker = new ManualResetEvent(false);
-
-        private readonly ConcurrentQueue<Action> _actions = new ConcurrentQueue<Action>();
-
-        private readonly ConcurrentDictionary<int, TCPNodePlayer> _players = new ConcurrentDictionary<int, TCPNodePlayer>();
-
-        private readonly Dictionary<byte, CommandHandle> _commands = new Dictionary<byte, CommandHandle>();
-
-        private bool InitResult { get; set; } = false;
-
-        public bool Initiliaze(string ip, ref int port, int playerId)
+        public override bool Initiliaze(string ip, ref int port, int myPlayerId)
         {
-            MyPlayerId = playerId;
-
+            base.Protocol = Protocol.Tcp;
             InitResult = true;
             _uPnPLocker.Reset();
 
             _socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             _socket.Bind(new IPEndPoint(IPAddress.Parse(ip), port));
 
-            NatUtility.DeviceFound += DeviceFound;
-            NatUtility.DeviceLost += DeviceLost;
-            NatUtility.StartDiscovery();
+            base.Initiliaze(ip, ref port, myPlayerId);
+
             if (port == 0)
             {
                 Port = port = (_socket.LocalEndPoint as IPEndPoint).Port;
@@ -73,7 +49,7 @@ namespace SCL.Node.TCPNode
 
             return InitResult;
         }
-        
+
         private void AcceptClient(IAsyncResult result)
         {
             try
@@ -92,7 +68,7 @@ namespace SCL.Node.TCPNode
                 Debug.Log($"AcceptClient player: {tnp} IPEP:{client.RemoteEndPoint.ToString()}");
                 tnp.SetSocket(client);
 
-                OnAppendClienEvent?.Invoke(tnp);
+                OnAppendClientEvent?.Invoke(tnp);
             }
             catch (Exception ex)
             {
@@ -102,56 +78,23 @@ namespace SCL.Node.TCPNode
             _socket?.BeginAccept(AcceptClient, _socket);
         }
 
-        #region NAT
-
-        private async void DeviceFound(object sender, DeviceEventArgs args)
-        {
-            try
-            {
-                INatDevice device = args.Device;
-
-                Mapping mapping = new Mapping(Protocol.Tcp, Port, Port);
-                await device.CreatePortMapAsync(mapping);
-            }
-            catch (Exception ex)
-            {
-                InitResult = false;
-                _socket.Dispose();
-                Debug.LogError(ex.ToString());
-            }
-            _uPnPLocker.Set();
-        }
-
-        private void DeviceLost(object sender, DeviceEventArgs args)
-        {
-            _socket.Dispose();
-            InitResult = false;
-            Debug.LogError("Router device is lost");
-            _uPnPLocker.Set();
-        }
-
-        #endregion
-
         private void Player_OnReceived(TCPNodePlayer player, NodeInputPacketBuffer packet)
         {
+#if DEBUG
+            AppendOnReceiveData(player, packet);
+#endif
+
             if (!_commands.ContainsKey(packet.PacketId))
             {
                 Node.Utils.SystemPackets.InvalidPid.Send(player, packet.PacketId);
-#if DEBUG
-                _actions.Enqueue(() => { OnReceivePacket?.Invoke(player, packet); });
-#endif
+
                 return;
             }
             _actions.Enqueue(() => { _commands[packet.PacketId].Invoke(player, packet); });
-
-#if DEBUG
-            _actions.Enqueue(() => { OnReceivePacket?.Invoke(player, packet); });
-#endif
-
         }
 
         #region Send
-        
+
         public void SendTo(TCPNodePlayer player, NodeOutputPacketBuffer packet)
         {
             packet.PlayerId = MyPlayerId;
@@ -160,19 +103,17 @@ namespace SCL.Node.TCPNode
 
         public void SendTo(int playerId, NodeOutputPacketBuffer packet)
         {
-            TCPNodePlayer player;
-
-            if (_players.TryGetValue(playerId, out player))
+            if (_players.TryGetValue(playerId, out TCPNodePlayer player))
             {
                 SendTo(player, packet);
             }
         }
-        
+
         public void BroadcastMessage(NodeOutputPacketBuffer packet)
         {
             packet.PlayerId = MyPlayerId;
 
-            foreach (var player in _players.Values)
+            foreach (TCPNodePlayer player in _players.Values)
             {
                 Debug.Log($"BroadcastMessage to {player.PlayerId} id:{packet.PacketId}");
                 Send(packet.GetBuffer(++player.OutputCurrentId), 0, packet.PacketLenght, player);
@@ -187,7 +128,7 @@ namespace SCL.Node.TCPNode
         #endregion
 
         private AutoResetEvent _addPlayerLocker = new AutoResetEvent(true);
-        
+
         public void AddPlayer(IPEndPoint playerPoint, int playerId)
         {
             if (MyPlayerId == playerId)
@@ -209,7 +150,7 @@ namespace SCL.Node.TCPNode
                     tnp.Connect();
                     Debug.Log($"AddPlayer connect to: {playerId} IPEP:{playerPoint.ToString()}");
 
-                    OnAppendClienEvent?.Invoke(tnp);
+                    OnAppendClientEvent?.Invoke(tnp);
                 }
                 else
                 {
@@ -236,42 +177,5 @@ namespace SCL.Node.TCPNode
 
             _commands.Add(id, handle);
         }
-
-        private void FixedUpdate()
-        {
-            Action action = null;
-            while (_actions.TryDequeue(out action))
-            {
-                action.Invoke();
-            }
-        }
-
-        private void OnDestroy()
-        {
-            Destroy();
-        }
-
-        public void Destroy()
-        {
-            if (_socket == null)
-                return;
-            try
-            {
-                _socket.Close();
-                _socket.Dispose();
-                _socket = null;
-            }
-            catch (Exception e)
-            {
-                Debug.LogError(e);
-            }
-            _players.Clear();
-        }
-
-        private void OnApplicationQuit()
-        {
-            NatUtility.StopDiscovery();
-        }
-
     }
 }

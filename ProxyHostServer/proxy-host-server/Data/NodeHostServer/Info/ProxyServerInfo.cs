@@ -44,6 +44,7 @@ namespace phs.Data.NodeHostServer.Info
         internal void RemovePlayer(NodePlayerInfo player)
         {
             playerMap.Remove(player.Id, out player);
+            Packets.Player.PlayerConnected.Send(player, false);
         }
 
         internal void DisconnectAll()
@@ -53,6 +54,11 @@ namespace phs.Data.NodeHostServer.Info
                 StaticData.NodePlayerManager.DisconnectPlayer(item.Value);
             }
             playerMap.Clear();
+        }
+
+        internal void ConfirmPlayer(NodePlayerInfo player)
+        {
+            Packets.Player.PlayerConnected.Send(player, true);
         }
 
         public void ChangeClient(NetworkNodeServerData client)
