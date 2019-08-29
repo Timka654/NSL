@@ -44,6 +44,8 @@ namespace ps.Data.NodeHostClient.Packets.Auth
 
             packet.WriteInt16(StaticData.ConfigurationManager.GetValue<short>("network/node_host_client/access/id"));
 
+            packet.WriteBool(true);
+
             packet.WriteString16(StaticData.ConfigurationManager.GetValue<string>("network/node_host_client/access/token"));
 
             StaticData.NodeHostNetwork?.Send(packet);

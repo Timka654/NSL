@@ -96,7 +96,7 @@ namespace ps.Data.NodeHostClient.Managers
         internal void Transport(NetworkClientData client, InputPacketBuffer data)
         {
             if (client.FavorList == null)
-                client.FavorList = new ConcurrentBag<NetworkClientData>(PlayersWhere(x => x.Client.RoomId == client.RoomId && x.Client.ServerId == client.ServerId && ).Select(x => x.Client));
+                client.FavorList = new ConcurrentBag<NetworkClientData>(PlayersWhere(x => x.Client.RoomId == client.RoomId && x.Client.ServerId == client.ServerId).Select(x => x.Client));
             byte[] body = data.GetBody();
             foreach (var item in client.FavorList)
             {

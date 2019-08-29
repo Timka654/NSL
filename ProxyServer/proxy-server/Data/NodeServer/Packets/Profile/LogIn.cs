@@ -11,7 +11,7 @@ namespace ps.Data.NodeServer.Packets.Profile
     /// <summary>
     /// Авторизация
     /// </summary>
-    [LobbyPacket(Info.Enums.Packets.ServerPacketsEnum.LogIn)]
+    [LobbyPacket(Info.Enums.Packets.ServerPacketsEnum.SignIn)]
     public class LogIn : IPacket<NetworkClientData>
     {
         public void Receive(NetworkClientData client, InputPacketBuffer data)
@@ -29,7 +29,7 @@ namespace ps.Data.NodeServer.Packets.Profile
         {
             var packet = new OutputPacketBuffer();
 
-            packet.SetPacketId(ClientPacketsEnum.LogInResult);
+            packet.SetPacketId(ClientPacketsEnum.SignInResult);
 
             packet.WriteByte((byte)result);
 

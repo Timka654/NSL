@@ -111,6 +111,27 @@ namespace BinarySerializer
             }
         }
 
+        public string DumpStruct(Type t, string scheme)
+        {
+            var ti = GetTypeInfo(t, scheme);
+
+            StringBuilder sb = new StringBuilder();
+
+            sb.AppendLine($"{t} {{");
+
+            foreach (var item in ti.PropertyList)
+            {
+                    sb.AppendLine($"\t{item.PropertyInfo.Name} {item.PropertyInfo.PropertyType} {item.BinaryAttr.Type} (ts:{item.BinaryAttr.TypeSize} : \"{item.BinaryAttr.TypeSizeName}\",as:{item.BinaryAttr.ArraySize} : \"{item.BinaryAttr.ArraySizeName}\")");
+                if (!item.IsBaseType)
+                {
+                    sb.AppendLine($"\t\t{DumpStruct(item.BinaryAttr.Type, scheme).Replace("\r\n", "\t\r\n")}");
+                }
+            }
+            sb.AppendLine("}");
+
+            return sb.ToString();
+        }
+
         public void SetCoding(Encoding coding)
         {
             Coding = coding;
