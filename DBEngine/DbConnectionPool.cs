@@ -8,24 +8,8 @@ using System.Threading.Tasks;
 
 namespace DBEngine
 {
-    public class ConnectionOptions
-    {
-        public DbOptions CSOptions { get; set; }
-
-        public string ConnectionString { get; set; }
-
-        public bool RecoveryWhenFailedTry { get; set; }
-
-        public short RecoveryTryCount { get; set; } = 1;
-
-        public short RecoveryTryDelay { get; set; }
-
-        public bool DropApplicationWhenFailed { get; set; } = true;
-    }
-
     public abstract class DbConnectionPool
     {
-
         public abstract DBEngine.DBCommand GetCommand();
 
         public abstract DBEngine.DBCommand GetStorageCommand(string storage_name = "");
@@ -144,6 +128,7 @@ namespace DBEngine
 
             return dbc;
         }
+
         public override DBEngine.DBCommand GetQueryCommand(string query = "")
         {
             var dbc = GetCommand();
