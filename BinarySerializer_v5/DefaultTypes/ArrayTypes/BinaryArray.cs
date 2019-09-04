@@ -126,7 +126,7 @@ namespace BinarySerializer.DefaultTypes
             }
 
             il.Ldloc(value);
-            il.Call(prop.Getter);
+            il.Call(prop.Getter, isVirtual: prop.Getter.IsVirtual);
             il.Stloc(arr);
             var type = prop.PropertyInfo.PropertyType.GetElementType();
 

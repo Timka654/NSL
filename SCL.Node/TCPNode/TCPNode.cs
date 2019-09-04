@@ -30,8 +30,6 @@ namespace SCL.Node.TCPNode
             _socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             _socket.Bind(new IPEndPoint(IPAddress.Parse(ip), port));
 
-            base.Initiliaze(ip, ref port, myPlayerId);
-
             if (port == 0)
             {
                 Port = port = (_socket.LocalEndPoint as IPEndPoint).Port;
@@ -39,10 +37,14 @@ namespace SCL.Node.TCPNode
 
             _socket.Dispose();
 
+            _socket = null;
+
+            base.Initiliaze(ip, ref port, myPlayerId);
+
             _socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             _socket.Bind(new IPEndPoint(IPAddress.Parse(ip), port));
 
-            _socket.Listen(20);
+            _socket.Listen(50);
             _socket.BeginAccept(AcceptClient, _socket);
 
             _uPnPLocker.WaitOne();

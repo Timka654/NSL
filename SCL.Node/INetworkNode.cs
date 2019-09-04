@@ -44,6 +44,8 @@ namespace SCL.Node
 
         public int MyPlayerId { get; set; }
 
+        protected Mapping Mapping { get; set; }
+
         public virtual bool Initiliaze(string ip, ref int port, int myPlayerId)
         {
             MyPlayerId = myPlayerId;
@@ -63,28 +65,41 @@ namespace SCL.Node
             {
                 INatDevice device = args.Device;
 
-                Mapping mapping = new Mapping(Protocol, Port, Port);
-                await device.CreatePortMapAsync(mapping);
+                Mapping = new Mapping(Protocol, Port, Port) { Description = "KazakiNodeNetwork" };
+                await device.CreatePortMapAsync(Mapping);
             }
             catch (Exception ex)
             {
                 InitResult = false;
-                _socket.Dispose();
+                _socket?.Dispose();
                 Debug.LogError(ex.ToString());
             }
             _uPnPLocker.Set();
         }
 
-        private void DeviceLost(object sender, DeviceEventArgs args)
+        private async void DeviceLost(object sender, DeviceEventArgs args)
         {
-            _socket.Dispose();
+            if (Mapping != null)
+            {
+                INatDevice device = args.Device;
+                await device.DeletePortMapAsync(Mapping);
+            }
+            _socket?.Dispose();
             InitResult = false;
             Debug.LogError("Router device is lost");
-            _uPnPLocker.Set();
+            _uPnPLocker?.Set();
         }
 
         #endregion
 
+        #region Proxy
+
+        public void SetProxyServerData()
+        { 
+        
+        }
+
+        #endregion
 
         private void FixedUpdate()
         {

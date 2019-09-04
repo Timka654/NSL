@@ -6,7 +6,7 @@ namespace ProxyHostClient.Packets.Enums
 {
     internal enum ServerPacketsEnum
     {
-        SignIn = 1,
+        GetProxyServer = 1,
         PlayerConnectedResult,
         PlayerDisconnected
     }

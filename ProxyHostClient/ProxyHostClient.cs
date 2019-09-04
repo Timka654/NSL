@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using Utils.Helper;
 using Utils.Helper.Configuration;
 using ProxyHostClient.Packets.Player.PacketData;
+using ProxyHostClient.Packets.Auth;
 
 namespace ProxyHostClient
 {
@@ -51,6 +52,12 @@ namespace ProxyHostClient
             remove { ((Packets.Player.PlayerDisconnected)options.GetPacket((ushort)Packets.Enums.ClientPacketsEnum.PlayerDisconnected)).OnReceive -= value; }
         }
 
+        public event GetProxyServerHandle OnProxyServer
+        {
+            add { ((Packets.Auth.GetProxyServer)options.GetPacket((ushort)Packets.Enums.ClientPacketsEnum.GetProxyServerResult)).OnReceive += value; }
+            remove { ((Packets.Auth.GetProxyServer)options.GetPacket((ushort)Packets.Enums.ClientPacketsEnum.GetProxyServerResult)).OnReceive -= value; }
+        }
+
         #endregion
 
         #region Load
@@ -68,8 +75,6 @@ namespace ProxyHostClient
             LoggerStorage.Instance.main.AppendInfo($"---> {PublicName} Client Loading");
 
             LoadConfiguration();
-
-            //LoadManagers();
 
             LoadReceivePackets();
 
@@ -96,16 +101,6 @@ namespace ProxyHostClient
 
             LoggerStorage.Instance.main.AppendInfo($"-> Configuration Loaded");
         }
-
-        ///// <summary>
-        ///// Загрузка менеджеров(Обработчиков)
-        ///// </summary>
-        //private void LoadManagers()
-        //{
-        //    LoggerStorage.Instance.main.AppendInfo($"-> Managers Loading");
-
-        //    LoggerStorage.Instance.main.AppendInfo($"-> Managers Loaded");
-        //}
 
         /// <summary>
         /// Загрузка пакетов для приема с клиента
@@ -140,7 +135,7 @@ namespace ProxyHostClient
             if (!result)
                 LoggerStorage.Instance.main.AppendError($"-> {PublicName} client ({options.IpAddress}:{options.Port}) Error connection");
             else
-            SignIn(Config.GetValue<int>($"{NetworkNodePath}/signin/server.id"), Config.GetValue<string>($"{NetworkNodePath}/signin/access.key"));
+                SignIn(Config.GetValue<int>($"{NetworkNodePath}/signin/server.id"), Config.GetValue<string>($"{NetworkNodePath}/signin/access.key"));
 
             return result;
         }
@@ -222,7 +217,7 @@ namespace ProxyHostClient
 
         public void SignIn(int serverId, string password)
         {
-            Packets.Auth.SignIn.Send((ProxyHostClientData)NetworkClient.GetUserData(),serverId, password);
+            Packets.Auth.SignIn.Send((ProxyHostClientData)NetworkClient.GetUserData(), serverId, password);
         }
 
         public void ConnectionResult(Guid guid, bool result)
@@ -233,6 +228,11 @@ namespace ProxyHostClient
         public void DisconnectPlayer(Guid guid)
         {
             Packets.Player.PlayerDisconnected.Send((ProxyHostClientData)NetworkClient.GetUserData(), guid);
+        }
+
+        public void GetRoomProxyServer(int roomId)
+        {
+            Packets.Auth.GetProxyServer.Send((ProxyHostClientData)NetworkClient.GetUserData(), roomId);
         }
 
         #endregion

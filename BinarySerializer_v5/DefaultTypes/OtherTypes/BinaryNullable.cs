@@ -49,7 +49,7 @@ namespace BinarySerializer.DefaultTypes
             var ilValue = il.DeclareLocal(prop.PropertyInfo.PropertyType);
 
             il.Ldloc(value);
-            il.Call(prop.Getter);
+            il.Call(prop.Getter, isVirtual: prop.Getter.IsVirtual);
             il.Stloc(ilValue);
 
             var exitLabel = il.DefineLabel("exit");

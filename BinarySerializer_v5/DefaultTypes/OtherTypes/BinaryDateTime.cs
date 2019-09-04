@@ -85,7 +85,7 @@ namespace BinarySerializer.DefaultTypes
             {
                 il.Ldloc(value);
                 var v1 = il.DeclareLocal(typeof(DateTime));
-                il.Call(prop.Getter);
+                il.Call(prop.Getter, isVirtual: prop.Getter.IsVirtual);
                 il.Stloc(v1);
                 il.Ldloca(v1);
             }

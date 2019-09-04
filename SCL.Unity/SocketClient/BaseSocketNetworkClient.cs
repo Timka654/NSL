@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-
+using UnityEngine;
 
 namespace SCL.SocketClient
 {
@@ -62,6 +62,11 @@ namespace SCL.SocketClient
         {
             if (WaitPacketBuffer == null)
                 return;
+
+#if DEBUG
+            if (this.WaitPacketBuffer.Count > 20)
+                Debug.LogWarning($"Warning: wait packet buffer > 20({this.WaitPacketBuffer.Count})");
+#endif
 
             if (offset == 0 && lenght == packet_data.Length)
                 WaitPacketBuffer.Enqueue(packet_data);

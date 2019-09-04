@@ -84,7 +84,7 @@ namespace BinarySerializer.DefaultTypes
             il.Ldloc(value);
 
             if (!listValue)
-                il.Call(prop.Getter);
+                il.Call(prop.Getter, isVirtual: prop.Getter.IsVirtual);
             il.Stloc(temp);
 
             il.Ldloc(temp);

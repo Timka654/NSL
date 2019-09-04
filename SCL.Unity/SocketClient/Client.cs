@@ -184,10 +184,14 @@ namespace SCL.SocketClient
                     //если все на месте, запускаем обработку
                     if (offset == lenght && data)
                     {
-                        //обработка пакета
-                        
-                        //дешефруем и засовываем это все в спец буффер в котором реализованы методы чтения типов, своего рода поток
-                        InputPacketBuffer pbuff = new InputPacketBuffer(inputCipher.Decode(receiveBuffer, 0, lenght));
+#if DEBUG
+                        if (this.receiveBuffer.Length > clientOptions.ReceiveBufferSize)
+                            Debug.LogWarning($"Warning: client receive buffer > {clientOptions.ReceiveBufferSize}({this.receiveBuffer.Length})");
+#endif
+                           //обработка пакета
+
+                           //дешефруем и засовываем это все в спец буффер в котором реализованы методы чтения типов, своего рода поток
+                           InputPacketBuffer pbuff = new InputPacketBuffer(inputCipher.Decode(receiveBuffer, 0, lenght));
 
                         // обнуляем показатели что-бы успешно запустить цикл заново
                         lenght = InputPacketBuffer.headerLenght;

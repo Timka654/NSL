@@ -32,7 +32,7 @@ namespace ProxyHostClient.Packets.Auth
         {
             var packet = new OutputPacketBuffer();
 
-            packet.SetPacketId(Enums.ServerPacketsEnum.SignIn);
+            packet.SetPacketId(Enums.ServerPacketsEnum.GetProxyServer);
 
             packet.WriteInt32(id);
 

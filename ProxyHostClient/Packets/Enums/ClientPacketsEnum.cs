@@ -8,6 +8,7 @@ namespace ProxyHostClient.Packets.Enums
     {
         SignInResult = 1,
         PlayerConnected,
-        PlayerDisconnected
+        PlayerDisconnected,
+        GetProxyServerResult,
     }
 }

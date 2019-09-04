@@ -71,7 +71,7 @@ namespace BinarySerializer.DefaultTypes
                var temp = il.DeclareLocal(typeof(TimeSpan));
 
                 il.Ldloc(value);
-                il.Call(prop.Getter);
+                il.Call(prop.Getter, isVirtual: prop.Getter.IsVirtual);
                 il.Stloc(temp);
 
                 il.Ldloca(temp);

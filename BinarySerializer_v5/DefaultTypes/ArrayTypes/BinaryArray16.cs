@@ -111,7 +111,7 @@ namespace BinarySerializer.DefaultTypes
             var arr = il.DeclareLocal(prop.PropertyInfo.PropertyType);
 
             il.Ldloc(value);
-            il.Call(prop.Getter);
+            il.Call(prop.Getter, isVirtual: prop.Getter.IsVirtual);
             il.Stloc(arr);
 
             var exitLabel = il.DefineLabel("exit");
