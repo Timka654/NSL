@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Logger;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data.Common;
@@ -8,6 +9,9 @@ using System.Threading.Tasks;
 
 namespace DBEngine
 {
+    /// <summary>
+    /// Хранилище отложенных запросов базы данных которые выполняються раз в определенное время
+    /// </summary>
     public class DbCommandQueue
     {
         public delegate void ExecutedDbCommandDelegate(long index);
@@ -16,21 +20,29 @@ namespace DBEngine
 
         protected DbConnectionPool connection_pool;
 
-        private int DelayCommandTime = 20000;
+        private TimeSpan DelayCommandTime = TimeSpan.FromSeconds(20);
 
         private long CurrentIndex = 1;
 
-        protected ConcurrentDictionary<long,Action<DBCommand>> WaitList = new ConcurrentDictionary<long, Action<DBCommand>>();
+        protected ILogger logger;
+
+        protected ConcurrentDictionary<long, Action<DBCommand>> WaitList = new ConcurrentDictionary<long, Action<DBCommand>>();
 
         protected AutoResetEvent invoker_locker = new AutoResetEvent(true);
 
-        public DbCommandQueue(DbConnectionPool connection_pool)
+        public DbCommandQueue(DbConnectionPool connection_pool, ILogger logger)
         {
             this.connection_pool = connection_pool;
+            this.logger = logger;
 
             FlushWhile();
         }
 
+        /// <summary>
+        /// Добавить отложенный запрос
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns>Индекс в хранилище</returns>
         public long AppendCommand(Action<DBCommand> command)
         {
             long index = Interlocked.Increment(ref CurrentIndex);
@@ -38,41 +50,43 @@ namespace DBEngine
             if (index == long.MaxValue - 10000)
                 CurrentIndex = 1;
 
-            WaitList.TryAdd(index,command);
+            WaitList.TryAdd(index, command);
 
             return index;
         }
 
-        public void SetDelayTime(int seconds)
+        /// <summary>
+        /// Установка времени ожидания для дальнейших запросов
+        /// </summary>
+        /// <param name="delay"></param>
+        public void SetDelayTime(TimeSpan delay)
         {
-            DelayCommandTime = seconds * 1000;
+            DelayCommandTime = delay;
         }
 
-        private void FlushWhile()
+        private async void FlushWhile()
         {
-            Task.Run(new Action(async () =>
+            while (true)
             {
-                while (true)
+                await Task.Delay(DelayCommandTime);
+                try
                 {
-                    await Task.Delay(DelayCommandTime);
-                    try
+                    invoker_locker.WaitOne();
+                    foreach (var item in WaitList)
                     {
-                        invoker_locker.WaitOne();
-                        foreach (var item in WaitList)
-                        {
-                            item.Value.Invoke(connection_pool.GetCommand());
+                        item.Value.Invoke(connection_pool.GetCommand());
 
-                            ExecutedDbCommandEvent?.Invoke(item.Key);
+                        ExecutedDbCommandEvent?.Invoke(item.Key);
 
-                            WaitList.TryRemove(item.Key, out var temp);
-                        }
-                        invoker_locker.Set();
+                        WaitList.TryRemove(item.Key, out var temp);
                     }
-                    catch (Exception)
-                    {
-                    }
+                    invoker_locker.Set();
                 }
-            }));
+                catch (Exception ex)
+                {
+                    logger.Append(LoggerLevel.Error, ex.ToString());
+                }
+            }
         }
     }
 }

@@ -24,7 +24,7 @@ namespace SCL.SocketClient.Utils.SystemPackets
                 Client.ServerDateTimeOffset = now - dt;
 
             }
-            catch (Exception ex)
+            catch
             {
                 //ThreadHelper.InvokeOnMain(() => { UnityEngine.Debug.Log($"{now} - {dt} =  {now - dt}"); });
             }

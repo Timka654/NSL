@@ -12,16 +12,25 @@ namespace Utils.Helper
 {
     public static class PacketHelper
     {
-        public static int LoadPackets<T>(this ServerOptions<T> serverOptions, Type selectAttrbuteType) where T : INetworkClient
+        /// <summary>
+        /// Инициализация пакетов (классов реализующих интерфейс <see cref="IPacket{TClient}"/>) по аттрибуту наследуемому от аттрибута <see cref="Packet.PacketAttribute"/>
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="serverOptions"></param>
+        /// <param name="assembly">Сборка из которой нужно выбрать классы пакетов</param>
+        /// <param name="selectAttrbuteType">Аттрибут по которому будут выбираться классы пакетов</param>
+        /// <returns>Кол-во пакетов которые были инициализированы</returns>
+        public static int LoadPackets<T>(this ServerOptions<T> serverOptions, Assembly assembly, Type selectAttrbuteType) where T : INetworkClient
         {
             if (!typeof(Packet.PacketAttribute).IsAssignableFrom(selectAttrbuteType))
             {
                 throw new Exception($"{selectAttrbuteType.FullName} must be assignable from {typeof(Packet.PacketAttribute).FullName}");
             }
 
-            var types = Assembly.GetCallingAssembly()
+            var types = assembly
                 .GetTypes()
-                .Select(x => new {
+                .Select(x => new
+                {
                     type = x,
                     attr = (Packet.PacketAttribute)x.GetCustomAttribute(selectAttrbuteType)
                 })
@@ -42,6 +51,19 @@ namespace Utils.Helper
             }
 
             return types.Count();
+        }
+
+        /// <summary>
+        /// Инициализация пакетов (классов реализующих интерфейс <see cref="IPacket{TClient}"/>) по аттрибуту наследуемому от аттрибута <see cref="Packet.PacketAttribute"/> из сборки с которой был произведен вызов функции
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="serverOptions"></param>
+        /// <param name="assembly">Сборка из которой нужно выбрать классы пакетов</param>
+        /// <param name="selectAttrbuteType">Аттрибут по которому будут выбираться классы пакетов</param>
+        /// <returns>Кол-во пакетов которые были инициализированы</returns>
+        public static int LoadPackets<T>(this ServerOptions<T> serverOptions, Type selectAttrbuteType) where T : INetworkClient
+        {
+            return LoadPackets(serverOptions, Assembly.GetCallingAssembly(), selectAttrbuteType);
         }
     }
 }

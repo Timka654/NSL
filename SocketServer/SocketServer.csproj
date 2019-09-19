@@ -16,6 +16,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\BinarySerializer_v5\BinarySerializer_v5.csproj" />
+    <ProjectReference Include="..\Logger\Logger.csproj" />
   </ItemGroup>
 
 </Project>

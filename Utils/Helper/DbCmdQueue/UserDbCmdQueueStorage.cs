@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Data.Common;
 using System.Collections.Concurrent;
-using Utils.Logger;
+using Logger;
 
 namespace Utils.Helper.DbCmdQueue
 {
@@ -15,7 +15,7 @@ namespace Utils.Helper.DbCmdQueue
 
         private ConcurrentDictionary<long, int> ActionUserMap = new ConcurrentDictionary<long, int>();
 
-        public UserDbCmdQueueStorage(DbConnectionPool connection_pool) : base(connection_pool)
+        public UserDbCmdQueueStorage(DbConnectionPool connection_pool, ILogger logger) : base(connection_pool, logger)
         {
             base.ExecutedDbCommandEvent += UserDbCmdQueueStorage_ExecutedDbCommandEvent;
         }
@@ -55,7 +55,7 @@ namespace Utils.Helper.DbCmdQueue
                     }
                     catch(Exception ex)
                     {
-                        LoggerStorage.Instance.main.AppendError(ex.ToString());
+                        logger.Append(Logger.LoggerLevel.Error, ex.ToString());
                     }
                 }
 

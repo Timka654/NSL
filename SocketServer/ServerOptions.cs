@@ -2,13 +2,64 @@
 using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Text;
+using Logger;
 using SocketServer.Utils;
 using SocketServer.Utils.Buffer;
 using SocketServer.Utils.SystemPackets;
 
 namespace SocketServer
 {
-    public class ServerOptions<T> where T: INetworkClient
+    public class ServerOptions
+    {
+        public ILogger HelperLogger { get; set; }
+
+        #region ServerSettings
+        //Данные для настройки сервера
+
+        /// <summary>
+        /// Тип ип адресса, InterNetwork - IPv4, InterNetworkV6 - IPv6
+        /// </summary>
+        public AddressFamily AddressFamily { get; set; }
+
+        /// <summary>
+        /// Тип сервера, обычно используется Tcp/Udp
+        /// </summary>
+        public ProtocolType ProtocolType { get; set; }
+
+        /// <summary>
+        /// Ип для инициализации сервера на определенном адаптере (0.0.0.0 - на всех, стандартное значение)
+        /// </summary>
+        public string IpAddress { get; set; }
+
+        /// <summary>
+        /// Порт для инициализации сервера 
+        /// </summary>
+        public int Port { get; set; }
+
+        /// <summary>
+        /// Длина очереди для приема подключения
+        /// </summary>
+        public int Backlog { get; set; }
+
+        #endregion
+
+        /// <summary>
+        /// Размер буффера приходящих данных, если пакет больше этого значения то данные по реализованному алгоритму принять не получиться
+        /// </summary>
+        public int ReceiveBufferSize { get; set; }
+
+        /// <summary>
+        /// Алгоритм шифрования входящих пакетов
+        /// </summary>
+        public IPacketCipher inputCipher { get; set; }
+
+        /// <summary>
+        /// Алгоритм шифрования входящих пакетов
+        /// </summary>
+        public IPacketCipher outputCipher { get; set; }
+    }
+
+    public class ServerOptions<T> : ServerOptions where T : INetworkClient
     {
         /// <summary>
         /// Делегат для регистрации пакета
@@ -77,51 +128,6 @@ namespace SocketServer
         {
             OnClientDisconnectEvent?.Invoke(client);
         }
-
-        #region ServerSettings
-        //Данные для настройки сервера
-
-        /// <summary>
-        /// Тип ип адресса, InterNetwork - IPv4, InterNetworkV6 - IPv6
-        /// </summary>
-        public AddressFamily AddressFamily { get; set; }
-
-        /// <summary>
-        /// Тип сервера, обычно используется Tcp/Udp
-        /// </summary>
-        public ProtocolType ProtocolType { get; set; }
-
-        /// <summary>
-        /// Ип для инициализации сервера на определенном адаптере (0.0.0.0 - на всех, стандартное значение)
-        /// </summary>
-        public string IpAddress { get; set; }
-
-        /// <summary>
-        /// Порт для инициализации сервера 
-        /// </summary>
-        public int Port { get; set; }
-
-        /// <summary>
-        /// Длина очереди для приема подключения
-        /// </summary>
-        public int Backlog { get; set; }
-
-        #endregion
-
-        /// <summary>
-        /// Размер буффера приходящих данных, если пакет больше этого значения то данные по реализованному алгоритму принять не получиться
-        /// </summary>
-        public int ReceiveBufferSize { get; set; }
-
-        /// <summary>
-        /// Алгоритм шифрования входящих пакетов
-        /// </summary>
-        public IPacketCipher inputCipher { get; set; }
-
-        /// <summary>
-        /// Алгоритм шифрования входящих пакетов
-        /// </summary>
-        public IPacketCipher outputCipher { get;set; }
 
         /// <summary>
         /// Пакеты которые будет принимать и обрабатывать сервер

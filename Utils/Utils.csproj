@@ -11,7 +11,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Cipher\Cipher.csproj" />
     <ProjectReference Include="..\DBEngine\DBEngine.csproj" />
+    <ProjectReference Include="..\Logger\Logger.csproj" />
     <ProjectReference Include="..\SocketServer\SocketServer.csproj" />
   </ItemGroup>
 

@@ -3,18 +3,18 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using gls.Data.Basic.Storages;
+using Logger;
 using SocketServer.Utils;
 using SocketServer.Utils.Buffer;
-using Utils.Logger;
 
 namespace Utils.Helper.Console
 {
     public class ConsoleManager<T> : ConsoleStorage<T>
         where T : INetworkClient
     {
-        public ConsoleManager()
+        public ConsoleManager(ILogger logger)
         {
-            LoggerStorage.Instance.main.AppendInfo($"ConsoleManager Loaded");
+            logger.Append(LoggerLevel.Info, $"ConsoleManager Loaded");
         }
 
         public string InvokeCommand(T client, string text)

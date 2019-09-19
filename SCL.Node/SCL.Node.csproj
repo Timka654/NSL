@@ -33,6 +33,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Remoting" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -60,8 +61,13 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TCPNode\TCPNode.cs" />
     <Compile Include="TCPNode\TCPNodePlayer.cs" />
+    <Compile Include="UDPNode\UDPChannel.cs" />
+    <Compile Include="UDPNode\UDPChannelIO.cs" />
+    <Compile Include="UDPNode\UDPClientChannelSinkProvider.cs" />
+    <Compile Include="UDPNode\UDPClientTransportSink.cs" />
     <Compile Include="UDPNode\UDPNode.cs" />
     <Compile Include="UDPNode\UDPNodePlayer.cs" />
+    <Compile Include="UDPNode\UDPServerTransportSink.cs" />
     <Compile Include="Utils\INodePlayer.cs" />
     <Compile Include="Utils\NodeInputPacketBuffer.cs" />
     <Compile Include="Utils\NodeOutputPacketBuffer.cs" />

@@ -105,7 +105,7 @@ namespace SCL.Node.TCPNode
                 socket.BeginReceive(buffer, offs, len - offs, SocketFlags.None, Receive, null);
 
             }
-            catch (Exception ex)
+            catch
             {
                 Disconnect();
             }

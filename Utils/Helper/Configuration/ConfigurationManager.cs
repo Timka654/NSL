@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using Logger;
+using Newtonsoft.Json.Linq;
 using SocketServer.Utils.Buffer;
 using System;
 using System.Collections.Generic;
@@ -6,7 +7,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Utils.Helper.Configuration.Info;
-using Utils.Logger;
 
 namespace Utils.Helper.Configuration
 {
@@ -16,13 +16,13 @@ namespace Utils.Helper.Configuration
 
         public string FileName { get; set; }
 
-        public ConfigurationManager(List<ConfigurationInfo> defaultConfigurationList, string fileName = "configuration.json")
+        public ConfigurationManager(List<ConfigurationInfo> defaultConfigurationList, ILogger logger, string fileName = "configuration.json")
         {
             FileName = fileName;
             SetDefaults(defaultConfigurationList);
             ReLoadData();
 
-            LoggerStorage.Instance.main.AppendInfo( $"ConfigurationManager Loaded");
+            logger.Append(LoggerLevel.Info, $"ConfigurationManager Loaded");
         }
 
         protected ConfigurationManager()

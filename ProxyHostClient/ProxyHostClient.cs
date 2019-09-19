@@ -3,7 +3,6 @@ using SocketServer;
 using System;
 using ProxyHostClient.Packets;
 using System.Net;
-using Utils.Logger;
 using Utils.Helper.Network;
 using SocketServer.Utils;
 using System.Threading.Tasks;
@@ -11,6 +10,7 @@ using Utils.Helper;
 using Utils.Helper.Configuration;
 using ProxyHostClient.Packets.Player.PacketData;
 using ProxyHostClient.Packets.Auth;
+using Logger;
 
 namespace ProxyHostClient
 {

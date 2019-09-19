@@ -1,8 +1,8 @@
-﻿using SocketServer.Utils.Buffer;
+﻿using Logger;
+using SocketServer.Utils.Buffer;
 using System;
 using System.Collections.Generic;
 using System.Text;
-using Utils.Logger;
 
 namespace ProxyHostClient.Packets.Auth
 {

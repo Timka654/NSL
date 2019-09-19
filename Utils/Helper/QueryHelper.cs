@@ -4,22 +4,30 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using Utils.Helper.Query;
-using Utils.Logger;
 
 namespace Utils.Helper
 {
     public static class QueryHelper
     {
-        public static int LoadQuerys<T>(this ServerOptions<T> options, Type selectAttrbuteType) where T : INetworkClient
+        /// <summary>
+        /// Выполнение запросов в базу данных (классов содержащих статичный метод Run без параметров) по аттрибуту наследуемому от аттрибута <see cref="Query.StaticQueryLoadAttribute"/>
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="serverOptions"></param>
+        /// <param name="assembly">Сборка из которой нужно выбрать классы запросов</param>
+        /// <param name="selectAttrbuteType">Аттрибут по которому будут выбираться классы запросов</param>
+        /// <returns>Кол-во запросов которые были выполнены</returns>
+        public static int LoadQuerys<T>(this ServerOptions<T> serverOptions, Assembly assembly, Type selectAttrbuteType) where T : INetworkClient
         {
             if (!typeof(Query.StaticQueryLoadAttribute).IsAssignableFrom(selectAttrbuteType))
             {
                 throw new Exception($"{selectAttrbuteType.FullName} must be assignable from {typeof(Query.StaticQueryLoadAttribute).FullName}");
             }
 
-            var querys = System.Reflection.Assembly.GetCallingAssembly()
+            var querys = assembly
                 .GetTypes()
                 .Select(x => new
                 {
@@ -35,7 +43,7 @@ namespace Utils.Helper
 
                 if (m == null)
                     throw new Exception($"{item.type.FullName} must have \"Run\" method");
-                if(m.GetParameters().Count() > 0)
+                if (m.GetParameters().Count() > 0)
                     throw new Exception($"{item.type.FullName} must have \"Run\" method with not parameters");
 
                 item.type.GetMethod("Run").Invoke(null, null);
@@ -43,10 +51,23 @@ namespace Utils.Helper
 
                 Debug.WriteLine($"Loading Query: query: {item.attr.Name} type: {item.type.FullName}");
 
-                LoggerStorage.Instance.main.AppendInfo( $"{item.attr.Name} Loaded");
+                serverOptions.HelperLogger.Append(Logger.LoggerLevel.Info, $"{item.attr.Name} Loaded");
             }
 
             return querys.Count;
+        }
+
+        /// <summary>
+        /// Выполнение запросов в базу данных (классов содержащих статичный метод Run без параметров) по аттрибуту наследуемому от аттрибута <see cref="Query.StaticQueryLoadAttribute"/> из сборки с которой был произведен вызов функции
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="serverOptions"></param>
+        /// <param name="assembly">Сборка из которой нужно выбрать классы запросов</param>
+        /// <param name="selectAttrbuteType">Аттрибут по которому будут выбираться классы запросов</param>
+        /// <returns>Кол-во запросов которые были выполнены</returns>
+        public static int LoadQuerys<T>(this ServerOptions<T> serverOptions, Type selectAttrbuteType) where T : INetworkClient
+        {
+            return LoadQuerys(serverOptions, Assembly.GetCallingAssembly(), selectAttrbuteType);
         }
     }
 }

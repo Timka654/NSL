@@ -67,6 +67,7 @@ namespace SocketServer
 
             //обзятельная переменная в NetworkClient, для отправки данных, можно использовать привидения типов (Client)NetworkClient но это никому не поможет
             this.Data.Network = this;
+            Data.ServerOptions = options;
 
             //установка переменной содержащую поток клиента
             this.sclient = client;

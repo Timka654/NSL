@@ -35,6 +35,8 @@ namespace SocketServer.Utils
 
         public DateTime? DisconnectTime { get; set; }
 
+        public ServerOptions ServerOptions { get; set; }
+
         /// <summary>
         /// Клиент для отправки данных, эта переменная обязательна
         /// </summary>
