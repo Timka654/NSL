@@ -29,16 +29,19 @@ namespace SCL.SocketClient
         protected override void Awake()
         {
             if (this.GetType() != typeof(TType))
+            {
+                Debug.LogError($"Object destroy by uncompared types {this.GetType()} != {typeof(TType)}");
                 DestroySelf();
-
+            }
             if (instance == null)
             {
                 instance = this as TType;
             }
             else if (instance != this)
             {
-                DestroySelf();
-                return;
+                Debug.LogError($"Scene contains two instances of ({instance.GetType()})");
+                //DestroySelf();
+                //return;
             }
 
             if (dontDestroyOnLoad)
@@ -77,6 +80,11 @@ namespace SCL.SocketClient
                 Destroy(this.gameObject);
             else
                 DestroyImmediate(this.gameObject);
+        }
+
+        protected virtual void OnDestroy()
+        {
+            instance = null;
         }
 
         #endregion

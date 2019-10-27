@@ -21,6 +21,54 @@ namespace SCL.Node.TCPNode
 
         public ConcurrentDictionary<string, TCPNodePlayer> WaitPlayerMap = new ConcurrentDictionary<string, TCPNodePlayer>();
 
+        public int Backlog { get; set; }
+
+        #region UnhandledProcess
+
+        public bool UnhandledPlayerProcess { get; set; } = false;
+
+        protected readonly Dictionary<byte, CommandHandle> _unhandledPlayerCommands = new Dictionary<byte, CommandHandle>();
+
+        public void AddUnhandledPlayerPacketHandle(byte id, CommandHandle handle)
+        {
+            if (_unhandledPlayerCommands.ContainsKey(id))
+            {
+                Debug.LogError($"Node network: (AddUnhandledPlayerPacketHandle) packet {id} already exist, be removed and append new");
+                _unhandledPlayerCommands.Remove(id);
+            }
+
+            _unhandledPlayerCommands.Add(id, handle);
+        }
+
+        #endregion
+
+        public void InitializeClient(string serverIp, int port, int myPlayerId)
+        {
+            base.Protocol = Protocol.Tcp;
+            InitResult = true;
+
+            MyPlayerId = myPlayerId;
+
+            _socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+
+            _socket.Connect(new IPEndPoint(IPAddress.Parse(serverIp), port));
+
+            TCPNodePlayer tnp = new TCPNodePlayer(this, (IPEndPoint)_socket.RemoteEndPoint);
+            tnp.OnReceived += Player_OnReceived;
+            tnp.SetSocket(_socket);
+            if (_players.TryRemove(-1, out var host))
+                host.Disconnect();
+            _players.TryAdd(-1, tnp);
+        }
+
+        /// <summary>
+        /// Server Initializer
+        /// if model is all peers to all peers
+        /// </summary>
+        /// <param name="ip"></param>
+        /// <param name="port"></param>
+        /// <param name="myPlayerId"></param>
+        /// <returns></returns>
         public override bool Initiliaze(string ip, ref int port, int myPlayerId)
         {
             base.Protocol = Protocol.Tcp;
@@ -35,16 +83,9 @@ namespace SCL.Node.TCPNode
                 Port = port = (_socket.LocalEndPoint as IPEndPoint).Port;
             }
 
-            _socket.Dispose();
-
-            _socket = null;
-
             base.Initiliaze(ip, ref port, myPlayerId);
 
-            _socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            _socket.Bind(new IPEndPoint(IPAddress.Parse(ip), port));
-
-            _socket.Listen(50);
+            _socket.Listen(Backlog);
             _socket.BeginAccept(AcceptClient, _socket);
 
             _uPnPLocker.WaitOne();
@@ -60,12 +101,21 @@ namespace SCL.Node.TCPNode
 
                 if (client == null)
                     return;
-                TCPNodePlayer tnp;
+                TCPNodePlayer tnp = null;
 
-                while (WaitPlayerMap.TryGetValue(((IPEndPoint)client.RemoteEndPoint).Address.ToString(), out tnp) == false)
+                if (UnhandledPlayerProcess && WaitPlayerMap.TryGetValue(((IPEndPoint)client.RemoteEndPoint).Address.ToString(), out tnp) == false)
                 {
-                    Thread.Sleep(10);
+                    tnp = new TCPNodePlayer(this, (IPEndPoint)client.RemoteEndPoint);
+                    tnp.PlayerId = GetUnhandledId();
+                    tnp.OnReceived += UnhandledPlayer_OnReceived;
+
+                    _players.TryAdd(tnp.PlayerId, tnp);
                 }
+                else
+                    while (WaitPlayerMap.TryGetValue(((IPEndPoint)client.RemoteEndPoint).Address.ToString(), out tnp) == false)
+                    {
+                        Thread.Sleep(30);
+                    }
 
                 Debug.Log($"AcceptClient player: {tnp} IPEP:{client.RemoteEndPoint.ToString()}");
                 tnp.SetSocket(client);
@@ -76,7 +126,7 @@ namespace SCL.Node.TCPNode
             {
                 Debug.LogError(ex.ToString());
             }
-
+            
             _socket?.BeginAccept(AcceptClient, _socket);
         }
 
@@ -88,11 +138,27 @@ namespace SCL.Node.TCPNode
 
             if (!_commands.ContainsKey(packet.PacketId))
             {
-                Node.Utils.SystemPackets.InvalidPid.Send(player, packet.PacketId);
+                Debug.LogError($"Handled player packet {packet.PacketId} not contains in map");
 
                 return;
             }
             _actions.Enqueue(() => { _commands[packet.PacketId].Invoke(player, packet); });
+        }
+
+        private void UnhandledPlayer_OnReceived(TCPNodePlayer player, NodeInputPacketBuffer packet)
+        {
+#if DEBUG
+            AppendOnReceiveData(player, packet);
+#endif
+
+            if (!_unhandledPlayerCommands.ContainsKey(packet.PacketId))
+            {
+                Debug.LogError($"Unhandled player packet {packet.PacketId} not contains in map");
+                //Node.Utils.SystemPackets.InvalidPid.Send(player, packet.PacketId);
+
+                return;
+            }
+            _actions.Enqueue(() => { _unhandledPlayerCommands[packet.PacketId].Invoke(player, packet); });
         }
 
         #region Send
@@ -131,6 +197,12 @@ namespace SCL.Node.TCPNode
 
         private AutoResetEvent _addPlayerLocker = new AutoResetEvent(true);
 
+        /// <summary>
+        /// Add wait players
+        /// if model is all peers to all peers
+        /// </summary>
+        /// <param name="playerPoint"></param>
+        /// <param name="playerId"></param>
         public void AddPlayer(IPEndPoint playerPoint, int playerId)
         {
             if (MyPlayerId == playerId)
@@ -147,18 +219,18 @@ namespace SCL.Node.TCPNode
 
                 tnp.OnReceived += Player_OnReceived;
 
-                if (playerId > MyPlayerId)
-                {
-                    tnp.Connect();
-                    Debug.Log($"AddPlayer connect to: {playerId} IPEP:{playerPoint.ToString()}");
+                    if (playerId > MyPlayerId)
+                    {
+                        tnp.Connect();
+                        Debug.Log($"AddPlayer connect to: {playerId} IPEP:{playerPoint.ToString()}");
 
-                    OnAppendClientEvent?.Invoke(tnp);
-                }
-                else
-                {
-                    Debug.Log($"AddPlayer wait: {playerId} IPEP:{playerPoint.ToString()}");
-                    WaitPlayerMap.TryAdd(playerPoint.Address.ToString(), tnp);
-                }
+                        OnAppendClientEvent?.Invoke(tnp);
+                    }
+                    else
+                    {
+                        Debug.Log($"AddPlayer wait: {playerId} IPEP:{playerPoint.ToString()}");
+                        WaitPlayerMap.TryAdd(playerPoint.Address.ToString(), tnp);
+                    }
                 _players.TryAdd(playerId, tnp);
             }
 
@@ -172,12 +244,37 @@ namespace SCL.Node.TCPNode
                 _players.TryRemove(player.PlayerId, out old);
         }
 
-        public void AddPacketHandle(byte id, CommandHandle handle)
+        public void HandleUnhandledPlayer(TCPNodePlayer player, int playerId)
         {
-            if (_commands.ContainsKey(id))
-                _commands.Remove(id);
+            if (!UnhandledPlayerProcess)
+                throw new Exception("This node not UnhandledPlayerProcess");
 
-            _commands.Add(id, handle);
+            if (player.PlayerId > 0)
+                throw new Exception("Player is already handled");
+
+            _players.TryRemove(player.PlayerId, out var dummy);
+            _players.TryRemove(playerId, out dummy);
+
+            player.PlayerId = playerId;
+
+            player.OnReceived -= UnhandledPlayer_OnReceived;
+            player.OnReceived += Player_OnReceived;
+            _players.TryAdd(playerId, player);
+
+            Debug.Log($"Handled player {playerId}");
+        }
+        
+        private static System.Random rnd = new System.Random();
+
+        public int GetUnhandledId()
+        {
+            int result;
+            do
+            {
+                result = rnd.Next(int.MinValue , -2);
+            } while (_players.ContainsKey(result));
+
+            return result;
         }
     }
 }

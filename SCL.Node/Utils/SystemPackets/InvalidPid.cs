@@ -13,8 +13,8 @@ namespace SCL.Node.Utils.SystemPackets
             NodeOutputPacketBuffer p = new NodeOutputPacketBuffer();
             p.PacketId = byte.MaxValue;
             p.AppendHash = true;
-            p.Write(pid);
-            player.Send(p);
+            p.WriteUInt32(pid);
+            player.Send(p, ReliableNetcode.QosType.Reliable);
         }
     }
 }

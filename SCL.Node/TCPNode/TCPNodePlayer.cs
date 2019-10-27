@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
+using ReliableNetcode;
 using SCL.Node.Utils;
 using SCL.Node.Utils.SystemPackets;
 using UnityEngine;
@@ -23,13 +24,15 @@ namespace SCL.Node.TCPNode
 
         public EndPoint IpPoint;
 
-        private TCPNode node;
+        private TCPNode TCPNetworkNode;
+
+        public override INetworkNode NetworkNode { get; set; }
 
         private Socket socket;
 
         public Socket Socket => socket;
 
-        public int PlayerId { get; set; }
+        public override int PlayerId { get; internal set; }
 
         public byte[] buffer = new byte[2048];
 
@@ -45,7 +48,7 @@ namespace SCL.Node.TCPNode
 
         public TCPNodePlayer(TCPNode node, IPEndPoint ipPoint)
         {
-            this.node = node;
+            NetworkNode = TCPNetworkNode = node;
             IpPoint = ipPoint;
         }
 
@@ -113,7 +116,7 @@ namespace SCL.Node.TCPNode
 
         public void Disconnect()
         {
-            node.RemovePlayer(this);
+            TCPNetworkNode.RemovePlayer(this);
             try
             {
             socket.Disconnect(false);
@@ -127,9 +130,9 @@ namespace SCL.Node.TCPNode
             }
         }
         
-        public void Send(NodeOutputPacketBuffer packet)
+        public override void Send(NodeOutputPacketBuffer packet, QosType qos = QosType.Reliable)
         {
-            node.SendTo(this, packet);
+            TCPNetworkNode.SendTo(this, packet);
         }
     }
 }

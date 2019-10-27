@@ -1,4 +1,5 @@
 ﻿using Mono.Nat;
+using ReliableNetcode;
 using SCL.Node.Utils;
 using System;
 using System.Collections;
@@ -32,7 +33,13 @@ namespace SCL.Node.UDPNode
 
             _socket.Dispose();
 
+            _socket = null;
+
+            base.Initiliaze(ip, ref port, myPlayerId);
+
             _socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+
+            _socket.Bind(new IPEndPoint(IPAddress.Parse(ip), port));
 
             _uPnPLocker.WaitOne();
 
@@ -51,34 +58,46 @@ namespace SCL.Node.UDPNode
 
         }
 
+        internal void SendTo(UDPNodePlayer player, byte[] packet, int len)
+        {
+            Send(packet, 0, len, player);
+        }
+
         public void SendTo(UDPNodePlayer player, NodeOutputPacketBuffer packet)
         {
             packet.PlayerId = MyPlayerId;
             Send(packet.GetBuffer(++player.OutputCurrentId), 0, packet.PacketLenght, player);
         }
 
-        public void SendTo(int playerId, NodeOutputPacketBuffer packet)
+        public void SendTo(int playerId, NodeOutputPacketBuffer packet, QosType qos)
         {
             UDPNodePlayer player;
 
             if (_players.TryGetValue(playerId, out player))
             {
-                SendTo((UDPNodePlayer)player, packet);
+                player.Send(packet, qos);
             }
         }
 
-        public void BroadcastMessage(NodeOutputPacketBuffer packet)
+        public void BroadcastMessage(NodeOutputPacketBuffer packet, QosType qos)
         {
             packet.PlayerId = MyPlayerId;
 
             foreach (UDPNodePlayer player in _players.Values)
             {
-                Send(packet.GetBuffer(++player.OutputCurrentId), 0, packet.PacketLenght, player);
+                player.Send(packet, qos);
             }
         }
 
         private void Send(byte[] buffer, int offset, int length, UDPNodePlayer player)
         {
+            //byte[] buf = buffer;
+            //if (offset > 0)
+            //{
+            //    buf = new byte[length - offset];
+
+            //    Array.Copy(buffer, offset, buf, 0, length);
+            //}
             _socket.SendTo(buffer, offset, length, SocketFlags.None, player.IpPoint);
         }
 

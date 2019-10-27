@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using ReliableNetcode;
 using SCL.Node.Utils;
 using SCL.Node.Utils.SystemPackets;
 
@@ -11,6 +12,8 @@ namespace SCL.Node.UDPNode
 {
     public class UDPNodePlayer : INodePlayer
     {
+        ReliableNetcode.ReliableEndpoint reliable = new ReliableNetcode.ReliableEndpoint();
+
         public delegate void ReceivedHandle(UDPNodePlayer player, NodeInputPacketBuffer packet);
 
         public event ReceivedHandle OnReceived;
@@ -21,16 +24,48 @@ namespace SCL.Node.UDPNode
 
         public EndPoint IpPoint;
 
-        private UDPNode node;
+        private UDPNode UDPNetworkNode;
 
-        public int PlayerId { get; set; }
+        public override INetworkNode NetworkNode { get; set; }
+
+        public override int PlayerId { get; internal set; }
 
         public byte[] buffer = new byte[1024];
 
         public UDPNodePlayer(UDPNode node, IPEndPoint ipPoint)
         {
-            this.node = node;
+            NetworkNode = UDPNetworkNode = node;
             IpPoint = ipPoint;
+
+            reliable.TransmitCallback += (buffer, len) =>
+            {
+                node.SendTo(this, buffer, len);
+            };
+
+            reliable.ReceiveCallback += (buffer, len) =>
+            {
+                NodeInputPacketBuffer packet = null;
+                try
+                {
+                    packet = new NodeInputPacketBuffer(buffer, true);
+
+                    if (packet.PlayerId != PlayerId)
+                        throw new Exception();
+
+                    if (InputCurrentId + 1 != packet.Cpid)
+                    {
+                        InvalidPid.Send(this, InputCurrentId);
+                    }
+
+                    InputCurrentId++;
+                }
+                catch
+                {
+                    return;
+                }
+
+                OnReceived?.Invoke(this, packet);
+            };
 
             Receive();
         }
@@ -39,41 +74,22 @@ namespace SCL.Node.UDPNode
         {
             await Task.Run(() =>
             {
-                while (true)
+                while (UDPNetworkNode != null)
                 {
-                    int len = node.ReceiveFrom(buffer, ref IpPoint);
+                    int len = UDPNetworkNode.ReceiveFrom(buffer, ref IpPoint);
 
                     if (len < 0)
                         return;
 
-                    NodeInputPacketBuffer packet = null;
-                    try
-                    {
-                        packet = new NodeInputPacketBuffer(buffer, true);
-
-                        if (packet.PlayerId != PlayerId)
-                            throw new Exception();
-
-                        if (InputCurrentId + 1 != packet.Cpid)
-                        {
-                            InvalidPid.Send(this,InputCurrentId);
-                        }
-
-                        InputCurrentId++;
-                    }
-                    catch
-                    {
-                        return;
-                    }
-
-                    OnReceived?.Invoke(this, packet);
+                    reliable.ReceivePacket(buffer, buffer.Length);
                 }
             });
         }
-        
-        public void Send(NodeOutputPacketBuffer packet)
+
+        public override void Send(NodeOutputPacketBuffer packet, QosType qos)
         {
-            node.SendTo(this, packet);
+            packet.PlayerId = PlayerId;
+            reliable.SendMessage(packet.GetBuffer(), packet.PacketLenght, qos);
         }
     }
 }

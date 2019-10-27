@@ -21,6 +21,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -58,16 +59,28 @@
     <Compile Include="NAT\Proxy\ProxyNetwork\SimpleNetworkProxy.cs" />
     <Compile Include="NAT\Proxy\ProxyNetwork\SingletonNetworkProxy.cs" />
     <Compile Include="NodeIPEndPoint.cs" />
+    <Compile Include="NodeSystemPacketEnum.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TCPNode\TCPNode.cs" />
     <Compile Include="TCPNode\TCPNodePlayer.cs" />
-    <Compile Include="UDPNode\UDPChannel.cs" />
-    <Compile Include="UDPNode\UDPChannelIO.cs" />
-    <Compile Include="UDPNode\UDPClientChannelSinkProvider.cs" />
-    <Compile Include="UDPNode\UDPClientTransportSink.cs" />
+    <Compile Include="UDPNode\Reliable\MessageChannel.cs" />
+    <Compile Include="UDPNode\Reliable\PacketHeader.cs" />
+    <Compile Include="UDPNode\Reliable\ReliableEndpoint.cs" />
+    <Compile Include="UDPNode\Reliable\ReliablePacketController.cs" />
+    <Compile Include="UDPNode\Reliable\SequenceBuffer.cs" />
+    <Compile Include="UDPNode\Reliable\Utils\BufferPool.cs" />
+    <Compile Include="UDPNode\Reliable\Utils\ByteBuffer.cs" />
+    <Compile Include="UDPNode\Reliable\Utils\DateTimeEx.cs" />
+    <Compile Include="UDPNode\Reliable\Utils\Defines.cs" />
+    <Compile Include="UDPNode\Reliable\Utils\IO\ByteArrayReader.cs" />
+    <Compile Include="UDPNode\Reliable\Utils\IO\ByteStream.cs" />
+    <Compile Include="UDPNode\Reliable\Utils\IO\PacketIO.cs" />
+    <Compile Include="UDPNode\Reliable\Utils\ObjPool.cs" />
     <Compile Include="UDPNode\UDPNode.cs" />
     <Compile Include="UDPNode\UDPNodePlayer.cs" />
-    <Compile Include="UDPNode\UDPServerTransportSink.cs" />
+    <Compile Include="UnityObject\NodeBehaviour.cs" />
+    <Compile Include="UnityObject\NodeObject.cs" />
+    <Compile Include="UnityObject\Storages\NodeObjectRPCMessageStorage.cs" />
     <Compile Include="Utils\INodePlayer.cs" />
     <Compile Include="Utils\NodeInputPacketBuffer.cs" />
     <Compile Include="Utils\NodeOutputPacketBuffer.cs" />
@@ -79,5 +92,6 @@
       <Name>SCL.Unity</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

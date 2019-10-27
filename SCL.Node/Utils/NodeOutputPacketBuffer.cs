@@ -94,35 +94,12 @@ namespace SCL.Node.Utils
 
             offset = 0;
         }
-        byte[] ObjectToByteArray(object obj)
-        {
-            if (obj == null)
-                return null;
-            BinaryFormatter bf = new BinaryFormatter();
-            using (MemoryStream ms = new MemoryStream())
-            {
-                bf.Serialize(ms, obj);
-                return ms.ToArray();
-            }
-        }
-        public void WriteObject(object[] value)
-        {
-            for(int i = 0; i < value.Length; i++)
-            {
-                WriteObject(value[i]);
-            }
-                
-        }
-        public void WriteObject(object value)
-        {
-            dynamic d = value;
-            Write(d);
-        }
+
         /// <summary>
         /// Запись значения float (4 bytes)
         /// </summary>
         /// <param name="value">значение</param>
-        public void Write(float value)
+        public void WriteFloat32 (float value)
         {
             Write(BitConverter.GetBytes(value), 0, 4);
         }
@@ -132,17 +109,17 @@ namespace SCL.Node.Utils
             await WriteAsync(BitConverter.GetBytes(value), 0, 4);
         }
 
-        public void Write(Vector2 value)
+        public void WriteVector2(Vector2 value)
         {
-            Write(value.x);
-            Write(value.y);
+            WriteFloat32(value.x);
+            WriteFloat32(value.y);
         }
 
-        public void Write(Vector3 value)
+        public void WriteVector3(Vector3 value)
         {
-            Write(value.x);
-            Write(value.y);
-            Write(value.z);
+            WriteFloat32(value.x);
+            WriteFloat32(value.y);
+            WriteFloat32(value.z);
         }
 
 
@@ -150,7 +127,7 @@ namespace SCL.Node.Utils
         /// Запись значения double (8 bytes)
         /// </summary>
         /// <param name="value">значение</param>
-        public void Write(double value)
+        public void WriteFloat64(double value)
         {
             Write(BitConverter.GetBytes(value), 0, 8);
         }
@@ -164,7 +141,7 @@ namespace SCL.Node.Utils
         /// не реализовано
         /// </summary>
         /// <param name="value">значение</param>
-        public void Write(decimal value)
+        public void WriteDecimal(decimal value)
         {
             throw new Exception();
         }
@@ -173,12 +150,12 @@ namespace SCL.Node.Utils
         /// Запись значения short (int16, 2 байта)
         /// </summary>
         /// <param name="value">значение</param>
-        public void Write(short value)
+        public void WriteInt16(short value)
         {
             Write(BitConverter.GetBytes(value), 0, 2);
         }
 
-        public async Task WriteAsync(short value)
+        public async Task WriteInt16Async(short value)
         {
             await WriteAsync(BitConverter.GetBytes(value), 0, 2);
         }
@@ -187,7 +164,7 @@ namespace SCL.Node.Utils
         /// Запись значения ushort (uint16, 2 байта)
         /// </summary>
         /// <param name="value">значение</param>
-        public void Write(ushort value)
+        public void WriteUInt16(ushort value)
         {
             Write(BitConverter.GetBytes(value), 0, 2);
         }
@@ -201,12 +178,12 @@ namespace SCL.Node.Utils
         /// Запись значения int (int32, 4 байта)
         /// </summary>
         /// <param name="value">значение</param>
-        public void Write(int value)
+        public void WriteInt32(int value)
         {
             Write(BitConverter.GetBytes(value), 0, 4);
         }
 
-        public async Task WriteAsync(int value)
+        public async Task WriteInt32Async(int value)
         {
             await WriteAsync(BitConverter.GetBytes(value), 0, 4);
         }
@@ -215,12 +192,12 @@ namespace SCL.Node.Utils
         /// Запись значения uint (uint32, 4 байта)
         /// </summary>
         /// <param name="value">значение</param>
-        public void Write(uint value)
+        public void WriteUInt32(uint value)
         {
             Write(BitConverter.GetBytes(value), 0, 4);
         }
 
-        public async Task WriteAsync(ushort value)
+        public async Task WriteUInt32Async(ushort value)
         {
             await WriteAsync(BitConverter.GetBytes(value), 0, 4);
         }
@@ -229,12 +206,12 @@ namespace SCL.Node.Utils
         /// Запись значения long (int64, 8 байта)
         /// </summary>
         /// <param name="value">значение</param>
-        public void Write(long value)
+        public void WriteInt64(long value)
         {
             Write(BitConverter.GetBytes(value), 0, 8);
         }
 
-        public async Task WriteAsync(long value)
+        public async Task WriteInt64Async(long value)
         {
             await WriteAsync(BitConverter.GetBytes(value), 0, 8);
         }
@@ -243,12 +220,12 @@ namespace SCL.Node.Utils
         /// Запись значения ulong (uint64, 8 байта)
         /// </summary>
         /// <param name="value">значение</param>
-        public void Write(ulong value)
+        public void WriteUInt64(ulong value)
         {
             Write(BitConverter.GetBytes(value), 0, 8);
         }
 
-        public async Task WriteAsync(ulong value)
+        public async Task WriteUInt64Async(ulong value)
         {
             await WriteAsync(BitConverter.GetBytes(value), 0, 8);
         }
@@ -257,21 +234,21 @@ namespace SCL.Node.Utils
         /// Запись значения bool (1 байт)
         /// </summary>
         /// <param name="value">значение</param>
-        public void Write(bool value)
+        public void WriteBool(bool value)
         {
-            Write((byte) (value ? 1 : 0));
+            WriteByte((byte) (value ? 1 : 0));
         }
 
-        public async Task WriteAsync(bool value)
+        public async Task WriteBoolAsync(bool value)
         {
-            await WriteAsync((byte) (value ? 1 : 0));
+            await WriteByteAsync((byte) (value ? 1 : 0));
         }
 
         /// <summary>
         /// Запись значения byte (1 байт)
         /// </summary>
         /// <param name="value">значение</param>
-        public void Write(byte value)
+        public void WriteByte(byte value)
         {
             if (offset + 1 >= bufferLenght)
                 SetLength(1);
@@ -281,16 +258,11 @@ namespace SCL.Node.Utils
                 lenght = offs;
         }
 
-        public async Task WriteAsync(byte value)
+        public async Task WriteByteAsync(byte value)
         {
             await Task.Run(() =>
             {
-                if (offset + 1 >= bufferLenght)
-                    SetLength(1);
-                buffer[offset] = value;
-                offs++;
-                if (offs >= lenght)
-                    lenght = offs;
+                WriteByte(value);
             });
         }
 
@@ -298,18 +270,18 @@ namespace SCL.Node.Utils
         /// Запись значения string, с записью заголовка c размером ushort (2 байта), до 36к симв
         /// </summary>
         /// <param name="value">значение</param>
-        public void Write(string value)
+        public void WriteString16(string value)
         {
             if (value == null)
                 value = "";
             byte[] buf = coding.GetBytes(value);
 
-            Write((ushort) buf.Length);
+            WriteUInt16((ushort) buf.Length);
             if (buf.Length > 0)
                 Write(buf, 0, buf.Length);
         }
 
-        public async Task WriteAsync(string value)
+        public async Task WriteString16Async(string value)
         {
             await Task.Run(() =>
             {
@@ -317,7 +289,7 @@ namespace SCL.Node.Utils
                     value = "";
                 byte[] buf = coding.GetBytes(value);
 
-                Write((ushort) buf.Length);
+                WriteUInt16((ushort) buf.Length);
                 if (buf.Length > 0)
                     Write(buf, 0, buf.Length);
             });
@@ -333,7 +305,7 @@ namespace SCL.Node.Utils
                 value = "";
             byte[] buf = coding.GetBytes(value);
 
-            Write((uint) buf.Length);
+            WriteUInt32((uint) buf.Length);
             if (buf.Length > 0)
                 Write(buf, 0, buf.Length);
         }
@@ -346,7 +318,7 @@ namespace SCL.Node.Utils
                     value = "";
                 byte[] buf = coding.GetBytes(value);
 
-                Write((uint) buf.Length);
+                WriteUInt32((uint) buf.Length);
                 if (buf.Length > 0)
                     Write(buf, 0, buf.Length);
             });
@@ -357,7 +329,7 @@ namespace SCL.Node.Utils
             if (value.HasValue)
                 await WriteDateTimeAsync(value.Value);
             else
-                await WriteAsync(0);
+                await WriteByteAsync(0);
         }
 
         public async Task WriteDateTimeAsync(DateTime value)
@@ -367,7 +339,7 @@ namespace SCL.Node.Utils
 
         public void WriteTimeSpan(TimeSpan value)
         {
-            Write((ulong) value.TotalMilliseconds);
+            WriteUInt64((ulong) value.TotalMilliseconds);
         }
 
         public void WriteDateTime(DateTime? value)
@@ -375,12 +347,12 @@ namespace SCL.Node.Utils
             if (value.HasValue)
                 WriteDateTime(value.Value);
             else
-                Write(0);
+                WriteByte(0);
         }
 
         public void WriteDateTime(DateTime value)
         {
-            Write((ulong) (value - DateTime.MinValue).TotalMilliseconds);
+            WriteUInt64((ulong) (value - DateTime.MinValue).TotalMilliseconds);
         }
 
         /// <summary>
@@ -470,13 +442,13 @@ namespace SCL.Node.Utils
             int off = offs;
 
             offset = 0 - headerLenght;
-            Write(PacketLenght);
-            Write(cpid);
-            Write(PacketId);
+            WriteInt32(PacketLenght);
+            WriteUInt32(cpid);
+            WriteByte(PacketId);
 
             if (AppendHash)
             {
-                Write((byte) (((PlayerId - PacketId) + cpid) % 14));
+                WriteByte((byte) (((PlayerId - PacketId) + cpid) % 14));
             }
 
             offs = off;

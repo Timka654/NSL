@@ -19,16 +19,14 @@ namespace SocketServer
             {
                 if (!client.ConnectAsync(options.IpAddress, options.Port).Wait(2000))
                     throw new Exception();
-                
-#if DEBUG
+
                 var c = new Client<T>(client, options);
+#if DEBUG
                 c.OnReceivePacket += OnReceivePacket;
                 c.OnSendPacket += OnSendPacket;
+#endif
                 c.RunPacketReceiver();
                 return c;
-#else
-               return new Client<T>(client, serverOptions).RunPacketReceiver();
-#endif
             }
             catch
             {
