@@ -14,7 +14,7 @@ namespace SCL.Node.Utils.SystemPackets
             p.PacketId = byte.MaxValue;
             p.AppendHash = true;
             p.WriteUInt32(pid);
-            player.Send(p, ReliableNetcode.QosType.Reliable);
+            //player.Send(p, ReliableNetcode.QosType.Reliable);
         }
     }
 }

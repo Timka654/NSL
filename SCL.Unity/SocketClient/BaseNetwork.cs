@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Cipher;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -36,8 +37,8 @@ namespace SCL.SocketClient
             AddressFamily = System.Net.Sockets.AddressFamily.InterNetwork,
             ProtocolType = System.Net.Sockets.ProtocolType.Tcp,
             ReceiveBufferSize = 81960,
-            inputCipher = new Cipher.PacketNoneCipher(),
-            outputCipher = new Cipher.PacketNoneCipher(),
+            inputCipher = new PacketNoneCipher(),
+            outputCipher = new PacketNoneCipher(),
         };
 
         protected virtual void Awake()

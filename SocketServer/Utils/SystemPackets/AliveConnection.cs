@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
-using SocketServer.Utils.Buffer;
+using SocketCore.Utils;
+using SocketCore.Utils.Buffer;
 
 namespace SocketServer.Utils.SystemPackets
 {
-    public class AliveConnection<T> :IPacket<T> where T: INetworkClient
+    public class AliveConnection<T> :IPacket<T> where T: IServerNetworkClient
     {
         public void Receive(T client, InputPacketBuffer data)
         {
@@ -16,7 +17,7 @@ namespace SocketServer.Utils.SystemPackets
                 client.PingCount = 0;
             
             if (client.PingCount++ % 60 == 0)
-                SocketServer.Utils.SystemPackets.SystemTime<T>.Send(client);
+                SocketServer.Utils.SystemPackets.SystemTime.Send(client);
         }
 
         public static void Send(INetworkClient client)

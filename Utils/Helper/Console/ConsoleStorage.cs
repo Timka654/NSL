@@ -12,7 +12,7 @@ namespace gls.Data.Basic.Storages
     /// Хранилище конфигураций
     /// </summary>
     public class ConsoleStorage<T>
-        where T : INetworkClient
+        where T : IServerNetworkClient
     {
         /// <summary>
         /// Список данных конфигураций

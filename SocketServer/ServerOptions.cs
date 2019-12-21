@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Text;
 using Logger;
+using SocketCore.Utils;
+using SocketCore.Utils.Buffer;
 using SocketServer.Utils;
-using SocketServer.Utils.Buffer;
 using SocketServer.Utils.SystemPackets;
 
 namespace SocketServer
@@ -59,7 +60,7 @@ namespace SocketServer
         public IPacketCipher outputCipher { get; set; }
     }
 
-    public class ServerOptions<T> : ServerOptions where T : INetworkClient
+    public class ServerOptions<T> : ServerOptions where T : IServerNetworkClient
     {
         /// <summary>
         /// Делегат для регистрации пакета
@@ -67,7 +68,7 @@ namespace SocketServer
         /// <param name="client">Данные клиента</param>
         /// <param name="data">Входящий буффер с данными</param>
         /// <param name="output">Исходящий буффер с данными(не обязательно)</param>
-        public delegate void PacketHandle(T client, Utils.Buffer.InputPacketBuffer data);
+        public delegate void PacketHandle(T client, InputPacketBuffer data);
 
         /// <summary>
         /// Делегат для регистрации события перехвата сетевых ошибок
@@ -136,7 +137,6 @@ namespace SocketServer
         {
             { (ushort)Utils.SystemPackets.Enums.ClientPacketEnum.AliveConnection, new AliveConnection<T>() },
             { (ushort)Utils.SystemPackets.Enums.ClientPacketEnum.RecoverySession, new RecoverySession<T>() },
-            { (ushort)Utils.SystemPackets.Enums.ClientPacketEnum.ServerTime, new SystemTime<T>() },
             { (ushort)Utils.SystemPackets.Enums.ClientPacketEnum.Version, new Version<T>() },
         };
 

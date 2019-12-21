@@ -5,10 +5,11 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using SocketServer.Utils.SystemPackets;
+using SocketCore.Utils;
 
 namespace SocketServer
 {
-    public class ServerListener<T> where T : INetworkClient
+    public class ServerListener<T> where T : IServerNetworkClient
     {
 #if DEBUG
         public event ReceivePacketDebugInfo<T> OnReceivePacket;

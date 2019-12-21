@@ -9,9 +9,10 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>SCL.Unity</RootNamespace>
     <AssemblyName>SCL.Unity</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -40,291 +41,10 @@
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
     <Reference Include="UnityEngine">
-      <HintPath>C:\Program Files\Unity\Hub\Editor\2018.2.14f1\Editor\Data\Managed\UnityEngine.dll</HintPath>
+      <HintPath>C:\Program Files\Unity\Hub\Editor\2018.4.9f1\Editor\Data\Managed\UnityEngine.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\BinarySerializer_v5\BinaryAttribute.cs">
-      <Link>BinarySerializer\BinaryAttribute.cs</Link>
-    </Compile>
-    <Compile Include="..\BinarySerializer_v5\BinaryPreCompileAttribute.cs">
-      <Link>BinarySerializer\BinaryPreCompileAttribute.cs</Link>
-    </Compile>
-    <Compile Include="..\BinarySerializer_v5\BinarySchemeAttribute.cs">
-      <Link>BinarySerializer\BinarySchemeAttribute.cs</Link>
-    </Compile>
-    <Compile Include="..\BinarySerializer_v5\BinarySerializer.cs">
-      <Link>BinarySerializer\BinarySerializer.cs</Link>
-    </Compile>
-    <Compile Include="..\BinarySerializer_v5\BinaryStruct.cs">
-      <Link>BinarySerializer\BinaryStruct.cs</Link>
-    </Compile>
-    <Compile Include="..\BinarySerializer_v5\Builder\BuilderPropertyData.cs">
-      <Link>BinarySerializer\Builder\BuilderPropertyData.cs</Link>
-    </Compile>
-    <Compile Include="..\BinarySerializer_v5\Builder\StructBuilder.cs">
-      <Link>BinarySerializer\Builder\StructBuilder.cs</Link>
-    </Compile>
-    <Compile Include="..\BinarySerializer_v5\Builder\StructBuilderPartialType.cs">
-      <Link>BinarySerializer\Builder\StructBuilderPartialType.cs</Link>
-    </Compile>
-    <Compile Include="..\BinarySerializer_v5\Builder\StructBuilderPartialTypeProperty.cs">
-      <Link>BinarySerializer\Builder\StructBuilderPartialTypeProperty.cs</Link>
-    </Compile>
-    <Compile Include="..\BinarySerializer_v5\Builder\StructBuilderProperty.cs">
-      <Link>BinarySerializer\Builder\StructBuilderProperty.cs</Link>
-    </Compile>
-    <Compile Include="..\BinarySerializer_v5\DefaultTypes\ArrayTypes\BinaryArray.cs">
-      <Link>BinarySerializer\DefaultTypes\ArrayTypes\BinaryArray.cs</Link>
-    </Compile>
-    <Compile Include="..\BinarySerializer_v5\DefaultTypes\ArrayTypes\BinaryArray16.cs">
-      <Link>BinarySerializer\DefaultTypes\ArrayTypes\BinaryArray16.cs</Link>
-    </Compile>
-    <Compile Include="..\BinarySerializer_v5\DefaultTypes\ArrayTypes\BinaryArray32.cs">
-      <Link>BinarySerializer\DefaultTypes\ArrayTypes\BinaryArray32.cs</Link>
-    </Compile>
-    <Compile Include="..\BinarySerializer_v5\DefaultTypes\ConcurrentDictionaryTypes\BinaryConcurrentDictionary.cs">
-      <Link>BinarySerializer\DefaultTypes\ConcurrentDictionaryTypes\BinaryConcurrentDictionary.cs</Link>
-    </Compile>
-    <Compile Include="..\BinarySerializer_v5\DefaultTypes\ConcurrentDictionaryTypes\BinaryConcurrentDictionary16.cs">
-      <Link>BinarySerializer\DefaultTypes\ConcurrentDictionaryTypes\BinaryConcurrentDictionary16.cs</Link>
-    </Compile>
-    <Compile Include="..\BinarySerializer_v5\DefaultTypes\ConcurrentDictionaryTypes\BinaryConcurrentDictionary32.cs">
-      <Link>BinarySerializer\DefaultTypes\ConcurrentDictionaryTypes\BinaryConcurrentDictionary32.cs</Link>
-    </Compile>
-    <Compile Include="..\BinarySerializer_v5\DefaultTypes\DictionaryTypes\BinaryDictionary.cs">
-      <Link>BinarySerializer\DefaultTypes\DictionaryTypes\BinaryDictionary.cs</Link>
-    </Compile>
-    <Compile Include="..\BinarySerializer_v5\DefaultTypes\DictionaryTypes\BinaryDictionary16.cs">
-      <Link>BinarySerializer\DefaultTypes\DictionaryTypes\BinaryDictionary16.cs</Link>
-    </Compile>
-    <Compile Include="..\BinarySerializer_v5\DefaultTypes\DictionaryTypes\BinaryDictionary32.cs">
-      <Link>BinarySerializer\DefaultTypes\DictionaryTypes\BinaryDictionary32.cs</Link>
-    </Compile>
-    <Compile Include="..\BinarySerializer_v5\DefaultTypes\FloatTypes\BinaryFloat32.cs">
-      <Link>BinarySerializer\DefaultTypes\FloatTypes\BinaryFloat32.cs</Link>
-    </Compile>
-    <Compile Include="..\BinarySerializer_v5\DefaultTypes\FloatTypes\BinaryFloat64.cs">
-      <Link>BinarySerializer\DefaultTypes\FloatTypes\BinaryFloat64.cs</Link>
-    </Compile>
-    <Compile Include="..\BinarySerializer_v5\DefaultTypes\IBasicType.cs">
-      <Link>BinarySerializer\DefaultTypes\IBasicType.cs</Link>
-    </Compile>
-    <Compile Include="..\BinarySerializer_v5\DefaultTypes\IntTypes\BinaryBool.cs">
-      <Link>BinarySerializer\DefaultTypes\IntTypes\BinaryBool.cs</Link>
-    </Compile>
-    <Compile Include="..\BinarySerializer_v5\DefaultTypes\IntTypes\BinaryByte.cs">
-      <Link>BinarySerializer\DefaultTypes\IntTypes\BinaryByte.cs</Link>
-    </Compile>
-    <Compile Include="..\BinarySerializer_v5\DefaultTypes\IntTypes\BinaryInt16.cs">
-      <Link>BinarySerializer\DefaultTypes\IntTypes\BinaryInt16.cs</Link>
-    </Compile>
-    <Compile Include="..\BinarySerializer_v5\DefaultTypes\IntTypes\BinaryInt32.cs">
-      <Link>BinarySerializer\DefaultTypes\IntTypes\BinaryInt32.cs</Link>
-    </Compile>
-    <Compile Include="..\BinarySerializer_v5\DefaultTypes\IntTypes\BinaryInt64.cs">
-      <Link>BinarySerializer\DefaultTypes\IntTypes\BinaryInt64.cs</Link>
-    </Compile>
-    <Compile Include="..\BinarySerializer_v5\DefaultTypes\IntTypes\BinaryInt8.cs">
-      <Link>BinarySerializer\DefaultTypes\IntTypes\BinaryInt8.cs</Link>
-    </Compile>
-    <Compile Include="..\BinarySerializer_v5\DefaultTypes\IntTypes\BinarySByte.cs">
-      <Link>BinarySerializer\DefaultTypes\IntTypes\BinarySByte.cs</Link>
-    </Compile>
-    <Compile Include="..\BinarySerializer_v5\DefaultTypes\IntTypes\BinarySInt8.cs">
-      <Link>BinarySerializer\DefaultTypes\IntTypes\BinarySInt8.cs</Link>
-    </Compile>
-    <Compile Include="..\BinarySerializer_v5\DefaultTypes\IntTypes\BinaryUInt16.cs">
-      <Link>BinarySerializer\DefaultTypes\IntTypes\BinaryUInt16.cs</Link>
-    </Compile>
-    <Compile Include="..\BinarySerializer_v5\DefaultTypes\IntTypes\BinaryUInt32.cs">
-      <Link>BinarySerializer\DefaultTypes\IntTypes\BinaryUInt32.cs</Link>
-    </Compile>
-    <Compile Include="..\BinarySerializer_v5\DefaultTypes\IntTypes\BinaryUInt64.cs">
-      <Link>BinarySerializer\DefaultTypes\IntTypes\BinaryUInt64.cs</Link>
-    </Compile>
-    <Compile Include="..\BinarySerializer_v5\DefaultTypes\ListTypes\BinaryList.cs">
-      <Link>BinarySerializer\DefaultTypes\ListTypes\BinaryList.cs</Link>
-    </Compile>
-    <Compile Include="..\BinarySerializer_v5\DefaultTypes\ListTypes\BinaryList16.cs">
-      <Link>BinarySerializer\DefaultTypes\ListTypes\BinaryList16.cs</Link>
-    </Compile>
-    <Compile Include="..\BinarySerializer_v5\DefaultTypes\ListTypes\BinaryList32.cs">
-      <Link>BinarySerializer\DefaultTypes\ListTypes\BinaryList32.cs</Link>
-    </Compile>
-    <Compile Include="..\BinarySerializer_v5\DefaultTypes\OtherTypes\BinaryDateTime.cs">
-      <Link>BinarySerializer\DefaultTypes\OtherTypes\BinaryDateTime.cs</Link>
-    </Compile>
-    <Compile Include="..\BinarySerializer_v5\DefaultTypes\OtherTypes\BinaryNullable.cs">
-      <Link>BinarySerializer\DefaultTypes\OtherTypes\BinaryNullable.cs</Link>
-    </Compile>
-    <Compile Include="..\BinarySerializer_v5\DefaultTypes\OtherTypes\BinaryTimeSpan.cs">
-      <Link>BinarySerializer\DefaultTypes\OtherTypes\BinaryTimeSpan.cs</Link>
-    </Compile>
-    <Compile Include="..\BinarySerializer_v5\DefaultTypes\OtherTypes\BinaryVector2.cs">
-      <Link>BinarySerializer\DefaultTypes\OtherTypes\BinaryVector2.cs</Link>
-    </Compile>
-    <Compile Include="..\BinarySerializer_v5\DefaultTypes\OtherTypes\BinaryVector3.cs">
-      <Link>BinarySerializer\DefaultTypes\OtherTypes\BinaryVector3.cs</Link>
-    </Compile>
-    <Compile Include="..\BinarySerializer_v5\DefaultTypes\StringTypes\BinaryString.cs">
-      <Link>BinarySerializer\DefaultTypes\StringTypes\BinaryString.cs</Link>
-    </Compile>
-    <Compile Include="..\BinarySerializer_v5\DefaultTypes\StringTypes\BinaryString16.cs">
-      <Link>BinarySerializer\DefaultTypes\StringTypes\BinaryString16.cs</Link>
-    </Compile>
-    <Compile Include="..\BinarySerializer_v5\DefaultTypes\StringTypes\BinaryString32.cs">
-      <Link>BinarySerializer\DefaultTypes\StringTypes\BinaryString32.cs</Link>
-    </Compile>
-    <Compile Include="..\BinarySerializer_v5\PropertyData.cs">
-      <Link>BinarySerializer\PropertyData.cs</Link>
-    </Compile>
-    <Compile Include="..\BinarySerializer_v5\TypeStorage.cs">
-      <Link>BinarySerializer\TypeStorage.cs</Link>
-    </Compile>
-    <Compile Include="..\Cipher\AES\AESCipher.cs">
-      <Link>Cipher\AES\AESCipher.cs</Link>
-    </Compile>
-    <Compile Include="..\Cipher\CipherConfiguration.cs">
-      <Link>Cipher\CipherConfiguration.cs</Link>
-    </Compile>
-    <Compile Include="..\Cipher\DES\DESCipher.cs">
-      <Link>Cipher\DES\DESCipher.cs</Link>
-    </Compile>
-    <Compile Include="..\Cipher\MD5\MD5Cipher.cs">
-      <Link>Cipher\MD5\MD5Cipher.cs</Link>
-    </Compile>
-    <Compile Include="..\Cipher\PacketNoneCipher.cs">
-      <Link>Cipher\PacketNoneCipher.cs</Link>
-    </Compile>
-    <Compile Include="..\Cipher\RC\RC4\RC4Cipher.cs">
-      <Link>Cipher\RC\RC4\RC4Cipher.cs</Link>
-    </Compile>
-    <Compile Include="..\Cipher\RC\RC4\XRC4Cipher.cs">
-      <Link>Cipher\RC\RC4\XRC4Cipher.cs</Link>
-    </Compile>
-    <Compile Include="..\Cipher\RC\RC5\RC5Cipher.cs">
-      <Link>Cipher\RC\RC5\RC5Cipher.cs</Link>
-    </Compile>
-    <Compile Include="..\Cipher\RSA\RSACipher.cs">
-      <Link>Cipher\RSA\RSACipher.cs</Link>
-    </Compile>
-    <Compile Include="..\Cipher\SHA\SHA1Cipher.cs">
-      <Link>Cipher\SHA\SHA1Cipher.cs</Link>
-    </Compile>
-    <Compile Include="BinarySerializer\GrEmit\FieldsExtractor.cs" />
-    <Compile Include="BinarySerializer\GrEmit\GroboIL.cs" />
-    <Compile Include="BinarySerializer\GrEmit\ILCode.cs" />
-    <Compile Include="BinarySerializer\GrEmit\ILInstructionComment.cs" />
-    <Compile Include="BinarySerializer\GrEmit\ILInstructionParameter.cs" />
-    <Compile Include="BinarySerializer\GrEmit\InstructionComments\EmptyILInstructionComment.cs" />
-    <Compile Include="BinarySerializer\GrEmit\InstructionComments\InaccessibleCodeILInstructionComment.cs" />
-    <Compile Include="BinarySerializer\GrEmit\InstructionComments\StackILInstructionComment.cs" />
-    <Compile Include="BinarySerializer\GrEmit\InstructionParameters\CallILInstructionParameter.cs" />
-    <Compile Include="BinarySerializer\GrEmit\InstructionParameters\ConstructorILInstructionParameter.cs" />
-    <Compile Include="BinarySerializer\GrEmit\InstructionParameters\FieldILInstructionParameter.cs" />
-    <Compile Include="BinarySerializer\GrEmit\InstructionParameters\LabelILInstructionParameter.cs" />
-    <Compile Include="BinarySerializer\GrEmit\InstructionParameters\LabelsILInstructionParameter.cs" />
-    <Compile Include="BinarySerializer\GrEmit\InstructionParameters\LocalILInstructionParameter.cs" />
-    <Compile Include="BinarySerializer\GrEmit\InstructionParameters\MethodByAddressILInstructionParameter.cs" />
-    <Compile Include="BinarySerializer\GrEmit\InstructionParameters\MethodILInstructionParameter.cs" />
-    <Compile Include="BinarySerializer\GrEmit\InstructionParameters\PrimitiveILInstructionParameter.cs" />
-    <Compile Include="BinarySerializer\GrEmit\InstructionParameters\StringILInstructionParameter.cs" />
-    <Compile Include="BinarySerializer\GrEmit\InstructionParameters\TypeILInstructionParameter.cs" />
-    <Compile Include="BinarySerializer\GrEmit\StackMutator.cs" />
-    <Compile Include="BinarySerializer\GrEmit\StackMutatorCollection.cs" />
-    <Compile Include="BinarySerializer\GrEmit\StackMutators\Add_Ovf_UnStackMutator.cs" />
-    <Compile Include="BinarySerializer\GrEmit\StackMutators\Add_UnStackMutator.cs" />
-    <Compile Include="BinarySerializer\GrEmit\StackMutators\ArglistStackMutator.cs" />
-    <Compile Include="BinarySerializer\GrEmit\StackMutators\ArithmeticBinOpStackMutator.cs" />
-    <Compile Include="BinarySerializer\GrEmit\StackMutators\ArithmeticComparisonStackMutator.cs" />
-    <Compile Include="BinarySerializer\GrEmit\StackMutators\ArithmeticEqualityStackMutator.cs" />
-    <Compile Include="BinarySerializer\GrEmit\StackMutators\BinOpStackMutator.cs" />
-    <Compile Include="BinarySerializer\GrEmit\StackMutators\BoxStackMutator.cs" />
-    <Compile Include="BinarySerializer\GrEmit\StackMutators\BranchComparisonStackMutator.cs" />
-    <Compile Include="BinarySerializer\GrEmit\StackMutators\BranchEqualityStackMutator.cs" />
-    <Compile Include="BinarySerializer\GrEmit\StackMutators\BranchStackMutator.cs" />
-    <Compile Include="BinarySerializer\GrEmit\StackMutators\BrfalseStackMutator.cs" />
-    <Compile Include="BinarySerializer\GrEmit\StackMutators\BrStackMutator.cs" />
-    <Compile Include="BinarySerializer\GrEmit\StackMutators\BrtrueStackMutator.cs" />
-    <Compile Include="BinarySerializer\GrEmit\StackMutators\CalliStackMutator.cs" />
-    <Compile Include="BinarySerializer\GrEmit\StackMutators\CallStackMutator.cs" />
-    <Compile Include="BinarySerializer\GrEmit\StackMutators\CastclassStackMutator.cs" />
-    <Compile Include="BinarySerializer\GrEmit\StackMutators\Cgt_UnStackMutator.cs" />
-    <Compile Include="BinarySerializer\GrEmit\StackMutators\CkfiniteStackMutator.cs" />
-    <Compile Include="BinarySerializer\GrEmit\StackMutators\ConvertStackMutator.cs" />
-    <Compile Include="BinarySerializer\GrEmit\StackMutators\ConvI1StackMutator.cs" />
-    <Compile Include="BinarySerializer\GrEmit\StackMutators\ConvI2StackMutator.cs" />
-    <Compile Include="BinarySerializer\GrEmit\StackMutators\ConvI4StackMutator.cs" />
-    <Compile Include="BinarySerializer\GrEmit\StackMutators\ConvI8StackMutator.cs" />
-    <Compile Include="BinarySerializer\GrEmit\StackMutators\ConvIStackMutator.cs" />
-    <Compile Include="BinarySerializer\GrEmit\StackMutators\ConvR4StackMutator.cs" />
-    <Compile Include="BinarySerializer\GrEmit\StackMutators\ConvR8StackMutator.cs" />
-    <Compile Include="BinarySerializer\GrEmit\StackMutators\ConvU1StackMutator.cs" />
-    <Compile Include="BinarySerializer\GrEmit\StackMutators\ConvU2StackMutator.cs" />
-    <Compile Include="BinarySerializer\GrEmit\StackMutators\ConvU4StackMutator.cs" />
-    <Compile Include="BinarySerializer\GrEmit\StackMutators\ConvU8StackMutator.cs" />
-    <Compile Include="BinarySerializer\GrEmit\StackMutators\ConvUStackMutator.cs" />
-    <Compile Include="BinarySerializer\GrEmit\StackMutators\CpblkStackMutator.cs" />
-    <Compile Include="BinarySerializer\GrEmit\StackMutators\CpobjStackMutator.cs" />
-    <Compile Include="BinarySerializer\GrEmit\StackMutators\DupStackMutator.cs" />
-    <Compile Include="BinarySerializer\GrEmit\StackMutators\InitblkStackMutator.cs" />
-    <Compile Include="BinarySerializer\GrEmit\StackMutators\InitobjStackMutator.cs" />
-    <Compile Include="BinarySerializer\GrEmit\StackMutators\IntegerOpStackMutator.cs" />
-    <Compile Include="BinarySerializer\GrEmit\StackMutators\IsinstStackMutator.cs" />
-    <Compile Include="BinarySerializer\GrEmit\StackMutators\JmpStackMutator.cs" />
-    <Compile Include="BinarySerializer\GrEmit\StackMutators\LdargaStackMutator.cs" />
-    <Compile Include="BinarySerializer\GrEmit\StackMutators\Ldarga_SStackMutator.cs" />
-    <Compile Include="BinarySerializer\GrEmit\StackMutators\LdargStackMutator.cs" />
-    <Compile Include="BinarySerializer\GrEmit\StackMutators\Ldarg_0StackMutator.cs" />
-    <Compile Include="BinarySerializer\GrEmit\StackMutators\Ldarg_1StackMutator.cs" />
-    <Compile Include="BinarySerializer\GrEmit\StackMutators\Ldarg_2StackMutator.cs" />
-    <Compile Include="BinarySerializer\GrEmit\StackMutators\Ldarg_3StackMutator.cs" />
-    <Compile Include="BinarySerializer\GrEmit\StackMutators\Ldarg_SStackMutator.cs" />
-    <Compile Include="BinarySerializer\GrEmit\StackMutators\Ldc_I4StackMutator.cs" />
-    <Compile Include="BinarySerializer\GrEmit\StackMutators\Ldc_I8StackMutator.cs" />
-    <Compile Include="BinarySerializer\GrEmit\StackMutators\Ldc_R4StackMutator.cs" />
-    <Compile Include="BinarySerializer\GrEmit\StackMutators\Ldc_R8StackMutator.cs" />
-    <Compile Include="BinarySerializer\GrEmit\StackMutators\LdelemaStackMutator.cs" />
-    <Compile Include="BinarySerializer\GrEmit\StackMutators\LdelemStackMutator.cs" />
-    <Compile Include="BinarySerializer\GrEmit\StackMutators\LdfldaStackMutator.cs" />
-    <Compile Include="BinarySerializer\GrEmit\StackMutators\LdfldStackMutator.cs" />
-    <Compile Include="BinarySerializer\GrEmit\StackMutators\LdftnStackMutator.cs" />
-    <Compile Include="BinarySerializer\GrEmit\StackMutators\LdindStackMutator.cs" />
-    <Compile Include="BinarySerializer\GrEmit\StackMutators\LdlenStackMutator.cs" />
-    <Compile Include="BinarySerializer\GrEmit\StackMutators\LdlocaStackMutator.cs" />
-    <Compile Include="BinarySerializer\GrEmit\StackMutators\LdlocStackMutator.cs" />
-    <Compile Include="BinarySerializer\GrEmit\StackMutators\LdnullStackMutator.cs" />
-    <Compile Include="BinarySerializer\GrEmit\StackMutators\LdstrStackMutator.cs" />
-    <Compile Include="BinarySerializer\GrEmit\StackMutators\LdtokenStackMutator.cs" />
-    <Compile Include="BinarySerializer\GrEmit\StackMutators\LdvirtftnStackMutator.cs" />
-    <Compile Include="BinarySerializer\GrEmit\StackMutators\MarkLabelStackMutator.cs" />
-    <Compile Include="BinarySerializer\GrEmit\StackMutators\NegStackMutator.cs" />
-    <Compile Include="BinarySerializer\GrEmit\StackMutators\NewarrStackMutator.cs" />
-    <Compile Include="BinarySerializer\GrEmit\StackMutators\NewobjStackMutator.cs" />
-    <Compile Include="BinarySerializer\GrEmit\StackMutators\NopStackMutator.cs" />
-    <Compile Include="BinarySerializer\GrEmit\StackMutators\NotStackMutator.cs" />
-    <Compile Include="BinarySerializer\GrEmit\StackMutators\NumericOpStackMutator.cs" />
-    <Compile Include="BinarySerializer\GrEmit\StackMutators\PopStackMutator.cs" />
-    <Compile Include="BinarySerializer\GrEmit\StackMutators\RethrowStackMutator.cs" />
-    <Compile Include="BinarySerializer\GrEmit\StackMutators\RetStackMutator.cs" />
-    <Compile Include="BinarySerializer\GrEmit\StackMutators\ShiftOpStackMutator.cs" />
-    <Compile Include="BinarySerializer\GrEmit\StackMutators\StargStackMutator.cs" />
-    <Compile Include="BinarySerializer\GrEmit\StackMutators\Starg_SStackMutator.cs" />
-    <Compile Include="BinarySerializer\GrEmit\StackMutators\StelemStackMutator.cs" />
-    <Compile Include="BinarySerializer\GrEmit\StackMutators\StfldStackMutator.cs" />
-    <Compile Include="BinarySerializer\GrEmit\StackMutators\StindStackMutator.cs" />
-    <Compile Include="BinarySerializer\GrEmit\StackMutators\StlocStackMutator.cs" />
-    <Compile Include="BinarySerializer\GrEmit\StackMutators\Sub_Ovf_UnStackMutator.cs" />
-    <Compile Include="BinarySerializer\GrEmit\StackMutators\Sub_UnStackMutator.cs" />
-    <Compile Include="BinarySerializer\GrEmit\StackMutators\SwitchStackMutator.cs" />
-    <Compile Include="BinarySerializer\GrEmit\StackMutators\ThrowStackMutator.cs" />
-    <Compile Include="BinarySerializer\GrEmit\StackMutators\Unbox_AnyStackMutator.cs" />
-    <Compile Include="BinarySerializer\GrEmit\Utils\EmitHelpers.cs" />
-    <Compile Include="BinarySerializer\GrEmit\Utils\Formatter.cs" />
-    <Compile Include="BinarySerializer\GrEmit\Utils\HackHelpers.cs" />
-    <Compile Include="BinarySerializer\GrEmit\Utils\ReflectionExtensions.cs" />
-    <Compile Include="BinarySerializer\GrEmit\Utils\TypeExtensions.cs" />
     <Compile Include="NAT\uPnP\AbstractNatDevice.cs" />
     <Compile Include="NAT\uPnP\AsyncResults\AsyncResult.cs" />
     <Compile Include="NAT\uPnP\Enums\MapState.cs" />
@@ -380,6 +100,15 @@
     <Compile Include="SocketClient\Utils\SystemPackets\Version.cs" />
     <Compile Include="ThreadHelper.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\BinarySerializer_v5%28NET.Standard%29\BinarySerializer%28NET.Standard%29.csproj">
+      <Project>{4696e092-1325-478f-bfa0-32f01df51ee5}</Project>
+      <Name>BinarySerializer%28NET.Standard%29</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Cipher%28NET.Standard%29\Cipher%28NET.Standard%29.csproj">
+      <Project>{65700C37-FB85-4D21-BD1C-FB1938012A24}</Project>
+      <Name>Cipher%28NET.Standard%29</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -58,7 +58,7 @@ namespace Logger
 
             var lm = new LogMessageInfo()
             {
-                Now = DateTime.Now,
+                Now = DateTime.UtcNow,
                 Level = level,
                 Text = text
             };
@@ -67,6 +67,13 @@ namespace Logger
                 ConsoleLogger.WriteLog(lm.Level, lm.ToString());
 
             WaitList.Enqueue(lm);
+        }
+
+        public void ConsoleLog(LoggerLevel level, string text)
+        {
+
+            if (ConsoleOutput)
+                ConsoleLogger.WriteLog(level, $"[{level.ToString()}] - {DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss")}: {text}");
         }
 
         public virtual void Initialize(string fname, string path, int delay)
@@ -82,6 +89,13 @@ namespace Logger
             RunOutput();
 
             Initialized = true;
+
+            AppDomain.CurrentDomain.ProcessExit += CurrentDomain_ProcessExit;
+        }
+
+        private void CurrentDomain_ProcessExit(object sender, EventArgs e)
+        {
+            Flush();
         }
 
         private async void RunOutput()

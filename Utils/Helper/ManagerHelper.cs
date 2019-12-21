@@ -19,7 +19,7 @@ namespace Utils.Helper
         /// <param name="assembly">Сборка из которой нужно выбрать классы менеджеров</param>
         /// <param name="selectAttrbuteType">Аттрибут по которому будут выбираться классы менеджеров</param>
         /// <returns>Кол-во менеджеров которые были инициализированы</returns>
-        public static int LoadManagers<T>(this ServerOptions<T> serverOptions, Assembly assembly, Type selectAttrbuteType) where T : INetworkClient
+        public static int LoadManagers<T>(this ServerOptions<T> serverOptions, Assembly assembly, Type selectAttrbuteType) where T : IServerNetworkClient
         {
             if (!typeof(Manager.ManagerLoadAttribute).IsAssignableFrom(selectAttrbuteType))
             {
@@ -52,7 +52,7 @@ namespace Utils.Helper
         /// <param name="serverOptions"></param>
         /// <param name="selectAttrbuteType">Аттрибут по которому будут выбираться классы менеджеров</param>
         /// <returns>Кол-во менеджеров которые были инициализированы</returns>
-        public static int LoadManagers<T>(this ServerOptions<T> serverOptions, Type selectAttrbuteType) where T : INetworkClient
+        public static int LoadManagers<T>(this ServerOptions<T> serverOptions, Type selectAttrbuteType) where T : IServerNetworkClient
         {
             return LoadManagers<T>(serverOptions, Assembly.GetCallingAssembly(), selectAttrbuteType);
         }

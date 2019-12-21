@@ -7,10 +7,10 @@ using Utils.Helper.Network;
 using SocketServer.Utils;
 using System.Threading.Tasks;
 using Utils.Helper;
-using Utils.Helper.Configuration;
 using ProxyHostClient.Packets.Player.PacketData;
 using ProxyHostClient.Packets.Auth;
 using Logger;
+using ConfigurationEngine;
 
 namespace ProxyHostClient
 {
@@ -27,7 +27,7 @@ namespace ProxyHostClient
 
         public NetworkClient<ProxyHostClientData> NetworkClient;
 
-        internal ConfigurationManager Config;
+        internal IConfigurationManager Config;
 
         private string NetworkNodePath;
 
@@ -65,7 +65,7 @@ namespace ProxyHostClient
         /// <summary>
         /// Полная инициализация
         /// </summary>
-        public void Load(ConfigurationManager config, string networkNodePath, string publicName = "Node Host")
+        public void Load(IConfigurationManager config, string networkNodePath, string publicName = "Node Host")
         {
             Config = config;
 

@@ -20,7 +20,7 @@ namespace Utils.Helper
         /// <param name="assembly">Сборка из которой нужно выбрать классы запросов</param>
         /// <param name="selectAttrbuteType">Аттрибут по которому будут выбираться классы запросов</param>
         /// <returns>Кол-во запросов которые были выполнены</returns>
-        public static int LoadQuerys<T>(this ServerOptions<T> serverOptions, Assembly assembly, Type selectAttrbuteType) where T : INetworkClient
+        public static int LoadQuerys<T>(this ServerOptions<T> serverOptions, Assembly assembly, Type selectAttrbuteType) where T : IServerNetworkClient
         {
             if (!typeof(Query.StaticQueryLoadAttribute).IsAssignableFrom(selectAttrbuteType))
             {
@@ -65,7 +65,7 @@ namespace Utils.Helper
         /// <param name="assembly">Сборка из которой нужно выбрать классы запросов</param>
         /// <param name="selectAttrbuteType">Аттрибут по которому будут выбираться классы запросов</param>
         /// <returns>Кол-во запросов которые были выполнены</returns>
-        public static int LoadQuerys<T>(this ServerOptions<T> serverOptions, Type selectAttrbuteType) where T : INetworkClient
+        public static int LoadQuerys<T>(this ServerOptions<T> serverOptions, Type selectAttrbuteType) where T : IServerNetworkClient
         {
             return LoadQuerys(serverOptions, Assembly.GetCallingAssembly(), selectAttrbuteType);
         }

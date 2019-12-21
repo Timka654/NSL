@@ -1,4 +1,4 @@
-﻿using ReliableNetcode;
+﻿//using ReliableNetcode;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +9,7 @@ namespace SCL.Node.Utils
 {
     public abstract class INodePlayer
     {
-        public virtual void Send(NodeOutputPacketBuffer p, QosType qos) { throw new NotImplementedException(); }
+        //public virtual void Send(NodeOutputPacketBuffer p, QosType qos) { throw new NotImplementedException(); }
         
         public virtual int PlayerId { get; internal set; }
 

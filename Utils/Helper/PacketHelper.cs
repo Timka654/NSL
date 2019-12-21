@@ -1,6 +1,5 @@
 ﻿using SocketServer;
 using SocketServer.Utils;
-using SocketServer.Utils.Buffer;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -20,7 +19,7 @@ namespace Utils.Helper
         /// <param name="assembly">Сборка из которой нужно выбрать классы пакетов</param>
         /// <param name="selectAttrbuteType">Аттрибут по которому будут выбираться классы пакетов</param>
         /// <returns>Кол-во пакетов которые были инициализированы</returns>
-        public static int LoadPackets<T>(this ServerOptions<T> serverOptions, Assembly assembly, Type selectAttrbuteType) where T : INetworkClient
+        public static int LoadPackets<T>(this ServerOptions<T> serverOptions, Assembly assembly, Type selectAttrbuteType) where T : IServerNetworkClient
         {
             if (!typeof(Packet.PacketAttribute).IsAssignableFrom(selectAttrbuteType))
             {
@@ -61,7 +60,7 @@ namespace Utils.Helper
         /// <param name="assembly">Сборка из которой нужно выбрать классы пакетов</param>
         /// <param name="selectAttrbuteType">Аттрибут по которому будут выбираться классы пакетов</param>
         /// <returns>Кол-во пакетов которые были инициализированы</returns>
-        public static int LoadPackets<T>(this ServerOptions<T> serverOptions, Type selectAttrbuteType) where T : INetworkClient
+        public static int LoadPackets<T>(this ServerOptions<T> serverOptions, Type selectAttrbuteType) where T : IServerNetworkClient
         {
             return LoadPackets(serverOptions, Assembly.GetCallingAssembly(), selectAttrbuteType);
         }

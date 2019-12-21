@@ -1,4 +1,4 @@
-﻿using Mono.Nat;
+﻿//using Mono.Nat;
 using SCL.Node.Utils;
 using System;
 using System.Collections;
@@ -44,7 +44,7 @@ namespace SCL.Node.TCPNode
 
         public void InitializeClient(string serverIp, int port, int myPlayerId)
         {
-            base.Protocol = Protocol.Tcp;
+            //base.Protocol = Protocol.Tcp;
             InitResult = true;
 
             MyPlayerId = myPlayerId;
@@ -71,7 +71,7 @@ namespace SCL.Node.TCPNode
         /// <returns></returns>
         public override bool Initiliaze(string ip, ref int port, int myPlayerId)
         {
-            base.Protocol = Protocol.Tcp;
+            //base.Protocol = Protocol.Tcp;
             InitResult = true;
             _uPnPLocker.Reset();
 

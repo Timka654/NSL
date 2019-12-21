@@ -9,9 +9,10 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>SCL.Node</RootNamespace>
     <AssemblyName>SCL.Node</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -63,19 +64,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TCPNode\TCPNode.cs" />
     <Compile Include="TCPNode\TCPNodePlayer.cs" />
-    <Compile Include="UDPNode\Reliable\MessageChannel.cs" />
-    <Compile Include="UDPNode\Reliable\PacketHeader.cs" />
-    <Compile Include="UDPNode\Reliable\ReliableEndpoint.cs" />
-    <Compile Include="UDPNode\Reliable\ReliablePacketController.cs" />
-    <Compile Include="UDPNode\Reliable\SequenceBuffer.cs" />
-    <Compile Include="UDPNode\Reliable\Utils\BufferPool.cs" />
-    <Compile Include="UDPNode\Reliable\Utils\ByteBuffer.cs" />
-    <Compile Include="UDPNode\Reliable\Utils\DateTimeEx.cs" />
-    <Compile Include="UDPNode\Reliable\Utils\Defines.cs" />
-    <Compile Include="UDPNode\Reliable\Utils\IO\ByteArrayReader.cs" />
-    <Compile Include="UDPNode\Reliable\Utils\IO\ByteStream.cs" />
-    <Compile Include="UDPNode\Reliable\Utils\IO\PacketIO.cs" />
-    <Compile Include="UDPNode\Reliable\Utils\ObjPool.cs" />
     <Compile Include="UDPNode\UDPNode.cs" />
     <Compile Include="UDPNode\UDPNodePlayer.cs" />
     <Compile Include="UnityObject\NodeBehaviour.cs" />

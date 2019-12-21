@@ -6,7 +6,7 @@ using System.Text;
 
 namespace SocketServer
 {
-    public class SocketClient<T> where T : INetworkClient
+    public class SocketClient<T> where T : IServerNetworkClient
     {
 #if DEBUG
         public event ReceivePacketDebugInfo<T> OnReceivePacket;

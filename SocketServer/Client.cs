@@ -5,8 +5,11 @@ using System.Net.Sockets;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
+using SocketCore;
+using SocketCore.Extensions.BinarySerializer;
+using SocketCore.Utils;
+using SocketCore.Utils.Buffer;
 using SocketServer.Utils;
-using SocketServer.Utils.Buffer;
 using SocketServer.Utils.Exceptions;
 
 namespace SocketServer
@@ -21,14 +24,14 @@ namespace SocketServer
     }
 
 #if DEBUG
-    public delegate void ReceivePacketDebugInfo<T>(Client<T> client, ushort pid, int len) where T : INetworkClient;
-    public delegate void SendPacketDebugInfo<T>(Client<T> client, ushort pid, int len, string memberName, string sourceFilePath, int sourceLineNumber) where T : INetworkClient;
+    public delegate void ReceivePacketDebugInfo<T>(Client<T> client, ushort pid, int len) where T : IServerNetworkClient;
+    public delegate void SendPacketDebugInfo<T>(Client<T> client, ushort pid, int len, string memberName, string sourceFilePath, int sourceLineNumber) where T : IServerNetworkClient;
 #endif
 
     /// <summary>
     /// Класс обработки клиента
     /// </summary>
-    public class Client<T> : IClient where T : INetworkClient
+    public class Client<T> : IClient where T : IServerNetworkClient
     {
         private T Data { get; set; }
 

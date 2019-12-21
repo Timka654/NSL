@@ -4,7 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
-using ReliableNetcode;
+//using ReliableNetcode;
 using SCL.Node.Utils;
 using SCL.Node.Utils.SystemPackets;
 
@@ -12,7 +12,7 @@ namespace SCL.Node.UDPNode
 {
     public class UDPNodePlayer : INodePlayer
     {
-        ReliableNetcode.ReliableEndpoint reliable = new ReliableNetcode.ReliableEndpoint();
+        //ReliableNetcode.ReliableEndpoint reliable = new ReliableNetcode.ReliableEndpoint();
 
         public delegate void ReceivedHandle(UDPNodePlayer player, NodeInputPacketBuffer packet);
 
@@ -37,35 +37,35 @@ namespace SCL.Node.UDPNode
             NetworkNode = UDPNetworkNode = node;
             IpPoint = ipPoint;
 
-            reliable.TransmitCallback += (buffer, len) =>
-            {
-                node.SendTo(this, buffer, len);
-            };
+            //reliable.TransmitCallback += (buffer, len) =>
+            //{
+            //    node.SendTo(this, buffer, len);
+            //};
 
-            reliable.ReceiveCallback += (buffer, len) =>
-            {
-                NodeInputPacketBuffer packet = null;
-                try
-                {
-                    packet = new NodeInputPacketBuffer(buffer, true);
+            //reliable.ReceiveCallback += (buffer, len) =>
+            //{
+            //    NodeInputPacketBuffer packet = null;
+            //    try
+            //    {
+            //        packet = new NodeInputPacketBuffer(buffer, true);
 
-                    if (packet.PlayerId != PlayerId)
-                        throw new Exception();
+            //        if (packet.PlayerId != PlayerId)
+            //            throw new Exception();
 
-                    if (InputCurrentId + 1 != packet.Cpid)
-                    {
-                        InvalidPid.Send(this, InputCurrentId);
-                    }
+            //        if (InputCurrentId + 1 != packet.Cpid)
+            //        {
+            //            InvalidPid.Send(this, InputCurrentId);
+            //        }
 
-                    InputCurrentId++;
-                }
-                catch
-                {
-                    return;
-                }
+            //        InputCurrentId++;
+            //    }
+            //    catch
+            //    {
+            //        return;
+            //    }
 
-                OnReceived?.Invoke(this, packet);
-            };
+            //    OnReceived?.Invoke(this, packet);
+            //};
 
             Receive();
         }
@@ -81,15 +81,15 @@ namespace SCL.Node.UDPNode
                     if (len < 0)
                         return;
 
-                    reliable.ReceivePacket(buffer, buffer.Length);
+                    //reliable.ReceivePacket(buffer, buffer.Length);
                 }
             });
         }
 
-        public override void Send(NodeOutputPacketBuffer packet, QosType qos)
-        {
-            packet.PlayerId = PlayerId;
-            reliable.SendMessage(packet.GetBuffer(), packet.PacketLenght, qos);
-        }
+        //public override void Send(NodeOutputPacketBuffer packet, QosType qos)
+        //{
+        //    packet.PlayerId = PlayerId;
+        //    reliable.SendMessage(packet.GetBuffer(), packet.PacketLenght, qos);
+        //}
     }
 }

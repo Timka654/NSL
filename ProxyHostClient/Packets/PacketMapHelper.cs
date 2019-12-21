@@ -1,4 +1,4 @@
-﻿using SocketServer.Utils.Buffer;
+﻿using SocketCore.Utils.Buffer;
 using System;
 using System.Collections.Generic;
 using System.Text;

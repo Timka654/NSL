@@ -1,5 +1,6 @@
 ﻿using Logger;
-using SocketServer.Utils.Buffer;
+using SocketCore.Utils.Buffer;
+using SocketServer.Utils;
 using System;
 using System.Collections.Generic;
 using System.Text;

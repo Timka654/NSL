@@ -1,4 +1,5 @@
 ﻿using Cipher;
+using ConfigurationEngine;
 using Logger;
 using SocketServer;
 using SocketServer.Utils;
@@ -6,12 +7,11 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Text;
-using Utils.Helper.Configuration;
 
 namespace Utils.Helper.Network
 {
     public class NetworkServer<T, CType>
-        where T : INetworkClient
+        where T : IServerNetworkClient
         where CType : NetworkServer<T,CType>
     {
         /// <summary>
@@ -54,7 +54,7 @@ namespace Utils.Helper.Network
         /// Менеджер конфигураций для установки значений в функциях по умолчанию
         /// Должен быть обзательно переопределен в случае если используеться хоть 1 функция по умолчанию
         /// </summary>
-        protected virtual ConfigurationManager ConfigurationManager { get; }
+        protected virtual IConfigurationManager ConfigurationManager { get; }
 
         #region Loading
 

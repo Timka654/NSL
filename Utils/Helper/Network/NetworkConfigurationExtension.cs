@@ -1,4 +1,5 @@
-﻿using SocketServer;
+﻿using ConfigurationEngine;
+using SocketServer;
 using SocketServer.Utils;
 using System;
 using System.Collections.Generic;
@@ -14,7 +15,7 @@ namespace Utils.Helper.Network
         /// </summary>
         /// <param name="ver">Номер версии ип протокола</param>
         /// <returns></returns>
-        public static AddressFamily GetIPv(this Configuration.ConfigurationManager configuration, string nodePath)
+        public static AddressFamily GetIPv(this IConfigurationManager configuration, string nodePath)
         {
             switch (configuration.GetValue<byte>(nodePath))
             {
@@ -31,7 +32,7 @@ namespace Utils.Helper.Network
         /// </summary>
         /// <param name="name">Название протокола</param>
         /// <returns></returns>
-        public static ProtocolType GetProtocolType(this Configuration.ConfigurationManager configuration, string nodePath)
+        public static ProtocolType GetProtocolType(this IConfigurationManager configuration, string nodePath)
         {
             switch (configuration.GetValue<string>(nodePath))
             {
@@ -43,8 +44,8 @@ namespace Utils.Helper.Network
             }
         }
 
-        public static ServerOptions<T> LoadConfigurationServerOptions<T>(this Configuration.ConfigurationManager configuration, string networkNodePath)
-            where T : INetworkClient
+        public static ServerOptions<T> LoadConfigurationServerOptions<T>(this IConfigurationManager configuration, string networkNodePath)
+            where T : IServerNetworkClient
         {
             return new ServerOptions<T>
             {

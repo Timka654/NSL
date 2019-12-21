@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
-using SocketServer.Utils.Buffer;
+using SocketCore.Utils.Buffer;
 
 namespace SocketServer.Utils
 {
@@ -17,7 +17,7 @@ namespace SocketServer.Utils
 
 namespace SocketServer.Utils.SystemPackets
 {
-    public class RecoverySession<T> :IPacket<T> where T: INetworkClient
+    public class RecoverySession<T> :IPacket<T> where T: IServerNetworkClient
     {
         public static RecoverySession<T> Instance { get; private set; }
 
@@ -44,7 +44,7 @@ namespace SocketServer.Utils.SystemPackets
             OnRecoverySessionReceiveEvent?.Invoke(client, session, keys);
         }
 
-        public static void Send(INetworkClient client, RecoverySessionResultEnum result, string session, string[] newKeys)
+        public static void Send(IServerNetworkClient client, RecoverySessionResultEnum result, string session, string[] newKeys)
         {
                var packet = new OutputPacketBuffer()
             {

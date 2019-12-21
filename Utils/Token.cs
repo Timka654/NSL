@@ -22,6 +22,8 @@ namespace Utils
 
             for (int i = 0; i < buffer.Length; i++)
             {
+                if (buffer[i] == '/')
+                    buffer[i] = (byte)'\\'; 
                 t.Value += buffer[i].ToString("x2");
             }
             return t;

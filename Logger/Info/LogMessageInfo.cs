@@ -18,7 +18,7 @@ namespace Logger.Info
         {
             if(Temp == null)
             {
-                Temp = $"[{Level.ToString()}] - {DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}: {Text}";
+                Temp = $"[{Level.ToString()}] - {DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss")}: {Text}";
                 Text = null;
             }
             return Temp;

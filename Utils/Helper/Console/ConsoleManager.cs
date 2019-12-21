@@ -4,13 +4,14 @@ using System.Text;
 using System.Threading.Tasks;
 using gls.Data.Basic.Storages;
 using Logger;
+using SocketCore.Utils;
+using SocketCore.Utils.Buffer;
 using SocketServer.Utils;
-using SocketServer.Utils.Buffer;
 
 namespace Utils.Helper.Console
 {
     public class ConsoleManager<T> : ConsoleStorage<T>
-        where T : INetworkClient
+        where T : IServerNetworkClient
     {
         public ConsoleManager(ILogger logger)
         {

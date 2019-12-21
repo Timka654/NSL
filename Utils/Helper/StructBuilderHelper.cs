@@ -19,7 +19,7 @@ namespace Utils.Helper
         /// <param name="assembly">Сборка из которой нужно выбрать классы инициализаторы структур</param>
         /// <param name="selectAttrbuteType">Аттрибут по которому будут инициализаторы структур</param>
         /// <returns>Кол-во инициализированых стурктур</returns>
-        public static int LoadStructures<T>(this ServerOptions<T> serverOptions, Assembly assembly, Type selectAttrbuteType) where T : INetworkClient
+        public static int LoadStructures<T>(this ServerOptions<T> serverOptions, Assembly assembly, Type selectAttrbuteType) where T : IServerNetworkClient
         {
             if (!typeof(StructBuilder.StructBuilderLoadAttribute).IsAssignableFrom(selectAttrbuteType))
             {
@@ -64,7 +64,7 @@ namespace Utils.Helper
         /// <param name="assembly">Сборка из которой нужно выбрать классы инициализаторы структур</param>
         /// <param name="selectAttrbuteType">Аттрибут по которому будут инициализаторы структур</param>
         /// <returns>Кол-во инициализированых стурктур</returns>
-        public static int LoadStructures<T>(this ServerOptions<T> serverOptions, Type selectAttrbuteType) where T : INetworkClient
+        public static int LoadStructures<T>(this ServerOptions<T> serverOptions, Type selectAttrbuteType) where T : IServerNetworkClient
         {
             return LoadStructures(serverOptions, Assembly.GetCallingAssembly(), selectAttrbuteType);
         }

@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
     <Platforms>AnyCPU;x64;x86</Platforms>
     <Configurations>Debug;Release;PublishDebug;PublishDebug</Configurations>
   </PropertyGroup>
@@ -15,7 +15,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Cipher\Cipher.csproj" />
+    <ProjectReference Include="..\Cipher(NET.Standard)\Cipher(NET.Standard).csproj" />
+    <ProjectReference Include="..\Configuration\ConfigurationEngine.csproj" />
     <ProjectReference Include="..\DBEngine\DBEngine.csproj" />
     <ProjectReference Include="..\Logger\Logger.csproj" />
     <ProjectReference Include="..\SocketServer\SocketServer.csproj" />

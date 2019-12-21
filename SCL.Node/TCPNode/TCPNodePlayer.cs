@@ -5,7 +5,6 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
-using ReliableNetcode;
 using SCL.Node.Utils;
 using SCL.Node.Utils.SystemPackets;
 using UnityEngine;
@@ -130,9 +129,9 @@ namespace SCL.Node.TCPNode
             }
         }
         
-        public override void Send(NodeOutputPacketBuffer packet, QosType qos = QosType.Reliable)
-        {
-            TCPNetworkNode.SendTo(this, packet);
-        }
+        //public override void Send(NodeOutputPacketBuffer packet, QosType qos = QosType.Reliable)
+        //{
+        //    TCPNetworkNode.SendTo(this, packet);
+        //}
     }
 }

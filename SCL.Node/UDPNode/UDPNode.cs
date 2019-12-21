@@ -1,5 +1,5 @@
-﻿using Mono.Nat;
-using ReliableNetcode;
+﻿//using Mono.Nat;
+//using ReliableNetcode;
 using SCL.Node.Utils;
 using System;
 using System.Collections;
@@ -17,7 +17,7 @@ namespace SCL.Node.UDPNode
     {
         public override bool Initiliaze(string ip, ref int port, int myPlayerId)
         {
-            base.Protocol = Protocol.Udp;
+            //base.Protocol = Protocol.Udp;
             InitResult = true;
             _uPnPLocker.Reset();
 
@@ -69,25 +69,25 @@ namespace SCL.Node.UDPNode
             Send(packet.GetBuffer(++player.OutputCurrentId), 0, packet.PacketLenght, player);
         }
 
-        public void SendTo(int playerId, NodeOutputPacketBuffer packet, QosType qos)
-        {
-            UDPNodePlayer player;
+        //public void SendTo(int playerId, NodeOutputPacketBuffer packet, QosType qos)
+        //{
+        //    UDPNodePlayer player;
 
-            if (_players.TryGetValue(playerId, out player))
-            {
-                player.Send(packet, qos);
-            }
-        }
+        //    if (_players.TryGetValue(playerId, out player))
+        //    {
+        //        player.Send(packet, qos);
+        //    }
+        //}
 
-        public void BroadcastMessage(NodeOutputPacketBuffer packet, QosType qos)
-        {
-            packet.PlayerId = MyPlayerId;
+        //public void BroadcastMessage(NodeOutputPacketBuffer packet, QosType qos)
+        //{
+        //    packet.PlayerId = MyPlayerId;
 
-            foreach (UDPNodePlayer player in _players.Values)
-            {
-                player.Send(packet, qos);
-            }
-        }
+        //    foreach (UDPNodePlayer player in _players.Values)
+        //    {
+        //        player.Send(packet, qos);
+        //    }
+        //}
 
         private void Send(byte[] buffer, int offset, int length, UDPNodePlayer player)
         {

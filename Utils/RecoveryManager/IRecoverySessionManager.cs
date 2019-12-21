@@ -10,7 +10,7 @@ using System.Text;
 namespace Utils.RecoveryManager
 {
     public class IRecoverySessionManager<T> 
-        where T : INetworkClient
+        where T : IServerNetworkClient
     {
         protected ConcurrentDictionary<string, RecoverySessionInfo<T>> keyStorage;
 
@@ -67,7 +67,7 @@ namespace Utils.RecoveryManager
             RecoverySession<T>.Send(client, RecoverySessionResultEnum.Ok, session, keys);
         }
 
-        protected virtual void Server_OnClientDisconnectEvent(SocketServer.Utils.INetworkClient client)
+        protected virtual void Server_OnClientDisconnectEvent(IServerNetworkClient client)
         {
             if (client == null)
                 return;
