@@ -5,6 +5,7 @@ using System.Text;
 using Logger;
 using SocketCore.Utils;
 using SocketCore.Utils.Buffer;
+using SocketCore.Utils.SystemPackets.Enums;
 using SocketServer.Utils;
 using SocketServer.Utils.SystemPackets;
 
@@ -135,9 +136,9 @@ namespace SocketServer
         /// </summary>
         public Dictionary<ushort, IPacket<T>> Packets = new Dictionary<ushort, IPacket<T>>()
         {
-            { (ushort)Utils.SystemPackets.Enums.ClientPacketEnum.AliveConnection, new AliveConnection<T>() },
-            { (ushort)Utils.SystemPackets.Enums.ClientPacketEnum.RecoverySession, new RecoverySession<T>() },
-            { (ushort)Utils.SystemPackets.Enums.ClientPacketEnum.Version, new Version<T>() },
+            { (ushort)ClientPacketEnum.AliveConnection, new AliveConnection<T>() },
+            { (ushort)ClientPacketEnum.RecoverySession, new RecoverySession<T>() },
+            { (ushort)ClientPacketEnum.Version, new Version<T>() },
         };
 
         /// <summary>

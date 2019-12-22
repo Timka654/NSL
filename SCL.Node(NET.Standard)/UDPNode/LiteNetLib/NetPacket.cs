@@ -5,30 +5,36 @@ namespace LiteNetLib
 {
     internal enum PacketProperty : byte
     {
-        Unreliable,
-        Channeled,
-        Ack,
-        Ping,
-        Pong,
-        ConnectRequest,
-        ConnectAccept,
-        Disconnect,
-        UnconnectedMessage,
-        NatIntroductionRequest,
-        NatIntroduction,
-        NatPunchMessage,
-        MtuCheck,
-        MtuOk,
-        Broadcast,
-        Merged,
-        ShutdownOk,
-        PeerNotFound,
-        InvalidProtocol
+        Unreliable,             //0
+        ReliableUnordered,      //1
+        Sequenced,              //2
+        ReliableOrdered,        //3
+        AckReliable,            //4
+        AckReliableOrdered,     //5
+        Ping,                   //6 *
+        Pong,                   //7 *
+        ConnectRequest,         //8 *
+        ConnectAccept,          //9 *
+        Disconnect,             //10 *
+        UnconnectedMessage,     //11
+        NatIntroductionRequest, //12 *
+        NatIntroduction,        //13 *
+        NatPunchMessage,        //14 *
+        MtuCheck,               //15 *
+        MtuOk,                  //16 *
+        DiscoveryRequest,       //17 *
+        DiscoveryResponse,      //18 *
+        Merged,                 //19
+        ShutdownOk,             //20 *   
+        ReliableSequenced,      //21
+        AckReliableSequenced,   //22
+        PeerNotFound,           //23
+        InvalidProtocol         //24
     }
 
     internal sealed class NetPacket
     {
-        private static readonly int LastProperty = Enum.GetValues(typeof(PacketProperty)).Length;
+        private const int LastProperty = 24;
         //Header
         public PacketProperty Property
         {
@@ -58,28 +64,22 @@ namespace LiteNetLib
             RawData[0] |= 0x80; //set first bit
         }
 
-        public byte ChannelId
-        {
-            get { return RawData[3]; }
-            set { RawData[3] = value; }
-        }
-
         public ushort FragmentId
         {
-            get { return BitConverter.ToUInt16(RawData, 4); }
-            set { FastBitConverter.GetBytes(RawData, 4, value); }
+            get { return BitConverter.ToUInt16(RawData, 3); }
+            set { FastBitConverter.GetBytes(RawData, 3, value); }
         }
 
         public ushort FragmentPart
         {
-            get { return BitConverter.ToUInt16(RawData, 6); }
-            set { FastBitConverter.GetBytes(RawData, 6, value); }
+            get { return BitConverter.ToUInt16(RawData, 5); }
+            set { FastBitConverter.GetBytes(RawData, 5, value); }
         }
 
         public ushort FragmentsTotal
         {
-            get { return BitConverter.ToUInt16(RawData, 8); }
-            set { FastBitConverter.GetBytes(RawData, 8, value); }
+            get { return BitConverter.ToUInt16(RawData, 7); }
+            set { FastBitConverter.GetBytes(RawData, 7, value); }
         }
 
         //Data
@@ -116,11 +116,15 @@ namespace LiteNetLib
         {
             switch (property)
             {
-                case PacketProperty.Channeled:
-                case PacketProperty.Ack:
-                    return NetConstants.ChanneledHeaderSize;
+                case PacketProperty.ReliableOrdered:
+                case PacketProperty.ReliableUnordered:
+                case PacketProperty.ReliableSequenced:
+                case PacketProperty.Sequenced:
+                case PacketProperty.AckReliable:
+                case PacketProperty.AckReliableOrdered:
+                case PacketProperty.AckReliableSequenced:
                 case PacketProperty.Ping:
-                    return NetConstants.HeaderSize + 2;
+                    return NetConstants.SequencedHeaderSize;
                 case PacketProperty.ConnectRequest:
                     return NetConnectRequestPacket.HeaderSize;
                 case PacketProperty.ConnectAccept:
@@ -128,7 +132,7 @@ namespace LiteNetLib
                 case PacketProperty.Disconnect:
                     return NetConstants.HeaderSize + 8;
                 case PacketProperty.Pong:
-                    return NetConstants.HeaderSize + 10;
+                    return NetConstants.SequencedHeaderSize + 8;
                 default:
                     return NetConstants.HeaderSize;
             }
@@ -148,8 +152,7 @@ namespace LiteNetLib
             int headerSize = GetHeaderSize((PacketProperty) property);
 
             if (property > LastProperty || packetSize < headerSize ||
-               (fragmented && packetSize < headerSize + NetConstants.FragmentHeaderSize) ||
-               data.Length < start + packetSize)
+               (fragmented && packetSize < headerSize + NetConstants.FragmentHeaderSize))
             {
                 return false;
             }

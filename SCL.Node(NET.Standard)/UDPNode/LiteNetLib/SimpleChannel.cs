@@ -20,9 +20,9 @@ namespace LiteNetLib
             }
         }
 
-        public override bool ProcessPacket(NetPacket packet)
+        public override void ProcessPacket(NetPacket packet)
         {
-            return false;
+            
         }
     }
 }

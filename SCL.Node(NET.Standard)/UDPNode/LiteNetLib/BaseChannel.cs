@@ -4,7 +4,6 @@ namespace LiteNetLib
 {
     internal abstract class BaseChannel
     {
-        public BaseChannel Next;
         protected readonly NetPeer Peer;
         protected readonly Queue<NetPacket> OutgoingQueue;
 
@@ -26,6 +25,6 @@ namespace LiteNetLib
         }
 
         public abstract void SendNextPackets();
-        public abstract bool ProcessPacket(NetPacket packet);
+        public abstract void ProcessPacket(NetPacket packet);
     }
 }

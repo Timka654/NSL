@@ -3,14 +3,14 @@ using SocketServer;
 using System;
 using ProxyHostClient.Packets;
 using System.Net;
-using Utils.Helper.Network;
 using SocketServer.Utils;
 using System.Threading.Tasks;
-using Utils.Helper;
 using ProxyHostClient.Packets.Player.PacketData;
 using ProxyHostClient.Packets.Auth;
 using Logger;
 using ConfigurationEngine;
+using ServerOptions.Extensions.Packet;
+using ServerOptions.Extensions.ConfigurationEngine;
 
 namespace ProxyHostClient
 {

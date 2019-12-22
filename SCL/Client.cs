@@ -457,7 +457,7 @@ namespace SCL
                 PacketId = packetId
             };
 
-            rbuff.WriteFloat(value);
+            rbuff.WriteFloat32(value);
 
             Send(rbuff.CompilePacket(), 0, rbuff.PacketLenght);
         }
@@ -469,7 +469,7 @@ namespace SCL
                 PacketId = packetId
             };
 
-            rbuff.WriteDouble(value);
+            rbuff.WriteFloat64(value);
 
             Send(rbuff.CompilePacket(), 0, rbuff.PacketLenght);
         }

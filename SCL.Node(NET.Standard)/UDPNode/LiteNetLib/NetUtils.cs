@@ -29,19 +29,24 @@ namespace LiteNetLib
 
         public static IPAddress ResolveAddress(string hostStr)
         {
-            if(hostStr == "localhost")
-                return IPAddress.Loopback;
-            
             IPAddress ipAddress;
             if (!IPAddress.TryParse(hostStr, out ipAddress))
             {
                 if (NetSocket.IPv6Support)
-                    ipAddress = ResolveAddress(hostStr, AddressFamily.InterNetworkV6);
+                {
+                    ipAddress = hostStr == "localhost"
+                        ? IPAddress.IPv6Loopback
+                        : ResolveAddress(hostStr, AddressFamily.InterNetworkV6);
+                }
                 if (ipAddress == null)
+                {
                     ipAddress = ResolveAddress(hostStr, AddressFamily.InterNetwork);
+                }
             }
             if (ipAddress == null)
+            {
                 throw new ArgumentException("Invalid address: " + hostStr);
+            }
 
             return ipAddress;
         }
@@ -61,7 +66,7 @@ namespace LiteNetLib
 
         private static IPAddress[] ResolveAddresses(string hostStr)
         {
-#if NETSTANDARD2_0 || NETCOREAPP2_0
+#if NETCORE
             var hostTask = Dns.GetHostEntryAsync(hostStr);
             hostTask.GetAwaiter().GetResult();
             var host = hostTask.Result;
@@ -88,7 +93,7 @@ namespace LiteNetLib
         /// </summary>
         /// <param name="targetList">result list</param>
         /// <param name="addrType">type of address (IPv4, IPv6 or both)</param>
-        public static void GetLocalIpList(IList<string> targetList, LocalAddrType addrType)
+        public static void GetLocalIpList(List<string> targetList, LocalAddrType addrType)
         {
             bool ipv4 = (addrType & LocalAddrType.IPv4) == LocalAddrType.IPv4;
             bool ipv6 = (addrType & LocalAddrType.IPv6) == LocalAddrType.IPv6;

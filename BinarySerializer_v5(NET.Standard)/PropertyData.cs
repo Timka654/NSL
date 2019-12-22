@@ -8,11 +8,9 @@ using System.Text;
 
 namespace BinarySerializer
 {
-    public class PropertyData
+    public class BinaryMemberData
     {
-        public PropertyInfo PropertyInfo { get; set; }
-
-        public MethodInfo Getter { get; set; }
+        public virtual MethodInfo Getter { get; set; }
 
         public MethodInfo Setter { get; set; }
 
@@ -33,6 +31,12 @@ namespace BinarySerializer
         public int ArraySize => BinaryAttr.ArraySize;
 
         public int TypeSize => BinaryAttr.TypeSize;
+
+    }
+
+    public class PropertyData : BinaryMemberData
+    {
+        public PropertyInfo PropertyInfo { get; set; }
 
         public PropertyData(PropertyInfo propertyInfo, TypeStorage storage, bool builder = false)
         {
@@ -80,6 +84,65 @@ namespace BinarySerializer
             Getter = propertyData.PropertyInfo.GetMethod;
 
             Setter = propertyData.PropertyInfo.SetMethod;
+
+        }
+    }
+
+    public class FieldData : BinaryMemberData
+    {
+        private static MethodInfo SetterMethodInfo = typeof(FieldInfo).GetMethod("SetValue");
+
+        private static MethodInfo GetterMethodInfo = typeof(FieldInfo).GetMethod("GetValue");
+
+        public FieldInfo FieldInfo { get; set; }
+
+        public FieldData(FieldInfo fieldInfo, TypeStorage storage, bool builder = false)
+        {
+            FieldInfo = fieldInfo;
+
+            BinaryAttr = fieldInfo.GetCustomAttribute<BinaryAttribute>();
+
+            BinarySchemeAttrList = fieldInfo.GetCustomAttributes<BinarySchemeAttribute>().ToList();
+
+            if (builder == false)
+            {
+                IsBaseType = typeof(IBasicType).IsAssignableFrom(BinaryAttr.Type);
+
+                //if (PropertyInfo.Name == "CharacterPart")
+                //    Debugger.Break();
+
+                if (IsBaseType)
+                    BinaryType = (IBasicType)Activator.CreateInstance(BinaryAttr.Type);
+                //else
+                //    BinaryStruct = storage.GetTypeInfo(BinaryAttr.Type,"");
+
+            }
+
+            Getter = GetterMethodInfo;
+
+            Setter = SetterMethodInfo;
+
+        }
+
+        public FieldData(FieldData fieldData, string scheme, TypeStorage storage)
+        {
+            FieldInfo = fieldData.FieldInfo;
+
+            BinaryAttr = fieldData.BinaryAttr;
+
+            BinarySchemeAttrList = fieldData.BinarySchemeAttrList;
+
+            IsBaseType = typeof(IBasicType).IsAssignableFrom(BinaryAttr.Type);
+
+            if (IsBaseType)
+                BinaryType = (IBasicType)Activator.CreateInstance(BinaryAttr.Type);
+            else
+                BinaryStruct = storage.GetTypeInfo(BinaryAttr.Type, scheme);
+
+
+            Getter = GetterMethodInfo;
+
+            Setter = SetterMethodInfo;
 
         }
     }

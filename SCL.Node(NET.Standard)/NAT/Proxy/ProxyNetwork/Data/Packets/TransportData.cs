@@ -1,7 +1,6 @@
 ﻿using SCL.Node.Utils;
-using SCL.SocketClient;
-using SCL.SocketClient.Utils.Buffer;
 using SCL.Unity.NAT.Proxy.ProxyNetwork.Data.Packets.Enums;
+using SocketCore.Utils.Buffer;
 using System;
 using System.Collections.Generic;
 using System.Linq;

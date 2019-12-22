@@ -1,4 +1,5 @@
 ﻿//using Mono.Nat;
+using Mono.Nat;
 using SCL.Node.Utils;
 using System;
 using System.Collections.Concurrent;
@@ -91,11 +92,11 @@ namespace SCL.Node
 
         public int Port { get; protected set; }
 
-        //protected Protocol Protocol { get; set; }
+        protected Protocol Protocol { get; set; }
 
         protected readonly ConcurrentDictionary<int, T> _players = new ConcurrentDictionary<int, T>();
 
-        //protected Mapping Mapping { get; set; }
+        protected Mapping Mapping { get; set; }
 
         public string UpNpDescription { get; set; }
 
@@ -103,9 +104,9 @@ namespace SCL.Node
         {
             MyPlayerId = myPlayerId;
 
-            //NatUtility.DeviceFound += DeviceFound;
-            //NatUtility.DeviceLost += DeviceLost;
-            //NatUtility.StartDiscovery();
+            NatUtility.DeviceFound += DeviceFound;
+            NatUtility.DeviceLost += DeviceLost;
+            NatUtility.StartDiscovery();
 
             _uPnPLocker.Set();
             return true;
@@ -113,36 +114,36 @@ namespace SCL.Node
 
         #region NAT
 
-        //private async void DeviceFound(object sender, DeviceEventArgs args)
-        //{
-        //    try
-        //    {
-        //        INatDevice device = args.Device;
+        private async void DeviceFound(object sender, DeviceEventArgs args)
+        {
+            try
+            {
+                INatDevice device = args.Device;
 
-        //        Mapping = new Mapping(Protocol, Port, Port) { Description = UpNpDescription };
-        //        await device.CreatePortMapAsync(Mapping);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        InitResult = false;
-        //        //_socket?.Dispose();
-        //        Debug.LogError(ex.ToString());
-        //    }
-        //    _uPnPLocker.Set();
-        //}
+                Mapping = new Mapping(Protocol, Port, Port) { Description = UpNpDescription };
+                await device.CreatePortMapAsync(Mapping);
+            }
+            catch (Exception ex)
+            {
+                InitResult = false;
+                //_socket?.Dispose();
+                Debug.LogError(ex.ToString());
+            }
+            _uPnPLocker.Set();
+        }
 
-        //private async void DeviceLost(object sender, DeviceEventArgs args)
-        //{
-        //    if (Mapping != null)
-        //    {
-        //        INatDevice device = args.Device;
-        //        await device.DeletePortMapAsync(Mapping);
-        //    }
-        //    //_socket?.Dispose();
-        //    InitResult = false;
-        //    Debug.LogError("Router device is lost");
-        //    _uPnPLocker?.Set();
-        //}
+        private async void DeviceLost(object sender, DeviceEventArgs args)
+        {
+            if (Mapping != null)
+            {
+                INatDevice device = args.Device;
+                await device.DeletePortMapAsync(Mapping);
+            }
+            //_socket?.Dispose();
+            InitResult = false;
+            Debug.LogError("Router device is lost");
+            _uPnPLocker?.Set();
+        }
 
         #endregion
 

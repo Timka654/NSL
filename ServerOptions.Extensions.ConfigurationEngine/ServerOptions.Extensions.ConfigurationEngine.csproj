@@ -1,0 +1,12 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Configuration\ConfigurationEngine.csproj" />
+    <ProjectReference Include="..\SocketServer\SocketServer.csproj" />
+  </ItemGroup>
+
+</Project>

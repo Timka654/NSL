@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using SocketCore.Utils.Buffer;
+using SocketCore.Utils.SystemPackets.Enums;
 
 namespace SocketServer.Utils
 {
@@ -48,7 +49,7 @@ namespace SocketServer.Utils.SystemPackets
         {
                var packet = new OutputPacketBuffer()
             {
-                PacketId = (ushort)Enums.ServerPacketEnum.RecoverySessionResult
+                PacketId = (ushort)ServerPacketEnum.RecoverySessionResult
             };
 
             packet.WriteByte((byte)result);

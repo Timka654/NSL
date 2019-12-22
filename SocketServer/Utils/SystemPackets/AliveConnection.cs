@@ -4,6 +4,7 @@ using System.Text;
 using System.Threading.Tasks;
 using SocketCore.Utils;
 using SocketCore.Utils.Buffer;
+using SocketCore.Utils.SystemPackets.Enums;
 
 namespace SocketServer.Utils.SystemPackets
 {
@@ -27,7 +28,7 @@ namespace SocketServer.Utils.SystemPackets
 
             var packet = new OutputPacketBuffer()
             {
-                PacketId = (ushort)Enums.ClientPacketEnum.AliveConnection
+                PacketId = (ushort)ClientPacketEnum.AliveConnection
             };
             client.Network.Send(packet);
 

@@ -36,7 +36,7 @@ namespace SocketServer.Utils
             base.AddWaitPacket(packet_data, offset, lenght);
         }
 
-        internal void Send(OutputPacketBuffer packet)
+        public void Send(OutputPacketBuffer packet)
         {
             Network.Send(packet);
         }

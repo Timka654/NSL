@@ -1,5 +1,5 @@
 ﻿using SocketCore.Utils.Buffer;
-using SocketServer.Utils.SystemPackets.Enums;
+using SocketCore.Utils.SystemPackets.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;

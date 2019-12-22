@@ -562,7 +562,7 @@ namespace SocketServer
                 PacketId = packetId
             };
 
-            rbuff.WriteFloat(value);
+            rbuff.WriteFloat32(value);
 
 #if DEBUG
             OnSendPacket?.Invoke(this, rbuff.PacketId, rbuff.PacketLenght, memberName, sourceFilePath, sourceLineNumber);
@@ -583,7 +583,7 @@ namespace SocketServer
                 PacketId = packetId
             };
 
-            rbuff.WriteDouble(value);
+            rbuff.WriteFloat64(value);
 
 #if DEBUG
             OnSendPacket?.Invoke(this, rbuff.PacketId, rbuff.PacketLenght, memberName, sourceFilePath, sourceLineNumber);

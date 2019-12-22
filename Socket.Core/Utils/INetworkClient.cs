@@ -4,7 +4,6 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using SocketCore.Utils.Buffer;
-using SocketServer.Utils.SystemPackets;
 
 namespace SocketCore.Utils
 {

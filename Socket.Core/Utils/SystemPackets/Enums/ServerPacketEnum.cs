@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace SocketServer.Utils.SystemPackets.Enums
+namespace SocketCore.Utils.SystemPackets.Enums
 {
 
     public enum ServerPacketEnum : ushort
     {
-        RecoverySessionResult = 65533,
-        SystemTime = 65534,
-        AliveConnection = 65535,
+        RecoverySessionResult = ushort.MaxValue - 2,
+        SystemTime = ushort.MaxValue - 1,
+        AliveConnection = ushort.MaxValue,
     }
 }

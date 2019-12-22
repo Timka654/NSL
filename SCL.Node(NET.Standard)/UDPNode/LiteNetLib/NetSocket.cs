@@ -1,7 +1,7 @@
 #if UNITY_4 || UNITY_5 || UNITY_5_3_OR_NEWER
 #define UNITY
 #endif
-#if NETSTANDARD2_0 || NETCOREAPP2_0
+#if NETCORE
 using System.Runtime.InteropServices;
 #endif
 
@@ -19,14 +19,12 @@ namespace LiteNetLib
 
     internal sealed class NetSocket
     {
-        public const int ReceivePollingTime = 1000000; //1 second
         private Socket _udpSocketv4;
         private Socket _udpSocketv6;
         private Thread _threadv4;
         private Thread _threadv6;
         private volatile bool _running;
         private readonly INetSocketListener _listener;
-        private const int SioUdpConnreset = -1744830452; //SIO_UDP_CONNRESET = IOC_IN | IOC_VENDOR | 12
         private static readonly IPAddress MulticastAddressV6 = IPAddress.Parse("FF02:0:0:0:0:0:0:1");
         internal static readonly bool IPv6Support;
 
@@ -42,7 +40,7 @@ namespace LiteNetLib
         {
 #if DISABLE_IPV6 || (!UNITY_EDITOR && ENABLE_IL2CPP && !UNITY_2018_3_OR_NEWER)
             IPv6Support = false;
-#elif !UNITY_2019_1_OR_NEWER && !UNITY_2018_4_OR_NEWER && (!UNITY_EDITOR && ENABLE_IL2CPP && UNITY_2018_3_OR_NEWER)
+#elif !UNITY_EDITOR && ENABLE_IL2CPP && UNITY_2018_3_OR_NEWER
             string version = UnityEngine.Application.unityVersion;
             IPv6Support = Socket.OSSupportsIPv6 && int.Parse(version.Remove(version.IndexOf('f')).Split('.')[2]) >= 6;
 #elif UNITY_2018_2_OR_NEWER
@@ -74,7 +72,7 @@ namespace LiteNetLib
                 //Reading data
                 try
                 {
-                    if (socket.Available == 0 && !socket.Poll(ReceivePollingTime, SelectMode.SelectRead))
+                    if (socket.Available == 0 && !socket.Poll(5000, SelectMode.SelectRead))
                         continue;
                     result = socket.ReceiveFrom(receiveBuffer, 0, receiveBuffer.Length, SocketFlags.None,
                         ref bufferEndPoint);
@@ -84,7 +82,6 @@ namespace LiteNetLib
                     switch (ex.SocketErrorCode)
                     {
                         case SocketError.Interrupted:
-                        case SocketError.NotSocket:
                             return;
                         case SocketError.ConnectionReset:
                         case SocketError.MessageSize:
@@ -112,7 +109,7 @@ namespace LiteNetLib
             }
         }
 
-        public bool Bind(IPAddress addressIPv4, IPAddress addressIPv6, int port, bool reuseAddress, bool ipv6)
+        public bool Bind(IPAddress addressIPv4, IPAddress addressIPv6, int port, bool reuseAddress)
         {
             _udpSocketv4 = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
             if (!BindSocket(_udpSocketv4, new IPEndPoint(addressIPv4, port), reuseAddress))
@@ -125,7 +122,7 @@ namespace LiteNetLib
             _threadv4.Start(_udpSocketv4);
 
             //Check IPv6 support
-            if (!IPv6Support || !ipv6)
+            if (!IPv6Support)
                 return true;
 
             _udpSocketv6 = new Socket(AddressFamily.InterNetworkV6, SocketType.Dgram, ProtocolType.Udp);
@@ -164,15 +161,6 @@ namespace LiteNetLib
             socket.SendBufferSize = NetConstants.SocketBufferSize;
             try
             {
-                socket.IOControl(SioUdpConnreset, new byte[] {0}, null);
-            }
-            catch
-            {
-                //ignored
-            }
-
-            try
-            {
                 socket.ExclusiveAddressUse = !reuseAddress;
                 socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, reuseAddress);
             }
@@ -184,7 +172,7 @@ namespace LiteNetLib
             {
                 socket.Ttl = NetConstants.SocketTTL;
 
-#if NETSTANDARD2_0 || NETCOREAPP2_0
+#if NETCORE
                 if(!RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
 #endif
                 try { socket.DontFragment = true; }
@@ -239,33 +227,32 @@ namespace LiteNetLib
 
         public bool SendBroadcast(byte[] data, int offset, int size, int port)
         {
-            bool broadcastSuccess = false;
-            bool multicastSuccess = false;
+            bool success;
             try
             {
-                broadcastSuccess = _udpSocketv4.SendTo(
+                success = _udpSocketv4.SendTo(
                              data,
                              offset,
                              size,
                              SocketFlags.None,
                              new IPEndPoint(IPAddress.Broadcast, port)) > 0;
            
-                if (_udpSocketv6 != null)
+                if (IPv6Support)
                 {
-                    multicastSuccess = _udpSocketv6.SendTo(
-                                                data,
-                                                offset,
-                                                size,
-                                                SocketFlags.None,
-                                                new IPEndPoint(MulticastAddressV6, port)) > 0;
+                    success = success || _udpSocketv6.SendTo(
+                                 data,
+                                 offset,
+                                 size,
+                                 SocketFlags.None,
+                                 new IPEndPoint(MulticastAddressV6, port)) > 0;
                 }
             }
             catch (Exception ex)
             {
                 NetDebug.WriteError("[S][MCAST]" + ex);
-                return broadcastSuccess;
+                return false;
             }
-            return broadcastSuccess || multicastSuccess;
+            return success;
         }
 
         public int SendTo(byte[] data, int offset, int size, IPEndPoint remoteEndPoint, ref SocketError errorCode)

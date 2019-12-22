@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using SocketCore.Utils;
 using SocketCore.Utils.Buffer;
+using SocketCore.Utils.SystemPackets.Enums;
 
 namespace SocketServer.Utils.SystemPackets
 {
@@ -12,7 +13,7 @@ namespace SocketServer.Utils.SystemPackets
         {
             var packet = new OutputPacketBuffer()
             {
-                PacketId = (ushort)Enums.ClientPacketEnum.ServerTime
+                PacketId = (ushort)ClientPacketEnum.ServerTime
             };
 
             packet.WriteDateTime(DateTime.Now);

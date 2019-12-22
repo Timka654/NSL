@@ -4,17 +4,17 @@ using LiteNetLib.Utils;
 
 namespace LiteNetLib
 {
-    public enum ConnectionRequestType
-    {
-        Incoming,
-        PeerToPeer
-    }
-
-    internal enum ConnectionRequestResult
+    public enum ConnectionRequestResult
     {
         None,
         Accept,
         Reject
+    }
+
+    public enum ConnectionRequestType
+    {
+        Incoming,
+        PeerToPeer
     }
 
     internal interface IConnectionRequestListener
@@ -29,9 +29,9 @@ namespace LiteNetLib
 
         public IPEndPoint RemoteEndPoint { get { return Peer.EndPoint; } }
         public readonly NetDataReader Data;
+        public ConnectionRequestResult Result { get; private set; }
         public ConnectionRequestType Type { get; private set; }
 
-        internal ConnectionRequestResult Result { get; private set; }
         internal readonly long ConnectionId;
         internal readonly byte ConnectionNumber;
         internal readonly NetPeer Peer;

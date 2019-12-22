@@ -1,5 +1,4 @@
 ﻿using SCL.Node.Utils;
-using SCL.SocketClient;
 using SCL.Unity.NAT.Proxy.ProxyNetwork.Data.Packets;
 using SCL.Unity.NAT.Proxy.ProxyNetwork.Data.Packets.PacketData;
 using System;

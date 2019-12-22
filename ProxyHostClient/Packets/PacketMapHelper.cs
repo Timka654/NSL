@@ -1,8 +1,8 @@
-﻿using SocketCore.Utils.Buffer;
+﻿using ServerOptions.Extensions.Packet;
+using SocketCore.Utils.Buffer;
 using System;
 using System.Collections.Generic;
 using System.Text;
-using Utils.Helper.Packet;
 
 namespace ProxyHostClient.Packets
 {

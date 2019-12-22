@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using SocketCore.Utils.Buffer;
-using SocketServer.Utils.SystemPackets.Enums;
+using SocketCore.Utils.SystemPackets.Enums;
 
 namespace SCL.Utils.SystemPackets
 {

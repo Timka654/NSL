@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace SocketCore.Utils.Buffer
 {
-    public class OutputPacketBuffer
+    public class OutputPacketBuffer : MemoryStream
     {
         private static readonly DateTime MinDatetimeValue = new DateTime(1970, 1, 1);
 
@@ -19,7 +19,7 @@ namespace SocketCore.Utils.Buffer
         /// <summary>
         /// Буффер с полученными данными
         /// </summary>
-        byte[] buffer;
+        byte[] _buffer = new byte[16];
 
         /// <summary>
         /// Текущий размер буффера (включая пустые байты)
@@ -29,24 +29,28 @@ namespace SocketCore.Utils.Buffer
         /// <summary>
         /// маскировка хедера пакета
         /// </summary>
-        int offs;
-        int offset { get { return offs + headerLenght; } set { offs = value; } }
-        int lenght;
 
-        /// <summary>
-        /// Текущая позиция чтения в потоке
-        /// </summary>
-        public int Offset { get { return offs; } }
+        int offset
+        {
+            get { return (int)base.Position - headerLenght; }
+            set { base.Position = value + headerLenght; }
+        }
 
         /// <summary>
         /// Размер данных пакета
         /// </summary>
-        public int Lenght { get { return lenght; } }
+        public int Lenght
+        {
+            get { return (int)base.Length + headerLenght; }
+        }
 
         /// <summary>
         /// Полный размер пакета
         /// </summary>
-        public int PacketLenght { get { return lenght + headerLenght; } }
+        public int PacketLenght
+        {
+            get { return Lenght - headerLenght; }
+        }
 
         /// <summary>
         /// Индификатор пакета
@@ -71,9 +75,8 @@ namespace SocketCore.Utils.Buffer
         {
             //начальный размер буффера необходим для оптимизации пакетов, в случае если пакет имеет заведомо известный размер, его не придется увеличивать что будет экономить время
             //инициализация буффера
-            buffer = new byte[headerLenght + len];
             //установка размера буффера
-            bufferLenght = headerLenght + len;
+            SetLength(len + headerLenght);
 
             offset = 0;
         }
@@ -82,28 +85,32 @@ namespace SocketCore.Utils.Buffer
         /// Запись значения float (4 bytes)
         /// </summary>
         /// <param name="value">значение</param>
-        public void WriteFloat(float value)
+        public unsafe void WriteFloat32(float value)
         {
-            Write(BitConverter.GetBytes(value), 0, 4);
-        }
-
-        public async Task WriteFloatAsync(float value)
-        {
-            await WriteAsync(BitConverter.GetBytes(value), 0, 4);
+            uint TmpValue = *(uint*)&value;
+            _buffer[0] = (byte)TmpValue;
+            _buffer[1] = (byte)(TmpValue >> 8);
+            _buffer[2] = (byte)(TmpValue >> 16);
+            _buffer[3] = (byte)(TmpValue >> 24);
+            Write(_buffer, 0, 4);
         }
 
         /// <summary>
         /// Запись значения double (8 bytes)
         /// </summary>
         /// <param name="value">значение</param>
-        public void WriteDouble(double value)
+        public unsafe void WriteFloat64(double value)
         {
-            Write(BitConverter.GetBytes(value), 0, 8);
-        }
-
-        public async Task WriteDoubleAsync(double value)
-        {
-            await WriteAsync(BitConverter.GetBytes(value), 0, 8);
+            ulong TmpValue = *(ulong*)&value;
+            _buffer[0] = (byte)TmpValue;
+            _buffer[1] = (byte)(TmpValue >> 8);
+            _buffer[2] = (byte)(TmpValue >> 16);
+            _buffer[3] = (byte)(TmpValue >> 24);
+            _buffer[4] = (byte)(TmpValue >> 32);
+            _buffer[5] = (byte)(TmpValue >> 40);
+            _buffer[6] = (byte)(TmpValue >> 48);
+            _buffer[7] = (byte)(TmpValue >> 56);
+            Write(_buffer, 0, 8);
         }
 
         /// <summary>
@@ -121,12 +128,9 @@ namespace SocketCore.Utils.Buffer
         /// <param name="value">значение</param>
         public void WriteInt16(short value)
         {
-            Write(BitConverter.GetBytes(value), 0, 2);
-        }
-
-        public async Task WriteInt16Async(short value)
-        {
-            await WriteAsync(BitConverter.GetBytes(value), 0, 2);
+            _buffer[0] = (byte)value;
+            _buffer[1] = (byte)(value >> 8);
+            Write(_buffer, 0, 2);
         }
 
         /// <summary>
@@ -135,12 +139,9 @@ namespace SocketCore.Utils.Buffer
         /// <param name="value">значение</param>
         public void WriteUInt16(ushort value)
         {
-            Write(BitConverter.GetBytes(value), 0, 2);
-        }
-
-        public async Task WriteUInt16Async(ushort value)
-        {
-            await WriteAsync(BitConverter.GetBytes(value), 0, 2);
+            _buffer[0] = (byte)value;
+            _buffer[1] = (byte)(value >> 8);
+            Write(_buffer, 0, 2);
         }
 
         /// <summary>
@@ -149,12 +150,11 @@ namespace SocketCore.Utils.Buffer
         /// <param name="value">значение</param>
         public void WriteInt32(int value)
         {
-            Write(BitConverter.GetBytes(value), 0, 4);
-        }
-
-        public async Task WriteInt32Async(int value)
-        {
-            await WriteAsync(BitConverter.GetBytes(value), 0, 4);
+            _buffer[0] = (byte)value;
+            _buffer[1] = (byte)(value >> 8);
+            _buffer[2] = (byte)(value >> 16);
+            _buffer[3] = (byte)(value >> 24);
+            Write(_buffer, 0, 4);
         }
 
         /// <summary>
@@ -163,12 +163,11 @@ namespace SocketCore.Utils.Buffer
         /// <param name="value">значение</param>
         public void WriteUInt32(uint value)
         {
-            Write(BitConverter.GetBytes(value), 0, 4);
-        }
-
-        public async Task WriteUInt32Async(ushort value)
-        {
-            await WriteAsync(BitConverter.GetBytes(value), 0, 4);
+            _buffer[0] = (byte)value;
+            _buffer[1] = (byte)(value >> 8);
+            _buffer[2] = (byte)(value >> 16);
+            _buffer[3] = (byte)(value >> 24);
+            Write(_buffer, 0, 4);
         }
 
         /// <summary>
@@ -177,12 +176,15 @@ namespace SocketCore.Utils.Buffer
         /// <param name="value">значение</param>
         public void WriteInt64(long value)
         {
-            Write(BitConverter.GetBytes(value), 0, 8);
-        }
-
-        public async Task WriteInt64Async(long value)
-        {
-            await WriteAsync(BitConverter.GetBytes(value), 0, 8);
+            _buffer[0] = (byte)value;
+            _buffer[1] = (byte)(value >> 8);
+            _buffer[2] = (byte)(value >> 16);
+            _buffer[3] = (byte)(value >> 24);
+            _buffer[4] = (byte)(value >> 32);
+            _buffer[5] = (byte)(value >> 40);
+            _buffer[6] = (byte)(value >> 48);
+            _buffer[7] = (byte)(value >> 56);
+            Write(_buffer, 0, 8);
         }
 
         /// <summary>
@@ -191,12 +193,15 @@ namespace SocketCore.Utils.Buffer
         /// <param name="value">значение</param>
         public void WriteUInt64(ulong value)
         {
-            Write(BitConverter.GetBytes(value), 0, 8);
-        }
-
-        public async Task WriteUInt64Async(ulong value)
-        {
-            await WriteAsync(BitConverter.GetBytes(value), 0, 8);
+            _buffer[0] = (byte)value;
+            _buffer[1] = (byte)(value >> 8);
+            _buffer[2] = (byte)(value >> 16);
+            _buffer[3] = (byte)(value >> 24);
+            _buffer[4] = (byte)(value >> 32);
+            _buffer[5] = (byte)(value >> 40);
+            _buffer[6] = (byte)(value >> 48);
+            _buffer[7] = (byte)(value >> 56);
+            Write(_buffer, 0, 8);
         }
 
         /// <summary>
@@ -208,36 +213,13 @@ namespace SocketCore.Utils.Buffer
             WriteByte((byte)(value ? 1 : 0));
         }
 
-        public async Task WriteBoolAsync(bool value)
-        {
-            await WriteByteAsync((byte)(value ? 1 : 0));
-        }
-
         /// <summary>
         /// Запись значения byte (1 байт)
         /// </summary>
         /// <param name="value">значение</param>
-        public void WriteByte(byte value)
+        public override void WriteByte(byte value)
         {
-            if (offset + 1 >= bufferLenght)
-                SetLength(1);
-            buffer[offset] = value;
-            offs++;
-            if (offs >= lenght)
-                lenght = offs;
-        }
-
-        public async Task WriteByteAsync(byte value)
-        {
-            await Task.Run(() =>
-            {
-                if (offset + 1 >= bufferLenght)
-                    SetLength(1);
-                buffer[offset] = value;
-                offs++;
-                if (offs >= lenght)
-                    lenght = offs;
-            });
+            base.WriteByte(value);
         }
 
         /// <summary>
@@ -247,26 +229,15 @@ namespace SocketCore.Utils.Buffer
         public void WriteString16(string value)
         {
             if (value == null)
-                value = "";
+            {
+                WriteUInt16(0);
+                return;
+            }
             byte[] buf = coding.GetBytes(value);
 
             WriteUInt16((ushort)buf.Length);
             if (buf.Length > 0)
                 Write(buf, 0, buf.Length);
-        }
-
-        public async Task WriteString16Async(string value)
-        {
-            await Task.Run(() =>
-            {
-                if (value == null)
-                    value = "";
-                byte[] buf = coding.GetBytes(value);
-
-                WriteUInt16((ushort)buf.Length);
-                if (buf.Length > 0)
-                    Write(buf, 0, buf.Length);
-            });
         }
 
         /// <summary>
@@ -276,39 +247,16 @@ namespace SocketCore.Utils.Buffer
         public void WriteString32(string value)
         {
             if (value == null)
-                value = "";
+            {
+                WriteUInt32(0);
+                return;
+            }
+
             byte[] buf = coding.GetBytes(value);
 
             WriteUInt32((uint)buf.Length);
             if (buf.Length > 0)
-                Write(buf, 0, buf.Length);
-        }
-
-        public async Task WriteString32Async(string value)
-        {
-            await Task.Run(() =>
-            {
-                if (value == null)
-                    value = "";
-                byte[] buf = coding.GetBytes(value);
-
-                WriteUInt32((uint)buf.Length);
-                if (buf.Length > 0)
-                    Write(buf, 0, buf.Length);
-            });
-        }
-
-        public async Task WriteDateTimeAsync(DateTime? value)
-        {
-            if (value.HasValue)
-                await WriteDateTimeAsync(value.Value);
-            else
-                await WriteDoubleAsync(0);
-        }
-
-        public async Task WriteDateTimeAsync(DateTime value)
-        {
-            await WriteDoubleAsync((value - MinDatetimeValue).TotalMilliseconds);
+                Write(buf);
         }
 
         public void WriteDateTime(DateTime? value)
@@ -316,12 +264,12 @@ namespace SocketCore.Utils.Buffer
             if (value.HasValue)
                 WriteDateTime(value.Value);
             else
-                WriteDouble(0);
+                WriteFloat64(0);
         }
 
         public void WriteDateTime(DateTime value)
         {
-            WriteDouble((value - MinDatetimeValue).TotalMilliseconds);
+            WriteFloat64((value - MinDatetimeValue).TotalMilliseconds);
         }
 
         public void WriteGuid(Guid value)
@@ -333,78 +281,11 @@ namespace SocketCore.Utils.Buffer
             Write(arr, 0, arr.Length);
         }
 
-        /// <summary>
-        /// Запись массива байт
-        /// </summary>
-        /// <param name="buf">буффер</param>
-        /// <param name="off">позиция в буффере</param>
-        /// <param name="len">размер для записи</param>
-        public void Write(byte[] buf, int off, int len)
+        public void Write(byte[] buf)
         {
-            if (offset + len >= bufferLenght)
-                SetLength(len);
-            for (int i = 0; i < len; i++)
-            {
-                buffer[offset + i] = buf[off + i];
-            }
-            offs += len;
-            if (offs >= lenght)
-                lenght = offs;
+            base.Write(buf, 0, buf.Length);
         }
 
-        public async Task WriteAsync(byte[] buf, int off, int len)
-        {
-            await Task.Run(() =>
-            {
-                if (offset + len >= bufferLenght)
-                    SetLength(len);
-                for (int i = 0; i < len; i++)
-                {
-                    buffer[offset + i] = buf[off + i];
-                }
-                offs += len;
-                if (offs >= lenght)
-                    lenght = offs;
-            });
-        }
-
-        /// <summary>
-        /// Добавление размера пакета в случае недостающего размера буффера
-        /// </summary>
-        /// <param name="appendLen">кол-во байт добавляемых в буффер</param>
-        private void SetLength(int appendLen)
-        {
-            while (offset + appendLen >= bufferLenght)
-            {
-                bufferLenght = bufferLenght * 2;
-            }
-            Array.Resize(ref buffer, bufferLenght);
-        }
-
-        /// <summary>
-        /// Смещение положения в массиве
-        /// </summary>
-        /// <param name="len">размер на который нужно сместить положение</param>
-        /// <param name="seek">откуда смещать</param>
-        /// <returns></returns>
-        public int Seek(int len, SeekOrigin seek)
-        {
-            if (seek == SeekOrigin.Begin)
-            {
-                offs = len;
-            }
-            else if (seek == SeekOrigin.Current)
-            {
-                offs += len;
-            }
-            else if (seek == SeekOrigin.End)
-            {
-                offs = lenght + len;
-            }
-            if (offs < 0)
-                offs = 0;
-            return offset;
-        }
 
         /// <summary>
         /// Сборка пакета в финальный вид перед отправкой
@@ -413,9 +294,7 @@ namespace SocketCore.Utils.Buffer
         /// <returns></returns>
         public byte[] CompilePacket()
         {
-            int off = offs;
-
-            offset = 0 - headerLenght;
+            base.Seek(0, SeekOrigin.Begin);
 
             WriteInt32(PacketLenght);
             WriteUInt16(PacketId);
@@ -425,9 +304,7 @@ namespace SocketCore.Utils.Buffer
                 WriteByte((byte)((Lenght + PacketId) % 14));
             }
 
-            offs = off;
-
-            return buffer;
+            return base.ToArray();
         }
     }
 }

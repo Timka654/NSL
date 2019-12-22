@@ -9,7 +9,8 @@ namespace LiteNetLib
     public enum UnconnectedMessageType
     {
         BasicMessage,
-        Broadcast
+        DiscoveryRequest,
+        DiscoveryResponse
     }
 
     /// <summary>
@@ -20,12 +21,10 @@ namespace LiteNetLib
         ConnectionFailed,
         Timeout,
         HostUnreachable,
-        NetworkUnreachable,
         RemoteConnectionClose,
         DisconnectPeerCalled,
         ConnectionRejected,
-        InvalidProtocol,
-        UnknownHost
+        InvalidProtocol
     }
 
     /// <summary>
@@ -127,7 +126,7 @@ namespace LiteNetLib
 
         public void ClearPeerDisconnectedEvent()
         {
-            PeerDisconnectedEvent = null;
+            PeerConnectedEvent = null;
         }
 
         public void ClearNetworkErrorEvent()
