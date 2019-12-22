@@ -10,6 +10,8 @@ namespace BinarySerializer
 {
     public class BinaryMemberData
     {
+        public MemberInfo MemberInfo { get; set; }
+
         public virtual MethodInfo Getter { get; set; }
 
         public MethodInfo Setter { get; set; }
@@ -24,14 +26,49 @@ namespace BinarySerializer
 
         public BinaryStruct BinaryStruct { get; internal set; }
 
-        public PropertyData ArraySizeProperty { get; internal set; }
+        public BinaryMemberData ArraySizeProperty { get; internal set; }
 
-        public PropertyData TypeSizeProperty { get; internal set; }
+        public BinaryMemberData TypeSizeProperty { get; internal set; }
 
         public int ArraySize => BinaryAttr.ArraySize;
 
         public int TypeSize => BinaryAttr.TypeSize;
 
+        public string Name { get; protected set; }
+
+        public Type Type { get; protected set; }
+
+        public Type DeclaringType { get; protected set; }
+
+        public BinaryMemberData()
+        { 
+        
+        }
+
+        public BinaryMemberData(BinaryMemberData binaryMemberData, string scheme, TypeStorage storage)
+        {
+            BinaryAttr = binaryMemberData.BinaryAttr;
+
+            BinarySchemeAttrList = binaryMemberData.BinarySchemeAttrList;
+
+            IsBaseType = typeof(IBasicType).IsAssignableFrom(BinaryAttr.Type);
+
+            if (IsBaseType)
+                BinaryType = (IBasicType)Activator.CreateInstance(BinaryAttr.Type);
+            else
+                BinaryStruct = storage.GetTypeInfo(BinaryAttr.Type, scheme);
+
+
+            Getter = binaryMemberData.Getter;
+
+            Setter = binaryMemberData.Setter;
+
+            Name = binaryMemberData.Name;
+
+            Type = binaryMemberData.Type;
+            MemberInfo = binaryMemberData.MemberInfo;
+
+        }
     }
 
     public class PropertyData : BinaryMemberData
@@ -41,6 +78,7 @@ namespace BinarySerializer
         public PropertyData(PropertyInfo propertyInfo, TypeStorage storage, bool builder = false)
         {
             PropertyInfo = propertyInfo;
+            MemberInfo = propertyInfo;
 
             BinaryAttr = propertyInfo.GetCustomAttribute<BinaryAttribute>();
 
@@ -63,30 +101,19 @@ namespace BinarySerializer
 
             Setter = propertyInfo.SetMethod;
 
+            Name = propertyInfo.Name;
+
+            Type = propertyInfo.PropertyType;
+
+            DeclaringType = propertyInfo.DeclaringType;
+
         }
 
-        public PropertyData(PropertyData propertyData, string scheme, TypeStorage storage)
+        public PropertyData(PropertyData propertyData, string scheme, TypeStorage storage) : base(propertyData,scheme,storage)
         {
             PropertyInfo = propertyData.PropertyInfo;
-
-            BinaryAttr = propertyData.BinaryAttr;
-
-            BinarySchemeAttrList = propertyData.BinarySchemeAttrList;
-
-            IsBaseType = typeof(IBasicType).IsAssignableFrom(BinaryAttr.Type);
-
-            if (IsBaseType)
-                BinaryType = (IBasicType)Activator.CreateInstance(BinaryAttr.Type);
-            else
-                BinaryStruct = storage.GetTypeInfo(BinaryAttr.Type, scheme);
-
-
-            Getter = propertyData.PropertyInfo.GetMethod;
-
-            Setter = propertyData.PropertyInfo.SetMethod;
-
         }
-    }
+        }
 
     public class FieldData : BinaryMemberData
     {
@@ -99,6 +126,7 @@ namespace BinarySerializer
         public FieldData(FieldInfo fieldInfo, TypeStorage storage, bool builder = false)
         {
             FieldInfo = fieldInfo;
+            MemberInfo = fieldInfo;
 
             BinaryAttr = fieldInfo.GetCustomAttribute<BinaryAttribute>();
 
@@ -122,28 +150,16 @@ namespace BinarySerializer
 
             Setter = SetterMethodInfo;
 
+            Name = fieldInfo.Name;
+
+            Type = fieldInfo.FieldType;
+
+            DeclaringType = fieldInfo.DeclaringType;
         }
 
-        public FieldData(FieldData fieldData, string scheme, TypeStorage storage)
+        public FieldData(FieldData fieldInfo, string scheme, TypeStorage storage) : base(fieldInfo, scheme, storage)
         {
-            FieldInfo = fieldData.FieldInfo;
-
-            BinaryAttr = fieldData.BinaryAttr;
-
-            BinarySchemeAttrList = fieldData.BinarySchemeAttrList;
-
-            IsBaseType = typeof(IBasicType).IsAssignableFrom(BinaryAttr.Type);
-
-            if (IsBaseType)
-                BinaryType = (IBasicType)Activator.CreateInstance(BinaryAttr.Type);
-            else
-                BinaryStruct = storage.GetTypeInfo(BinaryAttr.Type, scheme);
-
-
-            Getter = GetterMethodInfo;
-
-            Setter = SetterMethodInfo;
-
+            FieldInfo = fieldInfo.FieldInfo;
         }
     }
 }

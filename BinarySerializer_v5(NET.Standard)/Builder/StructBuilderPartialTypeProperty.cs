@@ -7,7 +7,7 @@ using System.Text;
 
 namespace BinarySerializer.Builder
 {
-    public class StructBuilderPartialTypeProperty<T, PrevT> : StructBuilderProperty<T>
+    public class StructBuilderPartialTypeProperty<T, PrevT> : StructBuilderMember<T>
     {
         StructBuilderPartialType<T, PrevT> prevType;
 

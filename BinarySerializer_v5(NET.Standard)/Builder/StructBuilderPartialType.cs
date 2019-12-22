@@ -9,14 +9,14 @@ namespace BinarySerializer.Builder
 {
     public class StructBuilderPartialType<T, PrevT> : StructBuilder<T>
     {
-        private StructBuilderProperty<PrevT> prevProp;
+        private StructBuilderMember<PrevT> prevProp;
 
-        protected StructBuilderPartialType(TypeStorage storage, StructBuilderProperty<PrevT> p) : base(storage)
+        protected StructBuilderPartialType(TypeStorage storage, StructBuilderMember<PrevT> p) : base(storage)
         {
             prevProp = p;
         }
 
-        public static StructBuilderPartialType<T, PrevT> GetStruct(StructBuilderProperty<PrevT> p, TypeStorage storage = null)
+        public static StructBuilderPartialType<T, PrevT> GetStruct(StructBuilderMember<PrevT> p, TypeStorage storage = null)
         {
             if (storage == null)
                 storage = TypeStorage.Instance;
@@ -64,13 +64,13 @@ namespace BinarySerializer.Builder
             return this;
         }
 
-        public StructBuilderProperty<PrevT> SavePartialType()
+        public StructBuilderMember<PrevT> SavePartialType()
         {
             base.Compile();
             return prevProp;
         }
 
-        public StructBuilderProperty<PrevT> Back()
+        public StructBuilderMember<PrevT> Back()
         {
             return prevProp;
         }

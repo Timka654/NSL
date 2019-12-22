@@ -17,17 +17,19 @@ namespace BinarySerializer_v5.Test
 
             BinarySerializer.TypeStorage.Instance.PreCompileBinaryStructs(Assembly.GetExecutingAssembly());
 
-            Structs.StringStruct _ss = new Structs.StringStruct();
-            Structs.IntegerStruct _is = new Structs.IntegerStruct();
-            Structs.FloatStruct _fs = new Structs.FloatStruct();
-            Structs.ArrayStruct _as = new Structs.ArrayStruct();
-            Structs.ListStruct _ls = new Structs.ListStruct();
-            Structs.DictionaryStruct _ds = new Structs.DictionaryStruct();
-            Structs.OtherStruct _os = new Structs.OtherStruct();
+            Structs.StringStruct _ss = Structs.StringStruct.GetRndValue();
+            Structs.IntegerStruct _is = Structs.IntegerStruct.GetRndValue();
+            Structs.FloatStruct _fs = Structs.FloatStruct.GetRndValue();
+            Structs.ArrayStruct _as = Structs.ArrayStruct.GetRndValue();
+            Structs.ListStruct _ls = Structs.ListStruct.GetRndValue();
+            Structs.DictionaryStruct _ds = Structs.DictionaryStruct.GetRndValue();
+            Structs.OtherStruct _os = Structs.OtherStruct.GetRndValue();
 
             int iteration = 1000;
 
             Console.WriteLine("BinarySerializer");
+
+
             t.Run(iteration, "Integer Serialize", _is.bsSerializeAction);
             t.Run(iteration, "Integer Desserialize", _is.bsDesserializeAction);
 

@@ -25,13 +25,13 @@ namespace BinarySerializer.DefaultTypes
             codingMethodInfo = typeof(BinaryStruct).GetProperty("Coding").GetMethod;
         }
 
-        public void GetReadILCode(PropertyData prop, BinaryStruct currentStruct, GroboIL il, GroboIL.Local binaryStruct, GroboIL.Local buffer, GroboIL.Local result, GroboIL.Local typeSize, GroboIL.Local offset, bool listValue)
+        public void GetReadILCode(BinaryMemberData prop, BinaryStruct currentStruct, GroboIL il, GroboIL.Local binaryStruct, GroboIL.Local buffer, GroboIL.Local result, GroboIL.Local typeSize, GroboIL.Local offset, bool listValue)
         {
             var exitLabel = il.DefineLabel("exit");
             BinaryStruct.ReadObjectNull(il, exitLabel, buffer, offset, typeSize);
 
             var len = il.DeclareLocal(typeof(short));
-            var list = il.DeclareLocal(prop.PropertyInfo.PropertyType);
+            var list = il.DeclareLocal(prop.Type);
             il.Ldloc(buffer);
             il.Ldloc(offset);
             il.Call(readBitConverterMethodInfo);
@@ -39,7 +39,7 @@ namespace BinarySerializer.DefaultTypes
 
             BinaryStruct.WriteOffsetAppend(il, offset, 2);
 
-            il.Newobj(BinaryStruct.GetConstructor(prop.PropertyInfo.PropertyType, null));
+            il.Newobj(BinaryStruct.GetConstructor(prop.Type, null));
 
             il.Stloc(list);
             il.Ldloc(result);
@@ -52,8 +52,8 @@ namespace BinarySerializer.DefaultTypes
             il.Ceq();
             il.Brtrue(exitLabel);
 
-            var typeKey = prop.PropertyInfo.PropertyType.GetGenericArguments()[0];
-            var typeValue = prop.PropertyInfo.PropertyType.GetGenericArguments()[1];
+            var typeKey = prop.Type.GetGenericArguments()[0];
+            var typeValue = prop.Type.GetGenericArguments()[1];
 
             var ivar = il.DeclareLocal(typeof(int));
             var currentItemKey = il.DeclareLocal(typeKey);
@@ -109,7 +109,7 @@ namespace BinarySerializer.DefaultTypes
             il.Ldloc(list);
             il.Ldloc(currentItemKey);
             il.Ldloc(currentItemValue);
-            il.Call(prop.PropertyInfo.PropertyType.GetMethod("TryAdd"), isVirtual: true);
+            il.Call(prop.Type.GetMethod("TryAdd"), isVirtual: true);
             il.Pop();
             //end body
 
@@ -127,9 +127,9 @@ namespace BinarySerializer.DefaultTypes
             il.MarkLabel(exitLabel);
         }
 
-        public void GetWriteILCode(PropertyData prop, BinaryStruct currentStruct, GroboIL il, GroboIL.Local binaryStruct, GroboIL.Local value, GroboIL.Local typeSize, GroboIL.Local buffer, GroboIL.Local offset, bool listValue)
+        public void GetWriteILCode(BinaryMemberData prop, BinaryStruct currentStruct, GroboIL il, GroboIL.Local binaryStruct, GroboIL.Local value, GroboIL.Local typeSize, GroboIL.Local buffer, GroboIL.Local offset, bool listValue)
         {
-            var arr = il.DeclareLocal(prop.PropertyInfo.PropertyType);
+            var arr = il.DeclareLocal(prop.Type);
 
             il.Ldloc(value);
             il.Call(prop.Getter, isVirtual: prop.Getter.IsVirtual);
@@ -178,8 +178,8 @@ namespace BinarySerializer.DefaultTypes
             il.Ceq();
             il.Brtrue(exitLabel);
 
-            var typeKey = prop.PropertyInfo.PropertyType.GetGenericArguments()[0];
-            var typeValue = prop.PropertyInfo.PropertyType.GetGenericArguments()[1];
+            var typeKey = prop.Type.GetGenericArguments()[0];
+            var typeValue = prop.Type.GetGenericArguments()[1];
 
             var ivar = il.DeclareLocal(typeof(int));
             var currentItemKey = il.DeclareLocal(typeKey);
@@ -190,7 +190,7 @@ namespace BinarySerializer.DefaultTypes
             il.Ldc_I4(0);
             il.Stloc(ivar);
 
-            var enumeratorMethod = prop.PropertyInfo.PropertyType.GetMethod("GetEnumerator");
+            var enumeratorMethod = prop.Type.GetMethod("GetEnumerator");
 
             var enumerator = il.DeclareLocal(enumeratorMethod.ReturnType);
 

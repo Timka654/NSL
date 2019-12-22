@@ -37,6 +37,7 @@ namespace BinarySerializer_v5.Test.Structs
             r.v3 = Utils.GetRandomV3();
             r.d1 = Utils.GetRandomD();
 
+            r.normalValue = r;
             return r;
         }
 
@@ -47,12 +48,12 @@ namespace BinarySerializer_v5.Test.Structs
             MemoryStream ms = new MemoryStream();
             BinaryWriter bw = new BinaryWriter(ms);
 
+            bw.Write((base.serializedValue.d1 - (new DateTime(1970, 1, 1, 0, 0, 0, 0))).TotalMilliseconds);
             bw.Write(base.serializedValue.v2.X);
             bw.Write(base.serializedValue.v2.Y);
             bw.Write(base.serializedValue.v3.X);
             bw.Write(base.serializedValue.v3.Y);
             bw.Write(base.serializedValue.v3.Z);
-            bw.Write((base.serializedValue.d1 - (new DateTime(1970, 1, 1, 0, 0, 0, 0))).TotalMilliseconds);
 
             base.streamWriteBuffer = ms.ToArray();
             sw.Stop();
@@ -67,9 +68,9 @@ namespace BinarySerializer_v5.Test.Structs
 
             OtherStruct r = new OtherStruct();
 
+            r.d1 = (new DateTime(1970, 1, 1, 0, 0, 0, 0)).AddMilliseconds(br.ReadDouble());
             r.v2 = new Vector2(br.ReadSingle(), br.ReadSingle());
             r.v3 = new Vector3(br.ReadSingle(), br.ReadSingle(), br.ReadSingle());
-            r.d1 = (new DateTime(1970, 1, 1, 0, 0, 0, 0)).AddMilliseconds(br.ReadDouble());
 
             sw.Stop();
 

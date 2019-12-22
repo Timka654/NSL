@@ -3,6 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <RootNamespace>Cipher_NET.Standard_</RootNamespace>
+    <Configurations>Debug;Release;Unity</Configurations>
   </PropertyGroup>
 
   <ItemGroup>

@@ -28,15 +28,13 @@ namespace BinarySerializer_v5.Test
 
         public virtual void bsSerializeAction(Stopwatch sw)
         {
-            var r = GetRandomValue();
-
             if (serializerWriteBuffer == null)
             {
-                serializedValue = r;
-                serializerWriteBuffer = bs.Serialize("default", r);
+                serializedValue = normalValue;
+                serializerWriteBuffer = bs.Serialize("default", normalValue);
             }
             sw.Start();
-            bs.Serialize("default", r);
+            bs.Serialize("default", normalValue);
             sw.Stop();
         }
 
@@ -108,7 +106,9 @@ namespace BinarySerializer_v5.Test
 
             foreach (var item in props)
             {
-                if (!CompareProperty(item, item.GetValue(value1, new object[] { }), item.GetValue(value2, new object[] { })))
+                if (
+                    !CompareProperty(item, item.GetValue(value1, new object[] { }), item.GetValue(value2, new object[] { }))
+                    && (typeof(string).IsAssignableFrom(item.PropertyType) && (!string.IsNullOrEmpty((string)item.GetValue(value1, new object[] { })) || !string.IsNullOrEmpty((string)item.GetValue(value2, new object[] { })))))
                     return false;
             }
             return true;

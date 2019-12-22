@@ -11,7 +11,7 @@ namespace BinarySerializer.Builder
     {
         internal Encoding coding = UTF8Encoding.UTF8;
 
-        internal List<StructBuilderProperty> Propertyes;
+        internal List<StructBuilderMember> Propertyes;
 
         internal TypeStorage CurrentStorage;
 
@@ -27,12 +27,12 @@ namespace BinarySerializer.Builder
         {
             CurrentStorage = storage;
 
-            Propertyes = new List<StructBuilderProperty>();
+            Propertyes = new List<StructBuilderMember>();
         }
 
         public BinaryStruct Compile()
         {
-            CurrentStruct = new BinaryStruct(CurrentType, "", Propertyes.Select(x => (PropertyData)x.property).ToList(), coding, CurrentStorage, true);
+            CurrentStruct = new BinaryStruct(CurrentType, "", Propertyes.Select(x => (BinaryMemberData)x.data).ToList(), coding, CurrentStorage, true);
             return CurrentStorage.AppendPreCompile(this);
         }
     }
@@ -57,7 +57,7 @@ namespace BinarySerializer.Builder
             return new StructBuilder<T>(storage);
         }
 
-        public StructBuilderProperty<T> GetProperty(string propertyName)
+        public StructBuilderMember<T> GetProperty(string propertyName)
         {
             var prop = typeof(T).GetProperty(propertyName, BindingFlags.Public |
                 BindingFlags.NonPublic |
@@ -66,10 +66,10 @@ namespace BinarySerializer.Builder
             if (prop == null)
                 throw new NullReferenceException();
 
-            return new StructBuilderProperty<T>(this, prop);
+            return new StructBuilderMember<T>(this, prop);
         }
 
-        public StructBuilderProperty<T> GetProperty(Expression<Func<T, object>> GetPropertyLambda)
+        public StructBuilderMember<T> GetProperty(Expression<Func<T, object>> GetPropertyLambda)
         {
             MemberExpression Exp = null;
 
@@ -93,7 +93,46 @@ namespace BinarySerializer.Builder
                 throw new ArgumentException();
             }
 
-            return new StructBuilderProperty<T>(this, (PropertyInfo)Exp.Member);
+            return new StructBuilderMember<T>(this, (PropertyInfo)Exp.Member);
+        }
+
+        public StructBuilderMember<T> GetField(string fieldName)
+        {
+            var prop = typeof(T).GetField(fieldName, BindingFlags.Public |
+                BindingFlags.NonPublic |
+                BindingFlags.Instance |
+                BindingFlags.DeclaredOnly);
+            if (prop == null)
+                throw new NullReferenceException();
+
+            return new StructBuilderMember<T>(this, prop);
+        }
+
+        public StructBuilderMember<T> GetField(Expression<Func<T, object>> GetFieldLambda)
+        {
+            MemberExpression Exp = null;
+
+            //this line is necessary, because sometimes the expression comes in as Convert(originalexpression)
+            if (GetFieldLambda.Body is UnaryExpression)
+            {
+                var UnExp = (UnaryExpression)GetFieldLambda.Body;
+                if (UnExp.Operand is MemberExpression)
+                {
+                    Exp = (MemberExpression)UnExp.Operand;
+                }
+                else
+                    throw new ArgumentException();
+            }
+            else if (GetFieldLambda.Body is MemberExpression)
+            {
+                Exp = (MemberExpression)GetFieldLambda.Body;
+            }
+            else
+            {
+                throw new ArgumentException();
+            }
+
+            return new StructBuilderMember<T>(this, (FieldInfo)Exp.Member);
         }
 
         public StructBuilder<T> SetSchemes(params string[] scheme)

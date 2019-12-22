@@ -3,10 +3,11 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.0</TargetFramework>
+    <Configurations>Debug;Release;Unity</Configurations>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\BinarySerializer_v5\BinarySerializer_v5.csproj" />
+    <ProjectReference Include="..\BinarySerializer_v5(NET.Standard)\BinarySerializer(NET.Standard).csproj" />
   </ItemGroup>
 
 </Project>

@@ -66,7 +66,7 @@ namespace BinarySerializer
 
         private void LoadType(Type type, int initialSize)
         {
-            List<PropertyData> t = GetProperties(type);
+            List<BinaryMemberData> t = GetProperties(type);
             var s = new BinaryStruct(type, "", t.ToList(), Coding, this);
             TypeCacheMap[type].TryAdd("", s);
             s.InitLen = initialSize;
@@ -81,15 +81,25 @@ namespace BinarySerializer
             //s.Compile();
         }
 
-        private List<PropertyData> GetProperties(Type type)
+        private List<BinaryMemberData> GetProperties(Type type)
         {
-            var r = type.GetProperties(
+            List<BinaryMemberData> r = new List<BinaryMemberData>();
+
+            r.AddRange(type.GetProperties(
                 BindingFlags.Public |
                 BindingFlags.NonPublic |
                 BindingFlags.Instance |
                 BindingFlags.DeclaredOnly).Where(x =>
                 Attribute.GetCustomAttribute(x, typeof(BinaryAttribute)) != null).Select(x =>
-                    new PropertyData(x,this)).ToList();
+                    new PropertyData(x, this)).ToList());
+
+            r.AddRange(type.GetFields(
+                BindingFlags.Public |
+                BindingFlags.NonPublic |
+                BindingFlags.Instance |
+                BindingFlags.DeclaredOnly).Where(x =>
+                Attribute.GetCustomAttribute(x, typeof(BinaryAttribute)) != null).Select(x =>
+                    new FieldData(x, this)).ToList());
 
             //все наследуемые классы
             if (type.BaseType != typeof(Object))
@@ -121,7 +131,7 @@ namespace BinarySerializer
 
             foreach (var item in ti.PropertyList)
             {
-                    sb.AppendLine($"\t{item.PropertyInfo.Name} {item.PropertyInfo.PropertyType} {item.BinaryAttr.Type} (ts:{item.BinaryAttr.TypeSize} : \"{item.BinaryAttr.TypeSizeName}\",as:{item.BinaryAttr.ArraySize} : \"{item.BinaryAttr.ArraySizeName}\")");
+                    sb.AppendLine($"\t{item.Name} {item.Type} {item.BinaryAttr.Type} (ts:{item.BinaryAttr.TypeSize} : \"{item.BinaryAttr.TypeSizeName}\",as:{item.BinaryAttr.ArraySize} : \"{item.BinaryAttr.ArraySizeName}\")");
                 if (!item.IsBaseType)
                 {
                     sb.AppendLine($"\t\t{DumpStruct(item.BinaryAttr.Type, scheme).Replace("\r\n", "\t\r\n")}");

@@ -79,6 +79,7 @@ namespace BinarySerializer_v5.Test.Structs
             {
                 r.isd.Add(Utils.GetRandomI32(), IntegerStruct.GetRndValue());
             }
+            r.normalValue = r;
 
             return r;
         }
@@ -134,18 +135,18 @@ namespace BinarySerializer_v5.Test.Structs
             MemoryStream ms = new MemoryStream();
             BinaryWriter bw = new BinaryWriter(ms);
 
-            if (WriteDictionaryHeader16(bw, base.binaryWritedValue.nulld16))
+            if (WriteDictionaryHeader16(bw, base.binaryWritedValue.d16))
             {
-                foreach (var item in base.binaryWritedValue.nulld16)
+                foreach (var item in base.binaryWritedValue.d16)
                 {
                     bw.Write(item.Key);
                     bw.Write(item.Value);
                 }
             }
 
-            if (WriteDictionaryHeader32(bw, base.binaryWritedValue.nulld32))
+            if (WriteDictionaryHeader32(bw, base.binaryWritedValue.d32))
             {
-                foreach (var item in base.binaryWritedValue.nulld32)
+                foreach (var item in base.binaryWritedValue.d32)
                 {
                     bw.Write(item.Key);
                     bw.Write(item.Value);
@@ -170,18 +171,27 @@ namespace BinarySerializer_v5.Test.Structs
                 }
             }
 
-            if (WriteDictionaryHeader16(bw, base.binaryWritedValue.d16))
+            if (WriteDictionaryHeader16(bw, base.binaryWritedValue.isd))
             {
-                foreach (var item in base.binaryWritedValue.d16)
+                foreach (var item in base.binaryWritedValue.isd)
+                {
+                    bw.Write(item.Key);
+                    IntegerStruct.Write(bw, item.Value);
+                }
+            }
+
+            if (WriteDictionaryHeader16(bw, base.binaryWritedValue.nulld16))
+            {
+                foreach (var item in base.binaryWritedValue.nulld16)
                 {
                     bw.Write(item.Key);
                     bw.Write(item.Value);
                 }
             }
 
-            if (WriteDictionaryHeader32(bw, base.binaryWritedValue.d32))
+            if (WriteDictionaryHeader32(bw, base.binaryWritedValue.nulld32))
             {
-                foreach (var item in base.binaryWritedValue.d32)
+                foreach (var item in base.binaryWritedValue.nulld32)
                 {
                     bw.Write(item.Key);
                     bw.Write(item.Value);
@@ -194,15 +204,6 @@ namespace BinarySerializer_v5.Test.Structs
                 {
                     bw.Write(item.Key);
                     bw.Write(item.Value);
-                }
-            }
-
-            if (WriteDictionaryHeader16(bw, base.binaryWritedValue.isd))
-            {
-                foreach (var item in base.binaryWritedValue.isd)
-                {
-                    bw.Write(item.Key);
-                    IntegerStruct.Write(bw, item.Value);
                 }
             }
 
@@ -230,21 +231,23 @@ namespace BinarySerializer_v5.Test.Structs
             var h16 = ReadDictionaryHeader16(br);
             if (h16.Item1)
             {
-                r.nulld16 = new Dictionary<float, int>();
+                r.d16 = new Dictionary<float, int>();
                 for (int i = 0; i < h16.Item2; i++)
                 {
-                    r.nulld16.Add(br.ReadSingle(), br.ReadInt32());
+                    r.d16.Add(br.ReadSingle(), br.ReadInt32());
                 }
             }
 
             var h32 = ReadDictionaryHeader32(br);
             if (h32.Item1)
             {
+                r.d32 = new Dictionary<int, float>();
                 for (int i = 0; i < h32.Item2; i++)
                 {
-                    r.nulld32.Add(br.ReadInt32(), br.ReadSingle());
+                    r.d32.Add(br.ReadInt32(), br.ReadSingle());
                 }
             }
+
 
             h16 = ReadDictionaryHeader16(br);
             if (h16.Item1)
@@ -269,20 +272,29 @@ namespace BinarySerializer_v5.Test.Structs
             h16 = ReadDictionaryHeader16(br);
             if (h16.Item1)
             {
-                r.d16 = new Dictionary<float, int>();
+                r.isd = new Dictionary<int, IntegerStruct>();
                 for (int i = 0; i < h16.Item2; i++)
                 {
-                    r.d16.Add(br.ReadSingle(), br.ReadInt32());
+                    r.isd.Add(br.ReadInt32(), IntegerStruct.Read(br));
+                }
+            }
+
+            h16 = ReadDictionaryHeader16(br);
+            if (h16.Item1)
+            {
+                r.nulld16 = new Dictionary<float, int>();
+                for (int i = 0; i < h16.Item2; i++)
+                {
+                    r.nulld16.Add(br.ReadSingle(), br.ReadInt32());
                 }
             }
 
             h32 = ReadDictionaryHeader32(br);
             if (h32.Item1)
             {
-                r.d32 = new Dictionary<int, float>();
                 for (int i = 0; i < h32.Item2; i++)
                 {
-                    r.d32.Add(br.ReadInt32(), br.ReadSingle());
+                    r.nulld32.Add(br.ReadInt32(), br.ReadSingle());
                 }
             }
 
@@ -293,16 +305,6 @@ namespace BinarySerializer_v5.Test.Structs
                 for (int i = 0; i < h32.Item2; i++)
                 {
                     r.nv1.Add(br.ReadInt32(), br.ReadInt32());
-                }
-            }
-
-            h16 = ReadDictionaryHeader16(br);
-            if (h16.Item1)
-            {
-                r.isd = new Dictionary<int, IntegerStruct>();
-                for (int i = 0; i < h16.Item2; i++)
-                {
-                    r.isd.Add(br.ReadInt32(), IntegerStruct.Read(br));
                 }
             }
 

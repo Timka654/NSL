@@ -72,6 +72,7 @@ namespace BinarySerializer_v5.Test.Structs
             {
                 r.isl.Add(IntegerStruct.GetRndValue());
             }
+            r.normalValue = r;
 
             return r;
         }
@@ -127,21 +128,6 @@ namespace BinarySerializer_v5.Test.Structs
             MemoryStream ms = new MemoryStream();
             BinaryWriter bw = new BinaryWriter(ms);
 
-            if (WriteListHeader16(bw, base.binaryWritedValue.nullfl32))
-            {
-                foreach (var item in base.binaryWritedValue.nullfl32)
-                {
-                    bw.Write(item);
-                }
-            }
-
-            if (WriteListHeader32(bw, base.binaryWritedValue.nullil32))
-            {
-                foreach (var item in base.binaryWritedValue.nullil32)
-                {
-                    bw.Write(item);
-                }
-            }
 
             if (WriteListHeader16(bw, base.binaryWritedValue.emptyfl32))
             {
@@ -183,6 +169,22 @@ namespace BinarySerializer_v5.Test.Structs
                 }
             }
 
+            if (WriteListHeader16(bw, base.binaryWritedValue.nullfl32))
+            {
+                foreach (var item in base.binaryWritedValue.nullfl32)
+                {
+                    bw.Write(item);
+                }
+            }
+
+            if (WriteListHeader32(bw, base.binaryWritedValue.nullil32))
+            {
+                foreach (var item in base.binaryWritedValue.nullil32)
+                {
+                    bw.Write(item);
+                }
+            }
+
             sw.Stop();
 
             base.streamWriteBuffer = ms.ToArray();
@@ -200,30 +202,6 @@ namespace BinarySerializer_v5.Test.Structs
 
             if (h16.Item1)
             {
-                r.nullfl32 = new List<float>();
-
-                for (int i = 0; i < h16.Item2; i++)
-                {
-                    r.nullfl32.Add(br.ReadSingle());
-                }
-            }
-
-            var h32 = ReadListHeader32(br);
-
-            if (h32.Item1)
-            {
-                r.nullil32 = new List<int>();
-
-                for (int i = 0; i < h32.Item2; i++)
-                {
-                    r.nullil32.Add(br.ReadInt32());
-                }
-            }
-
-            h16 = ReadListHeader16(br);
-
-            if (h16.Item1)
-            {
                 r.emptyfl32 = new List<float>();
 
                 for (int i = 0; i < h16.Item2; i++)
@@ -232,7 +210,7 @@ namespace BinarySerializer_v5.Test.Structs
                 }
             }
 
-            h32 = ReadListHeader32(br);
+            var h32 = ReadListHeader32(br);
 
             if (h32.Item1)
             {
@@ -277,6 +255,30 @@ namespace BinarySerializer_v5.Test.Structs
                 for (int i = 0; i < h16.Item2; i++)
                 {
                     r.isl.Add(IntegerStruct.Read(br));
+                }
+            }
+
+            h16 = ReadListHeader16(br);
+
+            if (h16.Item1)
+            {
+                r.nullfl32 = new List<float>();
+
+                for (int i = 0; i < h16.Item2; i++)
+                {
+                    r.nullfl32.Add(br.ReadSingle());
+                }
+            }
+
+            h32 = ReadListHeader32(br);
+
+            if (h32.Item1)
+            {
+                r.nullil32 = new List<int>();
+
+                for (int i = 0; i < h32.Item2; i++)
+                {
+                    r.nullil32.Add(br.ReadInt32());
                 }
             }
 

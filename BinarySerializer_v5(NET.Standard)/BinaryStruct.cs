@@ -18,7 +18,7 @@ namespace BinarySerializer
         public string Scheme { get; set; }
         public Encoding Coding { get; set; }
 
-        public List<PropertyData> PropertyList { get; set; }
+        public List<BinaryMemberData> PropertyList { get; set; }
 
         public Func<object, BinaryStruct, Tuple<int, byte[]>> WriteMethod { get; set; }
 
@@ -31,35 +31,35 @@ namespace BinarySerializer
         public string IlReadCode;
         public string IlWriteCode;
 
-        private List<PropertyData> FillPropertyes(BinaryStruct old, List<PropertyData> propertyList)
+        private List<BinaryMemberData> FillPropertyes(BinaryStruct old, List<BinaryMemberData> propertyList)
         {
-            List<PropertyData> result = old.PropertyList.ToList();
+            List<BinaryMemberData> result = old.PropertyList.ToList();
 
-            PropertyData tempPropData = null;
+            BinaryMemberData tempPropData = null;
 
             foreach (var item in propertyList)
             {
-                if ((tempPropData = result.FirstOrDefault(x => x.PropertyInfo.Name == item.PropertyInfo.Name)) == null)
+                if ((tempPropData = result.FirstOrDefault(x => x.Name == item.Name)) == null)
                 {
                     result.Add(item);
                 }
                 else
                 {
                     if (tempPropData.BinaryAttr.Type != item.BinaryAttr.Type)
-                        throw new Exception($"Cannot fill property \"{tempPropData.PropertyInfo.Name}\" in struct {Type} because of old binary type ({tempPropData.BinaryAttr.Type}) not compared new type ({item.BinaryAttr.Type})");
+                        throw new Exception($"Cannot fill property \"{tempPropData.Name}\" in struct {Type} because of old binary type ({tempPropData.BinaryAttr.Type}) not compared new type ({item.BinaryAttr.Type})");
 
                     if (tempPropData.BinaryAttr.ArraySize != item.BinaryAttr.ArraySize)
-                        throw new Exception($"Cannot fill property \"{tempPropData.PropertyInfo.Name}\" in struct {Type} because of old array size ({tempPropData.BinaryAttr.ArraySize}) not compared new array size ({item.BinaryAttr.ArraySize})");
+                        throw new Exception($"Cannot fill property \"{tempPropData.Name}\" in struct {Type} because of old array size ({tempPropData.BinaryAttr.ArraySize}) not compared new array size ({item.BinaryAttr.ArraySize})");
 
                     if (tempPropData.BinaryAttr.ArraySizeName != item.BinaryAttr.ArraySizeName)
-                        throw new Exception($"Cannot fill property \"{tempPropData.PropertyInfo.Name}\" in struct {Type} because of old array size name ({tempPropData.BinaryAttr.ArraySizeName}) not compared new array size name ({item.BinaryAttr.ArraySizeName})");
+                        throw new Exception($"Cannot fill property \"{tempPropData.Name}\" in struct {Type} because of old array size name ({tempPropData.BinaryAttr.ArraySizeName}) not compared new array size name ({item.BinaryAttr.ArraySizeName})");
 
 
                     if (tempPropData.BinaryAttr.TypeSize != item.BinaryAttr.TypeSize)
-                        throw new Exception($"Cannot fill property \"{tempPropData.PropertyInfo.Name}\" in struct {Type} because of old type size ({tempPropData.BinaryAttr.TypeSize}) not compared new type size ({item.BinaryAttr.TypeSize})");
+                        throw new Exception($"Cannot fill property \"{tempPropData.Name}\" in struct {Type} because of old type size ({tempPropData.BinaryAttr.TypeSize}) not compared new type size ({item.BinaryAttr.TypeSize})");
 
                     if (tempPropData.BinaryAttr.TypeSizeName != item.BinaryAttr.TypeSizeName)
-                        throw new Exception($"Cannot fill property \"{tempPropData.PropertyInfo.Name}\" in struct {Type} because of old type size name ({tempPropData.BinaryAttr.TypeSizeName}) not compared new type size name ({item.BinaryAttr.TypeSizeName})");
+                        throw new Exception($"Cannot fill property \"{tempPropData.Name}\" in struct {Type} because of old type size name ({tempPropData.BinaryAttr.TypeSizeName}) not compared new type size name ({item.BinaryAttr.TypeSizeName})");
 
                     foreach (var scheme in item.BinarySchemeAttrList)
                     {
@@ -74,7 +74,7 @@ namespace BinarySerializer
             return result;
         }
 
-        public BinaryStruct(Type type, string scheme, List<PropertyData> propertyList, Encoding coding, TypeStorage currentStorage, bool builderCompile = false)
+        public BinaryStruct(Type type, string scheme, List<BinaryMemberData> propertyList, Encoding coding, TypeStorage currentStorage, bool builderCompile = false)
         {
             Type = type;
             Scheme = scheme;
@@ -92,11 +92,11 @@ namespace BinarySerializer
                 {
                     PropertyList = FillPropertyes(existOldType, propertyList);
                 }
-                PropertyList = PropertyList.OrderBy(x => x.PropertyInfo.Name).ToList();
+                PropertyList = PropertyList.OrderBy(x => x.Name).ToList();
             }
             else
             {
-                PropertyList = propertyList.Where(x => x.BinarySchemeAttrList.FirstOrDefault(y => y.SchemeName == scheme) != null).Select(y => new PropertyData(y, scheme, CurrentStorage)).ToList();
+                PropertyList = propertyList.Where(x => x.BinarySchemeAttrList.FirstOrDefault(y => y.SchemeName == scheme) != null).Select(y => new BinaryMemberData(y, scheme, CurrentStorage)).ToList();
 
                 foreach (var item in PropertyList)
                 {
@@ -174,19 +174,19 @@ namespace BinarySerializer
             }
         }
 
-        public static void ProcessWrite(PropertyData item, BinaryStruct bs, GroboIL il, GroboIL.Local binaryStruct, GroboIL.Local value, GroboIL.Local buffer, GroboIL.Local offset, GroboIL.Local typeSize)
+        public static void ProcessWrite(BinaryMemberData item, BinaryStruct bs, GroboIL il, GroboIL.Local binaryStruct, GroboIL.Local value, GroboIL.Local buffer, GroboIL.Local offset, GroboIL.Local typeSize)
         {
             if (!string.IsNullOrEmpty(item.BinaryAttr?.ArraySizeName))
             {
-                item.ArraySizeProperty = bs.PropertyList.Find(x => x.PropertyInfo.Name == item.BinaryAttr.ArraySizeName);
+                item.ArraySizeProperty = bs.PropertyList.Find(x => x.Name == item.BinaryAttr.ArraySizeName);
                 if (item.ArraySizeProperty == null)
-                    throw new Exception($"ArraySizeProperty \"{item.BinaryAttr.ArraySizeName}\" for {item.PropertyInfo.Name} in Struct {bs.Type}:{item.PropertyInfo.DeclaringType} not found(Scheme: {bs.Scheme})");
+                    throw new Exception($"ArraySizeProperty \"{item.BinaryAttr.ArraySizeName}\" for {item.Name} in Struct {bs.Type}:{item.DeclaringType} not found(Scheme: {bs.Scheme})");
             }
             if (!string.IsNullOrEmpty(item.BinaryAttr?.TypeSizeName))
             {
-                item.TypeSizeProperty = bs.PropertyList.Find(x => x.PropertyInfo.Name == item.BinaryAttr.TypeSizeName);
+                item.TypeSizeProperty = bs.PropertyList.Find(x => x.Name == item.BinaryAttr.TypeSizeName);
                 if (item.TypeSizeProperty == null)
-                    throw new Exception($"TypeSizeProperty \"{item.BinaryAttr.TypeSizeName}\" for {item.PropertyInfo.Name} in Struct {bs.Type}:{item.PropertyInfo.DeclaringType} not found(Scheme: {bs.Scheme})");
+                    throw new Exception($"TypeSizeProperty \"{item.BinaryAttr.TypeSizeName}\" for {item.Name} in Struct {bs.Type}:{item.DeclaringType} not found(Scheme: {bs.Scheme})");
             }
 
             if (item.IsBaseType)
@@ -197,11 +197,11 @@ namespace BinarySerializer
 
             var methodBreak = il.DefineLabel("breakWriteMethod");
 
-            var in_value = il.DeclareLocal(item.PropertyInfo.PropertyType);
+            var in_value = il.DeclareLocal(item.Type);
 
             //значение вложенного класса
             il.Ldloc(value);
-            il.Call(item.PropertyInfo.GetGetMethod());
+            il.Call(item.Getter);
             il.Stloc(in_value);
 
             WriteSizeChecker(il, buffer, offset, 2);
@@ -281,12 +281,12 @@ namespace BinarySerializer
 
                     ReadObjectNull(il, methodBreak, buffer, offset, typeSize);
 
-                    var in_value = il.DeclareLocal(item.PropertyInfo.PropertyType);
+                    var in_value = il.DeclareLocal(item.Type);
 
-                    var constr = BinaryStruct.GetConstructor(item.PropertyInfo.PropertyType,null);
+                    var constr = BinaryStruct.GetConstructor(item.Type, null);
 
                     if (constr == null)
-                        throw new Exception($"Type {item.PropertyInfo.PropertyType} not have constructor with not parameters");
+                        throw new Exception($"Type {item.Type} not have constructor with not parameters");
 
                     il.Newobj(constr);
                     il.Stloc(in_value);

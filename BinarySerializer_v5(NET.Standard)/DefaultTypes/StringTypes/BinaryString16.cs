@@ -23,7 +23,7 @@ namespace BinarySerializer.DefaultTypes
             codingMethodInfo = typeof(BinaryStruct).GetProperty("Coding").GetMethod;
         }
 
-        public void GetReadILCode(PropertyData prop, BinaryStruct currentStruct, GroboIL il, GroboIL.Local binaryStruct, GroboIL.Local buffer, GroboIL.Local result, GroboIL.Local typeSize, GroboIL.Local offset, bool listValue)
+        public void GetReadILCode(BinaryMemberData prop, BinaryStruct currentStruct, GroboIL il, GroboIL.Local binaryStruct, GroboIL.Local buffer, GroboIL.Local result, GroboIL.Local typeSize, GroboIL.Local offset, bool listValue)
         {
             var exitLabel = il.DefineLabel("exit");
             BinaryStruct.ReadObjectNull(il, exitLabel, buffer, offset, typeSize);
@@ -69,7 +69,7 @@ namespace BinarySerializer.DefaultTypes
             il.MarkLabel(exitLabel);
         }
 
-        public void GetWriteILCode(PropertyData prop, BinaryStruct currentStruct, GroboIL il, GroboIL.Local binaryStruct, GroboIL.Local value, GroboIL.Local typeSize, GroboIL.Local buffer, GroboIL.Local offset, bool listValue)
+        public void GetWriteILCode(BinaryMemberData prop, BinaryStruct currentStruct, GroboIL il, GroboIL.Local binaryStruct, GroboIL.Local value, GroboIL.Local typeSize, GroboIL.Local buffer, GroboIL.Local offset, bool listValue)
         {
             BinaryStruct.WriteSizeChecker(il, buffer, offset, 3);
 

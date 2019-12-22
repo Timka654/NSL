@@ -53,6 +53,7 @@ namespace BinarySerializer_v5.Test.Structs
             r.s16 = Utils.GetRandomS();
             r.s32 = Utils.GetRandomS();
 
+            r.normalValue = r;
             return r;
         }
 
@@ -65,10 +66,10 @@ namespace BinarySerializer_v5.Test.Structs
             MemoryStream ms = new MemoryStream();
             BinaryWriter bw = new BinaryWriter(ms);
 
-            WriteString16(bw, base.serializedValue.nulls16);
-            WriteString32(bw, base.serializedValue.nulls32);
             WriteString16(bw, base.serializedValue.emptys16);
             WriteString32(bw, base.serializedValue.emptys32);
+            WriteString16(bw, base.serializedValue.nulls16);
+            WriteString32(bw, base.serializedValue.nulls32);
             WriteString16(bw, base.serializedValue.s16);
             WriteString32(bw, base.serializedValue.s32);
 
@@ -141,11 +142,11 @@ namespace BinarySerializer_v5.Test.Structs
 
             sw.Start();
 
-            r.nulls16 = ReadString16(br);
-            r.nulls32 = ReadString32(br);
-
             r.emptys16 = ReadString16(br);
             r.emptys32 = ReadString32(br);
+
+            r.nulls16 = ReadString16(br);
+            r.nulls32 = ReadString32(br);
 
             r.s16 = ReadString16(br);
             r.s32 = ReadString32(br);

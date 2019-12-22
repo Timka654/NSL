@@ -4,6 +4,7 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <RootNamespace>SocketCore.Extensions.BinarySerializer</RootNamespace>
     <AssemblyName>SocketCore.Extensions.BinarySerializer</AssemblyName>
+    <Configurations>Debug;Release;Unity</Configurations>
   </PropertyGroup>
 
   <ItemGroup>

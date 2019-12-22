@@ -83,6 +83,7 @@ namespace BinarySerializer_v5.Test.Structs
             {
                 r.sv1[i] = Utils.GetRandomS();
             }
+            r.normalValue = r;
 
             return r;
         }
@@ -138,21 +139,6 @@ namespace BinarySerializer_v5.Test.Structs
             MemoryStream ms = new MemoryStream();
             BinaryWriter bw = new BinaryWriter(ms);
 
-            if (WriteArrayHeader16(bw, base.binaryWritedValue.nullsv1))
-            {
-                foreach (var item in base.binaryWritedValue.nullsv1)
-                {
-                    StringStruct.WriteString16(bw, item);
-                }
-            }
-
-            if (WriteArrayHeader32(bw, base.binaryWritedValue.nullia32))
-            {
-                foreach (var item in base.binaryWritedValue.nullia32)
-                {
-                    bw.Write(item);
-                }
-            }
 
             if (WriteArrayHeader16(bw, base.binaryWritedValue.emptysv1))
             {
@@ -178,14 +164,6 @@ namespace BinarySerializer_v5.Test.Structs
                 }
             }
 
-            if (WriteArrayHeader16(bw, base.binaryWritedValue.sv1))
-            {
-                foreach (var item in base.binaryWritedValue.sv1)
-                {
-                    StringStruct.WriteString16(bw, item);
-                }
-            }
-
             if (WriteArrayHeader32(bw, base.binaryWritedValue.ia32))
             {
                 foreach (var item in base.binaryWritedValue.ia32)
@@ -199,6 +177,30 @@ namespace BinarySerializer_v5.Test.Structs
                 foreach (var item in base.binaryWritedValue.isa)
                 {
                     IntegerStruct.Write(bw, item);
+                }
+            }
+
+            if (WriteArrayHeader16(bw, base.binaryWritedValue.nullsv1))
+            {
+                foreach (var item in base.binaryWritedValue.nullsv1)
+                {
+                    StringStruct.WriteString16(bw, item);
+                }
+            }
+
+            if (WriteArrayHeader32(bw, base.binaryWritedValue.nullia32))
+            {
+                foreach (var item in base.binaryWritedValue.nullia32)
+                {
+                    bw.Write(item);
+                }
+            }
+
+            if (WriteArrayHeader16(bw, base.binaryWritedValue.sv1))
+            {
+                foreach (var item in base.binaryWritedValue.sv1)
+                {
+                    StringStruct.WriteString16(bw, item);
                 }
             }
 
@@ -216,33 +218,9 @@ namespace BinarySerializer_v5.Test.Structs
 
             var r = new ArrayStruct();
 
-            // nullsv1, int16
-            var ex16 = ReadArrayHeader16(br);
-
-            if (ex16.Item1)
-            {
-                r.nullsv1 = new string[ex16.Item2];
-                for (int i = 0; i < ex16.Item2; i++)
-                {
-                    r.nullsv1[i] = StringStruct.ReadString16(br);
-                }
-            }
-
-            //nullia32, int32
-            var ex32 = ReadArrayHeader32(br);
-
-            if (ex32.Item1)
-            {
-                r.nullia32 = new int[ex32.Item2];
-
-                for (int i = 0; i < ex32.Item2; i++)
-                {
-                    r.nullia32[i] = br.ReadInt32();
-                }
-            }
 
             //emptysv1, int16
-            ex16 = ReadArrayHeader16(br);
+            var ex16 = ReadArrayHeader16(br);
 
             if (ex16.Item1)
             {
@@ -254,7 +232,7 @@ namespace BinarySerializer_v5.Test.Structs
             }
 
             //emptyia32, int32
-            ex32 = ReadArrayHeader32(br);
+             var ex32 = ReadArrayHeader32(br);
 
             if (ex32.Item1)
             {
@@ -278,18 +256,7 @@ namespace BinarySerializer_v5.Test.Structs
                 }
             }
 
-            //sv1, int16
-            ex16 = ReadArrayHeader16(br);
-
-            if (ex16.Item1)
-            {
-                r.sv1 = new string[ex16.Item2];
-                for (int i = 0; i < ex16.Item2; i++)
-                {
-                    r.sv1[i] = StringStruct.ReadString16(br);
-                }
-            }
-
+            //ia32, int32
             ex32 = ReadArrayHeader32(br);
 
             if (ex32.Item1)
@@ -301,6 +268,7 @@ namespace BinarySerializer_v5.Test.Structs
                 }
             }
 
+            //isa, int16
             ex16 = ReadArrayHeader16(br);
 
             if (ex16.Item1)
@@ -309,6 +277,43 @@ namespace BinarySerializer_v5.Test.Structs
                 for (int i = 0; i < ex16.Item2; i++)
                 {
                     r.isa[i] = IntegerStruct.Read(br);
+                }
+            }
+
+            // nullsv1, int16
+            ex16 = ReadArrayHeader16(br);
+
+            if (ex16.Item1)
+            {
+                r.nullsv1 = new string[ex16.Item2];
+                for (int i = 0; i < ex16.Item2; i++)
+                {
+                    r.nullsv1[i] = StringStruct.ReadString16(br);
+                }
+            }
+
+            //nullia32, int32
+            ex32 = ReadArrayHeader32(br);
+
+            if (ex32.Item1)
+            {
+                r.nullia32 = new int[ex32.Item2];
+
+                for (int i = 0; i < ex32.Item2; i++)
+                {
+                    r.nullia32[i] = br.ReadInt32();
+                }
+            }
+
+            //sv1, int16
+            ex16 = ReadArrayHeader16(br);
+
+            if (ex16.Item1)
+            {
+                r.sv1 = new string[ex16.Item2];
+                for (int i = 0; i < ex16.Item2; i++)
+                {
+                    r.sv1[i] = StringStruct.ReadString16(br);
                 }
             }
 

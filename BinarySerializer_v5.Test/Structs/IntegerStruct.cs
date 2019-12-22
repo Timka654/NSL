@@ -70,19 +70,19 @@ namespace BinarySerializer_v5.Test.Structs
             r.i64 = Utils.GetRandomI64();
             r.ui64 = Utils.GetRandomUI64();
 
-            normalValue = r;
+            r.normalValue = r;
 
             return r;
         }
 
         public override void streamWriteFunc(Stopwatch sw)
         {
-            binaryWritedValue = base.serializedValue;
+            binaryWritedValue = base.normalValue;
             sw.Start();
             MemoryStream ms = new MemoryStream();
             BinaryWriter bw = new BinaryWriter(ms);
 
-            Write(bw, base.serializedValue);
+            Write(bw, base.normalValue);
 
             bw.Close();
 
@@ -92,15 +92,14 @@ namespace BinarySerializer_v5.Test.Structs
 
         public static void Write(BinaryWriter bw, IntegerStruct ist)
         {
-
             bw.Write(ist.b);
+            bw.Write(ist.i16);
+            bw.Write(ist.i32);
+            bw.Write(ist.i64);
             bw.Write(ist.i8);
             bw.Write(ist.si8);
-            bw.Write(ist.i16);
             bw.Write(ist.ui16);
-            bw.Write(ist.i32);
             bw.Write(ist.ui32);
-            bw.Write(ist.i64);
             bw.Write(ist.ui64);
         }
 
@@ -109,16 +108,16 @@ namespace BinarySerializer_v5.Test.Structs
             IntegerStruct r = new IntegerStruct();
             r.b = br.ReadBoolean();
 
+            r.i16 = br.ReadInt16();
+            r.i32 = br.ReadInt32();
+            r.i64 = br.ReadInt64();
             r.i8 = br.ReadByte();
             r.si8 = br.ReadSByte();
 
-            r.i16 = br.ReadInt16();
             r.ui16 = br.ReadUInt16();
 
-            r.i32 = br.ReadInt32();
             r.ui32 = br.ReadUInt32();
 
-            r.i64 = br.ReadInt64();
             r.ui64 = br.ReadUInt64();
 
             return r;
@@ -133,8 +132,8 @@ namespace BinarySerializer_v5.Test.Structs
             IntegerStruct r = Read(br);
 
             sw.Stop();
-            if(binaryReadedValue == null)
-            binaryReadedValue = r;
+            if (binaryReadedValue == null)
+                binaryReadedValue = r;
         }
     }
 }

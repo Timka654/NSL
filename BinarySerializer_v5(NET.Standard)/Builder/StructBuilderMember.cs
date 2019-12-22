@@ -6,64 +6,72 @@ using System.Reflection;
 
 namespace BinarySerializer.Builder
 {
-    public class StructBuilderProperty<T> : StructBuilderProperty
+    public class StructBuilderMember : BinaryMemberData
+    {
+        public BuilderMemberData data { get; set; }
+    }
+
+    public class StructBuilderMember<T> : StructBuilderMember
     {
         protected StructBuilder<T> currentBuilder { get; set; }
 
-        public StructBuilderProperty(StructBuilder<T> builder, PropertyInfo prop)
+        public StructBuilderMember(StructBuilder<T> builder, MemberInfo prop)
         {
             currentBuilder = builder;
 
-            property = new BuilderPropertyData(prop, builder.CurrentStorage);
+            if (prop is PropertyInfo p)
+                data = new BuilderPropertyData(p, builder.CurrentStorage);
+            else if (prop is FieldInfo f)
+                data = new BuilderFieldData(f, builder.CurrentStorage);
 
-            property.BinarySchemeAttrList = builder.Schemes.Select(x => new BinarySchemeAttribute(x)).ToList();
+            data.BinarySchemeAttrList = builder.Schemes.Select(x => new BinarySchemeAttribute(x)).ToList();
         }
 
-        public StructBuilderProperty<T> SetBinaryType<Q>()
+        public StructBuilderMember<T> SetBinaryType<Q>()
             where Q : IBasicType
         {
-            property.BinaryAttr = new BinaryAttribute(typeof(Q));
+            data.BinaryAttr = new BinaryAttribute(typeof(Q));
 
             return this;
         }
 
         public StructBuilderPartialType<Q, T> SetPartialType<Q>()
         {
-            property.BinaryAttr = new BinaryAttribute(typeof(Q));
+            data.BinaryAttr = new BinaryAttribute(typeof(Q));
 
             var temp = StructBuilderPartialType<Q, T>.GetStruct(this, currentBuilder.CurrentStorage);
 
-              property.CurrentBuilder = temp;
+            data.CurrentBuilder = temp;
             return temp;
         }
 
-        public StructBuilderProperty<T> SetTypeSize(int size)
+        public StructBuilderMember<T> SetTypeSize(int size)
         {
-            property.BinaryAttr.TypeSize = size;
+            data.BinaryAttr.TypeSize = size;
             return this;
         }
 
-        public StructBuilderProperty<T> SetArraySize(int size)
+        public StructBuilderMember<T> SetArraySize(int size)
         {
-            property.BinaryAttr.ArraySize = size;
+            data.BinaryAttr.ArraySize = size;
             return this;
         }
 
-        public StructBuilderProperty<T> SetSchemes(params string[] scheme)
+        public StructBuilderMember<T> SetSchemes(params string[] scheme)
         {
-            property.BinarySchemeAttrList = scheme.Select(x => new BinarySchemeAttribute(x)).ToList();
-
-            return this;
-        }
-
-        public StructBuilderProperty<T> AppendScheme(string scheme)
-        {
-            property.BinarySchemeAttrList.Add(new BinarySchemeAttribute(scheme));
+            data.BinarySchemeAttrList = scheme.Select(x => new BinarySchemeAttribute(x)).ToList();
 
             return this;
         }
 
-        public StructBuilderProperty<T> SetTypeSize(Expression<Func<T, object>> GetPropertyLambda)
+        public StructBuilderMember<T> AppendScheme(string scheme)
+        {
+            data.BinarySchemeAttrList.Add(new BinarySchemeAttribute(scheme));
+
+            return this;
+        }
+
+        public StructBuilderMember<T> SetTypeSize(Expression<Func<T, object>> GetPropertyLambda)
         {
             MemberExpression Exp = null;
 
@@ -89,12 +97,12 @@ namespace BinarySerializer.Builder
 
             var p = (PropertyInfo)Exp.Member;
 
-            property.TypeSizeProperty = currentBuilder.Propertyes.Find(x => x.property.PropertyInfo.Name == p.Name).property;
+            data.TypeSizeProperty = currentBuilder.Propertyes.Find(x => x.data.Name == p.Name).data;
 
             return this;
         }
 
-        public StructBuilderProperty<T> SetArraySize(Expression<Func<T, object>> GetPropertyLambda)
+        public StructBuilderMember<T> SetArraySize(Expression<Func<T, object>> GetPropertyLambda)
         {
             MemberExpression Exp = null;
 
@@ -120,7 +128,7 @@ namespace BinarySerializer.Builder
 
             var p = (PropertyInfo)Exp.Member;
 
-            property.ArraySizeProperty = currentBuilder.Propertyes.Find(x => x.property.PropertyInfo.Name == p.Name).property;
+            data.ArraySizeProperty = currentBuilder.Propertyes.Find(x => x.data.Name == p.Name).data;
 
             return this;
         }
@@ -130,10 +138,5 @@ namespace BinarySerializer.Builder
             currentBuilder.Propertyes.Add(this);
             return currentBuilder;
         }
-    }
-
-    public class StructBuilderProperty
-    {
-        internal BuilderPropertyData property { get; set; }
     }
 }

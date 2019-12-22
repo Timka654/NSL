@@ -4,9 +4,14 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <RootNamespace>SCL.Node</RootNamespace>
     <AssemblyName>SCL.Node</AssemblyName>
+    <Configurations>Debug;Release;Unity</Configurations>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <OutputPath>D:\SSDContent\ssd backup\2019-10-09_21-33-33\E\AppFox\SocketServerLibrary\UnityDebug\</OutputPath>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Unity|AnyCPU'">
     <OutputPath>D:\SSDContent\ssd backup\2019-10-09_21-33-33\E\AppFox\SocketServerLibrary\UnityDebug\</OutputPath>
   </PropertyGroup>
 
