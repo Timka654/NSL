@@ -15,10 +15,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\BinarySerializer_v5\BinarySerializer.csproj" />
     <ProjectReference Include="..\Logger\Logger.csproj" />
-    <ProjectReference Include="..\Socket.Core.Extensions.BinarySerializer\SocketCore.Extensions.BinarySerializer(NET.Core).csproj" />
     <ProjectReference Include="..\Socket.Core\SocketCore.csproj" />
+    <ProjectReference Include="..\SocketCore.Extensions.BinarySerializer(NET.Standard)\SocketCore.Extensions.BinarySerializer(NET.Standard).csproj" />
   </ItemGroup>
 
 </Project>

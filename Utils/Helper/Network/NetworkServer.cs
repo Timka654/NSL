@@ -178,7 +178,7 @@ namespace Utils.Helper.Network
         /// <param name="memberName"></param>
         /// <param name="sourceFilePath"></param>
         /// <param name="sourceLineNumber"></param>
-        protected virtual void Listener_OnSendPacket(Client<T> client, ushort pid, int len, string memberName, string sourceFilePath, int sourceLineNumber)
+        protected virtual void Listener_OnSendPacket(ServerClient<T> client, ushort pid, int len, string memberName, string sourceFilePath, int sourceLineNumber)
         {
             IPEndPoint ipep = null;
 
@@ -196,7 +196,7 @@ namespace Utils.Helper.Network
         /// <param name="client"></param>
         /// <param name="pid"></param>
         /// <param name="len"></param>
-        protected virtual void Listener_OnReceivePacket(Client<T> client, ushort pid, int len)
+        protected virtual void Listener_OnReceivePacket(ServerClient<T> client, ushort pid, int len)
         {
             IPEndPoint ipep = null;
 

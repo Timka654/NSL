@@ -10,7 +10,7 @@ using System.Text;
 
 namespace SocketServer.Utils
 {
-    public class NetworkClient<TData> : Client<TData>
+    public class NetworkClient<TData> : ServerClient<TData>
         where TData : IServerNetworkClient
     {
         ServerOptions<TData> serverOptions;

@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Cipher(NET.Standard)\Cipher(NET.Standard).csproj" />
+    <ProjectReference Include="..\Socket.Core\SocketCore.csproj" />
+    <ProjectReference Include="..\SocketCore.Extensions.BinarySerializer(NET.Standard)\SocketCore.Extensions.BinarySerializer(NET.Standard).csproj" />
+  </ItemGroup>
+
+</Project>

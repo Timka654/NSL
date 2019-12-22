@@ -109,7 +109,7 @@ namespace SocketServer
                 client = listener.EndAccept(result);
                 //инициализация слушателя клиента клиента
 #if DEBUG
-                var c = new Client<T>(client, serverOptions);
+                var c = new ServerClient<T>(client, serverOptions);
                 c.OnReceivePacket += OnReceivePacket;
                 c.OnSendPacket += OnSendPacket;
                 c.RunPacketReceiver();

@@ -1,16 +1,13 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.1</TargetFramework>
-    <RootNamespace>SocketCore.Extensions.BinarySerializer_NET.Standard_</RootNamespace>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <RootNamespace>SocketCore.Extensions.BinarySerializer</RootNamespace>
+    <AssemblyName>SocketCore.Extensions.BinarySerializer</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="..\Socket.Core.Extensions.BinarySerializer\IOExtensions.cs" Link="IOExtensions.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\BinarySerializer_v5\BinarySerializer_v5.csproj" />
+    <ProjectReference Include="..\BinarySerializer_v5(NET.Standard)\BinarySerializer(NET.Standard).csproj" />
     <ProjectReference Include="..\Socket.Core\SocketCore.csproj" />
   </ItemGroup>
 

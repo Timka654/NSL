@@ -12,7 +12,7 @@ namespace SocketServer
         public event ReceivePacketDebugInfo<T> OnReceivePacket;
         public event SendPacketDebugInfo<T> OnSendPacket;
 #endif
-        public Client<T> Connect(ServerOptions<T> options)
+        public ServerClient<T> Connect(ServerOptions<T> options)
         {
             Socket client = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             try
@@ -20,7 +20,7 @@ namespace SocketServer
                 if (!client.ConnectAsync(options.IpAddress, options.Port).Wait(2000))
                     throw new Exception();
 
-                var c = new Client<T>(client, options);
+                var c = new ServerClient<T>(client, options);
 #if DEBUG
                 c.OnReceivePacket += OnReceivePacket;
                 c.OnSendPacket += OnSendPacket;
@@ -31,7 +31,7 @@ namespace SocketServer
             catch
             {
 
-                return default(Client<T>);
+                return default(ServerClient<T>);
             }
         }
     }
