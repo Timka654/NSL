@@ -102,12 +102,12 @@ namespace SCL
             clientOptions.ClientData.RecoverySessionKeyArray = keys;
             clientOptions.ClientData.Network = this;
 
-            if(waitBuffer != null)
+            if (waitBuffer != null)
                 foreach (var item in waitBuffer)
                 {
                     clientOptions.ClientData.AddWaitPacket(item, 0, item.Length);
                 }
-            
+
             //установка переменной содержащую поток клиента
             this.sclient = client;
             currentPoint = (IPEndPoint)client.RemoteEndPoint;
@@ -121,7 +121,7 @@ namespace SCL
 
             //Bug fix, в системе Windows это значение берется из реестра, мы не сможем принять больше за раз чем прописанно в нем, если данных будет больше, то цикл зависнет
             sclient.ReceiveBufferSize = clientOptions.ReceiveBufferSize;
-            
+
             //Bug fix, отключение буфферизации пакетов для уменьшения трафика, если не отключить то получим фризы, в случае с игровым соединением эту опцию обычно нужно отключать
             sclient.NoDelay = true;
             _sendLocker.Set();
@@ -139,13 +139,13 @@ namespace SCL
 
             clientOptions.RunClientConnect();
         }
-        
+
         private void Receive(IAsyncResult result)
         {
             //замыкаем это все в блок try, если клиент отключился то EndReceive может вернуть ошибку
             try
             {
-                if(sclient == null)
+                if (sclient == null)
                     throw new ConnectionLostException(currentPoint, true);
                 //принимаем размер данных которые удалось считать
                 int rlen = sclient.EndReceive(result);
@@ -159,20 +159,17 @@ namespace SCL
                 //если размер ожидаемвых данных соответствует ожидаемому - обрабатываем
                 if (offset == lenght)
                 {
-                    if(data == false)
+                    if (data == false)
                     {
                         var peeked = inputCipher.Peek(receiveBuffer);
                         //если все ок
                         //получаем размер пакета
                         lenght = BitConverter.ToInt32(peeked, 0);
-    #if DEBUG
+#if DEBUG
                         int len = lenght;
                         ushort pid = BitConverter.ToUInt16(peeked, 4);
-                        ThreadHelper.InvokeOnMain(() =>
-                        {
-                            OnReceivePacket?.Invoke(this, pid, len);
-                        });
-    #endif
+                        OnReceive(pid, len);
+#endif
                         data = true;
 
                         while (receiveBuffer.Length < lenght)
@@ -185,14 +182,14 @@ namespace SCL
                     //если все на месте, запускаем обработку
                     if (offset == lenght && data)
                     {
-#if DEBUG
-                        if (this.receiveBuffer.Length > clientOptions.ReceiveBufferSize)
-                            Debug.LogWarning($"Warning: client receive buffer > {clientOptions.ReceiveBufferSize}({this.receiveBuffer.Length})");
-#endif
-                           //обработка пакета
+                        //#if DEBUG
+                        //                        if (this.receiveBuffer.Length > clientOptions.ReceiveBufferSize)
+                        //                            Debug.LogWarning($"Warning: client receive buffer > {clientOptions.ReceiveBufferSize}({this.receiveBuffer.Length})");
+                        //#endif
+                        //обработка пакета
 
-                           //дешефруем и засовываем это все в спец буффер в котором реализованы методы чтения типов, своего рода поток
-                           InputPacketBuffer pbuff = new InputPacketBuffer(inputCipher.Decode(receiveBuffer, 0, lenght));
+                        //дешефруем и засовываем это все в спец буффер в котором реализованы методы чтения типов, своего рода поток
+                        InputPacketBuffer pbuff = new InputPacketBuffer(inputCipher.Decode(receiveBuffer, 0, lenght));
 
                         // обнуляем показатели что-бы успешно запустить цикл заново
                         lenght = InputPacketBuffer.headerLenght;
@@ -208,12 +205,12 @@ namespace SCL
             }
             catch (ConnectionLostException clex)
             {
-                clientOptions.RunExtension(clex);
+                clientOptions.RunException(clex);
                 Disconnect();
             }
             catch (Exception ex)
             {
-                clientOptions.RunExtension(ex);
+                clientOptions.RunException(ex);
 
                 //отключаем клиента, в случае ошибки не в транспортном потоке а где-то в пакете, что-бы клиент не завис 
                 Disconnect();
@@ -227,7 +224,8 @@ namespace SCL
         public void Send(OutputPacketBuffer rbuff)
         {
 #if DEBUG
-            ThreadHelper.InvokeOnMain(() => { OnSendPacket?.Invoke(this, rbuff.PacketId, rbuff.PacketLenght); });
+            OnSend(rbuff);
+            //ThreadHelper.InvokeOnMain(() => { OnSendPacket?.Invoke(this, rbuff.PacketId, rbuff.PacketLenght); });
 #endif
 
             Send(rbuff.CompilePacket(), 0, rbuff.PacketLenght);
@@ -240,11 +238,23 @@ namespace SCL
             rbuff.Serialize<O>(obj, scheme);
 
 #if DEBUG
-            ThreadHelper.InvokeOnMain(() => { OnSendPacket?.Invoke(this, rbuff.PacketId, rbuff.PacketLenght); });
+            OnSend(rbuff);
+            //ThreadHelper.InvokeOnMain(() => { OnSendPacket?.Invoke(this, rbuff.PacketId, rbuff.PacketLenght); });
 #endif
 
             Send(rbuff.CompilePacket(), 0, rbuff.PacketLenght);
 
+        }
+
+
+        protected virtual void OnSend(OutputPacketBuffer rbuff)
+        {
+            OnSendPacket?.Invoke(this, rbuff.PacketId, rbuff.PacketLenght);
+        }
+
+        protected virtual void OnReceive(ushort pid, int len)
+        {
+            OnReceivePacket?.Invoke(this, pid, len);
         }
 
         private AutoResetEvent _sendLocker = new AutoResetEvent(true);
@@ -269,7 +279,7 @@ namespace SCL
             catch (Exception ex)
             {
                 clientOptions.ClientData.AddWaitPacket(buf, offset, lenght);
-                clientOptions.RunExtension(ex);
+                clientOptions.RunException(ex);
 
                 //отключаем клиента, лишним не будет
                 Disconnect();
@@ -297,7 +307,7 @@ namespace SCL
             {
                 var sas = ((SendAsyncState)r.AsyncState);
                 this.clientOptions.ClientData?.AddWaitPacket(sas.buf, sas.offset, sas.len);
-                clientOptions.RunExtension(clex);
+                clientOptions.RunException(clex);
                 Disconnect();
             }
             catch
@@ -321,7 +331,7 @@ namespace SCL
             }
             lenght = InputPacketBuffer.headerLenght;
             offset = 0;
-            if(disconnecteventcall)
+            if (disconnecteventcall)
                 this.clientOptions.RunClientDisconnect();
         }
 

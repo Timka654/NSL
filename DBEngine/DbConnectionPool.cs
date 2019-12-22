@@ -15,6 +15,8 @@ namespace DBEngine
         public abstract DBEngine.DBCommand GetStorageCommand(string storage_name = "");
 
         public abstract DBEngine.DBCommand GetQueryCommand(string query = "");
+
+        public abstract DbConnection GetDbConnection();
     }
 
     /// <summary>
@@ -75,7 +77,12 @@ namespace DBEngine
             if (options.DropApplicationWhenFailed)
                 new Exception("Drop application by DbConnectionPool");
         }
-        
+
+
+        public override DbConnection GetDbConnection()
+        {
+            return GetConnection();
+        }
 
         /// <summary>
         /// Получить подключение

@@ -6,12 +6,13 @@ using System.Threading.Tasks;
 
 namespace SCL
 {
-    public class SocketClient<T> : Client<T>
+    public class SocketClient<T, TOptions> : Client<T>
         where T : BaseSocketNetworkClient
+        where TOptions : ClientOptions<T>
     {
         Socket client;
 
-        public SocketClient(ClientOptions<T> options) : base(options)
+        public SocketClient(TOptions options) : base(options)
         {
         }
 
@@ -26,7 +27,7 @@ namespace SCL
             }
             catch (Exception ex)
             {
-                clientOptions.RunExtension(ex);
+                clientOptions.RunException(ex);
                 clientOptions.RunClientDisconnect();
             }
             return false;
@@ -67,7 +68,7 @@ namespace SCL
                 }
                 catch (Exception ex)
                 {
-                    clientOptions.RunExtension(ex);
+                    clientOptions.RunException(ex);
                     clientOptions.RunClientDisconnect();
                 }
 

@@ -4,10 +4,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
 
-namespace SCL
+namespace SCL.Unity
 {
-    public class BaseNetwork<T> where T: BaseSocketNetworkClient
+    public class BaseNetwork<T> : MonoBehaviour 
+        where T: BaseSocketNetworkClient
     {
         protected virtual string ClientType { get; }
 
@@ -65,7 +67,7 @@ namespace SCL
             SocketOptions.OnClientConnectEvent += SocketOptions_OnClientConnectEvent;
             SocketOptions.OnClientDisconnectEvent += SocketOptions_OnClientDisconnectEvent;
             SocketOptions.OnExtensionEvent += SocketOptions_OnExtensionEvent;
-            SocketOptions.NetworkClient = new SocketClient<T>(SocketOptions);
+            SocketOptions.NetworkClient = new SocketClient<T, SCL.ClientOptions<T>>(SocketOptions);
             SocketOptions.NetworkClient.Version = Version;
 #if DEBUG
             SocketOptions.NetworkClient.OnReceivePacket += NetworkClient_OnReceivePacket;
@@ -79,12 +81,16 @@ namespace SCL
 
 #if DEBUG
 
-        protected virtual void NetworkClient_OnSendPacket(Client<T> client, ushort pid, int len)
+        protected virtual void NetworkClient_OnSendPacket(SCL.Client<T> client, ushort pid, int len)
         {
+            if(LogEnabled)
+                Debug.Log($"{ClientType} packet send pid:{pid} len:{len}");
         }
 
-        protected virtual void NetworkClient_OnReceivePacket(Client<T> client, ushort pid, int len)
+        protected virtual void NetworkClient_OnReceivePacket(SCL.Client<T> client, ushort pid, int len)
         {
+            if (LogEnabled)
+                Debug.Log($"{ClientType} packet receive pid:{pid} len:{len}");
         }
 
 #endif
@@ -95,14 +101,17 @@ namespace SCL
 
         protected virtual void SocketOptions_OnExtensionEvent(Exception ex, T client)
         {
+            Debug.LogError(ex.ToString());
         }
 
         protected virtual void SocketOptions_OnClientConnectEvent(T client)
         {
+            Debug.Log($"{ClientType} server connected");
         }
 
         protected virtual void SocketOptions_OnClientDisconnectEvent(T client)
         {
+            Debug.LogError($"{ClientType} server connection lost");
         }
 
         protected virtual void OnApplicationQuit()

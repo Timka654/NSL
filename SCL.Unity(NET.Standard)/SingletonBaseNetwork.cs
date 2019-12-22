@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 
-namespace SCL.SocketClient
+namespace SCL.Unity
 {
     public class SingletonBaseNetwork<T, TType> : BaseNetwork<T> where T : BaseSocketNetworkClient
         where TType : MonoBehaviour

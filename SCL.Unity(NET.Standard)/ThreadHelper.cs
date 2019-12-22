@@ -2,7 +2,8 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using UnityEngine;
-namespace SCL
+
+namespace SCL.Unity
 {
     public class ThreadHelper : MonoBehaviour
     {

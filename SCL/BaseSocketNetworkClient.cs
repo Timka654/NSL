@@ -62,10 +62,10 @@ namespace SCL
             if (WaitPacketBuffer == null)
                 return;
 
-#if DEBUG
-            if (this.WaitPacketBuffer.Count > 20)
-                Debug.LogWarning($"Warning: wait packet buffer > 20({this.WaitPacketBuffer.Count})");
-#endif
+//#if DEBUG
+//            if (this.WaitPacketBuffer.Count > 20)
+//                Debug.LogWarning($"Warning: wait packet buffer > 20({this.WaitPacketBuffer.Count})");
+//#endif
 
             if (offset == 0 && lenght == packet_data.Length)
                 WaitPacketBuffer.Enqueue(packet_data);
@@ -78,7 +78,7 @@ namespace SCL
         }
 
         /// <summary>
-        /// Получить пакет из списка ожидания
+        /// Получить пакет из списка ожидания и уберает его с очереди
         /// </summary>
         /// <returns></returns>
         public byte[] GetWaitPacket()
@@ -87,12 +87,18 @@ namespace SCL
                 return null;
             return WaitPacketBuffer.Dequeue();
         }
+
+        /// <summary>
+        /// Получить все пакеты из списка ожидания и уберает их с очереди
+        /// </summary>
+        /// <returns></returns>
         public IEnumerable<byte[]> GetWaitPackets()
         {
-            if (WaitPacketBuffer == null || WaitPacketBuffer.Count == 0)
-                return new List<byte[]>();
+            IEnumerable<byte[]> result = WaitPacketBuffer?.ToArray() ?? new byte[0][];
 
-            return WaitPacketBuffer.ToArray();
+            ClearWaitPacketBuffer();
+
+            return result;
         }
 
         /// <summary>

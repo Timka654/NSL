@@ -16,9 +16,9 @@ namespace SCL.Utils
         public delegate void OnReceiveEventHandle(RDType value);
         public virtual event OnReceiveEventHandle OnReceiveEvent;
 
-        protected void InvokeEvent(RDType data)
+        protected virtual void InvokeEvent(RDType data)
         {
-            ThreadHelper.InvokeOnMain(() => { OnReceiveEvent?.Invoke(data); });
+            OnReceiveEvent?.Invoke(data);
         }
     }
 
@@ -32,9 +32,9 @@ namespace SCL.Utils
         public delegate void OnReceiveEventHandle();
         public virtual event OnReceiveEventHandle OnReceiveEvent;
 
-        protected void InvokeEvent()
+        protected virtual void InvokeEvent()
         {
-            ThreadHelper.InvokeOnMain(() => { OnReceiveEvent?.Invoke(); });
+            OnReceiveEvent?.Invoke();
         }
     }
 }

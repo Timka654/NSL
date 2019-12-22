@@ -93,9 +93,14 @@ namespace SCL
         /// <summary>
         /// Вызов события ошибка
         /// </summary>
-        public void RunExtension(Exception ex)
+        public void RunException(Exception ex)
         {
-            ThreadHelper.InvokeOnMain(() => { OnExtensionEvent?.Invoke(ex, ClientData); });
+            OnRunException(ex);
+        }
+
+        protected virtual void OnRunException(Exception ex)
+        {
+            OnExtensionEvent?.Invoke(ex, ClientData);
         }
 
         /// <summary>
@@ -104,7 +109,12 @@ namespace SCL
         /// <param name="client"></param>
         public void RunClientConnect()
         {
-            ThreadHelper.InvokeOnMain(() => { OnClientConnectEvent?.Invoke(ClientData); });
+            OnRunClientConnect();
+        }
+
+        protected virtual void OnRunClientConnect()
+        {
+            OnClientConnectEvent?.Invoke(ClientData);
         }
 
         /// <summary>
@@ -119,10 +129,15 @@ namespace SCL
                 lockedPacket?.UnlockPacket();
             }
 
-            ThreadHelper.InvokeOnMain(() => { OnClientDisconnectEvent?.Invoke(ClientData); });
+            OnRunClientDisconnect();
 
             if (EnableAutoRecovery)
                 RunRecovery();
+        }
+
+        protected virtual void OnRunClientDisconnect()
+        {
+            OnClientDisconnectEvent?.Invoke(ClientData);
         }
 
         internal void RunRecoverySession(RecoverySessionResultEnum result)
@@ -196,7 +211,7 @@ namespace SCL
 
         public T ClientData { get; set; }
 
-        public SocketClient<T> NetworkClient { get; set; }
+        public SocketClient<T,ClientOptions<T>> NetworkClient { get; set; }
 
         /// <summary>
         /// Размер буффера приходящих данных, если пакет больше этого значения то данные по реализованному алгоритму принять не получиться

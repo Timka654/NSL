@@ -7,15 +7,15 @@ using System.Data.Common;
 using System.Collections.Concurrent;
 using Logger;
 
-namespace Utils.Helper.DbCmdQueue
+namespace DBEngine.Extensions.CmdQueue
 {
-    public class UserDbCmdQueueStorage : DbCommandQueue
+    public class UserDBCmdQueue : DbCommandQueue
     {
         private ConcurrentDictionary<int, List<long>> UserActionListMap = new ConcurrentDictionary<int, List<long>>();
 
         private ConcurrentDictionary<long, int> ActionUserMap = new ConcurrentDictionary<long, int>();
 
-        public UserDbCmdQueueStorage(DbConnectionPool connection_pool, ILogger logger) : base(connection_pool, logger)
+        public UserDBCmdQueue(DbConnectionPool connection_pool, ILogger logger) : base(connection_pool, logger)
         {
             base.ExecutedDbCommandEvent += UserDbCmdQueueStorage_ExecutedDbCommandEvent;
         }

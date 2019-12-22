@@ -16,7 +16,7 @@ namespace SCL.Unity.NAT.Proxy.ProxyNetwork.Data.Packets
     {
         internal static SignIn<T> Instance { get; set; }
 
-        public SignIn(ClientOptions<T> options) : base(options)
+        public SignIn(SCL.ClientOptions<T> options) : base(options)
         {
             Instance = this;
         }

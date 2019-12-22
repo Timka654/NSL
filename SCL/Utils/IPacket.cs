@@ -38,7 +38,7 @@ namespace SCL.Utils
                 return;
             }
 
-            Options.RunExtension(new Exception("Не возможно отправить сообщение, соединение не установлено"));
+            Options.RunException(new Exception("Не возможно отправить сообщение, соединение не установлено"));
             SuccessSend = false;
         }
 
@@ -51,7 +51,7 @@ namespace SCL.Utils
                 return;
             }
 
-            Options.RunExtension(new Exception("Не возможно отправить сообщение, соединение не установлено"));
+            Options.RunException(new Exception("Не возможно отправить сообщение, соединение не установлено"));
             SuccessSend = false;
         }
     }
