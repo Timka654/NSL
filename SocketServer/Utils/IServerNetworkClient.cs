@@ -40,5 +40,9 @@ namespace SocketServer.Utils
         {
             Network.Send(packet);
         }
+
+        public virtual void ChangeOwner(IServerNetworkClient client)
+        {
+        }
     }
 }

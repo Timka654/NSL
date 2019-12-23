@@ -25,7 +25,7 @@ namespace BinarySerializer_v5.Test
             Structs.DictionaryStruct _ds = Structs.DictionaryStruct.GetRndValue();
             Structs.OtherStruct _os = Structs.OtherStruct.GetRndValue();
 
-            int iteration = 1000;
+            int iteration = 10000;
 
             Console.WriteLine("BinarySerializer");
 

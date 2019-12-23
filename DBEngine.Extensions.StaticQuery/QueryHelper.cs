@@ -47,7 +47,7 @@ namespace ServerOptions.Extensions.StaticQuery
 
                 obj = (IStaticQuery)Activator.CreateInstance(item.type);
 
-                obj.Run(conPull.GetDbConnection());
+                obj.Run(conPull);
 
                 Debug.WriteLine($"Loading Query: query: {item.attr.Name} type: {item.type.FullName}");
 

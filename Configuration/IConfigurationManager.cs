@@ -107,12 +107,20 @@ namespace ConfigurationEngine
     public abstract class IConfigurationManager<T> : IConfigurationManager
         where T : IConfigurationManager<T>
     {
+        public IConfigurationManager(string fileName, char nodeSeparator = '/') : base(fileName, nodeSeparator)
+        { 
+        
+        }
+
         /// <summary>
         /// Установка значений по умолчанию для перезагрузки
         /// </summary>
         public virtual T SetDefaults(List<ConfigurationInfo> defaultConfigurationList, bool reloading = false)
         {
             DefaultConfigurationList = defaultConfigurationList;
+
+            if (reloading)
+                ReloadData();
 
             return (T)this;
         }

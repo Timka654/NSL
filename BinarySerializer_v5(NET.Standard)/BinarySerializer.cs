@@ -23,9 +23,9 @@ namespace BinarySerializer
         }
 
 
-        public T Deserialize<T>(string scheme, byte[] buffer, ref int offset)
+        public T Deserialize<T>(string scheme, byte[] buffer, ref int offset, int initialSize = 32)
         {
-            var type = storage.GetTypeInfo(typeof(T), scheme);
+            var type = storage.GetTypeInfo(typeof(T), scheme, initialSize);
             var result = type.ReadMethod(buffer, type, offset);
 
             offset = result.Item1;
@@ -33,17 +33,17 @@ namespace BinarySerializer
             return (T)result.Item2;
         }
 
-        public T Deserialize<T>(string scheme, byte[] buffer)
+        public T Deserialize<T>(string scheme, byte[] buffer, int initialSize = 32)
         {
-            var type = storage.GetTypeInfo(typeof(T), scheme);
+            var type = storage.GetTypeInfo(typeof(T), scheme,initialSize);
             var result = type.ReadMethod(buffer, type, 0);
 
             return (T)result.Item2;
         }
 
-        public byte[] Serialize<T>(string scheme, T obj)
+        public byte[] Serialize<T>(string scheme, T obj, int initialSize = 32)
         {
-           var type = storage.GetTypeInfo(typeof(T), scheme);
+           var type = storage.GetTypeInfo(typeof(T), scheme, initialSize);
            var result = type.WriteMethod(obj, type);
 
             var buffer = result.Item2;

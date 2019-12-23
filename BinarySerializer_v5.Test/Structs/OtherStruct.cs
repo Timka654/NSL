@@ -38,6 +38,7 @@ namespace BinarySerializer_v5.Test.Structs
             r.d1 = Utils.GetRandomD();
 
             r.normalValue = r;
+            r.InitialSize = 28;
             return r;
         }
 

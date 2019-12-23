@@ -8,44 +8,44 @@ using System.Text;
 
 namespace BinarySerializer_v5.Test.Structs
 {
-    [BinarySerializer.BinaryPreCompile("default", 30)]
+    [BinarySerializer.BinaryPreCompile("default", 32)]
     public class IntegerStruct : ITestStruct<IntegerStruct>
     {
         [Binary(typeof(BinaryBool))]
         [BinaryScheme("default")]
-        public bool b { get; set; }
+        public bool b;
 
         [Binary(typeof(BinaryInt8))]
         [BinaryScheme("default")]
-        public byte i8 { get; set; }
+        public byte i8;
 
         [Binary(typeof(BinarySInt8))]
         [BinaryScheme("default")]
-        public sbyte si8 { get; set; }
+        public sbyte si8;
 
         [Binary(typeof(BinaryInt16))]
         [BinaryScheme("default")]
-        public short i16 { get; set; }
+        public short i16;
 
         [Binary(typeof(BinaryUInt16))]
         [BinaryScheme("default")]
-        public ushort ui16 { get; set; }
+        public ushort ui16;
 
         [Binary(typeof(BinaryInt32))]
         [BinaryScheme("default")]
-        public int i32 { get; set; }
+        public int i32;
 
         [Binary(typeof(BinaryUInt32))]
         [BinaryScheme("default")]
-        public uint ui32 { get; set; }
+        public uint ui32;
 
         [Binary(typeof(BinaryInt64))]
         [BinaryScheme("default")]
-        public long i64 { get; set; }
+        public long i64;
 
         [Binary(typeof(BinaryUInt64))]
         [BinaryScheme("default")]
-        public ulong ui64 { get; set; }
+        public ulong ui64;
 
         public static IntegerStruct GetRndValue()
         {
@@ -71,6 +71,7 @@ namespace BinarySerializer_v5.Test.Structs
             r.ui64 = Utils.GetRandomUI64();
 
             r.normalValue = r;
+            r.InitialSize = 32;
 
             return r;
         }

@@ -80,6 +80,7 @@ namespace BinarySerializer_v5.Test.Structs
                 r.isd.Add(Utils.GetRandomI32(), IntegerStruct.GetRndValue());
             }
             r.normalValue = r;
+            r.InitialSize = 256;
 
             return r;
         }

@@ -2,26 +2,29 @@
 
 namespace BinarySerializer.Builder
 {
-    public class BuilderMemberData : BinaryMemberData
+    public interface IBuilderMemberData
     {
-        public StructBuilder CurrentBuilder;
-
-        public BuilderMemberData(BinaryMemberData binaryMemberData, string scheme, TypeStorage storage) : base(binaryMemberData, scheme, storage)
-        {
-        }
+        StructBuilder CurrentBuilder { get; set; }
+        BinaryMemberData Member { get; }
     }
 
-    public class BuilderPropertyData : BuilderMemberData
+    public class BuilderPropertyData : PropertyData, IBuilderMemberData
     {
-        public BuilderPropertyData(PropertyInfo propertyInfo, TypeStorage storage) : base(new PropertyData(propertyInfo,storage, true), "", storage)
+        public BuilderPropertyData(PropertyInfo propertyInfo, TypeStorage storage) : base(propertyInfo,storage, true)
         {
         }
+
+        public StructBuilder CurrentBuilder { get; set; }
+        public BinaryMemberData Member { get => this; }
     }
 
-    public class BuilderFieldData : BuilderMemberData
+    public class BuilderFieldData : FieldData, IBuilderMemberData
     {
-        public BuilderFieldData(FieldInfo propertyInfo, TypeStorage storage) : base(new FieldData(propertyInfo, storage, true), "", storage)
+        public BuilderFieldData(FieldInfo propertyInfo, TypeStorage storage) : base(propertyInfo, storage, true)
         {
         }
+
+        public StructBuilder CurrentBuilder { get; set; }
+        public BinaryMemberData Member { get => this; }
     }
 }

@@ -29,10 +29,9 @@ namespace BinarySerializer
         {
             var result = CheckExist(type, initialSize);
 
-
             if (!TypeCacheMap[type].ContainsKey(schemeName))
             {
-                TypeCacheMap[type].TryAdd(schemeName, TypeCacheMap[type][""].GetSchemeData(schemeName, Coding, this));
+                TypeCacheMap[type].TryAdd(schemeName, result.GetSchemeData(schemeName, Coding, this));
             }
 
             return TypeCacheMap[type][schemeName];

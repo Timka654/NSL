@@ -26,12 +26,14 @@ namespace BinarySerializer_v5.Test
 
         protected T normalValue;
 
+        protected int InitialSize = 32;
+
         public virtual void bsSerializeAction(Stopwatch sw)
         {
             if (serializerWriteBuffer == null)
             {
                 serializedValue = normalValue;
-                serializerWriteBuffer = bs.Serialize("default", normalValue);
+                serializerWriteBuffer = bs.Serialize("default", normalValue, InitialSize);
             }
             sw.Start();
             bs.Serialize("default", normalValue);
@@ -43,12 +45,12 @@ namespace BinarySerializer_v5.Test
             int offset = 0;
             if (deserializedValue == null)
             {
-                deserializedValue = bs.Deserialize<T>("default", serializerWriteBuffer,ref offset);
+                deserializedValue = bs.Deserialize<T>("default", serializerWriteBuffer,ref offset, InitialSize);
                 offset = 0;
             }
 
             sw.Start();
-            bs.Deserialize<T>("default", serializerWriteBuffer, ref offset);
+            bs.Deserialize<T>("default", serializerWriteBuffer, ref offset, InitialSize);
             sw.Stop();
         }
 

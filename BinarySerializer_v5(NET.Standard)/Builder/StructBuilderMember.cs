@@ -8,7 +8,7 @@ namespace BinarySerializer.Builder
 {
     public class StructBuilderMember : BinaryMemberData
     {
-        public BuilderMemberData data { get; set; }
+        public IBuilderMemberData data { get; set; }
     }
 
     public class StructBuilderMember<T> : StructBuilderMember
@@ -24,20 +24,20 @@ namespace BinarySerializer.Builder
             else if (prop is FieldInfo f)
                 data = new BuilderFieldData(f, builder.CurrentStorage);
 
-            data.BinarySchemeAttrList = builder.Schemes.Select(x => new BinarySchemeAttribute(x)).ToList();
+            data.Member.BinarySchemeAttrList = builder.Schemes.Select(x => new BinarySchemeAttribute(x)).ToList();
         }
 
         public StructBuilderMember<T> SetBinaryType<Q>()
             where Q : IBasicType
         {
-            data.BinaryAttr = new BinaryAttribute(typeof(Q));
+            data.Member.BinaryAttr = new BinaryAttribute(typeof(Q));
 
             return this;
         }
 
         public StructBuilderPartialType<Q, T> SetPartialType<Q>()
         {
-            data.BinaryAttr = new BinaryAttribute(typeof(Q));
+            data.Member.BinaryAttr = new BinaryAttribute(typeof(Q));
 
             var temp = StructBuilderPartialType<Q, T>.GetStruct(this, currentBuilder.CurrentStorage);
 
@@ -47,26 +47,26 @@ namespace BinarySerializer.Builder
 
         public StructBuilderMember<T> SetTypeSize(int size)
         {
-            data.BinaryAttr.TypeSize = size;
+            data.Member.BinaryAttr.TypeSize = size;
             return this;
         }
 
         public StructBuilderMember<T> SetArraySize(int size)
         {
-            data.BinaryAttr.ArraySize = size;
+            data.Member.BinaryAttr.ArraySize = size;
             return this;
         }
 
         public StructBuilderMember<T> SetSchemes(params string[] scheme)
         {
-            data.BinarySchemeAttrList = scheme.Select(x => new BinarySchemeAttribute(x)).ToList();
+            data.Member.BinarySchemeAttrList = scheme.Select(x => new BinarySchemeAttribute(x)).ToList();
 
             return this;
         }
 
         public StructBuilderMember<T> AppendScheme(string scheme)
         {
-            data.BinarySchemeAttrList.Add(new BinarySchemeAttribute(scheme));
+            data.Member.BinarySchemeAttrList.Add(new BinarySchemeAttribute(scheme));
 
             return this;
         }
@@ -97,7 +97,7 @@ namespace BinarySerializer.Builder
 
             var p = (PropertyInfo)Exp.Member;
 
-            data.TypeSizeProperty = currentBuilder.Propertyes.Find(x => x.data.Name == p.Name).data;
+            data.Member.TypeSizeProperty = currentBuilder.Propertyes.Find(x => x.data.Member.Name == p.Name).data.Member;
 
             return this;
         }
@@ -128,7 +128,7 @@ namespace BinarySerializer.Builder
 
             var p = (PropertyInfo)Exp.Member;
 
-            data.ArraySizeProperty = currentBuilder.Propertyes.Find(x => x.data.Name == p.Name).data;
+            data.Member.ArraySizeProperty = currentBuilder.Propertyes.Find(x => x.data.Member.Name == p.Name).data.Member;
 
             return this;
         }

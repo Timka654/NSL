@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Reflection.Metadata;
 using System.Text;
 
 namespace BinarySerializer_v5.Test.Structs
@@ -12,6 +13,7 @@ namespace BinarySerializer_v5.Test.Structs
     public class StringStruct : ITestStruct<StringStruct>
     {
         private static UTF8Encoding encoding = new UTF8Encoding();
+
 
         [Binary(typeof(BinaryString16))]
         [BinaryScheme("default")]
@@ -54,6 +56,7 @@ namespace BinarySerializer_v5.Test.Structs
             r.s32 = Utils.GetRandomS();
 
             r.normalValue = r;
+            r.InitialSize = 256;
             return r;
         }
 

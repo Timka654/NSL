@@ -84,6 +84,7 @@ namespace BinarySerializer_v5.Test.Structs
                 r.sv1[i] = Utils.GetRandomS();
             }
             r.normalValue = r;
+            r.InitialSize = 256;
 
             return r;
         }

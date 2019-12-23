@@ -3,7 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
+using System.Reflection.Emit;
 using System.Text;
 
 namespace BinarySerializer
@@ -119,12 +121,11 @@ namespace BinarySerializer
     {
         private static MethodInfo SetterMethodInfo = typeof(FieldInfo).GetMethod("SetValue");
 
-        private static MethodInfo GetterMethodInfo = typeof(FieldInfo).GetMethod("GetValue");
-
         public FieldInfo FieldInfo { get; set; }
 
         public FieldData(FieldInfo fieldInfo, TypeStorage storage, bool builder = false)
         {
+            //new FieldInfo().GetValue()
             FieldInfo = fieldInfo;
             MemberInfo = fieldInfo;
 
@@ -146,9 +147,12 @@ namespace BinarySerializer
 
             }
 
-            Getter = GetterMethodInfo;
 
-            Setter = SetterMethodInfo;
+            Getter = MakeGetter(fieldInfo);
+
+
+
+            Setter = MakeSetter(fieldInfo);
 
             Name = fieldInfo.Name;
 
@@ -160,6 +164,43 @@ namespace BinarySerializer
         public FieldData(FieldData fieldInfo, string scheme, TypeStorage storage) : base(fieldInfo, scheme, storage)
         {
             FieldInfo = fieldInfo.FieldInfo;
+        }
+
+        static MethodInfo MakeSetter(FieldInfo field)
+        {
+            DynamicMethod m = new DynamicMethod(
+                "setter", typeof(void), new Type[] { field.DeclaringType, field.FieldType }, typeof(FieldData));
+            ILGenerator cg = m.GetILGenerator();
+
+            // arg0.<field> = arg1
+            cg.Emit(OpCodes.Ldarg_0);
+            cg.Emit(OpCodes.Ldarg_1);
+            cg.Emit(OpCodes.Stfld, field);
+            cg.Emit(OpCodes.Ret);
+
+            var a = typeof(Action<,>);
+
+            var tmp = a.MakeGenericType(field.DeclaringType, field.FieldType);
+
+            return m.CreateDelegate(tmp).GetMethodInfo();
+        }
+
+        static MethodInfo MakeGetter(FieldInfo field)
+        {
+            DynamicMethod m = new DynamicMethod(
+                "setter", field.FieldType, new Type[] { field.DeclaringType }, typeof(FieldData));
+            ILGenerator cg = m.GetILGenerator();
+
+            // arg0.<field> = arg1
+            cg.Emit(OpCodes.Ldarg_0);
+            cg.Emit(OpCodes.Ldloc, field);
+            cg.Emit(OpCodes.Ret);
+
+            var a = typeof(Func<,>);
+
+            var tmp = a.MakeGenericType(field.DeclaringType, field.FieldType);
+
+            return m.CreateDelegate(tmp).GetMethodInfo();
         }
     }
 }

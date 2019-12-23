@@ -32,6 +32,7 @@ namespace BinarySerializer_v5.Test.Structs
             r.f64 = Utils.GetRandomF64();
 
             r.normalValue = r;
+            r.InitialSize = 12;
             return r;
         }
 

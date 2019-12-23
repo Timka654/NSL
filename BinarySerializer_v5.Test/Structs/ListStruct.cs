@@ -73,6 +73,7 @@ namespace BinarySerializer_v5.Test.Structs
                 r.isl.Add(IntegerStruct.GetRndValue());
             }
             r.normalValue = r;
+            r.InitialSize = 256;
 
             return r;
         }
