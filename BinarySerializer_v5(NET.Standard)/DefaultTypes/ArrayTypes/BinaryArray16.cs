@@ -47,7 +47,7 @@ namespace BinarySerializer.DefaultTypes
             il.Stloc(list);
             il.Ldloc(result);
             il.Ldloc(list);
-            il.Call(prop.Setter, isVirtual: true);
+            prop.PropertySetter(il);
 
 
 
@@ -106,21 +106,21 @@ namespace BinarySerializer.DefaultTypes
             il.MarkLabel(exitLabel);
         }
 
-        public void GetWriteILCode(BinaryMemberData prop, BinaryStruct currentStruct, GroboIL il, GroboIL.Local binaryStruct, GroboIL.Local value, GroboIL.Local typeSize, GroboIL.Local buffer, GroboIL.Local offset, bool listValue)
+        public void GetWriteILCode(BinaryMemberData prop, BinaryStruct currentStruct, GroboIL il, GroboIL.Local binaryStruct, GroboIL.Local value, GroboIL.Local typeSize, GroboIL.Local buffer, bool listValue)
         {
             var arr = il.DeclareLocal(prop.Type);
 
             il.Ldloc(value);
-            il.Call(prop.Getter, isVirtual: prop.Getter.IsVirtual);
+            prop.PropertyGetter(il);
             il.Stloc(arr);
 
             var exitLabel = il.DefineLabel("exit");
 
-            BinaryStruct.WriteSizeChecker(il, buffer, offset, 3);
+            //BinaryStruct.WriteSizeChecker(il, buffer, offset, 3);
 
-            BinaryStruct.WriteObjectNull(il, exitLabel, arr, buffer, offset, typeSize);
+            BinaryStruct.WriteObjectNull(currentStruct, il, exitLabel, arr, buffer, typeSize);
 
-            var arrSize = il.DeclareLocal(typeof(byte[]));
+            var arrSize = currentStruct.TempBuildValues["tempLenghtBuffer"].Value;
             var len = il.DeclareLocal(typeof(short));
 
             il.Ldloc(arr);
@@ -131,26 +131,27 @@ namespace BinarySerializer.DefaultTypes
             il.Call(writeBitConverterMethodInfo);
             il.Stloc(arrSize);
 
-            il.Ldloc(buffer);
-            il.Ldloc(offset);
-            il.Ldloc(arrSize);
-            il.Ldc_I4(0);
-            il.Ldelem(typeof(byte));
-            il.Stelem(typeof(byte));
+            //il.Ldloc(buffer);
+            //il.Ldloc(offset);
+            //il.Ldloc(arrSize);
+            //il.Ldc_I4(0);
+            //il.Ldelem(typeof(byte));
+            //il.Stelem(typeof(byte));
 
-            for (int i = 1; i < 2; i++)
-            {
-                il.Ldloc(buffer);
-                il.Ldloc(offset);
-                il.Ldc_I4(i);
-                il.Add();
-                il.Ldloc(arrSize);
-                il.Ldc_I4(i);
-                il.Ldelem(typeof(byte));
-                il.Stelem(typeof(byte));
-            }
+            //for (int i = 1; i < 2; i++)
+            //{
+            //    il.Ldloc(buffer);
+            //    il.Ldloc(offset);
+            //    il.Ldc_I4(i);
+            //    il.Add();
+            //    il.Ldloc(arrSize);
+            //    il.Ldc_I4(i);
+            //    il.Ldelem(typeof(byte));
+            //    il.Stelem(typeof(byte));
+            //}
 
-            BinaryStruct.WriteOffsetAppend(il, offset, 2);
+            il.ArraySetter(buffer, arrSize, 2);
+            //BinaryStruct.WriteOffsetAppend(il, offset, 2);
 
 
             il.Ldloc(len);
@@ -183,11 +184,11 @@ namespace BinarySerializer.DefaultTypes
             if (typeof(IBasicType).IsAssignableFrom(prop.BinaryAttr.Type.GetGenericArguments()[0]))
             {
                 IBasicType t = (IBasicType)Activator.CreateInstance(prop.BinaryAttr.Type.GetGenericArguments()[0]);
-                t.GetWriteILCode(prop, currentStruct, il, binaryStruct, currentValue, typeSize, buffer, offset, true);
+                t.GetWriteILCode(prop, currentStruct, il, binaryStruct, currentValue, typeSize, buffer, true);
             }
             else
             {
-                BinaryStruct.CompileWriter(currentStruct.CurrentStorage.GetTypeInfo(type, currentStruct.Scheme), il, binaryStruct, currentValue, buffer, offset, typeSize);
+                BinaryStruct.CompileWriter(currentStruct.CurrentStorage.GetTypeInfo(type, currentStruct.Scheme), il, binaryStruct, currentValue, buffer, typeSize);
             }
 
             //end body

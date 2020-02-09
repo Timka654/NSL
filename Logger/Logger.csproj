@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <Configurations>Debug;Release;Unity</Configurations>
+    <Configurations>Debug;Release;Unity;UnityDebug</Configurations>
   </PropertyGroup>
 
 </Project>

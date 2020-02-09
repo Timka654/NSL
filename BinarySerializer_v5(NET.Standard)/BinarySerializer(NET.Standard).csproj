@@ -4,11 +4,16 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <RootNamespace>BinarySerializer</RootNamespace>
     <AssemblyName>BinarySerializer</AssemblyName>
-    <Configurations>Debug;Release;Unity</Configurations>
+    <Configurations>Debug;Release;Unity;UnityDebug</Configurations>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DefineConstants>TRACE;NOT_UNITY</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='UnityDebug|AnyCPU'">
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <OutputPath>D:\SSDContent\ssd backup\2019-10-09_21-33-33\E\AppFox\SocketServerLibrary\UnityDebug\</OutputPath>
   </PropertyGroup>
 
   <ItemGroup>

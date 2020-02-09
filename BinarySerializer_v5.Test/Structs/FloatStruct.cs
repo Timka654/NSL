@@ -13,11 +13,11 @@ namespace BinarySerializer_v5.Test.Structs
     {
         [Binary(typeof(BinaryFloat32))]
         [BinaryScheme("default")]
-        public float f32 { get; set; }
+        public float f32;
 
         [Binary(typeof(BinaryFloat64))]
         [BinaryScheme("default")]
-        public double f64 { get; set; }
+        public double f64;
 
         public static FloatStruct GetRndValue()
         {

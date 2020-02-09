@@ -21,6 +21,14 @@ namespace ServerOptions.Extensions.Manager
         /// <returns>Кол-во менеджеров которые были инициализированы</returns>
         public static int LoadManagers<T>(this ServerOptions<T> serverOptions, Assembly assembly, Type selectAttrbuteType) where T : IServerNetworkClient
         {
+            return LoadManagers(assembly, selectAttrbuteType, (a, t) =>
+            {
+                serverOptions.HelperLogger.Append(Logger.LoggerLevel.Info, $"{a.ManagerName ?? t.Name} Loaded");
+            });
+        }
+
+        public static int LoadManagers(Assembly assembly, Type selectAttrbuteType, Action<ManagerLoadAttribute, Type> onCreated = null)
+        {
             if (!typeof(ManagerLoadAttribute).IsAssignableFrom(selectAttrbuteType))
             {
                 throw new Exception($"{selectAttrbuteType.FullName} must be assignable from {typeof(ManagerLoadAttribute).FullName}");
@@ -39,7 +47,7 @@ namespace ServerOptions.Extensions.Manager
             {
                 Debug.WriteLine($"Loading Manager: name: {item.attr.ManagerName ?? item.type.Name} type: {item.type.FullName}");
                 Activator.CreateInstance(item.type);
-                serverOptions.HelperLogger.Append(Logger.LoggerLevel.Info, $"{item.attr.ManagerName ?? item.type.Name} Loaded");
+                onCreated?.Invoke(item.attr, item.type);
             }
 
             return types.Count();
@@ -55,6 +63,11 @@ namespace ServerOptions.Extensions.Manager
         public static int LoadManagers<T>(this ServerOptions<T> serverOptions, Type selectAttrbuteType) where T : IServerNetworkClient
         {
             return LoadManagers<T>(serverOptions, Assembly.GetCallingAssembly(), selectAttrbuteType);
+        }
+
+        public static int LoadManagers(Type selectAttrbuteType, Action<ManagerLoadAttribute, Type> onCreated = null)
+        {
+            return LoadManagers(Assembly.GetCallingAssembly(), selectAttrbuteType, onCreated);
         }
     }
 }

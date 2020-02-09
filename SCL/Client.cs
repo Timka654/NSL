@@ -249,12 +249,16 @@ namespace SCL
 
         protected virtual void OnSend(OutputPacketBuffer rbuff)
         {
+#if DEBUG
             OnSendPacket?.Invoke(this, rbuff.PacketId, rbuff.PacketLenght);
+#endif
         }
 
         protected virtual void OnReceive(ushort pid, int len)
         {
+#if DEBUG
             OnReceivePacket?.Invoke(this, pid, len);
+#endif
         }
 
         private AutoResetEvent _sendLocker = new AutoResetEvent(true);
@@ -342,7 +346,7 @@ namespace SCL
             return sclient.Connected;
         }
 
-        #region SendOneValueExtensions
+#region SendOneValueExtensions
 
         public void SendEmpty(ushort packetId)
         {
@@ -498,7 +502,7 @@ namespace SCL
             Send(rbuff.CompilePacket(), 0, rbuff.PacketLenght);
         }
 
-        #endregion
+#endregion
 
     }
 

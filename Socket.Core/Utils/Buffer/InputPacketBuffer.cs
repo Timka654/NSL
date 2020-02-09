@@ -33,7 +33,7 @@ namespace SocketCore.Utils.Buffer
         /// <summary>
         /// Текущая позиция чтения в потоке
         /// </summary>
-        public int Offset { get { return offset - headerLenght; } }
+        public int Offset { get { return offset; } }
 
         /// <summary>
         /// Размер пакета

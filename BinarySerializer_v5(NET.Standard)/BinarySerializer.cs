@@ -22,7 +22,15 @@ namespace BinarySerializer
 
         }
 
-
+        /// <summary>
+        /// Дессериализация данных по указанной схеме, с указанной позиции и возвратом offset после завершения процесса
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="scheme"></param>
+        /// <param name="buffer"></param>
+        /// <param name="offset"></param>
+        /// <param name="initialSize"></param>
+        /// <returns></returns>
         public T Deserialize<T>(string scheme, byte[] buffer, ref int offset, int initialSize = 32)
         {
             var type = storage.GetTypeInfo(typeof(T), scheme, initialSize);
@@ -33,6 +41,14 @@ namespace BinarySerializer
             return (T)result.Item2;
         }
 
+        /// <summary>
+        /// Дессериализация данных по указанной схеме
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="scheme"></param>
+        /// <param name="buffer"></param>
+        /// <param name="initialSize"></param>
+        /// <returns></returns>
         public T Deserialize<T>(string scheme, byte[] buffer, int initialSize = 32)
         {
             var type = storage.GetTypeInfo(typeof(T), scheme,initialSize);
@@ -41,6 +57,14 @@ namespace BinarySerializer
             return (T)result.Item2;
         }
 
+        /// <summary>
+        /// Серриализация данных по указанной схеме
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="scheme"></param>
+        /// <param name="obj"></param>
+        /// <param name="initialSize"></param>
+        /// <returns></returns>
         public byte[] Serialize<T>(string scheme, T obj, int initialSize = 32)
         {
            var type = storage.GetTypeInfo(typeof(T), scheme, initialSize);

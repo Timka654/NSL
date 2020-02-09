@@ -44,7 +44,7 @@ namespace BinarySerializer.DefaultTypes
             il.MarkLabel(exitLabel);
         }
 
-        public void GetWriteILCode(BinaryMemberData prop, BinaryStruct currentStruct, GroboIL il, GroboIL.Local binaryStruct, GroboIL.Local value, GroboIL.Local typeSize, GroboIL.Local buffer, GroboIL.Local offset, bool listValue)
+        public void GetWriteILCode(BinaryMemberData prop, BinaryStruct currentStruct, GroboIL il, GroboIL.Local binaryStruct, GroboIL.Local value, GroboIL.Local typeSize, GroboIL.Local buffer, bool listValue)
         {
             var ilValue = il.DeclareLocal(prop.Type);
 
@@ -55,7 +55,7 @@ namespace BinarySerializer.DefaultTypes
             var exitLabel = il.DefineLabel("exit");
 
             il.Ldloca(ilValue);
-            BinaryStruct.WriteNullableType<TType>(il, exitLabel, buffer, offset);
+            BinaryStruct.WriteNullableType<TType>(currentStruct,il, exitLabel, buffer);
 
             var nval = il.DeclareLocal(typeof(TType));
 
@@ -63,7 +63,7 @@ namespace BinarySerializer.DefaultTypes
             il.Call(Getter);
             il.Stloc(nval);
 
-            (new T()).GetWriteILCode(prop, currentStruct, il, binaryStruct, nval, typeSize, buffer, offset, true);
+            (new T()).GetWriteILCode(prop, currentStruct, il, binaryStruct, nval, typeSize, buffer, true);
 
             il.MarkLabel(exitLabel);
         }

@@ -13,39 +13,39 @@ namespace BinarySerializer_v5.Test.Structs
     {
         [Binary(typeof(BinaryDictionary16<BinaryFloat32, BinaryInt32>))]
         [BinaryScheme("default")]
-        public Dictionary<float, int> nulld16 { get; set; }
+        public Dictionary<float, int> nulld16;
 
         [Binary(typeof(BinaryDictionary32<BinaryInt32, BinaryFloat32>))]
         [BinaryScheme("default")]
-        public Dictionary<int, float> nulld32 { get; set; }
+        public Dictionary<int, float> nulld32;
 
         [Binary(typeof(BinaryDictionary16<BinaryFloat32, BinaryInt32>))]
         [BinaryScheme("default")]
-        public Dictionary<float, int> emptyd16 { get; set; }
+        public Dictionary<float, int> emptyd16;
 
         [Binary(typeof(BinaryDictionary32<BinaryInt32, BinaryFloat32>))]
         [BinaryScheme("default")]
-        public Dictionary<int, float> emptyd32 { get; set; }
+        public Dictionary<int, float> emptyd32;
 
-        [Binary(typeof(BinaryDictionary16<BinaryFloat32,BinaryInt32>))]
+        [Binary(typeof(BinaryDictionary16<BinaryFloat32, BinaryInt32>))]
         [BinaryScheme("default")]
-        public Dictionary<float,int> d16 { get; set; }
+        public Dictionary<float, int> d16;
 
-        [Binary(typeof(BinaryDictionary32<BinaryInt32,BinaryFloat32>))]
+        [Binary(typeof(BinaryDictionary32<BinaryInt32, BinaryFloat32>))]
         [BinaryScheme("default")]
-        public Dictionary<int, float> d32 { get; set; }
+        public Dictionary<int, float> d32;
 
         [Binary(typeof(BinaryDictionary32<BinaryInt32, BinaryInt32>))]
         [BinaryScheme("default")]
-        public Dictionary<int, int> nv1 { get; set; }
+        public Dictionary<int, int> nv1;
 
         [Binary(typeof(BinaryDictionary16<BinaryInt32, IntegerStruct>))]
         [BinaryScheme("default")]
-        public Dictionary<int, IntegerStruct> isd { get; set; }
+        public Dictionary<int, IntegerStruct> isd;
 
         [Binary(typeof(BinaryDictionary32<BinaryInt32, BinaryInt32>))]
         [BinaryScheme("default")]
-        public Dictionary<int, int> nv2 { get; set; }
+        public Dictionary<int, int> nv2;
 
         public static DictionaryStruct GetRndValue()
         {

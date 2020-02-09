@@ -26,7 +26,12 @@ namespace BinarySerializer.Builder
 
             data.Member.BinarySchemeAttrList = builder.Schemes.Select(x => new BinarySchemeAttribute(x)).ToList();
         }
-
+        
+        /// <summary>
+        /// Установить бинарную стуруктуру связанную с этим членом для генерации кода
+        /// </summary>
+        /// <typeparam name="Q"></typeparam>
+        /// <returns></returns>
         public StructBuilderMember<T> SetBinaryType<Q>()
             where Q : IBasicType
         {
@@ -35,6 +40,11 @@ namespace BinarySerializer.Builder
             return this;
         }
 
+        /// <summary>
+        /// Установить класс связанный с этим членом для генерации кода
+        /// </summary>
+        /// <typeparam name="Q"></typeparam>
+        /// <returns></returns>
         public StructBuilderPartialType<Q, T> SetPartialType<Q>()
         {
             data.Member.BinaryAttr = new BinaryAttribute(typeof(Q));

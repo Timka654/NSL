@@ -91,11 +91,11 @@ namespace BinarySerializer.DefaultTypes
             }
         }
 
-        public void GetWriteILCode(BinaryMemberData prop, BinaryStruct currentStruct, GroboIL il, GroboIL.Local binaryStruct, GroboIL.Local value, GroboIL.Local typeSize, GroboIL.Local buffer, GroboIL.Local offset, bool listValue)
+        public void GetWriteILCode(BinaryMemberData prop, BinaryStruct currentStruct, GroboIL il, GroboIL.Local binaryStruct, GroboIL.Local value, GroboIL.Local typeSize, GroboIL.Local buffer, bool listValue)
         {
-            BinaryStruct.WriteSizeChecker(il, buffer, offset, 12);
+            //BinaryStruct.WriteSizeChecker(il, buffer, offset, 12);
             var v = il.DeclareLocal(typeof(Vector3));
-            var arr = il.DeclareLocal(typeof(byte[]));
+            var arr = currentStruct.TempBuildValues["tempBuffer"].Value;
 
             il.Ldloc(value);
             if (!listValue)
@@ -111,25 +111,26 @@ namespace BinarySerializer.DefaultTypes
             il.Call(writeBitConverterMethodInfo);
             il.Stloc(arr);
 
-            il.Ldloc(buffer);
-            il.Ldloc(offset);
-            il.Ldloc(arr);
-            il.Ldc_I4(0);
-            il.Ldelem(typeof(byte));
-            il.Stelem(typeof(byte));
+            //il.Ldloc(buffer);
+            //il.Ldloc(offset);
+            //il.Ldloc(arr);
+            //il.Ldc_I4(0);
+            //il.Ldelem(typeof(byte));
+            //il.Stelem(typeof(byte));
 
-            for (int i = 1; i < 4; i++)
-            {
-                il.Ldloc(buffer);
-                il.Ldloc(offset);
-                il.Ldc_I4(i);
-                il.Add();
-                il.Ldloc(arr);
-                il.Ldc_I4(i);
-                il.Ldelem(typeof(byte));
-                il.Stelem(typeof(byte));
-            }
-            BinaryStruct.WriteOffsetAppend(il, offset, 4);
+            //for (int i = 1; i < 4; i++)
+            //{
+            //    il.Ldloc(buffer);
+            //    il.Ldloc(offset);
+            //    il.Ldc_I4(i);
+            //    il.Add();
+            //    il.Ldloc(arr);
+            //    il.Ldc_I4(i);
+            //    il.Ldelem(typeof(byte));
+            //    il.Stelem(typeof(byte));
+            //}
+            il.ArraySetter(buffer, arr, 4);
+            //BinaryStruct.WriteOffsetAppend(il, offset, 4);
 
             il.Ldloca(v);
 
@@ -137,25 +138,26 @@ namespace BinarySerializer.DefaultTypes
             il.Call(writeBitConverterMethodInfo);
             il.Stloc(arr);
 
-            il.Ldloc(buffer);
-            il.Ldloc(offset);
-            il.Ldloc(arr);
-            il.Ldc_I4(0);
-            il.Ldelem(typeof(byte));
-            il.Stelem(typeof(byte));
+            //il.Ldloc(buffer);
+            //il.Ldloc(offset);
+            //il.Ldloc(arr);
+            //il.Ldc_I4(0);
+            //il.Ldelem(typeof(byte));
+            //il.Stelem(typeof(byte));
 
-            for (int i = 1; i < 4; i++)
-            {
-                il.Ldloc(buffer);
-                il.Ldloc(offset);
-                il.Ldc_I4(i);
-                il.Add();
-                il.Ldloc(arr);
-                il.Ldc_I4(i);
-                il.Ldelem(typeof(byte));
-                il.Stelem(typeof(byte));
-            }
-            BinaryStruct.WriteOffsetAppend(il, offset, 4);
+            //for (int i = 1; i < 4; i++)
+            //{
+            //    il.Ldloc(buffer);
+            //    il.Ldloc(offset);
+            //    il.Ldc_I4(i);
+            //    il.Add();
+            //    il.Ldloc(arr);
+            //    il.Ldc_I4(i);
+            //    il.Ldelem(typeof(byte));
+            //    il.Stelem(typeof(byte));
+            //}
+            il.ArraySetter(buffer, arr, 4);
+            //BinaryStruct.WriteOffsetAppend(il, offset, 4);
 
             il.Ldloca(v);
 
@@ -163,25 +165,26 @@ namespace BinarySerializer.DefaultTypes
             il.Call(writeBitConverterMethodInfo);
             il.Stloc(arr);
 
-            il.Ldloc(buffer);
-            il.Ldloc(offset);
-            il.Ldloc(arr);
-            il.Ldc_I4(0);
-            il.Ldelem(typeof(byte));
-            il.Stelem(typeof(byte));
+            //il.Ldloc(buffer);
+            //il.Ldloc(offset);
+            //il.Ldloc(arr);
+            //il.Ldc_I4(0);
+            //il.Ldelem(typeof(byte));
+            //il.Stelem(typeof(byte));
 
-            for (int i = 1; i < 4; i++)
-            {
-                il.Ldloc(buffer);
-                il.Ldloc(offset);
-                il.Ldc_I4(i);
-                il.Add();
-                il.Ldloc(arr);
-                il.Ldc_I4(i);
-                il.Ldelem(typeof(byte));
-                il.Stelem(typeof(byte));
-            }
-            BinaryStruct.WriteOffsetAppend(il, offset, 4);
+            //for (int i = 1; i < 4; i++)
+            //{
+            //    il.Ldloc(buffer);
+            //    il.Ldloc(offset);
+            //    il.Ldc_I4(i);
+            //    il.Add();
+            //    il.Ldloc(arr);
+            //    il.Ldc_I4(i);
+            //    il.Ldelem(typeof(byte));
+            //    il.Stelem(typeof(byte));
+            //}
+            il.ArraySetter(buffer, arr, 4);
+            //BinaryStruct.WriteOffsetAppend(il, offset, 4);
         }
     }
 }

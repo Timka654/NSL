@@ -11,13 +11,22 @@ using System.Threading;
 
 namespace BinarySerializer
 {
+    /// <summary>
+    /// Хранилище структур
+    /// </summary>
     public class TypeStorage
     {
+        /// <summary>
+        /// Хранилище по умолчанию с предустановленной кодировкой UTF-8
+        /// </summary>
         public static TypeStorage Instance { get; } = new TypeStorage(UTF8Encoding.UTF8);
 
         private ConcurrentDictionary<Type, ConcurrentDictionary<string, BinaryStruct>> TypeCacheMap { get; set; }
 
-        private Encoding Coding { get; set; }
+        /// <summary>
+        /// Кодировка для компилируемых стурктур по умолчанию
+        /// </summary>
+        public Encoding Coding { get; set; }
 
         public TypeStorage(Encoding coding)
         {
@@ -25,6 +34,13 @@ namespace BinarySerializer
             Coding = coding;
         }
 
+        /// <summary>
+        /// Получить данные о компилированной бинарной структуре
+        /// </summary>
+        /// <param name="type">Тип</param>
+        /// <param name="schemeName">Схема сериализации</param>
+        /// <param name="initialSize">Размер начального буффера при серриализации</param>
+        /// <returns></returns>
         public BinaryStruct GetTypeInfo(Type type, string schemeName, int initialSize = 32)
         {
             var result = CheckExist(type, initialSize);
@@ -107,6 +123,10 @@ namespace BinarySerializer
             return r;
         }
 
+        /// <summary>
+        /// Предкомпиляция всех структур в сборке
+        /// </summary>
+        /// <param name="assembly">Сборка</param>
         public void PreCompileBinaryStructs(Assembly assembly)
         {
             var classes = assembly.GetTypes().Select(x => new { x, attr = x.GetCustomAttributes<BinaryPreCompileAttribute>() }).Where(x => x.attr != null);
@@ -120,6 +140,12 @@ namespace BinarySerializer
             }
         }
 
+        /// <summary>
+        /// Дамп данных скомпилированной стурктуры для определенного типа и схемы
+        /// </summary>
+        /// <param name="t">Тип</param>
+        /// <param name="scheme">Схема</param>
+        /// <returns></returns>
         public string DumpStruct(Type t, string scheme)
         {
             var ti = GetTypeInfo(t, scheme);
@@ -130,7 +156,7 @@ namespace BinarySerializer
 
             foreach (var item in ti.PropertyList)
             {
-                    sb.AppendLine($"\t{item.Name} {item.Type} {item.BinaryAttr.Type} (ts:{item.BinaryAttr.TypeSize} : \"{item.BinaryAttr.TypeSizeName}\",as:{item.BinaryAttr.ArraySize} : \"{item.BinaryAttr.ArraySizeName}\")");
+                sb.AppendLine($"\t{item.Name} {item.Type} {item.BinaryAttr.Type} (ts:{item.BinaryAttr.TypeSize} : \"{item.BinaryAttr.TypeSizeName}\",as:{item.BinaryAttr.ArraySize} : \"{item.BinaryAttr.ArraySizeName}\")");
                 if (!item.IsBaseType)
                 {
                     sb.AppendLine($"\t\t{DumpStruct(item.BinaryAttr.Type, scheme).Replace("\r\n", "\t\r\n")}");
@@ -139,11 +165,6 @@ namespace BinarySerializer
             sb.AppendLine("}");
 
             return sb.ToString();
-        }
-
-        public void SetCoding(Encoding coding)
-        {
-            Coding = coding;
         }
     }
 }

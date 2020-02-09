@@ -10,17 +10,17 @@ namespace ConfigurationEngine.Info
         /// <summary>
         /// Полный путь(название)
         /// </summary>
-        public string Name { get; internal set; }
+        public string Name { get; set; }
 
         /// <summary>
         /// Значение
         /// </summary>
-        public string Value { get; internal set; }
+        public string Value { get; set; }
 
         /// <summary>
         /// Необходимо отправить клиенту
         /// </summary>
-        public string Flags { get => flags; internal set { flags = value; compiledFlag = (compiledFlag = value.EndsWith("%") ? value : value + "%"); } }
+        public string Flags { get => flags; set { flags = value; compiledFlag = (compiledFlag = value.EndsWith("%") ? value : value + "%"); } }
 
         private string flags;
 

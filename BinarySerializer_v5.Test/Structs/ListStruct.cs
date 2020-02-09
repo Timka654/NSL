@@ -14,31 +14,31 @@ namespace BinarySerializer_v5.Test.Structs
     {
         [Binary(typeof(BinaryList16<BinaryFloat32>))]
         [BinaryScheme("default")]
-        public List<float> nullfl32 { get; set; }
+        public List<float> nullfl32;
 
         [Binary(typeof(BinaryList32<BinaryInt32>))]
         [BinaryScheme("default")]
-        public List<int> nullil32 { get; set; }
+        public List<int> nullil32;
 
         [Binary(typeof(BinaryList16<BinaryFloat32>))]
         [BinaryScheme("default")]
-        public List<float> emptyfl32 { get; set; }
+        public List<float> emptyfl32;
 
         [Binary(typeof(BinaryList32<BinaryInt32>))]
         [BinaryScheme("default")]
-        public List<int> emptyil32 { get; set; }
+        public List<int> emptyil32;
 
         [Binary(typeof(BinaryList16<BinaryFloat32>))]
         [BinaryScheme("default")]
-        public List<float> fl32 { get; set; }
+        public List<float> fl32;
 
         [Binary(typeof(BinaryList32<BinaryInt32>))]
         [BinaryScheme("default")]
-        public List<int> il32 { get; set; }
+        public List<int> il32;
 
         [Binary(typeof(BinaryList16<IntegerStruct>))]
         [BinaryScheme("default")]
-        public List<IntegerStruct> isl { get; set; }
+        public List<IntegerStruct> isl;
 
         public static ListStruct GetRndValue()
         {

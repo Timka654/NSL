@@ -36,24 +36,32 @@ namespace BinarySerializer.DefaultTypes
             {
                 il.Ldloc(result);
                 il.Ldloc(r);
-                il.Call(prop.Setter, isVirtual: true);
+                prop.PropertySetter(il);
             }
         }
 
-        public void GetWriteILCode(BinaryMemberData prop, BinaryStruct currentStruct, GroboIL il, GroboIL.Local binaryStruct, GroboIL.Local value, GroboIL.Local typeSize, GroboIL.Local buffer, GroboIL.Local offset, bool listValue)
+        public void GetWriteILCode(BinaryMemberData prop, BinaryStruct currentStruct, GroboIL il, GroboIL.Local binaryStruct, GroboIL.Local value, GroboIL.Local typeSize, GroboIL.Local buffer, bool listValue)
         {
-            BinaryStruct.WriteSizeChecker(il, buffer, offset, 1);
+            //BinaryStruct.WriteSizeChecker(il, buffer, offset, 1);
+            var arr = currentStruct.TempBuildValues["tempBuffer"].Value;
 
-            il.Ldloc(buffer);
-            il.Ldloc(offset);
-
+            il.Ldloc(arr);
+            il.Ldc_I4(0);
             il.Ldloc(value);
             if (!listValue)
-                il.Call(prop.Getter, isVirtual: prop.Getter.IsVirtual);
-
+                prop.PropertyGetter(il);
             il.Stelem(typeof(byte));
+            //il.Ldloc(buffer);
+            //il.Ldloc(offset);
 
-            BinaryStruct.WriteOffsetAppend(il, offset, 1);
+            //il.Ldloc(value);
+            //if (!listValue)
+            //    prop.PropertyGetter(il);
+
+            //il.Stelem(typeof(byte));
+            il.ArraySetter(buffer, arr, 1);
+
+            //BinaryStruct.WriteOffsetAppend(il, offset, 1);
         }
     }
 }

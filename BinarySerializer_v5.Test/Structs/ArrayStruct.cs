@@ -11,37 +11,49 @@ namespace BinarySerializer_v5.Test.Structs
     [BinarySerializer.BinaryPreCompile("default", 500)]
     public class ArrayStruct : ITestStruct<ArrayStruct>
     {
+        [Binary(typeof(BinaryArray<BinaryString16>))]
+        [BinaryScheme("default")]
+        public string[] nullsa;
+
+        //[Binary(typeof(BinaryArray<BinaryInt32>))]
+        //[BinaryScheme("default")]
+        public int[] emptyia;
+
         [Binary(typeof(BinaryArray16<BinaryString16>))]
         [BinaryScheme("default")]
-        public string[] nullsv1 { get; set; }
+        public string[] nullsa1;
 
         [Binary(typeof(BinaryArray32<BinaryInt32>))]
         [BinaryScheme("default")]
-        public int[] nullia32 { get; set; }
+        public int[] nullia32;
 
         [Binary(typeof(BinaryArray16<BinaryString16>))]
         [BinaryScheme("default")]
-        public string[] emptysv1 { get; set; }
+        public string[] emptysa1;
 
         [Binary(typeof(BinaryArray32<BinaryInt32>))]
         [BinaryScheme("default")]
-        public int[] emptyia32 { get; set; }
+        public int[] emptyia32;
+
+        //[Binary(typeof(BinaryArray<BinaryFloat32>))]
+        //[BinaryScheme("default")]
+        public float[] f1a32;
 
         [Binary(typeof(BinaryArray16<BinaryFloat32>))]
         [BinaryScheme("default")]
-        public float[] fa32 { get; set; }
+        public float[] fa32;
 
         [Binary(typeof(BinaryArray16<BinaryString16>))]
         [BinaryScheme("default")]
-        public string[] sv1 { get; set; }
+        public string[] sv1;
 
         [Binary(typeof(BinaryArray32<BinaryInt32>))]
         [BinaryScheme("default")]
-        public int[] ia32 { get; set; }
+        public int[] ia32;
 
         [Binary(typeof(BinaryArray16<IntegerStruct>))]
         [BinaryScheme("default")]
-        public IntegerStruct[] isa { get; set; }
+        public IntegerStruct[] isa;
 
         public static ArrayStruct GetRndValue()
         {
@@ -53,7 +65,7 @@ namespace BinarySerializer_v5.Test.Structs
             var r = new ArrayStruct();
 
             r.emptyia32 = new int[0];
-            r.emptysv1 = new string[0];
+            r.emptysa1 = new string[0];
 
             r.fa32 = new float[Utils.GetSize()];
 
@@ -83,6 +95,15 @@ namespace BinarySerializer_v5.Test.Structs
             {
                 r.sv1[i] = Utils.GetRandomS();
             }
+
+
+            r.f1a32 = new float[Utils.GetSize()];
+
+            for (int i = 0; i < r.f1a32.Length; i++)
+            {
+                r.f1a32[i] = Utils.GetRandomF32();
+            }
+
             r.normalValue = r;
             r.InitialSize = 256;
 
@@ -141,9 +162,9 @@ namespace BinarySerializer_v5.Test.Structs
             BinaryWriter bw = new BinaryWriter(ms);
 
 
-            if (WriteArrayHeader16(bw, base.binaryWritedValue.emptysv1))
+            if (WriteArrayHeader16(bw, base.binaryWritedValue.emptysa1))
             {
-                foreach (var item in base.binaryWritedValue.emptysv1)
+                foreach (var item in base.binaryWritedValue.emptysa1)
                 {
                     StringStruct.WriteString16(bw, item);
                 }
@@ -181,9 +202,9 @@ namespace BinarySerializer_v5.Test.Structs
                 }
             }
 
-            if (WriteArrayHeader16(bw, base.binaryWritedValue.nullsv1))
+            if (WriteArrayHeader16(bw, base.binaryWritedValue.nullsa1))
             {
-                foreach (var item in base.binaryWritedValue.nullsv1)
+                foreach (var item in base.binaryWritedValue.nullsa1)
                 {
                     StringStruct.WriteString16(bw, item);
                 }
@@ -225,10 +246,10 @@ namespace BinarySerializer_v5.Test.Structs
 
             if (ex16.Item1)
             {
-                r.emptysv1 = new string[ex16.Item2];
+                r.emptysa1 = new string[ex16.Item2];
                 for (int i = 0; i < ex16.Item2; i++)
                 {
-                    r.emptysv1[i] = StringStruct.ReadString16(br);
+                    r.emptysa1[i] = StringStruct.ReadString16(br);
                 }
             }
 
@@ -286,10 +307,10 @@ namespace BinarySerializer_v5.Test.Structs
 
             if (ex16.Item1)
             {
-                r.nullsv1 = new string[ex16.Item2];
+                r.nullsa1 = new string[ex16.Item2];
                 for (int i = 0; i < ex16.Item2; i++)
                 {
-                    r.nullsv1[i] = StringStruct.ReadString16(br);
+                    r.nullsa1[i] = StringStruct.ReadString16(br);
                 }
             }
 

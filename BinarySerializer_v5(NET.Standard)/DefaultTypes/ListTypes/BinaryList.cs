@@ -108,7 +108,7 @@ namespace BinarySerializer.DefaultTypes
             il.Pop();
         }
 
-        public void GetWriteILCode(BinaryMemberData prop, BinaryStruct currentStruct, GroboIL il, GroboIL.Local binaryStruct, GroboIL.Local value, GroboIL.Local typeSize, GroboIL.Local buffer, GroboIL.Local offset, bool listValue)
+        public void GetWriteILCode(BinaryMemberData prop, BinaryStruct currentStruct, GroboIL il, GroboIL.Local binaryStruct, GroboIL.Local value, GroboIL.Local typeSize, GroboIL.Local buffer, bool listValue)
         {
             var arr = il.DeclareLocal(prop.Type);
             var len = il.DeclareLocal(typeof(int));
@@ -152,11 +152,11 @@ namespace BinarySerializer.DefaultTypes
             if (typeof(IBasicType).IsAssignableFrom(prop.BinaryAttr.Type.GetGenericArguments()[0]))
             {
                 IBasicType t = (IBasicType)Activator.CreateInstance(prop.BinaryAttr.Type.GetGenericArguments()[0]);
-                t.GetWriteILCode(prop, currentStruct, il, binaryStruct, currentValue, typeSize, buffer, offset,true);
+                t.GetWriteILCode(prop, currentStruct, il, binaryStruct, currentValue, typeSize, buffer,true);
             }
             else
             {
-                BinaryStruct.CompileWriter(currentStruct.CurrentStorage.GetTypeInfo(type,currentStruct.Scheme), il, binaryStruct, currentValue, buffer, offset, typeSize);
+                BinaryStruct.CompileWriter(currentStruct.CurrentStorage.GetTypeInfo(type,currentStruct.Scheme), il, binaryStruct, currentValue, buffer, typeSize);
             }
             //end body
 

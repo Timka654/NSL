@@ -114,7 +114,7 @@ namespace SocketServer
                 c.OnSendPacket += OnSendPacket;
                 c.RunPacketReceiver();
 #else
-                new Client<T>(client, serverOptions).RunPacketReceiver();
+                new ServerClient<T>(client, serverOptions).RunPacketReceiver();
 #endif
             }
             catch (Exception ex)

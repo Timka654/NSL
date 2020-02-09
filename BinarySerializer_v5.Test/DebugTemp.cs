@@ -151,6 +151,12 @@ namespace BinarySerializer_v5.Test
             [BinaryScheme("UpdateSettings")]
             public bool AutoAccept { get; set; }
 
+            [Binary(typeof(BinaryNullable<BinaryBool,bool>))]
+            [BinaryScheme("Search")]
+            [BinaryScheme("PrivateInfo")]
+            [BinaryScheme("UpdateSettings")]
+            public bool? AutoAccept2 { get; set; }
+
             [Binary(typeof(ResourceInfo))]
             [BinaryScheme("PrivateInfo")]
             public ResourceInfo ResourceInfo { get; set; }
@@ -169,6 +175,7 @@ namespace BinarySerializer_v5.Test
                 st.Name = "Guild top 1";
                 st.Notice = "";
                 st.ResourceInfo = new ResourceInfo();
+                st.AutoAccept2 = true;
 
                 var bf = bs.Serialize("PrivateInfo", st);
 

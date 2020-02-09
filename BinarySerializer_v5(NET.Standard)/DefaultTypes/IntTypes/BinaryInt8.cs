@@ -14,8 +14,8 @@ namespace BinarySerializer.DefaultTypes
         public Type CompareType => typeof(byte);
 
         public BinaryInt8()
-        {
-                
+        { 
+        
         }
 
         public void GetReadILCode(BinaryMemberData prop, BinaryStruct currentStruct, GroboIL il, GroboIL.Local binaryStruct, GroboIL.Local buffer, GroboIL.Local result, GroboIL.Local typeSize, GroboIL.Local offset, bool listValue)
@@ -36,24 +36,33 @@ namespace BinarySerializer.DefaultTypes
             {
                 il.Ldloc(result);
                 il.Ldloc(r);
-                il.Call(prop.Setter, isVirtual: true);
+                prop.PropertySetter(il);
             }
         }
 
-        public void GetWriteILCode(BinaryMemberData prop, BinaryStruct currentStruct, GroboIL il, GroboIL.Local binaryStruct, GroboIL.Local value, GroboIL.Local typeSize, GroboIL.Local buffer, GroboIL.Local offset, bool listValue)
+        public void GetWriteILCode(BinaryMemberData prop, BinaryStruct currentStruct, GroboIL il, GroboIL.Local binaryStruct, GroboIL.Local value, GroboIL.Local typeSize, GroboIL.Local buffer, bool listValue)
         {
-            BinaryStruct.WriteSizeChecker(il, buffer, offset, 1);
+            //BinaryStruct.WriteSizeChecker(il, buffer, offset, 1);
+            var arr = currentStruct.TempBuildValues["tempBuffer"].Value;
 
-            il.Ldloc(buffer);
-            il.Ldloc(offset);
-
+            il.Ldloc(arr);
+            il.Ldc_I4(0);
             il.Ldloc(value);
             if (!listValue)
-                il.Call(prop.Getter,isVirtual: prop.Getter.IsVirtual);
-
+                prop.PropertyGetter(il);
             il.Stelem(typeof(byte));
 
-            BinaryStruct.WriteOffsetAppend(il, offset, 1);
+            //il.Ldloc(buffer);
+            //il.Ldloc(offset);
+            //il.Ldloc(arrSize);
+            //il.Ldc_I4(0);
+            //il.Ldelem(typeof(byte));
+            //il.Stelem(typeof(byte));
+            //il.Stloc(arr);
+
+            il.ArraySetter(buffer, arr, 1);
+
+            //BinaryStruct.WriteOffsetAppend(il, offset, 1);
         }
     }
 }
