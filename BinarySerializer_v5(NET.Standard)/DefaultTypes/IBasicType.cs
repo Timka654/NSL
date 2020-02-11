@@ -4,7 +4,13 @@ using System.Text;
 using System.Reflection;
 using System.Reflection.Emit;
 using GrEmit;
+#if !NOT_UNITY
+using UnityEngine.Scripting;
+#endif
 
+#if !NOT_UNITY
+[assembly: Preserve]
+#endif
 namespace BinarySerializer.DefaultTypes
 {
     public interface IBasicType

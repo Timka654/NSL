@@ -15,7 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Cipher(NET.Standard)\Cipher(NET.Standard).csproj" />
+    <ProjectReference Include="..\Cipher(NET.Standard)\Cipher.csproj" />
     <ProjectReference Include="..\Configuration\ConfigurationEngine.csproj" />
     <ProjectReference Include="..\DBEngine\DBEngine.csproj" />
     <ProjectReference Include="..\Logger\Logger.csproj" />

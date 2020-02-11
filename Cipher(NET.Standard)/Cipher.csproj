@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-    <RootNamespace>Cipher_NET.Standard_</RootNamespace>
+    <TargetFrameworks>netstandard2.0;net45</TargetFrameworks>
+    <RootNamespace>Cipher</RootNamespace>
     <Configurations>Debug;Release;Unity;UnityDebug</Configurations>
   </PropertyGroup>
 

@@ -21,7 +21,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Logger\Logger.csproj" />
     <ProjectReference Include="..\Socket.Core\SocketCore.csproj" />
-    <ProjectReference Include="..\SocketCore.Extensions.BinarySerializer(NET.Standard)\SocketCore.Extensions.BinarySerializer(NET.Standard).csproj" />
+    <ProjectReference Include="..\SocketCore.Extensions.BinarySerializer(NET.Standard)\SocketCore.Extensions.BinarySerializer.csproj" />
   </ItemGroup>
 
 </Project>

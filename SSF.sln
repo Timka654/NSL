@@ -29,17 +29,17 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DIEngine", "DIEngine\DIEngi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SocketCore", "Socket.Core\SocketCore.csproj", "{8A3928CB-9C64-4792-9BD2-68E544695926}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BinarySerializer(NET.Standard)", "BinarySerializer_v5(NET.Standard)\BinarySerializer(NET.Standard).csproj", "{4696E092-1325-478F-BFA0-32F01DF51EE5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BinarySerializer", "BinarySerializer_v5(NET.Standard)\BinarySerializer.csproj", "{4696E092-1325-478F-BFA0-32F01DF51EE5}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cipher(NET.Standard)", "Cipher(NET.Standard)\Cipher(NET.Standard).csproj", "{65700C37-FB85-4D21-BD1C-FB1938012A24}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cipher", "Cipher(NET.Standard)\Cipher.csproj", "{65700C37-FB85-4D21-BD1C-FB1938012A24}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SCL", "SCL\SCL.csproj", "{B04BE98C-428D-4AD0-BD13-DD40F85E7075}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SCL.Unity(NET.Standard)", "SCL.Unity(NET.Standard)\SCL.Unity(NET.Standard).csproj", "{8B89A2E7-14DF-4D22-A208-467FF4E232B5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SCL.Unity", "SCL.Unity(NET.Standard)\SCL.Unity.csproj", "{8B89A2E7-14DF-4D22-A208-467FF4E232B5}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SCL.Node(NET.Standard)", "SCL.Node(NET.Standard)\SCL.Node(NET.Standard).csproj", "{5FF30BE4-F125-43AA-AAC5-5BEC78398166}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SCL.Node", "SCL.Node(NET.Standard)\SCL.Node.csproj", "{5FF30BE4-F125-43AA-AAC5-5BEC78398166}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SocketCore.Extensions.BinarySerializer(NET.Standard)", "SocketCore.Extensions.BinarySerializer(NET.Standard)\SocketCore.Extensions.BinarySerializer(NET.Standard).csproj", "{C463EA17-81FB-4214-9D05-3A8C4890CA26}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SocketCore.Extensions.BinarySerializer", "SocketCore.Extensions.BinarySerializer(NET.Standard)\SocketCore.Extensions.BinarySerializer.csproj", "{C463EA17-81FB-4214-9D05-3A8C4890CA26}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DBEngine.Extensions.CmdQueue", "DBEngine.Extensions.CmdQueue\DBEngine.Extensions.CmdQueue.csproj", "{790C4387-45D0-4142-98FE-2F1C9C62A762}"
 EndProject
@@ -58,6 +58,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServerOptions.Extensions.ConfigurationEngine", "ServerOptions.Extensions.ConfigurationEngine\ServerOptions.Extensions.ConfigurationEngine.csproj", "{5557E0A3-D3FE-4A81-B69D-34621755C9D8}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BinarySerializer_v5.Test", "BinarySerializer_v5.Test\BinarySerializer_v5.Test.csproj", "{B8C2582B-15FC-46FD-AF7D-5920A42D2872}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GrEmit", "GREMIT\GrEmit\GrEmit.csproj", "{ED7A0DCC-CCF6-4F10-B71B-C92D455601C8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -918,6 +920,36 @@ Global
 		{B8C2582B-15FC-46FD-AF7D-5920A42D2872}.UnityDebug|x64.Build.0 = UnityDebug|Any CPU
 		{B8C2582B-15FC-46FD-AF7D-5920A42D2872}.UnityDebug|x86.ActiveCfg = UnityDebug|Any CPU
 		{B8C2582B-15FC-46FD-AF7D-5920A42D2872}.UnityDebug|x86.Build.0 = UnityDebug|Any CPU
+		{ED7A0DCC-CCF6-4F10-B71B-C92D455601C8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ED7A0DCC-CCF6-4F10-B71B-C92D455601C8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ED7A0DCC-CCF6-4F10-B71B-C92D455601C8}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{ED7A0DCC-CCF6-4F10-B71B-C92D455601C8}.Debug|x64.Build.0 = Debug|Any CPU
+		{ED7A0DCC-CCF6-4F10-B71B-C92D455601C8}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{ED7A0DCC-CCF6-4F10-B71B-C92D455601C8}.Debug|x86.Build.0 = Debug|Any CPU
+		{ED7A0DCC-CCF6-4F10-B71B-C92D455601C8}.PublishDebug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ED7A0DCC-CCF6-4F10-B71B-C92D455601C8}.PublishDebug|Any CPU.Build.0 = Debug|Any CPU
+		{ED7A0DCC-CCF6-4F10-B71B-C92D455601C8}.PublishDebug|x64.ActiveCfg = Debug|Any CPU
+		{ED7A0DCC-CCF6-4F10-B71B-C92D455601C8}.PublishDebug|x64.Build.0 = Debug|Any CPU
+		{ED7A0DCC-CCF6-4F10-B71B-C92D455601C8}.PublishDebug|x86.ActiveCfg = Debug|Any CPU
+		{ED7A0DCC-CCF6-4F10-B71B-C92D455601C8}.PublishDebug|x86.Build.0 = Debug|Any CPU
+		{ED7A0DCC-CCF6-4F10-B71B-C92D455601C8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ED7A0DCC-CCF6-4F10-B71B-C92D455601C8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ED7A0DCC-CCF6-4F10-B71B-C92D455601C8}.Release|x64.ActiveCfg = Release|Any CPU
+		{ED7A0DCC-CCF6-4F10-B71B-C92D455601C8}.Release|x64.Build.0 = Release|Any CPU
+		{ED7A0DCC-CCF6-4F10-B71B-C92D455601C8}.Release|x86.ActiveCfg = Release|Any CPU
+		{ED7A0DCC-CCF6-4F10-B71B-C92D455601C8}.Release|x86.Build.0 = Release|Any CPU
+		{ED7A0DCC-CCF6-4F10-B71B-C92D455601C8}.Unity|Any CPU.ActiveCfg = Release|Any CPU
+		{ED7A0DCC-CCF6-4F10-B71B-C92D455601C8}.Unity|Any CPU.Build.0 = Release|Any CPU
+		{ED7A0DCC-CCF6-4F10-B71B-C92D455601C8}.Unity|x64.ActiveCfg = Release|Any CPU
+		{ED7A0DCC-CCF6-4F10-B71B-C92D455601C8}.Unity|x64.Build.0 = Release|Any CPU
+		{ED7A0DCC-CCF6-4F10-B71B-C92D455601C8}.Unity|x86.ActiveCfg = Release|Any CPU
+		{ED7A0DCC-CCF6-4F10-B71B-C92D455601C8}.Unity|x86.Build.0 = Release|Any CPU
+		{ED7A0DCC-CCF6-4F10-B71B-C92D455601C8}.UnityDebug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ED7A0DCC-CCF6-4F10-B71B-C92D455601C8}.UnityDebug|Any CPU.Build.0 = Debug|Any CPU
+		{ED7A0DCC-CCF6-4F10-B71B-C92D455601C8}.UnityDebug|x64.ActiveCfg = Debug|Any CPU
+		{ED7A0DCC-CCF6-4F10-B71B-C92D455601C8}.UnityDebug|x64.Build.0 = Debug|Any CPU
+		{ED7A0DCC-CCF6-4F10-B71B-C92D455601C8}.UnityDebug|x86.ActiveCfg = Debug|Any CPU
+		{ED7A0DCC-CCF6-4F10-B71B-C92D455601C8}.UnityDebug|x86.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
