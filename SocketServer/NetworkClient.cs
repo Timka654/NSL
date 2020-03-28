@@ -1,12 +1,5 @@
-﻿using SocketCore.Utils;
-using SocketServer;
-using SocketServer.Utils;
-using SocketServer.Utils.SystemPackets;
-using System;
-using System.Collections.Generic;
-using System.Net;
+﻿using System.Net;
 using System.Net.Sockets;
-using System.Text;
 
 namespace SocketServer.Utils
 {
@@ -17,7 +10,7 @@ namespace SocketServer.Utils
 
         Socket socket;
 
-        public NetworkClient(ServerOptions<TData> options): base()
+        public NetworkClient(ServerOptions<TData> options) : base()
         {
             serverOptions = options;
         }

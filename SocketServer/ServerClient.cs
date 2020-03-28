@@ -1,16 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net;
-using System.Net.Sockets;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading;
-using SocketCore;
+﻿using SocketCore;
 using SocketCore.Extensions.BinarySerializer;
 using SocketCore.Utils;
 using SocketCore.Utils.Buffer;
 using SocketCore.Utils.Exceptions;
 using SocketServer.Utils;
+using System;
+using System.Net;
+using System.Net.Sockets;
+using System.Threading;
 
 namespace SocketServer
 {
@@ -133,8 +130,8 @@ namespace SocketServer
         {
             try
             {
-            if (sclient != null && sclient.RemoteEndPoint != null)
-                return (IPEndPoint)sclient.RemoteEndPoint;
+                if (sclient != null && sclient.RemoteEndPoint != null)
+                    return (IPEndPoint)sclient.RemoteEndPoint;
 
             }
             catch
@@ -268,7 +265,7 @@ namespace SocketServer
             )
         {
             var rbuff = new OutputPacketBuffer { PacketId = packetId };
-            rbuff.Serialize<O>(obj,scheme);
+            rbuff.Serialize<O>(obj, scheme);
 
 #if DEBUG
             OnSendPacket?.Invoke(this, rbuff.PacketId, rbuff.PacketLenght, memberName, sourceFilePath, sourceLineNumber);
@@ -292,10 +289,10 @@ namespace SocketServer
             {
                 //шифруем данные
                 byte[] sndBuffer = outputCipher.Encode(buf, offset, lenght);
-                
+
                 //начинаем отправку данных
-                sclient.BeginSend(sndBuffer, 0, lenght, SocketFlags.None, EndSend, new SendAsyncState { buf =  buf, offset = offset, len = lenght });
-                
+                sclient.BeginSend(sndBuffer, 0, lenght, SocketFlags.None, EndSend, new SendAsyncState { buf = buf, offset = offset, len = lenght });
+
             }
             catch
             {

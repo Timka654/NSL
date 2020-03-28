@@ -1,9 +1,6 @@
 ﻿using DBEngine.DBMigrator.ConfigurationAttributes;
 using System;
-using System.Collections.Generic;
 using System.Reflection;
-using System.Text;
-using static DBEngine.DBMigrator.DBCollumnType;
 
 namespace DBEngine.DBMigrator
 {

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Dynamic;
-using System.Text;
-
-namespace Logger
+﻿namespace Logger
 {
     public class LoggerStorage : DynamicLogger
     {
@@ -18,7 +13,7 @@ namespace Logger
         /// <param name="path">Путь к файлам логирования</param>
         /// <param name="delay">Время перерыва между выгрузками лог сообщений в файл</param>
         /// <returns></returns>
-        public static T InitializeLogger<T>(string name, string fname, string path, int delay) 
+        public static T InitializeLogger<T>(string name, string fname, string path, int delay)
             where T : ILogger, new()
         {
             var logger = new T();

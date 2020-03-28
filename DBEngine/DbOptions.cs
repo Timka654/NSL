@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Xml.Serialization;
+﻿using System.Xml.Serialization;
 
 namespace DBEngine
 {
@@ -30,8 +27,8 @@ namespace DBEngine
         /// IP адресс к базе данных
         /// </summary>
         [XmlElement(ElementName = "host")]
-        public string Host { get;set; }
-        
+        public string Host { get; set; }
+
         /// <summary>
         /// Логин к базе данных
         /// </summary>
@@ -66,6 +63,6 @@ namespace DBEngine
         /// В некоторых базах данных помимо основных есть другие параметры которых необходимо задать
         /// </summary>
         [XmlElement(ElementName = "other_params")]
-        public string OtherParams { get;set; }
+        public string OtherParams { get; set; }
     }
 }

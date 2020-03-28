@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace SocketCore.Utils.SystemPackets.Enums
+﻿namespace SocketCore.Utils.SystemPackets.Enums
 {
 
     public enum ServerPacketEnum : ushort

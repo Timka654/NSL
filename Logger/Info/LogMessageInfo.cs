@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Logger.Info
 {
@@ -16,7 +14,7 @@ namespace Logger.Info
 
         public override string ToString()
         {
-            if(Temp == null)
+            if (Temp == null)
             {
                 Temp = $"[{Level.ToString()}] - {DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss")}: {Text}";
                 Text = null;

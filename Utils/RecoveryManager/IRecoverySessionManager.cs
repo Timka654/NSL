@@ -5,11 +5,10 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace Utils.RecoveryManager
 {
-    public class IRecoverySessionManager<T> 
+    public class IRecoverySessionManager<T>
         where T : IServerNetworkClient
     {
         protected ConcurrentDictionary<string, RecoverySessionInfo<T>> keyStorage;
@@ -34,7 +33,7 @@ namespace Utils.RecoveryManager
             var keys = GenerateKeys();
             client.SetRecoveryData(session, keys);
 
-            keyStorage.TryAdd(session, new RecoverySessionInfo<T>( client,keys));
+            keyStorage.TryAdd(session, new RecoverySessionInfo<T>(client, keys));
         }
 
         public virtual bool RemoveSession(T client)

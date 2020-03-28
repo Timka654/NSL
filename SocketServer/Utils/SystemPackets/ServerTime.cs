@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using SocketCore.Utils;
-using SocketCore.Utils.Buffer;
+﻿using SocketCore.Utils.Buffer;
 using SocketCore.Utils.SystemPackets.Enums;
+using System;
 
 namespace SocketServer.Utils.SystemPackets
 {
@@ -20,5 +17,5 @@ namespace SocketServer.Utils.SystemPackets
 
             client.Network.Send(packet);
         }
-}
+    }
 }

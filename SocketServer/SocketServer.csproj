@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <Platforms>AnyCPU;x64;x86</Platforms>
-    <Configurations>Debug;Release;PublishDebug;Unity;UnityDebug</Configurations>
+    <Configurations>Debug;Release;PublishDebug;Unity;UnityDebug;DebugStable</Configurations>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='PublishDebug|AnyCPU'">
@@ -20,7 +20,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Logger\Logger.csproj" />
-    <ProjectReference Include="..\Socket.Core\SocketCore.csproj" />
     <ProjectReference Include="..\SocketCore.Extensions.BinarySerializer(NET.Standard)\SocketCore.Extensions.BinarySerializer.csproj" />
   </ItemGroup>
 

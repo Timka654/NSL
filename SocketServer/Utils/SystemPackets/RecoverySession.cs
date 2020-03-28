@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-using SocketCore.Utils.Buffer;
+﻿using SocketCore.Utils.Buffer;
 using SocketCore.Utils.SystemPackets.Enums;
 
 namespace SocketServer.Utils
@@ -13,12 +9,12 @@ namespace SocketServer.Utils
         NotFound
     }
 
-    public delegate void OnRecoverySessionReceiveDelegate<T>(T client,string key, string[] keys);
+    public delegate void OnRecoverySessionReceiveDelegate<T>(T client, string key, string[] keys);
 }
 
 namespace SocketServer.Utils.SystemPackets
 {
-    public class RecoverySession<T> :IPacket<T> where T: IServerNetworkClient
+    public class RecoverySession<T> : IPacket<T> where T : IServerNetworkClient
     {
         public static RecoverySession<T> Instance { get; private set; }
 
@@ -47,7 +43,7 @@ namespace SocketServer.Utils.SystemPackets
 
         public static void Send(IServerNetworkClient client, RecoverySessionResultEnum result, string session, string[] newKeys)
         {
-               var packet = new OutputPacketBuffer()
+            var packet = new OutputPacketBuffer()
             {
                 PacketId = (ushort)ServerPacketEnum.RecoverySessionResult
             };

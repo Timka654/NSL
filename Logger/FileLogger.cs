@@ -1,14 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-
-namespace Logger
+﻿namespace Logger
 {
     public class FileLogger : BaseLogger
-    { 
+    {
         public static FileLogger Initialize()
         {
             FileLogger fl = LoggerStorage.InitializeLogger<FileLogger>("main", "log", "logs", 5000);

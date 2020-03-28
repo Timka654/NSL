@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DBEngine.DBMigrator.ConfigurationAttributes
 {
@@ -46,7 +43,7 @@ namespace DBEngine.DBMigrator.ConfigurationAttributes
         /// </summary>
         /// <param name="name">Названия связующего ключа которому будет присвоено значение идентификатора текущей таблицы</param>
         /// <param name="table">Название созданой таблицы</param>
-        public DBCollumnForeignAttribute(string name, string table, params string [] foreignPrefixes)
+        public DBCollumnForeignAttribute(string name, string table, params string[] foreignPrefixes)
         {
             Name = name;
 

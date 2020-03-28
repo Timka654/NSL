@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Utils
 {
@@ -23,7 +21,7 @@ namespace Utils
             for (int i = 0; i < buffer.Length; i++)
             {
                 if (buffer[i] == '/')
-                    buffer[i] = (byte)'\\'; 
+                    buffer[i] = (byte)'\\';
                 t.Value += buffer[i].ToString("x2");
             }
             return t;

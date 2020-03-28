@@ -1,11 +1,9 @@
 ﻿using SocketServer;
 using SocketServer.Utils;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 
 namespace ServerOptions.Extensions.Manager
 {
@@ -36,7 +34,8 @@ namespace ServerOptions.Extensions.Manager
 
             var types = assembly
                 .GetTypes()
-                .Select(x => new {
+                .Select(x => new
+                {
                     type = x,
                     attr = (ManagerLoadAttribute)x.GetCustomAttribute(selectAttrbuteType)
                 })

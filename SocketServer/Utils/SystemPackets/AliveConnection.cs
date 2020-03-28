@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-using SocketCore.Utils;
+﻿using SocketCore.Utils;
 using SocketCore.Utils.Buffer;
 using SocketCore.Utils.SystemPackets.Enums;
 
 namespace SocketServer.Utils.SystemPackets
 {
-    public class AliveConnection<T> :IPacket<T> where T: IServerNetworkClient
+    public class AliveConnection<T> : IPacket<T> where T : IServerNetworkClient
     {
         public void Receive(T client, InputPacketBuffer data)
         {
@@ -16,7 +12,7 @@ namespace SocketServer.Utils.SystemPackets
             //client.Alive_locker.Set();
             if (client.PingCount == ulong.MaxValue)
                 client.PingCount = 0;
-            
+
             if (client.PingCount++ % 60 == 0)
                 SocketServer.Utils.SystemPackets.SystemTime.Send(client);
         }

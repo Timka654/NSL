@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Data.Common;
-using System.Text;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -161,12 +159,12 @@ namespace DBEngine
             //если подключение было открытым, а потом закрылось то делаем подключение свободным в нашем пуле
 
             Pool[(T)sender] = e.CurrentState != System.Data.ConnectionState.Open && (e.CurrentState == System.Data.ConnectionState.Closed || e.CurrentState == System.Data.ConnectionState.Broken);
-            
+
         }
 
         private async void Connection_Disposed(object sender, EventArgs e)
         {
-            Pool.TryRemove((T) sender,out var r);
+            Pool.TryRemove((T)sender, out var r);
             await CreateConnection();
         }
 

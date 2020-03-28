@@ -1,13 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net.Sockets;
-using System.Text;
-using Logger;
+﻿using Logger;
 using SocketCore.Utils;
 using SocketCore.Utils.Buffer;
 using SocketCore.Utils.SystemPackets.Enums;
 using SocketServer.Utils;
 using SocketServer.Utils.SystemPackets;
+using System;
+using System.Collections.Generic;
+using System.Net.Sockets;
 
 namespace SocketServer
 {

@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DBEngine.DBMigrator
 {
@@ -66,7 +63,7 @@ namespace DBEngine.DBMigrator
 
             { new KeyValuePair<string,bool>("[nvarchar]",false),typeof(string)},
             { new KeyValuePair<string,bool>("[nvarchar]",true),typeof(string)},
-            
+
             { new KeyValuePair<string,bool>("[smalldatetime]",false), typeof(DateTime) },
             { new KeyValuePair<string,bool>("[smalldatetime]",true), typeof(DateTime?) },
         };

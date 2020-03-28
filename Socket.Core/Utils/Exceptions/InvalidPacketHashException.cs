@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace SocketCore.Utils.Exceptions
 {
@@ -10,8 +8,8 @@ namespace SocketCore.Utils.Exceptions
     public class InvalidPacketHashException : Exception
     {
         public InvalidPacketHashException() : base("Ошибка проверки хеша")
-        { 
-            
+        {
+
         }
     }
 }

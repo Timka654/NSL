@@ -1,11 +1,7 @@
 ﻿using SocketServer.Utils;
 using System;
-using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
-using System.Text;
-using SocketServer.Utils.SystemPackets;
-using SocketCore.Utils;
 
 namespace SocketServer
 {
@@ -85,7 +81,7 @@ namespace SocketServer
             }
             catch (Exception ex)
             {
-                serverOptions.RunExtension(ex,null);
+                serverOptions.RunExtension(ex, null);
             }
             listener = null;
         }

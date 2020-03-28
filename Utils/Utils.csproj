@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <Platforms>AnyCPU;x64;x86</Platforms>
-    <Configurations>Debug;Release;PublishDebug;Unity;UnityDebug</Configurations>
+    <Configurations>Debug;Release;PublishDebug;Unity;UnityDebug;DebugStable</Configurations>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='PublishDebug|AnyCPU'">
@@ -11,14 +11,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Cipher(NET.Standard)\Cipher.csproj" />
-    <ProjectReference Include="..\Configuration\ConfigurationEngine.csproj" />
-    <ProjectReference Include="..\DBEngine\DBEngine.csproj" />
-    <ProjectReference Include="..\Logger\Logger.csproj" />
     <ProjectReference Include="..\SocketServer\SocketServer.csproj" />
   </ItemGroup>
 

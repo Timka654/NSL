@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Data.SqlClient;
-using System.Reflection;
+﻿using DBEngine.DBMigrator.ConfigurationAttributes;
+using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Data.Common;
-using DBEngine.DBMigrator.ConfigurationAttributes;
+using System.Linq;
+using System.Reflection;
 
 namespace DBEngine.DBMigrator
 {
@@ -40,8 +37,8 @@ namespace DBEngine.DBMigrator
         private static void UpdateDbGenericConfig<TQ>() where TQ : DBIdentityEntity
         {
             var inst = Activator.CreateInstance<TQ>();
-            
-            var type = MigrationTypeInfo.LoadType(typeof(TQ), inst is DBDataEntity dde? dde.GetData() : new List<TQ>());
+
+            var type = MigrationTypeInfo.LoadType(typeof(TQ), inst is DBDataEntity dde ? dde.GetData() : new List<TQ>());
             MigrationTypeInfo.FillIds(type);
             UpdateDbGeneric<TQ>(type, 0);
         }
@@ -67,7 +64,7 @@ namespace DBEngine.DBMigrator
                 if (item.CollumnAttribute != null)
                 {
                     var sqlType = DBCollumnType.GetSQLTypeData(item).Type;
-                    if(sqlType.Contains('('))
+                    if (sqlType.Contains('('))
                         _result.Add(CollumnInfo.GetSqlCollumnInfo(item.CollumnAttribute.Name, sqlType.Substring(0, sqlType.IndexOf("(")), IsOfNullableType(item.CollumnAttribute.Type ?? item.Type)));
                     else
                         _result.Add(CollumnInfo.GetSqlCollumnInfo(item.CollumnAttribute.Name, sqlType, IsOfNullableType(item.CollumnAttribute.Type ?? item.Type)));
@@ -79,7 +76,7 @@ namespace DBEngine.DBMigrator
             return _result;
         }
 
-         static bool IsOfNullableType(Type type)
+        static bool IsOfNullableType(Type type)
         {
             return Nullable.GetUnderlyingType(type) != null;
         }
@@ -95,17 +92,18 @@ namespace DBEngine.DBMigrator
             DBCommand cm = connPool.GetQueryCommand();
 
             bool mustMigrate = false;
-            
+
             var filtred = type.ExistDbCollumns.Where(x => type.DbCollumns.Exists(y => y.CollumnAttribute?.Name == x.CollumnAttribute.Name)).ToList();
 
             if (filtred.Count != type.ExistDbCollumns.Count || filtred.Count != type.DbCollumns.Count)
                 mustMigrate = true;
 
             type.ExistDbCollumns = filtred;
-            
+
             string migrateCollumns = string.Join(",", type.ExistDbCollumns.Select(x => $"{x.CollumnAttribute.Name}"));
-            
-            List<string> existCols = type.ExistDbCollumns.Select((e) => {
+
+            List<string> existCols = type.ExistDbCollumns.Select((e) =>
+            {
                 var t1 = type.DbCollumns.FirstOrDefault(x => x.CollumnAttribute?.Name == e.CollumnAttribute.Name);
                 if (t1.SqlType.Type == e.SqlType.Type)
                     return t1.CollumnAttribute.Name;
@@ -121,7 +119,7 @@ namespace DBEngine.DBMigrator
                  AND TABLE_NAME = 'tmp_{type.TableName}'))
                 BEGIN
                     Drop table dbo.tmp_{type.TableName}
-                END" + 
+                END" +
                 "\r\n\r\n\r\n\r\n" +
                 GetCreationQuery(type) +
                 "\r\n\r\n\r\n\r\n" +
@@ -218,7 +216,7 @@ namespace DBEngine.DBMigrator
                     continue;
 
 
-                collumn.MigrationTypeInfo.Values = (IEnumerable)( typeof(IDictionary).IsAssignableFrom(collumn.Type) ? ((IDictionary)collumn.Getter(item)).Values : collumn.Getter(item));
+                collumn.MigrationTypeInfo.Values = (IEnumerable)(typeof(IDictionary).IsAssignableFrom(collumn.Type) ? ((IDictionary)collumn.Getter(item)).Values : collumn.Getter(item));
 
                 if (collumn.MigrationTypeInfo.SourceKeys != null && collumn.MigrationTypeInfo.Values != null)
                     foreach (var sourceKey in collumn.MigrationTypeInfo.SourceKeys)

@@ -4,7 +4,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 
 namespace DBEngine.DBMigrator
 {
@@ -133,7 +132,7 @@ namespace DBEngine.DBMigrator
 
             if (t.BaseType != typeof(object))
             {
-                r.AddRange(GetCollumns(t.BaseType, foreignKey,null,prefixes, foreignKeys));
+                r.AddRange(GetCollumns(t.BaseType, foreignKey, null, prefixes, foreignKeys));
             }
 
             if (foreignKey?.Sealed != true)
@@ -162,7 +161,7 @@ namespace DBEngine.DBMigrator
                 {
                     if (item.Type.IsGenericType && item.Type.GetGenericTypeDefinition() == typeof(List<>))
                         item.Type = item.Type.GetGenericArguments()[0];
-                    else if(item.Type.IsGenericType && item.Type.GetGenericTypeDefinition() == typeof(Dictionary<,>))
+                    else if (item.Type.IsGenericType && item.Type.GetGenericTypeDefinition() == typeof(Dictionary<,>))
                         item.Type = item.Type.GetGenericArguments()[1];
 
                     if (item.Type.BaseType == typeof(Enum))
@@ -360,7 +359,7 @@ namespace DBEngine.DBMigrator
         {
             return TableName;
         }
-        
+
         private static CollumnInfo GetCollumn(PropertyInfo x)
         {
             return GetCollumnAttributes(new CollumnInfo

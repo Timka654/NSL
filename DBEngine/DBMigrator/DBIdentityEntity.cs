@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections;
 
 namespace DBEngine.DBMigrator
 {
@@ -17,7 +14,8 @@ namespace DBEngine.DBMigrator
         void SetIndex(int index);
     }
 
-    public interface DBDataEntity {
+    public interface DBDataEntity
+    {
         IEnumerable GetData();
     }
 }

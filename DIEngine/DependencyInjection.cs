@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
 
 namespace DIEngine
 {
@@ -92,12 +90,12 @@ namespace DIEngine
 
             var members = t
                 .GetMembers(
-                System.Reflection.BindingFlags.Public | 
-                System.Reflection.BindingFlags.Instance | 
+                System.Reflection.BindingFlags.Public |
+                System.Reflection.BindingFlags.Instance |
                 System.Reflection.BindingFlags.NonPublic)
-                .Where(x=> x is PropertyInfo || x is FieldInfo)
-                .Select(x=>new { membr = x, attr = x.GetCustomAttribute<DependencyMemberAttribute>() })
-                .Where(x=>x.attr != null);
+                .Where(x => x is PropertyInfo || x is FieldInfo)
+                .Select(x => new { membr = x, attr = x.GetCustomAttribute<DependencyMemberAttribute>() })
+                .Where(x => x.attr != null);
 
             object setObj = null;
             Type setT = null;

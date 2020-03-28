@@ -1,9 +1,7 @@
-﻿using System;
+﻿using ConfigurationEngine.Info;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using ConfigurationEngine.Info;
 
 namespace ConfigurationEngine
 {

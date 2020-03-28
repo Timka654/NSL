@@ -1,9 +1,15 @@
-﻿using System;
+﻿using SocketCore.Utils.Buffer;
+using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading;
+/* Необъединенное слияние из проекта "SocketCore (net45)"
+До:
 using System.Threading.Tasks;
 using SocketCore.Utils.Buffer;
+После:
+using System.Threading.Tasks;
+*/
+
 
 namespace SocketCore.Utils
 {

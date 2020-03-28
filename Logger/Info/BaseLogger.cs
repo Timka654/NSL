@@ -1,10 +1,8 @@
-﻿using System;
+﻿using Logger.Info;
+using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using System.Threading.Tasks;
-using Logger.Info;
 
 namespace Logger
 {
@@ -28,7 +26,7 @@ namespace Logger
 
         protected string FileName;
 
-        
+
         private void NextDay(LogMessageInfo msg)
         {
             if (CurrentDateInitialized == msg.Now.Date)
