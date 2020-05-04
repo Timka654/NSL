@@ -9,7 +9,7 @@ using GrEmit.Utils;
 
 namespace BinarySerializer.DefaultTypes
 {
-    public class BinaryUInt32 : IBasicType
+    public partial class BinaryUInt32 : IBasicType
     {
         public Type CompareType => typeof(uint);
 
@@ -23,6 +23,8 @@ namespace BinarySerializer.DefaultTypes
             readBitConverterMethodInfo = typeof(BitConverter).GetMethod("ToUInt32", new Type[] { typeof(byte[]), typeof(int) });
                 
         }
+
+#if NOT_UNITY
 
         public void GetReadILCode(BinaryMemberData prop, BinaryStruct currentStruct, GroboIL il, GroboIL.Local binaryStruct, GroboIL.Local buffer, GroboIL.Local result, GroboIL.Local typeSize, GroboIL.Local offset, bool listValue)
         {
@@ -79,5 +81,7 @@ namespace BinarySerializer.DefaultTypes
             //}
             //BinaryStruct.WriteOffsetAppend(il, offset, 4);
         }
+
+#endif
     }
 }

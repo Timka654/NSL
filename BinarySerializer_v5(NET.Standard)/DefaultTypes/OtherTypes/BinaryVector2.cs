@@ -14,7 +14,7 @@ using UnityEngine;
 
 namespace BinarySerializer.DefaultTypes
 {
-    public class BinaryVector2 : IBasicType
+    public partial class BinaryVector2 : IBasicType
     {
         public Type CompareType => typeof(Vector2);
 
@@ -45,6 +45,7 @@ namespace BinarySerializer.DefaultTypes
 
         }
 
+#if NOT_UNITY
         public void GetReadILCode(BinaryMemberData prop, BinaryStruct currentStruct, GroboIL il, GroboIL.Local binaryStruct, GroboIL.Local buffer, GroboIL.Local result, GroboIL.Local typeSize, GroboIL.Local offset, bool listValue)
         {
             var r = il.DeclareLocal(typeof(Vector2));
@@ -148,5 +149,6 @@ namespace BinarySerializer.DefaultTypes
             il.ArraySetter(buffer, arr, 4);
             //BinaryStruct.WriteOffsetAppend(il, offset, 4);
         }
+#endif
     }
 }

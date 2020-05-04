@@ -23,7 +23,7 @@ namespace BinarySerializer
     /// <summary>
     /// Данные для бинарной серриализации класса
     /// </summary>
-    public class BinaryStruct
+    public partial class BinaryStruct
     {
         internal Dictionary<string, TempValue> TempBuildValues = new Dictionary<string, TempValue>();
 
@@ -181,6 +181,7 @@ namespace BinarySerializer
             return s;
         }
 
+#if NOT_UNITY
         /// <summary>
         /// Получить временные значения
         /// </summary>
@@ -203,7 +204,7 @@ namespace BinarySerializer
             TempBuildValues.Add("tempLenghtBuffer", tempBuffer);
         }
 
-        #region Writer
+#region Writer
 
         /// <summary>
         /// Скомпилировать метод для записи
@@ -323,9 +324,9 @@ namespace BinarySerializer
             il.MarkLabel(methodBreak);
         }
 
-        #endregion
+#endregion
 
-        #region Reader
+#region Reader
 
         /// <summary>
         /// Скомпилировать метод для чтения
@@ -428,9 +429,9 @@ namespace BinarySerializer
             }
         }
 
-        #endregion
+#endregion
 
-        #region NULL
+#region NULL
 
         /// <summary>
         /// Вставить фрагмент кода для записи Nullable типа NULL == true и переноса на указанную метку
@@ -552,9 +553,9 @@ namespace BinarySerializer
 
         }
 
-        #endregion
+#endregion
 
-        #region LambdaCreators
+#region LambdaCreators
 
         private static Func<object, BinaryStruct, Tuple<int, byte[]>> CreateWriter(MethodInfo method)
         {
@@ -584,9 +585,9 @@ namespace BinarySerializer
             return getterExpression.Compile();
         }
 
-        #endregion
+#endregion
 
-        #region Offset
+#region Offset
 
         /// <summary>
         /// Вставка фрагмента кода для добавления размера типа к позиции
@@ -616,8 +617,8 @@ namespace BinarySerializer
             il.Stloc(offset);
         }
 
-        #endregion
-
+#endregion
+#endif
         internal static ConstructorInfo GetConstructor(Type type, Type[] args)
         {
             var construct = type.GetConstructors(BindingFlags.Public |

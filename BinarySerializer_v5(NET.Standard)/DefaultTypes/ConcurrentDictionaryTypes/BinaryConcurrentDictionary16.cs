@@ -8,7 +8,7 @@ using GrEmit;
 
 namespace BinarySerializer.DefaultTypes
 {
-    public class BinaryConcurrentDictionary16<TKey,TValue> : IBasicType
+    public partial class BinaryConcurrentDictionary16<TKey,TValue> : IBasicType
     {
         public Type CompareType => typeof(IDictionary);
 
@@ -25,6 +25,7 @@ namespace BinarySerializer.DefaultTypes
             codingMethodInfo = typeof(BinaryStruct).GetProperty("Coding").GetMethod;
         }
 
+#if NOT_UNITY
         public void GetReadILCode(BinaryMemberData prop, BinaryStruct currentStruct, GroboIL il, GroboIL.Local binaryStruct, GroboIL.Local buffer, GroboIL.Local result, GroboIL.Local typeSize, GroboIL.Local offset, bool listValue)
         {
             var exitLabel = il.DefineLabel("exit");
@@ -265,5 +266,6 @@ namespace BinarySerializer.DefaultTypes
 
             il.MarkLabel(exitLabel);
         }
+#endif
     }
 }

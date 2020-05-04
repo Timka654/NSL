@@ -13,7 +13,7 @@ namespace SCL.Unity.Utils
 
         protected override void InvokeEvent(RDType data)
         {
-            ThreadHelper.InvokeOnMain(()=> base.InvokeEvent(data));
+            ThreadHelper.InvokeOnMain(()=> { base.InvokeEvent(data); });
         }
     }
 

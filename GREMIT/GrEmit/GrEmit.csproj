@@ -2,10 +2,11 @@
 
   <PropertyGroup>
     <!-- todo (andrew, 21.02.2019): switch netcoreapp2.x targets to netstandard2.1 target when it will be released (see https://devblogs.microsoft.com/dotnet/announcing-net-standard-2-1/) -->
-    <TargetFrameworks>netstandard2.0;net45</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0</TargetFrameworks>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1701;1702;1705;1591</NoWarn>
+    <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
   </PropertyGroup>
 
   <ItemGroup Condition="'$(TargetFramework)'=='netstandard2.0'">

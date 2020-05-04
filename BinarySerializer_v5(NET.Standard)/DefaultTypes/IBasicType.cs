@@ -4,21 +4,25 @@ using System.Text;
 using System.Reflection;
 using System.Reflection.Emit;
 using GrEmit;
+using System.IO;
 #if !NOT_UNITY
 using UnityEngine.Scripting;
 #endif
 
-#if !NOT_UNITY
-[assembly: Preserve]
-#endif
 namespace BinarySerializer.DefaultTypes
 {
     public interface IBasicType
     {
+#if !NOT_UNITY
+        object GetReadILCode(BinaryMemberData prop, BinaryStruct currentStruct, IL2CPPMemoryStream buffer, object currentObject);
+
+        void GetWriteILCode(BinaryMemberData prop, BinaryStruct currentStruct, IL2CPPMemoryStream buffer, object currentObject);
+#else
         Type CompareType { get; }
 
         void GetReadILCode(BinaryMemberData prop, BinaryStruct currentStruct, GroboIL il, GroboIL.Local binaryStruct, GroboIL.Local buffer, GroboIL.Local result, GroboIL.Local typeSize, GroboIL.Local offset, bool listValue);
 
         void GetWriteILCode(BinaryMemberData prop, BinaryStruct currentStruct, GroboIL il, GroboIL.Local binaryStruct, GroboIL.Local value, GroboIL.Local typeSize, GroboIL.Local buffer, /*GroboIL.Local offset, */bool listValue);
+#endif
     }
 }
