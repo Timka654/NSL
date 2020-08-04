@@ -2,6 +2,7 @@
 using ConfigurationEngine;
 using Logger;
 using ServerOptions.Extensions.ConfigurationEngine;
+using SocketCore.Utils.Logger.Enums;
 using SocketServer;
 using SocketServer.Utils;
 using System;
@@ -89,7 +90,7 @@ namespace Utils.Helper.Network
         {
             Logger?.Append(LoggerLevel.Info, $"-> Configuration Loading");
 
-            Options = ConfigurationManager.LoadConfigurationServerOptions<T>($"server/{ServerConfigurationName}");
+            Options = ConfigurationManager.LoadConfigurationServerOptions<T>($"server.{ServerConfigurationName}");
 
             Options.HelperLogger = Logger;
 

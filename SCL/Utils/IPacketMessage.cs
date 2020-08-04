@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SocketCore.Utils;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace SCL.Utils
 {
-    public class IPacketMessage<TClient, RDType> : IPacket<TClient>
+    public class IPacketMessage<TClient, RDType> : IClientPacket<TClient>
         where TClient : BaseSocketNetworkClient
     {
         public IPacketMessage(ClientOptions<TClient> options) : base(options)
@@ -22,7 +23,7 @@ namespace SCL.Utils
         }
     }
 
-    public class IPacketMessage<TClient> : IPacket<TClient>
+    public class IPacketMessage<TClient> : IClientPacket<TClient>
         where TClient : BaseSocketNetworkClient
     {
         public IPacketMessage(ClientOptions<TClient> options) : base(options)

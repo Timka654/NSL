@@ -1,4 +1,5 @@
 ﻿using DBEngine;
+using SocketCore.Utils.Logger.Enums;
 using SocketServer;
 using SocketServer.Utils;
 using System;
@@ -51,7 +52,7 @@ namespace ServerOptions.Extensions.StaticQuery
 
                 Debug.WriteLine($"Loading Query: query: {item.attr.Name} type: {item.type.FullName}");
 
-                serverOptions.HelperLogger.Append(Logger.LoggerLevel.Info, $"{item.attr.Name} Loaded");
+                serverOptions.HelperLogger.Append(LoggerLevel.Info, $"{item.attr.Name} Loaded");
             }
 
             return querys.Count;

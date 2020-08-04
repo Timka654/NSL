@@ -1,4 +1,5 @@
 ﻿using SCL;
+using SocketCore.Utils;
 using SocketCore.Utils.Buffer;
 using System;
 using System.Collections.Generic;
@@ -7,16 +8,10 @@ using System.Text;
 
 namespace SCL
 {
-    public class BaseSocketNetworkClient
+    public class BaseSocketNetworkClient : INetworkClient
     {
-        /// <summary>
-        /// Клиент для отправки данных, эта переменная обязательна
-        /// </summary>
-        public IClient Network;
 
         public string Session { get; set; }
-
-        public string[] RecoverySessionKeyArray { get; set; }
 
         /// <summary>
         /// Буффер для хранения отправленных пакетов во время разрыва соединения

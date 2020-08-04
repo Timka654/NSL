@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <!-- todo (andrew, 21.02.2019): switch netcoreapp2.x targets to netstandard2.1 target when it will be released (see https://devblogs.microsoft.com/dotnet/announcing-net-standard-2-1/) -->
-    <TargetFrameworks>netstandard2.0;net45</TargetFrameworks>
+    <TargetFramework>net5.0</TargetFramework>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1701;1702;1705;1591</NoWarn>
@@ -11,6 +11,11 @@
   <ItemGroup Condition="'$(TargetFramework)'=='netstandard2.0'">
     <PackageReference Include="System.Reflection.Emit" Version="4.7.0" />
     <PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.7.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Update="Microsoft.SourceLink.GitHub" Version="1.0.0" />
+    <PackageReference Update="Nerdbank.GitVersioning" Version="3.1.91" />
   </ItemGroup>
 
 </Project>

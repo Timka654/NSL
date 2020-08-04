@@ -4,11 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using SCL;
+using SocketCore.Utils;
 using SocketCore.Utils.Buffer;
 
 namespace SCL.Utils.SystemPackets
 {
-    public class SystemTime<T> : IPacket<T> where T:BaseSocketNetworkClient
+    public class SystemTime<T> : IClientPacket<T> where T:BaseSocketNetworkClient
     {
         public SystemTime(ClientOptions<T> options) : base(options)
         {

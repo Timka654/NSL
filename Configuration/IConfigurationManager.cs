@@ -1,7 +1,9 @@
 ﻿using ConfigurationEngine.Info;
 using Logger;
+using SocketCore.Utils.Logger.Enums;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace ConfigurationEngine
@@ -16,17 +18,15 @@ namespace ConfigurationEngine
 
         public IConfigurationLoadingProvider Provider { get; protected set; }
 
-        public char NodeSeparator { get; protected set; }
-
-        public IConfigurationManager(string fileName, char nodeSeparator = '/') : this(nodeSeparator)
+        public IConfigurationManager(string fileName)
         {
             FileName = fileName;
             OnLog(LoggerLevel.Info, $"ConfigurationManager Loaded");
         }
 
-        protected IConfigurationManager(char nodeSeparator = '/')
+        public bool ExistsFile()
         {
-            NodeSeparator = nodeSeparator;
+            return File.Exists(FileName);
         }
 
         /// <summary>
@@ -77,7 +77,12 @@ namespace ConfigurationEngine
         /// <returns></returns>
         public T GetValue<T>(string path, string existFlag = "")
         {
-            return (T)Convert.ChangeType(GetValue(path, existFlag), typeof(T));
+            var val = GetValue(path, existFlag);
+
+            if (val == null)
+                return default;
+
+            return (T)Convert.ChangeType(val, typeof(T));
         }
 
         /// <summary>
@@ -101,12 +106,17 @@ namespace ConfigurationEngine
         {
             OnLog(level, content);
         }
+
+        public virtual bool SaveData()
+        {
+            return Provider.SaveData(this);
+        }
     }
 
     public abstract class IConfigurationManager<T> : IConfigurationManager
         where T : IConfigurationManager<T>
     {
-        public IConfigurationManager(string fileName, char nodeSeparator = '/') : base(fileName, nodeSeparator)
+        public IConfigurationManager(string fileName) : base(fileName)
         {
 
         }
@@ -116,6 +126,11 @@ namespace ConfigurationEngine
         /// </summary>
         public virtual T SetDefaults(List<ConfigurationInfo> defaultConfigurationList, bool reloading = false)
         {
+            foreach (var item in defaultConfigurationList)
+            {
+                item.Path = item.Path.ToLower();
+            }
+
             DefaultConfigurationList = defaultConfigurationList;
 
             if (reloading)

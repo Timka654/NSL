@@ -126,13 +126,13 @@ namespace SocketCore
 #endif
             );
 
-        void SendSerialize<O>(ushort packetId, O obj, string scheme
-#if DEBUG
-            , [System.Runtime.CompilerServices.CallerMemberName] string memberName = "",
-            [System.Runtime.CompilerServices.CallerFilePath] string sourceFilePath = "",
-            [System.Runtime.CompilerServices.CallerLineNumber] int sourceLineNumber = 0
-#endif
-            );
+//        void SendSerialize<O>(ushort packetId, O obj, string scheme
+//#if DEBUG
+//            , [System.Runtime.CompilerServices.CallerMemberName] string memberName = "",
+//            [System.Runtime.CompilerServices.CallerFilePath] string sourceFilePath = "",
+//            [System.Runtime.CompilerServices.CallerLineNumber] int sourceLineNumber = 0
+//#endif
+//            );
 
         void Send(byte[] buf, int offset, int lenght);
 

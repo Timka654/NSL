@@ -20,7 +20,11 @@ namespace SocketCore.Utils
     {
         public DateTime LastReceiveMessage { get; set; }
 
-        public bool AliveState { get; set; }
+        /// <summary>
+        /// Состояние соединение на текущий момент
+        /// Важно! работает только при запуске цикла сообщений AliveConnection
+        /// </summary>
+        public bool AliveState { get; set; } = true;
 
         public ulong PingCount { get; set; }
 
@@ -32,7 +36,7 @@ namespace SocketCore.Utils
 
         public long Version { get; set; }
 
-        public ManualResetEvent Alive_locker { get; set; } = new ManualResetEvent(true);
+        public AutoResetEvent Alive_locker { get; set; } = new AutoResetEvent(true);
 
         internal string Session { get; set; }
 

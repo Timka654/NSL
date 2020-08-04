@@ -23,14 +23,14 @@ namespace ConfigurationEngine
         /// <param name="config">Данные конфигурации</param>
         public void AddValue(ConfigurationInfo config)
         {
-            if (config_map.TryGetValue(config.Name, out ConfigurationInfo c))
+            if (config_map.TryGetValue(config.Path, out ConfigurationInfo c))
             {
                 c.Value = config.Value;
                 c.Flags = config.Flags;
                 return;
             }
 
-            config_map.TryAdd(config.Name, config);
+            config_map.TryAdd(config.Path, config);
         }
 
         /// <summary>
@@ -51,6 +51,11 @@ namespace ConfigurationEngine
         {
             config_map.TryGetValue(name, out ConfigurationInfo c);
             return c;
+        }
+
+        public bool ExistValue(string name)
+        {
+            return config_map.ContainsKey(name);
         }
 
         /// <summary>

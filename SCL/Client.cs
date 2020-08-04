@@ -1,5 +1,5 @@
 ﻿using SCL.Utils;
-using SocketCore.Extensions.BinarySerializer;
+using SocketCore;
 using SocketCore.Utils;
 using SocketCore.Utils.Buffer;
 using SocketCore.Utils.Exceptions;
@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 
@@ -99,8 +100,8 @@ namespace SCL
 
             clientOptions.ClientData = Activator.CreateInstance<T>();
 
-            clientOptions.ClientData.RecoverySessionKeyArray = keys;
-            clientOptions.ClientData.Network = this;
+            clientOptions.ClientData.SetRecoveryData(clientOptions.ClientData.Session, keys);
+            clientOptions.ClientData.Network = (IClient)this;
 
             if (waitBuffer != null)
                 foreach (var item in waitBuffer)
@@ -221,7 +222,13 @@ namespace SCL
         /// Отправка пакета
         /// </summary>
         /// <param name="rbuff">спец буффер содержащий в себе данные пакета</param>
-        public void Send(OutputPacketBuffer rbuff)
+        public void Send(OutputPacketBuffer rbuff
+#if DEBUG
+            , [System.Runtime.CompilerServices.CallerMemberName] string memberName = "",
+            [System.Runtime.CompilerServices.CallerFilePath] string sourceFilePath = "",
+            [System.Runtime.CompilerServices.CallerLineNumber] int sourceLineNumber = 0
+#endif
+            )
         {
 #if DEBUG
             OnSend(rbuff);
@@ -230,22 +237,6 @@ namespace SCL
 
             Send(rbuff.CompilePacket(), 0, rbuff.PacketLenght);
         }
-
-        public void SendSerialize<O>(ushort packetId, O obj, string scheme)
-        {
-            var rbuff = new OutputPacketBuffer { PacketId = packetId };
-
-            rbuff.Serialize<O>(obj, scheme);
-
-#if DEBUG
-            OnSend(rbuff);
-            //ThreadHelper.InvokeOnMain(() => { OnSendPacket?.Invoke(this, rbuff.PacketId, rbuff.PacketLenght); });
-#endif
-
-            Send(rbuff.CompilePacket(), 0, rbuff.PacketLenght);
-
-        }
-
 
         protected virtual void OnSend(OutputPacketBuffer rbuff)
         {
@@ -348,7 +339,13 @@ namespace SCL
 
 #region SendOneValueExtensions
 
-        public void SendEmpty(ushort packetId)
+        public void SendEmpty(ushort packetId
+#if DEBUG
+            , [System.Runtime.CompilerServices.CallerMemberName] string memberName = "",
+            [System.Runtime.CompilerServices.CallerFilePath] string sourceFilePath = "",
+            [System.Runtime.CompilerServices.CallerLineNumber] int sourceLineNumber = 0
+#endif
+)
         {
             OutputPacketBuffer rbuff = new OutputPacketBuffer
             {
@@ -358,7 +355,13 @@ namespace SCL
             Send(rbuff.CompilePacket(), 0, rbuff.PacketLenght);
         }
 
-        public void Send(ushort packetId, int value)
+        public void Send(ushort packetId, int value
+#if DEBUG
+            , [System.Runtime.CompilerServices.CallerMemberName] string memberName = "",
+            [System.Runtime.CompilerServices.CallerFilePath] string sourceFilePath = "",
+            [System.Runtime.CompilerServices.CallerLineNumber] int sourceLineNumber = 0
+#endif
+)
         {
             OutputPacketBuffer rbuff = new OutputPacketBuffer
             {
@@ -370,7 +373,13 @@ namespace SCL
             Send(rbuff.CompilePacket(), 0, rbuff.PacketLenght);
         }
 
-        public void Send(ushort packetId, byte value)
+        public void Send(ushort packetId, byte value
+#if DEBUG
+            , [System.Runtime.CompilerServices.CallerMemberName] string memberName = "",
+            [System.Runtime.CompilerServices.CallerFilePath] string sourceFilePath = "",
+            [System.Runtime.CompilerServices.CallerLineNumber] int sourceLineNumber = 0
+#endif
+)
         {
             OutputPacketBuffer rbuff = new OutputPacketBuffer
             {
@@ -382,7 +391,13 @@ namespace SCL
             Send(rbuff.CompilePacket(), 0, rbuff.PacketLenght);
         }
 
-        public void Send(ushort packetId, bool value)
+        public void Send(ushort packetId, bool value
+#if DEBUG
+            , [System.Runtime.CompilerServices.CallerMemberName] string memberName = "",
+            [System.Runtime.CompilerServices.CallerFilePath] string sourceFilePath = "",
+            [System.Runtime.CompilerServices.CallerLineNumber] int sourceLineNumber = 0
+#endif
+)
         {
             OutputPacketBuffer rbuff = new OutputPacketBuffer
             {
@@ -394,7 +409,13 @@ namespace SCL
             Send(rbuff.CompilePacket(), 0, rbuff.PacketLenght);
         }
 
-        public void Send(ushort packetId, short value)
+        public void Send(ushort packetId, short value
+#if DEBUG
+            , [System.Runtime.CompilerServices.CallerMemberName] string memberName = "",
+            [System.Runtime.CompilerServices.CallerFilePath] string sourceFilePath = "",
+            [System.Runtime.CompilerServices.CallerLineNumber] int sourceLineNumber = 0
+#endif
+)
         {
             OutputPacketBuffer rbuff = new OutputPacketBuffer
             {
@@ -406,7 +427,13 @@ namespace SCL
             Send(rbuff.CompilePacket(), 0, rbuff.PacketLenght);
         }
 
-        public void Send(ushort packetId, ushort value)
+        public void Send(ushort packetId, ushort value
+#if DEBUG
+            , [System.Runtime.CompilerServices.CallerMemberName] string memberName = "",
+            [System.Runtime.CompilerServices.CallerFilePath] string sourceFilePath = "",
+            [System.Runtime.CompilerServices.CallerLineNumber] int sourceLineNumber = 0
+#endif
+)
         {
             OutputPacketBuffer rbuff = new OutputPacketBuffer
             {
@@ -418,7 +445,13 @@ namespace SCL
             Send(rbuff.CompilePacket(), 0, rbuff.PacketLenght);
         }
 
-        public void Send(ushort packetId, uint value)
+        public void Send(ushort packetId, uint value
+#if DEBUG
+            , [System.Runtime.CompilerServices.CallerMemberName] string memberName = "",
+            [System.Runtime.CompilerServices.CallerFilePath] string sourceFilePath = "",
+            [System.Runtime.CompilerServices.CallerLineNumber] int sourceLineNumber = 0
+#endif
+)
         {
             OutputPacketBuffer rbuff = new OutputPacketBuffer
             {
@@ -430,7 +463,13 @@ namespace SCL
             Send(rbuff.CompilePacket(), 0, rbuff.PacketLenght);
         }
 
-        public void Send(ushort packetId, long value)
+        public void Send(ushort packetId, long value
+#if DEBUG
+            , [System.Runtime.CompilerServices.CallerMemberName] string memberName = "",
+            [System.Runtime.CompilerServices.CallerFilePath] string sourceFilePath = "",
+            [System.Runtime.CompilerServices.CallerLineNumber] int sourceLineNumber = 0
+#endif
+)
         {
             OutputPacketBuffer rbuff = new OutputPacketBuffer
             {
@@ -442,7 +481,13 @@ namespace SCL
             Send(rbuff.CompilePacket(), 0, rbuff.PacketLenght);
         }
 
-        public void Send(ushort packetId, ulong value)
+        public void Send(ushort packetId, ulong value
+#if DEBUG
+            , [System.Runtime.CompilerServices.CallerMemberName] string memberName = "",
+            [System.Runtime.CompilerServices.CallerFilePath] string sourceFilePath = "",
+            [System.Runtime.CompilerServices.CallerLineNumber] int sourceLineNumber = 0
+#endif
+)
         {
             OutputPacketBuffer rbuff = new OutputPacketBuffer
             {
@@ -454,7 +499,13 @@ namespace SCL
             Send(rbuff.CompilePacket(), 0, rbuff.PacketLenght);
         }
 
-        public void Send(ushort packetId, float value)
+        public void Send(ushort packetId, float value
+#if DEBUG
+            , [System.Runtime.CompilerServices.CallerMemberName] string memberName = "",
+            [System.Runtime.CompilerServices.CallerFilePath] string sourceFilePath = "",
+            [System.Runtime.CompilerServices.CallerLineNumber] int sourceLineNumber = 0
+#endif
+)
         {
             OutputPacketBuffer rbuff = new OutputPacketBuffer
             {
@@ -466,7 +517,13 @@ namespace SCL
             Send(rbuff.CompilePacket(), 0, rbuff.PacketLenght);
         }
 
-        public void Send(ushort packetId, double value)
+        public void Send(ushort packetId, double value
+#if DEBUG
+            , [System.Runtime.CompilerServices.CallerMemberName] string memberName = "",
+            [System.Runtime.CompilerServices.CallerFilePath] string sourceFilePath = "",
+            [System.Runtime.CompilerServices.CallerLineNumber] int sourceLineNumber = 0
+#endif
+)
         {
             OutputPacketBuffer rbuff = new OutputPacketBuffer
             {
@@ -478,7 +535,13 @@ namespace SCL
             Send(rbuff.CompilePacket(), 0, rbuff.PacketLenght);
         }
 
-        public void Send(ushort packetId, DateTime? value)
+        public void Send(ushort packetId, DateTime? value
+#if DEBUG
+            , [System.Runtime.CompilerServices.CallerMemberName] string memberName = "",
+            [System.Runtime.CompilerServices.CallerFilePath] string sourceFilePath = "",
+            [System.Runtime.CompilerServices.CallerLineNumber] int sourceLineNumber = 0
+#endif
+)
         {
             OutputPacketBuffer rbuff = new OutputPacketBuffer
             {
@@ -490,7 +553,13 @@ namespace SCL
             Send(rbuff.CompilePacket(), 0, rbuff.PacketLenght);
         }
 
-        public void Send(ushort packetId, string value)
+        public void Send(ushort packetId, string value
+#if DEBUG
+            , [System.Runtime.CompilerServices.CallerMemberName] string memberName = "",
+            [System.Runtime.CompilerServices.CallerFilePath] string sourceFilePath = "",
+            [System.Runtime.CompilerServices.CallerLineNumber] int sourceLineNumber = 0
+#endif
+)
         {
             OutputPacketBuffer rbuff = new OutputPacketBuffer
             {
@@ -502,46 +571,96 @@ namespace SCL
             Send(rbuff.CompilePacket(), 0, rbuff.PacketLenght);
         }
 
-#endregion
+        //public void SendSerialize<O>(ushort packetId, O obj, string scheme, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "", [CallerLineNumber] int sourceLineNumber = 0)
+        //{
+        //    var rbuff = new OutputPacketBuffer();
+        //    rbuff.Serialize<O>(obj, scheme);
+
+        //    Send(rbuff.CompilePacket(), 0, rbuff.PacketLenght);
+        //}
+
+        private bool disconnected;
+
+        public void Disconnect()
+        {
+            if (disconnected == true)
+                return;
+
+            disconnected = true;
+            this.clientOptions.RunClientDisconnect();
+            //проверяем возможно клиент и не был инициализирован, в случае дос атак, такое возможно
+            if (sclient != null)
+            {
+                //отключаем и очищаем данные о клиенте
+                try { sclient.Disconnect(false); } catch { }
+                try { sclient.Dispose(); } catch { }
+            }
+            //очищаем буффер данных
+            receiveBuffer = null;
+
+            sclient = null;
+        }
+
+        public IPEndPoint GetRemovePoint()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void ChangeUserData(INetworkClient data)
+        {
+            throw new NotImplementedException();
+        }
+
+        public object GetUserData()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Socket GetSocket()
+        {
+            return sclient;
+        }
+        #endregion
 
     }
 
-    public interface IClient
-    {
-        void Send(OutputPacketBuffer packet);
+    //public interface IClient
+    //{
+    //    void Send(OutputPacketBuffer packet);
 
-        void SendEmpty(ushort packetId);
+    //    void SendEmpty(ushort packetId);
 
-        void Send(ushort packetId, byte value);
+    //    void Send(ushort packetId, byte value);
 
-        void Send(ushort packetId, int value);
+    //    void Send(ushort packetId, int value);
 
-        void Send(ushort packetId, bool value);
+    //    void Send(ushort packetId, bool value);
 
-        void Send(ushort packetId, short value);
+    //    void Send(ushort packetId, short value);
 
-        void Send(ushort packetId, ushort value);
+    //    void Send(ushort packetId, ushort value);
 
-        void Send(ushort packetId, uint value);
+    //    void Send(ushort packetId, uint value);
 
-        void Send(ushort packetId, long value);
+    //    void Send(ushort packetId, long value);
 
-        void Send(ushort packetId, ulong value);
+    //    void Send(ushort packetId, ulong value);
 
-        void Send(ushort packetId, float value);
+    //    void Send(ushort packetId, float value);
 
-        void Send(ushort packetId, double value);
+    //    void Send(ushort packetId, double value);
 
-        void Send(ushort packetId, DateTime? value);
+    //    void Send(ushort packetId, DateTime? value);
 
-        void Send(ushort packetId, string value);
+    //    void Send(ushort packetId, string value);
 
-        void SendSerialize<O>(ushort packetId, O obj, string scheme);
+    //    void SendSerialize<O>(ushort packetId, O obj, string scheme);
 
-        void Send(byte[] buf, int offset, int lenght);
+    //    void Send(byte[] buf, int offset, int lenght);
 
-        void Disconnect(bool disconnecteventcall = true);
+    //    void Disconnect(bool disconnecteventcall = true);
 
-        bool GetState();
-    }
+    //    bool GetState();
+    //}
+
 }

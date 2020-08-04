@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SocketCore.Utils;
 using SocketCore.Utils.Buffer;
 
 namespace SCL.Utils
 {
-    public class IPacket<TClient> where TClient : BaseSocketNetworkClient
+    public class IClientPacket<TClient> : IPacket<TClient> where TClient : BaseSocketNetworkClient
     {
-        public IPacket(ClientOptions<TClient> options)
+        public IClientPacket(ClientOptions<TClient> options)
         {
             Options = options;
         }
@@ -23,7 +24,6 @@ namespace SCL.Utils
         protected virtual void Receive(InputPacketBuffer data)
         {
         }
-
         public ClientOptions<TClient>.PacketHandle GetReceiveHandle()
         {
             return Receive;
@@ -42,17 +42,22 @@ namespace SCL.Utils
             SuccessSend = false;
         }
 
-        protected void Send<O>(ushort packetId, O obj, string scheme)
-        {
-            if (Client.Network?.GetState() == true)
-            {
-                Client.Network.SendSerialize<O>(packetId, obj, scheme);
-                SuccessSend = true;
-                return;
-            }
+        //protected void Send<O>(ushort packetId, O obj, string scheme)
+        //{
+        //    if (Client.Network?.GetState() == true)
+        //    {
+        //        Client.Network.SendSerialize<O>(packetId, obj, scheme);
+        //        SuccessSend = true;
+        //        return;
+        //    }
 
-            Options.RunException(new Exception("Не возможно отправить сообщение, соединение не установлено"));
-            SuccessSend = false;
+        //    Options.RunException(new Exception("Не возможно отправить сообщение, соединение не установлено"));
+        //    SuccessSend = false;
+        //}
+
+        public override void Receive(TClient client, InputPacketBuffer data)
+        {
+            Receive(data);
         }
     }
 }

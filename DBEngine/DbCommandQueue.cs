@@ -1,4 +1,5 @@
 ﻿using Logger;
+using SocketCore.Utils.Logger.Enums;
 using System;
 using System.Collections.Concurrent;
 using System.Threading;

@@ -6,3 +6,4 @@ bin/
 /ProxyHostServer/.vs
 /ProxyServer/.vs
 /UnityDebug/
+*/Release/*

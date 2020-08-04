@@ -6,10 +6,9 @@ namespace SocketServer.Utils.SystemPackets
 {
     public class AliveConnection<T> : IPacket<T> where T : IServerNetworkClient
     {
-        public void Receive(T client, InputPacketBuffer data)
+        public override void Receive(T client, InputPacketBuffer data)
         {
-            client.AliveState = true;
-            //client.Alive_locker.Set();
+            client.Alive_locker.Set();
             if (client.PingCount == ulong.MaxValue)
                 client.PingCount = 0;
 
@@ -19,7 +18,6 @@ namespace SocketServer.Utils.SystemPackets
 
         public static void Send(INetworkClient client)
         {
-            client.AliveState = false;
             client.Alive_locker.Reset();
 
             var packet = new OutputPacketBuffer()
@@ -27,6 +25,8 @@ namespace SocketServer.Utils.SystemPackets
                 PacketId = (ushort)ClientPacketEnum.AliveConnection
             };
             client.Network.Send(packet);
+
+            client.AliveState = client.Alive_locker.WaitOne(client.AliveWaitTime);
 
             //client.Alive_locker.WaitOne(client.AliveWaitTime);
             //if (!client.AliveState)

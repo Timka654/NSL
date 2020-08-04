@@ -1,4 +1,5 @@
 ﻿using SCL.Utils;
+using SocketCore;
 using SocketCore.Utils;
 using SocketCore.Utils.Buffer;
 using SocketCore.Utils.SystemPackets.Enums;
@@ -10,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace SCL
 {
-    public class ClientOptions<T>
+    public class ClientOptions<T> : CoreOptions<T>
         where T : BaseSocketNetworkClient
     {
         #region EventDelegates
@@ -185,26 +186,6 @@ namespace SCL
         #region ServerSettings
         //Данные для настройки сервера
 
-        /// <summary>
-        /// Тип ип адресса, InterNetwork - IPv4, InterNetworkV6 - IPv6
-        /// </summary>
-        public AddressFamily AddressFamily { get; set; }
-
-        /// <summary>
-        /// Тип сервера, обычно используется Tcp/Udp
-        /// </summary>
-        public ProtocolType ProtocolType { get; set; }
-
-        /// <summary>
-        /// Ип для инициализации сервера на определенном адаптере (0.0.0.0 - на всех, стандартное значение)
-        /// </summary>
-        public string IpAddress { get; set; }
-
-        /// <summary>
-        /// Порт для инициализации сервера 
-        /// </summary>
-        public int Port { get; set; }
-
         #endregion
 
         #region Network
@@ -212,21 +193,6 @@ namespace SCL
         public T ClientData { get; set; }
 
         public SocketClient<T,ClientOptions<T>> NetworkClient { get; set; }
-
-        /// <summary>
-        /// Размер буффера приходящих данных, если пакет больше этого значения то данные по реализованному алгоритму принять не получиться
-        /// </summary>
-        public int ReceiveBufferSize { get; set; }
-
-        /// <summary>
-        /// Алгоритм шифрования входящих пакетов
-        /// </summary>
-        public IPacketCipher inputCipher { get; set; }
-
-        /// <summary>
-        /// Алгоритм шифрования входящих пакетов
-        /// </summary>
-        public IPacketCipher outputCipher { get; set; }
 
         /// <summary>
         /// Пакеты которые будет принимать и обрабатывать сервер
@@ -243,7 +209,7 @@ namespace SCL
         /// <param name="packetId">Индификатор пакета в системе</param>
         /// <param name="packet">Обработчик пакета</param>
         /// <returns></returns>
-        public bool AddPacket(ushort packetId, IPacket<T> packet)
+        public bool AddPacket(ushort packetId, IClientPacket<T> packet)
         {
             var r = PacketHandles.ContainsKey(packetId);
             if (!r)
@@ -258,10 +224,16 @@ namespace SCL
         {
             if (ClientData != null)
             {
-                ClientData.Session = null;
-                ClientData.RecoverySessionKeyArray = null;
+                ClientData.SetRecoveryData(null, null);
             }
         }
 
+        public override bool AddPacket(ushort packetId, IPacket<T> packet)
+        {
+            if (packet is IClientPacket<T> cp)
+                return AddPacket(packetId, cp);
+            else
+                throw new Exception("this packet is not IClientPacket");
+        }
     }
 }

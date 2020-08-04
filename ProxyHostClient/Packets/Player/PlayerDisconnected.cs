@@ -1,4 +1,5 @@
-﻿using SocketCore.Utils.Buffer;
+﻿using SocketCore.Utils;
+using SocketCore.Utils.Buffer;
 using SocketServer.Utils;
 using System;
 using System.Collections.Generic;
@@ -10,7 +11,7 @@ namespace ProxyHostClient.Packets.Player
     internal class PlayerDisconnected : IPacket<ProxyHostClientData>
     {
         public event ProxyHostClient.OnPlayerDisconnectedDelegate OnReceive;
-        public void Receive(ProxyHostClientData client, InputPacketBuffer data)
+        public override void Receive(ProxyHostClientData client, InputPacketBuffer data)
         {
             OnReceive?.Invoke(data.ReadGuid());
         }

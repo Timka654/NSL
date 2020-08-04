@@ -6,6 +6,7 @@ using System.Text;
 using System.Data.Common;
 using System.Collections.Concurrent;
 using Logger;
+using SocketCore.Utils.Logger.Enums;
 
 namespace DBEngine.Extensions.CmdQueue
 {
@@ -55,7 +56,7 @@ namespace DBEngine.Extensions.CmdQueue
                     }
                     catch(Exception ex)
                     {
-                        logger.Append(Logger.LoggerLevel.Error, ex.ToString());
+                        logger.Append(LoggerLevel.Error, ex.ToString());
                     }
                 }
 

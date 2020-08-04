@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SocketCore.Utils.Logger.Enums;
+using System;
 
 namespace Logger
 {

@@ -1,4 +1,6 @@
 ﻿using ConfigurationEngine;
+using SCL;
+using SocketCore.Utils;
 using SocketServer;
 using SocketServer.Utils;
 using System;
@@ -49,12 +51,25 @@ namespace ServerOptions.Extensions.ConfigurationEngine
         {
             return new ServerOptions<T>
             {
-                IpAddress = configuration.GetValue($"{networkNodePath}/io.ip"),
-                Port = configuration.GetValue<int>($"{networkNodePath}/io.port"),
-                Backlog = configuration.GetValue<int>($"{networkNodePath}/io.backlog"),
-                AddressFamily = configuration.GetIPv($"{networkNodePath}/io.ipv"),
-                ProtocolType = configuration.GetProtocolType($"{networkNodePath}/io.protocol"),
-                ReceiveBufferSize = configuration.GetValue<int>($"{networkNodePath}/io.buffer.size"),
+                IpAddress = configuration.GetValue($"{networkNodePath}.io.ip"),
+                Port = configuration.GetValue<int>($"{networkNodePath}.io.port"),
+                Backlog = configuration.GetValue<int>($"{networkNodePath}.io.backlog"),
+                AddressFamily = configuration.GetIPv($"{networkNodePath}.io.ipv"),
+                ProtocolType = configuration.GetProtocolType($"{networkNodePath}.io.protocol"),
+                ReceiveBufferSize = configuration.GetValue<int>($"{networkNodePath}.io.buffer.size"),
+            };
+        }
+
+        public static ClientOptions<T> LoadConfigurationClientOptions<T>(this IConfigurationManager configuration, string networkNodePath)
+            where T : BaseSocketNetworkClient
+        {
+            return new ClientOptions<T>
+            {
+                IpAddress = configuration.GetValue($"{networkNodePath}.io.ip"),
+                Port = configuration.GetValue<int>($"{networkNodePath}.io.port"),
+                AddressFamily = configuration.GetIPv($"{networkNodePath}.io.ipv"),
+                ProtocolType = configuration.GetProtocolType($"{networkNodePath}.io.protocol"),
+                ReceiveBufferSize = configuration.GetValue<int>($"{networkNodePath}.io.buffer.size"),
             };
         }
     }

@@ -1,5 +1,4 @@
 ﻿using SocketCore;
-using SocketCore.Extensions.BinarySerializer;
 using SocketCore.Utils;
 using SocketCore.Utils.Buffer;
 using SocketCore.Utils.Exceptions;
@@ -256,23 +255,23 @@ namespace SocketServer
             Send(rbuff.CompilePacket(), 0, rbuff.PacketLenght);
         }
 
-        public void SendSerialize<O>(ushort packetId, O obj, string scheme
-#if DEBUG
-            , [System.Runtime.CompilerServices.CallerMemberName] string memberName = "",
-            [System.Runtime.CompilerServices.CallerFilePath] string sourceFilePath = "",
-            [System.Runtime.CompilerServices.CallerLineNumber] int sourceLineNumber = 0
-#endif
-            )
-        {
-            var rbuff = new OutputPacketBuffer { PacketId = packetId };
-            rbuff.Serialize<O>(obj, scheme);
+//        public void SendSerialize<O>(ushort packetId, O obj, string scheme
+//#if DEBUG
+//            , [System.Runtime.CompilerServices.CallerMemberName] string memberName = "",
+//            [System.Runtime.CompilerServices.CallerFilePath] string sourceFilePath = "",
+//            [System.Runtime.CompilerServices.CallerLineNumber] int sourceLineNumber = 0
+//#endif
+//            )
+//        {
+//            var rbuff = new OutputPacketBuffer { PacketId = packetId };
+//            rbuff.Serialize<O>(obj, scheme);
 
-#if DEBUG
-            OnSendPacket?.Invoke(this, rbuff.PacketId, rbuff.PacketLenght, memberName, sourceFilePath, sourceLineNumber);
-#endif
-            Send(rbuff.CompilePacket(), 0, rbuff.PacketLenght);
+//#if DEBUG
+//            OnSendPacket?.Invoke(this, rbuff.PacketId, rbuff.PacketLenght, memberName, sourceFilePath, sourceLineNumber);
+//#endif
+//            Send(rbuff.CompilePacket(), 0, rbuff.PacketLenght);
 
-        }
+//        }
 
         private AutoResetEvent _sendLocker = new AutoResetEvent(true);
 

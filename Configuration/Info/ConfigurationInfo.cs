@@ -5,7 +5,7 @@
         /// <summary>
         /// Полный путь(название)
         /// </summary>
-        public string Name { get; set; }
+        public string Path { get; set; }
 
         /// <summary>
         /// Значение
@@ -37,7 +37,7 @@
         /// <param name="flags">Флаги указываются с разделителем % (прим. %c%d)</param>
         public ConfigurationInfo(string name, string value, string flags)
         {
-            Name = name;
+            Path = name;
             Value = value;
             Flags = flags ?? "";
         }

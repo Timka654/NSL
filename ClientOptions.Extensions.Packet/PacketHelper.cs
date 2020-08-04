@@ -1,8 +1,5 @@
 ﻿using SCL;
-using SocketCore;
-using SocketCore.Utils;
-using SocketServer;
-using SocketServer.Utils;
+using SCL.Utils;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -10,7 +7,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 
-namespace ServerOptions.Extensions.Packet
+namespace ClientOptions.Extensions.Packet
 {
     public static class PacketHelper
     {
@@ -22,11 +19,11 @@ namespace ServerOptions.Extensions.Packet
         /// <param name="assembly">Сборка из которой нужно выбрать классы пакетов</param>
         /// <param name="selectAttrbuteType">Аттрибут по которому будут выбираться классы пакетов</param>
         /// <returns>Кол-во пакетов которые были инициализированы</returns>
-        public static int LoadPackets<T>(this CoreOptions<T> serverOptions, Assembly assembly, Type selectAttrbuteType) where T : INetworkClient
+        public static int LoadPackets<T>(this ClientOptions<T> serverOptions, Assembly assembly, Type selectAttrbuteType) where T : BaseSocketNetworkClient
         {
-            if (!typeof(Packet.PacketAttribute).IsAssignableFrom(selectAttrbuteType))
+            if (!typeof(PacketAttribute).IsAssignableFrom(selectAttrbuteType))
             {
-                throw new Exception($"{selectAttrbuteType.FullName} must be assignable from {typeof(Packet.PacketAttribute).FullName}");
+                throw new Exception($"{selectAttrbuteType.FullName} must be assignable from {typeof(PacketAttribute).FullName}");
             }
 
             var types = assembly
@@ -34,13 +31,9 @@ namespace ServerOptions.Extensions.Packet
                 .Select(x => new
                 {
                     type = x,
-                    attr = (Packet.PacketAttribute)x.GetCustomAttribute(selectAttrbuteType)
+                    attr = (PacketAttribute)x.GetCustomAttribute(selectAttrbuteType)
                 })
                 .Where(x => x.attr != null);
-
-            bool server = typeof(IServerNetworkClient).IsAssignableFrom(typeof(T));
-
-
 
             foreach (var item in types)
             {
@@ -49,14 +42,11 @@ namespace ServerOptions.Extensions.Packet
                 if (!typeof(IPacket<T>).IsAssignableFrom(item.type))
                     throw new Exception($"Packet type {typeof(IPacket<T>)} is not assignable from {item.type}");
 
-                bool r = false;
+                var r = serverOptions.Packets.ContainsKey(item.attr.PacketId);
+                if (!r)
+                    serverOptions.AddPacket((ushort)item.attr.PacketId, (IPacket<T>)Activator.CreateInstance(item.type, serverOptions));
 
-                if (server)
-                    r = serverOptions.AddPacket((ushort)item.attr.PacketId, (IPacket<T>)Activator.CreateInstance(item.type));
-                else
-                    r = serverOptions.AddPacket((ushort)item.attr.PacketId, (IPacket<T>)Activator.CreateInstance(item.type,serverOptions));
-
-                Debug.WriteLine($"Loading Packet: packet: {item.attr.PacketId} type: {item.type.FullName} result: {r}");
+                Debug.WriteLine($"Loading Packet: packet: {item.attr.PacketId} type: {item.type.FullName} result: {!r}");
             }
 
             return types.Count();
@@ -70,14 +60,9 @@ namespace ServerOptions.Extensions.Packet
         /// <param name="assembly">Сборка из которой нужно выбрать классы пакетов</param>
         /// <param name="selectAttrbuteType">Аттрибут по которому будут выбираться классы пакетов</param>
         /// <returns>Кол-во пакетов которые были инициализированы</returns>
-        //public static int LoadPackets<T>(this CoreOptions serverOptions, Type selectAttrbuteType) where T : IServerNetworkClient
-        //{
-        //    return LoadPackets<T>(serverOptions, Assembly.GetCallingAssembly(), selectAttrbuteType);
-        //}
-
-        public static int LoadPackets<T>(this CoreOptions<T> serverOptions, Type selectAttrbuteType) where T : INetworkClient
+        public static int LoadPackets<T>(this ClientOptions<T> serverOptions, Type selectAttrbuteType) where T : BaseSocketNetworkClient
         {
-            return LoadPackets<T>(serverOptions, Assembly.GetCallingAssembly(), selectAttrbuteType);
+            return LoadPackets(serverOptions, Assembly.GetCallingAssembly(), selectAttrbuteType);
         }
     }
 }

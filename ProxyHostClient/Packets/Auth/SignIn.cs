@@ -1,4 +1,5 @@
 ﻿using Logger;
+using SocketCore.Utils;
 using SocketCore.Utils.Buffer;
 using SocketServer.Utils;
 using System;
@@ -11,7 +12,7 @@ namespace ProxyHostClient.Packets.Auth
     internal class SignIn : IPacket<ProxyHostClientData>
     {
         public event EventHandler<bool> OnReceive;
-        public void Receive(ProxyHostClientData client, InputPacketBuffer data)
+        public override void Receive(ProxyHostClientData client, InputPacketBuffer data)
         {
             bool result = data.ReadBool();
 

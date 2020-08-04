@@ -1,4 +1,4 @@
-﻿using Logger;
+﻿using SocketCore;
 using SocketCore.Utils;
 using SocketCore.Utils.Buffer;
 using SocketCore.Utils.SystemPackets.Enums;
@@ -10,32 +10,10 @@ using System.Net.Sockets;
 
 namespace SocketServer
 {
-    public class ServerOptions
+    public class ServerOptions<T> : CoreOptions<T> where T : IServerNetworkClient
     {
-        public ILogger HelperLogger { get; set; }
-
         #region ServerSettings
         //Данные для настройки сервера
-
-        /// <summary>
-        /// Тип ип адресса, InterNetwork - IPv4, InterNetworkV6 - IPv6
-        /// </summary>
-        public AddressFamily AddressFamily { get; set; }
-
-        /// <summary>
-        /// Тип сервера, обычно используется Tcp/Udp
-        /// </summary>
-        public ProtocolType ProtocolType { get; set; }
-
-        /// <summary>
-        /// Ип для инициализации сервера на определенном адаптере (0.0.0.0 - на всех, стандартное значение)
-        /// </summary>
-        public string IpAddress { get; set; }
-
-        /// <summary>
-        /// Порт для инициализации сервера 
-        /// </summary>
-        public int Port { get; set; }
 
         /// <summary>
         /// Длина очереди для приема подключения
@@ -44,24 +22,6 @@ namespace SocketServer
 
         #endregion
 
-        /// <summary>
-        /// Размер буффера приходящих данных, если пакет больше этого значения то данные по реализованному алгоритму принять не получиться
-        /// </summary>
-        public int ReceiveBufferSize { get; set; }
-
-        /// <summary>
-        /// Алгоритм шифрования входящих пакетов
-        /// </summary>
-        public IPacketCipher inputCipher { get; set; }
-
-        /// <summary>
-        /// Алгоритм шифрования входящих пакетов
-        /// </summary>
-        public IPacketCipher outputCipher { get; set; }
-    }
-
-    public class ServerOptions<T> : ServerOptions where T : IServerNetworkClient
-    {
         /// <summary>
         /// Делегат для регистрации пакета
         /// </summary>
@@ -146,7 +106,7 @@ namespace SocketServer
         /// <param name="packetId">Индификатор пакета в системе</param>
         /// <param name="packet">Обработчик пакета</param>
         /// <returns></returns>
-        public bool AddPacket(ushort packetId, IPacket<T> packet)
+        public override bool AddPacket(ushort packetId, IPacket<T> packet)
         {
             var r = Packets.ContainsKey(packetId);
             if (!r)

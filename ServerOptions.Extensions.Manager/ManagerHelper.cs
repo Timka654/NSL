@@ -1,4 +1,7 @@
-﻿using SocketServer;
+﻿using SocketCore;
+using SocketCore.Utils;
+using SocketCore.Utils.Logger.Enums;
+using SocketServer;
 using SocketServer.Utils;
 using System;
 using System.Diagnostics;
@@ -17,11 +20,11 @@ namespace ServerOptions.Extensions.Manager
         /// <param name="assembly">Сборка из которой нужно выбрать классы менеджеров</param>
         /// <param name="selectAttrbuteType">Аттрибут по которому будут выбираться классы менеджеров</param>
         /// <returns>Кол-во менеджеров которые были инициализированы</returns>
-        public static int LoadManagers<T>(this ServerOptions<T> serverOptions, Assembly assembly, Type selectAttrbuteType) where T : IServerNetworkClient
+        public static int LoadManagers<T>(this CoreOptions serverOptions, Assembly assembly, Type selectAttrbuteType) where T : INetworkClient
         {
             return LoadManagers(assembly, selectAttrbuteType, (a, t) =>
             {
-                serverOptions.HelperLogger.Append(Logger.LoggerLevel.Info, $"{a.ManagerName ?? t.Name} Loaded");
+                serverOptions.HelperLogger?.Append(LoggerLevel.Info, $"{a.ManagerName ?? t.Name} Loaded");
             });
         }
 
@@ -59,7 +62,7 @@ namespace ServerOptions.Extensions.Manager
         /// <param name="serverOptions"></param>
         /// <param name="selectAttrbuteType">Аттрибут по которому будут выбираться классы менеджеров</param>
         /// <returns>Кол-во менеджеров которые были инициализированы</returns>
-        public static int LoadManagers<T>(this ServerOptions<T> serverOptions, Type selectAttrbuteType) where T : IServerNetworkClient
+        public static int LoadManagers<T>(this CoreOptions serverOptions, Type selectAttrbuteType) where T : INetworkClient
         {
             return LoadManagers<T>(serverOptions, Assembly.GetCallingAssembly(), selectAttrbuteType);
         }
