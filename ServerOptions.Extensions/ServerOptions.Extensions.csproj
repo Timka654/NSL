@@ -9,6 +9,7 @@
     <ProjectReference Include="..\Cipher(NET.Standard)\Cipher.csproj" />
     <ProjectReference Include="..\Configuration\ConfigurationEngine.csproj" />
     <ProjectReference Include="..\Logger\Logger.csproj" />
+    <ProjectReference Include="..\SCL\SCL.csproj" />
     <ProjectReference Include="..\ServerOptions.Extensions.ConfigurationEngine\ServerOptions.Extensions.ConfigurationEngine.csproj" />
     <ProjectReference Include="..\Socket.Core\SocketCore.csproj" />
     <ProjectReference Include="..\SocketServer\SocketServer.csproj" />

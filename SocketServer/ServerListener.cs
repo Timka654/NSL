@@ -1,4 +1,5 @@
-﻿using SocketServer.Utils;
+﻿using SocketCore;
+using SocketServer.Utils;
 using System;
 using System.Net;
 using System.Net.Sockets;
@@ -8,8 +9,8 @@ namespace SocketServer
     public class ServerListener<T> where T : IServerNetworkClient
     {
 #if DEBUG
-        public event ReceivePacketDebugInfo<T> OnReceivePacket;
-        public event SendPacketDebugInfo<T> OnSendPacket;
+        public event ReceivePacketDebugInfo<ServerClient<T>> OnReceivePacket;
+        public event SendPacketDebugInfo<ServerClient<T>> OnSendPacket;
 #endif
         /// <summary>
         /// Слушатель порта (сервер)

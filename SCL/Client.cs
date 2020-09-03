@@ -22,10 +22,6 @@ namespace SCL
         public int len { get; set; }
     }
 
-#if DEBUG
-    public delegate void ReceivePacketDebugInfo<T>(Client<T> client, ushort pid, int len) where T : BaseSocketNetworkClient;
-    public delegate void SendPacketDebugInfo<T>(Client<T> client, ushort pid, int len) where T : BaseSocketNetworkClient;
-#endif
     /// <summary>
     /// Класс обработки клиента
     /// </summary>
@@ -34,8 +30,8 @@ namespace SCL
     {
 
 #if DEBUG
-        public event ReceivePacketDebugInfo<T> OnReceivePacket;
-        public event SendPacketDebugInfo<T> OnSendPacket;
+        public event ReceivePacketDebugInfo<Client<T>> OnReceivePacket;
+        public event SendPacketDebugInfo<Client<T>> OnSendPacket;
 #endif
 
         public long Version { get; set; }
@@ -231,17 +227,23 @@ namespace SCL
             )
         {
 #if DEBUG
-            OnSend(rbuff);
+            OnSend(rbuff, memberName, sourceFilePath, sourceLineNumber);
             //ThreadHelper.InvokeOnMain(() => { OnSendPacket?.Invoke(this, rbuff.PacketId, rbuff.PacketLenght); });
 #endif
 
             Send(rbuff.CompilePacket(), 0, rbuff.PacketLenght);
         }
 
-        protected virtual void OnSend(OutputPacketBuffer rbuff)
+        protected virtual void OnSend(OutputPacketBuffer rbuff
+#if DEBUG
+            , string memberName = "",
+             string sourceFilePath = "",
+             int sourceLineNumber = 0
+#endif
+            )
         {
 #if DEBUG
-            OnSendPacket?.Invoke(this, rbuff.PacketId, rbuff.PacketLenght);
+            OnSendPacket?.Invoke(this, rbuff.PacketId, rbuff.PacketLenght, memberName, sourceFilePath, sourceLineNumber);
 #endif
         }
 
@@ -603,17 +605,17 @@ namespace SCL
 
         public IPEndPoint GetRemovePoint()
         {
-            throw new NotImplementedException();
+            return (IPEndPoint)sclient.RemoteEndPoint;
         }
 
         public void ChangeUserData(INetworkClient data)
         {
-            throw new NotImplementedException();
+            clientOptions.ClientData = (T)data;
         }
 
         public object GetUserData()
         {
-            throw new NotImplementedException();
+            return clientOptions.ClientData;
         }
 
         public Socket GetSocket()

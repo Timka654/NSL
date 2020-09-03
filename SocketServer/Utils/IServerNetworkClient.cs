@@ -35,9 +35,15 @@ namespace SocketServer.Utils
             base.AddWaitPacket(packet_data, offset, lenght);
         }
 
-        public void Send(OutputPacketBuffer packet)
+        public void Send(OutputPacketBuffer packet
+#if DEBUG
+            , [System.Runtime.CompilerServices.CallerMemberName] string memberName = "",
+            [System.Runtime.CompilerServices.CallerFilePath] string sourceFilePath = "",
+            [System.Runtime.CompilerServices.CallerLineNumber] int sourceLineNumber = 0
+#endif
+            )
         {
-            Network.Send(packet);
+            Network.Send(packet, memberName, sourceFilePath, sourceLineNumber);
         }
 
         public virtual void ChangeOwner(IServerNetworkClient client)

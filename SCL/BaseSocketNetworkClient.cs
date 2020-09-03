@@ -39,51 +39,6 @@ namespace SCL
         }
 
         /// <summary>
-        /// Инициализация хранилища пакетов во время разрыва соединения
-        /// </summary>
-        public void InitializeWaitPacketBuffer()
-        {
-            if (WaitPacketBuffer == null)
-                WaitPacketBuffer = new Queue<byte[]>();
-        }
-
-        /// <summary>
-        /// Добавить пакет в список ожидания восстановления подключения
-        /// </summary>
-        /// <param name="packet_data"></param>
-        /// <param name="lenght"></param>
-        internal void AddWaitPacket(byte[] packet_data, int offset, int lenght)
-        {
-            if (WaitPacketBuffer == null)
-                return;
-
-//#if DEBUG
-//            if (this.WaitPacketBuffer.Count > 20)
-//                Debug.LogWarning($"Warning: wait packet buffer > 20({this.WaitPacketBuffer.Count})");
-//#endif
-
-            if (offset == 0 && lenght == packet_data.Length)
-                WaitPacketBuffer.Enqueue(packet_data);
-            else
-            {
-                var packet = new byte[lenght - offset];
-                Array.Copy(packet_data, offset, packet, 0, lenght);
-                WaitPacketBuffer.Enqueue(packet);
-            }
-        }
-
-        /// <summary>
-        /// Получить пакет из списка ожидания и уберает его с очереди
-        /// </summary>
-        /// <returns></returns>
-        public byte[] GetWaitPacket()
-        {
-            if (WaitPacketBuffer == null || WaitPacketBuffer.Count == 0)
-                return null;
-            return WaitPacketBuffer.Dequeue();
-        }
-
-        /// <summary>
         /// Получить все пакеты из списка ожидания и уберает их с очереди
         /// </summary>
         /// <returns></returns>

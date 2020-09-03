@@ -30,65 +30,6 @@ namespace SocketServer
         /// <param name="output">Исходящий буффер с данными(не обязательно)</param>
         public delegate void PacketHandle(T client, InputPacketBuffer data);
 
-        /// <summary>
-        /// Делегат для регистрации события перехвата сетевых ошибок
-        /// </summary>
-        /// <param name="ex">Возникшая ошибка</param>
-        /// <param name="s">Сокет с которым произошла ошибка</param>
-        public delegate void ExtensionHandle(Exception ex, T client);
-
-        /// <summary>
-        /// Делегат для регистрации события перехвата подключения клиента
-        /// </summary>
-        /// <param name="client">Данные клиента</param>
-        public delegate void ClientConnect(T client);
-
-        /// <summary>
-        /// Делегат для регистрации события перехвата отключения клиента
-        /// </summary>
-        /// <param name="client">Данные клиента</param>
-        public delegate void ClientDisconnect(T client);
-
-        /// <summary>
-        /// События вызываемое при получении ошибки
-        /// </summary>
-        public event ExtensionHandle OnExtensionEvent;
-
-        /// <summary>
-        /// Событие вызываемое при подключении клиента
-        /// </summary>
-        public event ClientConnect OnClientConnectEvent;
-
-        /// <summary>
-        /// Событие вызываемое при отключении клиента
-        /// </summary>
-        public event ClientDisconnect OnClientDisconnectEvent;
-
-        /// <summary>
-        /// Вызов события ошибка
-        /// </summary>
-        public void RunExtension(Exception ex, T client)
-        {
-            OnExtensionEvent?.Invoke(ex, client);
-        }
-
-        /// <summary>
-        /// Вызов события подключения клиента
-        /// </summary>
-        /// <param name="client"></param>
-        public void RunClientConnect(T client)
-        {
-            OnClientConnectEvent?.Invoke(client);
-        }
-
-        /// <summary>
-        /// Вызов события отключения клиента
-        /// </summary>
-        /// <param name="client"></param>
-        public void RunClientDisconnect(T client)
-        {
-            OnClientDisconnectEvent?.Invoke(client);
-        }
 
         /// <summary>
         /// Пакеты которые будет принимать и обрабатывать сервер

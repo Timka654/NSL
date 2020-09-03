@@ -68,7 +68,7 @@ namespace SocketCore.Utils
         /// </summary>
         /// <param name="packet_data"></param>
         /// <param name="lenght"></param>
-        protected void AddWaitPacket(byte[] packet_data, int offset, int lenght)
+        public void AddWaitPacket(byte[] packet_data, int offset, int lenght)
         {
             if (WaitPacketBuffer == null)
                 return;

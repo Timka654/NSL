@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <AssemblyName>BinarySerializer</AssemblyName>
+    <RootNamespace>BinarySerializer</RootNamespace>
+    <Configurations>Debug;Release;Unity;UnityDebug</Configurations>
+  </PropertyGroup>
+  
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='UnityDebug|AnyCPU'">
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <OutputPath>..\UnityDebug</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+  </PropertyGroup>
+
+</Project>

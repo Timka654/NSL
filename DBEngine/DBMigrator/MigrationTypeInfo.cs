@@ -103,6 +103,9 @@ namespace DBEngine.DBMigrator
         public static void FillIds(MigrationTypeInfo type)
         {
             var list = type.Values as IEnumerable<DBIdentityEntity>;
+            
+            if (list == null)
+                return;
 
             list = list.OrderBy(x => x.GetIndex() != 0).OrderBy(x => x.GetIndex()).ToList();
 

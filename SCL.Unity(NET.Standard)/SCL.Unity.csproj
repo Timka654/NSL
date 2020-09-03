@@ -12,10 +12,12 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Unity|AnyCPU'">
+    <TargetFramework>netstandard2.0</TargetFramework>
     <OutputPath>..\UnityDebug\</OutputPath>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='UnityDebug|AnyCPU'">
+    <TargetFramework>netstandard2.0</TargetFramework>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <OutputPath>..\UnityDebug\</OutputPath>
   </PropertyGroup>
@@ -24,12 +26,12 @@
     <ProjectReference Include="..\Cipher(NET.Standard)\Cipher.csproj" />
     <ProjectReference Include="..\SCL\SCL.csproj" />
     <ProjectReference Include="..\Socket.Core\SocketCore.csproj" />
-    <ProjectReference Include="..\SocketCore.Extensions.BinarySerializer(NET.Standard)\SocketCore.Extensions.BinarySerializer.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <Reference Include="UnityEngine">
       <HintPath>..\UnityEngine.dll</HintPath>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
       <Private>false</Private>
     </Reference>
   </ItemGroup>

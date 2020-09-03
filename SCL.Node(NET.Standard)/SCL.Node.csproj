@@ -16,7 +16,8 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='UnityDebug|AnyCPU'">
-    <OutputPath>D:\Projects\AppFox\SocketServerLibrary\UnityDebug</OutputPath>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <OutputPath>..\UnityDebug</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
   </PropertyGroup>
 
@@ -27,6 +28,7 @@
   <ItemGroup>
     <Reference Include="UnityEngine">
       <HintPath>..\UnityEngine.dll</HintPath>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
       <Private>false</Private>
     </Reference>
   </ItemGroup>

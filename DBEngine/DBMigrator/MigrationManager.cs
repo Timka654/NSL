@@ -34,7 +34,7 @@ namespace DBEngine.DBMigrator
             }
         }
 
-        private static void UpdateDbGenericConfig<TQ>() where TQ : DBIdentityEntity
+        private static void UpdateDbGenericConfig<TQ>() // where TQ : DBIdentityEntity
         {
             var inst = Activator.CreateInstance<TQ>();
 

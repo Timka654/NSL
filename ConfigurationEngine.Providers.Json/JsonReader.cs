@@ -23,7 +23,6 @@ namespace ConfigurationEngine.Providers.Json
             bool activePath = false;
             string currentValue = "";
             bool activeValue = false;
-            bool objectValue = false;
             char nextChar = ReadNext(jsonReader);
 
             if (nextChar != '{')

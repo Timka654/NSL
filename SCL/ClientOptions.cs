@@ -54,21 +54,6 @@ namespace SCL
 
         #region Events
 
-        /// <summary>
-        /// События вызываемое при получении ошибки
-        /// </summary>
-        public event ExtensionHandleDelegate OnExtensionEvent;
-
-        /// <summary>
-        /// Событие вызываемое при подключении клиента
-        /// </summary>
-        public event ClientConnectedDelegate OnClientConnectEvent;
-
-        /// <summary>
-        /// Событие вызываемое при отключении клиента
-        /// </summary>
-        public event ClientDisconnectedDelegate OnClientDisconnectEvent;
-
         public event ReconnectDelegate OnReconnectEvent;
 
         public event Utils.SystemPackets.RecoverySession<T>.OnReceiveEventHandle OnRecoverySessionEvent;
@@ -96,26 +81,12 @@ namespace SCL
         /// </summary>
         public void RunException(Exception ex)
         {
-            OnRunException(ex);
+            RunException(ex);
         }
 
-        protected virtual void OnRunException(Exception ex)
-        {
-            OnExtensionEvent?.Invoke(ex, ClientData);
-        }
-
-        /// <summary>
-        /// Вызов события подключения клиента
-        /// </summary>
-        /// <param name="client"></param>
         public void RunClientConnect()
         {
-            OnRunClientConnect();
-        }
-
-        protected virtual void OnRunClientConnect()
-        {
-            OnClientConnectEvent?.Invoke(ClientData);
+            RunClientConnect(ClientData);
         }
 
         /// <summary>
@@ -138,7 +109,7 @@ namespace SCL
 
         protected virtual void OnRunClientDisconnect()
         {
-            OnClientDisconnectEvent?.Invoke(ClientData);
+            RunClientDisconnect(ClientData);
         }
 
         internal void RunRecoverySession(RecoverySessionResultEnum result)

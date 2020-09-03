@@ -19,11 +19,6 @@ namespace SocketCore.Utils.Buffer
         byte[] _buffer = new byte[16];
 
         /// <summary>
-        /// Текущий размер буффера (включая пустые байты)
-        /// </summary>
-        int bufferLenght;
-
-        /// <summary>
         /// маскировка хедера пакета
         /// </summary>
 
