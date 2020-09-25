@@ -1,6 +1,6 @@
 ﻿using Cipher;
 using ConfigurationEngine;
-using Logger;
+using SCLogger;
 using SCL;
 using ServerOptions.Extensions;
 using ServerOptions.Extensions.ConfigurationEngine;

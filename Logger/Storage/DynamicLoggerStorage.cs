@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Dynamic;
 
-namespace Logger
+namespace SCLogger
 {
     public class DynamicLogger : DynamicObject
     {

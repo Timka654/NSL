@@ -1,6 +1,6 @@
 ﻿using SocketCore.Utils.Logger.Enums;
 
-namespace Logger
+namespace SCLogger
 {
     public class FileLogger : BaseLogger
     {

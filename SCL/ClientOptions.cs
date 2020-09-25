@@ -79,12 +79,12 @@ namespace SCL
         /// <summary>
         /// Вызов события ошибка
         /// </summary>
-        public void RunException(Exception ex)
+        public virtual void RunException(Exception ex)
         {
             RunException(ex);
         }
 
-        public void RunClientConnect()
+        public virtual void RunClientConnect()
         {
             RunClientConnect(ClientData);
         }

@@ -1,4 +1,5 @@
 ﻿using Cipher;
+using SocketCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -81,7 +82,7 @@ namespace SCL.Unity
 
 #if DEBUG
 
-        protected virtual void NetworkClient_OnSendPacket(SCL.Client<T> client, ushort pid, int len)
+        protected virtual void NetworkClient_OnSendPacket(SCL.Client<T> client, ushort pid, int len, string memberName = "", string sourceFilePath = "", int sourceLineNumber = 0)
         {
             if(LogEnabled)
                 Debug.Log($"{ClientType} packet send pid:{pid} len:{len}");
@@ -123,19 +124,19 @@ namespace SCL.Unity
             }
         }
 
-        public static event ClientOptions<T>.ExtensionHandleDelegate OnExtensionEvent
+        public static event CoreOptions<T>.ExtensionHandle OnExtensionEvent
         {
             add { SocketOptions.OnExtensionEvent += value; }
             remove { SocketOptions.OnExtensionEvent -= value; }
         }
 
-        public static event ClientOptions<T>.ClientConnectedDelegate OnClientConnectEvent
+        public static event CoreOptions<T>.ClientConnect OnClientConnectEvent
         {
             add { SocketOptions.OnClientConnectEvent += value; }
             remove { SocketOptions.OnClientConnectEvent -= value; }
         }
 
-        public static event ClientOptions<T>.ClientDisconnectedDelegate OnClientDisconnectEvent
+        public static event CoreOptions<T>.ClientDisconnect OnClientDisconnectEvent
         {
             add { SocketOptions.OnClientDisconnectEvent += value; }
             remove { SocketOptions.OnClientDisconnectEvent -= value; }

@@ -1,7 +1,7 @@
 ﻿using SocketCore.Utils.Logger;
 using Utils;
 
-namespace Logger
+namespace SCLogger
 {
     public interface ILogger : IBasicLogger
     {

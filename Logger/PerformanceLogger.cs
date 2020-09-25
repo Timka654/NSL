@@ -1,7 +1,7 @@
 ﻿using SocketCore.Utils.Logger.Enums;
 using System;
 
-namespace Logger
+namespace SCLogger
 {
     public class PerformanceLogger : BaseLogger
     {

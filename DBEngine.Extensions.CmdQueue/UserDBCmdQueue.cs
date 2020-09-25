@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Data.Common;
 using System.Collections.Concurrent;
-using Logger;
+using SCLogger;
 using SocketCore.Utils.Logger.Enums;
 
 namespace DBEngine.Extensions.CmdQueue

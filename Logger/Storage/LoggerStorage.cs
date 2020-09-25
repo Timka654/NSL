@@ -1,4 +1,4 @@
-﻿namespace Logger
+﻿namespace SCLogger
 {
     public class LoggerStorage : DynamicLogger
     {

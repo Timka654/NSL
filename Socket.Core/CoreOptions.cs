@@ -46,6 +46,7 @@ namespace SocketCore
         /// </summary>
         public IPacketCipher outputCipher { get; set; }
     }
+
     /// <summary>
     /// Содержит функции для которых необходимо явное указывание типа клиента наследуется <see cref="CoreOptions"/>
     /// </summary>

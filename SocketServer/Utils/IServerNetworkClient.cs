@@ -43,7 +43,11 @@ namespace SocketServer.Utils
 #endif
             )
         {
+#if DEBUG
             Network.Send(packet, memberName, sourceFilePath, sourceLineNumber);
+#else
+            Network.Send(packet);
+#endif
         }
 
         public virtual void ChangeOwner(IServerNetworkClient client)

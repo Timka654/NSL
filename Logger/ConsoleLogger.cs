@@ -3,7 +3,7 @@ using System;
 using System.Dynamic;
 using System.Threading.Tasks;
 
-namespace Logger
+namespace SCLogger
 {
     internal class ConsoleLogger : DynamicObject
     {

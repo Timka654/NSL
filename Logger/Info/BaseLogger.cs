@@ -1,11 +1,11 @@
-﻿using Logger.Info;
+﻿using SCLogger.Info;
 using SocketCore.Utils.Logger.Enums;
 using System;
 using System.Collections.Concurrent;
 using System.IO;
 using System.Threading.Tasks;
 
-namespace Logger
+namespace SCLogger
 {
     public class BaseLogger : ILogger
     {

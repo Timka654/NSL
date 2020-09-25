@@ -180,7 +180,12 @@ namespace DBEngine
             try
             {
                 sw.Start();
-                result = (T)cmd.ExecuteScalar();
+
+                var v = cmd.ExecuteScalar();
+                if (v != DBNull.Value)
+                    result = (T)v;
+                else
+                    result = default;
                 sw.Stop();
                 DbPerformanceEvent?.Invoke(sourceFilePath, memberName, sw.Elapsed);
             }

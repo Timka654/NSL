@@ -6,11 +6,11 @@ namespace SCL.Unity
 {
     public class ClientOptions<T> : SCL.ClientOptions<T> where T : BaseSocketNetworkClient
     {
-        protected override void OnRunClientConnect()
+        public override void RunClientConnect()
         {
             ThreadHelper.InvokeOnMain(() =>
             {
-                base.OnRunClientConnect();
+                base.RunClientConnect();
             });
         }
 
@@ -21,12 +21,11 @@ namespace SCL.Unity
                 base.OnRunClientDisconnect();
             });
         }
-
-        protected override void OnRunException(Exception ex)
+        public override void RunException(Exception ex)
         {
             ThreadHelper.InvokeOnMain(() =>
             {
-                base.OnRunException(ex);
+                base.RunException(ex);
             });
         }
     }

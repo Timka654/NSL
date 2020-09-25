@@ -1,5 +1,5 @@
 ﻿using ConfigurationEngine.Info;
-using Logger;
+using SCLogger;
 using SocketCore.Utils.Logger.Enums;
 using System;
 using System.Collections.Generic;
