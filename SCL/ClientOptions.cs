@@ -81,12 +81,12 @@ namespace SCL
         /// </summary>
         public virtual void RunException(Exception ex)
         {
-            RunException(ex);
+            base.RunException(ex, ClientData);
         }
 
         public virtual void RunClientConnect()
         {
-            RunClientConnect(ClientData);
+            base.RunClientConnect(ClientData);
         }
 
         /// <summary>

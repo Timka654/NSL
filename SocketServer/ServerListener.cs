@@ -82,7 +82,7 @@ namespace SocketServer
             }
             catch (Exception ex)
             {
-                serverOptions.RunExtension(ex, null);
+                serverOptions.RunException(ex, null);
             }
             listener = null;
         }
@@ -116,7 +116,7 @@ namespace SocketServer
             }
             catch (Exception ex)
             {
-                serverOptions.RunExtension(ex, null);
+                serverOptions.RunException(ex, null);
             }
             //продолжаем принимать запросы
             listener.BeginAccept(Accept, listener);

@@ -91,6 +91,7 @@ namespace SCL
         /// <param name="client">клиент</param>
         public void Reconnect(Socket client)
         {
+            disconnected = false;
             string[] keys = clientOptions.ClientData?.RecoverySessionKeyArray;
             IEnumerable<byte[]> waitBuffer = clientOptions.ClientData?.GetWaitPackets();
 
@@ -605,7 +606,7 @@ namespace SCL
 
         public IPEndPoint GetRemovePoint()
         {
-            return (IPEndPoint)sclient.RemoteEndPoint;
+            return (IPEndPoint)sclient?.RemoteEndPoint;
         }
 
         public void ChangeUserData(INetworkClient data)

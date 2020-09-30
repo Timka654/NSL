@@ -182,7 +182,7 @@ namespace DBEngine
                 sw.Start();
 
                 var v = cmd.ExecuteScalar();
-                if (v != DBNull.Value)
+                if (v != DBNull.Value && v != null)
                     result = (T)v;
                 else
                     result = default;

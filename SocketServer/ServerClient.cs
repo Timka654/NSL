@@ -223,11 +223,11 @@ namespace SocketServer
             }
             catch (ConnectionLostException clex)
             {
-                serverOptions.RunExtension(clex, Data);
+                serverOptions.RunException(clex, Data);
             }
             catch (Exception ex)
             {
-                serverOptions.RunExtension(ex, Data);
+                serverOptions.RunException(ex, Data);
                 Disconnect();
             }
         }
@@ -297,7 +297,7 @@ namespace SocketServer
             {
                 var sas = ((SendAsyncState)r.AsyncState);
                 Data?.AddWaitPacket(sas.buf, sas.offset, sas.len);
-                serverOptions.RunExtension(clex, Data);
+                serverOptions.RunException(clex, Data);
             }
             catch
             {

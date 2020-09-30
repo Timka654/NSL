@@ -102,7 +102,7 @@ namespace ServerOptions.Extensions
 
             Options.OnClientConnectEvent += SocketOptions_OnClientConnectEvent;
             Options.OnClientDisconnectEvent += SocketOptions_OnClientDisconnectEvent;
-            Options.OnExtensionEvent += SocketOptions_OnExtensionEvent;
+            Options.OnExceptionEvent += SocketOptions_OnExtensionEvent;
 
             Logger?.Append(LoggerLevel.Info, $"-> Configuration Loaded");
         }

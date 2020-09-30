@@ -1,4 +1,4 @@
-﻿using Logger;
+﻿using SCLogger;
 using SocketCore.Utils;
 using SocketCore.Utils.Buffer;
 using SocketServer.Utils;

@@ -67,7 +67,7 @@ namespace SCL.Unity
 
             SocketOptions.OnClientConnectEvent += SocketOptions_OnClientConnectEvent;
             SocketOptions.OnClientDisconnectEvent += SocketOptions_OnClientDisconnectEvent;
-            SocketOptions.OnExtensionEvent += SocketOptions_OnExtensionEvent;
+            SocketOptions.OnExceptionEvent += SocketOptions_OnExtensionEvent;
             SocketOptions.NetworkClient = new SocketClient<T, SCL.ClientOptions<T>>(SocketOptions);
             SocketOptions.NetworkClient.Version = Version;
 #if DEBUG
@@ -126,8 +126,8 @@ namespace SCL.Unity
 
         public static event CoreOptions<T>.ExtensionHandle OnExtensionEvent
         {
-            add { SocketOptions.OnExtensionEvent += value; }
-            remove { SocketOptions.OnExtensionEvent -= value; }
+            add { SocketOptions.OnExceptionEvent += value; }
+            remove { SocketOptions.OnExceptionEvent -= value; }
         }
 
         public static event CoreOptions<T>.ClientConnect OnClientConnectEvent

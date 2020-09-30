@@ -76,7 +76,7 @@ namespace SocketCore
         /// <summary>
         /// События вызываемое при получении ошибки
         /// </summary>
-        public event ExtensionHandle OnExtensionEvent;
+        public event ExtensionHandle OnExceptionEvent;
 
         /// <summary>
         /// Событие вызываемое при подключении клиента
@@ -90,9 +90,9 @@ namespace SocketCore
         /// <summary>
         /// Вызов события ошибка
         /// </summary>
-        public void RunExtension(Exception ex, T client)
+        public void RunException(Exception ex, T client)
         {
-            OnExtensionEvent?.Invoke(ex, client);
+            OnExceptionEvent?.Invoke(ex, client);
         }
 
         /// <summary>
