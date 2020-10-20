@@ -19,7 +19,7 @@ namespace SCL.Utils.SystemPackets
         {
             var now = DateTime.Now;
 
-            var dt = data.ReadDateTime().Value;
+            var dt = data.ReadDateTime();
             try
             {
                 Client.ServerDateTimeOffset = now - dt;

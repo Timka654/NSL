@@ -22,38 +22,38 @@ namespace SocketCore.Extensions.BinarySerializer
         }
 
         public static dynamic GetInstanceByType(Type t)
-        { 
-        return Expression.Lambda(Expression.New(t)).Compile();
+        {
+            if (t.IsAbstract)
+                throw new Exception($"Cannot build action for create object of type {t} because this type is abstract");
+            return Expression.Lambda(Expression.New(t)).Compile();
         }
 
-        public static Func<T, RT> CreateGetPropertyFunc<T, RT>(PropertyInfo propertyInfo)
+        public static Func<TObject, TProperty> CreateGetPropertyFunc<TObject, TProperty>(PropertyInfo propertyInfo)
         {
-            ParameterExpression p = Expression.Parameter(typeof(T));
-            return Expression.Lambda<Func<T, RT>>(
-                Expression.Convert(Expression.Property(p, propertyInfo), typeof(RT)),
-                p
+            ParameterExpression paramExpression = Expression.Parameter(typeof(TObject), "value");
+
+            Expression propertyGetterExpression = Expression.Property(paramExpression, propertyInfo.Name);
+
+            Func<TObject, TProperty> result =
+                Expression.Lambda<Func<TObject, TProperty>>(propertyGetterExpression, paramExpression).Compile();
+
+            return result;
+        }
+
+        public static Action<TObject, TProperty> CreateSetPropertyFunc<TObject, TProperty>(PropertyInfo pi)
+        {
+            ParameterExpression paramExpression = Expression.Parameter(typeof(TObject));
+
+            ParameterExpression paramExpression2 = Expression.Parameter(typeof(TProperty), pi.Name);
+
+            MemberExpression propertyGetterExpression = Expression.Property(paramExpression, pi.Name);
+
+            Action<TObject, TProperty> result = Expression.Lambda<Action<TObject, TProperty>>
+            (
+                Expression.Assign(propertyGetterExpression, paramExpression2), paramExpression, paramExpression2
             ).Compile();
-        }
 
-        public static Action<object, object> CreateSetPropertyFunc(PropertyInfo pi)
-        {
-            //p=> ((pi.DeclaringType)p).<pi>=(pi.PropertyType)v
-
-            var expParamPo = Expression.Parameter(typeof(object), "p");
-            var expParamPc = Expression.Convert(expParamPo, pi.DeclaringType);
-
-            var expParamV = Expression.Parameter(typeof(object), "v");
-            var expParamVc = Expression.Convert(expParamV, pi.PropertyType);
-
-            var expMma = Expression.Call(
-                    expParamPc
-                    , pi.GetSetMethod()
-                    , expParamVc
-                );
-
-            var exp = Expression.Lambda<Action<object, object>>(expMma, expParamPo, expParamV);
-
-            return exp.Compile();
+            return result;
         }
 
         private static readonly MethodInfo CreateGetPropertyMethodInfo = typeof(Extensions).GetMethod(nameof(Extensions.CreateGetPropertyFunc), BindingFlags.Public | BindingFlags.Static);
@@ -64,19 +64,21 @@ namespace SocketCore.Extensions.BinarySerializer
 
         public static dynamic CreateGetPropertyFuncDynamic<T>(PropertyInfo property)
         {
-            return property != null ? CreateGetPropertyMethodInfo.MakeGenericMethod(property.DeclaringType, typeof(T)).Invoke(null, new object[] { property }) : (Func<dynamic, dynamic>)((v) => v);
+            return property != null ? CreateGetPropertyMethodInfo.MakeGenericMethod(property.DeclaringType, property.PropertyType).Invoke(null, new object[] { property }) : (Func<dynamic, dynamic>)((v) => v);
         }
-        public static dynamic CreateSetPropertyFuncDynamic<T>(PropertyInfo property)
-        {
-            return property != null ? CreateSetPropertyMethodInfo.Invoke(null, new object[] { property }) : (Action<object, object>)((v,v2) => { });
-        }
+
         public static dynamic CreateGetPropertyFuncDynamic(PropertyInfo property)
         {
             return property != null ? CreateGetPropertyMethodInfo.MakeGenericMethod(property.DeclaringType, property.PropertyType).Invoke(null, new object[] { property }) : (Func<dynamic, dynamic>)((v) => v);
         }
+
+        public static dynamic CreateSetPropertyFuncDynamic<T>(PropertyInfo property)
+        {
+            return property != null ? CreateSetPropertyMethodInfo.MakeGenericMethod(property.DeclaringType,typeof(T)).Invoke(null, new object[] { property }) : (Action<object, object>)((v,v2) => { });
+        }
         public static dynamic CreateSetPropertyFuncDynamic(PropertyInfo property)
         {
-            return property != null ? CreateSetPropertyMethodInfo.Invoke(null, new object[] { property }) : (Func<dynamic, dynamic>)((v) => v);
+            return property != null ? CreateSetPropertyMethodInfo.MakeGenericMethod(property.DeclaringType, property.PropertyType).Invoke(null, new object[] { property }) : (Func<dynamic, dynamic>)((v) => v);
         }
 
         public static dynamic GetInstanceFuncDynamic(PropertyInfo property)

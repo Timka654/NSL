@@ -102,7 +102,8 @@ namespace SCL.Unity
 
         protected virtual void SocketOptions_OnExtensionEvent(Exception ex, T client)
         {
-            Debug.LogError(ex.ToString());
+            ThreadHelper.InvokeOnMain(() =>
+            Debug.LogError(ex.ToString()));
         }
 
         protected virtual void SocketOptions_OnClientConnectEvent(T client)
@@ -124,7 +125,7 @@ namespace SCL.Unity
             }
         }
 
-        public static event CoreOptions<T>.ExtensionHandle OnExtensionEvent
+        public static event CoreOptions<T>.ExceptionHandle OnExtensionEvent
         {
             add { SocketOptions.OnExceptionEvent += value; }
             remove { SocketOptions.OnExceptionEvent -= value; }

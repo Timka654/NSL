@@ -308,12 +308,36 @@ namespace SocketCore.Utils.Buffer
             return await Task.FromResult(coding.GetString(Read((int)len)));
         }
 
-        public DateTime? ReadDateTime()
+        public DateTime ReadDateTime()
         {
-            var r = ReadDouble();
-            if (r == 0)
-                return null;
-            return MinDatetimeValue.AddMilliseconds(r);
+            return MinDatetimeValue.AddMilliseconds(ReadDouble());
+        }
+
+        public TimeSpan ReadTimeSpan()
+        {
+            return TimeSpan.FromMilliseconds(ReadDouble());
+        }
+
+        public Nullable<T> ReadNullable<T>(Func<T> trueAction)
+            where T : struct
+        {
+            if (ReadBool())
+            {
+                return trueAction();
+            }
+
+            return null;
+        }
+
+        public T ReadNullableClass<T>(Func<T> trueAction)
+            where T : class
+        {
+            if (ReadBool())
+            {
+                return trueAction();
+            }
+
+            return null;
         }
 
         public Guid ReadGuid()

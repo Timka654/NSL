@@ -134,6 +134,6 @@ namespace BinarySerializer_v5.Test
             return r;
         }
 
-        public static BinaryNetworkStorage bs = new BinaryNetworkStorage();
+        //public static BinaryNetworkStorage bs = new BinaryNetworkStorage();
     }
 }

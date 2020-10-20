@@ -107,7 +107,7 @@ namespace SocketCore
 #endif
             );
 
-        void Send(ushort packetId, DateTime? value
+        void Send(ushort packetId, DateTime value
 #if DEBUG
             , [System.Runtime.CompilerServices.CallerMemberName] string memberName = "",
             [System.Runtime.CompilerServices.CallerFilePath] string sourceFilePath = "",

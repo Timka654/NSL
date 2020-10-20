@@ -59,7 +59,7 @@ namespace SocketCore
         /// </summary>
         /// <param name="ex">Возникшая ошибка</param>
         /// <param name="s">Сокет с которым произошла ошибка</param>
-        public delegate void ExtensionHandle(Exception ex, T client);
+        public delegate void ExceptionHandle(Exception ex, T client);
 
         /// <summary>
         /// Делегат для регистрации события перехвата подключения клиента
@@ -76,7 +76,7 @@ namespace SocketCore
         /// <summary>
         /// События вызываемое при получении ошибки
         /// </summary>
-        public event ExtensionHandle OnExceptionEvent;
+        public event ExceptionHandle OnExceptionEvent;
 
         /// <summary>
         /// Событие вызываемое при подключении клиента

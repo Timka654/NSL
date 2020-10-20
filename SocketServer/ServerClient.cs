@@ -564,7 +564,7 @@ namespace SocketServer
             Send(rbuff.CompilePacket(), 0, rbuff.PacketLenght);
         }
 
-        public void Send(ushort packetId, DateTime? value
+        public void Send(ushort packetId, DateTime value
 #if DEBUG
             , [System.Runtime.CompilerServices.CallerMemberName] string memberName = "",
             [System.Runtime.CompilerServices.CallerFilePath] string sourceFilePath = "",

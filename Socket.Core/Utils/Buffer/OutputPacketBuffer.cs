@@ -33,16 +33,14 @@ namespace SocketCore.Utils.Buffer
         /// </summary>
         public int Lenght
         {
-            get { return (int)base.Length + headerLenght; }
+            get;
+            private set;
         }
 
         /// <summary>
         /// Полный размер пакета
         /// </summary>
-        public int PacketLenght
-        {
-            get { return Lenght - headerLenght; }
-        }
+        public int PacketLenght => Lenght + headerLenght;
 
         /// <summary>
         /// Индификатор пакета
@@ -85,6 +83,13 @@ namespace SocketCore.Utils.Buffer
             _buffer[2] = (byte)(TmpValue >> 16);
             _buffer[3] = (byte)(TmpValue >> 24);
             Write(_buffer, 0, 4);
+        }
+
+        public override void Write(byte[] buffer, int offset, int count)
+        {
+            base.Write(buffer, offset, count);
+            if (this.offset > Lenght)
+                Lenght = this.offset;
         }
 
         /// <summary>
@@ -212,6 +217,9 @@ namespace SocketCore.Utils.Buffer
         public override void WriteByte(byte value)
         {
             base.WriteByte(value);
+            if (this.offset > Lenght)
+                Lenght = this.offset;
+
         }
 
         /// <summary>
@@ -251,17 +259,38 @@ namespace SocketCore.Utils.Buffer
                 Write(buf);
         }
 
-        public void WriteDateTime(DateTime? value)
+        public void WriteNullable<T>(Nullable<T> value, Action trueAction)
+            where T : struct
         {
             if (value.HasValue)
-                WriteDateTime(value.Value);
-            else
-                WriteFloat64(0);
+            {
+                WriteBool(true);
+                trueAction();
+                return;
+            }
+            WriteBool(false);
+        }
+
+        public void WriteNullableClass<T>(T value, Action trueAction)
+            where T : class
+        {
+            if (value != null)
+            {
+                WriteBool(true);
+                trueAction();
+                return;
+            }
+            WriteBool(false);
         }
 
         public void WriteDateTime(DateTime value)
         {
             WriteFloat64((value - MinDatetimeValue).TotalMilliseconds);
+        }
+
+        public void WriteTimeSpan(TimeSpan value)
+        {
+            WriteFloat64(value.TotalMilliseconds);
         }
 
         public void WriteGuid(Guid value)
@@ -275,7 +304,7 @@ namespace SocketCore.Utils.Buffer
 
         public void Write(byte[] buf)
         {
-            base.Write(buf, 0, buf.Length);
+            Write(buf, 0, buf.Length);
         }
 
 

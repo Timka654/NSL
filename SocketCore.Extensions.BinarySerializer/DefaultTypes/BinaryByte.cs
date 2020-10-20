@@ -20,7 +20,7 @@ namespace SocketCore.Extensions.BinarySerializer.DefaultTypes
         {
             dynamic func = Extensions.CreateGetPropertyFuncDynamic<byte>(property);
 
-            return (ms, s, val) => ((OutputPacketBuffer)ms).WriteByte(func(val));
+            return (ms, s, val) => ((OutputPacketBuffer)ms).WriteByte((byte)func(val));
         }
     }
 }
