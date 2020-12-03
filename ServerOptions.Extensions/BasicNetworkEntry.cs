@@ -172,12 +172,12 @@ namespace ServerOptions.Extensions
         /// Перехват ошибок обработки клиента
         /// </summary>
         /// <param name="ex">Данные об ошибке</param>
-        /// <param name="s">Подключение</param>
+        /// <param name="s">Подключение</param> 
         protected virtual void SocketOptions_OnExtensionEvent(Exception ex, T client)
         {
             try
             {
-                Logger?.Append(LoggerLevel.Error, $"{ServerName} socket Error ({client.Network.GetSocket()?.RemoteEndPoint}) - {ex.ToString()}");
+                Logger?.Append(LoggerLevel.Error, $"{ServerName} socket Error ({client?.Network?.GetSocket()?.RemoteEndPoint}) - {ex.ToString()}");
             }
             catch
             {

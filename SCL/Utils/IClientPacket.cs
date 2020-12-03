@@ -31,7 +31,7 @@ namespace SCL.Utils
 
         protected void Send(OutputPacketBuffer packet)
         {
-            if (Client.Network?.GetState() == true)
+            if (Client?.Network?.GetState() == true)
             {
                 Client.Network.Send(packet);
                 SuccessSend = true;

@@ -142,7 +142,7 @@ namespace DBEngine
             catch (Exception ex)
             {
                 DbExceptionEvent?.Invoke(this, ex);
-                throw ex;
+                throw;
             }
         }
 
@@ -429,5 +429,7 @@ namespace DBEngine
             cmd.Dispose();
             return this;
         }
+
+        public DbConnection GetConnection() => cmd.Connection;
     }
 }

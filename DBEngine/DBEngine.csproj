@@ -6,6 +6,12 @@
     <Configurations>Debug;Release;PublishDebug;Unity;UnityDebug;DebugStable</Configurations>
   </PropertyGroup>
   
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='UnityDebug|AnyCPU'">
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <OutputPath>..\UnityDebug</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+  </PropertyGroup>
+  
   <ItemGroup>
     <ProjectReference Include="..\Logger\Logger.csproj" />
   </ItemGroup>

@@ -88,28 +88,43 @@ namespace DBEngine
 
             for (int i = 0; (i < options.RecoveryTryCount && options.RecoveryWhenFailedTry) || !options.RecoveryWhenFailedTry; i++)
             {
-                try
-                {
-                    for (int h = 0; h < options.CSOptions.PoolSize; h++)
-                    {
-                        CreateConnection();
-                    }
+                int h;
 
-                    return;
-                }
-                catch (Exception ex)
+                for (h = 0; h < ConnectionOptions.CSOptions.PoolSize; h++)
                 {
-                    DbExceptionEvent?.Invoke(null, ex);
-                    if (!options.RecoveryWhenFailedTry)
+                    if (CreateNew() == false && !ConnectionOptions.RecoveryWhenFailedTry)
                         break;
-                    System.Threading.Thread.Sleep(options.RecoveryTryDelay * 1000);
-
                 }
+                if (h == ConnectionOptions.CSOptions.PoolSize)
+                    return;
             }
+
             if (options.DropApplicationWhenFailed)
                 new Exception("Drop application by DbConnectionPool");
         }
 
+
+        public bool CreateNew()
+        {
+            try
+            {
+                    CreateConnection();
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                DbExceptionEvent?.Invoke(null, ex);
+                System.Threading.Thread.Sleep(ConnectionOptions.RecoveryTryDelay * 1000);
+
+            }
+            return false;
+        }
+
+        public void Remove(T conn)
+        {
+            Pool.TryRemove(conn, out var dummy);
+        }
 
         public override DbConnection GetDbConnection()
         {

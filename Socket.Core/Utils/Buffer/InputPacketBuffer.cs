@@ -1,5 +1,6 @@
 ﻿using SocketCore.Utils.Exceptions;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
@@ -316,6 +317,21 @@ namespace SocketCore.Utils.Buffer
         public TimeSpan ReadTimeSpan()
         {
             return TimeSpan.FromMilliseconds(ReadDouble());
+        }
+
+
+        public IEnumerable<T> ReadCollection<T>(Func<InputPacketBuffer, T> readAction)
+        {
+            int len = ReadInt32();
+
+            List<T> result = new List<T>(len);
+
+            for (int i = 0; i < len; i++)
+            {
+                result.Add(readAction(this));
+            }
+
+            return result;
         }
 
         public Nullable<T> ReadNullable<T>(Func<T> trueAction)

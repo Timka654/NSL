@@ -35,6 +35,10 @@ namespace Utils.Helper.Network
 
         public virtual int ReconnectDelay { get; } = 15000;
 
+        protected virtual bool ConnectOnLoad => true;
+
+        protected string NetworkConfigurationPath => $"client.{ServerConfigurationName}";
+
         public virtual void Load()
         {
             base.Load(postAction: LoadClient);
@@ -53,6 +57,8 @@ namespace Utils.Helper.Network
             Client.OnReceivePacket += Listener_OnReceivePacket;
             Client.OnSendPacket += Listener_OnSendPacket;
 #endif
+            if (!ConnectOnLoad)
+                return;
 
             try
             {
@@ -68,7 +74,7 @@ namespace Utils.Helper.Network
 
         protected internal override ClientOptions<T> LoadConfigurationAction()
         {
-            return ConfigurationManager.LoadConfigurationCoreOptions< ClientOptions < T > ,T>($"client.{ServerConfigurationName}");
+            return ConfigurationManager.LoadConfigurationCoreOptions< ClientOptions < T > ,T>(NetworkConfigurationPath);
         }
 
 

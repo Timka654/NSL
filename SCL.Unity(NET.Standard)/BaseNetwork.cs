@@ -43,13 +43,13 @@ namespace SCL.Unity
             outputCipher = new PacketNoneCipher(),
         };
 
-        protected virtual void Awake()
+        protected virtual async void Awake()
         {
             if (InitializeOnAwake)
-                StartClient();
+                await StartClient();
         }
 
-        public async void StartClient()
+        public async Task StartClient()
         {
             if (SocketOptions.NetworkClient != null)
             {

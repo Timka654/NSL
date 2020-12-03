@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 
 namespace SocketCore.Utils.Buffer
@@ -257,6 +260,16 @@ namespace SocketCore.Utils.Buffer
             WriteUInt32((uint)buf.Length);
             if (buf.Length > 0)
                 Write(buf);
+        }
+
+        public void WriteCollection<T>(IEnumerable<T> arr, Action<OutputPacketBuffer, T> writeAction)
+        {
+            WriteInt32(arr.Count());
+
+            foreach (var item in arr)
+            {
+                writeAction(this, item);
+            }
         }
 
         public void WriteNullable<T>(Nullable<T> value, Action trueAction)

@@ -4,6 +4,7 @@ using System;
 using System.Collections.Concurrent;
 using System.IO;
 using System.Threading.Tasks;
+using Utils;
 
 namespace SCLogger
 {
@@ -40,8 +41,7 @@ namespace SCLogger
                 stream = null;
             }
 
-            if (!Directory.Exists(LogsPath))
-                Directory.CreateDirectory(LogsPath);
+            IOUtils.CreateDirectoryIfNoExists(LogsPath);
 
             CurrentDateInitialized = msg.Now.Date;
 

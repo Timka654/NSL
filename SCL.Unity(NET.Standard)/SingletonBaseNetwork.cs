@@ -39,7 +39,7 @@ namespace SCL.Unity
             }
             else if (instance != this)
             {
-                Debug.LogError($"Scene contains two instances of ({instance.GetType()})");
+                Debug.Log($"Scene contains two instances of ({instance.GetType()})");
                 //DestroySelf();
                 //return;
             }

@@ -1,6 +1,8 @@
-﻿namespace ConfigurationEngine.Info
+﻿using System;
+
+namespace ConfigurationEngine.Info
 {
-    public class ConfigurationInfo
+    public class ConfigurationInfo : IEquatable<ConfigurationInfo>
     {
         /// <summary>
         /// Полный путь(название)
@@ -26,6 +28,11 @@
             return compiledFlag.Contains(flag + "%");
         }
 
+        public bool Equals(ConfigurationInfo other)
+        {
+            return other.Path.Equals(Path) && other.Value.Equals(Value) && other.Flags.Equals(Flags);
+        }
+
         protected ConfigurationInfo()
         { }
 
@@ -41,5 +48,6 @@
             Value = value;
             Flags = flags ?? "";
         }
+
     }
 }

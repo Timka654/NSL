@@ -72,5 +72,13 @@ namespace ConfigurationEngine
         {
             config_map.Clear();
         }
+
+        public void CopyFrom(ConfigurationStorage otherStorage)
+        {
+            foreach (var item in otherStorage.config_map)
+            {
+                AddValue(item.Value);
+            }
+        }
     }
 }
