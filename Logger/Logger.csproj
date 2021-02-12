@@ -5,6 +5,8 @@
     <Configurations>Debug;Release;Unity;UnityDebug;DebugStable</Configurations>
     <AssemblyName>SCLogger</AssemblyName>
     <RootNamespace>SCLogger</RootNamespace>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Version>$(VersionSuffix)</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">

@@ -5,10 +5,13 @@
     <RootNamespace>SCL.Unity</RootNamespace>
     <AssemblyName>SCL.Unity</AssemblyName>
     <Configurations>Debug;Release;Unity;UnityDebug</Configurations>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Version>$(VersionSuffix)</Version>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+  <PropertyGroup Condition="'$(Configuration)'=='Debug'">
     <OutputPath>..\UnityDebug\</OutputPath>
+    <!--<PackageId>$(AssemblyName).Develop</PackageId>-->
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Unity|AnyCPU'">
@@ -19,6 +22,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='UnityDebug|AnyCPU'">
     <TargetFramework>netstandard2.0</TargetFramework>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <!--<PackageId>$(AssemblyName).Develop</PackageId>-->
     <OutputPath>..\UnityDebug\</OutputPath>
   </PropertyGroup>
 

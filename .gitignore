@@ -7,3 +7,4 @@ bin/
 /ProxyServer/.vs
 /UnityDebug/
 */Release/*
+/nupkg/

@@ -31,7 +31,7 @@ namespace ServerOptions.Extensions.Console
         {
             var packet = new OutputPacketBuffer()
             {
-                PacketId = (ushort)ServerPacketEnum.RecoverySessionResult
+                PacketId = ConsoleHelper.DefaultClientPacketId
             };
 
             packet.WriteString16(result);

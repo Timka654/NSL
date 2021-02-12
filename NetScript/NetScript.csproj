@@ -4,6 +4,8 @@
     <TargetFramework>net5.0</TargetFramework>
     <Platforms>AnyCPU;x64;x86</Platforms>
     <Configurations>Debug;Release;PublishDebug;Unity;UnityDebug</Configurations>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Version>$(VersionSuffix)</Version>
   </PropertyGroup>
 
   <ItemGroup>

@@ -18,7 +18,9 @@ namespace Utils
         {
             var splited = path.Split(Path.DirectorySeparatorChar);
 
-            if (splited.Any(x => string.IsNullOrWhiteSpace(x) || x.Trim() != x))
+            var firstElement = splited.First();
+
+            if (splited.Any(x => (string.IsNullOrWhiteSpace(x) && firstElement != x) || x.Trim() != x))
                 throw new Exception($"invalid path \"{path}\"");
 
             path = string.Join(Path.DirectorySeparatorChar, splited.Select(x => x.Trim()));

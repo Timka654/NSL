@@ -3,11 +3,13 @@
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
     <Configurations>Debug;Release;Unity;UnityDebug</Configurations>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Version>$(VersionSuffix)</Version>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ConsoleEngine\ConsoleEngine.csproj" />
-    <ProjectReference Include="..\SocketServer\SocketServer.csproj" />
+    <PackageReference Include="ConsoleEngine" Version="2020.12.8.1139" />
+    <PackageReference Include="SocketServer" Version="2020.12.8.1139" />
   </ItemGroup>
 
 </Project>

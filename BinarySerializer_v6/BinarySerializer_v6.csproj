@@ -5,6 +5,8 @@
     <AssemblyName>BinarySerializer</AssemblyName>
     <RootNamespace>BinarySerializer</RootNamespace>
     <Configurations>Debug;Release;Unity;UnityDebug</Configurations>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Version>$(VersionSuffix)</Version>
   </PropertyGroup>
   
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='UnityDebug|AnyCPU'">

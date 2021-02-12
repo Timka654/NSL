@@ -5,7 +5,13 @@
     <RootNamespace>SCL.Node</RootNamespace>
     <AssemblyName>SCL.Node</AssemblyName>
     <Configurations>Debug;Release;Unity;UnityDebug</Configurations>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Version>$(VersionSuffix)</Version>
   </PropertyGroup>
+
+  <!--<PropertyGroup Condition="'$(Configuration)'=='Debug'">
+    <PackageId>$(AssemblyName).Develop</PackageId>
+  </PropertyGroup>-->
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <OutputPath>..\UnityDebug\</OutputPath>

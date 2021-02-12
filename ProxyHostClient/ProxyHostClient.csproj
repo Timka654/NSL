@@ -3,7 +3,12 @@
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
     <Configurations>Debug;Release;Unity;UnityDebug</Configurations>
+    <Version>$(VersionSuffix)</Version>
   </PropertyGroup>
+
+  <!--<PropertyGroup Condition="'$(Configuration)'=='Debug'">
+    <PackageId>$(AssemblyName).Develop</PackageId>
+  </PropertyGroup>-->
 
   <ItemGroup>
     <ProjectReference Include="..\ServerOptions.Extensions.ConfigurationEngine\ServerOptions.Extensions.ConfigurationEngine.csproj" />

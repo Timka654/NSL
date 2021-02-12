@@ -16,6 +16,8 @@ namespace ConfigurationEngine
 
         public event Action<LoggerLevel, string> OnLog = (ll, v) => { };
 
+        public event Action OnLoad = () => { };
+
         public IConfigurationLoadingProvider Provider { get; protected set; }
 
         public IConfigurationManager(string fileName)
