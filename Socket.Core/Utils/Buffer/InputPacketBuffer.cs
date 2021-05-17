@@ -1,12 +1,13 @@
 ﻿using SocketCore.Utils.Exceptions;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace SocketCore.Utils.Buffer
 {
-    public class InputPacketBuffer
+    public class InputPacketBuffer : MemoryStream
     {
         private static readonly DateTime MinDatetimeValue = new DateTime(1970, 1, 1);
         /// <summary>
@@ -14,16 +15,15 @@ namespace SocketCore.Utils.Buffer
         /// </summary>
         Encoding coding = Encoding.UTF8;
 
-        /// <summary>
-        /// Буффер с полученными данными
-        /// </summary>
-        readonly byte[] buffer;
+        ///// <summary>
+        ///// Буффер с полученными данными
+        ///// </summary>
+        //readonly byte[] buffer;
 
         /// <summary>
         /// маскировка хедера пакета
         /// </summary>
-        int offs;
-        int offset { get { return offs; } set { offs = value; } }
+        int offset { get { return (int)base.Position; } set { base.Position = value; } }
 
         readonly int lenght;
 
@@ -54,10 +54,10 @@ namespace SocketCore.Utils.Buffer
         /// </summary>
         /// <param name="buf">входящий буффер</param>
         /// <param name="checkHash">проверка хеша пакета</param>
-        public InputPacketBuffer(byte[] buf, bool checkHash = false)
+        public InputPacketBuffer(byte[] buf, bool checkHash = false) : base(buf, 0, buf.Length, false, true)
         {
             //присвоение буффера
-            buffer = buf;
+            //buffer = buf;
             //установка позиции на 0 без смещения
             offset = 0;
 
@@ -87,7 +87,7 @@ namespace SocketCore.Utils.Buffer
         public bool CheckHash()
         {
             //проверяем хеш по спец формуле
-            if (buffer[6] != ((lenght - headerLenght) + PacketId) % 14)
+            if (GetBuffer()[6] != ((lenght - headerLenght) + PacketId) % 14)
             {
                 return false;
             }
@@ -101,12 +101,12 @@ namespace SocketCore.Utils.Buffer
         public float ReadFloat()
         {
             offset += 4;
-            return BitConverter.ToSingle(buffer, offset - 4);
+            return BitConverter.ToSingle(GetBuffer(), offset - 4);
         }
 
         public async Task<float> ReadFloatAsync()
         {
-            return await Task.FromResult<float>(BitConverter.ToSingle(buffer, offset - 4));
+            return await Task.FromResult<float>(BitConverter.ToSingle(GetBuffer(), offset - 4));
         }
 
         /// <summary>
@@ -116,13 +116,13 @@ namespace SocketCore.Utils.Buffer
         public double ReadDouble()
         {
             offset += 8;
-            return BitConverter.ToDouble(buffer, offset - 8);
+            return BitConverter.ToDouble(GetBuffer(), offset - 8);
         }
 
         public async Task<double> ReadDoubleAsync()
         {
             offset += 8;
-            return await Task.FromResult<double>(BitConverter.ToDouble(buffer, offset - 8));
+            return await Task.FromResult<double>(BitConverter.ToDouble(GetBuffer(), offset - 8));
         }
 
         /// <summary>
@@ -141,13 +141,13 @@ namespace SocketCore.Utils.Buffer
         public short ReadInt16()
         {
             offset += 2;
-            return BitConverter.ToInt16(buffer, offset - 2);
+            return BitConverter.ToInt16(GetBuffer(), offset - 2);
         }
 
         public async Task<short> ReadInt16Async()
         {
             offset += 2;
-            return await Task.FromResult(BitConverter.ToInt16(buffer, offset - 2));
+            return await Task.FromResult(BitConverter.ToInt16(GetBuffer(), offset - 2));
         }
 
         /// <summary>
@@ -157,13 +157,13 @@ namespace SocketCore.Utils.Buffer
         public ushort ReadUInt16()
         {
             offset += 2;
-            return BitConverter.ToUInt16(buffer, offset - 2);
+            return BitConverter.ToUInt16(GetBuffer(), offset - 2);
         }
 
         public async Task<ushort> ReadUInt16Async()
         {
             offset += 2;
-            return await Task.FromResult(BitConverter.ToUInt16(buffer, offset - 2));
+            return await Task.FromResult(BitConverter.ToUInt16(GetBuffer(), offset - 2));
         }
 
         /// <summary>
@@ -173,13 +173,13 @@ namespace SocketCore.Utils.Buffer
         public int ReadInt32()
         {
             offset += 4;
-            return BitConverter.ToInt32(buffer, offset - 4);
+            return BitConverter.ToInt32(GetBuffer(), offset - 4);
         }
 
         public async Task<int> ReadInt32Async()
         {
             offset += 4;
-            return await Task.FromResult(BitConverter.ToInt32(buffer, offset - 4));
+            return await Task.FromResult(BitConverter.ToInt32(GetBuffer(), offset - 4));
         }
 
         /// <summary>
@@ -189,13 +189,13 @@ namespace SocketCore.Utils.Buffer
         public uint ReadUInt32()
         {
             offset += 4;
-            return BitConverter.ToUInt32(buffer, offset - 4);
+            return BitConverter.ToUInt32(GetBuffer(), offset - 4);
         }
 
         public async Task<uint> ReadUInt32Async()
         {
             offset += 4;
-            return await Task.FromResult(BitConverter.ToUInt32(buffer, offset - 4));
+            return await Task.FromResult(BitConverter.ToUInt32(GetBuffer(), offset - 4));
         }
 
         /// <summary>
@@ -205,13 +205,13 @@ namespace SocketCore.Utils.Buffer
         public long ReadInt64()
         {
             offset += 8;
-            return BitConverter.ToInt64(buffer, offset - 8);
+            return BitConverter.ToInt64(GetBuffer(), offset - 8);
         }
 
         public async Task<long> ReadInt64Async()
         {
             offset += 8;
-            return await Task.FromResult(BitConverter.ToInt64(buffer, offset - 8));
+            return await Task.FromResult(BitConverter.ToInt64(GetBuffer(), offset - 8));
         }
 
         /// <summary>
@@ -221,27 +221,27 @@ namespace SocketCore.Utils.Buffer
         public ulong ReadUInt64()
         {
             offset += 8;
-            return BitConverter.ToUInt64(buffer, offset - 8);
+            return BitConverter.ToUInt64(GetBuffer(), offset - 8);
         }
 
         public async Task<ulong> ReadUInt64Async()
         {
             offset += 8;
-            return await Task.FromResult(BitConverter.ToUInt64(buffer, offset - 8));
+            return await Task.FromResult(BitConverter.ToUInt64(GetBuffer(), offset - 8));
         }
 
         /// <summary>
         /// Чтения значения byte (1 байт)
         /// </summary>
         /// <returns></returns>
-        public byte ReadByte()
+        public new byte ReadByte()
         {
-            return buffer[offset++];
+            return (byte)base.ReadByte();
         }
 
         public async Task<byte> ReadByteAsync()
         {
-            return await Task.FromResult<byte>(buffer[offset++]);
+            return await Task.FromResult<byte>((byte)base.ReadByte());
         }
 
         /// <summary>
@@ -308,12 +308,51 @@ namespace SocketCore.Utils.Buffer
             return await Task.FromResult(coding.GetString(Read((int)len)));
         }
 
-        public DateTime? ReadDateTime()
+        public DateTime ReadDateTime()
         {
-            var r = ReadDouble();
-            if (r == 0)
-                return null;
-            return MinDatetimeValue.AddMilliseconds(r);
+            return MinDatetimeValue.AddTicks(ReadInt64());
+        }
+
+        public TimeSpan ReadTimeSpan()
+        {
+            return TimeSpan.FromTicks(ReadInt64());
+        }
+
+
+        public IEnumerable<T> ReadCollection<T>(Func<InputPacketBuffer, T> readAction)
+        {
+            int len = ReadInt32();
+
+            List<T> result = new List<T>(len);
+
+            for (int i = 0; i < len; i++)
+            {
+                result.Add(readAction(this));
+            }
+
+            return result;
+        }
+
+        public Nullable<T> ReadNullable<T>(Func<T> trueAction)
+            where T : struct
+        {
+            if (ReadBool())
+            {
+                return trueAction();
+            }
+
+            return null;
+        }
+
+        public T ReadNullableClass<T>(Func<T> trueAction)
+            where T : class
+        {
+            if (ReadBool())
+            {
+                return trueAction();
+            }
+
+            return null;
         }
 
         public Guid ReadGuid()
@@ -329,26 +368,15 @@ namespace SocketCore.Utils.Buffer
         public byte[] Read(int len)
         {
             byte[] buf = new byte[len];
-            for (int i = 0; i < len; i++)
-            {
-                buf[i] = buffer[offset + i];
-            }
-            offset += len;
+            base.Read(buf, 0, len);
             return buf;
         }
 
         public async Task<byte[]> ReadAsync(int len)
         {
-            return await Task.Run(() =>
-            {
-                byte[] buf = new byte[len];
-                for (int i = 0; i < len; i++)
-                {
-                    buf[i] = buffer[offset + i];
-                }
-                offset += len;
-                return buf;
-            });
+            byte[] buf = new byte[len];
+            await base.ReadAsync(buf, 0, len);
+            return buf;
         }
 
         /// <summary>
@@ -397,20 +425,21 @@ namespace SocketCore.Utils.Buffer
         /// <param name="off">позиция начала копирования</param>
         public void AppendBody(byte[] buffer, int off)
         {
-            Array.Copy(buffer, off, this.buffer, 7, this.lenght - 7);
+            int tempPos = offset;
+
+            offset = 7;
+
+            Write(buffer, off, this.lenght - 7);
+
+            offset = tempPos;
         }
 
         public byte[] GetBody()
         {
             byte[] buf = new byte[DataLength];
-            Array.Copy(buffer, headerLenght, buf, 0, DataLength);
+            Array.Copy(GetBuffer(), headerLenght, buf, 0, DataLength);
 
             return buf;
-        }
-
-        public byte[] GetBuffer()
-        {
-            return buffer;
         }
     }
 }

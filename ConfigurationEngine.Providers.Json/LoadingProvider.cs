@@ -1,8 +1,12 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using ConfigurationEngine.Info;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using SocketCore.Utils.Logger.Enums;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 
 namespace ConfigurationEngine.Providers.Json
 {
@@ -12,35 +16,89 @@ namespace ConfigurationEngine.Providers.Json
         {
             try
             {
-                var json_text = File.ReadAllText(Path.Combine(System.IO.Directory.GetCurrentDirectory(), manager.FileName));
+                var json_text = File.ReadAllText(manager.FileName);
                 var json_data = JObject.Parse(json_text);
-                var result = ParseArray(manager, "", json_data.Values());
+
+                var result = json_data.Descendants().Where(x=>x.Type == JTokenType.String || x.Type == JTokenType.Date || x.Type == JTokenType.Boolean || x.Type == JTokenType.Integer || x.Type == JTokenType.Float || x.Type == JTokenType.Guid || x.Type == JTokenType.TimeSpan);
 
                 foreach (var item in result)
                 {
-                    manager.AddValue(new Info.ConfigurationInfo(item.Key.ToLower(), item.Value, ""));
+                    manager.AddValue(new Info.ConfigurationInfo(CorrectPath(item,manager), item.Value<string>(), ""));
                 }
             }
             catch (Exception ex)
             {
-                manager.Log(Logger.LoggerLevel.Error, $"ConfigurationManager Exception: {ex.ToString()}");
+                manager.Log(LoggerLevel.Error, $"ConfigurationManager Exception: {ex.ToString()}");
                 return false;
             }
             return true;
         }
 
-        private List<KeyValuePair<string, string>> ParseArray(IConfigurationManager manager, string path, IEnumerable<JToken> _prop)
+        private string CorrectPath(JToken jt, IConfigurationManager manager)
         {
-            List<KeyValuePair<string, string>> res = new List<KeyValuePair<string, string>>();
-            foreach (var item in _prop.Where(x => x.Type != JTokenType.Array && x.Type != JTokenType.Object))
+            var npath = jt.Path;
+
+            npath = npath.Replace("['", ".");
+            npath = npath.Replace("']", "");
+
+            return npath.ToLower();
+        }
+
+        public bool LoadData(IConfigurationManager manager, byte[] data)
+        {
+            try
             {
-                res.Add(new KeyValuePair<string, string>(path + (path != "" ? manager.NodeSeparator.ToString() : "") + ((JProperty)item.Parent).Name, item.Value<string>()));
+                var json_text = Encoding.UTF8.GetString(data);
+                var json_data = JObject.Parse(json_text);
+
+                //var result = ParseArray(manager, "", json_data.Values());
+
+                //foreach (var item in result)
+                //{
+                //    manager.AddValue(new Info.ConfigurationInfo(item.Key.ToLower(), item.Value, ""));
+                //}
             }
-            foreach (var item in _prop.Where(x => x.Type == JTokenType.Array || x.Type == JTokenType.Object))
+            catch (Exception ex)
             {
-                res.AddRange(ParseArray(manager, path + (path != "" ? manager.NodeSeparator.ToString() : "") + ((JProperty)item.Parent).Name, item.Values()));
+                manager.Log(LoggerLevel.Error, $"ConfigurationManager Exception: {ex.ToString()}");
+                return false;
             }
-            return res;
+            return true;
+        }
+
+        public bool SaveData(IConfigurationManager manager)
+        {
+            var data = manager.GetAllValues();
+            try
+            {
+                JObject jobj = new JObject();
+
+                using (var writer = jobj.CreateWriter())
+                {
+
+                    foreach (var item in data)
+                    {
+                        writer.WritePropertyName(item.Path);
+
+                                writer.WriteValue(item.Value);
+                    }
+                }
+                var json = jobj.ToString();
+
+                File.WriteAllText(manager.FileName, json);
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                manager.Log(LoggerLevel.Error, $"ConfigurationManager Exception: {ex.ToString()}");
+                return false;
+            }
+        }
+
+        private string GetPath(IConfigurationManager manager, JToken jt)
+        {
+            return jt.Path;
         }
     }
 }

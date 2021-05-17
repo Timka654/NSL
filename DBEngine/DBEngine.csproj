@@ -1,13 +1,24 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
     <Platforms>AnyCPU;x64;x86</Platforms>
     <Configurations>Debug;Release;PublishDebug;Unity;UnityDebug;DebugStable</Configurations>
+    
+    <Version>$(VersionSuffix)</Version>
+    <Description>Базовая библиотека для взаимодействия с базой данных</Description>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
   </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Logger\Logger.csproj" />
-  </ItemGroup>
+  <PropertyGroup Condition="'$(Configuration)'=='Debug'">
+    <PackageId>$(MSBuildProjectName)_Debug</PackageId>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='UnityDebug|AnyCPU'">
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <OutputPath>..\UnityDebug</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+  </PropertyGroup>
 
 </Project>

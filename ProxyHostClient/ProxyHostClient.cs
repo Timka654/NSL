@@ -7,7 +7,7 @@ using SocketServer.Utils;
 using System.Threading.Tasks;
 using ProxyHostClient.Packets.Player.PacketData;
 using ProxyHostClient.Packets.Auth;
-using Logger;
+using SCLogger;
 using ConfigurationEngine;
 using ServerOptions.Extensions.Packet;
 using ServerOptions.Extensions.ConfigurationEngine;
@@ -97,7 +97,7 @@ namespace ProxyHostClient
 
             options.OnClientConnectEvent += SocketOptions_OnClientConnectEvent;
             options.OnClientDisconnectEvent += SocketOptions_OnClientDisconnectEvent;
-            options.OnExtensionEvent += SocketOptions_OnExtensionEvent;
+            options.OnExceptionEvent += SocketOptions_OnExtensionEvent;
 
             LoggerStorage.Instance.main.AppendInfo($"-> Configuration Loaded");
         }

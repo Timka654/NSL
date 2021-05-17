@@ -1,6 +1,9 @@
-﻿namespace Logger
+﻿using SocketCore.Utils.Logger;
+using Utils;
+
+namespace SCLogger
 {
-    public interface ILogger
+    public interface ILogger : IBasicLogger
     {
         /// <summary>
         /// 
@@ -9,8 +12,6 @@
         /// <param name="path">Путь к директории с файлами лога</param>
         /// <param name="delay">Время между выводами данных с кэша</param>
         void Initialize(string fname, string path, int delay);
-
-        void Append(LoggerLevel level, string text);
 
         void SetConsoleOutput(bool allow);
 

@@ -5,6 +5,12 @@ using System.Net;
 
 namespace SocketCore
 {
+    public delegate void ReceivePacketDebugInfo<T>(T client, ushort pid, int len) where T : IClient;
+#if DEBUG
+    public delegate void SendPacketDebugInfo<T>(T client, ushort pid, int len, string memberName = "", string sourceFilePath = "", int sourceLineNumber = 0) where T : IClient;
+#else
+    public delegate void SendPacketDebugInfo<T>(T client, ushort pid, int len) where T : IClient;
+#endif
     public interface IClient
     {
         void Send(OutputPacketBuffer packet
@@ -103,7 +109,7 @@ namespace SocketCore
 #endif
             );
 
-        void Send(ushort packetId, DateTime? value
+        void Send(ushort packetId, DateTime value
 #if DEBUG
             , [System.Runtime.CompilerServices.CallerMemberName] string memberName = "",
             [System.Runtime.CompilerServices.CallerFilePath] string sourceFilePath = "",
@@ -126,13 +132,13 @@ namespace SocketCore
 #endif
             );
 
-        void SendSerialize<O>(ushort packetId, O obj, string scheme
-#if DEBUG
-            , [System.Runtime.CompilerServices.CallerMemberName] string memberName = "",
-            [System.Runtime.CompilerServices.CallerFilePath] string sourceFilePath = "",
-            [System.Runtime.CompilerServices.CallerLineNumber] int sourceLineNumber = 0
-#endif
-            );
+//        void SendSerialize<O>(ushort packetId, O obj, string scheme
+//#if DEBUG
+//            , [System.Runtime.CompilerServices.CallerMemberName] string memberName = "",
+//            [System.Runtime.CompilerServices.CallerFilePath] string sourceFilePath = "",
+//            [System.Runtime.CompilerServices.CallerLineNumber] int sourceLineNumber = 0
+//#endif
+//            );
 
         void Send(byte[] buf, int offset, int lenght);
 

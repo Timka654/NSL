@@ -35,8 +35,6 @@ namespace BinarySerializer
         /// </summary>
         public IBasicType BinaryType { get; set; }
 
-        public object[] BinaryTypeGenerics { get; set; }
-
         /// <summary>
         /// Бинарный аттрибут с данными для серриализации
         /// </summary>
@@ -77,10 +75,6 @@ namespace BinarySerializer
         /// </summary>
         public int TypeSize => BinaryAttr.TypeSize;
 
-        public Func<int> ArraySizeGetter = () => { return 0; };
-
-        public Func<int> TypeSizeGetter = () => { return 0; };
-
         /// <summary>
         /// Название учасника
         /// </summary>
@@ -112,17 +106,9 @@ namespace BinarySerializer
             if (IsBaseType)
                 BinaryType = (IBasicType)Activator.CreateInstance(BinaryAttr.Type);
             else
-            {
                 BinaryStruct = storage.GetTypeInfo(BinaryAttr.Type, scheme);
 
-                BinaryTypeGenerics = BinaryAttr.Type.GetGenericArguments().Select(x =>
-                {
-                    if (typeof(IBasicType).IsAssignableFrom(x))
-                        return (object)Activator.CreateInstance(x);
-                    else
-                        return (object)storage.GetTypeInfo(x, scheme);
-                }).ToArray();
-            }
+
             Getter = binaryMemberData.Getter;
 
             Setter = binaryMemberData.Setter;
@@ -130,7 +116,6 @@ namespace BinarySerializer
             Name = binaryMemberData.Name;
 
             Type = binaryMemberData.Type;
-
             MemberInfo = binaryMemberData.MemberInfo;
 
         }

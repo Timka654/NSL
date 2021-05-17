@@ -7,7 +7,7 @@ using GrEmit;
 
 namespace BinarySerializer.DefaultTypes
 {
-    public partial class BinaryNullable<T, TType> : IBasicType
+    public class BinaryNullable<T, TType> : IBasicType
         where T : IBasicType, new()
         where TType : struct
     {
@@ -25,8 +25,6 @@ namespace BinarySerializer.DefaultTypes
 
             Setter = typeof(Nullable<TType>).GetConstructor(new Type[] { typeof(TType) });
         }
-
-#if NOT_UNITY
 
         public void GetReadILCode(BinaryMemberData prop, BinaryStruct currentStruct, GroboIL il, GroboIL.Local binaryStruct, GroboIL.Local buffer, GroboIL.Local result, GroboIL.Local typeSize, GroboIL.Local offset, bool listValue)
         {
@@ -69,7 +67,5 @@ namespace BinarySerializer.DefaultTypes
 
             il.MarkLabel(exitLabel);
         }
-
-#endif
     }
 }

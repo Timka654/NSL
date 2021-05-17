@@ -9,16 +9,14 @@ using GrEmit.Utils;
 
 namespace BinarySerializer.DefaultTypes
 {
-    public partial class BinarySInt8 : IBasicType
+    public class BinarySInt8 : IBasicType
     {
         public Type CompareType => typeof(sbyte);
 
         public BinarySInt8()
         {
-
+                
         }
-
-#if NOT_UNITY
 
         public void GetReadILCode(BinaryMemberData prop, BinaryStruct currentStruct, GroboIL il, GroboIL.Local binaryStruct, GroboIL.Local buffer, GroboIL.Local result, GroboIL.Local typeSize, GroboIL.Local offset, bool listValue)
         {
@@ -65,8 +63,5 @@ namespace BinarySerializer.DefaultTypes
 
             //BinaryStruct.WriteOffsetAppend(il, offset, 1);
         }
-
-#endif
-
     }
 }

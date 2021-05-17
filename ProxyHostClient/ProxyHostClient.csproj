@@ -1,15 +1,19 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
     <Configurations>Debug;Release;Unity;UnityDebug</Configurations>
+    <Version>$(VersionSuffix)</Version>
   </PropertyGroup>
+
+  <!--<PropertyGroup Condition="'$(Configuration)'=='Debug'">
+    <PackageId>$(AssemblyName).Develop</PackageId>
+  </PropertyGroup>-->
 
   <ItemGroup>
     <ProjectReference Include="..\ServerOptions.Extensions.ConfigurationEngine\ServerOptions.Extensions.ConfigurationEngine.csproj" />
-    <ProjectReference Include="..\ServerOptions.Extensions.Manager\ServerOptions.Extensions.Manager.csproj" />
-    <ProjectReference Include="..\ServerOptions.Extensions.Packet\ServerOptions.Extensions.Packet.csproj" />
-    <ProjectReference Include="..\ServerOptions.Extensions\ServerOptions.Extensions.csproj" />
+    <ProjectReference Include="..\ServerOptions.Extensions\Network.Extensions.csproj" />
+    <ProjectReference Include="..\SocketCore.Extensions.Packet\SocketCore.Extensions.Packet.csproj" />
     <ProjectReference Include="..\SocketServer\SocketServer.csproj" />
     <ProjectReference Include="..\Utils\Utils.csproj" />
   </ItemGroup>

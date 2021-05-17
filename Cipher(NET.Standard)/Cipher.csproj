@@ -1,14 +1,27 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;net45</TargetFrameworks>
+    <TargetFramework>net5.0</TargetFramework>
     <RootNamespace>Cipher</RootNamespace>
     <Configurations>Debug;Release;Unity;UnityDebug</Configurations>
+    
+    <Version>$(VersionSuffix)</Version>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)'=='Debug'">
+    <PackageId>$(MSBuildProjectName)_Debug</PackageId>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='UnityDebug|AnyCPU'">
-    <OutputPath>D:\SSDContent\ssd backup\2019-10-09_21-33-33\E\AppFox\SocketServerLibrary\UnityDebug\</OutputPath>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <OutputPath>..\UnityDebug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <ItemGroup>

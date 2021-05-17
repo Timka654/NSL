@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using SocketCore.Utils;
 using SocketCore.Utils.Buffer;
 using SocketCore.Utils.SystemPackets.Enums;
 
 namespace SCL.Utils.SystemPackets
 {
-    public class AliveConnection<T> : IPacket<T> where T: BaseSocketNetworkClient
+    public class AliveConnection<T> : IClientPacket<T> where T: BaseSocketNetworkClient
     {
         protected override void Receive(InputPacketBuffer data)
         {

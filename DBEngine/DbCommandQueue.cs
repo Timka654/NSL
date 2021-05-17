@@ -1,6 +1,6 @@
-﻿using Logger;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -11,26 +11,22 @@ namespace DBEngine
     /// </summary>
     public class DbCommandQueue
     {
-        public delegate void ExecutedDbCommandDelegate(long index);
-
-        public event ExecutedDbCommandDelegate ExecutedDbCommandEvent;
-
         protected DbConnectionPool connection_pool;
 
         private TimeSpan DelayCommandTime = TimeSpan.FromSeconds(20);
 
         private long CurrentIndex = 1;
 
-        protected ILogger logger;
+        public Action<Exception> OnException { protected get; set; } = (e) => { };
 
-        protected ConcurrentDictionary<long, Action<DBCommand>> WaitList = new ConcurrentDictionary<long, Action<DBCommand>>();
+        protected ConcurrentQueue<Action<DBCommand>> WaitList = new ConcurrentQueue<Action<DBCommand>>();
+
 
         protected AutoResetEvent invoker_locker = new AutoResetEvent(true);
 
-        public DbCommandQueue(DbConnectionPool connection_pool, ILogger logger)
+        public DbCommandQueue(DbConnectionPool connection_pool)
         {
             this.connection_pool = connection_pool;
-            this.logger = logger;
 
             FlushWhile();
         }
@@ -40,16 +36,18 @@ namespace DBEngine
         /// </summary>
         /// <param name="command"></param>
         /// <returns>Индекс в хранилище</returns>
-        public long AppendCommand(Action<DBCommand> command)
+        public void AppendCommand(Action<DBCommand> command)
         {
-            long index = Interlocked.Increment(ref CurrentIndex);
+            //long index = Interlocked.Increment(ref CurrentIndex);
 
-            if (index == long.MaxValue - 10000)
-                CurrentIndex = 1;
+            //if (index == long.MaxValue - 10000)
+            //    CurrentIndex = 1;
 
-            WaitList.TryAdd(index, command);
+            //WaitList.TryAdd(index, command);
 
-            return index;
+            //return index;
+
+            WaitList.Enqueue(command);
         }
 
         /// <summary>
@@ -66,23 +64,41 @@ namespace DBEngine
             while (true)
             {
                 await Task.Delay(DelayCommandTime);
-                try
-                {
-                    invoker_locker.WaitOne();
-                    foreach (var item in WaitList)
-                    {
-                        item.Value.Invoke(connection_pool.GetCommand());
+                invoker_locker.WaitOne();
+                Execute();
+                invoker_locker.Set();
+            }
+        }
 
-                        ExecutedDbCommandEvent?.Invoke(item.Key);
+        protected virtual void Execute()
+        {
+            ExecuteQueue(WaitList);
+        }
 
-                        WaitList.TryRemove(item.Key, out var temp);
-                    }
-                    invoker_locker.Set();
-                }
-                catch (Exception ex)
+        protected bool ExecuteQueue(ConcurrentQueue<Action<DBCommand>> commands)
+        {
+            DBEngine.DBCommand command = default;
+
+            try
+            {
+                while (commands.TryDequeue(out var cmd))
                 {
-                    logger.Append(LoggerLevel.Error, ex.ToString());
+                    command = connection_pool.GetCommand();
+                    cmd(command);
+
+                    //ExecutedDbCommandEvent?.Invoke(item.Key);
+
+                    command.CloseConnection();
                 }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                command.CloseConnection();
+                OnException(ex);
+
+                return false;
             }
         }
     }

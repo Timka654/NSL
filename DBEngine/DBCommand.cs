@@ -95,7 +95,7 @@ namespace DBEngine
             catch (Exception ex)
             {
                 DbExceptionEvent?.Invoke(this, ex);
-                throw ex;
+                throw;
             }
             return this;
         }
@@ -118,7 +118,7 @@ namespace DBEngine
             catch (Exception ex)
             {
                 DbExceptionEvent?.Invoke(this, ex);
-                throw ex;
+                throw;
             }
             return this;
         }
@@ -142,7 +142,7 @@ namespace DBEngine
             catch (Exception ex)
             {
                 DbExceptionEvent?.Invoke(this, ex);
-                throw ex;
+                throw;
             }
         }
 
@@ -164,7 +164,7 @@ namespace DBEngine
             catch (Exception ex)
             {
                 DbExceptionEvent?.Invoke(this, ex);
-                throw ex;
+                throw;
             }
             return this;
         }
@@ -180,14 +180,19 @@ namespace DBEngine
             try
             {
                 sw.Start();
-                result = (T)cmd.ExecuteScalar();
+
+                var v = cmd.ExecuteScalar();
+                if (v != DBNull.Value && v != null)
+                    result = (T)v;
+                else
+                    result = default;
                 sw.Stop();
                 DbPerformanceEvent?.Invoke(sourceFilePath, memberName, sw.Elapsed);
             }
             catch (Exception ex)
             {
                 DbExceptionEvent?.Invoke(this, ex);
-                throw ex;
+                throw;
             }
             return this;
         }
@@ -210,7 +215,7 @@ namespace DBEngine
             catch (Exception ex)
             {
                 DbExceptionEvent?.Invoke(this, ex);
-                throw ex;
+                throw;
             }
             return this;
         }
@@ -234,7 +239,7 @@ namespace DBEngine
             catch (Exception ex)
             {
                 DbExceptionEvent?.Invoke(this, ex);
-                throw ex;
+                throw;
             }
         }
 
@@ -262,7 +267,7 @@ namespace DBEngine
             {
                 DbExceptionEvent?.Invoke(this, ex);
                 CloseConnection();
-                throw ex;
+                throw;
             }
             return this;
         }
@@ -293,7 +298,7 @@ namespace DBEngine
             {
                 DbExceptionEvent?.Invoke(this, ex);
                 CloseConnection();
-                throw ex;
+                throw;
             }
             return this;
         }
@@ -318,7 +323,7 @@ namespace DBEngine
             catch (Exception ex)
             {
                 DbExceptionEvent?.Invoke(this, ex);
-                throw ex;
+                throw;
             }
         }
 
@@ -424,5 +429,7 @@ namespace DBEngine
             cmd.Dispose();
             return this;
         }
+
+        public DbConnection GetConnection() => cmd.Connection;
     }
 }

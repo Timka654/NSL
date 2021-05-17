@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using ConsoleEngine;
+using SocketCore.Utils;
 using SocketCore.Utils.Buffer;
 using SocketCore.Utils.SystemPackets.Enums;
 using SocketServer.Utils;
@@ -21,7 +22,7 @@ namespace ServerOptions.Extensions.Console
             this.manager = manager;
         }
 
-        public void Receive(T client, InputPacketBuffer data)
+        public override void Receive(T client, InputPacketBuffer data)
         {
             Send(client, manager.InvokeCommand(client, data.ReadString16()));
         }
@@ -30,7 +31,7 @@ namespace ServerOptions.Extensions.Console
         {
             var packet = new OutputPacketBuffer()
             {
-                PacketId = (ushort)ServerPacketEnum.RecoverySessionResult
+                PacketId = ConsoleHelper.DefaultClientPacketId
             };
 
             packet.WriteString16(result);

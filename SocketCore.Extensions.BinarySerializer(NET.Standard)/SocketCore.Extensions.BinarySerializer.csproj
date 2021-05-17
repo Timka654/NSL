@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0</TargetFrameworks>
+    <TargetFramework>net5.0</TargetFramework>
     <RootNamespace>SocketCore.Extensions.BinarySerializer</RootNamespace>
     <AssemblyName>SocketCore.Extensions.BinarySerializer</AssemblyName>
     <Configurations>Debug;Release;Unity;UnityDebug</Configurations>
@@ -9,11 +9,10 @@
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='UnityDebug|AnyCPU'">
     <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <OutputPath>D:\SSDContent\ssd backup\2019-10-09_21-33-33\E\AppFox\SocketServerLibrary\UnityDebug</OutputPath>
+    <OutputPath>..\UnityDebug\</OutputPath>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\BinarySerializer_v5(NET.Standard)\BinarySerializer.csproj" />
     <ProjectReference Include="..\Socket.Core\SocketCore.csproj" />
   </ItemGroup>
 

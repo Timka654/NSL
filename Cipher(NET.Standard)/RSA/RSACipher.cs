@@ -8,11 +8,11 @@ namespace Cipher.RSA
 {
     public class RSACipher : IPacketCipher
     {
-        System.Security.Cryptography.RSA rsa;
+        RSACryptoServiceProvider rsa;
 
-        public RSACipher(string algName = "", int keySize = 1024)
+        public RSACipher(string algName = "RSA", int keySize = 1024)
         {
-            rsa = System.Security.Cryptography.RSA.Create(algName);
+            rsa = new RSACryptoServiceProvider();
             rsa.KeySize = keySize;
         }
 
@@ -35,21 +35,21 @@ namespace Cipher.RSA
         {
             byte[] buf = new byte[lenght];
             Array.Copy(buffer,offset,buf,0,lenght);
-            return rsa.DecryptValue(buf);
+            return rsa.Decrypt(buf,true);
         }
 
         public byte[] Encode(byte[] buffer, int offset, int lenght)
         {
             byte[] buf = new byte[lenght];
             Array.Copy(buffer, offset, buf, 0, lenght);
-            return rsa.EncryptValue(buf);
+            return rsa.Encrypt(buf, true);
         }
 
         public byte[] Peek(byte[] buffer)
         {
             byte[] buf = new byte[InputPacketBuffer.headerLenght];
             Array.Copy(buffer, 0, buf, 0, InputPacketBuffer.headerLenght);
-            return rsa.EncryptValue(buf);
+            return rsa.Encrypt(buf,true);
         }
 
         public object Clone()

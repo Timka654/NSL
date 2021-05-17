@@ -32,12 +32,14 @@ namespace SCL.Utils.SystemPackets
             
             if (result == RecoverySessionResultEnum.Ok)
             {
-                Client.Session = data.ReadString16();
-                Client.RecoverySessionKeyArray = new string[data.ReadInt32()];
+                string session = data.ReadString16();
+                var recoverySessionKeyArray = new string[data.ReadInt32()];
                 for (int i = 0; i < Client.RecoverySessionKeyArray.Count(); i++)
                 {
-                    Client.RecoverySessionKeyArray[i] = data.ReadString16();
+                    recoverySessionKeyArray[i] = data.ReadString16();
                 }
+
+                Client.SetRecoveryData(session, recoverySessionKeyArray);
             }
 
             InvokeEvent(result);

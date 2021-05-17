@@ -19,33 +19,33 @@ namespace SCL.Utils
             Send(Convert.ToUInt16(packetId));
         }
 
-        protected void Send<T>(SPType packetId, T obj, string scheme)
-        {
-            Send(Convert.ToUInt16(packetId), obj, scheme);
-        }
+        //protected void Send<T>(SPType packetId, T obj, string scheme)
+        //{
+        //    Send(Convert.ToUInt16(packetId), obj, scheme);
+        //}
 
         protected RData SendWait(SPType packetId)
         {
             return SendWait(Convert.ToUInt16(packetId));
         }
 
-        protected RData SendWait<T>(SPType packetId, T obj, string scheme)
-        {
-            return SendWait(Convert.ToUInt16(packetId), obj, scheme);
-        }
+        //protected RData SendWait<T>(SPType packetId, T obj, string scheme)
+        //{
+        //    return SendWait(Convert.ToUInt16(packetId), obj, scheme);
+        //}
 
         protected async Task<RData> SendWaitAsync(SPType packetId)
         {
             return await SendWaitAsync(Convert.ToUInt16(packetId));
         }
 
-        protected async Task<RData> SendWaitAsync<T>(SPType packetId, T obj, string scheme)
-        {
-            return await base.SendWaitAsync(Convert.ToUInt16(packetId), obj, scheme);
-        }
+        //protected async Task<RData> SendWaitAsync<T>(SPType packetId, T obj, string scheme)
+        //{
+        //    return await base.SendWaitAsync(Convert.ToUInt16(packetId), obj, scheme);
+        //}
     }
 
-    public class IPacketReceive<TClient, RData> : IPacket<TClient>, ILockedPacket where TClient : BaseSocketNetworkClient
+    public class IPacketReceive<TClient, RData> : IClientPacket<TClient>, ILockedPacket where TClient : BaseSocketNetworkClient
     {
         public IPacketReceive(ClientOptions<TClient> options) : base(options)
         {
@@ -103,14 +103,14 @@ namespace SCL.Utils
             return SendWait(packet);
         }
 
-        protected RData SendWait<T>(ushort packetId, T obj, string scheme)
-        {
-            _dataLocker.WaitOne();
+        //protected RData SendWait<T>(ushort packetId, T obj, string scheme)
+        //{
+        //    _dataLocker.WaitOne();
 
-            base.Send(packetId, obj, scheme);
+        //    base.Send(packetId, obj, scheme);
 
-            return Data;
-        }
+        //    return Data;
+        //}
 
         protected async Task<RData> SendWaitAsync(OutputPacketBuffer packet)
         {
@@ -122,10 +122,10 @@ namespace SCL.Utils
             return await Task.Run(() => SendWait(packetId));
         }
 
-        protected async Task<RData> SendWaitAsync<T>(ushort packetId, T obj, string scheme)
-        {
-            return await Task.Run(() => SendWait(packetId, obj, scheme));
-        }
+        //protected async Task<RData> SendWaitAsync<T>(ushort packetId, T obj, string scheme)
+        //{
+        //    return await Task.Run(() => SendWait(packetId, obj, scheme));
+        //}
 
         public void UnlockPacket()
         {

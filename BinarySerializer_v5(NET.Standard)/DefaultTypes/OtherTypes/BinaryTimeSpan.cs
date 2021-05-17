@@ -9,7 +9,7 @@ using GrEmit.Utils;
 
 namespace BinarySerializer.DefaultTypes
 {
-    public partial class BinaryTimeSpan : IBasicType
+    public class BinaryTimeSpan : IBasicType
     {
         public Type CompareType => typeof(DateTime);
 
@@ -32,8 +32,6 @@ namespace BinarySerializer.DefaultTypes
             writeBitConverterMethodInfo = typeof(BitConverter).GetMethod("GetBytes",new Type[] { typeof(double) });
             readBitConverterMethodInfo = typeof(BitConverter).GetMethod("ToDouble", new Type[] { typeof(byte[]), typeof(int) });
         }
-
-#if NOT_UNITY
 
         public void GetReadILCode(BinaryMemberData prop, BinaryStruct currentStruct, GroboIL il, GroboIL.Local binaryStruct, GroboIL.Local buffer, GroboIL.Local result, GroboIL.Local typeSize, GroboIL.Local offset, bool listValue)
         {
@@ -92,8 +90,5 @@ namespace BinarySerializer.DefaultTypes
             il.ArraySetter(buffer, arr, 8);
             //BinaryStruct.WriteOffsetAppend(il, offset, 8);
         }
-
-#endif
-
     }
 }

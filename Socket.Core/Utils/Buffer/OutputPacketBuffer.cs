@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 
 namespace SocketCore.Utils.Buffer
@@ -19,11 +22,6 @@ namespace SocketCore.Utils.Buffer
         byte[] _buffer = new byte[16];
 
         /// <summary>
-        /// Текущий размер буффера (включая пустые байты)
-        /// </summary>
-        int bufferLenght;
-
-        /// <summary>
         /// маскировка хедера пакета
         /// </summary>
 
@@ -38,16 +36,14 @@ namespace SocketCore.Utils.Buffer
         /// </summary>
         public int Lenght
         {
-            get { return (int)base.Length + headerLenght; }
+            get;
+            private set;
         }
 
         /// <summary>
         /// Полный размер пакета
         /// </summary>
-        public int PacketLenght
-        {
-            get { return Lenght - headerLenght; }
-        }
+        public int PacketLenght => Lenght + headerLenght;
 
         /// <summary>
         /// Индификатор пакета
@@ -68,7 +64,7 @@ namespace SocketCore.Utils.Buffer
         /// Инициализация
         /// </summary>
         /// <param name="len">начальный размер буффера</param>
-        public OutputPacketBuffer(int len = 32)
+        public OutputPacketBuffer(int len = 32) : base()
         {
             //начальный размер буффера необходим для оптимизации пакетов, в случае если пакет имеет заведомо известный размер, его не придется увеличивать что будет экономить время
             //инициализация буффера
@@ -90,6 +86,13 @@ namespace SocketCore.Utils.Buffer
             _buffer[2] = (byte)(TmpValue >> 16);
             _buffer[3] = (byte)(TmpValue >> 24);
             Write(_buffer, 0, 4);
+        }
+
+        public override void Write(byte[] buffer, int offset, int count)
+        {
+            base.Write(buffer, offset, count);
+            if (this.offset > Lenght)
+                Lenght = this.offset;
         }
 
         /// <summary>
@@ -217,6 +220,9 @@ namespace SocketCore.Utils.Buffer
         public override void WriteByte(byte value)
         {
             base.WriteByte(value);
+            if (this.offset > Lenght)
+                Lenght = this.offset;
+
         }
 
         /// <summary>
@@ -256,17 +262,48 @@ namespace SocketCore.Utils.Buffer
                 Write(buf);
         }
 
-        public void WriteDateTime(DateTime? value)
+        public void WriteCollection<T>(IEnumerable<T> arr, Action<OutputPacketBuffer, T> writeAction)
+        {
+            WriteInt32(arr.Count());
+
+            foreach (var item in arr)
+            {
+                writeAction(this, item);
+            }
+        }
+
+        public void WriteNullable<T>(Nullable<T> value, Action trueAction)
+            where T : struct
         {
             if (value.HasValue)
-                WriteDateTime(value.Value);
-            else
-                WriteFloat64(0);
+            {
+                WriteBool(true);
+                trueAction();
+                return;
+            }
+            WriteBool(false);
+        }
+
+        public void WriteNullableClass<T>(T value, Action trueAction)
+            where T : class
+        {
+            if (value != null)
+            {
+                WriteBool(true);
+                trueAction();
+                return;
+            }
+            WriteBool(false);
         }
 
         public void WriteDateTime(DateTime value)
         {
-            WriteFloat64((value - MinDatetimeValue).TotalMilliseconds);
+            WriteInt64((value - MinDatetimeValue).Ticks);
+        }
+
+        public void WriteTimeSpan(TimeSpan value)
+        {
+            WriteInt64(value.Ticks);
         }
 
         public void WriteGuid(Guid value)
@@ -280,7 +317,7 @@ namespace SocketCore.Utils.Buffer
 
         public void Write(byte[] buf)
         {
-            base.Write(buf, 0, buf.Length);
+            Write(buf, 0, buf.Length);
         }
 
 
@@ -301,7 +338,11 @@ namespace SocketCore.Utils.Buffer
                 WriteByte((byte)((Lenght + PacketId) % 14));
             }
 
-            return base.ToArray();
+            var arr = base.ToArray();
+
+            base.Dispose();
+
+            return arr;
         }
     }
 }

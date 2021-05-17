@@ -9,7 +9,7 @@ using GrEmit.Utils;
 
 namespace BinarySerializer.DefaultTypes
 {
-    public partial class BinaryDateTime : IBasicType
+    public class BinaryDateTime : IBasicType
     {
         public Type CompareType => typeof(DateTime);
 
@@ -25,24 +25,17 @@ namespace BinarySerializer.DefaultTypes
 
         private ConstructorInfo datetimeConstructor;
 
-        private MethodInfo debugMethod;
-
         public BinaryDateTime()
         {
             addMethod = typeof(DateTime).GetMethod("AddMilliseconds", new Type[] { typeof(double) });
             substractMethod = typeof(DateTime).GetMethod("Subtract", new Type[] { typeof(DateTime) });
             propertyGetter = typeof(TimeSpan).GetProperty("TotalMilliseconds").GetGetMethod();
             datetimeConstructor = typeof(DateTime).GetConstructor(new Type[] { typeof(int), typeof(int), typeof(int), typeof(int), typeof(int), typeof(int), typeof(int) });
-
-            debugMethod = typeof(Console).GetMethod("WriteLine", new Type[] { typeof(object) });
-
             //var d = new DateTime();
             //d.AddMilliseconds
             writeBitConverterMethodInfo = typeof(BitConverter).GetMethod("GetBytes",new Type[] { typeof(double) });
             readBitConverterMethodInfo = typeof(BitConverter).GetMethod("ToDouble", new Type[] { typeof(byte[]), typeof(int) });
         }
-
-#if NOT_UNITY
 
         public void GetReadILCode(BinaryMemberData prop, BinaryStruct currentStruct, GroboIL il, GroboIL.Local binaryStruct, GroboIL.Local buffer, GroboIL.Local result, GroboIL.Local typeSize, GroboIL.Local offset, bool listValue)
         {
@@ -101,10 +94,7 @@ namespace BinarySerializer.DefaultTypes
                 il.Ldloca(value);
             }
 
-            //il.Box(typeof(DateTime));
-            //il.Call(debugMethod);
-            //il.Ldloca(v);
-
+            il.Ldloca(v);
             il.Ldc_I4(1970);
             il.Ldc_I4(1);
             il.Ldc_I4(1);
@@ -112,11 +102,10 @@ namespace BinarySerializer.DefaultTypes
             il.Ldc_I4(0);
             il.Ldc_I4(0);
             il.Ldc_I4(0);
-            il.Newobj(datetimeConstructor);
+            il.Call(datetimeConstructor);
 
-            //new DateTime()
-            //il.Ldloc(v);
-            //il.Ldloca(v);
+
+            il.Ldloc(v);
             il.Call(substractMethod);
             il.Stloc(t);
             il.Ldloca(t);
@@ -146,7 +135,5 @@ namespace BinarySerializer.DefaultTypes
             il.ArraySetter(buffer, arr, 8);
             //BinaryStruct.WriteOffsetAppend(il, offset, 8);
         }
-
-#endif
     }
 }

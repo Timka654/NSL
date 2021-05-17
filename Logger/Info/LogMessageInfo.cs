@@ -1,6 +1,7 @@
-﻿using System;
+﻿using SocketCore.Utils.Logger.Enums;
+using System;
 
-namespace Logger.Info
+namespace SCLogger.Info
 {
     internal class LogMessageInfo
     {

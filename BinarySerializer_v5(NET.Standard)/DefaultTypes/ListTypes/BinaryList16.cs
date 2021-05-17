@@ -7,7 +7,7 @@ using GrEmit;
 
 namespace BinarySerializer.DefaultTypes
 {
-    public partial class BinaryList16<T> : IBasicType
+    public class BinaryList16<T> : IBasicType
     {
         public Type CompareType => typeof(IList);
 
@@ -19,17 +19,12 @@ namespace BinarySerializer.DefaultTypes
 
         private MethodInfo codingMethodInfo;
 
-        private MethodInfo debugMethodInfo;
-
         public BinaryList16()
         {
             writeBitConverterMethodInfo = typeof(BitConverter).GetMethod("GetBytes", new Type[] { typeof(short) });
             readBitConverterMethodInfo = typeof(BitConverter).GetMethod("ToInt16", new Type[] { typeof(byte[]), typeof(int) });
             codingMethodInfo = typeof(BinaryStruct).GetProperty("Coding").GetMethod;
-            debugMethodInfo = typeof(Console).GetMethod("WriteLine", new Type[] { typeof(object) });
         }
-
-#if NOT_UNITY
 
         public void GetReadILCode(BinaryMemberData prop, BinaryStruct currentStruct, GroboIL il, GroboIL.Local binaryStruct, GroboIL.Local buffer, GroboIL.Local result, GroboIL.Local typeSize, GroboIL.Local offset, bool listValue)
         {
@@ -158,15 +153,6 @@ namespace BinarySerializer.DefaultTypes
             il.ArraySetter(buffer, arrSize, 2);
             //BinaryStruct.WriteOffsetAppend(il, offset, 2);
 
-            //il.Ldstr(prop.MemberInfo.Name);
-            //il.Box(typeof(string));
-            //il.Call(debugMethodInfo);
-
-            //il.Ldloc(len);
-            //il.Box(typeof(int));
-            //il.Call(debugMethodInfo);
-
-
 
             il.Ldloc(len);
             il.Ldc_I4(0);
@@ -216,7 +202,5 @@ namespace BinarySerializer.DefaultTypes
 
             il.MarkLabel(exitLabel);
         }
-
-#endif
     }
 }

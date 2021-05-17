@@ -1,4 +1,5 @@
-﻿using SocketCore.Utils;
+﻿using SocketCore;
+using SocketCore.Utils;
 using SocketCore.Utils.Buffer;
 using SocketServer.Utils.SystemPackets;
 using System.Threading.Tasks;
@@ -7,16 +8,17 @@ namespace SocketServer.Utils
 {
     public class IServerNetworkClient : INetworkClient
     {
-        public ServerOptions ServerOptions { get; set; }
+        public CoreOptions ServerOptions { get; set; }
 
         public async void RunAliveChecker()
         {
             await Task.Delay(AliveCheckTimeOut);
-            while (Network.GetState())
+            do
             {
                 AliveConnection<IServerNetworkClient>.Send(this);
                 await Task.Delay(AliveCheckTimeOut);
             }
+            while (Network.GetState());
         }
 
         public async void RunSyncTime()
@@ -33,9 +35,19 @@ namespace SocketServer.Utils
             base.AddWaitPacket(packet_data, offset, lenght);
         }
 
-        public void Send(OutputPacketBuffer packet)
+        public void Send(OutputPacketBuffer packet
+#if DEBUG
+            , [System.Runtime.CompilerServices.CallerMemberName] string memberName = "",
+            [System.Runtime.CompilerServices.CallerFilePath] string sourceFilePath = "",
+            [System.Runtime.CompilerServices.CallerLineNumber] int sourceLineNumber = 0
+#endif
+            )
         {
+#if DEBUG
+            Network.Send(packet, memberName, sourceFilePath, sourceLineNumber);
+#else
             Network.Send(packet);
+#endif
         }
 
         public virtual void ChangeOwner(IServerNetworkClient client)

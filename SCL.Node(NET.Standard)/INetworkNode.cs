@@ -9,12 +9,18 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using UnityEngine;
 
 namespace SCL.Node
 {
-    public class INetworkNode : MonoBehaviour
+    public interface IBasicNetworkNode
     {
+
+    }
+
+    public class INetworkNode
+    {
+        public Action<Exception> OnException = (ex) => { };
+
         public delegate void CommandHandle(INodePlayer player, NodeInputPacketBuffer buffer);
 
         protected Socket _socket;
@@ -25,11 +31,11 @@ namespace SCL.Node
 
         protected readonly Dictionary<byte, CommandHandle> _commands = new Dictionary<byte, CommandHandle>();
 
-        public void AddPacketHandle(byte id, CommandHandle handle)
+        public virtual void AddPacketHandle(byte id, CommandHandle handle)
         {
             if (_commands.ContainsKey(id))
             {
-                Debug.LogError($"Node network: (AddPacketHandle) packet {id} already exist, be removed and append new");
+                OnException(new Exception($"Node network: (AddPacketHandle) packet {id} already exist, be removed and append new"));
                 _commands.Remove(id);
             }
 
@@ -42,33 +48,6 @@ namespace SCL.Node
             {
                 action.Invoke();
             }
-        }
-
-        private void OnDestroy()
-        {
-            Destroy();
-        }
-
-        public void Destroy()
-        {
-            if (_socket == null)
-                return;
-            var s = _socket;
-            _socket = null;
-            try
-            {
-                s.Close();
-                s.Dispose();
-            }
-            catch (Exception e)
-            {
-                Debug.LogError(e);
-            }
-        }
-
-        private void OnApplicationQuit()
-        {
-            //NatUtility.StopDiscovery();
         }
 
     }
@@ -84,7 +63,6 @@ namespace SCL.Node
             _actions.Enqueue(() => { OnReceivePacket?.Invoke(player, packet); });
         }
 #endif
-
 
         protected ManualResetEvent _uPnPLocker = new ManualResetEvent(false);
 
@@ -127,7 +105,7 @@ namespace SCL.Node
             {
                 InitResult = false;
                 //_socket?.Dispose();
-                Debug.LogError(ex.ToString());
+                OnException(ex);
             }
             _uPnPLocker.Set();
         }
@@ -141,7 +119,7 @@ namespace SCL.Node
             }
             //_socket?.Dispose();
             InitResult = false;
-            Debug.LogError("Router device is lost");
+            OnException(new Exception("Router device is lost"));
             _uPnPLocker?.Set();
         }
 
@@ -155,6 +133,5 @@ namespace SCL.Node
         }
 
         #endregion
-
     }
 }

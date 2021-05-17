@@ -1,4 +1,5 @@
-﻿using SocketCore.Utils.Buffer;
+﻿using SocketCore.Utils;
+using SocketCore.Utils.Buffer;
 using SocketCore.Utils.SystemPackets.Enums;
 
 namespace SocketServer.Utils
@@ -25,7 +26,7 @@ namespace SocketServer.Utils.SystemPackets
             Instance = this;
         }
 
-        public void Receive(T client, InputPacketBuffer data)
+        public override void Receive(T client, InputPacketBuffer data)
         {
             string session = data.ReadString16();
 

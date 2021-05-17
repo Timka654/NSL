@@ -32,10 +32,23 @@ namespace DBEngine.Extensions.Reader
         /// </summary>
         /// <param name="r"></param>
         /// <param name="ordinal"></param>
-        /// <returns>default ?? Value</returns>
+        /// <returns>Value ?? default</returns>
         public static T Def<T>(this DbDataReader r, int ord)
         {
             if (r.IsDBNull(ord)) return default;
+            var t = r.GetValue(ord);
+            return (T)t;
+        }
+
+        /// <summary>
+        /// Получить значение указанного типа с поля которое поддерживает значение NULL
+        /// </summary>
+        /// <param name="r"></param>
+        /// <param name="ordinal"></param>
+        /// <returns>Value ?? defaultValue</returns>
+        public static T Def<T>(this DbDataReader r, int ord, T defaultValue)
+        {
+            if (r.IsDBNull(ord)) return defaultValue;
             var t = r.GetValue(ord);
             return (T)t;
         }

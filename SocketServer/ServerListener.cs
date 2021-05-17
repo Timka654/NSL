@@ -1,4 +1,5 @@
-﻿using SocketServer.Utils;
+﻿using SocketCore;
+using SocketServer.Utils;
 using System;
 using System.Net;
 using System.Net.Sockets;
@@ -7,10 +8,8 @@ namespace SocketServer
 {
     public class ServerListener<T> where T : IServerNetworkClient
     {
-#if DEBUG
-        public event ReceivePacketDebugInfo<T> OnReceivePacket;
-        public event SendPacketDebugInfo<T> OnSendPacket;
-#endif
+        public event ReceivePacketDebugInfo<ServerClient<T>> OnReceivePacket;
+        public event SendPacketDebugInfo<ServerClient<T>> OnSendPacket;
         /// <summary>
         /// Слушатель порта (сервер)
         /// </summary>
@@ -81,7 +80,7 @@ namespace SocketServer
             }
             catch (Exception ex)
             {
-                serverOptions.RunExtension(ex, null);
+                serverOptions.RunException(ex, null);
             }
             listener = null;
         }
@@ -104,18 +103,18 @@ namespace SocketServer
                 //получения ожидающего подключения
                 client = listener.EndAccept(result);
                 //инициализация слушателя клиента клиента
-#if DEBUG
+//#if DEBUG
                 var c = new ServerClient<T>(client, serverOptions);
                 c.OnReceivePacket += OnReceivePacket;
                 c.OnSendPacket += OnSendPacket;
                 c.RunPacketReceiver();
-#else
-                new ServerClient<T>(client, serverOptions).RunPacketReceiver();
-#endif
+//#else
+//                new ServerClient<T>(client, serverOptions).RunPacketReceiver();
+//#endif
             }
             catch (Exception ex)
             {
-                serverOptions.RunExtension(ex, null);
+                serverOptions.RunException(ex, null);
             }
             //продолжаем принимать запросы
             listener.BeginAccept(Accept, listener);

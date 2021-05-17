@@ -1,4 +1,5 @@
-﻿using SocketCore.Utils.Buffer;
+﻿using SocketCore.Utils;
+using SocketCore.Utils.Buffer;
 using SocketServer.Utils;
 using System;
 using System.Collections.Generic;
@@ -13,7 +14,7 @@ namespace ProxyHostClient.Packets.Auth
     public class GetProxyServer : IPacket<ProxyHostClientData>
     {
         public event GetProxyServerHandle OnReceive;
-        public void Receive(ProxyHostClientData client, InputPacketBuffer data)
+        public override void Receive(ProxyHostClientData client, InputPacketBuffer data)
         {
             bool result = data.ReadBool();
             int roomId = data.ReadInt32();

@@ -45,7 +45,7 @@ namespace DBEngine
         /// <summary>
         /// Добавить подключение
         /// </summary>
-        public async Task Add(ConnectionOptions options)
+        public async Task AddAsync(ConnectionOptions options)
         {
             if (ConnectionOptions != null)
                 throw new Exception("You can initialize pool only one time");
@@ -58,7 +58,7 @@ namespace DBEngine
                 {
                     for (int h = 0; h < options.CSOptions.PoolSize; h++)
                     {
-                        await CreateConnection();
+                        await CreateConnectionAsync();
                     }
 
                     return;
@@ -76,6 +76,55 @@ namespace DBEngine
                 new Exception("Drop application by DbConnectionPool");
         }
 
+        /// <summary>
+        /// Добавить подключение
+        /// </summary>
+        public void Add(ConnectionOptions options)
+        {
+            if (ConnectionOptions != null)
+                throw new Exception("You can initialize pool only one time");
+
+            ConnectionOptions = options;
+
+            for (int i = 0; (i < options.RecoveryTryCount && options.RecoveryWhenFailedTry) || !options.RecoveryWhenFailedTry; i++)
+            {
+                int h;
+
+                for (h = 0; h < ConnectionOptions.CSOptions.PoolSize; h++)
+                {
+                    if (CreateNew() == false && !ConnectionOptions.RecoveryWhenFailedTry)
+                        break;
+                }
+                if (h == ConnectionOptions.CSOptions.PoolSize)
+                    return;
+            }
+
+            if (options.DropApplicationWhenFailed)
+                new Exception("Drop application by DbConnectionPool");
+        }
+
+
+        public bool CreateNew()
+        {
+            try
+            {
+                    CreateConnection();
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                DbExceptionEvent?.Invoke(null, ex);
+                System.Threading.Thread.Sleep(ConnectionOptions.RecoveryTryDelay * 1000);
+
+            }
+            return false;
+        }
+
+        public void Remove(T conn)
+        {
+            Pool.TryRemove(conn, out var dummy);
+        }
 
         public override DbConnection GetDbConnection()
         {
@@ -165,10 +214,23 @@ namespace DBEngine
         private async void Connection_Disposed(object sender, EventArgs e)
         {
             Pool.TryRemove((T)sender, out var r);
-            await CreateConnection();
+            await CreateConnectionAsync();
         }
 
-        private async Task CreateConnection()
+        private void CreateConnection()
+        {
+            T connection = Activator.CreateInstance<T>();
+
+            connection.ConnectionString = ConnectionOptions.ConnectionString;
+            connection.Open();
+            connection.Close();
+
+            connection.StateChange += V_StateChange;
+            connection.Disposed += Connection_Disposed;
+            Pool.TryAdd(connection, true);
+        }
+
+        private async Task CreateConnectionAsync()
         {
             T connection = Activator.CreateInstance<T>();
 

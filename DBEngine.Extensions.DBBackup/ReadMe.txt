@@ -10,7 +10,6 @@ Version	nvarchar(25)	Unchecked
 Time	smalldatetime	Unchecked
 
 Хранимые процедуры
-
 -----------------------------------------
 PROCEDURE [dbo].[create_backup]
 @version nvarchar(42),

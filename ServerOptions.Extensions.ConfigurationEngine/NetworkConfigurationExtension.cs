@@ -1,4 +1,6 @@
 ﻿using ConfigurationEngine;
+using SocketCore;
+using SocketCore.Utils;
 using SocketServer;
 using SocketServer.Utils;
 using System;
@@ -47,14 +49,24 @@ namespace ServerOptions.Extensions.ConfigurationEngine
         public static ServerOptions<T> LoadConfigurationServerOptions<T>(this IConfigurationManager configuration, string networkNodePath)
             where T : IServerNetworkClient
         {
-            return new ServerOptions<T>
+            var r = configuration.LoadConfigurationCoreOptions<ServerOptions<T>, T>(networkNodePath);
+
+            r.Backlog = configuration.GetValue<int>($"{networkNodePath}.io.backlog");
+
+            return r;
+        }
+
+        public static T LoadConfigurationCoreOptions<T, TType>(this IConfigurationManager configuration, string networkNodePath)
+            where T : CoreOptions<TType>, new()
+            where TType : INetworkClient
+        {
+            return new T
             {
-                IpAddress = configuration.GetValue($"{networkNodePath}/io.ip"),
-                Port = configuration.GetValue<int>($"{networkNodePath}/io.port"),
-                Backlog = configuration.GetValue<int>($"{networkNodePath}/io.backlog"),
-                AddressFamily = configuration.GetIPv($"{networkNodePath}/io.ipv"),
-                ProtocolType = configuration.GetProtocolType($"{networkNodePath}/io.protocol"),
-                ReceiveBufferSize = configuration.GetValue<int>($"{networkNodePath}/io.buffer.size"),
+                IpAddress = configuration.GetValue($"{networkNodePath}.io.ip"),
+                Port = configuration.GetValue<int>($"{networkNodePath}.io.port"),
+                AddressFamily = configuration.GetIPv($"{networkNodePath}.io.ipv"),
+                ProtocolType = configuration.GetProtocolType($"{networkNodePath}.io.protocol"),
+                ReceiveBufferSize = configuration.GetValue<int>($"{networkNodePath}.io.buffer.size"),
             };
         }
     }

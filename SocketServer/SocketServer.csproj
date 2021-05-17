@@ -1,26 +1,40 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
     <Platforms>AnyCPU;x64;x86</Platforms>
-    <Configurations>Debug;Release;PublishDebug;Unity;UnityDebug;DebugStable;ASP.NET</Configurations>
+    <Configurations>Debug;Release;PublishDebug;Unity;UnityDebug;DebugStable</Configurations>
+    
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Version>$(VersionSuffix)</Version>
+    <Description>Базовая библиотека содержащая классы для реализации TCP сервера</Description>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='PublishDebug|AnyCPU'">
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+  <PropertyGroup Condition="'$(Configuration)'=='Debug'">
+    <PackageId>$(MSBuildProjectName)_Debug</PackageId>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='PublishDebug|x64'">
+  <PropertyGroup Condition="'$(Configuration)'=='PublishDebug'">
     <DefineConstants>DEBUG;TRACE</DefineConstants>
   </PropertyGroup>
+  
+  <!--<PropertyGroup Condition="'$(Configuration)'=='Debug'">
+    <PackageId>$(AssemblyName).Develop</PackageId>
+  </PropertyGroup>-->
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='UnityDebug|AnyCPU'">
+      <TargetFramework>netstandard2.0</TargetFramework>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Unity|AnyCPU'">
+      <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Logger\Logger.csproj" />
-    <ProjectReference Include="..\SocketCore.Extensions.BinarySerializer(NET.Standard)\SocketCore.Extensions.BinarySerializer.csproj" />
+    <ProjectReference Include="..\Socket.Core\SocketCore.csproj" />
   </ItemGroup>
 
 </Project>

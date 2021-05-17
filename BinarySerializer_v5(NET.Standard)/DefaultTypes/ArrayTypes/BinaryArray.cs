@@ -7,7 +7,7 @@ using GrEmit;
 
 namespace BinarySerializer.DefaultTypes
 {
-    public partial class BinaryArray<T> : IBasicType
+    public class BinaryArray<T> : IBasicType
     {
         public Type CompareType => null;
 
@@ -24,7 +24,6 @@ namespace BinarySerializer.DefaultTypes
             codingMethodInfo = typeof(BinaryStruct).GetProperty("Coding").GetMethod;
         }
 
-#if NOT_UNITY
         public void GetReadILCode(BinaryMemberData prop, BinaryStruct currentStruct, GroboIL il, GroboIL.Local binaryStruct, GroboIL.Local buffer, GroboIL.Local result, GroboIL.Local typeSize, GroboIL.Local offset, bool listValue)
         {
             var exitLabel = il.DefineLabel("exit");
@@ -168,6 +167,5 @@ namespace BinarySerializer.DefaultTypes
             il.Clt(false);
             il.Brtrue(point);
         }
-#endif
     }
 }

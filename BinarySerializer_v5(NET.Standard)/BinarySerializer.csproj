@@ -1,31 +1,23 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0</TargetFrameworks>
+    <TargetFramework>net5.0</TargetFramework>
     <RootNamespace>BinarySerializer</RootNamespace>
     <AssemblyName>BinarySerializer</AssemblyName>
     <Configurations>Debug;Release;Unity;UnityDebug</Configurations>
-    <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DefineConstants>TRACE;NOT_UNITY</DefineConstants>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DefineConstants>NOT_UNITY</DefineConstants>
-  </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='UnityDebug|AnyCPU'">
     <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <OutputPath>D:\SSDContent\ssd backup\2019-10-09_21-33-33\E\AppFox\SocketServerLibrary\UnityDebug\</OutputPath>
+    <OutputPath>..\UnityDebug\</OutputPath>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="System.Numerics.Vectors" Version="4.6.0-preview5.19224.8" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\GREMIT\GrEmit\GrEmit.csproj" />
   </ItemGroup>
 
   <ItemGroup>

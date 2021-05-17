@@ -1,10 +1,23 @@
-﻿namespace Logger
+﻿using SocketCore.Utils.Logger.Enums;
+using System;
+
+namespace SCLogger
 {
     public class FileLogger : BaseLogger
     {
         public static FileLogger Initialize()
         {
-            FileLogger fl = LoggerStorage.InitializeLogger<FileLogger>("main", "log", "logs", 5000);
+            return Initialize("logs");
+        }
+
+        public static FileLogger Initialize(string logsDir, string fileName = "log {date}",  int delayOutput = 5000, string instanceName = "{auto}")
+        {
+            if (instanceName == "{auto}")
+                instanceName = Guid.NewGuid().ToString();
+
+            FileLogger fl = LoggerStorage.InitializeLogger<FileLogger>(instanceName, fileName, logsDir, delayOutput);
+
+            fl.InstanceName = instanceName;
 
             fl.SetUnhandledExCatch(true);
             fl.SetConsoleOutput(true);
@@ -30,6 +43,11 @@
         public void AppendInfo(string text)
         {
             base.Append(LoggerLevel.Info, text);
+        }
+
+        public new void Flush()
+        {
+            base.Flush();
         }
     }
 }

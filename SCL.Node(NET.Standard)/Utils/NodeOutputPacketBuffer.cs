@@ -5,7 +5,6 @@ using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading.Tasks;
-using UnityEngine;
 
 namespace SCL.Node.Utils
 {
@@ -107,19 +106,6 @@ namespace SCL.Node.Utils
         public async Task WriteAsync(float value)
         {
             await WriteAsync(BitConverter.GetBytes(value), 0, 4);
-        }
-
-        public void WriteVector2(Vector2 value)
-        {
-            WriteFloat32(value.x);
-            WriteFloat32(value.y);
-        }
-
-        public void WriteVector3(Vector3 value)
-        {
-            WriteFloat32(value.x);
-            WriteFloat32(value.y);
-            WriteFloat32(value.z);
         }
 
 

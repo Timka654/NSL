@@ -1,5 +1,4 @@
 ﻿using SocketCore;
-using SocketCore.Extensions.BinarySerializer;
 using SocketCore.Utils;
 using SocketCore.Utils.Buffer;
 using SocketCore.Utils.Exceptions;
@@ -20,11 +19,6 @@ namespace SocketServer
         public int len { get; set; }
     }
 
-#if DEBUG
-    public delegate void ReceivePacketDebugInfo<T>(ServerClient<T> client, ushort pid, int len) where T : IServerNetworkClient;
-    public delegate void SendPacketDebugInfo<T>(ServerClient<T> client, ushort pid, int len, string memberName, string sourceFilePath, int sourceLineNumber) where T : IServerNetworkClient;
-#endif
-
     /// <summary>
     /// Класс обработки клиента
     /// </summary>
@@ -32,10 +26,8 @@ namespace SocketServer
     {
         private T Data { get; set; }
 
-#if DEBUG
-        public event ReceivePacketDebugInfo<T> OnReceivePacket;
-        public event SendPacketDebugInfo<T> OnSendPacket;
-#endif
+        public event ReceivePacketDebugInfo<ServerClient<T>> OnReceivePacket;
+        public event SendPacketDebugInfo<ServerClient<T>> OnSendPacket;
 
         /// <summary>
         /// Общие настройки сервера
@@ -202,9 +194,9 @@ namespace SocketServer
                     //получаем размер пакета
                     byte[] peeked = inputCipher.Peek(receiveBuffer);
                     lenght = BitConverter.ToInt32(peeked, 0);
-#if DEBUG
+//#if DEBUG
                     OnReceivePacket?.Invoke(this, BitConverter.ToUInt16(peeked, 4), lenght);
-#endif
+//#endif
                     data = true;
                 }
 
@@ -222,6 +214,7 @@ namespace SocketServer
                     //ищем пакет и выполняем его, передаем ему данные сессии, полученные данные, и просим у него данные для передачи
                     serverOptions.Packets[pbuff.PacketId].Receive(Data, pbuff);
 
+                    pbuff.Dispose();
                     data = false;
                     //перезапускаем последовательность
                 }
@@ -229,11 +222,11 @@ namespace SocketServer
             }
             catch (ConnectionLostException clex)
             {
-                serverOptions.RunExtension(clex, Data);
+                serverOptions.RunException(clex, Data);
             }
             catch (Exception ex)
             {
-                serverOptions.RunExtension(ex, Data);
+                serverOptions.RunException(ex, Data);
                 Disconnect();
             }
         }
@@ -252,26 +245,10 @@ namespace SocketServer
         {
 #if DEBUG
             OnSendPacket?.Invoke(this, rbuff.PacketId, rbuff.PacketLenght, memberName, sourceFilePath, sourceLineNumber);
+#else
+            OnSendPacket?.Invoke(this, rbuff.PacketId, rbuff.PacketLenght);
 #endif
             Send(rbuff.CompilePacket(), 0, rbuff.PacketLenght);
-        }
-
-        public void SendSerialize<O>(ushort packetId, O obj, string scheme
-#if DEBUG
-            , [System.Runtime.CompilerServices.CallerMemberName] string memberName = "",
-            [System.Runtime.CompilerServices.CallerFilePath] string sourceFilePath = "",
-            [System.Runtime.CompilerServices.CallerLineNumber] int sourceLineNumber = 0
-#endif
-            )
-        {
-            var rbuff = new OutputPacketBuffer { PacketId = packetId };
-            rbuff.Serialize<O>(obj, scheme);
-
-#if DEBUG
-            OnSendPacket?.Invoke(this, rbuff.PacketId, rbuff.PacketLenght, memberName, sourceFilePath, sourceLineNumber);
-#endif
-            Send(rbuff.CompilePacket(), 0, rbuff.PacketLenght);
-
         }
 
         private AutoResetEvent _sendLocker = new AutoResetEvent(true);
@@ -321,7 +298,7 @@ namespace SocketServer
             {
                 var sas = ((SendAsyncState)r.AsyncState);
                 Data?.AddWaitPacket(sas.buf, sas.offset, sas.len);
-                serverOptions.RunExtension(clex, Data);
+                serverOptions.RunException(clex, Data);
             }
             catch
             {
@@ -374,6 +351,8 @@ namespace SocketServer
 
 #if DEBUG
             OnSendPacket?.Invoke(this, rbuff.PacketId, rbuff.PacketLenght, memberName, sourceFilePath, sourceLineNumber);
+#else
+            OnSendPacket?.Invoke(this, rbuff.PacketId, rbuff.PacketLenght);
 #endif
             Send(rbuff.CompilePacket(), 0, rbuff.PacketLenght);
         }
@@ -395,6 +374,8 @@ namespace SocketServer
 
 #if DEBUG
             OnSendPacket?.Invoke(this, rbuff.PacketId, rbuff.PacketLenght, memberName, sourceFilePath, sourceLineNumber);
+#else
+            OnSendPacket?.Invoke(this, rbuff.PacketId, rbuff.PacketLenght);
 #endif
             Send(rbuff.CompilePacket(), 0, rbuff.PacketLenght);
         }
@@ -416,6 +397,8 @@ namespace SocketServer
 
 #if DEBUG
             OnSendPacket?.Invoke(this, rbuff.PacketId, rbuff.PacketLenght, memberName, sourceFilePath, sourceLineNumber);
+#else
+            OnSendPacket?.Invoke(this, rbuff.PacketId, rbuff.PacketLenght);
 #endif
             Send(rbuff.CompilePacket(), 0, rbuff.PacketLenght);
         }
@@ -437,6 +420,8 @@ namespace SocketServer
 
 #if DEBUG
             OnSendPacket?.Invoke(this, rbuff.PacketId, rbuff.PacketLenght, memberName, sourceFilePath, sourceLineNumber);
+#else
+            OnSendPacket?.Invoke(this, rbuff.PacketId, rbuff.PacketLenght);
 #endif
             Send(rbuff.CompilePacket(), 0, rbuff.PacketLenght);
         }
@@ -458,6 +443,8 @@ namespace SocketServer
 
 #if DEBUG
             OnSendPacket?.Invoke(this, rbuff.PacketId, rbuff.PacketLenght, memberName, sourceFilePath, sourceLineNumber);
+#else
+            OnSendPacket?.Invoke(this, rbuff.PacketId, rbuff.PacketLenght);
 #endif
             Send(rbuff.CompilePacket(), 0, rbuff.PacketLenght);
         }
@@ -479,6 +466,8 @@ namespace SocketServer
 
 #if DEBUG
             OnSendPacket?.Invoke(this, rbuff.PacketId, rbuff.PacketLenght, memberName, sourceFilePath, sourceLineNumber);
+#else
+            OnSendPacket?.Invoke(this, rbuff.PacketId, rbuff.PacketLenght);
 #endif
             Send(rbuff.CompilePacket(), 0, rbuff.PacketLenght);
         }
@@ -500,6 +489,8 @@ namespace SocketServer
 
 #if DEBUG
             OnSendPacket?.Invoke(this, rbuff.PacketId, rbuff.PacketLenght, memberName, sourceFilePath, sourceLineNumber);
+#else
+            OnSendPacket?.Invoke(this, rbuff.PacketId, rbuff.PacketLenght);
 #endif
             Send(rbuff.CompilePacket(), 0, rbuff.PacketLenght);
         }
@@ -521,6 +512,8 @@ namespace SocketServer
 
 #if DEBUG
             OnSendPacket?.Invoke(this, rbuff.PacketId, rbuff.PacketLenght, memberName, sourceFilePath, sourceLineNumber);
+#else
+            OnSendPacket?.Invoke(this, rbuff.PacketId, rbuff.PacketLenght);
 #endif
             Send(rbuff.CompilePacket(), 0, rbuff.PacketLenght);
         }
@@ -542,6 +535,8 @@ namespace SocketServer
 
 #if DEBUG
             OnSendPacket?.Invoke(this, rbuff.PacketId, rbuff.PacketLenght, memberName, sourceFilePath, sourceLineNumber);
+#else
+            OnSendPacket?.Invoke(this, rbuff.PacketId, rbuff.PacketLenght);
 #endif
             Send(rbuff.CompilePacket(), 0, rbuff.PacketLenght);
         }
@@ -563,6 +558,8 @@ namespace SocketServer
 
 #if DEBUG
             OnSendPacket?.Invoke(this, rbuff.PacketId, rbuff.PacketLenght, memberName, sourceFilePath, sourceLineNumber);
+#else
+            OnSendPacket?.Invoke(this, rbuff.PacketId, rbuff.PacketLenght);
 #endif
             Send(rbuff.CompilePacket(), 0, rbuff.PacketLenght);
         }
@@ -584,11 +581,14 @@ namespace SocketServer
 
 #if DEBUG
             OnSendPacket?.Invoke(this, rbuff.PacketId, rbuff.PacketLenght, memberName, sourceFilePath, sourceLineNumber);
+#else
+            OnSendPacket?.Invoke(this, rbuff.PacketId, rbuff.PacketLenght);
 #endif
+
             Send(rbuff.CompilePacket(), 0, rbuff.PacketLenght);
         }
 
-        public void Send(ushort packetId, DateTime? value
+        public void Send(ushort packetId, DateTime value
 #if DEBUG
             , [System.Runtime.CompilerServices.CallerMemberName] string memberName = "",
             [System.Runtime.CompilerServices.CallerFilePath] string sourceFilePath = "",
@@ -605,6 +605,8 @@ namespace SocketServer
 
 #if DEBUG
             OnSendPacket?.Invoke(this, rbuff.PacketId, rbuff.PacketLenght, memberName, sourceFilePath, sourceLineNumber);
+#else
+            OnSendPacket?.Invoke(this, rbuff.PacketId, rbuff.PacketLenght);
 #endif
             Send(rbuff.CompilePacket(), 0, rbuff.PacketLenght);
         }
@@ -626,6 +628,8 @@ namespace SocketServer
 
 #if DEBUG
             OnSendPacket?.Invoke(this, rbuff.PacketId, rbuff.PacketLenght, memberName, sourceFilePath, sourceLineNumber);
+#else
+            OnSendPacket?.Invoke(this, rbuff.PacketId, rbuff.PacketLenght);
 #endif
             Send(rbuff.CompilePacket(), 0, rbuff.PacketLenght);
         }

@@ -1,4 +1,5 @@
 ﻿using Cipher;
+using SocketCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -42,13 +43,13 @@ namespace SCL.Unity
             outputCipher = new PacketNoneCipher(),
         };
 
-        protected virtual void Awake()
+        protected virtual async void Awake()
         {
             if (InitializeOnAwake)
-                StartClient();
+                await StartClient();
         }
 
-        public async void StartClient()
+        public async Task StartClient()
         {
             if (SocketOptions.NetworkClient != null)
             {
@@ -66,22 +67,24 @@ namespace SCL.Unity
 
             SocketOptions.OnClientConnectEvent += SocketOptions_OnClientConnectEvent;
             SocketOptions.OnClientDisconnectEvent += SocketOptions_OnClientDisconnectEvent;
-            SocketOptions.OnExtensionEvent += SocketOptions_OnExtensionEvent;
+            SocketOptions.OnExceptionEvent += SocketOptions_OnExtensionEvent;
             SocketOptions.NetworkClient = new SocketClient<T, SCL.ClientOptions<T>>(SocketOptions);
             SocketOptions.NetworkClient.Version = Version;
-#if DEBUG
+
             SocketOptions.NetworkClient.OnReceivePacket += NetworkClient_OnReceivePacket;
             SocketOptions.NetworkClient.OnSendPacket += NetworkClient_OnSendPacket;
-#endif
+
             if (ConnectOnAwake)
             {
                 await ConnectAsync();
             }
         }
-
 #if DEBUG
 
+        protected virtual void NetworkClient_OnSendPacket(SCL.Client<T> client, ushort pid, int len, string memberName = "", string sourceFilePath = "", int sourceLineNumber = 0)
+#else
         protected virtual void NetworkClient_OnSendPacket(SCL.Client<T> client, ushort pid, int len)
+#endif
         {
             if(LogEnabled)
                 Debug.Log($"{ClientType} packet send pid:{pid} len:{len}");
@@ -93,15 +96,14 @@ namespace SCL.Unity
                 Debug.Log($"{ClientType} packet receive pid:{pid} len:{len}");
         }
 
-#endif
-
         protected virtual void LoadPackets()
         {
         }
 
         protected virtual void SocketOptions_OnExtensionEvent(Exception ex, T client)
         {
-            Debug.LogError(ex.ToString());
+            ThreadHelper.InvokeOnMain(() =>
+            Debug.LogError(ex.ToString()));
         }
 
         protected virtual void SocketOptions_OnClientConnectEvent(T client)
@@ -123,19 +125,19 @@ namespace SCL.Unity
             }
         }
 
-        public static event ClientOptions<T>.ExtensionHandleDelegate OnExtensionEvent
+        public static event CoreOptions<T>.ExceptionHandle OnExtensionEvent
         {
-            add { SocketOptions.OnExtensionEvent += value; }
-            remove { SocketOptions.OnExtensionEvent -= value; }
+            add { SocketOptions.OnExceptionEvent += value; }
+            remove { SocketOptions.OnExceptionEvent -= value; }
         }
 
-        public static event ClientOptions<T>.ClientConnectedDelegate OnClientConnectEvent
+        public static event CoreOptions<T>.ClientConnect OnClientConnectEvent
         {
             add { SocketOptions.OnClientConnectEvent += value; }
             remove { SocketOptions.OnClientConnectEvent -= value; }
         }
 
-        public static event ClientOptions<T>.ClientDisconnectedDelegate OnClientDisconnectEvent
+        public static event CoreOptions<T>.ClientDisconnect OnClientDisconnectEvent
         {
             add { SocketOptions.OnClientDisconnectEvent += value; }
             remove { SocketOptions.OnClientDisconnectEvent -= value; }

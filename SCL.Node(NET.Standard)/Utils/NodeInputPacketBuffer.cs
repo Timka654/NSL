@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using UnityEngine;
 
 namespace SCL.Node.Utils
 {
@@ -124,16 +123,6 @@ namespace SCL.Node.Utils
         public async Task<float> ReadFloatAsync()
         {
             return await Task.FromResult<float>(BitConverter.ToSingle(buffer, offset - 4));
-        }
-
-        public Vector2 ReadVector2()
-        {
-            return new Vector2(ReadFloat(), ReadFloat());
-        }
-
-        public Vector3 ReadVector3()
-        {
-            return new Vector3(ReadFloat(), ReadFloat(), ReadFloat());
         }
 
         /// <summary>

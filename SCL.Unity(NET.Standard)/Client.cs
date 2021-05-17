@@ -15,10 +15,17 @@ namespace SCL.Unity
         {
             ThreadHelper.InvokeOnMain(()=>base.OnReceive(pid, len));
         }
-
-        protected override void OnSend(OutputPacketBuffer rbuff)
+        protected override void OnSend(OutputPacketBuffer rbuff
+#if DEBUG
+            , string memberName = "",
+     string sourceFilePath = "",
+     int sourceLineNumber = 0
+#endif
+            )
         {
-            ThreadHelper.InvokeOnMain(() => base.OnSend(rbuff));
+#if DEBUG
+            ThreadHelper.InvokeOnMain(() => base.OnSend(rbuff, memberName, sourceFilePath, sourceLineNumber));
+#endif
         }
     }
 }

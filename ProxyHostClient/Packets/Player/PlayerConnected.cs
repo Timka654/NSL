@@ -1,4 +1,5 @@
 ﻿using ProxyHostClient.Packets.Player.PacketData;
+using SocketCore.Utils;
 using SocketCore.Utils.Buffer;
 using SocketServer.Utils;
 using System;
@@ -12,7 +13,7 @@ namespace ProxyHostClient.Packets.Player
     {
         public event ProxyHostClient.OnPlayerConnectedDelegate OnReceive;
 
-        public void Receive(ProxyHostClientData client, InputPacketBuffer data)
+        public override void Receive(ProxyHostClientData client, InputPacketBuffer data)
         {
             PlayerConnectedPacketData result = new PlayerConnectedPacketData();
 

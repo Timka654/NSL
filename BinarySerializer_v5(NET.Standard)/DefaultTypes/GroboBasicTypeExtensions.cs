@@ -58,13 +58,5 @@ namespace BinarySerializer.DefaultTypes
 
             il.Call(writeMethod, isVirtual: writeMethod.IsVirtual);
         }
-
-        public static object GetDefaultValue(this Type t)
-        {
-            if (t.IsValueType)
-                return Activator.CreateInstance(t);
-
-            return null;
-        }
     }
 }

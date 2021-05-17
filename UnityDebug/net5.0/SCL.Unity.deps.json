@@ -1,0 +1,65 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v5.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v5.0": {
+      "SCL.Unity/2021.05.16.2309": {
+        "dependencies": {
+          "Cipher_Debug": "2021.5.16.2309",
+          "SCL_Debug": "2021.5.16.2309",
+          "SocketCore_Debug": "2021.5.16.2309"
+        },
+        "runtime": {
+          "SCL.Unity.dll": {}
+        }
+      },
+      "Cipher_Debug/2021.5.16.2309": {
+        "dependencies": {
+          "SocketCore_Debug": "2021.5.16.2309"
+        },
+        "runtime": {
+          "Cipher.dll": {}
+        }
+      },
+      "SCL_Debug/2021.5.16.2309": {
+        "dependencies": {
+          "Cipher_Debug": "2021.5.16.2309",
+          "SocketCore_Debug": "2021.5.16.2309"
+        },
+        "runtime": {
+          "SCL.dll": {}
+        }
+      },
+      "SocketCore_Debug/2021.5.16.2309": {
+        "runtime": {
+          "SocketCore.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "SCL.Unity/2021.05.16.2309": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Cipher_Debug/2021.5.16.2309": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "SCL_Debug/2021.5.16.2309": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "SocketCore_Debug/2021.5.16.2309": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}

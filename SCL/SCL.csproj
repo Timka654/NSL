@@ -1,19 +1,32 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0</TargetFrameworks>
+    <TargetFramework>net5.0</TargetFramework>
     <Configurations>Debug;Release;Unity;UnityDebug</Configurations>
+    
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Version>$(VersionSuffix)</Version>
+    <Description>Базовая библиотека для создания клиента с логикой взаимодействия совместимой с сервером созданным при помощи пакета SocketServer</Description>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)'=='Debug'">
+    <PackageId>$(MSBuildProjectName)_Debug</PackageId>
+  </PropertyGroup>
+
+  <!--<PropertyGroup Condition="'$(Configuration)'=='Debug'">
+    <PackageId>$(AssemblyName).Develop</PackageId>
+  </PropertyGroup>-->
+
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='UnityDebug|AnyCPU'">
+    <TargetFramework>netstandard2.0</TargetFramework>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <OutputPath>D:\Projects\AppFox\SocketServerLibrary\UnityDebug\</OutputPath>
+    <OutputPath>..\UnityDebug</OutputPath>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Cipher(NET.Standard)\Cipher.csproj" />
     <ProjectReference Include="..\Socket.Core\SocketCore.csproj" />
-    <ProjectReference Include="..\SocketCore.Extensions.BinarySerializer(NET.Standard)\SocketCore.Extensions.BinarySerializer.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,4 +1,4 @@
-﻿namespace Logger
+﻿namespace SCLogger
 {
     public class LoggerStorage : DynamicLogger
     {
@@ -21,6 +21,20 @@
             logger.Initialize(fname, path, delay);
 
             return logger;
+        }
+
+        public static void DestroyLogger(string name)
+        {
+            var instance = Instance.dictionary[name];
+
+            if (instance != null)
+            {
+                if (instance is BaseLogger bl)
+                {
+                    bl.Dispose();
+                }
+                Instance.dictionary[name] = null;
+            }
         }
     }
 }

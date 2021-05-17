@@ -1,8 +1,9 @@
-﻿using System;
+﻿using SocketCore.Utils.Logger.Enums;
+using System;
 using System.Dynamic;
 using System.Threading.Tasks;
 
-namespace Logger
+namespace SCLogger
 {
     internal class ConsoleLogger : DynamicObject
     {
@@ -35,6 +36,9 @@ namespace Logger
                             break;
                     }
                     Console.WriteLine(text);
+#if DEBUG
+                    System.Diagnostics.Debug.WriteLine(text);
+#endif
                 }
             });
         }

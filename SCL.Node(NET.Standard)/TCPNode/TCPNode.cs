@@ -9,7 +9,6 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
-using UnityEngine;
 
 namespace SCL.Node.TCPNode
 {
@@ -20,6 +19,8 @@ namespace SCL.Node.TCPNode
         public event AppendClientHandle OnAppendClientEvent;
 
         public ConcurrentDictionary<string, TCPNodePlayer> WaitPlayerMap = new ConcurrentDictionary<string, TCPNodePlayer>();
+
+        public Action<string> OnMessage { internal get; set; } = (s) => { };
 
         public int Backlog { get; set; }
 
@@ -33,8 +34,8 @@ namespace SCL.Node.TCPNode
         {
             if (_unhandledPlayerCommands.ContainsKey(id))
             {
-                Debug.LogError($"Node network: (AddUnhandledPlayerPacketHandle) packet {id} already exist, be removed and append new");
-                _unhandledPlayerCommands.Remove(id);
+                throw new Exception($"Node network: (AddUnhandledPlayerPacketHandle) packet {id} already exist, be removed and append new");
+                //_unhandledPlayerCommands.Remove(id);
             }
 
             _unhandledPlayerCommands.Add(id, handle);
@@ -117,14 +118,14 @@ namespace SCL.Node.TCPNode
                         Thread.Sleep(30);
                     }
 
-                Debug.Log($"AcceptClient player: {tnp} IPEP:{client.RemoteEndPoint.ToString()}");
+                OnMessage($"AcceptClient player: {tnp} IPEP:{client.RemoteEndPoint.ToString()}");
                 tnp.SetSocket(client);
 
                 OnAppendClientEvent?.Invoke(tnp);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Debug.LogError(ex.ToString());
+                throw;
             }
             
             _socket?.BeginAccept(AcceptClient, _socket);
@@ -138,7 +139,7 @@ namespace SCL.Node.TCPNode
 
             if (!_commands.ContainsKey(packet.PacketId))
             {
-                Debug.LogError($"Handled player packet {packet.PacketId} not contains in map");
+                OnMessage($"Handled player packet {packet.PacketId} not contains in map");
 
                 return;
             }
@@ -153,7 +154,7 @@ namespace SCL.Node.TCPNode
 
             if (!_unhandledPlayerCommands.ContainsKey(packet.PacketId))
             {
-                Debug.LogError($"Unhandled player packet {packet.PacketId} not contains in map");
+                OnMessage($"Unhandled player packet {packet.PacketId} not contains in map");
                 //Node.Utils.SystemPackets.InvalidPid.Send(player, packet.PacketId);
 
                 return;
@@ -183,7 +184,7 @@ namespace SCL.Node.TCPNode
 
             foreach (TCPNodePlayer player in _players.Values)
             {
-                Debug.Log($"BroadcastMessage to {player.PlayerId} id:{packet.PacketId}");
+                OnMessage($"BroadcastMessage to {player.PlayerId} id:{packet.PacketId}");
                 Send(packet.GetBuffer(++player.OutputCurrentId), 0, packet.PacketLenght, player);
             }
         }
@@ -213,7 +214,7 @@ namespace SCL.Node.TCPNode
             if (!_players.ContainsKey(playerId))
             {
 
-                Debug.Log($"AddPlayer id: {playerId} IPEP:{playerPoint.ToString()}");
+                OnMessage($"AddPlayer id: {playerId} IPEP:{playerPoint.ToString()}");
 
                 var tnp = new TCPNodePlayer(this, playerPoint) { PlayerId = playerId };
 
@@ -222,13 +223,13 @@ namespace SCL.Node.TCPNode
                     if (playerId > MyPlayerId)
                     {
                         tnp.Connect();
-                        Debug.Log($"AddPlayer connect to: {playerId} IPEP:{playerPoint.ToString()}");
+                    OnMessage($"AddPlayer connect to: {playerId} IPEP:{playerPoint.ToString()}");
 
                         OnAppendClientEvent?.Invoke(tnp);
                     }
                     else
                     {
-                        Debug.Log($"AddPlayer wait: {playerId} IPEP:{playerPoint.ToString()}");
+                    OnMessage($"AddPlayer wait: {playerId} IPEP:{playerPoint.ToString()}");
                         WaitPlayerMap.TryAdd(playerPoint.Address.ToString(), tnp);
                     }
                 _players.TryAdd(playerId, tnp);
@@ -261,7 +262,7 @@ namespace SCL.Node.TCPNode
             player.OnReceived += Player_OnReceived;
             _players.TryAdd(playerId, player);
 
-            Debug.Log($"Handled player {playerId}");
+            OnMessage($"Handled player {playerId}");
         }
         
         private static System.Random rnd = new System.Random();
