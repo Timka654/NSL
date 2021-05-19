@@ -5,9 +5,11 @@ using System.Net;
 
 namespace SocketCore
 {
-#if DEBUG
     public delegate void ReceivePacketDebugInfo<T>(T client, ushort pid, int len) where T : IClient;
+#if DEBUG
     public delegate void SendPacketDebugInfo<T>(T client, ushort pid, int len, string memberName = "", string sourceFilePath = "", int sourceLineNumber = 0) where T : IClient;
+#else
+    public delegate void SendPacketDebugInfo<T>(T client, ushort pid, int len) where T : IClient;
 #endif
     public interface IClient
     {

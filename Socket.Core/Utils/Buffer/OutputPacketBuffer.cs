@@ -64,7 +64,7 @@ namespace SocketCore.Utils.Buffer
         /// Инициализация
         /// </summary>
         /// <param name="len">начальный размер буффера</param>
-        public OutputPacketBuffer(int len = 32)
+        public OutputPacketBuffer(int len = 32) : base()
         {
             //начальный размер буффера необходим для оптимизации пакетов, в случае если пакет имеет заведомо известный размер, его не придется увеличивать что будет экономить время
             //инициализация буффера
@@ -298,12 +298,12 @@ namespace SocketCore.Utils.Buffer
 
         public void WriteDateTime(DateTime value)
         {
-            WriteFloat64((value - MinDatetimeValue).TotalMilliseconds);
+            WriteInt64((value - MinDatetimeValue).Ticks);
         }
 
         public void WriteTimeSpan(TimeSpan value)
         {
-            WriteFloat64(value.TotalMilliseconds);
+            WriteInt64(value.Ticks);
         }
 
         public void WriteGuid(Guid value)
@@ -338,7 +338,11 @@ namespace SocketCore.Utils.Buffer
                 WriteByte((byte)((Lenght + PacketId) % 14));
             }
 
-            return base.ToArray();
+            var arr = base.ToArray();
+
+            base.Dispose();
+
+            return arr;
         }
     }
 }

@@ -5,13 +5,15 @@
     <RootNamespace>SCL.Node</RootNamespace>
     <AssemblyName>SCL.Node</AssemblyName>
     <Configurations>Debug;Release;Unity;UnityDebug</Configurations>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    
     <Version>$(VersionSuffix)</Version>
+    <Description>Базовая библиотека для создания клиента P2P работающая по протоколу UDP/TCP
+Так-же содержит классы</Description>
   </PropertyGroup>
 
-  <!--<PropertyGroup Condition="'$(Configuration)'=='Debug'">
-    <PackageId>$(AssemblyName).Develop</PackageId>
-  </PropertyGroup>-->
+  <PropertyGroup Condition="'$(Configuration)'=='Debug'">
+    <PackageId>$(MSBuildProjectName)_Debug</PackageId>
+  </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <OutputPath>..\UnityDebug\</OutputPath>
@@ -29,14 +31,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SCL.Unity(NET.Standard)\SCL.Unity.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="UnityEngine">
-      <HintPath>..\UnityEngine.dll</HintPath>
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-      <Private>false</Private>
-    </Reference>
   </ItemGroup>
 
 </Project>

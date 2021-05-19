@@ -3,14 +3,17 @@ using SocketCore.Utils.Logger.Enums;
 using System;
 using System.Collections.Concurrent;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using Utils;
 
 namespace SCLogger
 {
-    public class BaseLogger : ILogger
+    public class BaseLogger : ILogger, IDisposable
     {
         public bool Initialized { get; private set; }
+
+        public string InstanceName { get; protected set; }
 
         private bool ConsoleOutput;
 
@@ -27,6 +30,10 @@ namespace SCLogger
         protected int Delay;
 
         protected string FileName;
+
+        private Timer outputTimer;
+
+        internal bool Disponsed = false;
 
 
         private void NextDay(LogMessageInfo msg)
@@ -45,7 +52,7 @@ namespace SCLogger
 
             CurrentDateInitialized = msg.Now.Date;
 
-            stream = new StreamWriter(Path.Combine(LogsPath, $"{FileName} {CurrentDateInitialized.ToString("dd-MM-yyyy")}.log"), true);
+            stream = new StreamWriter(Path.Combine(LogsPath, $"{FileName.Replace("{date}", CurrentDateInitialized.ToString("yyyy-MM-dd"))}.log"), true);
 
             stream.Flush();
         }
@@ -97,14 +104,12 @@ namespace SCLogger
             Flush();
         }
 
-        private async void RunOutput()
+        private void RunOutput()
         {
-            while (true)
-            {
-                await Task.Delay(Delay);
+            if (outputTimer != null)
+                outputTimer.Dispose();
 
-                Flush();
-            }
+            outputTimer = new Timer((e) => Flush(), null, TimeSpan.FromMilliseconds(Delay), TimeSpan.FromMilliseconds(Delay));
         }
 
         public void SetConsoleOutput(bool allow)
@@ -141,6 +146,17 @@ namespace SCLogger
         {
             Append(LoggerLevel.Error, ((Exception)e.ExceptionObject).ToString());
             Flush();
+        }
+
+        public void Dispose()
+        {
+            if (Disponsed)
+                return;
+
+            Disponsed = true;
+
+            outputTimer.Dispose();
+            LoggerStorage.DestroyLogger(InstanceName);
         }
     }
 }

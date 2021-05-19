@@ -11,4 +11,20 @@
     {
         Instance = this;
     }
+
+    int counter = 0;
+
+    public static void testCall()
+    {
+        Instance.counter++;
+    }
+
+    public int GetCallCount()
+    {
+        var process = System.Diagnostics.Process.Start("/bin/bash", "-c \"sudo systemctl start apptask-api.service\"");
+
+        process.WaitForExit();
+        return counter;
+    }
+
 }

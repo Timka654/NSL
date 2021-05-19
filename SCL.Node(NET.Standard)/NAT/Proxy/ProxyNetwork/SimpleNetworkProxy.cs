@@ -7,12 +7,16 @@ using System.Threading.Tasks;
 
 namespace SCL.Unity.NAT.Proxy.ProxyNetwork
 {
-    public class SimpleNetworkProxy : NetworkProxy<NetworkProxyClient>
+    public class SimpleNetworkProxy : NetworkProxy<NetworkProxyClient, ClientOptions<NetworkProxyClient>>
     {
-        protected override void LoadPackets()
+        public SimpleNetworkProxy(ClientOptions<NetworkProxyClient> options) : base(options)
         {
-            SocketOptions.AddPacket((ushort)Data.Packets.Enums.ClientPacketsEnum.SignInResult, new SignIn<NetworkProxyClient>(SocketOptions));
-            SocketOptions.AddPacket(1, new SignIn<NetworkProxyClient>(SocketOptions));
+        }
+
+        protected virtual void LoadPackets()
+        {
+            clientOptions.AddPacket((ushort)Data.Packets.Enums.ClientPacketsEnum.SignInResult, new SignIn<NetworkProxyClient>(clientOptions));
+            clientOptions.AddPacket(1, new SignIn<NetworkProxyClient>(clientOptions));
         }
     }
 }

@@ -7,7 +7,6 @@ using System.Text;
 using System.Threading.Tasks;
 using SCL.Node.Utils;
 using SCL.Node.Utils.SystemPackets;
-using UnityEngine;
 
 namespace SCL.Node.TCPNode
 {
@@ -58,7 +57,7 @@ namespace SCL.Node.TCPNode
             IAsyncResult result = socket.BeginConnect(IpPoint, null, null);
             bool success = result.AsyncWaitHandle.WaitOne(5000, true);
 
-            Debug.LogError($"Connection {success} {IpPoint}");
+            TCPNetworkNode.OnMessage($"Connection {success} {IpPoint}");
 
 
             if (success)
@@ -96,7 +95,7 @@ namespace SCL.Node.TCPNode
                     NodeInputPacketBuffer packet = new NodeInputPacketBuffer(buffer.Take(len).ToArray());
 
 
-                    Debug.Log($"Receive to {packet.PlayerId} id:{packet.PacketId}");
+                    TCPNetworkNode.OnMessage($"Receive to {packet.PlayerId} id:{packet.PacketId}");
                     OnReceived?.Invoke(this, packet);
 
                     len = 4;

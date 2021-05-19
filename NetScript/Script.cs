@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IO;
+using System.Text.RegularExpressions;
+using System.Reflection;
 
 namespace NetScript
 {
@@ -24,7 +26,7 @@ namespace NetScript
         /// <summary>
         /// Код скрипта
         /// </summary>
-        private string code = "#define CompileScript\r\n";
+        private string code = "";
 
         /// <summary>
         /// Конструктор
@@ -32,6 +34,7 @@ namespace NetScript
         public Script()
         {
             core = new Core();
+            RegistrationDefine("CompileScript");
         }
 
         /// <summary>
@@ -62,16 +65,61 @@ namespace NetScript
         /// <param name="path">Путь к файлу</param>
         public void AddFile(string path)
         {
-            int start = code.Count(x => x == '\n');
-
             using (StreamReader sr = new StreamReader(path))
             {
-                code += sr.ReadToEnd() + "\r\n";
+                AppendCodeFragment(sr.ReadToEnd(), path);
+            }
+        }
+
+        public void AddCodeFragment(string appendCode)
+        {
+            AppendCodeFragment(appendCode, $"codefragment_{Guid.NewGuid()}.cs");
+        }
+
+        private void AppendCodeFragment(string appendCode, string fileName)
+        {
+            appendCode = appendCode.Trim();
+
+
+            var usings = Regex.Matches(appendCode, @"using(\s*)(\S*);");
+
+            foreach (Match item in usings)
+            {
+                RegistrationUsingDirective(item.Groups[2].Value);
             }
 
-            int end = code.Count(x=> x == '\n');
+            foreach (Match item in usings.Reverse())
+            {
+                foreach (Capture cap in item.Captures)
+                {
+                    appendCode = appendCode.Remove(cap.Index, cap.Length);
+                }
+            }
 
-            core.Fragments.Add(new CompileCodeFragmentInfo() { Start = start, End = end, FileName = path });
+            var defines = Regex.Matches(appendCode, @"#define(\s*)(\S*);");
+
+            foreach (Match item in defines)
+            {
+                RegistrationDefine(item.Groups[2].Value);
+            }
+
+            foreach (Match item in defines.Reverse())
+            {
+                foreach (Capture cap in item.Captures)
+                {
+                    appendCode = appendCode.Remove(cap.Index, cap.Length);
+                }
+            }
+
+            appendCode = appendCode.Trim();
+
+            int start = code.Count(x => x == '\n');
+
+            code += appendCode + "\r\n";
+
+            int end = start + (appendCode + "\r\n").Count(x => x == '\n');
+
+            core.Fragments.Add(new CompileCodeFragmentInfo() { Start = start, End = end, FileName = fileName });
         }
 
         /// <summary>
@@ -86,10 +134,33 @@ namespace NetScript
         /// <summary>
         /// Регистрация библиотеки
         /// </summary>
-        /// <param name="library">Имя библиотеки прим. System.dll System.Xml.dll ...</param>
+        /// <param name="library">полный путь к библиотеке/opt/abc/lib.dll</param>
         public void RegistrationReference(string library)
         {
             core.references.Add(library);
+        }
+
+        public void RegisterExecutableReference()
+        {
+            var asm = Assembly.GetCallingAssembly();
+            RegistrationReference(asm.Location);
+        }
+
+        string coreDir = null;
+
+        /// <summary>
+        /// Регистрация библиотеки ядра dotnet
+        /// </summary>
+        /// <param name="library">Имя библиотеки прим. System.dll System.Xml.dll ...</param>
+        public void RegisterCoreReference(string library)
+        {
+            if (coreDir == null)
+            {
+                var dd = typeof(Object).GetTypeInfo().Assembly.Location;
+                coreDir = Directory.GetParent(dd).FullName;
+            }
+
+            RegistrationReference(Path.Combine(coreDir, library));
         }
 
         /// <summary>
@@ -99,6 +170,15 @@ namespace NetScript
         public void RegistrationUsingDirective(string _using)
         {
             core.usings.Add(_using);
+        }
+
+        /// <summary>
+        /// Регистрация дерективы using
+        /// </summary>
+        /// <param name="_using">имя define прим. ABB, AAB, ...</param>
+        public void RegistrationDefine(string _define)
+        {
+            core.defines.Add(_define);
         }
 
         /// <summary>
@@ -117,15 +197,7 @@ namespace NetScript
         /// <param name="value">Значение переменной</param>
         public void SetGlobalVariable(string _var, object value)
         {
-#if DEBUG
-            performanceTimer.Reset();
-            performanceTimer.Start();
-#endif
             SetProperty("Globals", _var, core.globalData, value);
-#if DEBUG
-            performanceTimer.Stop();
-            OnPerformanceMessageEvent?.Invoke(this, $"SetGlobalVariable elapsed = {performanceTimer.ElapsedMilliseconds}");
-#endif
         }
 
         public T GetGlobalVariable<T>(string _var, object value)
@@ -192,6 +264,28 @@ namespace NetScript
 #endif
         }
 
+        public T InvokeMethod<T>(MethodInfo method, object _obj, params object[] args)
+        {
+#if DEBUG
+            performanceTimer.Reset();
+            performanceTimer.Start();
+
+            T r = (T)core.InvokeMethod(method, _obj, args);
+
+            performanceTimer.Stop();
+            OnPerformanceMessageEvent?.Invoke(this, $"InvokeMethod elapsed = {performanceTimer.ElapsedMilliseconds}");
+
+            return r;
+#else
+            return (T)core.InvokeMethod(method, _obj, args);
+#endif
+        }
+
+        public MethodInfo GetMethod(string _class, string _method)
+        {
+            return core.GetMethod(_class, _method);
+        }
+
         public void InvokeMethod(string _class, string _method, object _obj, params object[] args)
         {
 #if DEBUG
@@ -201,7 +295,7 @@ namespace NetScript
             core.InvokeMethod(_class, _method, _obj, args);
 #if DEBUG
             performanceTimer.Stop();
-            OnPerformanceMessageEvent?.Invoke(this, $"InvokeMethod elapsed = {performanceTimer.ElapsedMilliseconds}");
+            OnPerformanceMessageEvent?.Invoke(this, $"InvokeMethod elapsed = {performanceTimer.ElapsedTicks}");
 #endif
         }
 
@@ -231,7 +325,7 @@ namespace NetScript
             ns.OnPerformanceMessageEvent += OnPerformanceMessageEvent;
 #endif
             ns.core = (Core)this.core.Clone();
-            ns.core.CacheMethodMap = new Dictionary<string, Dictionary<string, System.Reflection.MethodInfo>>();
+            ns.core.CacheMethodMap = new Dictionary<int, Dictionary<int, System.Reflection.MethodInfo>>();
             ns.core.CachePropertyMap = new Dictionary<string, Dictionary<string, System.Reflection.PropertyInfo>>();
 
             ns.core.globals = core.globals;
@@ -244,9 +338,9 @@ namespace NetScript
             return ns;
         }
 
-        public string DumpScriptText()
+        public string DumpCompiledScriptText()
         {
-            return this.code;
+            return this.core.code;
         }
 
         public string DumpCoreCode()

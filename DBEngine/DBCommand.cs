@@ -95,7 +95,7 @@ namespace DBEngine
             catch (Exception ex)
             {
                 DbExceptionEvent?.Invoke(this, ex);
-                throw ex;
+                throw;
             }
             return this;
         }
@@ -118,7 +118,7 @@ namespace DBEngine
             catch (Exception ex)
             {
                 DbExceptionEvent?.Invoke(this, ex);
-                throw ex;
+                throw;
             }
             return this;
         }
@@ -164,7 +164,7 @@ namespace DBEngine
             catch (Exception ex)
             {
                 DbExceptionEvent?.Invoke(this, ex);
-                throw ex;
+                throw;
             }
             return this;
         }
@@ -192,7 +192,7 @@ namespace DBEngine
             catch (Exception ex)
             {
                 DbExceptionEvent?.Invoke(this, ex);
-                throw ex;
+                throw;
             }
             return this;
         }
@@ -215,7 +215,7 @@ namespace DBEngine
             catch (Exception ex)
             {
                 DbExceptionEvent?.Invoke(this, ex);
-                throw ex;
+                throw;
             }
             return this;
         }
@@ -239,7 +239,7 @@ namespace DBEngine
             catch (Exception ex)
             {
                 DbExceptionEvent?.Invoke(this, ex);
-                throw ex;
+                throw;
             }
         }
 
@@ -267,7 +267,7 @@ namespace DBEngine
             {
                 DbExceptionEvent?.Invoke(this, ex);
                 CloseConnection();
-                throw ex;
+                throw;
             }
             return this;
         }
@@ -298,7 +298,7 @@ namespace DBEngine
             {
                 DbExceptionEvent?.Invoke(this, ex);
                 CloseConnection();
-                throw ex;
+                throw;
             }
             return this;
         }
@@ -323,7 +323,7 @@ namespace DBEngine
             catch (Exception ex)
             {
                 DbExceptionEvent?.Invoke(this, ex);
-                throw ex;
+                throw;
             }
         }
 

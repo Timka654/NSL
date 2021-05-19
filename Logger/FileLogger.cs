@@ -1,4 +1,5 @@
 ﻿using SocketCore.Utils.Logger.Enums;
+using System;
 
 namespace SCLogger
 {
@@ -9,9 +10,14 @@ namespace SCLogger
             return Initialize("logs");
         }
 
-        public static FileLogger Initialize(string logsDir, string fileName = "log",  int delayOutput = 5000, string nameInStorage = "main")
+        public static FileLogger Initialize(string logsDir, string fileName = "log {date}",  int delayOutput = 5000, string instanceName = "{auto}")
         {
-            FileLogger fl = LoggerStorage.InitializeLogger<FileLogger>(nameInStorage, fileName, logsDir, delayOutput);
+            if (instanceName == "{auto}")
+                instanceName = Guid.NewGuid().ToString();
+
+            FileLogger fl = LoggerStorage.InitializeLogger<FileLogger>(instanceName, fileName, logsDir, delayOutput);
+
+            fl.InstanceName = instanceName;
 
             fl.SetUnhandledExCatch(true);
             fl.SetConsoleOutput(true);

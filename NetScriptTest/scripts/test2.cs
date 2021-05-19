@@ -1,6 +1,5 @@
 ﻿public partial class test2
 {
-    11
     private static Globals global => ScriptCore.Instance.GlobalData;
     public test2()
     {

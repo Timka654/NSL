@@ -127,7 +127,7 @@ namespace SCL
 
         public async void RunRecovery()
         {
-            if (NetworkClient == null || ClientData == null)
+            if (NetworkClient == null)
             {
                 OnReconnectEvent?.Invoke(MaxRecoveryTryTime, false);
                 return;
@@ -146,6 +146,8 @@ namespace SCL
             }
 
             byte[] buffer;
+
+            if(ClientData != null)
             while ((buffer = ClientData.GetWaitPacket()) != null)
             {
                 NetworkClient.Send(buffer,0,buffer.Length);

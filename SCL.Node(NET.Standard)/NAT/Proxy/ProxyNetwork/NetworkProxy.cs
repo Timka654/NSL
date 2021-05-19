@@ -9,9 +9,14 @@ using System.Threading.Tasks;
 
 namespace SCL.Unity.NAT.Proxy.ProxyNetwork
 {
-    public class NetworkProxy<T> : BaseNetwork<T>
+    public class NetworkProxy<T, TOptions> : SCL.SocketClient<T, TOptions>
         where T : NetworkProxyClient
+        where TOptions : ClientOptions<T>
     {
+        public NetworkProxy(TOptions options) : base(options)
+        {
+        }
+
         public async Task<ProxySignInPacketResultData> SignProxy(string serverIp, int serverPort, ProxySignInPacketData data)
         {
             data.Proxy = false;
@@ -38,12 +43,12 @@ namespace SCL.Unity.NAT.Proxy.ProxyNetwork
 
         public void Transport(NodeOutputPacketBuffer buffer)
         {
-            Data.Packets.TransportData.Send(SocketOptions.ClientData, buffer.GetBuffer());
+            Data.Packets.TransportData.Send(clientOptions.ClientData, buffer.GetBuffer());
         }
 
         public void Transport(byte[] buffer)
         {
-            Data.Packets.TransportData.Send(SocketOptions.ClientData, buffer);
+            Data.Packets.TransportData.Send(clientOptions.ClientData, buffer);
         }
     }
 }

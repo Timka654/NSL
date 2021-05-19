@@ -8,10 +8,8 @@ namespace SocketServer
 {
     public class ServerListener<T> where T : IServerNetworkClient
     {
-#if DEBUG
         public event ReceivePacketDebugInfo<ServerClient<T>> OnReceivePacket;
         public event SendPacketDebugInfo<ServerClient<T>> OnSendPacket;
-#endif
         /// <summary>
         /// Слушатель порта (сервер)
         /// </summary>
@@ -105,14 +103,14 @@ namespace SocketServer
                 //получения ожидающего подключения
                 client = listener.EndAccept(result);
                 //инициализация слушателя клиента клиента
-#if DEBUG
+//#if DEBUG
                 var c = new ServerClient<T>(client, serverOptions);
                 c.OnReceivePacket += OnReceivePacket;
                 c.OnSendPacket += OnSendPacket;
                 c.RunPacketReceiver();
-#else
-                new ServerClient<T>(client, serverOptions).RunPacketReceiver();
-#endif
+//#else
+//                new ServerClient<T>(client, serverOptions).RunPacketReceiver();
+//#endif
             }
             catch (Exception ex)
             {

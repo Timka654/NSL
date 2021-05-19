@@ -12,6 +12,15 @@ namespace NetScriptTest
         static Dictionary<int, TScript> scripts = new Dictionary<int, TScript>();
         static void Main(string[] args)
         {
+            //try
+            //{
+            //    throw new Exception("abc");
+            //}
+            //catch (Exception ex)
+            //{
+            //    string test = ex.ToString();
+            //}
+
             scripts.Add(0, new TScript(0));
             scripts.Add(1, new TScript(1));
             Random r = new Random();
@@ -40,21 +49,36 @@ namespace NetScriptTest
             {
                 cscript = new NetScript.Script();
                 cscript.AddFolder(Environment.CurrentDirectory + "\\scripts\\", true);
-                cscript.RegistrationReference("mscorlib.dll");
-                cscript.RegistrationReference("System.dll");
-                cscript.RegistrationReference("System.Runtime.dll");
-                cscript.RegistrationReference("System.Private.CoreLib.dll");
-                cscript.RegistrationReference("System.Linq.dll");
-                cscript.RegistrationReference(System.Reflection.Assembly.GetAssembly(typeof(Program)).Location);
-                cscript.RegistrationUsingDirective("System");
-                cscript.RegistrationUsingDirective("System.Collections.Generic");
-                cscript.RegistrationUsingDirective("System.Linq");
-                cscript.RegistrationUsingDirective("System.Text");
+
+                cscript.RegistrationReference("NetScript.dll");
+                cscript.RegisterCoreReference("System.Linq.dll");
+                cscript.RegisterCoreReference("System.ComponentModel.Primitives.dll");
+                cscript.RegisterCoreReference("System.Diagnostics.Process.dll");
+
+                cscript.RegisterExecutableReference();
+                //foreach
+
                 cscript.GenerateVariable(typeof(TScript),"Character");
-                cscript.Compile();
+                try
+                {
+                    cscript.Compile();
+                }
+                catch (NetScriptCompileException compileError)
+                {
+                    string code = cscript.DumpCompiledScriptText();
+
+                    Console.WriteLine(compileError.ToString());
+                    foreach (var item in compileError.Exceptions)
+                    {
+                        Console.WriteLine(item);
+                    }
+                    Console.ReadLine();
+                }
                 cscript.OnPerformanceMessageEvent += Cscript_OnPerformanceMessageEvent;
             }
+
             script = cscript.Copy();
+
             script.SetGlobalVariable("Character", this);
         }
 
@@ -68,10 +92,12 @@ namespace NetScriptTest
             Debug(string.Format("testCall id = {0}", id));
             script.InvokeMethod("ScriptCore", "testCall", script.GetCoreObject(), null);
         }
+
         public void ShowCallCount()
         { 
             Console.WriteLine(string.Format("CallCount {0} for id:{1}",script.InvokeMethod<int>("ScriptCore", "GetCallCount", script.GetCoreObject()),id));
         }
+
         public void Debug(string value)
         {
             Console.WriteLine(value);

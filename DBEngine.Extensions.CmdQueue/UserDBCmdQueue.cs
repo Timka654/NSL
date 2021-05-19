@@ -5,62 +5,72 @@ using System.Collections.Generic;
 using System.Text;
 using System.Data.Common;
 using System.Collections.Concurrent;
-using SCLogger;
-using SocketCore.Utils.Logger.Enums;
 
 namespace DBEngine.Extensions.CmdQueue
 {
-    public class UserDBCmdQueue : DbCommandQueue
+    public class UserDBCmdQueue<T> : DbCommandQueue
     {
-        private ConcurrentDictionary<int, List<long>> UserActionListMap = new ConcurrentDictionary<int, List<long>>();
+        protected ConcurrentDictionary<T, ConcurrentQueue<Action<DBCommand>>> WaitMap = new ConcurrentDictionary<T, ConcurrentQueue<Action<DBCommand>>>();
 
-        private ConcurrentDictionary<long, int> ActionUserMap = new ConcurrentDictionary<long, int>();
-
-        public UserDBCmdQueue(DbConnectionPool connection_pool, ILogger logger) : base(connection_pool, logger)
+        public UserDBCmdQueue(DbConnectionPool connection_pool) : base(connection_pool)
         {
-            base.ExecutedDbCommandEvent += UserDbCmdQueueStorage_ExecutedDbCommandEvent;
+            //base.ExecutedDbCommandEvent += UserDbCmdQueueStorage_ExecutedDbCommandEvent;
         }
 
-        public void AppendCommand(int userId, Action<DBCommand> command)
+        public void AppendCommand(T userId, Action<DBCommand> command)
         {
-            long idx = base.AppendCommand(command);
+            //long idx = base.AppendCommand(command);
 
-            if (!UserActionListMap.TryGetValue(userId, out List<long> result))
-                UserActionListMap.TryAdd(userId, result = new List<long>());
+            if (!WaitMap.TryGetValue(userId, out var result))
+                WaitMap.TryAdd(userId, result = new ConcurrentQueue<Action<DBCommand>>());
 
-            result.Add(idx);
+            result.Enqueue(command);
 
-            ActionUserMap.TryAdd(idx, userId);
+            //ActionUserMap.TryAdd(idx, userId);
         }
 
-        private void UserDbCmdQueueStorage_ExecutedDbCommandEvent(long index)
+        //private void UserDbCmdQueueStorage_ExecutedDbCommandEvent(long index)
+        //{
+        //    if (ActionUserMap.TryRemove(index, out var userId))
+        //    {
+        //        UserActionListMap[userId].Remove(index);
+        //    }
+        //}
+
+        protected override void Execute()
         {
-            if (ActionUserMap.TryRemove(index, out var userId))
+            foreach (var item in WaitMap.Keys.ToList())
             {
-                UserActionListMap[userId].Remove(index);
+                execUser(item);
             }
+
+            base.Execute();
         }
 
-        public void ExecuteUser(int user_id)
+
+        public bool ExecuteUser(T user_id)
         {
             invoker_locker.WaitOne();
-            if (UserActionListMap.TryRemove(user_id,out var funcIndexList))
-                foreach (var idx in funcIndexList)
-                {
-                    try
-                    {
-                        if(WaitList.TryRemove(idx, out var e))
-                            e.Invoke(connection_pool.GetCommand());
 
-                        ActionUserMap.TryRemove(idx, out var dummy);
-                    }
-                    catch(Exception ex)
-                    {
-                        logger.Append(LoggerLevel.Error, ex.ToString());
-                    }
-                }
+            bool result = execUser(user_id);
 
             invoker_locker.Set();
+
+            return result;
+        }
+
+        private bool execUser(T user_id)
+        {
+            if (WaitMap.TryRemove(user_id, out var funcIndexList))
+            {
+                if (!base.ExecuteQueue(funcIndexList))
+                {
+                    WaitMap.TryAdd(user_id, funcIndexList);
+                    return false;
+                } 
+            }
+
+            return true;
         }
     }
 }

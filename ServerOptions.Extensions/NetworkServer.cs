@@ -1,7 +1,7 @@
 ﻿using Cipher;
 using ConfigurationEngine;
 using SCLogger;
-using ServerOptions.Extensions;
+using Network.Extensions;
 using ServerOptions.Extensions.ConfigurationEngine;
 using SocketCore;
 using SocketCore.Utils.Logger.Enums;
@@ -44,10 +44,8 @@ namespace Utils.Helper.Network
 
             Listener = new SocketServer.ServerListener<T>(Options);
 
-#if DEBUG
             Listener.OnReceivePacket += Listener_OnReceivePacket;
             Listener.OnSendPacket += Listener_OnSendPacket;
-#endif
 
             try
             {
@@ -68,10 +66,9 @@ namespace Utils.Helper.Network
 
         #region Handle
 
-#if DEBUG
 
         /// <summary>
-        /// Перехват отправленных пакетов (только в режиме отладки)
+        /// Перехват отправленных пакетов
         /// </summary>
         /// <param name="client"></param>
         /// <param name="pid"></param>
@@ -79,6 +76,7 @@ namespace Utils.Helper.Network
         /// <param name="memberName"></param>
         /// <param name="sourceFilePath"></param>
         /// <param name="sourceLineNumber"></param>
+#if DEBUG
         protected virtual void Listener_OnSendPacket(ServerClient<T> client, ushort pid, int len
             , string memberName, string sourceFilePath, int sourceLineNumber)
         {
@@ -91,9 +89,15 @@ namespace Utils.Helper.Network
 
             Logger?.Append(LoggerLevel.Info, $"{ServerName} packet send pid:{pid} len:{len} to {ipep?.ToString()} from {sourceFilePath}:{sourceLineNumber}");
         }
+#else
+        protected virtual void Listener_OnSendPacket(ServerClient<T> client, ushort pid, int len)
+        { 
+        
+        }
+#endif
 
         /// <summary>
-        /// Перехват полученных пакетов клиента (только в режиме отладки)
+        /// Перехват полученных пакетов клиента
         /// </summary>
         /// <param name="client"></param>
         /// <param name="pid"></param>
@@ -110,8 +114,6 @@ namespace Utils.Helper.Network
             Logger?.Append(LoggerLevel.Info, $"{ServerName} packet receive pid:{pid} len:{len} from {ipep?.ToString()}");
         }
 
-#endif
-
-        #endregion
+#endregion
     }
 }

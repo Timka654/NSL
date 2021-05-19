@@ -1,14 +1,23 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    
     <Version>$(VersionSuffix)</Version>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)'=='Debug'">
+    <PackageId>$(MSBuildProjectName)_Debug</PackageId>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="ConfigurationEngine" Version="2021.1.2.529" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="5.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Configuration\ConfigurationEngine.csproj" />
   </ItemGroup>
 
 </Project>

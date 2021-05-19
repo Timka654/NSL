@@ -29,10 +29,8 @@ namespace SCL
         where T : BaseSocketNetworkClient
     {
 
-#if DEBUG
         public event ReceivePacketDebugInfo<Client<T>> OnReceivePacket;
         public event SendPacketDebugInfo<Client<T>> OnSendPacket;
-#endif
 
         public long Version { get; set; }
 
@@ -163,11 +161,9 @@ namespace SCL
                         //если все ок
                         //получаем размер пакета
                         lenght = BitConverter.ToInt32(peeked, 0);
-#if DEBUG
-                        int len = lenght;
+
                         ushort pid = BitConverter.ToUInt16(peeked, 4);
-                        OnReceive(pid, len);
-#endif
+                        OnReceive(pid, lenght);
                         data = true;
 
                         while (receiveBuffer.Length < lenght)
@@ -197,6 +193,7 @@ namespace SCL
 
                         //ищем пакет и выполняем его, передаем ему данные сессии, полученные данные, и просим у него данные для передачи
                         clientOptions.PacketHandles[pbuff.PacketId](pbuff);
+                        pbuff.Dispose();
                     }
                 }
                 sclient.BeginReceive(receiveBuffer, offset, lenght - offset, SocketFlags.None, Receive, sclient);
@@ -230,6 +227,8 @@ namespace SCL
 #if DEBUG
             OnSend(rbuff, memberName, sourceFilePath, sourceLineNumber);
             //ThreadHelper.InvokeOnMain(() => { OnSendPacket?.Invoke(this, rbuff.PacketId, rbuff.PacketLenght); });
+#else
+            OnSend(rbuff);
 #endif
 
             Send(rbuff.CompilePacket(), 0, rbuff.PacketLenght);
@@ -245,14 +244,15 @@ namespace SCL
         {
 #if DEBUG
             OnSendPacket?.Invoke(this, rbuff.PacketId, rbuff.PacketLenght, memberName, sourceFilePath, sourceLineNumber);
+#else
+            OnSendPacket?.Invoke(this, rbuff.PacketId, rbuff.PacketLenght);
 #endif
+
         }
 
         protected virtual void OnReceive(ushort pid, int len)
         {
-#if DEBUG
             OnReceivePacket?.Invoke(this, pid, len);
-#endif
         }
 
         private AutoResetEvent _sendLocker = new AutoResetEvent(true);

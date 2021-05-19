@@ -1,0 +1,39 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net5.0</TargetFramework>
+		<Configurations>Debug;Release;Unity;UnityDebug;DebugStable</Configurations>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+
+		<Version>$(VersionSuffix)</Version>
+		<Description>Библиотека для расширения функций буффера</Description>
+		<PublishRepositoryUrl>true</PublishRepositoryUrl>
+		<EmbedUntrackedSources>true</EmbedUntrackedSources>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)'=='Debug'">
+		<PackageId>$(MSBuildProjectName)_Debug</PackageId>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Unity|AnyCPU'">
+		<TargetFramework>netstandard2.0</TargetFramework>
+	</PropertyGroup>
+
+	<!--<PropertyGroup Condition="'$(Configuration)'=='Debug'">
+    <PackageId>$(AssemblyName).Develop</PackageId>
+  </PropertyGroup>-->
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='UnityDebug|AnyCPU'">
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<DefineConstants>DEBUG;TRACE</DefineConstants>
+		<OutputPath>..\UnityDebug\</OutputPath>
+	</PropertyGroup>
+
+	<ItemGroup>
+	  <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\Socket.Core\SocketCore.csproj" />
+	</ItemGroup>
+</Project>

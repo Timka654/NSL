@@ -2,7 +2,7 @@
 using ConfigurationEngine;
 using SCLogger;
 using SCL;
-using ServerOptions.Extensions;
+using Network.Extensions;
 using ServerOptions.Extensions.ConfigurationEngine;
 using SocketCore;
 using SocketCore.Utils.Logger.Enums;
@@ -24,6 +24,10 @@ namespace Utils.Helper.Network
         /// Слушатель подключений
         /// </summary>
         public static SocketClient<T, ClientOptions<T>> Client { get; protected set; }
+
+        protected SocketClient<T, ClientOptions<T>> client { get; set; }
+
+        public SocketClient<T, ClientOptions<T>> GetClient() => client;
 
         /// <summary>
         /// Путь к конфигурации сервера client/{ServerConfigurationName}
@@ -50,13 +54,10 @@ namespace Utils.Helper.Network
         {
             Logger?.Append(LoggerLevel.Info, $"-> Client Socket Client Loading");
 
-            Client = new SocketClient<T, ClientOptions<T>>(Options);
+            Client = client = new SocketClient<T, ClientOptions<T>>(options);
 
-
-#if DEBUG
-            Client.OnReceivePacket += Listener_OnReceivePacket;
-            Client.OnSendPacket += Listener_OnSendPacket;
-#endif
+            client.OnReceivePacket += Listener_OnReceivePacket;
+            client.OnSendPacket += Listener_OnSendPacket;
             if (!ConnectOnLoad)
                 return;
 
@@ -64,11 +65,11 @@ namespace Utils.Helper.Network
             {
                 Connect();
 
-                Logger?.Append(LoggerLevel.Info, $"-> Socket Client ({Options.IpAddress}:{Options.Port}) Loaded");
+                Logger?.Append(LoggerLevel.Info, $"-> Socket Client ({options.IpAddress}:{options.Port}) Loaded");
             }
             catch (Exception e)
             {
-                Logger?.Append(LoggerLevel.Info, $"-> Socket Client ({Options.IpAddress}:{Options.Port}) Error:\r\n{e.ToString()}");
+                Logger?.Append(LoggerLevel.Info, $"-> Socket Client ({options.IpAddress}:{options.Port}) Error:\r\n{e.ToString()}");
             }
         }
 
@@ -91,11 +92,11 @@ namespace Utils.Helper.Network
 
         private async Task ConnectTransport()
         { 
-            if (Client?.GetState() != false)
+            if (client?.GetState() != false)
                 return;
 
-            Logger?.Append(LoggerLevel.Info, $"-> {ServerName} try connect to {Options.IpAddress}:{Options.Port}");
-            bool result = await Client.ConnectAsync();
+            Logger?.Append(LoggerLevel.Info, $"-> {ServerName} try connect to {options.IpAddress}:{options.Port}");
+            bool result = await client.ConnectAsync();
 
             if (result)
                 Logger?.Append(LoggerLevel.Info, $"-> Success connected");
@@ -106,10 +107,9 @@ namespace Utils.Helper.Network
 
         #region Handle
 
-#if DEBUG
 
         /// <summary>
-        /// Перехват отправленных пакетов (только в режиме отладки)
+        /// Перехват отправленных пакетов
         /// </summary>
         /// <param name="client"></param>
         /// <param name="pid"></param>
@@ -117,6 +117,7 @@ namespace Utils.Helper.Network
         /// <param name="memberName"></param>
         /// <param name="sourceFilePath"></param>
         /// <param name="sourceLineNumber"></param>
+#if DEBUG
         protected virtual void Listener_OnSendPacket(Client<T> client, ushort pid, int len, string memberName, string sourceFilePath, int sourceLineNumber)
         {
             IPEndPoint ipep = null;
@@ -128,9 +129,15 @@ namespace Utils.Helper.Network
 
             Logger?.Append(LoggerLevel.Info, $"{ServerName} packet send pid:{pid} len:{len} to {ipep?.ToString()} from {sourceFilePath}:{sourceLineNumber}");
         }
+#else
+        protected virtual void Listener_OnSendPacket(Client<T> client, ushort pid, int len)
+        {
+        }
+
+#endif
 
         /// <summary>
-        /// Перехват полученных пакетов клиента (только в режиме отладки)
+        /// Перехват полученных пакетов клиента
         /// </summary>
         /// <param name="client"></param>
         /// <param name="pid"></param>
@@ -146,8 +153,6 @@ namespace Utils.Helper.Network
 
             Logger?.Append(LoggerLevel.Info, $"{ServerName} packet receive pid:{pid} len:{len} from {ipep?.ToString()}");
         }
-
-#endif
 
         protected override void SocketOptions_OnClientDisconnectEvent(T client)
         {

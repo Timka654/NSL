@@ -7,7 +7,7 @@ namespace SCLogger
     {
         public static PerformanceLogger Initialize()
         {
-            return LoggerStorage.InitializeLogger<PerformanceLogger>("performance", "performance", "performance", 5000);
+            return LoggerStorage.InitializeLogger<PerformanceLogger>("performance {date}", "performance", "performance", 5000);
         }
 
         public void AppendPerformance(string filename, string methodname, TimeSpan time)

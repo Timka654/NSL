@@ -8,20 +8,14 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace ServerOptions.Extensions.StaticQuery
 {
     public static class QueryHelper
     {
-        /// <summary>
-        /// Выполнение запросов в базу данных (классов содержащих статичный метод Run без параметров) по аттрибуту наследуемому от аттрибута <see cref="Query.StaticQueryLoadAttribute"/>
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="serverOptions"></param>
-        /// <param name="assembly">Сборка из которой нужно выбрать классы запросов</param>
-        /// <param name="selectAttrbuteType">Аттрибут по которому будут выбираться классы запросов</param>
-        /// <returns>Кол-во запросов которые были выполнены</returns>
-        public static int LoadQuerys<T>(this ServerOptions<T> serverOptions, DbConnectionPool conPull, Assembly assembly, Type selectAttrbuteType) where T : IServerNetworkClient
+        public static int LoadQuerys(this DbConnectionPool conPull, Assembly assembly, Type selectAttrbuteType, Action<Type, StaticQueryLoadAttribute> onLoadQuery = null
+        )
         {
             if (!typeof(StaticQueryLoadAttribute).IsAssignableFrom(selectAttrbuteType))
             {
@@ -51,11 +45,24 @@ namespace ServerOptions.Extensions.StaticQuery
                 obj.Run(conPull);
 
                 Debug.WriteLine($"Loading Query: query: {item.attr.Name} type: {item.type.FullName}");
-
-                serverOptions.HelperLogger.Append(LoggerLevel.Info, $"{item.attr.Name} Loaded");
+                onLoadQuery?.Invoke(item.type, item.attr);
             }
 
             return querys.Count;
+        }
+
+
+        /// <summary>
+        /// Выполнение запросов в базу данных (классов содержащих статичный метод Run без параметров) по аттрибуту наследуемому от аттрибута <see cref="Query.StaticQueryLoadAttribute"/>
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="serverOptions"></param>
+        /// <param name="assembly">Сборка из которой нужно выбрать классы запросов</param>
+        /// <param name="selectAttrbuteType">Аттрибут по которому будут выбираться классы запросов</param>
+        /// <returns>Кол-во запросов которые были выполнены</returns>
+        public static int LoadQuerys<T>(this ServerOptions<T> serverOptions, DbConnectionPool conPull, Assembly assembly, Type selectAttrbuteType) where T : IServerNetworkClient
+        {
+            return LoadQuerys(conPull, assembly, selectAttrbuteType, (type, attr) => serverOptions.HelperLogger.Append(LoggerLevel.Info, $"{attr.Name} Loaded"));
         }
 
         /// <summary>

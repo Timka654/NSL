@@ -70,19 +70,21 @@ namespace SCL.Unity
             SocketOptions.OnExceptionEvent += SocketOptions_OnExtensionEvent;
             SocketOptions.NetworkClient = new SocketClient<T, SCL.ClientOptions<T>>(SocketOptions);
             SocketOptions.NetworkClient.Version = Version;
-#if DEBUG
+
             SocketOptions.NetworkClient.OnReceivePacket += NetworkClient_OnReceivePacket;
             SocketOptions.NetworkClient.OnSendPacket += NetworkClient_OnSendPacket;
-#endif
+
             if (ConnectOnAwake)
             {
                 await ConnectAsync();
             }
         }
-
 #if DEBUG
 
         protected virtual void NetworkClient_OnSendPacket(SCL.Client<T> client, ushort pid, int len, string memberName = "", string sourceFilePath = "", int sourceLineNumber = 0)
+#else
+        protected virtual void NetworkClient_OnSendPacket(SCL.Client<T> client, ushort pid, int len)
+#endif
         {
             if(LogEnabled)
                 Debug.Log($"{ClientType} packet send pid:{pid} len:{len}");
@@ -93,8 +95,6 @@ namespace SCL.Unity
             if (LogEnabled)
                 Debug.Log($"{ClientType} packet receive pid:{pid} len:{len}");
         }
-
-#endif
 
         protected virtual void LoadPackets()
         {

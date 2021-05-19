@@ -1,4 +1,4 @@
-$ver = (Get-Date).ToString("yyyy.MM.dd.hhmm")
+$ver = (Get-Date).ToString("yyyy.MM.dd.HHmm")
 
 ./BuildDebug $ver
 ./BuildRelease $ver

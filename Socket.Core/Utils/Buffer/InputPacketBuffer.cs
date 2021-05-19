@@ -54,9 +54,8 @@ namespace SocketCore.Utils.Buffer
         /// </summary>
         /// <param name="buf">входящий буффер</param>
         /// <param name="checkHash">проверка хеша пакета</param>
-        public InputPacketBuffer(byte[] buf, bool checkHash = false)
+        public InputPacketBuffer(byte[] buf, bool checkHash = false) : base(buf, 0, buf.Length, false, true)
         {
-            Write(buf, 0, buf.Length);
             //присвоение буффера
             //buffer = buf;
             //установка позиции на 0 без смещения
@@ -311,12 +310,12 @@ namespace SocketCore.Utils.Buffer
 
         public DateTime ReadDateTime()
         {
-            return MinDatetimeValue.AddMilliseconds(ReadDouble());
+            return MinDatetimeValue.AddTicks(ReadInt64());
         }
 
         public TimeSpan ReadTimeSpan()
         {
-            return TimeSpan.FromMilliseconds(ReadDouble());
+            return TimeSpan.FromTicks(ReadInt64());
         }
 
 
@@ -375,9 +374,9 @@ namespace SocketCore.Utils.Buffer
 
         public async Task<byte[]> ReadAsync(int len)
         {
-                byte[] buf = new byte[len];
-                await base.ReadAsync(buf, 0, len);
-                return buf;
+            byte[] buf = new byte[len];
+            await base.ReadAsync(buf, 0, len);
+            return buf;
         }
 
         /// <summary>
@@ -430,7 +429,7 @@ namespace SocketCore.Utils.Buffer
 
             offset = 7;
 
-                Write(buffer, off, this.lenght - 7);
+            Write(buffer, off, this.lenght - 7);
 
             offset = tempPos;
         }

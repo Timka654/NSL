@@ -7,10 +7,10 @@ namespace SocketServer
 {
     public class SocketClient<T> where T : IServerNetworkClient
     {
-#if DEBUG
+//#if DEBUG
         public event ReceivePacketDebugInfo<ServerClient<T>> OnReceivePacket;
         public event SendPacketDebugInfo<ServerClient<T>> OnSendPacket;
-#endif
+//#endif
         public ServerClient<T> Connect(ServerOptions<T> options)
         {
             Socket client = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
@@ -20,10 +20,10 @@ namespace SocketServer
                     throw new Exception();
 
                 var c = new ServerClient<T>(client, options);
-#if DEBUG
+//#if DEBUG
                 c.OnReceivePacket += OnReceivePacket;
                 c.OnSendPacket += OnSendPacket;
-#endif
+//#endif
                 c.RunPacketReceiver();
                 return c;
             }

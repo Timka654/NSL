@@ -5,13 +5,15 @@
     <RootNamespace>SCL.Unity</RootNamespace>
     <AssemblyName>SCL.Unity</AssemblyName>
     <Configurations>Debug;Release;Unity;UnityDebug</Configurations>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    
     <Version>$(VersionSuffix)</Version>
+    <Description>Библиотека реализующая совместимую логику для работы с Unity
+ThreadHelper - компонент должен был закреплен как Singletone для вывода операций в освноной поток</Description>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)'=='Debug'">
     <OutputPath>..\UnityDebug\</OutputPath>
-    <!--<PackageId>$(AssemblyName).Develop</PackageId>-->
+      <PackageId>$(MSBuildProjectName)_Debug</PackageId>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Unity|AnyCPU'">

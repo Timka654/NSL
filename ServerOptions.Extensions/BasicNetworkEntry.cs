@@ -14,7 +14,7 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ServerOptions.Extensions
+namespace Network.Extensions
 {
     public class BasicNetworkEntry<T, CType, OType>
         where T : INetworkClient
@@ -31,6 +31,10 @@ namespace ServerOptions.Extensions
         /// Глобальные настройки сервера
         /// </summary>
         public static OType Options { get; protected set; }
+
+        protected OType options { get; set; }
+
+        public OType GetOptions() => options;
 
         /// <summary>
         /// Логгер используемый в функциях по умолчанию
@@ -86,23 +90,25 @@ namespace ServerOptions.Extensions
         }
 
         /// <summary>
-        /// Инициализация переменной Options
+        /// Инициализация переменной options
         /// Может быть использовано для установки других значений
         /// </summary>
         protected virtual void LoadConfiguration()
         {
             Logger?.Append(LoggerLevel.Info, $"-> Configuration Loading");
 
-            Options = LoadConfigurationAction();
+            options = Options = LoadConfigurationAction();
 
-            Options.HelperLogger = Logger;
+            options.HelperLogger = Logger;
 
-            Options.inputCipher = new PacketNoneCipher();
-            Options.outputCipher = new PacketNoneCipher();
+            if (options.inputCipher == null)
+                options.inputCipher = new PacketNoneCipher();
+            if (options.outputCipher == null)
+                options.outputCipher = new PacketNoneCipher();
 
-            Options.OnClientConnectEvent += SocketOptions_OnClientConnectEvent;
-            Options.OnClientDisconnectEvent += SocketOptions_OnClientDisconnectEvent;
-            Options.OnExceptionEvent += SocketOptions_OnExtensionEvent;
+            options.OnClientConnectEvent += SocketOptions_OnClientConnectEvent;
+            options.OnClientDisconnectEvent += SocketOptions_OnClientDisconnectEvent;
+            options.OnExceptionEvent += SocketOptions_OnExtensionEvent;
 
             Logger?.Append(LoggerLevel.Info, $"-> Configuration Loaded");
         }
@@ -122,8 +128,8 @@ namespace ServerOptions.Extensions
         }
 
         protected virtual void LoadManagersAction()
-        { 
-        
+        {
+
         }
 
         /// <summary>
