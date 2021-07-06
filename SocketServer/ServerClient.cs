@@ -212,7 +212,7 @@ namespace SocketServer
                     offset = 0;
 
                     //ищем пакет и выполняем его, передаем ему данные сессии, полученные данные, и просим у него данные для передачи
-                    serverOptions.Packets[pbuff.PacketId].Receive(Data, pbuff);
+                    serverOptions.PacketHandles[pbuff.PacketId](Data, pbuff);
 
                     pbuff.Dispose();
                     data = false;
@@ -235,16 +235,10 @@ namespace SocketServer
         /// Отправка пакета
         /// </summary>
         /// <param name="rbuff">спец буффер содержащий в себе данные пакета</param>
-        public void Send(OutputPacketBuffer rbuff
-#if DEBUG
-            , [System.Runtime.CompilerServices.CallerMemberName] string memberName = "",
-            [System.Runtime.CompilerServices.CallerFilePath] string sourceFilePath = "",
-            [System.Runtime.CompilerServices.CallerLineNumber] int sourceLineNumber = 0
-#endif
-            )
+        public void Send(OutputPacketBuffer rbuff)
         {
 #if DEBUG
-            OnSendPacket?.Invoke(this, rbuff.PacketId, rbuff.PacketLenght, memberName, sourceFilePath, sourceLineNumber);
+            OnSendPacket?.Invoke(this, rbuff.PacketId, rbuff.PacketLenght, Environment.StackTrace);
 #else
             OnSendPacket?.Invoke(this, rbuff.PacketId, rbuff.PacketLenght);
 #endif
@@ -334,306 +328,14 @@ namespace SocketServer
             return sclient;
         }
 
-        #region SendOneValueExtensions
-
-        public void SendEmpty(ushort packetId
-#if DEBUG
-            , [System.Runtime.CompilerServices.CallerMemberName] string memberName = "",
-            [System.Runtime.CompilerServices.CallerFilePath] string sourceFilePath = "",
-            [System.Runtime.CompilerServices.CallerLineNumber] int sourceLineNumber = 0
-#endif
-            )
+        public void SendEmpty(ushort packetId)
         {
             OutputPacketBuffer rbuff = new OutputPacketBuffer
             {
                 PacketId = packetId
             };
 
-#if DEBUG
-            OnSendPacket?.Invoke(this, rbuff.PacketId, rbuff.PacketLenght, memberName, sourceFilePath, sourceLineNumber);
-#else
-            OnSendPacket?.Invoke(this, rbuff.PacketId, rbuff.PacketLenght);
-#endif
-            Send(rbuff.CompilePacket(), 0, rbuff.PacketLenght);
+            Send(rbuff);
         }
-
-        public void Send(ushort packetId, int value
-#if DEBUG
-            , [System.Runtime.CompilerServices.CallerMemberName] string memberName = "",
-            [System.Runtime.CompilerServices.CallerFilePath] string sourceFilePath = "",
-            [System.Runtime.CompilerServices.CallerLineNumber] int sourceLineNumber = 0
-#endif
-            )
-        {
-            OutputPacketBuffer rbuff = new OutputPacketBuffer
-            {
-                PacketId = packetId
-            };
-
-            rbuff.WriteInt32(value);
-
-#if DEBUG
-            OnSendPacket?.Invoke(this, rbuff.PacketId, rbuff.PacketLenght, memberName, sourceFilePath, sourceLineNumber);
-#else
-            OnSendPacket?.Invoke(this, rbuff.PacketId, rbuff.PacketLenght);
-#endif
-            Send(rbuff.CompilePacket(), 0, rbuff.PacketLenght);
-        }
-
-        public void Send(ushort packetId, byte value
-#if DEBUG
-            , [System.Runtime.CompilerServices.CallerMemberName] string memberName = "",
-            [System.Runtime.CompilerServices.CallerFilePath] string sourceFilePath = "",
-            [System.Runtime.CompilerServices.CallerLineNumber] int sourceLineNumber = 0
-#endif
-            )
-        {
-            OutputPacketBuffer rbuff = new OutputPacketBuffer
-            {
-                PacketId = packetId
-            };
-
-            rbuff.WriteByte(value);
-
-#if DEBUG
-            OnSendPacket?.Invoke(this, rbuff.PacketId, rbuff.PacketLenght, memberName, sourceFilePath, sourceLineNumber);
-#else
-            OnSendPacket?.Invoke(this, rbuff.PacketId, rbuff.PacketLenght);
-#endif
-            Send(rbuff.CompilePacket(), 0, rbuff.PacketLenght);
-        }
-
-        public void Send(ushort packetId, bool value
-#if DEBUG
-            , [System.Runtime.CompilerServices.CallerMemberName] string memberName = "",
-            [System.Runtime.CompilerServices.CallerFilePath] string sourceFilePath = "",
-            [System.Runtime.CompilerServices.CallerLineNumber] int sourceLineNumber = 0
-#endif
-            )
-        {
-            OutputPacketBuffer rbuff = new OutputPacketBuffer
-            {
-                PacketId = packetId
-            };
-
-            rbuff.WriteBool(value);
-
-#if DEBUG
-            OnSendPacket?.Invoke(this, rbuff.PacketId, rbuff.PacketLenght, memberName, sourceFilePath, sourceLineNumber);
-#else
-            OnSendPacket?.Invoke(this, rbuff.PacketId, rbuff.PacketLenght);
-#endif
-            Send(rbuff.CompilePacket(), 0, rbuff.PacketLenght);
-        }
-
-        public void Send(ushort packetId, short value
-#if DEBUG
-            , [System.Runtime.CompilerServices.CallerMemberName] string memberName = "",
-            [System.Runtime.CompilerServices.CallerFilePath] string sourceFilePath = "",
-            [System.Runtime.CompilerServices.CallerLineNumber] int sourceLineNumber = 0
-#endif
-            )
-        {
-            OutputPacketBuffer rbuff = new OutputPacketBuffer
-            {
-                PacketId = packetId
-            };
-
-            rbuff.WriteInt32(value);
-
-#if DEBUG
-            OnSendPacket?.Invoke(this, rbuff.PacketId, rbuff.PacketLenght, memberName, sourceFilePath, sourceLineNumber);
-#else
-            OnSendPacket?.Invoke(this, rbuff.PacketId, rbuff.PacketLenght);
-#endif
-            Send(rbuff.CompilePacket(), 0, rbuff.PacketLenght);
-        }
-
-        public void Send(ushort packetId, ushort value
-#if DEBUG
-            , [System.Runtime.CompilerServices.CallerMemberName] string memberName = "",
-            [System.Runtime.CompilerServices.CallerFilePath] string sourceFilePath = "",
-            [System.Runtime.CompilerServices.CallerLineNumber] int sourceLineNumber = 0
-#endif
-            )
-        {
-            OutputPacketBuffer rbuff = new OutputPacketBuffer
-            {
-                PacketId = packetId
-            };
-
-            rbuff.WriteInt32(value);
-
-#if DEBUG
-            OnSendPacket?.Invoke(this, rbuff.PacketId, rbuff.PacketLenght, memberName, sourceFilePath, sourceLineNumber);
-#else
-            OnSendPacket?.Invoke(this, rbuff.PacketId, rbuff.PacketLenght);
-#endif
-            Send(rbuff.CompilePacket(), 0, rbuff.PacketLenght);
-        }
-
-        public void Send(ushort packetId, uint value
-#if DEBUG
-            , [System.Runtime.CompilerServices.CallerMemberName] string memberName = "",
-            [System.Runtime.CompilerServices.CallerFilePath] string sourceFilePath = "",
-            [System.Runtime.CompilerServices.CallerLineNumber] int sourceLineNumber = 0
-#endif
-            )
-        {
-            OutputPacketBuffer rbuff = new OutputPacketBuffer
-            {
-                PacketId = packetId
-            };
-
-            rbuff.WriteUInt32(value);
-
-#if DEBUG
-            OnSendPacket?.Invoke(this, rbuff.PacketId, rbuff.PacketLenght, memberName, sourceFilePath, sourceLineNumber);
-#else
-            OnSendPacket?.Invoke(this, rbuff.PacketId, rbuff.PacketLenght);
-#endif
-            Send(rbuff.CompilePacket(), 0, rbuff.PacketLenght);
-        }
-
-        public void Send(ushort packetId, long value
-#if DEBUG
-            , [System.Runtime.CompilerServices.CallerMemberName] string memberName = "",
-            [System.Runtime.CompilerServices.CallerFilePath] string sourceFilePath = "",
-            [System.Runtime.CompilerServices.CallerLineNumber] int sourceLineNumber = 0
-#endif
-            )
-        {
-            OutputPacketBuffer rbuff = new OutputPacketBuffer
-            {
-                PacketId = packetId
-            };
-
-            rbuff.WriteInt64(value);
-
-#if DEBUG
-            OnSendPacket?.Invoke(this, rbuff.PacketId, rbuff.PacketLenght, memberName, sourceFilePath, sourceLineNumber);
-#else
-            OnSendPacket?.Invoke(this, rbuff.PacketId, rbuff.PacketLenght);
-#endif
-            Send(rbuff.CompilePacket(), 0, rbuff.PacketLenght);
-        }
-
-        public void Send(ushort packetId, ulong value
-#if DEBUG
-            , [System.Runtime.CompilerServices.CallerMemberName] string memberName = "",
-            [System.Runtime.CompilerServices.CallerFilePath] string sourceFilePath = "",
-            [System.Runtime.CompilerServices.CallerLineNumber] int sourceLineNumber = 0
-#endif
-            )
-        {
-            OutputPacketBuffer rbuff = new OutputPacketBuffer
-            {
-                PacketId = packetId
-            };
-
-            rbuff.WriteUInt64(value);
-
-#if DEBUG
-            OnSendPacket?.Invoke(this, rbuff.PacketId, rbuff.PacketLenght, memberName, sourceFilePath, sourceLineNumber);
-#else
-            OnSendPacket?.Invoke(this, rbuff.PacketId, rbuff.PacketLenght);
-#endif
-            Send(rbuff.CompilePacket(), 0, rbuff.PacketLenght);
-        }
-
-        public void Send(ushort packetId, float value
-#if DEBUG
-            , [System.Runtime.CompilerServices.CallerMemberName] string memberName = "",
-            [System.Runtime.CompilerServices.CallerFilePath] string sourceFilePath = "",
-            [System.Runtime.CompilerServices.CallerLineNumber] int sourceLineNumber = 0
-#endif
-            )
-        {
-            OutputPacketBuffer rbuff = new OutputPacketBuffer
-            {
-                PacketId = packetId
-            };
-
-            rbuff.WriteFloat32(value);
-
-#if DEBUG
-            OnSendPacket?.Invoke(this, rbuff.PacketId, rbuff.PacketLenght, memberName, sourceFilePath, sourceLineNumber);
-#else
-            OnSendPacket?.Invoke(this, rbuff.PacketId, rbuff.PacketLenght);
-#endif
-            Send(rbuff.CompilePacket(), 0, rbuff.PacketLenght);
-        }
-
-        public void Send(ushort packetId, double value
-#if DEBUG
-            , [System.Runtime.CompilerServices.CallerMemberName] string memberName = "",
-            [System.Runtime.CompilerServices.CallerFilePath] string sourceFilePath = "",
-            [System.Runtime.CompilerServices.CallerLineNumber] int sourceLineNumber = 0
-#endif
-            )
-        {
-            OutputPacketBuffer rbuff = new OutputPacketBuffer
-            {
-                PacketId = packetId
-            };
-
-            rbuff.WriteFloat64(value);
-
-#if DEBUG
-            OnSendPacket?.Invoke(this, rbuff.PacketId, rbuff.PacketLenght, memberName, sourceFilePath, sourceLineNumber);
-#else
-            OnSendPacket?.Invoke(this, rbuff.PacketId, rbuff.PacketLenght);
-#endif
-
-            Send(rbuff.CompilePacket(), 0, rbuff.PacketLenght);
-        }
-
-        public void Send(ushort packetId, DateTime value
-#if DEBUG
-            , [System.Runtime.CompilerServices.CallerMemberName] string memberName = "",
-            [System.Runtime.CompilerServices.CallerFilePath] string sourceFilePath = "",
-            [System.Runtime.CompilerServices.CallerLineNumber] int sourceLineNumber = 0
-#endif
-            )
-        {
-            OutputPacketBuffer rbuff = new OutputPacketBuffer
-            {
-                PacketId = packetId
-            };
-
-            rbuff.WriteDateTime(value);
-
-#if DEBUG
-            OnSendPacket?.Invoke(this, rbuff.PacketId, rbuff.PacketLenght, memberName, sourceFilePath, sourceLineNumber);
-#else
-            OnSendPacket?.Invoke(this, rbuff.PacketId, rbuff.PacketLenght);
-#endif
-            Send(rbuff.CompilePacket(), 0, rbuff.PacketLenght);
-        }
-
-        public void Send(ushort packetId, string value
-#if DEBUG
-            , [System.Runtime.CompilerServices.CallerMemberName] string memberName = "",
-            [System.Runtime.CompilerServices.CallerFilePath] string sourceFilePath = "",
-            [System.Runtime.CompilerServices.CallerLineNumber] int sourceLineNumber = 0
-#endif
-            )
-        {
-            OutputPacketBuffer rbuff = new OutputPacketBuffer
-            {
-                PacketId = packetId
-            };
-
-            rbuff.WriteString16(value);
-
-#if DEBUG
-            OnSendPacket?.Invoke(this, rbuff.PacketId, rbuff.PacketLenght, memberName, sourceFilePath, sourceLineNumber);
-#else
-            OnSendPacket?.Invoke(this, rbuff.PacketId, rbuff.PacketLenght);
-#endif
-            Send(rbuff.CompilePacket(), 0, rbuff.PacketLenght);
-        }
-
-        #endregion
     }
 }

@@ -5,10 +5,10 @@ using System.Text;
 using System.CodeDom;
 using System.CodeDom.Compiler;
 using System.Reflection;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.Text;
 using Microsoft.CodeAnalysis;
 using System.IO;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.Text;
 
 namespace NetScript
 {

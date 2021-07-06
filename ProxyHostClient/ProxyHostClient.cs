@@ -146,7 +146,7 @@ namespace ProxyHostClient
 
 #if DEBUG
 
-        private void Listener_OnSendPacket(ServerClient<ProxyHostClientData> client, ushort pid, int len, string memberName, string sourceFilePath, int sourceLineNumber)
+        private void Listener_OnSendPacket(ServerClient<ProxyHostClientData> client, ushort pid, int len, string stackTrace)
         {
             IPEndPoint ipep = null;
 
@@ -155,7 +155,7 @@ namespace ProxyHostClient
                 ipep = client.GetRemovePoint();
             }
 
-            LoggerStorage.Instance.main.AppendInfo($"{PublicName} packet send pid:{pid}({(Packets.Enums.ServerPacketsEnum)pid}) len:{len} to {ipep?.ToString()} from {sourceFilePath}:{sourceLineNumber}");
+            LoggerStorage.Instance.main.AppendInfo($"{PublicName} packet send pid:{pid}({(Packets.Enums.ServerPacketsEnum)pid}) len:{len} to {ipep?.ToString()} from {stackTrace}");
         }
 
         private void Listener_OnReceivePacket(ServerClient<ProxyHostClientData> client, ushort pid, int len)

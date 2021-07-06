@@ -7,6 +7,8 @@
     <Configurations>Debug;Release;Unity;UnityDebug</Configurations>
     
     <Version>$(VersionSuffix)</Version>
+	  <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+	  <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
     <Description>Библиотека реализующая совместимую логику для работы с Unity
 ThreadHelper - компонент должен был закреплен как Singletone для вывода операций в освноной поток</Description>
   </PropertyGroup>

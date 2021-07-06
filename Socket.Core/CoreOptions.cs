@@ -1,4 +1,5 @@
 ﻿using SocketCore.Utils;
+using SocketCore.Utils.Buffer;
 using SocketCore.Utils.Logger;
 using System;
 using System.Collections.Generic;
@@ -45,6 +46,7 @@ namespace SocketCore
         /// Алгоритм шифрования входящих пакетов
         /// </summary>
         public IPacketCipher outputCipher { get; set; }
+
     }
 
     /// <summary>
@@ -74,6 +76,14 @@ namespace SocketCore
         public delegate void ClientDisconnect(T client);
 
         /// <summary>
+        /// Делегат для регистрации пакета
+        /// </summary>
+        /// <param name="client">Данные клиента</param>
+        /// <param name="data">Входящий буффер с данными</param>
+        /// <param name="output">Исходящий буффер с данными(не обязательно)</param>
+        public delegate void PacketHandle(T client, InputPacketBuffer data);
+
+        /// <summary>
         /// События вызываемое при получении ошибки
         /// </summary>
         public event ExceptionHandle OnExceptionEvent;
@@ -87,6 +97,8 @@ namespace SocketCore
         /// Событие вызываемое при отключении клиента
         /// </summary>
         public event ClientDisconnect OnClientDisconnectEvent;
+
+
         /// <summary>
         /// Вызов события ошибка
         /// </summary>
@@ -112,6 +124,8 @@ namespace SocketCore
         {
             OnClientDisconnectEvent?.Invoke(client);
         }
+
+        public virtual IPacket<T> GetPacket(ushort packetId) { throw new NotImplementedException(); }
 
         public virtual bool AddPacket(ushort packetId, IPacket<T> packet) { throw new NotImplementedException(); }
     }

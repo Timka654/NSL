@@ -6,6 +6,7 @@ using SocketServer.Utils;
 using SocketServer.Utils.SystemPackets;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Sockets;
 
 namespace SocketServer
@@ -22,14 +23,6 @@ namespace SocketServer
 
         #endregion
 
-        /// <summary>
-        /// Делегат для регистрации пакета
-        /// </summary>
-        /// <param name="client">Данные клиента</param>
-        /// <param name="data">Входящий буффер с данными</param>
-        /// <param name="output">Исходящий буффер с данными(не обязательно)</param>
-        public delegate void PacketHandle(T client, InputPacketBuffer data);
-
 
         /// <summary>
         /// Пакеты которые будет принимать и обрабатывать сервер
@@ -41,6 +34,11 @@ namespace SocketServer
             { (ushort)ClientPacketEnum.Version, new Version<T>() },
         };
 
+        public Dictionary<ushort, PacketHandle> PacketHandles = new Dictionary<ushort, PacketHandle>()
+        {
+
+        };
+
         /// <summary>
         /// Добавить пакет для обработки сервером
         /// </summary>
@@ -49,13 +47,16 @@ namespace SocketServer
         /// <returns></returns>
         public override bool AddPacket(ushort packetId, IPacket<T> packet)
         {
-            var r = Packets.ContainsKey(packetId);
+            var r = Packets.ContainsKey(packetId) || PacketHandles.ContainsKey(packetId);
             if (!r)
+            {
                 Packets.Add(packetId, packet);
+                PacketHandles.Add(packetId, packet.Receive);
+            }
             return !r;
         }
 
-        public IPacket<T> GetPacket(ushort packetId)
+        public override IPacket<T> GetPacket(ushort packetId)
         {
             Packets.TryGetValue(packetId, out var result);
             return result;
@@ -65,6 +66,11 @@ namespace SocketServer
         {
             add { RecoverySession<T>.Instance.OnRecoverySessionReceiveEvent += value; }
             remove { RecoverySession<T>.Instance.OnRecoverySessionReceiveEvent -= value; }
+        }
+
+        public ServerOptions()
+        {
+            PacketHandles = Packets.ToDictionary(x => x.Key, x => (PacketHandle)x.Value.Receive);
         }
     }
 }

@@ -79,12 +79,8 @@ namespace SCL.Unity
                 await ConnectAsync();
             }
         }
-#if DEBUG
 
-        protected virtual void NetworkClient_OnSendPacket(SCL.Client<T> client, ushort pid, int len, string memberName = "", string sourceFilePath = "", int sourceLineNumber = 0)
-#else
-        protected virtual void NetworkClient_OnSendPacket(SCL.Client<T> client, ushort pid, int len)
-#endif
+        protected virtual void NetworkClient_OnSendPacket(SCL.Client<T> client, ushort pid, int len, string stackTrace)
         {
             if(LogEnabled)
                 Debug.Log($"{ClientType} packet send pid:{pid} len:{len}");

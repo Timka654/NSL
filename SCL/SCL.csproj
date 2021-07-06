@@ -6,6 +6,8 @@
     
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Version>$(VersionSuffix)</Version>
+	  <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+	  <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
     <Description>Базовая библиотека для создания клиента с логикой взаимодействия совместимой с сервером созданным при помощи пакета SocketServer</Description>
   </PropertyGroup>
 

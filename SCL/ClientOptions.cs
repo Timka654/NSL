@@ -17,14 +17,6 @@ namespace SCL
         #region EventDelegates
 
         /// <summary>
-        /// Делегат для регистрации пакета
-        /// </summary>
-        /// <param name="client">Данные клиента</param>
-        /// <param name="data">Входящий буффер с данными</param>
-        /// <param name="output">Исходящий буффер с данными(не обязательно)</param>
-        public delegate void PacketHandle(InputPacketBuffer data);
-
-        /// <summary>
         /// Делегат для регистрации события перехвата сетевых ошибок
         /// </summary>
         /// <param name="ex">Возникшая ошибка</param>
@@ -167,11 +159,6 @@ namespace SCL
 
         public SocketClient<T,ClientOptions<T>> NetworkClient { get; set; }
 
-        /// <summary>
-        /// Пакеты которые будет принимать и обрабатывать сервер
-        /// </summary>
-        public Dictionary<ushort, PacketHandle> PacketHandles = new Dictionary<ushort, PacketHandle>();
-
         public Dictionary<ushort, IPacket<T>> Packets = new Dictionary<ushort, IPacket<T>>();
 
         #endregion
@@ -184,13 +171,7 @@ namespace SCL
         /// <returns></returns>
         public bool AddPacket(ushort packetId, IClientPacket<T> packet)
         {
-            var r = PacketHandles.ContainsKey(packetId);
-            if (!r)
-            {
-                Packets.Add(packetId, packet);
-                PacketHandles.Add(packetId, packet.GetReceiveHandle());
-            }
-            return !r;
+            return AddPacket(packetId, (IPacket<T>)packet);
         }
 
         public void ClearRecoveryData()
@@ -203,10 +184,20 @@ namespace SCL
 
         public override bool AddPacket(ushort packetId, IPacket<T> packet)
         {
-            if (packet is IClientPacket<T> cp)
-                return AddPacket(packetId, cp);
-            else
-                throw new Exception("this packet is not IClientPacket");
+            if (!Packets.ContainsKey(packetId))
+            {
+                Packets.Add(packetId, packet);
+                return true;
+            }
+
+            return false;
+        }
+
+        public override IPacket<T> GetPacket(ushort packetId)
+        {
+            Packets.TryGetValue(packetId, out var packet);
+
+            return packet;
         }
     }
 }

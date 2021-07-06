@@ -75,5 +75,6 @@ namespace ServerOptions.Extensions.Packet
         {
             return LoadPackets<T>(serverOptions, Assembly.GetCallingAssembly(), selectAttrbuteType);
         }
+
     }
 }

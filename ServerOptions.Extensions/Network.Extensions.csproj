@@ -5,6 +5,8 @@
     <Configurations>Debug;Release;Unity;UnityDebug</Configurations>
     
     <Version>$(VersionSuffix)</Version>
+	  <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+	  <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
     <Description>Библиотека расширений для библиотек SocketServer и SCL
 NetworkServer - базовый класс сервера
 NetworkServerClient - базовый класс клиента</Description>

@@ -1,9 +1,6 @@
 ﻿using BinarySerializer;
 using BinarySerializer.Attributes;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.CodeAnalysis.Text;
 using SocketCore.Utils.Buffer;
 using System;
 using System.Collections.Generic;

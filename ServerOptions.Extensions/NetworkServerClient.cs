@@ -118,7 +118,7 @@ namespace Utils.Helper.Network
         /// <param name="sourceFilePath"></param>
         /// <param name="sourceLineNumber"></param>
 #if DEBUG
-        protected virtual void Listener_OnSendPacket(Client<T> client, ushort pid, int len, string memberName, string sourceFilePath, int sourceLineNumber)
+        protected virtual void Listener_OnSendPacket(Client<T> client, ushort pid, int len, string stackTrace)
         {
             IPEndPoint ipep = null;
 
@@ -127,7 +127,7 @@ namespace Utils.Helper.Network
                 ipep = client.GetRemovePoint();
             }
 
-            Logger?.Append(LoggerLevel.Info, $"{ServerName} packet send pid:{pid} len:{len} to {ipep?.ToString()} from {sourceFilePath}:{sourceLineNumber}");
+            Logger?.Append(LoggerLevel.Info, $"{ServerName} packet send pid:{pid} len:{len} to {ipep?.ToString()} from {stackTrace}");
         }
 #else
         protected virtual void Listener_OnSendPacket(Client<T> client, ushort pid, int len)

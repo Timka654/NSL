@@ -2,10 +2,6 @@
 
 	<PropertyGroup>
 		<TargetFramework>net5.0</TargetFramework>
-		<AssemblyName>BinarySerializer</AssemblyName>
-		<RootNamespace>BinarySerializer</RootNamespace>
-		<Configurations>Debug;Release;Unity;UnityDebug</Configurations>
-
 		<Version>$(VersionSuffix)</Version>
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
 		<EmbedUntrackedSources>true</EmbedUntrackedSources>
@@ -22,5 +18,13 @@
 		<OutputPath>..\UnityDebug</OutputPath>
 		<DefineConstants>DEBUG;TRACE</DefineConstants>
 	</PropertyGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\SocketCore.Extensions.Packet\SocketCore.Extensions.Packet.csproj" />
+	</ItemGroup>
+
+	<!--<ItemGroup>
+		<ProjectReference Include="..\SocketCore.Extensions.Packet\SocketCore.Extensions.Packet.csproj" />
+	</ItemGroup>-->
 
 </Project>
