@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Security.Cryptography;
-using System.Text;
-using SocketCore.Utils;
-using SocketCore.Utils.Buffer;
+﻿using System.Text;
 
 namespace Cipher.MD5
 {

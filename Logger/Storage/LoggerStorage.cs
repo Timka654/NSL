@@ -1,8 +1,8 @@
 ﻿namespace SCLogger
 {
-    public class LoggerStorage : DynamicLogger
+    public class LoggerStorage// : DynamicLogger
     {
-        public static dynamic Instance { get; private set; } = new LoggerStorage();
+        public static LoggerStorage Instance { get; private set; } = new LoggerStorage();
 
         /// <summary>
         /// Инициализация обработчика лог сообщений
@@ -17,24 +17,24 @@
             where T : ILogger, new()
         {
             var logger = new T();
-            Instance.dictionary[name] = logger;
+            //Instance.dictionary[name] = logger;
             logger.Initialize(fname, path, delay);
 
             return logger;
         }
 
-        public static void DestroyLogger(string name)
-        {
-            var instance = Instance.dictionary[name];
+        //public static void DestroyLogger(string name)
+        //{
+        //    var instance = Instance.dictionary[name];
 
-            if (instance != null)
-            {
-                if (instance is BaseLogger bl)
-                {
-                    bl.Dispose();
-                }
-                Instance.dictionary[name] = null;
-            }
-        }
+        //    if (instance != null)
+        //    {
+        //        if (instance is BaseLogger bl)
+        //        {
+        //            bl.Dispose();
+        //        }
+        //        Instance.dictionary[name] = null;
+        //    }
+        //}
     }
 }

@@ -1,7 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
     <RootNamespace>SCL.Unity</RootNamespace>
     <AssemblyName>SCL.Unity</AssemblyName>
     <Configurations>Debug;Release;Unity;UnityDebug</Configurations>
@@ -12,6 +11,16 @@
     <Description>Библиотека реализующая совместимую логику для работы с Unity
 ThreadHelper - компонент должен был закреплен как Singletone для вывода операций в освноной поток</Description>
   </PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)'=='Debug'">
+		<TargetFramework>net5.0</TargetFramework>
+		<PackageId>$(MSBuildProjectName)_Debug</PackageId>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)'=='Release'">
+		<TargetFramework>net5.0</TargetFramework>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+	</PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)'=='Debug'">
     <OutputPath>..\UnityDebug\</OutputPath>

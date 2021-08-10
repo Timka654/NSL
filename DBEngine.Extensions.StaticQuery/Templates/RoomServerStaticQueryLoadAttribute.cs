@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace ServerOptions.Extensions.StaticQuery.Templates
+﻿namespace ServerOptions.Extensions.StaticQuery.Templates
 {
     public class RoomServerStaticQueryLoadAttribute : StaticQueryLoadAttribute
     {

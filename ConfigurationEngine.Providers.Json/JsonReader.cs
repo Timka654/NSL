@@ -1,8 +1,6 @@
 ﻿using ConfigurationEngine.Info;
-using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
 
 namespace ConfigurationEngine.Providers.Json
 {

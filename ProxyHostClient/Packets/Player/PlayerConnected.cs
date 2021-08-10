@@ -1,10 +1,7 @@
 ﻿using ProxyHostClient.Packets.Player.PacketData;
 using SocketCore.Utils;
 using SocketCore.Utils.Buffer;
-using SocketServer.Utils;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace ProxyHostClient.Packets.Player
 {

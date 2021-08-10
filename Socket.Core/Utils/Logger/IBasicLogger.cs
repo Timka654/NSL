@@ -1,7 +1,4 @@
 ﻿using SocketCore.Utils.Logger.Enums;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace SocketCore.Utils.Logger
 {

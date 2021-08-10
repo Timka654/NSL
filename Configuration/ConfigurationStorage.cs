@@ -1,6 +1,5 @@
 ﻿using ConfigurationEngine.Info;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace ConfigurationEngine
@@ -39,7 +38,7 @@ namespace ConfigurationEngine
         /// <param name="name">Путь</param>
         public void RemoveValue(string name)
         {
-            config_map.Remove(name, out ConfigurationInfo c);
+            config_map.TryRemove(name, out ConfigurationInfo c);
         }
 
         /// <summary>

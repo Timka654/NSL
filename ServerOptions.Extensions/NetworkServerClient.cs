@@ -1,18 +1,11 @@
-﻿using Cipher;
-using ConfigurationEngine;
-using SCLogger;
-using SCL;
+﻿using SCL;
 using Network.Extensions;
-using ServerOptions.Extensions.ConfigurationEngine;
-using SocketCore;
 using SocketCore.Utils.Logger.Enums;
-using SocketServer;
-using SocketServer.Utils;
 using System;
-using System.Collections.Generic;
 using System.Net;
-using System.Text;
 using System.Threading.Tasks;
+using SocketCore.Utils;
+using ServerOptions.Extensions.ConfigurationEngine;
 
 namespace Utils.Helper.Network
 {

@@ -1,5 +1,4 @@
-﻿using SocketCore.Utils.Buffer;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading;
 /* Необъединенное слияние из проекта "SocketCore (net45)"
@@ -38,7 +37,7 @@ namespace SocketCore.Utils
 
         public AutoResetEvent Alive_locker { get; set; } = new AutoResetEvent(true);
 
-        internal string Session { get; set; }
+        public string Session { get; set; }
 
         public string[] RecoverySessionKeyArray { get; private set; }
 

@@ -1,16 +1,10 @@
-﻿using Cipher;
-using ConfigurationEngine;
-using SCLogger;
-using Network.Extensions;
+﻿using Network.Extensions;
 using ServerOptions.Extensions.ConfigurationEngine;
-using SocketCore;
 using SocketCore.Utils.Logger.Enums;
 using SocketServer;
 using SocketServer.Utils;
 using System;
-using System.Collections.Generic;
 using System.Net;
-using System.Text;
 
 namespace Utils.Helper.Network
 {
@@ -77,8 +71,7 @@ namespace Utils.Helper.Network
         /// <param name="sourceFilePath"></param>
         /// <param name="sourceLineNumber"></param>
 #if DEBUG
-        protected virtual void Listener_OnSendPacket(ServerClient<T> client, ushort pid, int len
-            , string stacktrace)
+        protected virtual void Listener_OnSendPacket(ServerClient<T> client, ushort pid, int len, string stacktrace)
         {
             IPEndPoint ipep = null;
 

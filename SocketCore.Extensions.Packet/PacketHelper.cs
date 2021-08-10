@@ -1,6 +1,5 @@
 ﻿using SocketCore;
 using SocketCore.Utils;
-using SocketServer.Utils;
 using System;
 using System.Diagnostics;
 using System.Linq;
@@ -34,9 +33,7 @@ namespace ServerOptions.Extensions.Packet
                 })
                 .Where(x => x.attr != null);
 
-            bool server = typeof(IServerNetworkClient).IsAssignableFrom(typeof(T));
-
-
+            bool client = typeof(BaseSocketNetworkClient).IsAssignableFrom(typeof(T));
 
             foreach (var item in types)
             {
@@ -47,10 +44,10 @@ namespace ServerOptions.Extensions.Packet
 
                 bool r = false;
 
-                if (server)
-                    r = serverOptions.AddPacket((ushort)item.attr.PacketId, (IPacket<T>)Activator.CreateInstance(item.type));
+                if (client)
+                    r = serverOptions.AddPacket((ushort)item.attr.PacketId, (IPacket<T>)Activator.CreateInstance(item.type, serverOptions));
                 else
-                    r = serverOptions.AddPacket((ushort)item.attr.PacketId, (IPacket<T>)Activator.CreateInstance(item.type,serverOptions));
+                    r = serverOptions.AddPacket((ushort)item.attr.PacketId, (IPacket<T>)Activator.CreateInstance(item.type));
 
                 Debug.WriteLine($"Loading Packet: packet: {item.attr.PacketId} type: {item.type.FullName} result: {r}");
             }

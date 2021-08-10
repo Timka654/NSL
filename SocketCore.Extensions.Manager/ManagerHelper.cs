@@ -1,8 +1,6 @@
 ﻿using SocketCore;
 using SocketCore.Utils;
 using SocketCore.Utils.Logger.Enums;
-using SocketServer;
-using SocketServer.Utils;
 using System;
 using System.Diagnostics;
 using System.Linq;

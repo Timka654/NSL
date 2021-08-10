@@ -1,24 +1,30 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
-    <Configurations>Debug;Release;Unity;UnityDebug;DebugStable</Configurations>
-    
-    <Version>$(VersionSuffix)</Version>
-    <PublishRepositoryUrl>true</PublishRepositoryUrl>
-    <EmbedUntrackedSources>true</EmbedUntrackedSources>
-	  <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-	  <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net5.0</TargetFramework>
+		<Configurations>Debug;Release;Unity;UnityDebug;DebugStable</Configurations>
 
-  <PropertyGroup Condition="'$(Configuration)'=='Debug'">
-    <PackageId>$(MSBuildProjectName)_Debug</PackageId>
-  </PropertyGroup>
+		<Version>$(VersionSuffix)</Version>
+		<PublishRepositoryUrl>true</PublishRepositoryUrl>
+		<EmbedUntrackedSources>true</EmbedUntrackedSources>
+		<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+		<GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <Compile Remove="Release\**" />
-    <EmbeddedResource Remove="Release\**" />
-    <None Remove="Release\**" />
-  </ItemGroup>
+	<PropertyGroup Condition="'$(Configuration)'=='Debug'">
+		<PackageId>$(MSBuildProjectName)_Debug</PackageId>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='UnityDebug|AnyCPU'">
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<OutputPath>..\UnityDebug</OutputPath>
+		<DefineConstants>DEBUG;TRACE</DefineConstants>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<Compile Remove="Release\**" />
+		<EmbeddedResource Remove="Release\**" />
+		<None Remove="Release\**" />
+	</ItemGroup>
 
 </Project>

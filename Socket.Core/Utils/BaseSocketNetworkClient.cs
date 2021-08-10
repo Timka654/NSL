@@ -1,18 +1,11 @@
-﻿using SCL;
-using SocketCore.Utils;
-using SocketCore.Utils.Buffer;
+﻿using SocketCore.Utils.Buffer;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
-namespace SCL
+namespace SocketCore.Utils
 {
     public class BaseSocketNetworkClient : INetworkClient
     {
-
-        public string Session { get; set; }
-
         /// <summary>
         /// Буффер для хранения отправленных пакетов во время разрыва соединения
         /// </summary>

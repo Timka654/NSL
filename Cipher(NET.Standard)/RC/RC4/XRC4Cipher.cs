@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using SocketCore.Utils;
-using SocketCore.Utils.Buffer;
 
 namespace Cipher.RC.RC4
 {

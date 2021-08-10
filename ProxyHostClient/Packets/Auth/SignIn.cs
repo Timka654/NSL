@@ -1,10 +1,6 @@
-﻿using SCLogger;
-using SocketCore.Utils;
+﻿using SocketCore.Utils;
 using SocketCore.Utils.Buffer;
-using SocketServer.Utils;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace ProxyHostClient.Packets.Auth
 {
@@ -19,11 +15,11 @@ namespace ProxyHostClient.Packets.Auth
             if (result)
             {
                 client.RunAliveChecker();
-                LoggerStorage.Instance.main.AppendInfo($"Host success connected!");
+                //LoggerStorage.Instance.main.AppendInfo($"Host success connected!");
             }
             else
             {
-                LoggerStorage.Instance.main.AppendError("Invalid connection host data... Disconnect!");
+                //LoggerStorage.Instance.main.AppendError("Invalid connection host data... Disconnect!");
                 client.Network.Disconnect();
             }
             OnReceive?.Invoke(this, result);

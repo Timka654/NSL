@@ -1,10 +1,7 @@
-﻿using SocketCore.Utils.Buffer;
+﻿using SocketCore.Utils;
+using SocketCore.Utils.Buffer;
 using SocketCore.Utils.SystemPackets.Enums;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SCL.Utils
 {

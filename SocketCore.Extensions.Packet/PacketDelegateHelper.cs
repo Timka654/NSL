@@ -1,13 +1,9 @@
 ﻿using ServerOptions.Extensions.Packet;
 using SocketCore.Utils;
 using SocketCore.Utils.Buffer;
-using SocketServer;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SocketCore.Extensions.Packet
 {
@@ -40,7 +36,7 @@ namespace SocketCore.Extensions.Packet
 
                 foreach (var method in methods)
                 {
-                    if (client.AddPacket(method.attributes.PacketId, new DelegatePacket<TClient>() { Delegate = method.x.CreateDelegate<CoreOptions<TClient>.PacketHandle>() }))
+                    if (client.AddPacket(method.attributes.PacketId, new DelegatePacket<TClient>() { Delegate = (CoreOptions<TClient>.PacketHandle)method.x.CreateDelegate(typeof(CoreOptions<TClient>.PacketHandle)) }))
                         result++;
                 }
             }

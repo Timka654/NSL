@@ -1,13 +1,11 @@
 ﻿using BinarySerializer;
 using BinarySerializer.Attributes;
-using Microsoft.CodeAnalysis;
 using SocketCore.Utils.Buffer;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlTypes;
 using System.Linq;
 using System.Reflection;
-using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Threading.Tasks;
 

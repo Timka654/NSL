@@ -3,12 +3,9 @@ using SocketCore.Utils.Logger.Enums;
 using SocketServer;
 using SocketServer.Utils;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ServerOptions.Extensions.StaticQuery
 {

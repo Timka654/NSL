@@ -1,12 +1,9 @@
 ﻿using SCL.Utils;
 using SocketCore;
 using SocketCore.Utils;
-using SocketCore.Utils.Buffer;
 using SocketCore.Utils.SystemPackets.Enums;
 using System;
 using System.Collections.Generic;
-using System.Net.Sockets;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace SCL

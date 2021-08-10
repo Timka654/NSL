@@ -1,49 +1,59 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
-    <Platforms>AnyCPU;x64;x86</Platforms>
-    <Configurations>Debug;Release;PublishDebug;Unity;UnityDebug;DebugStable</Configurations>
-    
-    <Version>$(VersionSuffix)</Version>
-    <PublishRepositoryUrl>true</PublishRepositoryUrl>
-    <EmbedUntrackedSources>true</EmbedUntrackedSources>
-	  <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-	  <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
-  </PropertyGroup>
+	<PropertyGroup>
+		<Platforms>AnyCPU;x64;x86</Platforms>
+		<Configurations>Debug;Release;PublishDebug;Unity;UnityDebug;DebugStable</Configurations>
 
-  <PropertyGroup Condition="'$(Configuration)'=='Debug'">
-    <PackageId>$(MSBuildProjectName)_Debug</PackageId>
-  </PropertyGroup>
+		<Version>$(VersionSuffix)</Version>
+		<PublishRepositoryUrl>true</PublishRepositoryUrl>
+		<EmbedUntrackedSources>true</EmbedUntrackedSources>
+		<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+		<GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
+	</PropertyGroup>
 
-  <!--<PropertyGroup Condition="'$(Configuration)'=='Debug'">
+	<PropertyGroup Condition="'$(Configuration)'=='Debug'">
+		<TargetFramework>net5.0</TargetFramework>
+		<PackageId>$(MSBuildProjectName)_Debug</PackageId>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)'=='Release'">
+		<TargetFramework>net5.0</TargetFramework>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)'=='UnityDebug'">
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<OutputPath>..\UnityDebug</OutputPath>
+		<DefineConstants>DEBUG;TRACE</DefineConstants>
+	</PropertyGroup>
+
+	<!--<PropertyGroup Condition="'$(Configuration)'=='Debug'">
     <PackageId>$(AssemblyName).Develop</PackageId>
   </PropertyGroup>-->
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='PublishDebug|AnyCPU'">
-    <DefineConstants>DEBUG;TRACE;</DefineConstants>
-  </PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='PublishDebug|AnyCPU'">
+		<DefineConstants>DEBUG;TRACE;</DefineConstants>
+	</PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-  </PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+	</PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='UnityDebug|AnyCPU'">
-    <TargetFramework>netstandard2.0</TargetFramework>
-  </PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='UnityDebug|AnyCPU'">
+		<TargetFramework>netstandard2.0</TargetFramework>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <Compile Remove="Release\**" />
-    <EmbeddedResource Remove="Release\**" />
-    <None Remove="Release\**" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-  </ItemGroup>
+	<ItemGroup>
+		<Compile Remove="Release\**" />
+		<EmbeddedResource Remove="Release\**" />
+		<None Remove="Release\**" />
+	</ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Cipher(NET.Standard)\Cipher.csproj" />
-    <ProjectReference Include="..\SocketServer\SocketServer.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\Cipher(NET.Standard)\Cipher.csproj" />
+	</ItemGroup>
 
 </Project>

@@ -1,14 +1,8 @@
-﻿using ServerOptions.Extensions.Packet;
-using SocketCore.Utils;
+﻿using SocketCore.Utils;
 using SocketCore.Utils.Buffer;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Reflection;
-using System.Runtime.Serialization;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SocketCore.Extensions.Packet.FastEvent
 {
@@ -115,7 +109,7 @@ namespace SocketCore.Extensions.Packet.FastEvent
                 {
                     if (packet is EventPacket<TClient> ep)
                     {
-                        var phandle = item.x.CreateDelegate<Action<TClient>>(o);
+                        var phandle = (Action<TClient>)item.x.CreateDelegate(typeof(Action<TClient>),o);
 
                         ep.OnReceive += (client, buffer) => phandle(client);
                     }
@@ -130,7 +124,7 @@ namespace SocketCore.Extensions.Packet.FastEvent
                     {
                         if (packet is EventPacket<TClient> ep)
                         {
-                            var phandle = item.x.CreateDelegate<Action<TClient, InputPacketBuffer>>(o);
+                            var phandle = (Action<TClient, InputPacketBuffer>)item.x.CreateDelegate(typeof(Action<TClient, InputPacketBuffer>),o);
 
                             ep.OnReceive += phandle;
                         }
@@ -143,7 +137,7 @@ namespace SocketCore.Extensions.Packet.FastEvent
                     {
                         var prm = p.ElementAt(1);
 
-                        if (packet.GetType().IsAssignableTo(typeof(EventPacket<,>).MakeGenericType(typeof(TClient), prm.ParameterType)))
+                        if (typeof(EventPacket<,>).MakeGenericType(typeof(TClient), prm.ParameterType).IsAssignableFrom(packet.GetType()))
                         {
                             var t = packet.GetType();
 

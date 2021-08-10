@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>net5.0</TargetFramework>
+		<Configurations>Debug;Release;Unity;UnityDebug;DebugStable</Configurations>
 		<Version>$(VersionSuffix)</Version>
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
 		<EmbedUntrackedSources>true</EmbedUntrackedSources>
@@ -10,13 +10,24 @@
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)'=='Debug'">
+		<TargetFramework>net5.0</TargetFramework>
 		<PackageId>$(MSBuildProjectName)_Debug</PackageId>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)'=='Release'">
+		<TargetFramework>net5.0</TargetFramework>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Unity|AnyCPU'">
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<OutputPath>..\UnityDebug\</OutputPath>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='UnityDebug|AnyCPU'">
 		<TargetFramework>netstandard2.0</TargetFramework>
-		<OutputPath>..\UnityDebug</OutputPath>
 		<DefineConstants>DEBUG;TRACE</DefineConstants>
+		<!--<PackageId>$(AssemblyName).Develop</PackageId>-->
+		<OutputPath>..\UnityDebug\</OutputPath>
 	</PropertyGroup>
 
 	<ItemGroup>

@@ -1,6 +1,5 @@
 ﻿using SocketCore.Utils;
 using SocketCore.Utils.Buffer;
-using System;
 using System.Net;
 
 namespace SocketCore

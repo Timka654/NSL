@@ -2,7 +2,6 @@
 using SocketCore.Utils;
 using SocketCore.Utils.Buffer;
 using System;
-using System.Reflection.Metadata;
 
 namespace SocketCore.Extensions.Buffer
 {
@@ -52,13 +51,7 @@ namespace SocketCore.Extensions.Buffer
             buffer.WriteString32(JsonConvert.SerializeObject(value));
         }
 
-        public static void SendJson16<TClient, TObject>(this TClient client, ushort packetId, TObject o
-#if DEBUG
-            , [System.Runtime.CompilerServices.CallerMemberName] string memberName = "",
-            [System.Runtime.CompilerServices.CallerFilePath] string sourceFilePath = "",
-            [System.Runtime.CompilerServices.CallerLineNumber] int sourceLineNumber = 0
-#endif
-            )
+        public static void SendJson16<TClient, TObject>(this TClient client, ushort packetId, TObject o)
             where TClient : INetworkClient
         {
             var packet = new OutputPacketBuffer();
@@ -70,51 +63,21 @@ namespace SocketCore.Extensions.Buffer
             client.Network.Send(packet);
         }
 
-        public static void SendJson16<TClient, TPacket, TObject>(this TClient client, TPacket packetId, TObject o
-#if DEBUG
-            , [System.Runtime.CompilerServices.CallerMemberName] string memberName = "",
-    [System.Runtime.CompilerServices.CallerFilePath] string sourceFilePath = "",
-    [System.Runtime.CompilerServices.CallerLineNumber] int sourceLineNumber = 0
-#endif
-            )
-    where TClient : INetworkClient
+        public static void SendJson16<TClient, TPacket, TObject>(this TClient client, TPacket packetId, TObject o)
+            where TClient : INetworkClient
             where TPacket : Enum
         {
-            SendJson16<TClient, TObject>(client, Convert.ToUInt16(packetId), o
-#if DEBUG
-                , memberName,
-                sourceFilePath,
-                sourceLineNumber
-#endif
-                );
+            SendJson16<TClient, TObject>(client, Convert.ToUInt16(packetId), o);
         }
 
-        public static void SendJson16<TClient, TPacket>(this TClient client, TPacket packetId, object o
-#if DEBUG
-            , [System.Runtime.CompilerServices.CallerMemberName] string memberName = "",
-    [System.Runtime.CompilerServices.CallerFilePath] string sourceFilePath = "",
-    [System.Runtime.CompilerServices.CallerLineNumber] int sourceLineNumber = 0
-#endif
-            )
-    where TClient : INetworkClient
+        public static void SendJson16<TClient, TPacket>(this TClient client, TPacket packetId, object o)
+            where TClient : INetworkClient
             where TPacket : Enum
         {
-            SendJson16<TClient, object>(client, Convert.ToUInt16(packetId), o
-#if DEBUG
-                , memberName,
-                sourceFilePath,
-                sourceLineNumber
-#endif
-                );
+            SendJson16<TClient, object>(client, Convert.ToUInt16(packetId), o);
         }
 
-        public static void SendJson32<TClient, TObject>(this TClient client, ushort packetId, TObject o
-#if DEBUG
-            , [System.Runtime.CompilerServices.CallerMemberName] string memberName = "",
-            [System.Runtime.CompilerServices.CallerFilePath] string sourceFilePath = "",
-            [System.Runtime.CompilerServices.CallerLineNumber] int sourceLineNumber = 0
-#endif
-            )
+        public static void SendJson32<TClient, TObject>(this TClient client, ushort packetId, TObject o)
             where TClient : INetworkClient
         {
             var packet = new OutputPacketBuffer();
@@ -126,50 +89,25 @@ namespace SocketCore.Extensions.Buffer
             client.Network.Send(packet);
         }
 
-        public static void SendJson32<TClient, TPacket, TObject>(this TClient client, TPacket packetId, TObject o
-#if DEBUG
-            , [System.Runtime.CompilerServices.CallerMemberName] string memberName = "",
-    [System.Runtime.CompilerServices.CallerFilePath] string sourceFilePath = "",
-    [System.Runtime.CompilerServices.CallerLineNumber] int sourceLineNumber = 0
-#endif
-            )
-    where TClient : INetworkClient
-            where TPacket : Enum
+        public static void SendJson32<TClient, TPacket, TObject>(this TClient client, TPacket packetId, TObject o)
+            where TClient : INetworkClient
+            where TPacket : struct, Enum, IConvertible
         {
-            SendJson32<TClient, TObject>(client, Convert.ToUInt16(packetId), o
-#if DEBUG
-                , memberName,
-                sourceFilePath,
-                sourceLineNumber
-#endif
-                );
+            SendJson32<TClient, TObject>(client, Convert.ToUInt16(packetId), o);
         }
 
-        public static void SendJson32<TClient, TPacket>(this TClient client, TPacket packetId, object o
-#if DEBUG
-            , [System.Runtime.CompilerServices.CallerMemberName] string memberName = "",
-    [System.Runtime.CompilerServices.CallerFilePath] string sourceFilePath = "",
-    [System.Runtime.CompilerServices.CallerLineNumber] int sourceLineNumber = 0
-#endif
-            )
-    where TClient : INetworkClient
-            where TPacket : Enum
+        public static void SendJson32<TClient, TPacket>(this TClient client, TPacket packetId, object o)
+            where TClient : INetworkClient
+            where TPacket : struct, Enum, IConvertible
         {
-            SendJson32<TClient, object>(client, Convert.ToUInt16(packetId), o
-#if DEBUG
-                , memberName,
-                sourceFilePath,
-                sourceLineNumber
-#endif
-                );
+            SendJson32<TClient, object>(client, Convert.ToUInt16(packetId), o);
         }
 
-
-
-        public static void Send<TClient>(this TClient client, ushort packetId, int value)
-    where TClient : IClient
+        public static void Send<TClient, TPacket>(this TClient client, TPacket packetId, int value)
+            where TClient : IClient
+            where TPacket : struct, Enum, IConvertible
         {
-            OutputPacketBuffer rbuff = new OutputPacketBuffer
+            OutputPacketBuffer<TPacket> rbuff = new OutputPacketBuffer<TPacket>
             {
                 PacketId = packetId
             };
@@ -178,10 +116,11 @@ namespace SocketCore.Extensions.Buffer
             client.Send(rbuff);
         }
 
-        public static void Send<TClient>(this TClient client, ushort packetId, byte value)
-    where TClient : IClient
+        public static void Send<TClient, TPacket>(this TClient client, TPacket packetId, byte value)
+            where TClient : IClient
+            where TPacket : struct, Enum, IConvertible
         {
-            OutputPacketBuffer rbuff = new OutputPacketBuffer
+            OutputPacketBuffer<TPacket> rbuff = new OutputPacketBuffer<TPacket>
             {
                 PacketId = packetId
             };
@@ -191,10 +130,11 @@ namespace SocketCore.Extensions.Buffer
             client.Send(rbuff);
         }
 
-        public static void Send<TClient>(this TClient client, ushort packetId, bool value)
-    where TClient : IClient
+        public static void Send<TClient, TPacket>(this TClient client, TPacket packetId, bool value)
+            where TClient : IClient
+            where TPacket : struct, Enum, IConvertible
         {
-            OutputPacketBuffer rbuff = new OutputPacketBuffer
+            OutputPacketBuffer<TPacket> rbuff = new OutputPacketBuffer<TPacket>
             {
                 PacketId = packetId
             };
@@ -204,10 +144,11 @@ namespace SocketCore.Extensions.Buffer
             client.Send(rbuff);
         }
 
-        public static void Send<TClient>(this TClient client, ushort packetId, short value)
-    where TClient : IClient
+        public static void Send<TClient, TPacket>(this TClient client, TPacket packetId, short value)
+            where TClient : IClient
+            where TPacket : struct, Enum, IConvertible
         {
-            OutputPacketBuffer rbuff = new OutputPacketBuffer
+            OutputPacketBuffer<TPacket> rbuff = new OutputPacketBuffer<TPacket>
             {
                 PacketId = packetId
             };
@@ -217,10 +158,11 @@ namespace SocketCore.Extensions.Buffer
             client.Send(rbuff);
         }
 
-        public static void Send<TClient>(this TClient client, ushort packetId, ushort value)
-    where TClient : IClient
+        public static void Send<TClient, TPacket>(this TClient client, TPacket packetId, ushort value)
+            where TClient : IClient
+            where TPacket : struct, Enum, IConvertible
         {
-            OutputPacketBuffer rbuff = new OutputPacketBuffer
+            OutputPacketBuffer<TPacket> rbuff = new OutputPacketBuffer<TPacket>
             {
                 PacketId = packetId
             };
@@ -230,10 +172,11 @@ namespace SocketCore.Extensions.Buffer
             client.Send(rbuff);
         }
 
-        public static void Send<TClient>(this TClient client, ushort packetId, uint value)
-    where TClient : IClient
+        public static void Send<TClient, TPacket>(this TClient client, TPacket packetId, uint value)
+            where TClient : IClient
+            where TPacket : struct, Enum, IConvertible
         {
-            OutputPacketBuffer rbuff = new OutputPacketBuffer
+            OutputPacketBuffer<TPacket> rbuff = new OutputPacketBuffer<TPacket>
             {
                 PacketId = packetId
             };
@@ -243,10 +186,11 @@ namespace SocketCore.Extensions.Buffer
             client.Send(rbuff);
         }
 
-        public static void Send<TClient>(this TClient client, ushort packetId, long value)
-    where TClient : IClient
+        public static void Send<TClient, TPacket>(this TClient client, TPacket packetId, long value)
+            where TClient : IClient
+            where TPacket : struct, Enum, IConvertible
         {
-            OutputPacketBuffer rbuff = new OutputPacketBuffer
+            OutputPacketBuffer<TPacket> rbuff = new OutputPacketBuffer<TPacket>
             {
                 PacketId = packetId
             };
@@ -256,10 +200,11 @@ namespace SocketCore.Extensions.Buffer
             client.Send(rbuff);
         }
 
-        public static void Send<TClient>(this TClient client, ushort packetId, ulong value)
-    where TClient : IClient
+        public static void Send<TClient, TPacket>(this TClient client, TPacket packetId, ulong value)
+            where TClient : IClient
+            where TPacket : struct, Enum, IConvertible
         {
-            OutputPacketBuffer rbuff = new OutputPacketBuffer
+            OutputPacketBuffer<TPacket> rbuff = new OutputPacketBuffer<TPacket>
             {
                 PacketId = packetId
             };
@@ -269,10 +214,11 @@ namespace SocketCore.Extensions.Buffer
             client.Send(rbuff);
         }
 
-        public static void Send<TClient>(this TClient client, ushort packetId, float value)
-    where TClient : IClient
+        public static void Send<TClient, TPacket>(this TClient client, TPacket packetId, float value)
+            where TClient : IClient
+            where TPacket : struct, Enum, IConvertible
         {
-            OutputPacketBuffer rbuff = new OutputPacketBuffer
+            OutputPacketBuffer<TPacket> rbuff = new OutputPacketBuffer<TPacket>
             {
                 PacketId = packetId
             };
@@ -282,16 +228,11 @@ namespace SocketCore.Extensions.Buffer
             client.Send(rbuff);
         }
 
-        public static void Send<TClient>(this TClient client, ushort packetId, double value
-#if DEBUG
-            , [System.Runtime.CompilerServices.CallerMemberName] string memberName = "",
-            [System.Runtime.CompilerServices.CallerFilePath] string sourceFilePath = "",
-            [System.Runtime.CompilerServices.CallerLineNumber] int sourceLineNumber = 0
-#endif
-            )
-    where TClient : IClient
+        public static void Send<TClient, TPacket>(this TClient client, TPacket packetId, double value)
+            where TClient : IClient
+            where TPacket : struct, Enum, IConvertible
         {
-            OutputPacketBuffer rbuff = new OutputPacketBuffer
+            OutputPacketBuffer<TPacket> rbuff = new OutputPacketBuffer<TPacket>
             {
                 PacketId = packetId
             };
@@ -301,10 +242,11 @@ namespace SocketCore.Extensions.Buffer
             client.Send(rbuff.CompilePacket(), 0, rbuff.PacketLenght);
         }
 
-        public static void Send<TClient>(this TClient client, ushort packetId, DateTime value)
-    where TClient : IClient
+        public static void Send<TClient, TPacket>(this TClient client, TPacket packetId, DateTime value)
+            where TClient : IClient
+            where TPacket : struct, Enum, IConvertible
         {
-            OutputPacketBuffer rbuff = new OutputPacketBuffer
+            OutputPacketBuffer<TPacket> rbuff = new OutputPacketBuffer<TPacket>
             {
                 PacketId = packetId
             };
@@ -314,10 +256,11 @@ namespace SocketCore.Extensions.Buffer
             client.Send(rbuff);
         }
 
-        public static void Send<TClient>(this TClient client, ushort packetId, string value)
-    where TClient : IClient
+        public static void Send<TClient, TPacket>(this TClient client, TPacket packetId, string value)
+            where TClient : IClient
+            where TPacket : struct, Enum, IConvertible
         {
-            OutputPacketBuffer rbuff = new OutputPacketBuffer
+            OutputPacketBuffer<TPacket> rbuff = new OutputPacketBuffer<TPacket>
             {
                 PacketId = packetId
             };
@@ -327,7 +270,15 @@ namespace SocketCore.Extensions.Buffer
             client.Send(rbuff);
         }
 
-
+        public static void SendEmpty<TClient, TPacket>(this TClient client, TPacket packetId)
+            where TClient : IClient
+            where TPacket : struct, Enum, IConvertible
+        {
+            client.Send(new OutputPacketBuffer<TPacket>
+            {
+                PacketId = packetId
+            });
+        }
     }
 
     public class OutputPacketBuffer<TPacketId> : OutputPacketBuffer

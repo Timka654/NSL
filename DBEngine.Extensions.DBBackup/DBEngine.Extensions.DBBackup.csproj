@@ -14,9 +14,15 @@
   <PropertyGroup Condition="'$(Configuration)'=='Debug'">
     <PackageId>$(MSBuildProjectName)_Debug</PackageId>
   </PropertyGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\DBEngine\DBEngine.csproj" />
-  </ItemGroup>
+	
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='UnityDebug|AnyCPU'">
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<OutputPath>..\UnityDebug</OutputPath>
+		<DefineConstants>DEBUG;TRACE</DefineConstants>
+	</PropertyGroup>
+	
+	<ItemGroup>
+	  <ProjectReference Include="..\DBEngine\DBEngine.csproj" />
+	</ItemGroup>
 
 </Project>

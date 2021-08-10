@@ -1,35 +1,44 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
-    <Configurations>Debug;Release;Unity;UnityDebug;DebugStable</Configurations>
-    <AssemblyName>SCLogger</AssemblyName>
-    <RootNamespace>SCLogger</RootNamespace>
-    
-    <Version>$(VersionSuffix)</Version>
-	  <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-	  <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
-  </PropertyGroup>
+	<PropertyGroup>
+		<Configurations>Debug;Release;Unity;UnityDebug;DebugStable</Configurations>
+		<AssemblyName>SCLogger</AssemblyName>
+		<RootNamespace>SCLogger</RootNamespace>
 
-  <PropertyGroup Condition="'$(Configuration)'=='Debug'">
-    <PackageId>$(MSBuildProjectName)_Debug</PackageId>
-  </PropertyGroup>
+		<Version>$(VersionSuffix)</Version>
+		<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+		<GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
+	</PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='UnityDebug|AnyCPU'">
-  <TargetFramework>netstandard2.0</TargetFramework>
-  </PropertyGroup>
-  <ItemGroup>
-    <Compile Remove="Release\**" />
-    <EmbeddedResource Remove="Release\**" />
-    <None Remove="Release\**" />
-  </ItemGroup>
+	<PropertyGroup Condition="'$(Configuration)'=='Debug'">
+		<TargetFramework>net5.0</TargetFramework>
+		<PackageId>$(MSBuildProjectName)_Debug</PackageId>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Socket.Core\SocketCore.csproj" />
-    <ProjectReference Include="..\Utils\Utils.csproj" />
-  </ItemGroup>
+	<PropertyGroup Condition="'$(Configuration)'=='Release'">
+		<TargetFramework>net5.0</TargetFramework>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+	</PropertyGroup>
+	
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='UnityDebug|AnyCPU'">
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<OutputPath>..\UnityDebug</OutputPath>
+		<DefineConstants>DEBUG;TRACE</DefineConstants>
+	</PropertyGroup>
+	
+	<ItemGroup>
+		<Compile Remove="Release\**" />
+		<EmbeddedResource Remove="Release\**" />
+		<None Remove="Release\**" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Socket.Core\SocketCore.csproj" />
+		<ProjectReference Include="..\Utils\Utils.csproj" />
+	</ItemGroup>
 
 </Project>

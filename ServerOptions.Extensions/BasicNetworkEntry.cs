@@ -1,18 +1,10 @@
 ﻿using Cipher;
 using ConfigurationEngine;
 using SCLogger;
-using ServerOptions.Extensions.ConfigurationEngine;
 using SocketCore;
 using SocketCore.Utils;
 using SocketCore.Utils.Logger.Enums;
-using SocketServer;
-using SocketServer.Utils;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Network.Extensions
 {

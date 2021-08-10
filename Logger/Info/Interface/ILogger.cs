@@ -1,5 +1,4 @@
 ﻿using SocketCore.Utils.Logger;
-using Utils;
 
 namespace SCLogger
 {

@@ -1,5 +1,4 @@
-﻿using SocketCore.Utils;
-using SocketCore.Utils.Buffer;
+﻿using SocketCore.Utils.Buffer;
 
 namespace SocketCore.Utils
 {

@@ -8,3 +8,4 @@ bin/
 /UnityDebug/
 */Release/*
 /nupkg/
+/unity/

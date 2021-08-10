@@ -7,10 +7,7 @@ using SocketServer.Utils;
 using System.Threading.Tasks;
 using ProxyHostClient.Packets.Player.PacketData;
 using ProxyHostClient.Packets.Auth;
-using SCLogger;
-using ConfigurationEngine;
 using ServerOptions.Extensions.Packet;
-using ServerOptions.Extensions.ConfigurationEngine;
 
 namespace ProxyHostClient
 {
@@ -27,7 +24,7 @@ namespace ProxyHostClient
 
         public NetworkClient<ProxyHostClientData> NetworkClient;
 
-        internal IConfigurationManager Config;
+        //internal IConfigurationManager Config;
 
         private string NetworkNodePath;
 
@@ -41,7 +38,8 @@ namespace ProxyHostClient
             remove { ((Packets.Auth.SignIn)options.GetPacket((ushort)Packets.Enums.ClientPacketsEnum.SignInResult)).OnReceive -= value; }
         }
 
-        public event OnPlayerConnectedDelegate OnPlayerConnected {
+        public event OnPlayerConnectedDelegate OnPlayerConnected
+        {
             add { ((Packets.Player.PlayerConnected)options.GetPacket((ushort)Packets.Enums.ClientPacketsEnum.PlayerConnected)).OnReceive += value; }
             remove { ((Packets.Player.PlayerConnected)options.GetPacket((ushort)Packets.Enums.ClientPacketsEnum.PlayerConnected)).OnReceive -= value; }
         }
@@ -65,14 +63,14 @@ namespace ProxyHostClient
         /// <summary>
         /// Полная инициализация
         /// </summary>
-        public void Load(IConfigurationManager config, string networkNodePath, string publicName = "Node Host")
+        public void Load(/*IConfigurationManager config,*/ string networkNodePath, string publicName = "Node Host")
         {
-            Config = config;
+            //Config = config;
 
             NetworkNodePath = networkNodePath;
             PublicName = publicName;
 
-            LoggerStorage.Instance.main.AppendInfo($"---> {PublicName} Client Loading");
+            //LoggerStorage.Instance.main.AppendInfo($"---> {PublicName} Client Loading");
 
             LoadConfiguration();
 
@@ -80,7 +78,7 @@ namespace ProxyHostClient
 
             LoadClient();
 
-            LoggerStorage.Instance.main.AppendInfo($"---> {PublicName} Client Loaded");
+            //LoggerStorage.Instance.main.AppendInfo($"---> {PublicName} Client Loaded");
         }
 
         /// <summary>
@@ -88,18 +86,18 @@ namespace ProxyHostClient
         /// </summary>
         private void LoadConfiguration()
         {
-            LoggerStorage.Instance.main.AppendInfo($"-> Configuration Loading");
+            //LoggerStorage.Instance.main.AppendInfo($"-> Configuration Loading");
 
-            options = Config.LoadConfigurationServerOptions<ProxyHostClientData>(NetworkNodePath);
+            //options = Config.LoadConfigurationServerOptions<ProxyHostClientData>(NetworkNodePath);
 
-            options.inputCipher = new PacketNoneCipher();
-            options.outputCipher = new PacketNoneCipher();
+            //options.inputCipher = new PacketNoneCipher();
+            //options.outputCipher = new PacketNoneCipher();
 
-            options.OnClientConnectEvent += SocketOptions_OnClientConnectEvent;
-            options.OnClientDisconnectEvent += SocketOptions_OnClientDisconnectEvent;
-            options.OnExceptionEvent += SocketOptions_OnExtensionEvent;
+            //options.OnClientConnectEvent += SocketOptions_OnClientConnectEvent;
+            //options.OnClientDisconnectEvent += SocketOptions_OnClientDisconnectEvent;
+            //options.OnExceptionEvent += SocketOptions_OnExtensionEvent;
 
-            LoggerStorage.Instance.main.AppendInfo($"-> Configuration Loaded");
+            //LoggerStorage.Instance.main.AppendInfo($"-> Configuration Loaded");
         }
 
         /// <summary>
@@ -107,11 +105,11 @@ namespace ProxyHostClient
         /// </summary>
         private void LoadReceivePackets()
         {
-            LoggerStorage.Instance.main.AppendInfo($"-> {PublicName} Client Packets Loading");
+            //LoggerStorage.Instance.main.AppendInfo($"-> {PublicName} Client Packets Loading");
 
             options.LoadPackets(typeof(ProxyHostPacketAttribute));
 
-            LoggerStorage.Instance.main.AppendInfo($"-> {PublicName} Client Packets Loaded");
+            //LoggerStorage.Instance.main.AppendInfo($"-> {PublicName} Client Packets Loaded");
         }
 
         /// <summary>
@@ -119,7 +117,7 @@ namespace ProxyHostClient
         /// </summary>
         private void LoadClient()
         {
-            LoggerStorage.Instance.main.AppendInfo($"-> {PublicName} Socket Listener Loading");
+            //LoggerStorage.Instance.main.AppendInfo($"-> {PublicName} Socket Listener Loading");
 
             NetworkClient = new NetworkClient<ProxyHostClientData>(options);
 
@@ -132,10 +130,10 @@ namespace ProxyHostClient
         public bool Connect()
         {
             bool result = NetworkClient.Connect();
-            if (!result)
-                LoggerStorage.Instance.main.AppendError($"-> {PublicName} client ({options.IpAddress}:{options.Port}) Error connection");
-            else
-                SignIn(Config.GetValue<int>($"{NetworkNodePath}/signin/server.id"), Config.GetValue<string>($"{NetworkNodePath}/signin/access.key"));
+            //if (!result)
+            //    LoggerStorage.Instance.main.AppendError($"-> {PublicName} client ({options.IpAddress}:{options.Port}) Error connection");
+            //else
+            //    SignIn(Config.GetValue<int>($"{NetworkNodePath}/signin/server.id"), Config.GetValue<string>($"{NetworkNodePath}/signin/access.key"));
 
             return result;
         }
@@ -155,7 +153,7 @@ namespace ProxyHostClient
                 ipep = client.GetRemovePoint();
             }
 
-            LoggerStorage.Instance.main.AppendInfo($"{PublicName} packet send pid:{pid}({(Packets.Enums.ServerPacketsEnum)pid}) len:{len} to {ipep?.ToString()} from {stackTrace}");
+            //LoggerStorage.Instance.main.AppendInfo($"{PublicName} packet send pid:{pid}({(Packets.Enums.ServerPacketsEnum)pid}) len:{len} to {ipep?.ToString()} from {stackTrace}");
         }
 
         private void Listener_OnReceivePacket(ServerClient<ProxyHostClientData> client, ushort pid, int len)
@@ -167,7 +165,7 @@ namespace ProxyHostClient
                 ipep = client.GetRemovePoint();
             }
 
-            LoggerStorage.Instance.main.AppendInfo($"{PublicName} packet receive pid:{pid}({(Packets.Enums.ClientPacketsEnum)pid}) len:{len} from {ipep?.ToString()}");
+            //LoggerStorage.Instance.main.AppendInfo($"{PublicName} packet receive pid:{pid}({(Packets.Enums.ClientPacketsEnum)pid}) len:{len} from {ipep?.ToString()}");
         }
 
 #endif
@@ -181,12 +179,12 @@ namespace ProxyHostClient
         {
             try
             {
-                LoggerStorage.Instance.main.AppendError($"{PublicName} socket Error ({client?.Network?.GetSocket()?.RemoteEndPoint}) - {ex.ToString()}");
+                //LoggerStorage.Instance.main.AppendError($"{PublicName} socket Error ({client?.Network?.GetSocket()?.RemoteEndPoint}) - {ex.ToString()}");
 
             }
             catch
             {
-                LoggerStorage.Instance.main.AppendError($"{PublicName} socket Error  {ex.ToString()}");
+                //LoggerStorage.Instance.main.AppendError($"{PublicName} socket Error  {ex.ToString()}");
 
             }
             await Task.Delay(5000);
@@ -199,7 +197,7 @@ namespace ProxyHostClient
         /// <param name="client">Текущий клиент</param>
         private void SocketOptions_OnClientDisconnectEvent(ProxyHostClientData client)
         {
-            LoggerStorage.Instance.main.AppendInfo($"{PublicName} network client disconnected ({client?.Network?.GetRemovePoint()})");
+            //LoggerStorage.Instance.main.AppendInfo($"{PublicName} network client disconnected ({client?.Network?.GetRemovePoint()})");
         }
 
         /// <summary>
@@ -208,7 +206,7 @@ namespace ProxyHostClient
         /// <param name="client">Текущий клиент</param>
         private void SocketOptions_OnClientConnectEvent(ProxyHostClientData client)
         {
-            LoggerStorage.Instance.main.AppendInfo($"{PublicName} network client connected ({client?.Network?.GetRemovePoint()})");
+            //LoggerStorage.Instance.main.AppendInfo($"{PublicName} network client connected ({client?.Network?.GetRemovePoint()})");
         }
 
         #endregion

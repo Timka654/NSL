@@ -4,7 +4,6 @@ using System;
 using System.Collections.Concurrent;
 using System.IO;
 using System.Threading;
-using System.Threading.Tasks;
 using Utils;
 
 namespace SCLogger
@@ -156,7 +155,7 @@ namespace SCLogger
             Disponsed = true;
 
             outputTimer.Dispose();
-            LoggerStorage.DestroyLogger(InstanceName);
+            //LoggerStorage.DestroyLogger(InstanceName);
         }
     }
 }
