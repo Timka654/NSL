@@ -1,12 +1,9 @@
-﻿using SocketPhantom.Unity.Network.Packets;
-using NSL.TCP.Client;
-using SCL;
+﻿using NSL.TCP.Client;
 using SocketClient;
+using SocketPhantom.Unity.Network.Packets;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Text;
 using System.Threading.Tasks;
 using static SocketPhantom.Unity.PhantomHubConnection;
 

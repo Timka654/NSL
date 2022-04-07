@@ -2,7 +2,6 @@
 
 	<PropertyGroup>
 		<TargetFramework>net6.0</TargetFramework>
-		<OutputPath>..\package_build</OutputPath>
 		<Configurations>Debug;Release;Unity;UnityDebug;</Configurations>
 		<Version>$(VersionSuffix)</Version>
 
@@ -15,37 +14,16 @@
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 	</PropertyGroup>
 
-
 	<PropertyGroup Condition="'$(Configuration)'=='Debug'">
 		<PackageId>$(MSBuildProjectName)_Debug</PackageId>
 	</PropertyGroup>
 
-	<PropertyGroup Condition="'$(Configuration)'=='Release'">
-		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+	<PropertyGroup Condition="'$(Configuration)'=='UnityDebug'">
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<DefineConstants>DEBUG;TRACE</DefineConstants>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)'=='Unity'">
 		<TargetFramework>netstandard2.0</TargetFramework>
-	</PropertyGroup>
-
-	<PropertyGroup Condition="'$(Configuration)'=='UnityDebug'">
-		<TargetFramework>netstandard2.0</TargetFramework>
-		<OutputPath>..\package_unity_build</OutputPath>
-		<DefineConstants>DEBUG;TRACE</DefineConstants>
-	</PropertyGroup>
-
-	<!--<PropertyGroup Condition="'$(Configuration)'=='Debug'">
-    <PackageId>$(AssemblyName).Develop</PackageId>
-  </PropertyGroup>-->
-
-	<PropertyGroup Condition="'$(Configuration)'=='UnityDebug'">
-		<TargetFramework>netstandard2.0</TargetFramework>
-		<DefineConstants>DEBUG;TRACE</DefineConstants>
-		<OutputPath>..\package_unity_build</OutputPath>
-	</PropertyGroup>
-
-	<PropertyGroup Condition="'$(Configuration)'=='Unity'">
-		<TargetFramework>netstandard2.0</TargetFramework>
-		<OutputPath>..\package_unity_build</OutputPath>
 	</PropertyGroup>
 </Project>

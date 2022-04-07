@@ -1,7 +1,4 @@
 using SocketClient;
-using SocketCore.Utils;
-using System.Collections;
-using System.Collections.Generic;
 
 namespace SocketPhantom.Unity
 {

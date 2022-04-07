@@ -1,12 +1,12 @@
-using Newtonsoft.Json;
-using SocketCore.Extensions.Buffer;
-using SocketCore.Utils.Buffer;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
+using SocketCore.Extensions.Buffer;
+using SocketCore.Utils.Buffer;
 using SocketPhantom.Unity.Network;
 
 namespace SocketPhantom.Unity

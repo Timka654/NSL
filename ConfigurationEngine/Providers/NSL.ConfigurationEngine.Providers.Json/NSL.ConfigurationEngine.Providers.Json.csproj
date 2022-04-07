@@ -2,7 +2,6 @@
 
 	<PropertyGroup>
 		<TargetFramework>net6.0</TargetFramework>
-		<OutputPath>..\package_build</OutputPath>
 		<Configurations>Debug;Release;Unity;UnityDebug;</Configurations>
 		<Version>$(VersionSuffix)</Version>
 
@@ -10,23 +9,22 @@
 		<EmbedUntrackedSources>true</EmbedUntrackedSources>
 		<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
 		<GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
+		
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)'=='Debug'">
 		<PackageId>$(MSBuildProjectName)_Debug</PackageId>
 	</PropertyGroup>
 
-	<PropertyGroup Condition="'$(Configuration)'=='Release'">
-		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+	<PropertyGroup Condition="'$(Configuration)'=='UnityDebug'">
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<DefineConstants>DEBUG;TRACE</DefineConstants>
 	</PropertyGroup>
 
-	<ItemGroup Condition="'$(Configuration)'=='UnityDebug'">
-		<PackageReference Include="Newtonsoft.Json" Version="12.0.0" />
-	</ItemGroup>
-
-	<ItemGroup Condition="'$(Configuration)'!='UnityDebug'">
-		<PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-	</ItemGroup>
+	<PropertyGroup Condition="'$(Configuration)'=='Unity'">
+		<TargetFramework>netstandard2.0</TargetFramework>
+	</PropertyGroup>
 
 	<ItemGroup>
 	  <ProjectReference Include="..\..\NSL.ConfigurationEngine\NSL.ConfigurationEngine.csproj" />

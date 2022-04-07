@@ -2,7 +2,6 @@
 
 	<PropertyGroup>
 		<TargetFramework>net6.0</TargetFramework>
-		<OutputPath>..\package_build</OutputPath>
 		<Configurations>Debug;Release;Unity;UnityDebug;</Configurations>
 		<Version>$(VersionSuffix)</Version>
 
@@ -16,16 +15,13 @@
 		<PackageId>$(MSBuildProjectName)_Debug</PackageId>
 	</PropertyGroup>
 
-	<PropertyGroup Condition="'$(Configuration)'=='Unity'">
-		<TargetFramework>netstandard2.0</TargetFramework>
-		<OutputPath>..\package_unity_build</OutputPath>
-	</PropertyGroup>
-
 	<PropertyGroup Condition="'$(Configuration)'=='UnityDebug'">
 		<TargetFramework>netstandard2.0</TargetFramework>
 		<DefineConstants>DEBUG;TRACE</DefineConstants>
-		<!--<PackageId>$(AssemblyName).Develop</PackageId>-->
-		<OutputPath>..\package_unity_build</OutputPath>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)'=='Unity'">
+		<TargetFramework>netstandard2.0</TargetFramework>
 	</PropertyGroup>
 
 	<ItemGroup>

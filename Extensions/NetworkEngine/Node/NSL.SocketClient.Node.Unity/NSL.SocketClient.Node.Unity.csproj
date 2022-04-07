@@ -19,13 +19,13 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\SCL.Node(NET.Standard)\SCL.Node.csproj" />
+	  <ProjectReference Include="..\NSL.SocketClient.Node\NSL.SocketClient.Node.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<Reference Include="UnityEngine">
-			<HintPath>..\UnityEngine.dll</HintPath>
-		</Reference>
+	  <Reference Include="UnityEngine">
+	    <HintPath>..\..\..\..\Unity\UnityEngine.dll</HintPath>
+	  </Reference>
 	</ItemGroup>
 
 </Project>

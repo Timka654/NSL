@@ -1,0 +1,36 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<Configurations>Debug;Release;Unity;UnityDebug</Configurations>
+		<Version>$(VersionSuffix)</Version>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)'=='UnityDebug'">
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<OutputPath>..\package_unity_build</OutputPath>
+		<DefineConstants>DEBUG;TRACE</DefineConstants>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)'=='Unity'">
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<OutputPath>..\package_unity_build</OutputPath>
+	</PropertyGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\..\..\..\Core\Extensions\SocketCore.Extensions.Buffer\NSL.SocketCore.Extensions.Buffer.csproj" />
+	  <ProjectReference Include="..\..\..\..\Core\NSL.SocketClient\NSL.SocketClient.csproj" />
+	  <ProjectReference Include="..\..\..\..\Core\NSL.SocketCore\NSL.SocketCore.csproj" />
+	  <ProjectReference Include="..\..\..\..\Core\Utils\NSL.Utils\NSL.Utils.csproj" />
+	  <ProjectReference Include="..\..\..\..\Protocols\TCP\NSL.TCP.Client\NSL.TCP.Client.csproj" />
+	  <ProjectReference Include="..\..\..\..\Unity\NSL.SocketClient.Unity\NSL.SocketClient.Unity.csproj" />
+	  <ProjectReference Include="..\NSL.SocketPhantom\NSL.SocketPhantom.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Reference Include="UnityEngine">
+	    <HintPath>..\..\..\..\Unity\UnityEngine.dll</HintPath>
+	  </Reference>
+	</ItemGroup>
+
+</Project>

@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<TargetFramework>netstandard2.0</TargetFramework>
@@ -18,15 +18,13 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\SCL.Unity(NET.Standard)\SCL.Unity.csproj" />
-		<ProjectReference Include="..\SocketCore.Extensions.Buffer\SocketCore.Extensions.Buffer.csproj" />
-		<ProjectReference Include="..\SocketPhantom\SocketPhantom.csproj" />
-		<ProjectReference Include="..\Utils\Utils.csproj" />
+	  <ProjectReference Include="..\..\..\Core\Utils\NSL.Utils\NSL.Utils.csproj" />
+	  <ProjectReference Include="..\..\..\Unity\NSL.SocketClient.Unity\NSL.SocketClient.Unity.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
 	  <Reference Include="UnityEngine">
-	    <HintPath>..\UnityEngine.dll</HintPath>
+	    <HintPath>..\..\..\Unity\UnityEngine.dll</HintPath>
 	  </Reference>
 	</ItemGroup>
 

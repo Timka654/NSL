@@ -2,7 +2,6 @@
 
 	<PropertyGroup>
 		<TargetFramework>net6.0</TargetFramework>
-		<OutputPath>..\package_build</OutputPath>
 		<Configurations>Debug;Release;</Configurations>
 		<Version>$(VersionSuffix)</Version>
 

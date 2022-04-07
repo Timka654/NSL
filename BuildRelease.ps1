@@ -1,3 +1,3 @@
 $ver = $args[0]
-dotnet build "NSL.sln" --configuration Release --output "package_build_release" --version-suffix "$ver" 
-dotnet pack "NSL.sln" --configuration Release --output "package_nupkg_release" --version-suffix "$ver"
+dotnet build --configuration Release --output "build/Release/build" --version-suffix "$ver" "NSL.sln"
+dotnet pack --configuration Release --output "build/Release/package" --version-suffix "$ver" "NSL.sln"
