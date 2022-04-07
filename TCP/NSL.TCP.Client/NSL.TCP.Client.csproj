@@ -1,0 +1,31 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<OutputPath>..\package_build</OutputPath>
+		<Configurations>Debug;Release;Unity;UnityDebug;</Configurations>
+		<Version>$(VersionSuffix)</Version>
+
+		<PublishRepositoryUrl>true</PublishRepositoryUrl>
+		<EmbedUntrackedSources>true</EmbedUntrackedSources>
+		<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+		<GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\NSL.TCP\NSL.TCP.csproj" />
+		<ProjectReference Include="..\SCL\NSL.SocketClient.csproj" />
+	</ItemGroup>
+
+	<PropertyGroup Condition="'$(Configuration)'=='UnityDebug'">
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<OutputPath>..\package_unity_build</OutputPath>
+		<DefineConstants>DEBUG;TRACE</DefineConstants>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)'=='Unity'">
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<OutputPath>..\package_unity_build</OutputPath>
+	</PropertyGroup>
+
+</Project>

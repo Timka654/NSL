@@ -1,3 +1,2 @@
 $ver = $args[0]
-dotnet build --configuration UnityDebug "SSFUnity.sln"
-dotnet pack --configuration UnityDebug --output "unity" --version-suffix "$ver" SSFUnity.sln
+dotnet pack --version-suffix "$ver" --configuration UnityDebug --output "package_unity" SSFUnity.sln

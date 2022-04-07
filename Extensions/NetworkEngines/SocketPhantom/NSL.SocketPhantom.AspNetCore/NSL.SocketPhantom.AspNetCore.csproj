@@ -1,0 +1,32 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<OutputPath>..\package_build</OutputPath>
+		<Configurations>Debug;Release;</Configurations>
+		<Version>$(VersionSuffix)</Version>
+
+		<PublishRepositoryUrl>true</PublishRepositoryUrl>
+		<EmbedUntrackedSources>true</EmbedUntrackedSources>
+		<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+		<GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
+		
+		<IsPackable>true</IsPackable>
+		<OutputType>Library</OutputType>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)'=='Debug'">
+		<PackageId>$(MSBuildProjectName)_Debug</PackageId>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\ConfigurationEngine.Providers.IConfiguration\NSL.ConfigurationEngine.Providers.IConfiguration.csproj" />
+		<ProjectReference Include="..\Configuration\NSL.ConfigurationEngine.csproj" />
+		<ProjectReference Include="..\NSL.TCP.Server\NSL.TCP.Server.csproj" />
+		<ProjectReference Include="..\ServerOptions.Extensions\Network.Extensions.csproj" />
+		<ProjectReference Include="..\SocketCore.Extensions.Packet\SocketCore.Extensions.Packet.csproj" />
+		<ProjectReference Include="..\SocketPhantom\NSL.SocketPhantom.csproj" />
+		<ProjectReference Include="..\Utils\Utils.csproj" />
+	</ItemGroup>
+
+</Project>

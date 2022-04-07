@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<Configurations>Debug;Release;Unity;UnityDebug;DebugStable</Configurations>
+		<OutputType>Exe</OutputType>
+		<TargetFramework>net5.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<Version>$(VersionSuffix)</Version>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\UDPExample\UDPExample.csproj" />
+	</ItemGroup>
+
+</Project>

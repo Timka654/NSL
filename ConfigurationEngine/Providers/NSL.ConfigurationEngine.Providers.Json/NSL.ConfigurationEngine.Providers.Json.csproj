@@ -1,0 +1,36 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<OutputPath>..\package_build</OutputPath>
+		<Configurations>Debug;Release;Unity;UnityDebug;</Configurations>
+		<Version>$(VersionSuffix)</Version>
+
+		<PublishRepositoryUrl>true</PublishRepositoryUrl>
+		<EmbedUntrackedSources>true</EmbedUntrackedSources>
+		<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+		<GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)'=='Debug'">
+		<PackageId>$(MSBuildProjectName)_Debug</PackageId>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)'=='Release'">
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+	</PropertyGroup>
+
+	<ItemGroup Condition="'$(Configuration)'=='UnityDebug'">
+		<PackageReference Include="Newtonsoft.Json" Version="12.0.0" />
+	</ItemGroup>
+
+	<ItemGroup Condition="'$(Configuration)'!='UnityDebug'">
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Configuration\NSL.ConfigurationEngine.csproj" />
+		<ProjectReference Include="..\Logger\NSL.Logger.csproj" />
+	</ItemGroup>
+
+</Project>
