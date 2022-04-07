@@ -1,7 +1,7 @@
-﻿using ConfigurationEngine.Providers.IConfiguration;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using NSL.ConfigurationEngine;
 using NSL.ConfigurationEngine.Info;
+using NSL.ConfigurationEngine.Providers.IConfiguration;
 using System.Collections.Generic;
 
 namespace SocketPhantom.AspNetCore

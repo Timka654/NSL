@@ -1,9 +1,8 @@
 ﻿using Microsoft.Extensions.Configuration;
-using NSL.ConfigurationEngine;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace ConfigurationEngine.Providers.IConfiguration
+namespace NSL.ConfigurationEngine.Providers.IConfiguration
 {
     public static class ConfigurationExtensions
     {

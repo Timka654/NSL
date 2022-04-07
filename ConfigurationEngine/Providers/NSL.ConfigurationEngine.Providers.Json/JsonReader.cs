@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 
-namespace ConfigurationEngine.Providers.Json
+namespace NSL.ConfigurationEngine.Providers.Json
 {
     public class JsonReader
     {

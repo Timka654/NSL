@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json.Linq;
-using NSL.ConfigurationEngine;
 using NSL.ConfigurationEngine.Info;
 using SocketCore.Utils.Logger.Enums;
 using System;
@@ -7,7 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
-namespace ConfigurationEngine.Providers.Json
+namespace NSL.ConfigurationEngine.Providers.Json
 {
     public class LoadingProvider : IConfigurationLoadingProvider
     {

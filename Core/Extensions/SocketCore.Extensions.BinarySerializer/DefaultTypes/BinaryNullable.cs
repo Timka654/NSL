@@ -1,4 +1,4 @@
-﻿using BinarySerializer;
+﻿using NSL.Extensions.BinarySerializer;
 using System.Linq;
 using System.Reflection;
 

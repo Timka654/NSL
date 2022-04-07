@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace BinarySerializer.Attributes
+namespace NSL.Extensions.BinarySerializer.Attributes
 {
     [AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
     public class BinaryAttribute: Attribute

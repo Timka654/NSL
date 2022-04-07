@@ -1,4 +1,4 @@
-﻿using BinarySerializer;
+﻿using NSL.Extensions.BinarySerializer;
 using SocketCore.Utils.Buffer;
 using System.Reflection;
 

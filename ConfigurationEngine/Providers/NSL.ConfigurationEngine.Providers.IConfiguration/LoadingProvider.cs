@@ -1,9 +1,8 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Primitives;
-using NSL.ConfigurationEngine;
 using System;
 
-namespace ConfigurationEngine.Providers.IConfiguration
+namespace NSL.ConfigurationEngine.Providers.IConfiguration
 {
     public class LoadingProvider : IConfigurationLoadingProvider
     {
