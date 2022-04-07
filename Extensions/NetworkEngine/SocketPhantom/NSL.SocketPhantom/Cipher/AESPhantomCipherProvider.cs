@@ -2,7 +2,7 @@
 using NSL.Cipher.AES;
 using SocketCore;
 
-namespace SocketPhantom.Cipher
+namespace NSL.SocketPhantom.Cipher
 {
     public class AESPhantomCipherProvider : PhantomCipherProvider
     {

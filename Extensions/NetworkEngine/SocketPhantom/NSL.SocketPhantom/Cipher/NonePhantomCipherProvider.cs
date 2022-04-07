@@ -1,7 +1,7 @@
 ﻿using SocketCore;
 using SocketCore.Utils.Cipher;
 
-namespace SocketPhantom.Cipher
+namespace NSL.SocketPhantom.Cipher
 {
     public class NonePhantomCipherProvider : PhantomCipherProvider
     {

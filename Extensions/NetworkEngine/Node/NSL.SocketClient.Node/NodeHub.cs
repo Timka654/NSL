@@ -1,9 +1,9 @@
-﻿using SCL.Node.Packets;
+﻿using NSL.SocketClient.Node.Packets;
 using SocketServer;
 using SocketServer.Utils;
 using System.Collections.Concurrent;
 
-namespace SCL.Node
+namespace NSL.SocketClient.Node
 {
     public class NodeHub<TClient>
         where TClient : INodeNetworkClient

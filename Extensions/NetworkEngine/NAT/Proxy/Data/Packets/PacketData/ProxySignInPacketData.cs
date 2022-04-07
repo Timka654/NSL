@@ -1,6 +1,6 @@
 ﻿using SocketCore.Utils.Buffer;
 
-namespace SCL.Node.NAT.Proxy.Data.Packets.PacketData
+namespace NSL.Extensions.NAT.Proxy.Data.Packets.PacketData
 {
     public class ProxySignInPacketData
     {

@@ -4,7 +4,7 @@ using System.Data.Common;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace DBEngine
+namespace NSL.Extensions.DBEngine
 {
     public abstract class DbConnectionPool
     {

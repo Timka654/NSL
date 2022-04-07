@@ -1,11 +1,11 @@
 ﻿using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.DependencyInjection;
-using SocketPhantom.Cipher;
+using NSL.SocketPhantom.Cipher;
 using System;
 using System.Threading.Tasks;
 
-namespace SocketPhantom.AspNetCore
+namespace NSL.SocketPhantom.AspNetCore
 {
     public static class Extensions
     {

@@ -1,12 +1,12 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using SocketCore.Extensions.Buffer;
-using SocketPhantom.Enums;
+using NSL.SocketPhantom.Enums;
 using SocketServer.Utils;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SocketPhantom.AspNetCore.Network
+namespace NSL.SocketPhantom.AspNetCore.Network
 {
     public class PhantomHubClientProxy : IServerNetworkClient, IClientProxy
     {

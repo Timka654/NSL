@@ -2,12 +2,12 @@
 using NSL.ConfigurationEngine;
 using NSL.Logger;
 using NSL.ServerOptions.Extensions;
-using SocketPhantom.AspNetCore.Network.Packets;
-using SocketPhantom.Cipher;
-using SocketPhantom.Enums;
+using NSL.SocketPhantom.AspNetCore.Network.Packets;
+using NSL.SocketPhantom.Cipher;
+using NSL.SocketPhantom.Enums;
 using SocketServer;
 
-namespace SocketPhantom.AspNetCore.Network
+namespace NSL.SocketPhantom.AspNetCore.Network
 {
     internal class PhantomNetworkServer : NetworkServer<PhantomHubClientProxy, PhantomNetworkServer>
     {

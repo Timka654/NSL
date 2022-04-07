@@ -3,7 +3,7 @@ using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SocketPhantom.AspNetCore.Network
+namespace NSL.SocketPhantom.AspNetCore.Network
 {
     public class PhantomGroupManager : IGroupManager
     {

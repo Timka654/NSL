@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace NetScript
+namespace NSL.Extensions.NetScript
 {
     public static class TypeHelper
     {

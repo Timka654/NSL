@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 
-namespace SCL.Node.NAT
+namespace NSL.Extensions.NAT
 {
     public class UPNPProvider
     {

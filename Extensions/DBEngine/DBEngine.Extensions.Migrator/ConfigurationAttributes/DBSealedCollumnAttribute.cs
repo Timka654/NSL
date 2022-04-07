@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace DBEngine.DBMigrator.ConfigurationAttributes
+namespace NSL.Extensions.DBEngine.Migrator.ConfigurationAttributes
 {
     /// <summary>
     /// Помечает поле указывая члены закрытого класса (тот которые не возможно изменить для добавления аттрибутов) которые необходимо мигроровать в таблицу, используется вместе с DBCollumnForeignAttribute

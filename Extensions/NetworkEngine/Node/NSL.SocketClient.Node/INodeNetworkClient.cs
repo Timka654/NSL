@@ -1,9 +1,9 @@
-﻿using SCL.Node.ObjectInterface;
+﻿using NSL.SocketClient.Node.ObjectInterface;
 using SocketServer.Utils;
 using System;
 using System.Collections.Concurrent;
 
-namespace SCL.Node
+namespace NSL.SocketClient.Node
 {
     public class INodeNetworkClient : IServerNetworkClient
     {

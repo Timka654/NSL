@@ -1,4 +1,4 @@
-﻿namespace DIEngine
+﻿namespace NSL.Extensions.DIEngine
 {
     public interface IDependencyObject
     {

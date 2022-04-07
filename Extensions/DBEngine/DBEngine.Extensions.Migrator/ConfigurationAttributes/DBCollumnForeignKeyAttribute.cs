@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace DBEngine.DBMigrator.ConfigurationAttributes
+namespace NSL.Extensions.DBEngine.Migrator.ConfigurationAttributes
 {
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property, AllowMultiple = true)]
     public class DBCollumnForeignKeyAttribute : Attribute

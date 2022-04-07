@@ -4,7 +4,7 @@ using System.Data;
 using System.Data.Common;
 using System.Diagnostics;
 
-namespace DBEngine
+namespace NSL.Extensions.DBEngine
 {
     /// <summary>
     /// Класс помогающий исполнять запросы к базе данных

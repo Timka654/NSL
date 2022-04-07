@@ -1,9 +1,9 @@
 ﻿using SocketCore.Extensions.Buffer;
 using SocketCore.Utils;
 using SocketCore.Utils.Buffer;
-using SocketPhantom.Enums;
+using NSL.SocketPhantom.Enums;
 
-namespace SocketPhantom.AspNetCore.Network.Packets
+namespace NSL.SocketPhantom.AspNetCore.Network.Packets
 {
     internal class SessionPacket : IPacket<PhantomHubClientProxy>
     {

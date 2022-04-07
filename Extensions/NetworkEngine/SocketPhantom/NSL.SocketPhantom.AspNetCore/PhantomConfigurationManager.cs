@@ -4,7 +4,7 @@ using NSL.ConfigurationEngine.Info;
 using NSL.ConfigurationEngine.Providers.IConfiguration;
 using System.Collections.Generic;
 
-namespace SocketPhantom.AspNetCore
+namespace NSL.SocketPhantom.AspNetCore
 {
     internal class PhantomConfigurationManager : IConfigurationManager
     {

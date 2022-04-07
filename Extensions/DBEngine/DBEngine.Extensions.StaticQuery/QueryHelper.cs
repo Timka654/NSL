@@ -1,5 +1,4 @@
-﻿using DBEngine;
-using SocketCore.Utils.Logger.Enums;
+﻿using SocketCore.Utils.Logger.Enums;
 using SocketServer;
 using SocketServer.Utils;
 using System;
@@ -7,7 +6,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 
-namespace ServerOptions.Extensions.StaticQuery
+namespace NSL.Extensions.DBEngine.StaticQuery
 {
     public static class QueryHelper
     {

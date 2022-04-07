@@ -1,4 +1,4 @@
-﻿using DBEngine.DBMigrator.ConfigurationAttributes;
+﻿using NSL.Extensions.DBEngine.Migrator.ConfigurationAttributes;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -6,7 +6,7 @@ using System.Data.Common;
 using System.Linq;
 using System.Reflection;
 
-namespace DBEngine.DBMigrator
+namespace NSL.Extensions.DBEngine.Migrator
 {
     /*
      * Entity Framework курильщика

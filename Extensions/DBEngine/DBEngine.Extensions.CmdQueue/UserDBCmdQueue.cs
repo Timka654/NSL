@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Collections.Concurrent;
 
-namespace DBEngine.Extensions.CmdQueue
+namespace NSL.Extensions.DBEngine.CmdQueue
 {
     public class UserDBCmdQueue<T> : DbCommandQueue
     {

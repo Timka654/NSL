@@ -2,7 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using SocketCore.Extensions.Buffer;
 using SocketCore.Utils.Buffer;
-using SocketPhantom.AspNetCore.Network;
+using NSL.SocketPhantom.AspNetCore.Network;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -12,7 +12,7 @@ using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SocketPhantom.AspNetCore
+namespace NSL.SocketPhantom.AspNetCore
 {
     public class BasePhantomHub<THub> : BasePhantomHub
         where THub : PhantomHub

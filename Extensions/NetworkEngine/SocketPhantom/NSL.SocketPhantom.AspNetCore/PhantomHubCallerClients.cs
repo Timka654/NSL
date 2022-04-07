@@ -1,10 +1,10 @@
 ﻿using Microsoft.AspNetCore.SignalR;
-using SocketPhantom.AspNetCore.Network;
+using NSL.SocketPhantom.AspNetCore.Network;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace SocketPhantom.AspNetCore
+namespace NSL.SocketPhantom.AspNetCore
 {
     public class PhantomHubCallerClients : IHubCallerClients, IHubClients
     {

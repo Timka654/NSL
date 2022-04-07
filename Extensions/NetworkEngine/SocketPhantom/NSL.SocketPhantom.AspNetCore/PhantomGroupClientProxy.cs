@@ -1,11 +1,11 @@
 ﻿using Microsoft.AspNetCore.SignalR;
-using SocketPhantom.AspNetCore.Network;
+using NSL.SocketPhantom.AspNetCore.Network;
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SocketPhantom.AspNetCore
+namespace NSL.SocketPhantom.AspNetCore
 {
     public class PhantomGroupClientProxy : IClientProxy
     {

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace DBEngine.DBMigrator
+namespace NSL.Extensions.DBEngine.Migrator
 {
     public class DBCollumnType
     {

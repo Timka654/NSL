@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Net;
 
-namespace SCL.Node
+namespace NSL.SocketClient.Node
 {
     public class NodeIPEndPoint
     {

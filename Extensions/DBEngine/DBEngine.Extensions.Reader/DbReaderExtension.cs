@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Data.Common;
 
-namespace DBEngine.Extensions.Reader
+namespace NSL.Extensions.DBEngine.Reader
 {
     public static class DbReaderExtension
     {

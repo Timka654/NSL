@@ -1,6 +1,6 @@
 ﻿using System.Collections;
 
-namespace DBEngine.DBMigrator
+namespace NSL.Extensions.DBEngine.Migrator
 {
     public interface DBIdentityEntity<T> : DBIdentityEntity
     {

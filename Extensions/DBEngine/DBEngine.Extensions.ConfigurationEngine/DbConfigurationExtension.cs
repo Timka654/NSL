@@ -1,7 +1,7 @@
 ﻿using NSL.ConfigurationEngine;
 using System;
 
-namespace DBEngine.Extensions.ConfigurationEngine
+namespace NSL.Extensions.DBEngine.ConfigurationEngine
 {
     public static class DbConfigurationExtension
     {

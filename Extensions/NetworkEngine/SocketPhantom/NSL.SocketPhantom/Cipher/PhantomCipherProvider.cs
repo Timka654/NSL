@@ -1,6 +1,6 @@
 ﻿using SocketCore;
 
-namespace SocketPhantom.Cipher
+namespace NSL.SocketPhantom.Cipher
 {
     public abstract class PhantomCipherProvider
     {

@@ -10,3 +10,4 @@ bin/
 /nupkg/
 /unity/
 package_build/
+package_build_release/

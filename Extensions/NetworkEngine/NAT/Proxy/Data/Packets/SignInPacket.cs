@@ -1,11 +1,11 @@
-﻿using SCL.Node.NAT.Proxy.Data.Packets.Enums;
-using SCL.Node.NAT.Proxy.Data.Packets.PacketData;
+﻿using NSL.Extensions.NAT.Proxy.Data.Packets.Enums;
+using NSL.Extensions.NAT.Proxy.Data.Packets.PacketData;
 using SocketClient;
 using SocketClient.Utils;
 using SocketCore.Utils.Buffer;
 using System.Threading.Tasks;
 
-namespace SCL.Node.NAT.Proxy.Data.Packets
+namespace NSL.Extensions.NAT.Proxy.Data.Packets
 {
     internal class SignInPacket : IPacketReceive<NetworkProxyClient, ProxySignInPacketResultData>
     {

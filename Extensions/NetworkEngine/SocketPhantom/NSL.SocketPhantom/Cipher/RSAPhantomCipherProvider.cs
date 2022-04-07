@@ -1,7 +1,7 @@
 ﻿using NSL.Cipher.RSA;
 using SocketCore;
 
-namespace SocketPhantom.Cipher
+namespace NSL.SocketPhantom.Cipher
 {
     public class RSAPhantomCipherProvider : PhantomCipherProvider
     {

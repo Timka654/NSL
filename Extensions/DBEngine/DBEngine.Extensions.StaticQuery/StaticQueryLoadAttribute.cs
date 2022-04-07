@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ServerOptions.Extensions.StaticQuery
+namespace NSL.Extensions.DBEngine.StaticQuery
 {
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
     public class StaticQueryLoadAttribute : Attribute

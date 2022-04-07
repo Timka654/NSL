@@ -1,4 +1,4 @@
-﻿using ConsoleEngine;
+﻿using NSL.Extensions.ConsoleEngine;
 using SocketCore.Utils;
 using SocketCore.Utils.Buffer;
 using SocketServer.Utils;

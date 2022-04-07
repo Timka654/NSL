@@ -1,4 +1,4 @@
-﻿namespace SocketPhantom.Enums
+﻿namespace NSL.SocketPhantom.Enums
 {
     public enum SignStatusCodeEnum : byte
     {

@@ -1,4 +1,4 @@
-﻿namespace NetScript
+﻿namespace NSL.Extensions.NetScript
 {
     public class CompileCodeFragmentInfo
     {

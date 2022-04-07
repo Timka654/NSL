@@ -2,7 +2,7 @@
 
 using SocketServer.Utils;
 
-namespace SCL.Node.Utils
+namespace NSL.SocketClient.Node.Utils
 {
     public abstract class INodePlayer
     {

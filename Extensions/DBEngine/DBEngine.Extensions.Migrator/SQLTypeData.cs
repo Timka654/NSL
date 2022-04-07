@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace DBEngine.DBMigrator
+namespace NSL.Extensions.DBEngine.Migrator
 {
     public class SQLTypeData
     {

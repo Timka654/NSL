@@ -1,9 +1,9 @@
-﻿using SCL.Node.NAT.Proxy.Data.Packets.Enums;
+﻿using NSL.Extensions.NAT.Proxy.Data.Packets.Enums;
 using SocketClient;
 using SocketClient.Utils;
 using SocketCore.Utils.Buffer;
 
-namespace SCL.Node.NAT.Proxy.Data.Packets
+namespace NSL.Extensions.NAT.Proxy.Data.Packets
 {
     internal class TransportDataPacket : IPacketMessage<NetworkProxyClient, (string, InputPacketBuffer)>
     {

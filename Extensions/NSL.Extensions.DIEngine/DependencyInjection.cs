@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-namespace DIEngine
+namespace NSL.Extensions.DIEngine
 {
     public class DependencyInjection
     {

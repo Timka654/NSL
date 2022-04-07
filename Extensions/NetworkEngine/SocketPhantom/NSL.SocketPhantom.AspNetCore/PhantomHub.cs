@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.SignalR;
-using SocketPhantom.AspNetCore.Network;
+using NSL.SocketPhantom.AspNetCore.Network;
 
-namespace SocketPhantom.AspNetCore
+namespace NSL.SocketPhantom.AspNetCore
 {
     public class PhantomHub : Hub
     {

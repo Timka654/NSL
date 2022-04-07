@@ -1,6 +1,6 @@
 ﻿using SocketClient;
 
-namespace SCL.Node.NAT.Proxy
+namespace NSL.Extensions.NAT.Proxy
 {
     public class NetworkProxyClient : BaseSocketNetworkClient
     {

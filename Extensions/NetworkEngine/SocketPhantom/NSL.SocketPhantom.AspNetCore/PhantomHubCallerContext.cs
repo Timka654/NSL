@@ -1,11 +1,11 @@
 ﻿using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.SignalR;
-using SocketPhantom.AspNetCore.Network;
+using NSL.SocketPhantom.AspNetCore.Network;
 using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading;
 
-namespace SocketPhantom.AspNetCore
+namespace NSL.SocketPhantom.AspNetCore
 {
     public class PhantomHubCallerContext : HubCallerContext
     {

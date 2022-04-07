@@ -1,7 +1,7 @@
 ﻿using SocketCore.Utils;
 using SocketCore.Utils.Buffer;
 
-namespace SocketPhantom.AspNetCore.Network.Packets
+namespace NSL.SocketPhantom.AspNetCore.Network.Packets
 {
     internal class InvokePacket : IPacket<PhantomHubClientProxy>
     {

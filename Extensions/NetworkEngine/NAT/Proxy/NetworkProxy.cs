@@ -1,13 +1,13 @@
-﻿using SCL.Node.NAT.Proxy.Data.Packets;
-using SCL.Node.NAT.Proxy.Data.Packets.PacketData;
+﻿using NSL.Extensions.NAT.Proxy.Data.Packets;
+using NSL.Extensions.NAT.Proxy.Data.Packets.PacketData;
 using System.Threading.Tasks;
-using SCL.Node.NAT.Proxy.Data.Enums;
-using SCL.Node.NAT.Proxy.Data.Packets.Enums;
+using NSL.Extensions.NAT.Proxy.Data.Enums;
+using NSL.Extensions.NAT.Proxy.Data.Packets.Enums;
 using SocketCore.Utils.Buffer;
 using SocketClient;
 using NSL.TCP.Client;
 
-namespace SCL.Node.NAT.Proxy
+namespace NSL.Extensions.NAT.Proxy
 {
     public class NetworkProxy
     {

@@ -1,6 +1,6 @@
 ﻿using SocketCore.Utils.Buffer;
 
-namespace SCL.Node.Utils
+namespace NSL.SocketClient.Node.Utils
 {
     public class NodeOutputPacketBuffer : OutputPacketBuffer
     {

@@ -1,7 +1,7 @@
 ﻿using SocketCore.Utils;
 using System;
 
-namespace ConsoleEngine
+namespace NSL.Extensions.ConsoleEngine
 {
     public class ConsoleManager<T> : ConsoleStorage<T>
         where T : INetworkClient

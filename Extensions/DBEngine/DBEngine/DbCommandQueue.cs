@@ -3,7 +3,7 @@ using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace DBEngine
+namespace NSL.Extensions.DBEngine
 {
     /// <summary>
     /// Хранилище отложенных запросов базы данных которые выполняються раз в определенное время

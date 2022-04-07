@@ -8,7 +8,7 @@ using System.IO;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Text;
 
-namespace NetScript
+namespace NSL.Extensions.NetScript
 {
     internal class Core : ICloneable
     {

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace DBEngine.DBMigrator.ConfigurationAttributes
+namespace NSL.Extensions.DBEngine.Migrator.ConfigurationAttributes
 {
     /// <summary>
     /// Помечает поле для добавления в структуру таблицы дополнительных столбцов, используется вместе с DBCollumnForeignAttribute

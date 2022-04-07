@@ -1,4 +1,4 @@
-﻿namespace SCL.Node.NAT.Proxy.Data.Enums
+﻿namespace NSL.Extensions.NAT.Proxy.Data.Enums
 {
     public enum ProxySignInResultEnum
     {

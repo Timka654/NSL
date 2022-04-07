@@ -1,6 +1,6 @@
 {
   "profiles": {
-    "SocketPhantom.AspNetCore": {
+    "NSL.SocketPhantom.AspNetCore": {
       "commandName": "Project",
       "launchBrowser": true,
       "environmentVariables": {

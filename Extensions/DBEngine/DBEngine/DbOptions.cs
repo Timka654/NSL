@@ -1,6 +1,6 @@
 ﻿using System.Xml.Serialization;
 
-namespace DBEngine
+namespace NSL.Extensions.DBEngine
 {
     public class XmlDbOptions
     {

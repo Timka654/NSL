@@ -1,4 +1,4 @@
-﻿namespace SCL.Node.NAT.Proxy.Data.Packets.Enums
+﻿namespace NSL.Extensions.NAT.Proxy.Data.Packets.Enums
 {
     internal enum ServerPacketsEnum : ushort
     {

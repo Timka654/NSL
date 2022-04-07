@@ -6,7 +6,7 @@ using System.IO;
 using System.Text.RegularExpressions;
 using System.Reflection;
 
-namespace NetScript
+namespace NSL.Extensions.NetScript
 {
     public class Script
     {

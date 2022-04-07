@@ -4,14 +4,14 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using SocketPhantom.AspNetCore.Network;
-using SocketPhantom.Cipher;
+using NSL.SocketPhantom.AspNetCore.Network;
+using NSL.SocketPhantom.Cipher;
 using System;
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Reflection;
 
-namespace SocketPhantom.AspNetCore
+namespace NSL.SocketPhantom.AspNetCore
 {
     public class PhantomHubsManager
     {

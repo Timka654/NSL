@@ -1,4 +1,4 @@
-﻿namespace ServerOptions.Extensions.StaticQuery.Templates
+﻿namespace NSL.Extensions.DBEngine.StaticQuery.Templates
 {
     public class RoomServerStaticQueryLoadAttribute : StaticQueryLoadAttribute
     {

@@ -1,7 +1,7 @@
 ﻿using NSL.Cipher.RC.RC4;
 using SocketCore;
 
-namespace SocketPhantom.Cipher
+namespace NSL.SocketPhantom.Cipher
 {
     public class XRC4PhantomCipherProvider : PhantomCipherProvider
     {

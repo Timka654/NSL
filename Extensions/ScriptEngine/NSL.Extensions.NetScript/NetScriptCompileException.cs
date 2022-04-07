@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace NetScript
+namespace NSL.Extensions.NetScript
 {
     public class NetScriptCompileException : Exception
     {

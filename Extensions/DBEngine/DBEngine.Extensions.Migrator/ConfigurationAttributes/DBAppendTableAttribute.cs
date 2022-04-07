@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace DBEngine.DBMigrator.ConfigurationAttributes
+namespace NSL.Extensions.DBEngine.Migrator.ConfigurationAttributes
 {
     /// <summary>
     /// Пометить поле ссылочного типа что-бы интегрировать в текущую таблицу все столбцы

@@ -1,4 +1,4 @@
-﻿namespace SCL.Node.ObjectInterface
+﻿namespace NSL.SocketClient.Node.ObjectInterface
 {
     public interface IIdentityObject
     {

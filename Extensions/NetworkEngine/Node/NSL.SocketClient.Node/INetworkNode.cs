@@ -1,8 +1,8 @@
-﻿using SCL.Node.Utils;
+﻿using NSL.SocketClient.Node.Utils;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 
-namespace SCL.Node
+namespace NSL.SocketClient.Node
 {
     public class INetworkNode
     {

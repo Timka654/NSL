@@ -1,7 +1,7 @@
 ﻿using SocketCore.Utils;
 using SocketCore.Utils.Buffer;
 
-namespace SCL.Node.Packets
+namespace NSL.SocketClient.Node.Packets
 {
     internal class SignInPacket<TClient> : IPacket<TClient>
         where TClient : INodeNetworkClient

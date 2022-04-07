@@ -2,45 +2,8 @@
 using System.IO;
 using System.Threading.Tasks;
 
-namespace DBEngine.Extensions.DBBackup
+namespace NSL.Extensions.DBEngine.Backup
 {
-    public class DBBackupOptions
-    {
-        public DBBackupOptions(string version, string path, bool autoCreatePath)
-        {
-            var di = new DirectoryInfo(path);
-
-            if (!di.Exists && autoCreatePath)
-                di.Create();
-
-            path = di.FullName;
-
-            if (!path.EndsWith(System.IO.Path.DirectorySeparatorChar))
-                path += System.IO.Path.DirectorySeparatorChar;
-
-            Version = version;
-            Path = path;
-            AutoCreatePath = autoCreatePath;
-
-        }
-
-        public string Version { get; private set; }
-
-        public string Path { get; private set; }
-
-        public bool AutoCreatePath { get; private set; }
-    }
-
-    public class DBAutoBackupOptions : DBBackupOptions
-    {
-        public DBAutoBackupOptions(string version, string path, TimeSpan elapseTime, bool autoCreatePath) : base(version, path, autoCreatePath)
-        {
-            ElapseTime = elapseTime;
-        }
-
-        public TimeSpan ElapseTime { get; private set; }
-    }
-
     public static class DBBackupExtension
     {
         public static async void RunAutoBackup(this DbConnectionPool pool, DBAutoBackupOptions options)

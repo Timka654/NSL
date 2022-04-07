@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 
-namespace DBEngine.DBMigrator.ConfigurationAttributes
+namespace NSL.Extensions.DBEngine.Migrator.ConfigurationAttributes
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Field | AttributeTargets.Property, AllowMultiple = false, Inherited = false)]
     public class DBMigrationIgnoreFieldsAttribute : Attribute

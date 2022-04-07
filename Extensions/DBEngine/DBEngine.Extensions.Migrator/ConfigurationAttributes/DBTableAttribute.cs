@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 
-namespace DBEngine.DBMigrator.ConfigurationAttributes
+namespace NSL.Extensions.DBEngine.Migrator.ConfigurationAttributes
 {
     /// <summary>
     /// Указывает основные параметры таблицы

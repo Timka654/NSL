@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SocketPhantom.AspNetCore
+namespace NSL.SocketPhantom.AspNetCore
 {
     public class PhantomHubOptions
     {

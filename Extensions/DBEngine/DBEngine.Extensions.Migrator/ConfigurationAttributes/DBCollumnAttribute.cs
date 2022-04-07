@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace DBEngine.DBMigrator.ConfigurationAttributes
+namespace NSL.Extensions.DBEngine.Migrator.ConfigurationAttributes
 {
     /// <summary>
     /// Помечает поле для создания столбца в таблице

@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Concurrent;
 
-namespace ConsoleEngine
+namespace NSL.Extensions.ConsoleEngine
 {
     /// <summary>
     /// Хранилище конфигураций

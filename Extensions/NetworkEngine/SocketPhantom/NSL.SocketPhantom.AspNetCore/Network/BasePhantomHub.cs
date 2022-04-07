@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
-namespace SocketPhantom.AspNetCore.Network
+namespace NSL.SocketPhantom.AspNetCore.Network
 {
     public abstract class BasePhantomHub : Hub, IHubContext
     {

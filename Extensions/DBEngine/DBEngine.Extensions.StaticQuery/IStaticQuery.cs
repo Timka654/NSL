@@ -1,6 +1,5 @@
-﻿using DBEngine;
-
-namespace ServerOptions.Extensions.StaticQuery
+﻿
+namespace NSL.Extensions.DBEngine.StaticQuery
 {
     public interface IStaticQuery
     {

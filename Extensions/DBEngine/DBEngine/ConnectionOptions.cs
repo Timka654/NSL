@@ -1,4 +1,4 @@
-﻿namespace DBEngine
+﻿namespace NSL.Extensions.DBEngine
 {
     public class ConnectionOptions
     {

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 
-namespace DBEngine.DBMigrator.ConfigurationAttributes
+namespace NSL.Extensions.DBEngine.Migrator.ConfigurationAttributes
 {
     /// <summary>
     /// Помечает поле для создания связанной таблице по шаблону типа поля
