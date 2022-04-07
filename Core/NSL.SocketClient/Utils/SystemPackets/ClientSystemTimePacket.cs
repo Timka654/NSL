@@ -1,5 +1,4 @@
 ﻿using System;
-using SocketCore.Utils;
 using SocketCore.Utils.Buffer;
 
 namespace SocketClient.Utils.SystemPackets

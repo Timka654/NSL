@@ -27,7 +27,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\Logger\NSL.Logger.csproj" />
+	  <ProjectReference Include="..\..\Core\NSL.SocketCore\NSL.SocketCore.csproj" />
 	</ItemGroup>
 
 </Project>

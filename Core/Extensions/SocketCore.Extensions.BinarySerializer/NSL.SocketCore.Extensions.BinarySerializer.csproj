@@ -1,36 +1,37 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
-    <Configurations>Debug;Release;Unity;UnityDebug</Configurations>
-    
-    <Version>$(VersionSuffix)</Version>
-    <PublishRepositoryUrl>true</PublishRepositoryUrl>
-    <EmbedUntrackedSources>true</EmbedUntrackedSources>
-	  <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-	  <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<OutputPath>..\package_build</OutputPath>
+		<Configurations>Debug;Release;Unity;UnityDebug;</Configurations>
+		<Version>$(VersionSuffix)</Version>
 
-  <PropertyGroup Condition="'$(Configuration)'=='Debug'">
-    <PackageId>$(MSBuildProjectName)_Debug</PackageId>
-  </PropertyGroup>
+		<PublishRepositoryUrl>true</PublishRepositoryUrl>
+		<EmbedUntrackedSources>true</EmbedUntrackedSources>
+		<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+		<GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
+	</PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='UnityDebug|AnyCPU'">
-    <TargetFramework>netstandard2.0</TargetFramework>
-    <OutputPath>..\UnityDebug</OutputPath>
-    <DefineConstants>DEBUG;TRACE;Unity</DefineConstants>
-  </PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)'=='Debug'">
+		<PackageId>$(MSBuildProjectName)_Debug</PackageId>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\BinarySerializer_v6\BinarySerializer_v6.csproj" />
-    <ProjectReference Include="..\Socket.Core\SocketCore.csproj" />
-  </ItemGroup>
+	<PropertyGroup Condition="'$(Configuration)'=='UnityDebug'">
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<OutputPath>..\package_unity_build</OutputPath>
+		<DefineConstants>DEBUG;TRACE</DefineConstants>
+	</PropertyGroup>
 
-  <ItemGroup Condition="'$(Configuration)|$(Platform)'=='UnityDebug|AnyCPU'">
-    <Reference Include="UnityEngine">
-      <HintPath>..\UnityEngine.dll</HintPath>
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </Reference>
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\..\..\BinarySerializer\NSL.Extensions.BinarySerializer\NSL.Extensions.BinarySerializer.csproj" />
+		<ProjectReference Include="..\..\NSL.SocketCore\NSL.SocketCore.csproj" />
+	</ItemGroup>
+
+	<ItemGroup Condition="'$(Configuration)|$(Platform)'=='UnityDebug|AnyCPU'">
+		<Reference Include="UnityEngine">
+			<HintPath>..\UnityEngine.dll</HintPath>
+			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</Reference>
+	</ItemGroup>
 
 </Project>

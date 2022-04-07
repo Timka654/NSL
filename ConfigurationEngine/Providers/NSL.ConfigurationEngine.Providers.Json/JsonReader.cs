@@ -1,19 +1,18 @@
-﻿using ConfigurationEngine.Info;
+﻿using NSL.ConfigurationEngine.Info;
 using System.Collections.Generic;
 using System.IO;
 
 namespace ConfigurationEngine.Providers.Json
 {
-
     public class JsonReader
     {
-        public static IEnumerable<ConfigurationEngine.Info.ConfigurationInfo> ReadJson(string json)
+        public static IEnumerable<ConfigurationInfo> ReadJson(string json)
         {
             using var sr = new System.IO.StringReader(json);
             return ReadJson(sr);
         }
 
-        public static IEnumerable<ConfigurationEngine.Info.ConfigurationInfo> ReadJson(TextReader jsonReader)
+        public static IEnumerable<ConfigurationInfo> ReadJson(TextReader jsonReader)
         {
             List<ConfigurationInfo> result = new List<ConfigurationInfo>();
 

@@ -1,6 +1,4 @@
-﻿using SocketCore.Utils;
-
-namespace SocketClient.Utils
+﻿namespace SocketClient.Utils
 {
     public class IPacketMessage<TClient, RDType> : IClientPacket<TClient>
         where TClient : BaseSocketNetworkClient

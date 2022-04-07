@@ -1,14 +1,12 @@
-﻿using SocketClient;
-using Network.Extensions;
+﻿using NSL.ServerOptions.Extensions.ConfigurationEngine;
+using NSL.TCP.Client;
+using SocketClient;
 using SocketCore.Utils.Logger.Enums;
 using System;
 using System.Net;
 using System.Threading.Tasks;
-using SocketCore.Utils;
-using ServerOptions.Extensions.ConfigurationEngine;
-using NSL.TCP.Client;
 
-namespace Utils.Helper.Network
+namespace NSL.ServerOptions.Extensions
 {
     public class NetworkServerClient<T, CType> : BasicNetworkEntry<T, CType, ClientOptions<T>>
         where T : BaseSocketNetworkClient

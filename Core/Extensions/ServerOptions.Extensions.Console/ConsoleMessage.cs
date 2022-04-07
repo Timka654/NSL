@@ -3,7 +3,7 @@ using SocketCore.Utils;
 using SocketCore.Utils.Buffer;
 using SocketServer.Utils;
 
-namespace ServerOptions.Extensions.Console
+namespace NSL.ServerOptions.Extensions.Console
 {
     public class ConsoleMessage<T> : IPacket<T> where T : IServerNetworkClient
     {

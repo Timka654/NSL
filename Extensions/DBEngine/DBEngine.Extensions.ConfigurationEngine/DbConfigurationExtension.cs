@@ -1,4 +1,4 @@
-﻿using ConfigurationEngine;
+﻿using NSL.ConfigurationEngine;
 using System;
 
 namespace DBEngine.Extensions.ConfigurationEngine

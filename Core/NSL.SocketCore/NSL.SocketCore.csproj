@@ -12,6 +12,7 @@
 		<GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
 		
 		<Description>Библиотека содержащая базовые классы для взаимодействия по сетевому протоколу TCP</Description>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 	</PropertyGroup>
 
 

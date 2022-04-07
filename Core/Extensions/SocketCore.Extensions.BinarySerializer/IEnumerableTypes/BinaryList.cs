@@ -7,7 +7,7 @@
 //using System.Text;
 //using System.Threading.Tasks;
 
-//namespace SocketCore.Extensions.BinarySerializer.IEnumerableTypes
+//namespace NSL.SocketCore.Extensions.BinarySerializer.IEnumerableTypes
 //{
 //    public class BinaryList : BinaryTypeBasic
 //    {

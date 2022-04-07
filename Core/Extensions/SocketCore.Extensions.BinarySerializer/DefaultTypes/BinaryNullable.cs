@@ -1,14 +1,8 @@
 ﻿using BinarySerializer;
-using SocketCore.Utils.Buffer;
-using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace SocketCore.Extensions.BinarySerializer.DefaultTypes
+namespace NSL.SocketCore.Extensions.BinarySerializer.DefaultTypes
 {
     public class BinaryNullable : BinaryTypeBasic
     {

@@ -1,14 +1,8 @@
 ﻿using BinarySerializer;
 using SocketCore.Utils.Buffer;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace SocketCore.Extensions.BinarySerializer.DefaultTypes
+namespace NSL.SocketCore.Extensions.BinarySerializer.DefaultTypes
 {
     public class BinaryInt32 : BinaryTypeBasic
     {

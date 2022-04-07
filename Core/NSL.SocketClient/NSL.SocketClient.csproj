@@ -39,8 +39,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\Cipher(NET.Standard)\Cipher.csproj" />
-		<ProjectReference Include="..\Socket.Core\NSL.SocketCore.csproj" />
+	  <ProjectReference Include="..\NSL.SocketCore\NSL.SocketCore.csproj" />
 	</ItemGroup>
 
 </Project>

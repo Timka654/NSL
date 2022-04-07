@@ -1,5 +1,4 @@
-﻿using SocketClient.Utils.SystemPackets;
-using SocketCore.Utils;
+﻿using SocketCore.Utils;
 using SocketCore.Utils.Buffer;
 using SocketCore.Utils.SystemPackets.Enums;
 using System;

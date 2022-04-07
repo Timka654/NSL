@@ -1,7 +1,7 @@
 ﻿//using BinarySerializer;
 //using BinarySerializer.Attributes;
-//using SocketCore.Extensions.BinarySerializer.DefaultTypes;
-//using SocketCore.Extensions.BinarySerializer.IEnumerableTypes;
+//using NSL.SocketCore.Extensions.BinarySerializer.DefaultTypes;
+//using NSL.SocketCore.Extensions.BinarySerializer.IEnumerableTypes;
 //using System;
 //using System.Collections.Generic;
 //using System.Linq;
@@ -14,7 +14,7 @@
 //using UnityEngine;
 //#endif
 
-//namespace SocketCore.Extensions.BinarySerializer
+//namespace NSL.SocketCore.Extensions.BinarySerializer
 //{
 //    public class BinaryNetworkStorage : BinaryStorage
 //    {

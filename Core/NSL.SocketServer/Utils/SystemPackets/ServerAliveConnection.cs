@@ -1,6 +1,5 @@
 ﻿using SocketCore.Utils;
 using SocketCore.Utils.Buffer;
-using SocketCore.Utils.SystemPackets.Enums;
 
 namespace SocketServer.Utils.SystemPackets
 {

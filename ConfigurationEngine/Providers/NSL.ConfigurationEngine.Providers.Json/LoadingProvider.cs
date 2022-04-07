@@ -1,4 +1,6 @@
 ﻿using Newtonsoft.Json.Linq;
+using NSL.ConfigurationEngine;
+using NSL.ConfigurationEngine.Info;
 using SocketCore.Utils.Logger.Enums;
 using System;
 using System.IO;
@@ -20,7 +22,7 @@ namespace ConfigurationEngine.Providers.Json
 
                 foreach (var item in result)
                 {
-                    manager.AddValue(new Info.ConfigurationInfo(CorrectPath(item,manager), item.Value<string>(), ""));
+                    manager.AddValue(new ConfigurationInfo(CorrectPath(item,manager), item.Value<string>(), ""));
                 }
             }
             catch (Exception ex)

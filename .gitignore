@@ -9,3 +9,4 @@ bin/
 */Release/*
 /nupkg/
 /unity/
+package_build/

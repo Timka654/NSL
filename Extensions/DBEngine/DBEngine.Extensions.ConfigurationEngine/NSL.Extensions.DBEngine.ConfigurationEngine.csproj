@@ -23,7 +23,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\Configuration\NSL.ConfigurationEngine.csproj" />
+		<ProjectReference Include="..\..\..\ConfigurationEngine\NSL.ConfigurationEngine\NSL.ConfigurationEngine.csproj" />
 		<ProjectReference Include="..\DBEngine\NSL.Extensions.DBEngine.csproj" />
 	</ItemGroup>
 

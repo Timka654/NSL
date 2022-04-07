@@ -1,13 +1,12 @@
-﻿using Cipher;
-using ConfigurationEngine;
-using SCLogger;
+﻿using NSL.ConfigurationEngine;
+using NSL.Logger;
 using SocketCore;
 using SocketCore.Utils;
 using SocketCore.Utils.Cipher;
 using SocketCore.Utils.Logger.Enums;
 using System;
 
-namespace Network.Extensions
+namespace NSL.ServerOptions.Extensions
 {
     public class BasicNetworkEntry<T, CType, OType>
         where T : INetworkClient

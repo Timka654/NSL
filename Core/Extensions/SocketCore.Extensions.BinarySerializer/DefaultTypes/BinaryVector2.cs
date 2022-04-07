@@ -12,7 +12,7 @@
 //using UnityEngine;
 //#endif
 
-//namespace SocketCore.Extensions.BinarySerializer.DefaultTypes
+//namespace NSL.SocketCore.Extensions.BinarySerializer.DefaultTypes
 //{
 //    public class BinaryVector2 : BinaryTypeBasic
 //    {

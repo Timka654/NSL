@@ -27,8 +27,9 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\Configuration\NSL.ConfigurationEngine.csproj" />
-		<ProjectReference Include="..\SocketServer\NSL.SocketServer.csproj" />
+	  <ProjectReference Include="..\..\..\ConfigurationEngine\NSL.ConfigurationEngine\NSL.ConfigurationEngine.csproj" />
+	  <ProjectReference Include="..\..\NSL.SocketCore\NSL.SocketCore.csproj" />
+	  <ProjectReference Include="..\..\NSL.SocketServer\NSL.SocketServer.csproj" />
 	</ItemGroup>
 
 </Project>

@@ -22,7 +22,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\Configuration\NSL.ConfigurationEngine.csproj" />
+	  <ProjectReference Include="..\..\NSL.ConfigurationEngine\NSL.ConfigurationEngine.csproj" />
 	</ItemGroup>
 
 </Project>

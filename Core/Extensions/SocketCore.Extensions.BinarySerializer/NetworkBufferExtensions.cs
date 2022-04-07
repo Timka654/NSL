@@ -5,7 +5,7 @@
 //using System.Text;
 //using System.Threading.Tasks;
 
-//namespace SocketCore.Extensions.BinarySerializer
+//namespace NSL.SocketCore.Extensions.BinarySerializer
 //{
 //    public static class NetworkBufferExtensions
 //    {

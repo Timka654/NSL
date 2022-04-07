@@ -1,6 +1,4 @@
-﻿using SocketCore.Utils;
-
-namespace SocketCore.Utils.Cipher
+﻿namespace SocketCore.Utils.Cipher
 {
     public class PacketNoneCipher : IPacketCipher
     {

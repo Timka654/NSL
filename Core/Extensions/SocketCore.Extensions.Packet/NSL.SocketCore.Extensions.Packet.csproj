@@ -32,7 +32,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\SocketCore.Extensions.Buffer\SocketCore.Extensions.Buffer.csproj" />
+	  <ProjectReference Include="..\..\NSL.SocketCore\NSL.SocketCore.csproj" />
 	</ItemGroup>
 
 </Project>

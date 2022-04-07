@@ -3,9 +3,7 @@ using SocketCore;
 using SocketCore.Utils;
 using SocketCore.Utils.SystemPackets.Enums;
 using System;
-using System.Collections.Generic;
 using System.Net;
-using System.Threading.Tasks;
 
 namespace SocketClient
 {

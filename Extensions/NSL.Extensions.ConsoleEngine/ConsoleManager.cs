@@ -1,5 +1,5 @@
-﻿using System;
-using SocketCore.Utils;
+﻿using SocketCore.Utils;
+using System;
 
 namespace ConsoleEngine
 {

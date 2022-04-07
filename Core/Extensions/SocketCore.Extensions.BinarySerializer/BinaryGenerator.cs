@@ -1,15 +1,12 @@
-﻿using BinarySerializer;
-using BinarySerializer.Attributes;
+﻿using BinarySerializer.Attributes;
 using SocketCore.Utils.Buffer;
 using System;
 using System.Collections.Generic;
-using System.Data.SqlTypes;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using System.Threading.Tasks;
 
-namespace SocketCore.Extensions.BinarySerializer
+namespace NSL.SocketCore.Extensions.BinarySerializer
 {
     internal static class DictionaryExtensions
     {
