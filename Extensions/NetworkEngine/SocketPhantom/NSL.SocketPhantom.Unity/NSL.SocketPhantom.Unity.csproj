@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<TargetFramework>net6.0</TargetFramework>
@@ -19,17 +19,17 @@
 
 	<ItemGroup>
 	  <ProjectReference Include="..\..\..\..\Core\Extensions\SocketCore.Extensions.Buffer\NSL.SocketCore.Extensions.Buffer.csproj" />
+	  <ProjectReference Include="..\..\..\..\Core\NSL.SocketClient.Unity\NSL.SocketClient.Unity.csproj" />
 	  <ProjectReference Include="..\..\..\..\Core\NSL.SocketClient\NSL.SocketClient.csproj" />
 	  <ProjectReference Include="..\..\..\..\Core\NSL.SocketCore\NSL.SocketCore.csproj" />
 	  <ProjectReference Include="..\..\..\..\Core\Utils\NSL.Utils\NSL.Utils.csproj" />
 	  <ProjectReference Include="..\..\..\..\Protocols\TCP\NSL.TCP.Client\NSL.TCP.Client.csproj" />
-	  <ProjectReference Include="..\..\..\..\Unity\NSL.SocketClient.Unity\NSL.SocketClient.Unity.csproj" />
 	  <ProjectReference Include="..\NSL.SocketPhantom\NSL.SocketPhantom.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
 	  <Reference Include="UnityEngine">
-	    <HintPath>..\..\..\..\Unity\UnityEngine.dll</HintPath>
+	    <HintPath>..\..\..\..\Reference\UnityEngine.dll</HintPath>
 	  </Reference>
 	</ItemGroup>
 

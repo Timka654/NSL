@@ -9,7 +9,7 @@ namespace NSL.SocketClient.Node
     {
         public virtual string PlayerId { get; internal set; }
 
-        private ConcurrentDictionary<string, IIdentityObject> ObjectMap = new();
+        private ConcurrentDictionary<string, IIdentityObject> ObjectMap = new ConcurrentDictionary<string, IIdentityObject>();
 
         public bool AddObject(string identity, IIdentityObject obj)
         {

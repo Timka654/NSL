@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
 
-namespace SCL.Node.UnityObject.Storages
+namespace NSL.SocketClient.Node.UnityObject.Storages
 {
     public class NodeObjectRPCMessageProcess : MonoBehaviour
     {

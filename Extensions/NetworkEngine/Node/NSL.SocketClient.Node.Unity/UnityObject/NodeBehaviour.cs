@@ -3,7 +3,7 @@ using System;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 
-namespace SCL.Node.UnityObject
+namespace NSL.SocketClient.Node.UnityObject
 {
     [RequireComponent(typeof(NodeObject))]
     public class NodeBehaviour : MonoBehaviour

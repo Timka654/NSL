@@ -1,4 +1,4 @@
-using SocketClient;
+using NSL.SocketClient;
 
 namespace SocketPhantom.Unity
 {

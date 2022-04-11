@@ -12,7 +12,7 @@ namespace NSL.SocketClient.Node
 
         public string ConnectionToken { get; private set; }
 
-        private ConcurrentDictionary<string, TClient> players = new();
+        private ConcurrentDictionary<string, TClient> players = new ConcurrentDictionary<string, TClient>();
 
         ServerOptions<TClient> Options => listener.GetServerOptions();
 

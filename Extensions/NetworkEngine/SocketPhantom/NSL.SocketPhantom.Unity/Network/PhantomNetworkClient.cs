@@ -1,5 +1,7 @@
-﻿using NSL.TCP.Client;
-using SocketClient;
+﻿using Newtonsoft.Json;
+using NSL.SocketClient;
+using NSL.SocketPhantom.Unity;
+using NSL.TCP.Client;
 using SocketPhantom.Unity.Network.Packets;
 using System;
 using System.Linq;
@@ -19,12 +21,18 @@ namespace SocketPhantom.Unity.Network
         {
             var connectUrl = new Uri(data.Url);
 
+            phantomHubConnection.DebugException($"Initialize client with host {data.Url}");
+
             var dnss = Dns.GetHostAddresses(connectUrl.Host);
+
+            phantomHubConnection.DebugException($"Founded {dnss.Length} dns count - {string.Join(",", dnss.Select(x => x.ToString()))}");
 
             var dns = dnss.FirstOrDefault(x => x.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork) ?? dnss.FirstOrDefault(x => x.AddressFamily == System.Net.Sockets.AddressFamily.InterNetworkV6);
 
             if (dns == null)
                 throw new Exception($"dns for {data.Url} not found");
+
+            phantomHubConnection.DebugException($"Selected IPAddress = {dns}");
 
             clientOptions = new ClientOptions<PhantomSocketNetworkClient>();
 
@@ -49,9 +57,13 @@ namespace SocketPhantom.Unity.Network
                 connectUrl.Port,
                 (int)phantomHubConnection.ConnectionTimeout.TotalMilliseconds) && oldConnectionState)
             {
+                phantomHubConnection.DebugException($"Failed connected - {ip.ToString()}:{connectUrl.Port}");
                 SuccessConnected = true;
                 ClientOptions_OnClientDisconnectEvent(null);
+                return;
             }
+
+            phantomHubConnection.DebugException($"Success connected {ip.ToString()}:{connectUrl.Port}");
         }
 
         internal int retryCount = 0;

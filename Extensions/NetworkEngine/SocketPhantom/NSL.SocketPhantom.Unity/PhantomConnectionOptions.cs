@@ -19,5 +19,7 @@ namespace SocketPhantom.Unity
         public PhantomCipherProvider CipherProvider { get; set; } = new NonePhantomCipherProvider();
 
         public Func<Task<IRetryPolicy>> RetryPolicy { get; set; }
+
+        public bool DebugExceptions { get; set; } = false;
     }
 }

@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
-namespace SCL.Node.UnityObject
+
+namespace NSL.SocketClient.Node.UnityObject
 {
     public sealed class NodeObject : MonoBehaviour
     {

@@ -5,6 +5,7 @@ using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using NSL.SocketPhantom.Unity;
 using SocketCore.Extensions.Buffer;
 using SocketCore.Utils.Buffer;
 using SocketPhantom.Unity.Network;
@@ -118,13 +119,19 @@ namespace SocketPhantom.Unity
                         }
                     }
 
-                    HttpRequestMessage msg = new HttpRequestMessage(HttpMethod.Get, await options.Url() + endUrl);
+                    var url = await options.Url() + endUrl;
+
+                    DebugException($"Try request to {url}");
+
+                    HttpRequestMessage msg = new HttpRequestMessage(HttpMethod.Get, url);
 
                     var response = await hc.SendAsync(msg);
 
                     if (response.IsSuccessStatusCode)
                     {
                         string content = await response.Content.ReadAsStringAsync();
+
+                        DebugException($"{url} - Success Request {content}");
 
                         var data = JsonConvert.DeserializeObject<PhantomRequestResult>(content);
 
@@ -339,6 +346,12 @@ namespace SocketPhantom.Unity
 
             if (authLocker.CurrentCount == 0)
                 authLocker.Release();
+        }
+
+        internal async void DebugException(string msg)
+        {
+            if (options.DebugExceptions)
+                await OnException(new PhantomDebugMessageException(msg));
         }
 
         public class PhantomRequestResult

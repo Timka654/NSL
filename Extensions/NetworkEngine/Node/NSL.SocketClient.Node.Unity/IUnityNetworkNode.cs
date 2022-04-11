@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace SCL.Node.Unity
+namespace NSL.SocketClient.Node.Unity
 {
     public class IUnityNetworkNode : MonoBehaviour
     {

@@ -1,7 +1,7 @@
 ﻿using NSL.SocketClient.Node.Utils;
 using UnityEngine;
 
-namespace SCL.Node.Unity
+namespace NSL.SocketClient.Node.Unity
 {
     public static class UnityBufferExtensions
     {

@@ -2,6 +2,6 @@
 {
     public interface IIdentityObject
     {
-        string NodeIdentity { get; internal set; }
+        string NodeIdentity { get; set; }
     }
 }

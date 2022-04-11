@@ -1,4 +1,4 @@
-﻿using SCL.Unity;
+﻿using NSL.SocketClient.Unity;
 using System;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -17,12 +17,27 @@ namespace SocketPhantom.Unity
 
         public HubConnectionState CurrentState => _hubConnection.State;
 
-        protected WSClient()
+        protected WSClient() : this((c, o) => { })
+        { 
+        
+        }
+
+        protected WSClient(Action<WSClient,PhantomConnectionOptions> optionsAction)
         {
-            _hubConnection = new PhantomHubConnectionBuilder()
+            Build(new PhantomHubConnectionBuilder()
                 .WithUrl(GetUrl, o => { o.AccessTokenProvider = () => Task.FromResult(GetAccessToken()); })
                 .WithAutomaticReconnect(GetReconnectPolicy)
-                .Build();
+                .WithOptions(options => optionsAction(this, options)));
+        }
+
+        protected WSClient(PhantomHubConnectionBuilder builder)
+        {
+            Build(builder);
+        }
+
+        private void Build(PhantomHubConnectionBuilder builder)
+        {
+            _hubConnection = builder.Build();
 
             _hubConnection.OnException += (e) => { ThreadHelper.InvokeOnMain(() => OnException(e)); return Task.CompletedTask; };
 
