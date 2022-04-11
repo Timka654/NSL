@@ -1,6 +1,6 @@
 ﻿using SocketCore.Utils.Buffer;
 
-namespace SocketClient.Utils.SystemPackets
+namespace NSL.SocketClient.Utils.SystemPackets
 {
     public class ClientAliveConnectionPacket<T> : IClientPacket<T> where T: BaseSocketNetworkClient
     {

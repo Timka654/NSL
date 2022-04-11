@@ -1,4 +1,4 @@
-﻿using SocketClient;
+﻿using NSL.SocketClient;
 
 namespace NSL.Extensions.NAT.Proxy
 {

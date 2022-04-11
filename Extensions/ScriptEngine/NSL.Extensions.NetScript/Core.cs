@@ -7,6 +7,7 @@ using Microsoft.CodeAnalysis;
 using System.IO;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Text;
+using Newtonsoft.Json;
 
 namespace NSL.Extensions.NetScript
 {
@@ -138,12 +139,12 @@ namespace NSL.Extensions.NetScript
             }
             sb.AppendLine("}");
 
-            GlobalCodeStartLine = this.code.Split("\n").Count();
+            GlobalCodeStartLine = this.code.Split('\n').Count();
 
             //Добавляем класс с глобальными переменными в код
             this.code += sb.ToString();
 
-            GlobalCodeEndLine = GlobalCodeStartLine + sb.ToString().Split("\n").Count();
+            GlobalCodeEndLine = GlobalCodeStartLine + sb.ToString().Split('\n').Count();
 
         }
 
@@ -237,7 +238,7 @@ namespace NSL.Extensions.NetScript
             }
             catch (Exception ex)
             {
-                throw new Exception($"{ex}\r\n   at Class = {_method.DeclaringType.Name}\r\n   at Method = {_method.Name}\r\n   with args =  {System.Text.Json.JsonSerializer.Serialize(args)}");
+                throw new Exception($"{ex}\r\n   at Class = {_method.DeclaringType.Name}\r\n   at Method = {_method.Name}\r\n   with args =  {JsonConvert.SerializeObject(args)}");
             }
         }
 

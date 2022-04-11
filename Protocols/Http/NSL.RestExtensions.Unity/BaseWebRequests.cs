@@ -1,11 +1,11 @@
-﻿using RestExtensions.Unity;
+﻿using NSL.SocketClient.Unity;
+using RestExtensions.Unity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using SCL.Unity;
 using UnityEngine;
 
 namespace RestExtensions.Unity
@@ -268,7 +268,7 @@ namespace RestExtensions.Unity
 
         protected BaseWebRequests()
         {
-            clientPool = new HttpClientPool(GetBaseDomain());
+            clientPool = new HttpClientPool(() => GetBaseDomain());
         }
 
         #endregion

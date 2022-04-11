@@ -1,5 +1,5 @@
 ﻿using NSL.ConfigurationEngine;
-using SocketClient;
+using NSL.SocketClient;
 using System.Net.Sockets;
 
 namespace ServerOptions.Extensions.ConfigurationEngine

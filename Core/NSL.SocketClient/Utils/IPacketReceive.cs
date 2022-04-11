@@ -3,7 +3,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SocketClient.Utils
+namespace NSL.SocketClient.Utils
 {
     public class IPacketReceive<TClient, RData, SPType> : IPacketReceive<TClient, RData> where TClient : BaseSocketNetworkClient where SPType : struct, IConvertible
     {

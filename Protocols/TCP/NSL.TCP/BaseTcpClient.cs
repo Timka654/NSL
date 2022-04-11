@@ -179,6 +179,8 @@ namespace NSL.TCP
             }
         }
 
+        #region Send
+
         /// <summary>
         /// Отправка пакета
         /// </summary>
@@ -254,13 +256,6 @@ namespace NSL.TCP
             }
         }
 
-        public bool GetState()
-        {
-            if (sclient == null || disconnected)
-                return false;
-            return sclient.Connected;
-        }
-
         public void SendEmpty(ushort packetId)
         {
             OutputPacketBuffer rbuff = new OutputPacketBuffer
@@ -271,11 +266,17 @@ namespace NSL.TCP
             Send(rbuff);
         }
 
+        #endregion
+
+        public bool GetState()
+        {
+            if (sclient == null || disconnected)
+                return false;
+
+            return sclient.Connected;
+        }
+
         protected bool disconnected = true;
-
-        private readonly TParent parent;
-
-        public CoreOptions Options => options;
 
         public void Disconnect()
         {
@@ -296,6 +297,10 @@ namespace NSL.TCP
 
             sclient = null;
         }
+
+        private readonly TParent parent;
+
+        public CoreOptions Options => options;
 
         public abstract void ChangeUserData(INetworkClient data);
 

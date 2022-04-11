@@ -1,4 +1,4 @@
-﻿namespace SocketClient.Utils
+﻿namespace NSL.SocketClient.Utils
 {
     public interface ILockedPacket
     {

@@ -1,6 +1,6 @@
 ﻿using NSL.Extensions.NAT.Proxy.Data.Packets.Enums;
-using SocketClient;
-using SocketClient.Utils;
+using NSL.SocketClient;
+using NSL.SocketClient.Utils;
 using SocketCore.Utils.Buffer;
 
 namespace NSL.Extensions.NAT.Proxy.Data.Packets

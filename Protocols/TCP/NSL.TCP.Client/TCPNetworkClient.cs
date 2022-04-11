@@ -1,4 +1,4 @@
-﻿using SocketClient;
+﻿using NSL.SocketClient;
 using System;
 using System.Net;
 using System.Net.Sockets;
@@ -49,6 +49,7 @@ namespace NSL.TCP.Client
         {
             this.ConnectionOptions.IpAddress = ip;
             this.ConnectionOptions.Port = port;
+
             return await ConnectAsync(connectionTimeOut);
         }
 

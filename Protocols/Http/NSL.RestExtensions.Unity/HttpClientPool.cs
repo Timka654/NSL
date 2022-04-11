@@ -11,14 +11,14 @@ namespace RestExtensions.Unity
 
         public static readonly TimeSpan defaultTimeout = TimeSpan.FromSeconds(60);
 
-        private string baseUrl;
+        private Func<string> baseUrl;
         private TimeSpan requestTimeout;
 
         private SemaphoreSlim locker = new SemaphoreSlim(MaxParrallelRequestCount);
 
         private System.Collections.Concurrent.ConcurrentDictionary<string, string> headerMap = new System.Collections.Concurrent.ConcurrentDictionary<string, string>();
 
-        public HttpClientPool(string baseUrl, TimeSpan? requestTimeout = null)
+        public HttpClientPool(Func<string> baseUrl, TimeSpan? requestTimeout = null)
         {
             this.baseUrl = baseUrl;
             this.requestTimeout = requestTimeout ?? defaultTimeout;
@@ -28,13 +28,14 @@ namespace RestExtensions.Unity
         {
             if (!await locker.WaitAsync(timeout))
                 return default;
-            
 
-            var client = new HttpClient(customHandler ?? new HttpClientHandler() { 
+
+            var client = new HttpClient(customHandler ?? new HttpClientHandler()
+            {
                 AllowAutoRedirect = false
             })
             {
-                BaseAddress = new Uri(baseUrl ?? this.baseUrl),
+                BaseAddress = new Uri(baseUrl ?? this.baseUrl()),
                 Timeout = requestTimeout ?? this.requestTimeout
             };
 

@@ -1,7 +1,7 @@
 ﻿using System;
 using SocketCore.Utils.Buffer;
 
-namespace SocketClient.Utils.SystemPackets
+namespace NSL.SocketClient.Utils.SystemPackets
 {
     internal interface IClientSystemTimePacket
     {

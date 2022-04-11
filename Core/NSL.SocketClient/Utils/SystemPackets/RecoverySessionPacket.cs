@@ -2,7 +2,7 @@
 using SocketCore.Utils.SystemPackets.Enums;
 using System.Linq;
 
-namespace SocketClient.Utils
+namespace NSL.SocketClient.Utils
 {
     public enum RecoverySessionResultEnum
     {
@@ -12,7 +12,7 @@ namespace SocketClient.Utils
     }
 }
 
-namespace SocketClient.Utils.SystemPackets
+namespace NSL.SocketClient.Utils.SystemPackets
 {
     public class RecoverySessionPacket<T> : IPacketMessage<T, RecoverySessionResultEnum> where T : BaseSocketNetworkClient
     {

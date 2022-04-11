@@ -1,7 +1,7 @@
 ﻿using SocketCore.Utils.Buffer;
 using SocketCore.Utils.SystemPackets.Enums;
 
-namespace SocketClient.Utils.SystemPackets
+namespace NSL.SocketClient.Utils.SystemPackets
 {
     public class VersionPacket
     {

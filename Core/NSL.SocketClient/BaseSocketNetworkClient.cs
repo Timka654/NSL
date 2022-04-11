@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SocketClient
+namespace NSL.SocketClient
 {
     public abstract class BaseSocketNetworkClient : INetworkClient
     {

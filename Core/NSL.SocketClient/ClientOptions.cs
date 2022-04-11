@@ -1,11 +1,11 @@
-﻿using SocketClient.Utils;
+﻿using NSL.SocketClient.Utils;
 using SocketCore;
 using SocketCore.Utils;
 using SocketCore.Utils.SystemPackets.Enums;
 using System;
 using System.Net;
 
-namespace SocketClient
+namespace NSL.SocketClient
 {
     public class ClientOptions<TClient> : CoreOptions<TClient>
         where TClient : BaseSocketNetworkClient

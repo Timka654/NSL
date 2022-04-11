@@ -2,7 +2,7 @@
 using SocketCore.Utils;
 using SocketCore.Utils.Buffer;
 
-namespace SocketClient.Utils
+namespace NSL.SocketClient.Utils
 {
     public class IClientPacket<TClient> : IPacket<TClient> where TClient : BaseSocketNetworkClient
     {

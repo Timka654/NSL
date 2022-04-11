@@ -8,23 +8,21 @@
 
 	<PropertyGroup Condition="'$(Configuration)'=='UnityDebug'">
 		<TargetFramework>netstandard2.0</TargetFramework>
-		<OutputPath>..\package_unity_build</OutputPath>
 		<DefineConstants>DEBUG;TRACE</DefineConstants>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)'=='Unity'">
 		<TargetFramework>netstandard2.0</TargetFramework>
-		<OutputPath>..\package_unity_build</OutputPath>
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <ProjectReference Include="..\..\..\Core\NSL.SocketClient.Unity\NSL.SocketClient.Unity.csproj" />
 	  <ProjectReference Include="..\..\..\Core\Utils\NSL.Utils\NSL.Utils.csproj" />
-	  <ProjectReference Include="..\..\..\Unity\NSL.SocketClient.Unity\NSL.SocketClient.Unity.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
 	  <Reference Include="UnityEngine">
-	    <HintPath>..\..\..\Unity\UnityEngine.dll</HintPath>
+	    <HintPath>..\..\..\Reference\UnityEngine.dll</HintPath>
 	  </Reference>
 	</ItemGroup>
 

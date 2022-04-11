@@ -8,9 +8,9 @@ namespace NSL.Extensions.NAT
 {
     public class UPNPProvider
     {
-        static List<INatDevice> DeviceList = new();
+        static List<INatDevice> DeviceList = new List<INatDevice>();
 
-        static List<Mapping> MapList = new();
+        static List<Mapping> MapList = new List<Mapping>();
 
         static Timer checkTimer;
 

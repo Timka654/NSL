@@ -4,8 +4,8 @@ using System.Threading.Tasks;
 using NSL.Extensions.NAT.Proxy.Data.Enums;
 using NSL.Extensions.NAT.Proxy.Data.Packets.Enums;
 using SocketCore.Utils.Buffer;
-using SocketClient;
 using NSL.TCP.Client;
+using NSL.SocketClient;
 
 namespace NSL.Extensions.NAT.Proxy
 {
