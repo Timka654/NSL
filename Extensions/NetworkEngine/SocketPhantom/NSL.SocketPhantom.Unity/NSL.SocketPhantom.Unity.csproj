@@ -8,13 +8,11 @@
 
 	<PropertyGroup Condition="'$(Configuration)'=='UnityDebug'">
 		<TargetFramework>netstandard2.0</TargetFramework>
-		<OutputPath>..\package_unity_build</OutputPath>
 		<DefineConstants>DEBUG;TRACE</DefineConstants>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)'=='Unity'">
 		<TargetFramework>netstandard2.0</TargetFramework>
-		<OutputPath>..\package_unity_build</OutputPath>
 	</PropertyGroup>
 
 	<ItemGroup>
