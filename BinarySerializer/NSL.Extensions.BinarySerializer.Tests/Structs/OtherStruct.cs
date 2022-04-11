@@ -1,11 +1,8 @@
-﻿using BinarySerializer;
-using BinarySerializer.Attributes;
+﻿using NSL.Extensions.BinarySerializer.Attributes;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Numerics;
-using System.Text;
 
 namespace BinarySerializer_v5.Test.Structs
 {

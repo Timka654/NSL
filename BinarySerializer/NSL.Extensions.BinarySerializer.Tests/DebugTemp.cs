@@ -1,12 +1,6 @@
-﻿using BinarySerializer;
-using BinarySerializer.Attributes;
-using SocketCore.Extensions.BinarySerializer;
+﻿using NSL.Extensions.BinarySerializer.Attributes;
 using SocketCore.Utils.Buffer;
-using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Numerics;
-using System.Text;
 
 namespace BinarySerializer_v5.Test
 {
@@ -170,7 +164,7 @@ namespace BinarySerializer_v5.Test
         {
             public static void Debug()
             {
-                
+
                 StringTest st = new StringTest();
 
                 st.Name = "Guild top 1";
@@ -179,12 +173,11 @@ namespace BinarySerializer_v5.Test
                 st.AutoAccept2 = true;
 
                 var bf = new OutputPacketBuffer();
-                Utils.bs.Serialize(bf,st, "PrivateInfo");
+                Utils.bs.Serialize(bf, st, "PrivateInfo");
 
                 var inp = new InputPacketBuffer(bf.GetBuffer());
 
-                var ds =
-    Utils.bs.Deserialize<StringTest>(inp, "PrivateInfo");
+                var ds = Utils.bs.Deserialize<StringTest>(inp, "PrivateInfo");
 
                 RecurciveError r = new RecurciveError();
                 r.t = new List<tempStruct>();
@@ -195,7 +188,7 @@ namespace BinarySerializer_v5.Test
 
 
 
-                Utils.bs.Serialize( new OutputPacketBuffer(),  r,"default");
+                Utils.bs.Serialize(new OutputPacketBuffer(), r, "default");
 
             }
         }

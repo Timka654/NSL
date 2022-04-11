@@ -1,13 +1,9 @@
-﻿using SocketCore.Extensions.BinarySerializer;
-using SocketCore.Utils.Buffer;
+﻿using SocketCore.Utils.Buffer;
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Numerics;
 using System.Reflection;
-using System.Text;
 
 namespace BinarySerializer_v5.Test
 {

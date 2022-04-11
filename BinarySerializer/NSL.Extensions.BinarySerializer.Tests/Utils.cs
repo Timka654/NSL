@@ -1,14 +1,11 @@
-﻿using SocketCore.Extensions.BinarySerializer;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Numerics;
-using System.Text;
 
 namespace BinarySerializer_v5.Test
 {
     class Utils
     {
-        private static Random rand = new Random();
+        private static System.Random rand = new System.Random();
 
         private static char[] randStringTable = new char[]
             {

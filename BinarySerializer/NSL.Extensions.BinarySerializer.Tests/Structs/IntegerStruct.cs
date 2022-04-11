@@ -1,16 +1,9 @@
-﻿using BinarySerializer;
-using BinarySerializer.Attributes;
-using SocketCore.Extensions.BinarySerializer;
-using System;
-using System.Collections.Generic;
+﻿using NSL.Extensions.BinarySerializer.Attributes;
 using System.Diagnostics;
 using System.IO;
-using System.Text;
 
 namespace BinarySerializer_v5.Test.Structs
 {
-    //[BinarySerializer.BinaryPreCompile("default", 32)]
-    [BinaryNetworkType]
     public class IntegerStruct : ITestStruct<IntegerStruct>
     {
         [Binary]

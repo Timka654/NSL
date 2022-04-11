@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Numerics;
-using System.Reflection;
-using BinarySerializer;
 
 namespace BinarySerializer_v5.Test
 {
