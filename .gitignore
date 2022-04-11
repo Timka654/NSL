@@ -1,0 +1,14 @@
+obj/
+bin/
+/BinarySerializerTest_v5/.vs
+/SCL.Unity/.vs/
+/.vs/
+/ProxyHostServer/.vs
+/ProxyServer/.vs
+/UnityDebug/
+*/Release/*
+/nupkg/
+/unity/
+package_build/
+package_build_release/
+*.dll

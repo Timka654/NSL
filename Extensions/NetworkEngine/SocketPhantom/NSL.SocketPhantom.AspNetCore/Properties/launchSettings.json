@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "NSL.SocketPhantom.AspNetCore": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:10476;http://localhost:10477"
+    }
+  }
+}

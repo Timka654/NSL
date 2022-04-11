@@ -1,0 +1,40 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+	  <TargetFramework>net6.0</TargetFramework>
+	  <Configurations>Debug;Release;Unity;UnityDebug;</Configurations>
+	  <Version>$(VersionSuffix)</Version>
+
+	  <PublishRepositoryUrl>true</PublishRepositoryUrl>
+	  <EmbedUntrackedSources>true</EmbedUntrackedSources>
+	  <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+	  <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
+  </PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)'=='Debug'">
+		<PackageId>$(MSBuildProjectName)_Debug</PackageId>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)'=='UnityDebug'">
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<DefineConstants>DEBUG;TRACE</DefineConstants>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)'=='Unity'">
+		<TargetFramework>netstandard2.0</TargetFramework>
+	</PropertyGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\..\..\Base\NSL.Logger\NSL.Logger.csproj" />
+	  <ProjectReference Include="..\..\..\ConfigurationEngine\NSL.ConfigurationEngine\NSL.ConfigurationEngine.csproj" />
+	  <ProjectReference Include="..\..\..\Protocols\TCP\NSL.TCP.Client\NSL.TCP.Client.csproj" />
+	  <ProjectReference Include="..\..\..\Protocols\TCP\NSL.TCP.Server\NSL.TCP.Server.csproj" />
+	  <ProjectReference Include="..\..\NSL.SocketClient\NSL.SocketClient.csproj" />
+	  <ProjectReference Include="..\..\NSL.SocketServer\NSL.SocketServer.csproj" />
+	  <ProjectReference Include="..\ServerOptions.Extensions.ConfigurationEngine\NSL.ServerOptions.Extensions.ConfigurationEngine.csproj" />
+	</ItemGroup>
+  <!--<PropertyGroup Condition="'$(Configuration)'=='Debug'">
+    <PackageId>$(AssemblyName).Develop</PackageId>
+  </PropertyGroup>-->
+
+</Project>

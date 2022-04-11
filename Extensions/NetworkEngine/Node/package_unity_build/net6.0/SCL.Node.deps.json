@@ -1,0 +1,50 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v6.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v6.0": {
+      "SCL.Node/1.0.0": {
+        "dependencies": {
+          "NSL.SocketCore_Debug": "1.0.0",
+          "NSL.SocketServer_Debug": "1.0.0"
+        },
+        "runtime": {
+          "SCL.Node.dll": {}
+        }
+      },
+      "NSL.SocketCore_Debug/1.0.0": {
+        "runtime": {
+          "NSL.SocketCore.dll": {}
+        }
+      },
+      "NSL.SocketServer_Debug/1.0.0": {
+        "dependencies": {
+          "NSL.SocketCore_Debug": "1.0.0"
+        },
+        "runtime": {
+          "NSL.SocketServer.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "SCL.Node/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "NSL.SocketCore_Debug/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "NSL.SocketServer_Debug/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}
