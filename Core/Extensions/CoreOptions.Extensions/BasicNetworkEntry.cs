@@ -76,7 +76,7 @@ namespace NSL.ServerOptions.Extensions
             Logger?.Append(LoggerLevel.Info, $"---> {ServerName} server Loaded");
         }
 
-        protected internal virtual OType LoadConfigurationAction()
+        protected virtual OType LoadConfigurationAction()
         {
             throw new NotImplementedException();
         }

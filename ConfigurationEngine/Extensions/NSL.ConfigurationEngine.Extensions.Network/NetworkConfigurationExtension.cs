@@ -1,5 +1,6 @@
 ﻿using NSL.ConfigurationEngine;
-using NSL.SocketClient;
+using SocketCore;
+using SocketCore.Utils;
 using System.Net.Sockets;
 
 namespace ServerOptions.Extensions.ConfigurationEngine
@@ -40,13 +41,12 @@ namespace ServerOptions.Extensions.ConfigurationEngine
             }
         }
 
-        public static ClientOptions<T> LoadConfigurationClientOptions<T>(this IConfigurationManager configuration, string networkNodePath)
-            where T : BaseSocketNetworkClient
+        public static T LoadConfigurationCoreOptions<T, TType>(this IConfigurationManager configuration, string networkNodePath)
+            where T : CoreOptions<TType>, new()
+            where TType : INetworkClient
         {
-            return new ClientOptions<T>
+            return new T
             {
-                IpAddress = configuration.GetValue($"{networkNodePath}.io.ip"),
-                Port = configuration.GetValue<int>($"{networkNodePath}.io.port"),
                 AddressFamily = configuration.GetIPv($"{networkNodePath}.io.ipv"),
                 ProtocolType = configuration.GetProtocolType($"{networkNodePath}.io.protocol"),
                 ReceiveBufferSize = configuration.GetValue<int>($"{networkNodePath}.io.buffer.size"),

@@ -17,6 +17,11 @@ namespace NSL.SocketClient.Unity
 
         public void FixedUpdate()
         {
+            InvokeQueue();
+        }
+
+        public static void InvokeQueue()
+        {
             while (mainThreadActions.TryDequeue(out temp))
             {
                 temp.Invoke();

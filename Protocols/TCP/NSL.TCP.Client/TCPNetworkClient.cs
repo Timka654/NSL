@@ -104,6 +104,9 @@ namespace NSL.TCP.Client
 
         private void Release()
         {
+            if (client == null)
+                return;
+
             client.Dispose();
             client = null;
         }

@@ -20,6 +20,8 @@ namespace RestExtensions.Unity
 
     public class BaseWebRequests
     {
+        public const string DefaultJsonMimeType = "application/json";
+
         public virtual int GetTimeout() => 10000;
 
         public virtual string GetBaseDomain() => "http://127.0.0.1/";
@@ -155,6 +157,11 @@ namespace RestExtensions.Unity
             try
             {
                 result = await client.SendAsync(request);
+            }
+            //Unity has throw on error status code and form data content, cannot find any fixes
+            catch (ObjectDisposedException ex)
+            {
+                result = new HttpResponseMessage(HttpStatusCode.InternalServerError) { RequestMessage = request };
             }
 #pragma warning disable CS0168 // Переменная объявлена, но не используется
             catch (HttpRequestException ex)

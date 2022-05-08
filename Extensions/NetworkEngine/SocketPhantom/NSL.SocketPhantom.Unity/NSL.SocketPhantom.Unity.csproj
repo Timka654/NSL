@@ -3,6 +3,8 @@
 	<PropertyGroup>
 		<TargetFramework>net6.0</TargetFramework>
 		<Configurations>Debug;Release;Unity;UnityDebug</Configurations>
+		
+		<Authors>Relife87</Authors>
 		<Version>$(VersionSuffix)</Version>
 	</PropertyGroup>
 

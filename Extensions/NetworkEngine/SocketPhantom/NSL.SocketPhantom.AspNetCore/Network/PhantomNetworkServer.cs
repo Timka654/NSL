@@ -2,6 +2,7 @@
 using NSL.ConfigurationEngine;
 using NSL.Logger;
 using NSL.ServerOptions.Extensions;
+using NSL.SocketCore.Extensions.TCPServer;
 using NSL.SocketPhantom.AspNetCore.Network.Packets;
 using NSL.SocketPhantom.Cipher;
 using NSL.SocketPhantom.Enums;
@@ -9,7 +10,7 @@ using SocketServer;
 
 namespace NSL.SocketPhantom.AspNetCore.Network
 {
-    internal class PhantomNetworkServer : NetworkServer<PhantomHubClientProxy, PhantomNetworkServer>
+    internal class PhantomNetworkServer : TCPNetworkServerEntry<PhantomHubClientProxy, PhantomNetworkServer>
     {
         protected override string ServerConfigurationName => "phantom";
 

@@ -12,3 +12,4 @@ bin/
 package_build/
 package_build_release/
 *.dll
+/build/

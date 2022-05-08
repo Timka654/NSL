@@ -5,7 +5,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 
-namespace ServerOptions.Extensions.Packet
+namespace NSL.SocketCore.Extensions.Packet
 {
     public static class PacketHelper
     {
@@ -13,11 +13,12 @@ namespace ServerOptions.Extensions.Packet
         /// Инициализация пакетов (классов реализующих интерфейс <see cref="IPacket{TClient}"/>) по аттрибуту наследуемому от аттрибута <see cref="Packet.PacketAttribute"/>
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="serverOptions"></param>
+        /// <param name="coreOptions"></param>
         /// <param name="assembly">Сборка из которой нужно выбрать классы пакетов</param>
         /// <param name="selectAttrbuteType">Аттрибут по которому будут выбираться классы пакетов</param>
         /// <returns>Кол-во пакетов которые были инициализированы</returns>
-        public static int LoadPackets<T>(this CoreOptions<T> serverOptions, Assembly assembly, Type selectAttrbuteType) where T : INetworkClient
+        public static int LoadPackets<T>(this CoreOptions<T> coreOptions, Assembly assembly, Type selectAttrbuteType, Func<Type, IPacket<T>> initAction) 
+            where T : INetworkClient
         {
             if (!typeof(Packet.PacketAttribute).IsAssignableFrom(selectAttrbuteType))
             {
@@ -42,12 +43,7 @@ namespace ServerOptions.Extensions.Packet
                 if (!typeof(IPacket<T>).IsAssignableFrom(item.type))
                     throw new Exception($"Packet type {typeof(IPacket<T>)} is not assignable from {item.type}");
 
-                bool r = false;
-
-                if (client)
-                    r = serverOptions.AddPacket((ushort)item.attr.PacketId, (IPacket<T>)Activator.CreateInstance(item.type, serverOptions));
-                else
-                    r = serverOptions.AddPacket((ushort)item.attr.PacketId, (IPacket<T>)Activator.CreateInstance(item.type));
+                bool r = coreOptions.AddPacket((ushort)item.attr.PacketId, initAction(item.type));
 
                 Debug.WriteLine($"Loading Packet: packet: {item.attr.PacketId} type: {item.type.FullName} result: {r}");
             }
@@ -68,9 +64,9 @@ namespace ServerOptions.Extensions.Packet
         //    return LoadPackets<T>(serverOptions, Assembly.GetCallingAssembly(), selectAttrbuteType);
         //}
 
-        public static int LoadPackets<T>(this CoreOptions<T> serverOptions, Type selectAttrbuteType) where T : INetworkClient
+        public static int LoadPackets<T>(this CoreOptions<T> coreOptions, Type selectAttrbuteType, Func<Type, IPacket<T>> initAction) where T : INetworkClient
         {
-            return LoadPackets<T>(serverOptions, Assembly.GetCallingAssembly(), selectAttrbuteType);
+            return LoadPackets<T>(coreOptions, Assembly.GetCallingAssembly(), selectAttrbuteType, initAction);
         }
 
     }

@@ -9,6 +9,8 @@
 		<EmbedUntrackedSources>true</EmbedUntrackedSources>
 		<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
 		<GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
+		
+		<Authors>Relife87</Authors>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)'=='Debug'">

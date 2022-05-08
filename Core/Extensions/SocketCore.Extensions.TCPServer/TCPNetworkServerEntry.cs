@@ -1,4 +1,5 @@
-﻿using NSL.ServerOptions.Extensions.ConfigurationEngine;
+﻿using NSL.ServerOptions.Extensions;
+using NSL.ServerOptions.Extensions.ConfigurationEngine;
 using NSL.TCP.Server;
 using SocketCore.Utils.Logger.Enums;
 using SocketServer;
@@ -6,13 +7,12 @@ using SocketServer.Utils;
 using System;
 using System.Net;
 
-namespace NSL.ServerOptions.Extensions
+namespace NSL.SocketCore.Extensions.TCPServer
 {
-    public class NetworkServer<T, CType> : BasicNetworkEntry<T, CType,ServerOptions<T>>
+    public class TCPNetworkServerEntry<T, CType> : BasicNetworkEntry<T, CType,ServerOptions<T>>
         where T : IServerNetworkClient
-        where CType : NetworkServer<T,CType>
+        where CType : TCPNetworkServerEntry<T,CType>
     {
-
         /// <summary>
         /// Слушатель подключений
         /// </summary>
@@ -22,7 +22,9 @@ namespace NSL.ServerOptions.Extensions
         /// Путь к конфигурации сервера server/{ServerConfigurationName}
         /// Должен быть обзательно переопределен в случае если используеться хоть 1 функция по умолчанию
         /// </summary>
-        protected virtual string ServerConfigurationName { get; } = "client";
+        protected virtual string ServerConfigurationName { get; } = "network";
+
+        protected string NetworkConfigurationPath => $"server.{ServerConfigurationName}";
 
         public virtual void Load()
         {
@@ -53,9 +55,9 @@ namespace NSL.ServerOptions.Extensions
             }
         }
 
-        protected internal override ServerOptions<T> LoadConfigurationAction()
+        protected override ServerOptions<T> LoadConfigurationAction()
         {
-            return ConfigurationManager.LoadConfigurationServerOptions<T>($"server.{ServerConfigurationName}");
+            return ConfigurationManager.LoadConfigurationServerOptions<T>(NetworkConfigurationPath);
         }
 
         #region Handle

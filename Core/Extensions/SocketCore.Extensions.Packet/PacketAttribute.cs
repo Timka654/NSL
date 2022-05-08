@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ServerOptions.Extensions.Packet
+namespace NSL.SocketCore.Extensions.Packet
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, AllowMultiple = false, Inherited = false)]
     public class PacketAttribute : Attribute

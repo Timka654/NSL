@@ -3,13 +3,15 @@
 	<PropertyGroup>
 		<TargetFramework>net6.0</TargetFramework>
 		<Configurations>Debug;Release;Unity;UnityDebug;</Configurations>
-		<Version>$(VersionSuffix)</Version>
 
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
 		<EmbedUntrackedSources>true</EmbedUntrackedSources>
 		<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
 		<GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
 
+		<Version>$(VersionSuffix)</Version>
+		<Authors>Relife87</Authors>
+		
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 	</PropertyGroup>
 
@@ -18,18 +20,20 @@
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)'=='UnityDebug'">
+		<AssemblyName>Unity.$(MSBuildProjectName)</AssemblyName>
 		<TargetFramework>netstandard2.0</TargetFramework>
 		<DefineConstants>DEBUG;TRACE</DefineConstants>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)'=='Unity'">
+		<AssemblyName>Unity.$(MSBuildProjectName)</AssemblyName>
 		<TargetFramework>netstandard2.0</TargetFramework>
 	</PropertyGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\..\ConfigurationEngine\NSL.ConfigurationEngine\NSL.ConfigurationEngine.csproj" />
-		<ProjectReference Include="..\..\NSL.SocketCore\NSL.SocketCore.csproj" />
-		<ProjectReference Include="..\..\NSL.SocketServer\NSL.SocketServer.csproj" />
+	  <ProjectReference Include="..\..\..\ConfigurationEngine\Extensions\NSL.ConfigurationEngine.Extensions.Network\NSL.ConfigurationEngine.Extensions.Network.csproj" />
+	  <ProjectReference Include="..\..\..\ConfigurationEngine\NSL.ConfigurationEngine\NSL.ConfigurationEngine.csproj" />
+	  <ProjectReference Include="..\..\NSL.SocketServer\NSL.SocketServer.csproj" />
 	</ItemGroup>
 
 </Project>

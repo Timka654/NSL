@@ -1,34 +1,37 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-	  <TargetFramework>net6.0</TargetFramework>
-	  <Configurations>Debug;Release;Unity;UnityDebug;</Configurations>
-	  <Version>$(VersionSuffix)</Version>
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<Configurations>Debug;Release;Unity;UnityDebug;</Configurations>
+		<Version>$(VersionSuffix)</Version>
 
-	  <PublishRepositoryUrl>true</PublishRepositoryUrl>
-	  <EmbedUntrackedSources>true</EmbedUntrackedSources>
-	  <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-	  <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
-	  
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-  </PropertyGroup>
+		<PublishRepositoryUrl>true</PublishRepositoryUrl>
+		<EmbedUntrackedSources>true</EmbedUntrackedSources>
+		<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+		<GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
+
+		<Authors>Relife87</Authors>
+
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)'=='Debug'">
 		<PackageId>$(MSBuildProjectName)_Debug</PackageId>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)'=='UnityDebug'">
+		<AssemblyName>Unity.$(MSBuildProjectName)</AssemblyName>
 		<TargetFramework>netstandard2.0</TargetFramework>
 		<DefineConstants>DEBUG;TRACE</DefineConstants>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)'=='Unity'">
+		<AssemblyName>Unity.$(MSBuildProjectName)</AssemblyName>
 		<TargetFramework>netstandard2.0</TargetFramework>
 	</PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\Core\NSL.SocketClient\NSL.SocketClient.csproj" />
-    <ProjectReference Include="..\..\NSL.ConfigurationEngine\NSL.ConfigurationEngine.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\..\NSL.ConfigurationEngine\NSL.ConfigurationEngine.csproj" />
+	</ItemGroup>
 
 </Project>

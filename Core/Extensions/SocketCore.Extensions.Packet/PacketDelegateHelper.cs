@@ -1,11 +1,11 @@
-﻿using ServerOptions.Extensions.Packet;
+﻿using SocketCore;
 using SocketCore.Utils;
 using SocketCore.Utils.Buffer;
 using System;
 using System.Linq;
 using System.Reflection;
 
-namespace SocketCore.Extensions.Packet
+namespace NSL.SocketCore.Extensions.Packet
 {
     public class PacketDelegateContainerAttribute : Attribute
     {

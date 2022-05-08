@@ -9,6 +9,8 @@
 		<EmbedUntrackedSources>true</EmbedUntrackedSources>
 		<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
 		<GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
+		
+		<Authors>Relife87</Authors>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)'=='Debug'">
@@ -16,11 +18,13 @@
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)'=='UnityDebug'">
+		<AssemblyName>Unity.$(MSBuildProjectName)</AssemblyName>
 		<TargetFramework>netstandard2.0</TargetFramework>
 		<DefineConstants>DEBUG;TRACE</DefineConstants>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)'=='Unity'">
+		<AssemblyName>Unity.$(MSBuildProjectName)</AssemblyName>
 		<TargetFramework>netstandard2.0</TargetFramework>
 	</PropertyGroup>
 

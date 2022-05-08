@@ -1,31 +1,33 @@
-﻿using NSL.ServerOptions.Extensions.ConfigurationEngine;
+﻿using NSL.ClientOptions.Extensions.ConfigurationEngine;
+using NSL.ServerOptions.Extensions;
 using NSL.SocketClient;
 using NSL.TCP.Client;
+using ServerOptions.Extensions.ConfigurationEngine;
 using SocketCore.Utils.Logger.Enums;
 using System;
 using System.Net;
 using System.Threading.Tasks;
 
-namespace NSL.ServerOptions.Extensions
+namespace NSL.SocketCore.Extensions.TCPClient
 {
-    public class NetworkServerClient<T, CType> : BasicNetworkEntry<T, CType, ClientOptions<T>>
+    public class TCPNetworkClientEntry<T, CType> : BasicNetworkEntry<T, CType, ClientOptions<T>>
         where T : BaseSocketNetworkClient
-        where CType : NetworkServerClient<T, CType>
+        where CType : TCPNetworkClientEntry<T, CType>
     {
         /// <summary>
         /// Слушатель подключений
         /// </summary>
-        public static TCPNetworkClient<T, ClientOptions<T>> Client { get; protected set; }
+        public static TCP.Client.TCPNetworkClient<T, ClientOptions<T>> Client { get; protected set; }
 
-        protected TCPNetworkClient<T, ClientOptions<T>> client { get; set; }
+        protected TCP.Client.TCPNetworkClient<T, ClientOptions<T>> client { get; set; }
 
-        public TCPNetworkClient<T, ClientOptions<T>> GetClient() => client;
+        public TCP.Client.TCPNetworkClient<T, ClientOptions<T>> GetClient() => client;
 
         /// <summary>
         /// Путь к конфигурации сервера client/{ServerConfigurationName}
         /// Должен быть обзательно переопределен в случае если используеться хоть 1 функция по умолчанию
         /// </summary>
-        protected virtual string ServerConfigurationName { get; } = "client";
+        protected virtual string ServerConfigurationName { get; } = "network";
 
         public virtual bool ReconnectOnDisconnected { get; } = true;
 
@@ -46,7 +48,7 @@ namespace NSL.ServerOptions.Extensions
         {
             Logger?.Append(LoggerLevel.Info, $"-> Client Socket Client Loading");
 
-            Client = client = new TCPNetworkClient<T, ClientOptions<T>>(options);
+            Client = client = new TCP.Client.TCPNetworkClient<T, ClientOptions<T>>(options);
 
             client.OnReceivePacket += Listener_OnReceivePacket;
             client.OnSendPacket += Listener_OnSendPacket;
@@ -65,9 +67,9 @@ namespace NSL.ServerOptions.Extensions
             }
         }
 
-        protected internal override ClientOptions<T> LoadConfigurationAction()
+        protected override ClientOptions<T> LoadConfigurationAction()
         {
-            return ConfigurationManager.LoadConfigurationCoreOptions<ClientOptions<T>, T>(NetworkConfigurationPath);
+            return ConfigurationManager.LoadConfigurationClientOptions<T>(NetworkConfigurationPath);
         }
 
 

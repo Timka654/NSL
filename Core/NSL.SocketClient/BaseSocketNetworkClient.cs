@@ -67,10 +67,13 @@ namespace NSL.SocketClient
 
                 if (pingPongEnabled)
                 {
+
+                    if (pingPongTokenSource != null)
+                        pingPongTokenSource.Cancel();
+
                     if (pingPongTokenSource == null)
                         pingPongTokenSource = new CancellationTokenSource();
 
-                    pingPongTokenSource.Cancel();
 
                     RunAliveChecker(pingPongTokenSource.Token);
                 }

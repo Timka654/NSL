@@ -3,7 +3,6 @@
 	<PropertyGroup>
 		<TargetFramework>net6.0</TargetFramework>
 		<Configurations>Debug;Release;Unity;UnityDebug;</Configurations>
-		<Version>$(VersionSuffix)</Version>
 
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
 		<EmbedUntrackedSources>true</EmbedUntrackedSources>
@@ -11,6 +10,8 @@
 		<GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
 		
 		<Description>Библиотека для расширения функций буффера</Description>
+		<Authors>Relife87</Authors>
+		<Version>$(VersionSuffix)</Version>
 		
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 	</PropertyGroup>
@@ -20,11 +21,13 @@
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)'=='UnityDebug'">
+		<AssemblyName>Unity.$(MSBuildProjectName)</AssemblyName>
 		<TargetFramework>netstandard2.0</TargetFramework>
 		<DefineConstants>DEBUG;TRACE</DefineConstants>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)'=='Unity'">
+		<AssemblyName>Unity.$(MSBuildProjectName)</AssemblyName>
 		<TargetFramework>netstandard2.0</TargetFramework>
 	</PropertyGroup>
 

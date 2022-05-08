@@ -10,6 +10,8 @@
 		<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
 		<GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
 		
+		<Authors>Relife87</Authors>
+		
 		<IsPackable>true</IsPackable>
 		<OutputType>Library</OutputType>
 	</PropertyGroup>
@@ -22,8 +24,8 @@
 	  <ProjectReference Include="..\..\..\..\Base\NSL.Logger\NSL.Logger.csproj" />
 	  <ProjectReference Include="..\..\..\..\ConfigurationEngine\NSL.ConfigurationEngine\NSL.ConfigurationEngine.csproj" />
 	  <ProjectReference Include="..\..\..\..\ConfigurationEngine\Providers\NSL.ConfigurationEngine.Providers.IConfiguration\NSL.ConfigurationEngine.Providers.IConfiguration.csproj" />
-	  <ProjectReference Include="..\..\..\..\Core\Extensions\ServerOptions.Extensions\NSL.ServerOptions.Extensions.csproj" />
 	  <ProjectReference Include="..\..\..\..\Core\Extensions\SocketCore.Extensions.Buffer\NSL.SocketCore.Extensions.Buffer.csproj" />
+	  <ProjectReference Include="..\..\..\..\Core\Extensions\SocketCore.Extensions.TCPServer\NSL.SocketCore.Extensions.TCPServer.csproj" />
 	  <ProjectReference Include="..\..\..\..\Core\NSL.SocketServer\NSL.SocketServer.csproj" />
 	  <ProjectReference Include="..\NSL.SocketPhantom\NSL.SocketPhantom.csproj" />
 	</ItemGroup>

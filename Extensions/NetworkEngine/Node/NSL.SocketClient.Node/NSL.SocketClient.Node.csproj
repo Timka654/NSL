@@ -3,17 +3,18 @@
 	<PropertyGroup>
 		<TargetFramework>net6.0</TargetFramework>
 		<Configurations>Debug;Release;Unity;UnityDebug;</Configurations>
-		<Version>$(VersionSuffix)</Version>
 
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
 		<EmbedUntrackedSources>true</EmbedUntrackedSources>
 		<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
 		<GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
-		
+
 		<Description>
 			Базовая библиотека для создания клиента P2P работающая по протоколу UDP/TCP
 			Так-же содержит классы
 		</Description>
+		<Version>$(VersionSuffix)</Version>
+		<Authors>Relife87</Authors>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)'=='Debug'">
@@ -21,17 +22,19 @@
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)'=='UnityDebug'">
+		<AssemblyName>Unity.$(MSBuildProjectName)</AssemblyName>
 		<TargetFramework>netstandard2.0</TargetFramework>
 		<DefineConstants>DEBUG;TRACE</DefineConstants>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)'=='Unity'">
+		<AssemblyName>Unity.$(MSBuildProjectName)</AssemblyName>
 		<TargetFramework>netstandard2.0</TargetFramework>
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\..\..\..\Core\NSL.SocketCore\NSL.SocketCore.csproj" />
-	  <ProjectReference Include="..\..\..\..\Core\NSL.SocketServer\NSL.SocketServer.csproj" />
+		<ProjectReference Include="..\..\..\..\Core\NSL.SocketCore\NSL.SocketCore.csproj" />
+		<ProjectReference Include="..\..\..\..\Core\NSL.SocketServer\NSL.SocketServer.csproj" />
 	</ItemGroup>
 
 </Project>
