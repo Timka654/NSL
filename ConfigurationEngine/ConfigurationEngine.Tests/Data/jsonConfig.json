@@ -1,0 +1,22 @@
+{
+  "testName1": "1-readed",
+  "testName2.testName3": "23-readed",
+  "testName4.testName5.testName6": "456-readed",
+  "testName4.testName5": {
+    "testName6": "456-readed-but-another"
+  },
+  "testName6.testName7": [ 1, 2, 3, 4, 5, 6, 7 ],
+  "testName8": 8,
+  "testName9": "2021-01-01T10:10:10",
+  "testName10": {
+    "selector": {
+      "type": "TextPositionSelector",
+      "start": 412,
+      "end": 795
+    },
+    "source": "http://example.org/ebook1"
+  },
+  "testName11": "1.12:24:02",
+  "testName12": "A5ED95F5-4B61-4EAC-8A2F-ED9D4274E46F",
+  "testName13": 10.5
+}

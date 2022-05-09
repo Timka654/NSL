@@ -117,7 +117,7 @@ namespace NSL.ConfigurationEngine
         /// <summary>
         /// Установка значений по умолчанию для перезагрузки
         /// </summary>
-        public void SetDefaults(List<ConfigurationInfo> defaultConfigurationList, bool reloading = false)
+        public bool SetDefaults(List<ConfigurationInfo> defaultConfigurationList, bool reloading = false)
         {
             foreach (var item in defaultConfigurationList)
             {
@@ -127,18 +127,24 @@ namespace NSL.ConfigurationEngine
             DefaultConfigurationList = defaultConfigurationList;
 
             if (reloading)
-                ReloadData();
+                return ReloadData();
+
+            return true;
         }
 
         /// <summary>
         /// Пере/Загрузить значения с указанного источника с учетом данных по умолчанию
         /// </summary>
         /// <returns></returns>
-        public void ReloadData()
+        public bool ReloadData()
         {
             ClearStorage();
             DefaultConfigurationList?.ForEach(x => AddValue(x));
-            Provider.LoadData(this);
+
+            if (Provider == null)
+                throw new NullReferenceException($"{nameof(Provider)} cannot be null");
+            
+            return Provider.LoadData(this);
         }
     }
 
