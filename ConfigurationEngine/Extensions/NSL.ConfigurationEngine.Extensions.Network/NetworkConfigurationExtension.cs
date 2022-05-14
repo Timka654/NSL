@@ -1,4 +1,6 @@
 ﻿using NSL.ConfigurationEngine;
+using NSL.SocketCore;
+using NSL.SocketCore.Utils;
 using System.Net.Sockets;
 
 namespace NSL.ServerOptions.Extensions.ConfigurationEngine

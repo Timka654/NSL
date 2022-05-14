@@ -1,6 +1,7 @@
 ﻿using NSL.ClientOptions.Extensions.ConfigurationEngine;
 using NSL.ServerOptions.Extensions;
 using NSL.SocketClient;
+using NSL.SocketCore.Utils.Logger.Enums;
 using NSL.TCP.Client;
 using System;
 using System.Net;
