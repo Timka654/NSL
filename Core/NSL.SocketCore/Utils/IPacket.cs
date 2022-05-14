@@ -1,6 +1,6 @@
-﻿using SocketCore.Utils.Buffer;
+﻿using NSL.SocketCore.Utils.Buffer;
 
-namespace SocketCore.Utils
+namespace NSL.SocketCore.Utils
 {
     public abstract class IPacket<TClient> 
         where TClient : INetworkClient

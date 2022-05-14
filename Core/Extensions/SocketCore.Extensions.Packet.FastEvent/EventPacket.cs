@@ -1,9 +1,9 @@
-﻿using SocketCore.Extensions.Buffer;
-using SocketCore.Utils;
-using SocketCore.Utils.Buffer;
+﻿using NSL.SocketCore.Extensions.Buffer;
+using NSL.SocketCore.Utils;
+using NSL.SocketCore.Utils.Buffer;
 using System;
 
-namespace SocketCore.Extensions.Packet.FastEvent
+namespace NSL.SocketCore.Extensions.Packet.FastEvent
 {
     public class EventPacket<TClient, ReceiveType> : IPacket<TClient>
         where TClient : INetworkClient

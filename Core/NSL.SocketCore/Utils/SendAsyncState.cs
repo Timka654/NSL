@@ -1,4 +1,4 @@
-﻿namespace SocketCore.Utils
+﻿namespace NSL.SocketCore.Utils
 {
     public class SendAsyncState
     {

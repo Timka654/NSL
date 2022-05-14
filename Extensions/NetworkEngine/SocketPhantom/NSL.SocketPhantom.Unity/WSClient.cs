@@ -3,7 +3,7 @@ using System;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace SocketPhantom.Unity
+namespace NSL.SocketPhantom.Unity
 {
     public class WSClient : IDisposable
     {

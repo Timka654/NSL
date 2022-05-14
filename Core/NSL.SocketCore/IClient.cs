@@ -1,8 +1,8 @@
-﻿using SocketCore.Utils;
-using SocketCore.Utils.Buffer;
+﻿using NSL.SocketCore.Utils;
+using NSL.SocketCore.Utils.Buffer;
 using System.Net;
 
-namespace SocketCore
+namespace NSL.SocketCore
 {
     public delegate void ReceivePacketDebugInfo<T>(T client, ushort pid, int len) where T : IClient;
 

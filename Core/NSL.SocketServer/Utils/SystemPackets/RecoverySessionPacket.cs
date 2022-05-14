@@ -1,8 +1,7 @@
-﻿using SocketCore.Utils;
-using SocketCore.Utils.Buffer;
-using SocketCore.Utils.SystemPackets.Enums;
+﻿using NSL.SocketCore.Utils;
+using NSL.SocketCore.Utils.Buffer;
 
-namespace SocketServer.Utils
+namespace NSL.SocketServer.Utils
 {
     public enum RecoverySessionResultEnum
     {
@@ -13,10 +12,12 @@ namespace SocketServer.Utils
     public delegate void OnRecoverySessionReceiveDelegate<T>(T client, string key, string[] keys);
 }
 
-namespace SocketServer.Utils.SystemPackets
+namespace NSL.SocketServer.Utils.SystemPackets
 {
-    public class RecoverySession<T> : IPacket<T> where T : IServerNetworkClient
+    public class RecoverySessionPacket<T> : IPacket<T> where T : IServerNetworkClient
     {
+        public const ushort PacketId = ushort.MaxValue - 2;
+
         public event OnRecoverySessionReceiveDelegate<T> OnRecoverySessionReceiveEvent;
 
         public override void Receive(T client, InputPacketBuffer data)
@@ -39,7 +40,7 @@ namespace SocketServer.Utils.SystemPackets
         {
             var packet = new OutputPacketBuffer()
             {
-                PacketId = (ushort)ServerPacketEnum.RecoverySession
+                PacketId = PacketId
             };
 
             packet.WriteByte((byte)result);

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SocketPhantom.Unity
+namespace NSL.SocketPhantom.Unity
 {
     public interface IRetryPolicy
     {

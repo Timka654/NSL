@@ -1,9 +1,7 @@
 ﻿using NSL.ConfigurationEngine;
-using SocketCore;
-using SocketCore.Utils;
 using System.Net.Sockets;
 
-namespace ServerOptions.Extensions.ConfigurationEngine
+namespace NSL.ServerOptions.Extensions.ConfigurationEngine
 {
     public static class NetworkConfigurationExtension
     {

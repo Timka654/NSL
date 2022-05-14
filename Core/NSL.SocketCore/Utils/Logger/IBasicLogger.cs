@@ -1,6 +1,6 @@
-﻿using SocketCore.Utils.Logger.Enums;
+﻿using NSL.SocketCore.Utils.Logger.Enums;
 
-namespace SocketCore.Utils.Logger
+namespace NSL.SocketCore.Utils.Logger
 {
     public interface IBasicLogger
     {

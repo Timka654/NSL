@@ -1,13 +1,12 @@
-﻿using SocketCore.Utils;
-using SocketCore.Utils.Buffer;
-using SocketCore.Utils.SystemPackets.Enums;
+﻿using NSL.SocketCore.Utils;
+using NSL.SocketCore.Utils.Buffer;
 using System;
 
-namespace SocketServer.Utils.SystemPackets
+namespace NSL.SocketServer.Utils.SystemPackets
 {
     public class SystemTime<T> : IPacket<T> where T : IServerNetworkClient
     {
-        public event OnRecoverySessionReceiveDelegate<T> OnRecoverySessionReceiveEvent;
+        public const ushort PacketId = ushort.MaxValue - 1;
 
         public SystemTime()
         {
@@ -22,7 +21,7 @@ namespace SocketServer.Utils.SystemPackets
         {
             var packet = new OutputPacketBuffer()
             {
-                PacketId = (ushort)ClientPacketEnum.ServerTimeResult
+                PacketId = PacketId
             };
 
             packet.WriteDateTime(DateTime.UtcNow);

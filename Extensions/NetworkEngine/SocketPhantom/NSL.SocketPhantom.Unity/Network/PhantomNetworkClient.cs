@@ -1,15 +1,13 @@
-﻿using Newtonsoft.Json;
-using NSL.SocketClient;
-using NSL.SocketPhantom.Unity;
+﻿using NSL.SocketClient;
 using NSL.TCP.Client;
-using SocketPhantom.Unity.Network.Packets;
+using NSL.SocketPhantom.Unity.Network.Packets;
 using System;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using static SocketPhantom.Unity.PhantomHubConnection;
+using static NSL.SocketPhantom.Unity.PhantomHubConnection;
 
-namespace SocketPhantom.Unity.Network
+namespace NSL.SocketPhantom.Unity.Network
 {
     internal class PhantomNetworkClient
     {

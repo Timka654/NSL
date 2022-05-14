@@ -1,4 +1,4 @@
-﻿using SocketServer.Utils;
+﻿using NSL.SocketServer.Utils;
 using System.Net.Sockets;
 
 namespace NSL.UDP.Client

@@ -1,6 +1,6 @@
-﻿using SocketCore;
-using SocketServer;
-using SocketServer.Utils;
+﻿using NSL.SocketCore;
+using NSL.SocketServer;
+using NSL.SocketServer.Utils;
 using System.Collections.Concurrent;
 using System.Net;
 using System.Net.Sockets;

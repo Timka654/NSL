@@ -1,4 +1,4 @@
-﻿using SocketCore.Utils.Buffer;
+﻿using NSL.SocketCore.Utils.Buffer;
 using System;
 using System.Threading;
 using System.Threading.Tasks;

@@ -2,7 +2,7 @@ using NSL.SocketPhantom.Cipher;
 using System;
 using System.Threading.Tasks;
 
-namespace SocketPhantom.Unity
+namespace NSL.SocketPhantom.Unity
 {
     public class PhantomConnectionOptions
     {

@@ -1,7 +1,7 @@
-﻿using SocketCore;
-using SocketCore.Utils;
-using SocketCore.Utils.Buffer;
-using SocketCore.Utils.Exceptions;
+﻿using NSL.SocketCore;
+using NSL.SocketCore.Utils;
+using NSL.SocketCore.Utils.Buffer;
+using NSL.SocketCore.Utils.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Net;

@@ -5,12 +5,11 @@ using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
-using NSL.SocketPhantom.Unity;
-using SocketCore.Extensions.Buffer;
-using SocketCore.Utils.Buffer;
-using SocketPhantom.Unity.Network;
+using NSL.SocketCore.Extensions.Buffer;
+using NSL.SocketCore.Utils.Buffer;
+using NSL.SocketPhantom.Unity.Network;
 
-namespace SocketPhantom.Unity
+namespace NSL.SocketPhantom.Unity
 {
     public class PhantomHubConnection : IDisposable
     {

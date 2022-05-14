@@ -1,4 +1,4 @@
-﻿namespace Utils.RecoveryManager
+﻿namespace NSL.Utils.RecoveryManager
 {
     public class RecoverySessionInfo<T>
     {

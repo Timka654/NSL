@@ -1,7 +1,6 @@
 ﻿using NSL.ConfigurationEngine;
-using ServerOptions.Extensions.ConfigurationEngine;
-using SocketServer;
-using SocketServer.Utils;
+using NSL.SocketServer;
+using NSL.SocketServer.Utils;
 
 namespace NSL.ServerOptions.Extensions.ConfigurationEngine
 {

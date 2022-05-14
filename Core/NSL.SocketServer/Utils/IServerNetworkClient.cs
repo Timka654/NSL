@@ -1,9 +1,9 @@
-﻿using SocketCore;
-using SocketCore.Utils;
-using SocketCore.Utils.Buffer;
+﻿using NSL.SocketCore;
+using NSL.SocketCore.Utils;
+using NSL.SocketCore.Utils.Buffer;
 using System;
 
-namespace SocketServer.Utils
+namespace NSL.SocketServer.Utils
 {
     public abstract class IServerNetworkClient : INetworkClient
     {

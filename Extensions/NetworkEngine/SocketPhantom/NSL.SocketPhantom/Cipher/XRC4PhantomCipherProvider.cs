@@ -1,5 +1,5 @@
 ﻿using NSL.Cipher.RC.RC4;
-using SocketCore;
+using NSL.SocketCore;
 
 namespace NSL.SocketPhantom.Cipher
 {

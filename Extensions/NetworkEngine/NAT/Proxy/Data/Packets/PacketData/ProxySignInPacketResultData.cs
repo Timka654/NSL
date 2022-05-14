@@ -1,5 +1,5 @@
 ﻿using NSL.Extensions.NAT.Proxy.Data.Enums;
-using SocketCore.Utils.Buffer;
+using NSL.SocketCore.Utils.Buffer;
 
 namespace NSL.Extensions.NAT.Proxy.Data.Packets.PacketData
 {

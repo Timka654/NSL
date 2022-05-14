@@ -1,7 +1,7 @@
 using System;
 using System.Threading.Tasks;
 
-namespace SocketPhantom.Unity
+namespace NSL.SocketPhantom.Unity
 {
     public class PhantomHubConnectionBuilder
     {

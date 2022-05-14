@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 
-namespace SocketCore.Utils
+namespace NSL.SocketCore.Utils
 {
     public class ClientObjectBag : IDisposable
     {

@@ -2,7 +2,7 @@
 using System.IO;
 using System.Linq;
 
-namespace Utils
+namespace NSL.Utils
 {
     public static class IOUtils
     {

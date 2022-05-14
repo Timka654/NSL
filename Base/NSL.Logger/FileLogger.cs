@@ -1,10 +1,7 @@
 ﻿using NSL.Logger.Info;
-using NSL.Logger.Interface;
-using SocketCore.Utils.Logger.Enums;
-using System;
 using System.IO;
 using System.Threading;
-using Utils;
+using NSL.Utils;
 
 namespace NSL.Logger
 {

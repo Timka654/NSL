@@ -1,4 +1,4 @@
-﻿using SocketCore.Utils.Buffer;
+﻿using NSL.SocketCore.Utils.Buffer;
 
 namespace NSL.SocketClient.Node.Utils
 {

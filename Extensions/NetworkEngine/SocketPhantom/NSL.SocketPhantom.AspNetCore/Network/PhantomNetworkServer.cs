@@ -2,12 +2,11 @@
 using NSL.ConfigurationEngine;
 using NSL.Logger;
 using NSL.Logger.Interface;
-using NSL.ServerOptions.Extensions;
 using NSL.SocketCore.Extensions.TCPServer;
 using NSL.SocketPhantom.AspNetCore.Network.Packets;
 using NSL.SocketPhantom.Cipher;
 using NSL.SocketPhantom.Enums;
-using SocketServer;
+using NSL.SocketServer;
 
 namespace NSL.SocketPhantom.AspNetCore.Network
 {

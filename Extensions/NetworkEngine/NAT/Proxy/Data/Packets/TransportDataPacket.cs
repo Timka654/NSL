@@ -1,7 +1,7 @@
 ﻿using NSL.Extensions.NAT.Proxy.Data.Packets.Enums;
 using NSL.SocketClient;
 using NSL.SocketClient.Utils;
-using SocketCore.Utils.Buffer;
+using NSL.SocketCore.Utils.Buffer;
 
 namespace NSL.Extensions.NAT.Proxy.Data.Packets
 {

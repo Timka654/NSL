@@ -1,4 +1,4 @@
-﻿namespace SocketPhantom.Unity
+﻿namespace NSL.SocketPhantom.Unity
 {
     public enum HubConnectionState
     {

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace SocketCore.Utils
+namespace NSL.SocketCore.Utils
 {
     /// <summary>
     /// Класс для хранения пользовательских данных

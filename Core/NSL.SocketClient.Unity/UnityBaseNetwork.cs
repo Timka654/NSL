@@ -1,7 +1,5 @@
 ﻿using NSL.TCP.Client;
-using SocketCore;
-using SocketCore.Utils;
-using SocketCore.Utils.Cipher;
+using NSL.SocketCore;
 using System;
 using System.Threading.Tasks;
 using UnityEngine;

@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.SignalR;
-using SocketCore.Extensions.Buffer;
+using NSL.SocketCore.Extensions.Buffer;
 using NSL.SocketPhantom.Enums;
-using SocketServer.Utils;
+using NSL.SocketServer.Utils;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
@@ -53,6 +53,10 @@ namespace NSL.SocketPhantom.AspNetCore.Network
 
             Session = c.Session;
             Network = c.Network;
+
+            if (!LastReceiveMessage.HasValue)
+                LastReceiveMessage = c.LastReceiveMessage;
+
             Hub = c.Hub;
         }
     }

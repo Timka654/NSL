@@ -1,4 +1,4 @@
-﻿using SocketCore.Utils.Logger.Enums;
+﻿using NSL.SocketCore.Utils.Logger.Enums;
 using System;
 
 namespace NSL.Logger.Info

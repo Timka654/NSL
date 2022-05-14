@@ -1,25 +1,17 @@
 ﻿using System;
-using SocketCore.Utils.Buffer;
+using NSL.SocketCore.Utils.Buffer;
 
 namespace NSL.SocketClient.Utils.SystemPackets
 {
-    internal interface IClientSystemTimePacket
+    public class ClientSystemTimePacket<T> : IClientPacket<T> where T : BaseSocketNetworkClient
     {
-        void Mark();
-    }
+        public const ushort PacketId = ushort.MaxValue - 1;
 
-    public class ClientSystemTimePacket<T> : IClientPacket<T>, IClientSystemTimePacket where T : BaseSocketNetworkClient
-    {
         public ClientSystemTimePacket(ClientOptions<T> options) : base(options)
         {
         }
 
         private DateTime mark;
-
-        public void Mark()
-        {
-            mark = DateTime.UtcNow;
-        }
 
         protected override void Receive(InputPacketBuffer data)
         {
@@ -37,5 +29,16 @@ namespace NSL.SocketClient.Utils.SystemPackets
             }
         }
 
+        public static void SendRequest(T client)
+        {
+            var packet = new OutputPacketBuffer()
+            {
+                PacketId = PacketId
+            };
+
+            packet.WriteDateTime(DateTime.UtcNow);
+
+            client.Network.Send(packet);
+        }
     }
 }

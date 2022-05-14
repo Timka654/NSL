@@ -1,6 +1,6 @@
 ﻿//using ReliableNetcode;
 
-using SocketServer.Utils;
+using NSL.SocketServer.Utils;
 
 namespace NSL.SocketClient.Node.Utils
 {

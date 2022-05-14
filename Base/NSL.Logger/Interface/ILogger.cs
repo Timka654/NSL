@@ -1,10 +1,5 @@
-﻿using SocketCore.Utils.Logger;
-using SocketCore.Utils.Logger.Enums;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using NSL.SocketCore.Utils.Logger;
+using NSL.SocketCore.Utils.Logger.Enums;
 
 namespace NSL.Logger.Interface
 {

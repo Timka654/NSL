@@ -1,6 +1,6 @@
 ﻿using NSL.ConfigurationEngine;
 using NSL.SocketClient;
-using ServerOptions.Extensions.ConfigurationEngine;
+using NSL.ServerOptions.Extensions.ConfigurationEngine;
 
 namespace NSL.ClientOptions.Extensions.ConfigurationEngine
 {

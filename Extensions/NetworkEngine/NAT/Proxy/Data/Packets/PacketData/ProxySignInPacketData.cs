@@ -1,4 +1,4 @@
-﻿using SocketCore.Utils.Buffer;
+﻿using NSL.SocketCore.Utils.Buffer;
 
 namespace NSL.Extensions.NAT.Proxy.Data.Packets.PacketData
 {

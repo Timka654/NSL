@@ -1,6 +1,6 @@
 using NSL.SocketClient;
 
-namespace SocketPhantom.Unity
+namespace NSL.SocketPhantom.Unity
 {
     internal class PhantomSocketNetworkClient : BaseSocketNetworkClient
     {

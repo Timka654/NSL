@@ -1,9 +1,9 @@
-﻿using SocketCore.Utils;
-using SocketCore.Utils.Buffer;
+﻿using NSL.SocketCore.Utils;
+using NSL.SocketCore.Utils.Buffer;
 using System.Collections.Concurrent;
 using System.Threading;
 
-namespace SocketServer.Utils
+namespace NSL.SocketServer.Utils
 {
     public abstract class IDataReceivePacket<T, TData> : IPacket<T>
            where T : IServerNetworkClient

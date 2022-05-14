@@ -1,4 +1,4 @@
-﻿namespace ServerOptions.Extensions.Manager.Manager
+﻿namespace NSL.ServerOptions.Extensions.Manager.Manager
 {
     public class ClientServerManagerLoadAttribute : ManagerLoadAttribute
     {

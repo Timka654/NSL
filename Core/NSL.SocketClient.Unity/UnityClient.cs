@@ -1,8 +1,5 @@
-﻿using NSL.SocketClient;
-using NSL.SocketClient.Unity;
-using NSL.TCP.Client;
-using SocketCore.Utils;
-using SocketCore.Utils.Buffer;
+﻿using NSL.TCP.Client;
+using NSL.SocketCore.Utils.Buffer;
 
 namespace NSL.SocketClient.Unity
 {

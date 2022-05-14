@@ -1,4 +1,4 @@
-﻿namespace SocketCore.Utils.Logger.Enums
+﻿namespace NSL.SocketCore.Utils.Logger.Enums
 {
     public enum LoggerLevel
     {

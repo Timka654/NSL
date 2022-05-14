@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
-using SocketCore.Extensions.Buffer;
-using SocketCore.Utils.Buffer;
+using NSL.SocketCore.Extensions.Buffer;
+using NSL.SocketCore.Utils.Buffer;
 using NSL.SocketPhantom.AspNetCore.Network;
 using System;
 using System.Collections.Concurrent;
@@ -267,7 +267,10 @@ namespace NSL.SocketPhantom.AspNetCore
 
             clearClientsLocker.Release();
 
-            client = new PhantomHubClientProxy();
+            client = new PhantomHubClientProxy()
+            {
+                AliveCheckTimeOut = (int)Options.DisconnectTimeOut.TotalMilliseconds
+            };
 
             do
             {
@@ -311,14 +314,12 @@ namespace NSL.SocketPhantom.AspNetCore
 
             clearClientsLocker.Release();
 
-            var timeMark = DateTime.UtcNow.Add(-Options.DisconnectTimeOut);
-
             foreach (var client in cliens)
             {
-                if (client.GetState())
+                if (client.GetState(true))
                     continue;
 
-                if (client.LastReceiveMessage > timeMark)
+                if (client.AliveState == true)
                 {
                     DisconnectClient(client);
                     continue;

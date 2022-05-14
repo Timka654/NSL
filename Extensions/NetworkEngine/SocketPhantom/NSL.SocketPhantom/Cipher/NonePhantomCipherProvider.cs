@@ -1,5 +1,5 @@
-﻿using SocketCore;
-using SocketCore.Utils.Cipher;
+﻿using NSL.SocketCore;
+using NSL.SocketCore.Utils.Cipher;
 
 namespace NSL.SocketPhantom.Cipher
 {

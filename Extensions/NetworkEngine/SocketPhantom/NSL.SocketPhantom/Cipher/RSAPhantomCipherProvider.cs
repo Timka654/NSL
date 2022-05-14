@@ -1,5 +1,5 @@
 ﻿using NSL.Cipher.RSA;
-using SocketCore;
+using NSL.SocketCore;
 
 namespace NSL.SocketPhantom.Cipher
 {

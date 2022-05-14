@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SocketCore.Utils.Exceptions
+namespace NSL.SocketCore.Utils.Exceptions
 {
     /// <summary>
     /// Ошибка хеша пакета

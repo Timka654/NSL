@@ -1,6 +1,6 @@
-﻿using SocketCore.Extensions.Buffer;
-using SocketCore.Utils;
-using SocketCore.Utils.Buffer;
+﻿using NSL.SocketCore.Extensions.Buffer;
+using NSL.SocketCore.Utils;
+using NSL.SocketCore.Utils.Buffer;
 using NSL.SocketPhantom.Enums;
 
 namespace NSL.SocketPhantom.AspNetCore.Network.Packets

@@ -1,10 +1,10 @@
-﻿using SocketCore.Utils;
-using SocketCore.Utils.Buffer;
+﻿using NSL.SocketCore.Utils;
+using NSL.SocketCore.Utils.Buffer;
 using System;
 using System.Linq;
 using System.Reflection;
 
-namespace SocketCore.Extensions.Packet.FastEvent
+namespace NSL.SocketCore.Extensions.Packet.FastEvent
 {
     [AttributeUsage(AttributeTargets.Enum)]
     public class FastEventEnumAttribute : Attribute

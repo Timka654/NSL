@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Utils
+namespace NSL.Utils
 {
     public class Token : IConvertible
     {

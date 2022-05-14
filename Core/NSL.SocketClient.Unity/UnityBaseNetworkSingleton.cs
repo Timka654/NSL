@@ -1,5 +1,4 @@
-﻿using SocketCore.Utils;
-using System.Linq;
+﻿using System.Linq;
 using UnityEngine;
 
 namespace NSL.SocketClient.Unity

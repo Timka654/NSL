@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text;
-using SocketCore.Utils;
-using SocketCore.Utils.Buffer;
+using NSL.SocketCore.Utils;
+using NSL.SocketCore.Utils.Buffer;
 
 namespace NSL.Cipher.RC.RC4
 {

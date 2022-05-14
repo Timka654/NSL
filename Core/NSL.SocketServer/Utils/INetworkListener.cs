@@ -1,6 +1,6 @@
-﻿using SocketCore;
+﻿using NSL.SocketCore;
 
-namespace SocketServer.Utils
+namespace NSL.SocketServer.Utils
 {
     public interface INetworkListener
     {

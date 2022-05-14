@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Reflection;
 
-namespace Utils
+namespace NSL.Utils
 {
     public static class OtherExtensions
     {

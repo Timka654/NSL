@@ -1,4 +1,4 @@
-﻿using SocketCore;
+﻿using NSL.SocketCore;
 
 namespace NSL.SocketPhantom.Cipher
 {

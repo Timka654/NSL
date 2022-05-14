@@ -1,13 +1,13 @@
-﻿using SocketCore.Utils;
-using SocketCore.Utils.Buffer;
-using SocketCore.Utils.Cipher;
-using SocketCore.Utils.Logger;
+﻿using NSL.SocketCore.Utils;
+using NSL.SocketCore.Utils.Buffer;
+using NSL.SocketCore.Utils.Cipher;
+using NSL.SocketCore.Utils.Logger;
 using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 
-namespace SocketCore
+namespace NSL.SocketCore
 {
     public class CoreOptions
     {

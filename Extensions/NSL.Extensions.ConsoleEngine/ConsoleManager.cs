@@ -1,4 +1,4 @@
-﻿using SocketCore.Utils;
+﻿using NSL.SocketCore.Utils;
 using System;
 
 namespace NSL.Extensions.ConsoleEngine

@@ -1,6 +1,7 @@
-﻿using SocketCore.Utils;
-using SocketCore.Utils.Buffer;
-using SocketCore.Utils.SystemPackets.Enums;
+﻿using NSL.SocketClient.Utils.SystemPackets;
+using NSL.SocketCore.Utils.SystemPackets;
+using NSL.SocketCore.Utils;
+using NSL.SocketCore.Utils.Buffer;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -67,7 +68,6 @@ namespace NSL.SocketClient
 
                 if (pingPongEnabled)
                 {
-
                     if (pingPongTokenSource != null)
                         pingPongTokenSource.Cancel();
 
@@ -83,6 +83,7 @@ namespace NSL.SocketClient
         private async void RunAliveChecker(CancellationToken token)
         {
             await Task.Delay(AliveCheckTimeOut, token);
+
             do
             {
                 RequestPing();
@@ -104,12 +105,8 @@ namespace NSL.SocketClient
 
             aliveLocker.Reset();
 
-            var packet = new OutputPacketBuffer()
-            {
-                PacketId = (ushort)ServerPacketEnum.AliveConnection
-            };
-
-            Send(packet);
+            if (Network != null)
+                AliveConnectionPacket.SendRequest(Network);
 
             AliveState = aliveLocker.WaitOne(AliveCheckTimeOut);
         }
@@ -142,12 +139,7 @@ namespace NSL.SocketClient
 
         public void RequestServerTimeOffset()
         {
-            var packet = new OutputPacketBuffer()
-            {
-                PacketId = (ushort)ServerPacketEnum.ServerTime
-            };
-
-            Send(packet);
+            ClientSystemTimePacket<BaseSocketNetworkClient>.SendRequest(this);
         }
 
         #endregion

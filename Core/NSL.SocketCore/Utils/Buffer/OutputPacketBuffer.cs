@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
-namespace SocketCore.Utils.Buffer
+namespace NSL.SocketCore.Utils.Buffer
 {
     public class OutputPacketBuffer : MemoryStream
     {

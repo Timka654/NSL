@@ -1,11 +1,9 @@
 ﻿using NSL.Logger.Info;
 using NSL.Logger.Interface;
-using SocketCore.Utils.Logger.Enums;
+using NSL.SocketCore.Utils.Logger.Enums;
 using System;
 using System.Collections.Concurrent;
-using System.IO;
 using System.Threading;
-using Utils;
 
 namespace NSL.Logger
 {

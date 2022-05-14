@@ -1,15 +1,16 @@
-﻿using SocketCore.Utils.Buffer;
-using SocketCore.Utils.SystemPackets.Enums;
+﻿using NSL.SocketCore.Utils.Buffer;
 
 namespace NSL.SocketClient.Utils.SystemPackets
 {
     public class VersionPacket
     {
+        public const ushort PacketId = ushort.MaxValue - 3;
+
         public static void Send(BaseSocketNetworkClient client, long version)
         {
             var packet = new OutputPacketBuffer()
             {
-                PacketId = (ushort)ServerPacketEnum.Version
+                PacketId = PacketId
             };
 
             packet.WriteInt64(version);

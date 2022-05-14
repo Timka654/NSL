@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace SocketCore.Extensions.Packet.SocketRTC
+namespace NSL.SocketCore.Extensions.Packet.SocketRTC
 {
     class RTCPacketData
     {

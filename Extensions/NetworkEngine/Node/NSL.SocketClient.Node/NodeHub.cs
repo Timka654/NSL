@@ -1,6 +1,6 @@
 ﻿using NSL.SocketClient.Node.Packets;
-using SocketServer;
-using SocketServer.Utils;
+using NSL.SocketServer;
+using NSL.SocketServer.Utils;
 using System.Collections.Concurrent;
 
 namespace NSL.SocketClient.Node

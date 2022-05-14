@@ -1,11 +1,11 @@
-﻿using SocketCore.Utils.Exceptions;
+﻿using NSL.SocketCore.Utils.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SocketCore.Utils.Buffer
+namespace NSL.SocketCore.Utils.Buffer
 {
     public class InputPacketBuffer : MemoryStream
     {

@@ -1,7 +1,5 @@
-﻿using SocketCore.Utils;
-using SocketCore.Utils.Cipher;
-using SocketServer;
-using SocketServer.Utils;
+﻿using NSL.SocketServer;
+using NSL.SocketServer.Utils;
 using System;
 using System.Net.Sockets;
 

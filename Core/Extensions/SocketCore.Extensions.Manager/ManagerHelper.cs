@@ -1,12 +1,12 @@
-﻿using SocketCore;
-using SocketCore.Utils;
-using SocketCore.Utils.Logger.Enums;
+﻿using NSL.SocketCore;
+using NSL.SocketCore.Utils;
+using NSL.SocketCore.Utils.Logger.Enums;
 using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 
-namespace ServerOptions.Extensions.Manager
+namespace NSL.ServerOptions.Extensions.Manager
 {
     public static class ManagerHelper
     {

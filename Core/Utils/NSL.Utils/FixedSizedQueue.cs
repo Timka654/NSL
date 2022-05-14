@@ -1,6 +1,6 @@
 ﻿using System.Collections.Concurrent;
 
-namespace Utils
+namespace NSL.Utils
 {
     public class FixedSizedQueue<T>
     {

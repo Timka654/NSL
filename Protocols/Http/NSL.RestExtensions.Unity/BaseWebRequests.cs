@@ -1,5 +1,4 @@
 ﻿using NSL.SocketClient.Unity;
-using RestExtensions.Unity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +7,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace RestExtensions.Unity
+namespace NSL.RestExtensions.Unity
 {
     public delegate void WebResponseDelegate(HttpRequestResult request);
 

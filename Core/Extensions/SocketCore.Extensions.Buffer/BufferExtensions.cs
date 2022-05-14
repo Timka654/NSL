@@ -1,8 +1,7 @@
-﻿using Newtonsoft.Json;
-using SocketCore.Utils.Buffer;
+﻿using NSL.SocketCore.Utils.Buffer;
 using System;
 
-namespace SocketCore.Extensions.Buffer
+namespace NSL.SocketCore.Extensions.Buffer
 {
     public static class BufferExtensions
     {

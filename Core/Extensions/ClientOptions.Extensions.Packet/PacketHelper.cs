@@ -1,7 +1,4 @@
 ﻿using NSL.SocketClient;
-using NSL.SocketClient.Utils;
-using NSL.SocketCore.Extensions.Packet;
-using SocketCore.Utils;
 using System;
 using System.Reflection;
 

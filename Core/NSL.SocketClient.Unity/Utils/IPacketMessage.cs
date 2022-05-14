@@ -1,6 +1,4 @@
-﻿using SocketCore.Utils;
-
-namespace NSL.SocketClient.Unity.Utils
+﻿namespace NSL.SocketClient.Unity.Utils
 {
     public class IPacketMessage<TClient, RDType> : NSL.SocketClient.Utils.IPacketMessage<TClient,RDType>
         where TClient : BaseSocketNetworkClient

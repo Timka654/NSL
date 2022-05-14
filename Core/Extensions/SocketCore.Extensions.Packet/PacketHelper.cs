@@ -1,5 +1,4 @@
-﻿using SocketCore;
-using SocketCore.Utils;
+﻿using NSL.SocketCore.Utils;
 using System;
 using System.Diagnostics;
 using System.Linq;

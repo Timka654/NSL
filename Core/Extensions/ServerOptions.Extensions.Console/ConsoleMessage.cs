@@ -1,7 +1,7 @@
 ﻿using NSL.Extensions.ConsoleEngine;
-using SocketCore.Utils;
-using SocketCore.Utils.Buffer;
-using SocketServer.Utils;
+using NSL.SocketCore.Utils;
+using NSL.SocketCore.Utils.Buffer;
+using NSL.SocketServer.Utils;
 
 namespace NSL.ServerOptions.Extensions.Console
 {

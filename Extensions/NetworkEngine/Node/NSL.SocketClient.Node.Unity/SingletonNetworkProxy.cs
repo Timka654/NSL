@@ -1,4 +1,4 @@
-﻿namespace SCL.Unity.NAT.Proxy.ProxyNetwork
+﻿namespace NSL.Unity.NAT.Proxy.ProxyNetwork
 {
     //    public class SingletonNetworkProxy<T, TType, TOptions> : T
     //        where T : NetworkProxyClient

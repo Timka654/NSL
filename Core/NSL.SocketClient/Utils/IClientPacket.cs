@@ -1,6 +1,6 @@
 ﻿using System;
-using SocketCore.Utils;
-using SocketCore.Utils.Buffer;
+using NSL.SocketCore.Utils;
+using NSL.SocketCore.Utils.Buffer;
 
 namespace NSL.SocketClient.Utils
 {

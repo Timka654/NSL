@@ -1,5 +1,5 @@
 ﻿using NSL.Logger.Interface;
-using SocketCore.Utils.Logger.Enums;
+using NSL.SocketCore.Utils.Logger.Enums;
 using System;
 using System.Diagnostics;
 using System.IO;

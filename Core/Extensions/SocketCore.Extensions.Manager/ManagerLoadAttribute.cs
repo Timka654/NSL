@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ServerOptions.Extensions.Manager
+namespace NSL.ServerOptions.Extensions.Manager
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, AllowMultiple = false, Inherited = false)]
     public class ManagerLoadAttribute : Attribute

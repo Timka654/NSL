@@ -1,8 +1,8 @@
-﻿using SocketCore.Utils;
-using SocketCore.Utils.Buffer;
+﻿using NSL.SocketCore.Utils;
+using NSL.SocketCore.Utils.Buffer;
 using System;
 
-namespace SocketPhantom.Unity.Network.Packets
+namespace NSL.SocketPhantom.Unity.Network.Packets
 {
     internal class SessionPacket : IPacket<PhantomSocketNetworkClient>
     {
@@ -23,6 +23,8 @@ namespace SocketPhantom.Unity.Network.Packets
             switch (state)
             {
                 case byte.MaxValue:
+                    client.AliveCheckTimeOut = (int)phantomHubConnection.KeepAliveInterval.TotalMilliseconds;
+                    client.PingPongEnabled = true;
                     client.connection.SetState(HubConnectionState.Connected);
                     break;
                 case 0:

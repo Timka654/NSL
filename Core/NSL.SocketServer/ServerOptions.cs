@@ -1,10 +1,10 @@
-﻿using SocketCore;
-using SocketCore.Utils.SystemPackets.Enums;
-using SocketServer.Utils;
-using SocketServer.Utils.SystemPackets;
+﻿using NSL.SocketCore.Utils.SystemPackets;
+using NSL.SocketCore;
+using NSL.SocketServer.Utils;
+using NSL.SocketServer.Utils.SystemPackets;
 using System.Net;
 
-namespace SocketServer
+namespace NSL.SocketServer
 {
     public class ServerOptions<TClient> : CoreOptions<TClient>
         where TClient : IServerNetworkClient
@@ -21,16 +21,16 @@ namespace SocketServer
 
         public event OnRecoverySessionReceiveDelegate<TClient> OnRecoverySessionReceiveEvent
         {
-            add { GetPacket<RecoverySession<TClient>>((ushort)ServerPacketEnum.RecoverySession).OnRecoverySessionReceiveEvent += value; }
-            remove { GetPacket<RecoverySession<TClient>>((ushort)ServerPacketEnum.RecoverySession).OnRecoverySessionReceiveEvent -= value; }
+            add { GetPacket<RecoverySessionPacket<TClient>>(RecoverySessionPacket<TClient>.PacketId).OnRecoverySessionReceiveEvent += value; }
+            remove { GetPacket<RecoverySessionPacket<TClient>>(RecoverySessionPacket<TClient>.PacketId).OnRecoverySessionReceiveEvent -= value; }
         }
 
         public ServerOptions()
         {
-            AddPacket((ushort)ServerPacketEnum.AliveConnection, new ServerAliveConnection<TClient>());
-            AddPacket((ushort)ServerPacketEnum.RecoverySession, new RecoverySession<TClient>());
-            AddPacket((ushort)ServerPacketEnum.Version, new Version<TClient>());
-            AddPacket((ushort)ServerPacketEnum.ServerTime, new SystemTime<TClient>());
+            AddPacket(AliveConnectionPacket.PacketId, new ServerAliveConnectionPacket<TClient>());
+            AddPacket(RecoverySessionPacket<TClient>.PacketId, new RecoverySessionPacket<TClient>());
+            AddPacket(VersionPacket<TClient>.PacketId, new VersionPacket<TClient>());
+            AddPacket(SystemTime<TClient>.PacketId, new SystemTime<TClient>());
         }
 
 

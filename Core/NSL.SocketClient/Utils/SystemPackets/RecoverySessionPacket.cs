@@ -1,5 +1,4 @@
-﻿using SocketCore.Utils.Buffer;
-using SocketCore.Utils.SystemPackets.Enums;
+﻿using NSL.SocketCore.Utils.Buffer;
 using System.Linq;
 
 namespace NSL.SocketClient.Utils
@@ -16,6 +15,8 @@ namespace NSL.SocketClient.Utils.SystemPackets
 {
     public class RecoverySessionPacket<T> : IPacketMessage<T, RecoverySessionResultEnum> where T : BaseSocketNetworkClient
     {
+        public const ushort PacketId = ushort.MaxValue - 2;
+
         internal static RecoverySessionPacket<T> Instance;
 
         public RecoverySessionPacket(ClientOptions<T> options) : base(options)
@@ -52,7 +53,7 @@ namespace NSL.SocketClient.Utils.SystemPackets
 
             var packet = new OutputPacketBuffer()
             {
-                PacketId = (ushort)ServerPacketEnum.RecoverySession
+                PacketId = PacketId
             };
 
             packet.WriteString16(client.Session);

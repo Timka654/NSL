@@ -1,5 +1,5 @@
 ﻿using NSL.Extensions.BinarySerializer;
-using SocketCore.Utils.Buffer;
+using NSL.SocketCore.Utils.Buffer;
 using System;
 using System.Reflection;
 

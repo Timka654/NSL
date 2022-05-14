@@ -1,6 +1,6 @@
 ﻿using NSL.Cipher;
 using NSL.Cipher.AES;
-using SocketCore;
+using NSL.SocketCore;
 
 namespace NSL.SocketPhantom.Cipher
 {

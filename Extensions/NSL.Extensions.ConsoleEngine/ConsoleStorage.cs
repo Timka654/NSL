@@ -1,4 +1,4 @@
-﻿using SocketCore.Utils;
+﻿using NSL.SocketCore.Utils;
 using System;
 using System.Collections.Concurrent;
 

@@ -1,6 +1,5 @@
-﻿using SocketCore;
-using SocketCore.Utils;
-using SocketCore.Utils.Buffer;
+﻿using NSL.SocketCore.Utils;
+using NSL.SocketCore.Utils.Buffer;
 using System;
 using System.Linq;
 using System.Reflection;

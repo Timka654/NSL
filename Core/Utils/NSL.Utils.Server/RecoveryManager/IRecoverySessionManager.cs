@@ -1,12 +1,11 @@
-﻿using SocketServer;
-using SocketServer.Utils;
-using SocketServer.Utils.SystemPackets;
+﻿using NSL.SocketServer;
+using NSL.SocketServer.Utils;
+using NSL.SocketServer.Utils.SystemPackets;
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Linq;
 
-namespace Utils.RecoveryManager
+namespace NSL.Utils.RecoveryManager
 {
     public class IRecoverySessionManager<T>
         where T : IServerNetworkClient
@@ -52,7 +51,7 @@ namespace Utils.RecoveryManager
         {
             if (!keyStorage.TryRemove(session, out var result) || result.RestoreKeys.Count() != keys.Length || !keys.SequenceEqual(result.RestoreKeys))
             {
-                RecoverySession<T>.Send(client, RecoverySessionResultEnum.NotFound, null, null);
+                RecoverySessionPacket<T>.Send(client, RecoverySessionResultEnum.NotFound, null, null);
                 return;
             }
 
@@ -63,7 +62,7 @@ namespace Utils.RecoveryManager
 
             keyStorage.TryAdd(session, new RecoverySessionInfo<T>(client, keys));
 
-            RecoverySession<T>.Send(client, RecoverySessionResultEnum.Ok, session, keys);
+            RecoverySessionPacket<T>.Send(client, RecoverySessionResultEnum.Ok, session, keys);
         }
 
         protected virtual void Server_OnClientDisconnectEvent(IServerNetworkClient client)

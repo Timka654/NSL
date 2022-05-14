@@ -1,5 +1,5 @@
-﻿using SocketServer;
-using SocketServer.Utils;
+﻿using NSL.SocketServer;
+using NSL.SocketServer.Utils;
 using System.Net;
 
 namespace NSL.UDP.Client

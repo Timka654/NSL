@@ -1,6 +1,6 @@
 ﻿using NSL.Extensions.ConsoleEngine;
-using SocketServer;
-using SocketServer.Utils;
+using NSL.SocketServer;
+using NSL.SocketServer.Utils;
 
 namespace NSL.ServerOptions.Extensions.Console
 {

@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Security.Cryptography;
-using SocketCore.Utils;
-using SocketCore.Utils.Buffer;
+using NSL.SocketCore.Utils;
+using NSL.SocketCore.Utils.Buffer;
+
 namespace NSL.Cipher.RSA
 {
     public class RSACipher : IPacketCipher

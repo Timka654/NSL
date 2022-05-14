@@ -1,5 +1,5 @@
 ﻿using System;
-using SocketCore.Utils;
+using NSL.SocketCore.Utils;
 
 namespace NSL.Cipher.RC.RC4
 {

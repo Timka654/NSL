@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SocketCore.Utils
+namespace NSL.SocketCore.Utils
 {
     /// <summary>
     /// Интерфейс для реализации методов криптографии 

@@ -1,7 +1,8 @@
 ﻿using NSL.SocketClient.Utils;
-using SocketCore;
-using SocketCore.Utils;
-using SocketCore.Utils.SystemPackets.Enums;
+using NSL.SocketClient.Utils.SystemPackets;
+using NSL.SocketCore;
+using NSL.SocketCore.Utils;
+using NSL.SocketCore.Utils.SystemPackets;
 using System;
 using System.Net;
 
@@ -44,23 +45,23 @@ namespace NSL.SocketClient
 
         public event ReconnectDelegate OnReconnectEvent;
 
-        public event Utils.SystemPackets.RecoverySessionPacket<TClient>.OnReceiveEventHandle OnRecoverySessionEvent;
+        public event RecoverySessionPacket<TClient>.OnReceiveEventHandle OnRecoverySessionEvent;
 
         #endregion
 
         public ClientOptions()
         {
-            var recoverySession = new Utils.SystemPackets.RecoverySessionPacket<TClient>(this);
+            var recoverySession = new RecoverySessionPacket<TClient>(this);
 
             recoverySession.OnReceiveEvent += RunRecoverySession;
 
-            AddPacket((ushort)ClientPacketEnum.ServerTimeResult,
-                    new Utils.SystemPackets.ClientSystemTimePacket<TClient>(this));
+            AddPacket(ClientSystemTimePacket<TClient>.PacketId,
+                    new ClientSystemTimePacket<TClient>(this));
 
-            AddPacket((ushort)ClientPacketEnum.AliveConnection,
-                new Utils.SystemPackets.ClientAliveConnectionPacket<TClient>(this));
+            AddPacket(AliveConnectionPacket.PacketId,
+                new ClientAliveConnectionPacket<TClient>(this));
 
-            AddPacket((ushort)ServerPacketEnum.RecoverySession,
+            AddPacket(RecoverySessionPacket<TClient>.PacketId,
                 recoverySession);
         }
 
