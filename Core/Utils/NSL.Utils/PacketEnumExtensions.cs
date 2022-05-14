@@ -16,7 +16,7 @@ namespace Utils
         {
             var v = Enum.ToObject(typeof(T), value);
 
-            return Enum.GetValues<T>().Contains((T)v);
+            return Enum.GetValues(typeof(T)).Cast<T>().Contains((T)v);
         }
     }
 }
