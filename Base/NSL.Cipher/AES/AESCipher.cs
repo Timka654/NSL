@@ -66,11 +66,16 @@ namespace NSL.Cipher.AES
             return decrypt.TransformFinalBlock(buffer,0,InputPacketBuffer.headerLenght);
         }
 
-        public object Clone()
+        public IPacketCipher CreateEntry()
         {
             return new AESCipher(aes);
         }
 
         public bool Sync() => false;
+
+        public void Dispose()
+        {
+            aes?.Dispose();
+        }
     }
 }

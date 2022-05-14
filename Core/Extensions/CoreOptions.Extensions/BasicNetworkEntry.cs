@@ -94,11 +94,6 @@ namespace NSL.ServerOptions.Extensions
 
             options.HelperLogger = Logger;
 
-            if (options.inputCipher == null)
-                options.inputCipher = new PacketNoneCipher();
-            if (options.outputCipher == null)
-                options.outputCipher = new PacketNoneCipher();
-
             options.OnClientConnectEvent += SocketOptions_OnClientConnectEvent;
             options.OnClientDisconnectEvent += SocketOptions_OnClientDisconnectEvent;
             options.OnExceptionEvent += SocketOptions_OnExtensionEvent;

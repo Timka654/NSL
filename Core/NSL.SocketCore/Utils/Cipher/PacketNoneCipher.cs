@@ -2,14 +2,18 @@
 {
     public class PacketNoneCipher : IPacketCipher
     {
-        public object Clone()
+        public IPacketCipher CreateEntry()
         {
-            return new PacketNoneCipher();
+            return this;
         }
 
         public byte[] Decode(byte[] buffer, int offset, int lenght)
         {
             return buffer;
+        }
+
+        public void Dispose()
+        {
         }
 
         public byte[] Encode(byte[] buffer, int offset, int lenght)

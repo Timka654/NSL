@@ -50,7 +50,7 @@ namespace NSL.Cipher.RSA
             return rsa.Encrypt(buf,true);
         }
 
-        public object Clone()
+        public IPacketCipher CreateEntry()
         {
             var r =  new RSACipher();
             r.LoadXml(GetPrivateKey());
@@ -58,5 +58,10 @@ namespace NSL.Cipher.RSA
         }
 
         public bool Sync() => false;
+
+        public void Dispose()
+        {
+            rsa?.Dispose();
+        }
     }
 }

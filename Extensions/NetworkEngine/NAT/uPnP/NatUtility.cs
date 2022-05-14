@@ -166,9 +166,9 @@ namespace Mono.Nat
 			case 10:
 				return true; //10.x.x.x
 			case 172:
-				return ((int)ba[1] & 16) != 0; //172.16-31.x.x
+				return (ba[1] & 16) != 0; //172.16-31.x.x
 			case 192:
-				return (int)ba[1] == 168; //192.168.x.x
+				return ba[1] == 168; //192.168.x.x
 			default:
 				return false;
 			}

@@ -5,7 +5,7 @@ namespace SocketCore.Utils
     /// <summary>
     /// Интерфейс для реализации методов криптографии 
     /// </summary>
-    public interface IPacketCipher : ICloneable
+    public interface IPacketCipher : IDisposable
     {
         /// <summary>
         /// Дешифровка заголовка пакета
@@ -32,5 +32,7 @@ namespace SocketCore.Utils
         byte[] Decode(byte[] buffer, int offset, int lenght);
 
         bool Sync();
+
+        IPacketCipher CreateEntry();
     }
 }

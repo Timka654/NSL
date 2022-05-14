@@ -147,10 +147,10 @@ namespace NSL.Cipher.RC.RC5
             UInt64 r = 0;
             for (int i = p + 7; i > p; i--)
             {
-                r |= (UInt64)b[i];
+                r |= b[i];
                 r <<= 8;
             }
-            r |= (UInt64)b[p];
+            r |= b[p];
             return r;
         }
 
@@ -239,11 +239,15 @@ namespace NSL.Cipher.RC.RC5
             throw new NotImplementedException();
         }
 
-        public object Clone()
+        public IPacketCipher CreateEntry()
         {
             return new RC5Cipher(key);
         }
 
         public bool Sync() => true;
+
+        public void Dispose()
+        {
+        }
     }
 }

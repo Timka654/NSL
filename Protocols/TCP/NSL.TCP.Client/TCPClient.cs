@@ -54,9 +54,9 @@ namespace NSL.TCP.Client
             //установка массива для приема данных, размер указан в общих настройках сервера
             this.receiveBuffer = new byte[ConnectionOptions.ReceiveBufferSize];
             //установка криптографии для дешифровки входящих данных, указана в общих настройках сервера
-            this.inputCipher = (IPacketCipher)ConnectionOptions.inputCipher.Clone();
+            this.inputCipher = ConnectionOptions.InputCipher.CreateEntry();
             //установка криптографии для шифровки исходящих данных, указана в общих настройках сервера
-            this.outputCipher = (IPacketCipher)ConnectionOptions.outputCipher.Clone();
+            this.outputCipher = ConnectionOptions.OutputCipher.CreateEntry();
 
             //Bug fix, в системе Windows это значение берется из реестра, мы не сможем принять больше за раз чем прописанно в нем, если данных будет больше, то цикл зависнет
             sclient.ReceiveBufferSize = ConnectionOptions.ReceiveBufferSize;

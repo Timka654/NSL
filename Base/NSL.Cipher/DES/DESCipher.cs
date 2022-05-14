@@ -66,11 +66,16 @@ namespace NSL.Cipher.DES
             return decrypt.TransformFinalBlock(buffer, 0, InputPacketBuffer.headerLenght);
         }
 
-        public object Clone()
+        public IPacketCipher CreateEntry()
         {
             return new DESCipher(des);
         }
 
         public bool Sync() => false;
+
+        public void Dispose()
+        {
+            des?.Dispose();
+        }
     }
 }

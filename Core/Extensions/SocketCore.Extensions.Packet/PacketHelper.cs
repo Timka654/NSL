@@ -43,7 +43,7 @@ namespace NSL.SocketCore.Extensions.Packet
                 if (!typeof(IPacket<T>).IsAssignableFrom(item.type))
                     throw new Exception($"Packet type {typeof(IPacket<T>)} is not assignable from {item.type}");
 
-                bool r = coreOptions.AddPacket((ushort)item.attr.PacketId, initAction(item.type));
+                bool r = coreOptions.AddPacket(item.attr.PacketId, initAction(item.type));
 
                 Debug.WriteLine($"Loading Packet: packet: {item.attr.PacketId} type: {item.type.FullName} result: {r}");
             }

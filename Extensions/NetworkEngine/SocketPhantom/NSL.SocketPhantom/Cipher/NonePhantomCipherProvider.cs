@@ -7,8 +7,8 @@ namespace NSL.SocketPhantom.Cipher
     {
         public override void SetProvider(CoreOptions options)
         {
-            options.inputCipher = new PacketNoneCipher();
-            options.outputCipher = new PacketNoneCipher();
+            options.InputCipher = new PacketNoneCipher();
+            options.OutputCipher = new PacketNoneCipher();
         }
     }
 }

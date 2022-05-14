@@ -103,7 +103,7 @@ namespace NSL.Cipher.RC.RC4
                 m_state.m_nBox[j] = temp;
                 byte a = pSrc[offset + off];
                 byte b = m_state.m_nBox[(m_state.m_nBox[i] + m_state.m_nBox[j]) % 256];
-                pDst[offset] = (byte)((int)a ^ (int)b);
+                pDst[offset] = (byte)(a ^ b);
             }
 
             m_state.x = (int)i;
@@ -141,11 +141,15 @@ namespace NSL.Cipher.RC.RC4
             init(key);
             }
 
-        public object Clone()
+        public IPacketCipher CreateEntry()
         {
             return new RC4Cipher(key);
         }
 
         public bool Sync() => true;
+
+        public void Dispose()
+        {
+        }
     }
 }

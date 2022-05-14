@@ -100,7 +100,7 @@ namespace NSL.Cipher.RC.RC4
             rc4.code(ref pSource, off, ref pTarget, len);
         }
 
-        public object Clone()
+        public IPacketCipher CreateEntry()
         {
             return new XRC4Cipher(rc4.key);
         }
@@ -109,5 +109,10 @@ namespace NSL.Cipher.RC.RC4
 
 
         public bool Sync() => true;
+
+        public void Dispose()
+        {
+            rc4?.Dispose();
+        }
     }
 }

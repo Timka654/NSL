@@ -285,6 +285,13 @@ namespace NSL.TCP
 
             disconnected = true;
             RunDisconnect();
+
+            if (inputCipher != null)
+                inputCipher.Dispose();
+
+            if (outputCipher != null)
+                outputCipher.Dispose();
+
             //проверяем возможно клиент и не был инициализирован, в случае дос атак, такое возможно
             if (sclient != null)
             {

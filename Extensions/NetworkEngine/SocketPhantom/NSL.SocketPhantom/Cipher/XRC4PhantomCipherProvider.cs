@@ -14,8 +14,8 @@ namespace NSL.SocketPhantom.Cipher
 
         public override void SetProvider(CoreOptions options)
         {
-            options.inputCipher = new XRC4Cipher(Key);
-            options.outputCipher = new XRC4Cipher(Key);
+            options.InputCipher = new XRC4Cipher(Key);
+            options.OutputCipher = new XRC4Cipher(Key);
         }
     }
 }

@@ -17,8 +17,8 @@ namespace NSL.SocketPhantom.Cipher
             var cipher = new RSACipher();
             cipher.LoadXml(XmlKey);
 
-            options.inputCipher = cipher;
-            options.outputCipher = cipher;
+            options.InputCipher = cipher;
+            options.OutputCipher = cipher;
         }
     }
 }

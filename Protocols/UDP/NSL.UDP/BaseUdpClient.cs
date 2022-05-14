@@ -88,8 +88,15 @@ namespace NSL.UDP
             if (disconnected == true)
                 return;
 
+
             disconnected = true;
             RunDisconnect();
+
+            if (inputCipher != null)
+                inputCipher.Dispose();
+
+            if (outputCipher != null)
+                outputCipher.Dispose();
         }
 
         public IPEndPoint GetRemotePoint() => endPoint;

@@ -55,9 +55,9 @@ namespace NSL.UDP.Client
             Data.ServerOptions = options;
 
             //установка криптографии для дешифровки входящих данных, указана в общих настройках сервера
-            inputCipher = (IPacketCipher)options.inputCipher.Clone();
+            inputCipher = options.InputCipher.CreateEntry();
             //установка криптографии для шифровки исходящих данных, указана в общих настройках сервера
-            outputCipher = (IPacketCipher)options.outputCipher.Clone();
+            outputCipher = options.OutputCipher.CreateEntry();
 
             disconnected = false;
             //Начало приема пакетов от клиента

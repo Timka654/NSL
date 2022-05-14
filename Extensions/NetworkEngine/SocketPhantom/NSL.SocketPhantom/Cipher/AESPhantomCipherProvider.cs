@@ -17,8 +17,8 @@ namespace NSL.SocketPhantom.Cipher
         {
             var cipher = new AESCipher(Options);
 
-            options.inputCipher = cipher;
-            options.outputCipher = cipher;
+            options.InputCipher = cipher;
+            options.OutputCipher = cipher;
         }
     }
 }

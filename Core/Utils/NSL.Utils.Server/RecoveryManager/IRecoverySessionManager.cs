@@ -50,7 +50,7 @@ namespace Utils.RecoveryManager
 
         private void Server_OnRecoverySessionReceiveEvent(T client, string session, string[] keys)
         {
-            if (!keyStorage.TryRemove(session, out var result) || result.RestoreKeys.Count() != keys.Length || !((IEnumerable<string>)keys).SequenceEqual(result.RestoreKeys))
+            if (!keyStorage.TryRemove(session, out var result) || result.RestoreKeys.Count() != keys.Length || !keys.SequenceEqual(result.RestoreKeys))
             {
                 RecoverySession<T>.Send(client, RecoverySessionResultEnum.NotFound, null, null);
                 return;

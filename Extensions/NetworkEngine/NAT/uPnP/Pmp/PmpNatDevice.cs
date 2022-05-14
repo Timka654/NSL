@@ -179,8 +179,8 @@ namespace Mono.Nat.Pmp
 			
 			package.Add (PmpConstants.Version);
 			package.Add (mapping.Protocol == Protocol.Tcp ? PmpConstants.OperationCodeTcp : PmpConstants.OperationCodeUdp);
-			package.Add ((byte)0); //reserved
-			package.Add ((byte)0); //reserved
+			package.Add (0); //reserved
+			package.Add (0); //reserved
 			package.AddRange (BitConverter.GetBytes (IPAddress.HostToNetworkOrder((short)mapping.PrivatePort)));
 			package.AddRange (BitConverter.GetBytes (create ? IPAddress.HostToNetworkOrder((short)mapping.PublicPort) : (short)0));
 			package.AddRange (BitConverter.GetBytes (IPAddress.HostToNetworkOrder(mapping.Lifetime)));
@@ -253,7 +253,7 @@ namespace Mono.Nat.Pmp
 				if (data[0] != PmpConstants.Version)
 					continue;
 			
-				byte opCode = (byte)(data[1] & (byte)127);
+				byte opCode = (byte)(data[1] & 127);
 				
 				Protocol protocol = Protocol.Tcp;
 				if (opCode == PmpConstants.OperationCodeUdp)

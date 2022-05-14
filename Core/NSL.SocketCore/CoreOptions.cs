@@ -1,5 +1,6 @@
 ﻿using SocketCore.Utils;
 using SocketCore.Utils.Buffer;
+using SocketCore.Utils.Cipher;
 using SocketCore.Utils.Logger;
 using System;
 using System.Collections.Generic;
@@ -37,15 +38,40 @@ namespace SocketCore
         /// </summary>
         public int ReceiveBufferSize { get; set; } = 1024;
 
-        /// <summary>
-        /// Алгоритм шифрования входящих пакетов
-        /// </summary>
-        public IPacketCipher inputCipher { get; set; }
+        private IPacketCipher inputCipher = new PacketNoneCipher();
 
         /// <summary>
         /// Алгоритм шифрования входящих пакетов
         /// </summary>
-        public IPacketCipher outputCipher { get; set; }
+        public IPacketCipher InputCipher
+        {
+            get => inputCipher;
+            set
+            {
+                if (inputCipher != null && inputCipher != value)
+                    inputCipher.Dispose();
+
+                inputCipher = value ?? new PacketNoneCipher();
+            }
+        }
+
+
+        private IPacketCipher outputCipher = new PacketNoneCipher();
+
+        /// <summary>
+        /// Алгоритм шифрования исходящих пакетов
+        /// </summary>
+        public IPacketCipher OutputCipher
+        {
+            get => outputCipher;
+            set
+            {
+                if (outputCipher != null && outputCipher != value)
+                    outputCipher.Dispose();
+
+                outputCipher = value ?? new PacketNoneCipher();
+            }
+        }
     }
 
     /// <summary>
