@@ -1,5 +1,6 @@
 ﻿using NSL.ConfigurationEngine;
 using NSL.Logger;
+using NSL.Logger.Interface;
 using SocketCore;
 using SocketCore.Utils;
 using SocketCore.Utils.Cipher;

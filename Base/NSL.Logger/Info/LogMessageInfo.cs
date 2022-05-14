@@ -3,7 +3,7 @@ using System;
 
 namespace NSL.Logger.Info
 {
-    internal class LogMessageInfo
+    public class LogMessageInfo
     {
         public string Text { get; set; }
 

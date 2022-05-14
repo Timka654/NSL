@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace NSL.Logger
 {
-    internal class ConsoleLogger : DynamicObject
+    internal class ConsoleLogger
     {
         private static object _locked = new object();
 

@@ -1,53 +1,78 @@
-﻿using SocketCore.Utils.Logger.Enums;
+﻿using NSL.Logger.Info;
+using NSL.Logger.Interface;
+using SocketCore.Utils.Logger.Enums;
 using System;
+using System.IO;
+using System.Threading;
+using Utils;
 
 namespace NSL.Logger
 {
     public class FileLogger : BaseLogger
     {
-        public static FileLogger Initialize()
+        public FileLogger(string logsDir, string fileTemplateName = "log {date}", int delay = 5000, bool consoleOutput = true, bool handleUnhandledThrow = false)
         {
-            return Initialize("logs");
+            LogsPath = logsDir;
+
+            base.Initialize(fileTemplateName, delay);
+
+            SetUnhandledExCatch(handleUnhandledThrow);
+            SetConsoleOutput(consoleOutput);
+
         }
 
-        public static FileLogger Initialize(string logsDir, string fileName = "log {date}",  int delayOutput = 5000, string instanceName = "{auto}")
+        /// <summary>
+        /// Create instance with parameters 
+        /// logsDir = "logs"
+        /// handleUnhandledThrow = true
+        /// </summary>
+        public FileLogger() : this("logs", handleUnhandledThrow: true)
         {
-            if (instanceName == "{auto}")
-                instanceName = Guid.NewGuid().ToString();
-
-            FileLogger fl = LoggerStorage.InitializeLogger<FileLogger>(instanceName, fileName, logsDir, delayOutput);
-
-            fl.InstanceName = instanceName;
-
-            fl.SetUnhandledExCatch(true);
-            fl.SetConsoleOutput(true);
-
-            return fl;
         }
 
-        public void AppendLog(string text)
+        private AutoResetEvent flushLocker = new AutoResetEvent(true);
+
+        public override void Flush()
         {
-            base.Append(LoggerLevel.Log, text);
+            //if this method throwns - unlock after 2s
+            if (!flushLocker.WaitOne(2_000))
+                return;
+
+            base.FlushBuffer(message =>
+            {
+                NextDay(message);
+
+                stream.WriteLine(message.ToString());
+            });
+
+            stream?.Flush();
+
+            flushLocker.Reset();
         }
 
-        public void AppendDebug(string text)
+        private void NextDay(LogMessageInfo msg)
         {
-            base.Append(LoggerLevel.Debug, text);
+            if (CurrentDateInitialized == msg.Now.Date)
+                return;
+
+            if (stream != null)
+            {
+                stream.Flush();
+                stream.Close();
+                stream = null;
+            }
+
+            IOUtils.CreateDirectoryIfNoExists(LogsPath);
+
+            CurrentDateInitialized = msg.Now.Date;
+
+            stream = new StreamWriter(Path.Combine(LogsPath, $"{FileTemplateName.Replace("{date}", CurrentDateInitialized.ToString("yyyy-MM-dd"))}.log"), true);
+
+            stream.Flush();
         }
 
-        public void AppendError(string text)
-        {
-            base.Append(LoggerLevel.Error, text);
-        }
+        protected TextWriter stream;
 
-        public void AppendInfo(string text)
-        {
-            base.Append(LoggerLevel.Info, text);
-        }
-
-        public new void Flush()
-        {
-            base.Flush();
-        }
+        protected string LogsPath;
     }
 }

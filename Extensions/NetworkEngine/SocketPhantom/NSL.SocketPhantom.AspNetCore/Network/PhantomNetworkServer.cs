@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using NSL.ConfigurationEngine;
 using NSL.Logger;
+using NSL.Logger.Interface;
 using NSL.ServerOptions.Extensions;
 using NSL.SocketCore.Extensions.TCPServer;
 using NSL.SocketPhantom.AspNetCore.Network.Packets;
@@ -14,7 +15,7 @@ namespace NSL.SocketPhantom.AspNetCore.Network
     {
         protected override string ServerConfigurationName => "phantom";
 
-        ILogger logger = FileLogger.Initialize();
+        ILogger logger = new FileLogger();
         protected override ILogger Logger => logger;
 
         IConfigurationManager configurationManager;

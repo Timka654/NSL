@@ -1,4 +1,5 @@
 ﻿using NSL.Logger.Info;
+using NSL.Logger.Interface;
 using SocketCore.Utils.Logger.Enums;
 using System;
 using System.Collections.Concurrent;
@@ -8,7 +9,7 @@ using Utils;
 
 namespace NSL.Logger
 {
-    public class BaseLogger : ILogger, IDisposable
+    public abstract class BaseLogger : ILogger, IDisposable
     {
         public bool Initialized { get; private set; }
 
@@ -22,38 +23,32 @@ namespace NSL.Logger
 
         protected DateTime CurrentDateInitialized;
 
-        protected TextWriter stream;
-
-        protected string LogsPath;
-
         protected int Delay;
 
-        protected string FileName;
+        protected string FileTemplateName;
 
         private Timer outputTimer;
 
         internal bool Disponsed = false;
 
-
-        private void NextDay(LogMessageInfo msg)
+        public void AppendLog(string text)
         {
-            if (CurrentDateInitialized == msg.Now.Date)
-                return;
+            Append(LoggerLevel.Log, text);
+        }
 
-            if (stream != null)
-            {
-                stream.Flush();
-                stream.Close();
-                stream = null;
-            }
+        public void AppendDebug(string text)
+        {
+            Append(LoggerLevel.Debug, text);
+        }
 
-            IOUtils.CreateDirectoryIfNoExists(LogsPath);
+        public void AppendError(string text)
+        {
+            Append(LoggerLevel.Error, text);
+        }
 
-            CurrentDateInitialized = msg.Now.Date;
-
-            stream = new StreamWriter(Path.Combine(LogsPath, $"{FileName.Replace("{date}", CurrentDateInitialized.ToString("yyyy-MM-dd"))}.log"), true);
-
-            stream.Flush();
+        public void AppendInfo(string text)
+        {
+            Append(LoggerLevel.Info, text);
         }
 
         public void Append(LoggerLevel level, string text)
@@ -76,22 +71,19 @@ namespace NSL.Logger
 
         public void ConsoleLog(LoggerLevel level, string text)
         {
-
             if (ConsoleOutput)
                 ConsoleLogger.WriteLog(level, $"[{level.ToString()}] - {DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss")}: {text}");
         }
 
-        public virtual void Initialize(string fname, string path, int delay)
+        protected void Initialize(string fileTemplateName, int delay)
         {
-            FileName = fname;
-
-            LogsPath = path;
+            FileTemplateName = fileTemplateName;
 
             Delay = delay;
 
             WaitList = new ConcurrentQueue<LogMessageInfo>();
 
-            RunOutput();
+            RunFlush();
 
             Initialized = true;
 
@@ -103,7 +95,7 @@ namespace NSL.Logger
             Flush();
         }
 
-        private void RunOutput()
+        private void RunFlush()
         {
             if (outputTimer != null)
                 outputTimer.Dispose();
@@ -130,15 +122,12 @@ namespace NSL.Logger
             }
         }
 
-        protected void Flush()
+        protected void FlushBuffer(Action<LogMessageInfo> processMessage)
         {
             while (WaitList.TryDequeue(out var message))
             {
-                NextDay(message);
-
-                stream.WriteLine(message.ToString());
+                processMessage(message);
             }
-            stream?.Flush();
         }
 
         private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
@@ -155,7 +144,11 @@ namespace NSL.Logger
             Disponsed = true;
 
             outputTimer.Dispose();
+
+            Flush();
             //LoggerStorage.DestroyLogger(InstanceName);
         }
+
+        public abstract void Flush();
     }
 }
