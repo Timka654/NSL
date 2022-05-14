@@ -31,9 +31,7 @@ namespace NSL.SocketClient.Unity
 
         public UnityClientOptions<T> SocketOptions { get; private set; } = new UnityClientOptions<T>
         {
-            ReceiveBufferSize = 81960,
-            inputCipher = new PacketNoneCipher(),
-            outputCipher = new PacketNoneCipher(),
+            ReceiveBufferSize = 81960
         };
 
         public UnityClient<T> NetworkClient { get; private set; }
