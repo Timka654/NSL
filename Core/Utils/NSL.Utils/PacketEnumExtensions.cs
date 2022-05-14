@@ -5,12 +5,18 @@ namespace Utils
 {
     public static class PacketEnumExtensions
     {
+        /// <summary>
+        /// Enum.IsDefined defined default but not all target frameworks have this
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public static bool IsDefined<T>(ushort value)
-            where T : Enum
+            where T : struct, Enum
         {
-            var values = Enum.GetValues(typeof(T)).Cast<T>().Select(x=>Convert.ToUInt16(x));
+            var v = Enum.ToObject(typeof(T), value);
 
-            return values.Contains(value);
+            return Enum.GetValues<T>().Contains((T)v);
         }
     }
 }
