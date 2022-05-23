@@ -109,6 +109,23 @@ namespace NSL.ConfigurationEngine
         }
 
         /// <summary>
+        /// Получить значение по указаному пути
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="existFlag">Оставить стандартным для получения значения без учета флага</param>
+        /// <returns></returns>
+        public TEnum GetEnumValue<TEnum>(string path, string existFlag = "", bool ignoreCase = false) 
+            where TEnum : struct
+        {
+            var val = GetValue(path, existFlag);
+
+            if (val == null)
+                return default;
+
+            return Enum.Parse<TEnum>(val, ignoreCase);
+        }
+
+        /// <summary>
         /// Получить все записи
         /// </summary>
         /// <param name="existFlag">Оставить стандартным для получения значения без учета флага</param>
