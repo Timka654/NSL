@@ -189,10 +189,14 @@ namespace NSL.ConfigurationEngine
         }
     }
 
-    public abstract class IConfigurationManager<T> : BaseConfigurationManager
-        where T : IConfigurationManager<T>
+    public abstract class InstanceConfigurationManager<T> : BaseConfigurationManager
+        where T : InstanceConfigurationManager<T>, new()
     {
-        public IConfigurationManager(string fileName)
+        private static T instance;
+
+        public static T Instance => instance ?? (instance = new T());
+
+        public InstanceConfigurationManager()
         {
 
         }
@@ -217,5 +221,7 @@ namespace NSL.ConfigurationEngine
 
             return (T)this;
         }
+
+        public new T AddProvider(IConfigurationProvider provider) => base.AddProvider(provider) as T;
     }
 }
