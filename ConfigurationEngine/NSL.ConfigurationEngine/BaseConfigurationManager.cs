@@ -114,7 +114,7 @@ namespace NSL.ConfigurationEngine
         /// <param name="path"></param>
         /// <param name="existFlag">Оставить стандартным для получения значения без учета флага</param>
         /// <returns></returns>
-        public TEnum GetEnumValue<TEnum>(string path, string existFlag = "", bool ignoreCase = false) 
+        public TEnum GetEnumValue<TEnum>(string path, string existFlag = "", bool ignoreCase = false)
             where TEnum : struct
         {
             var val = GetValue(path, existFlag);
@@ -122,7 +122,9 @@ namespace NSL.ConfigurationEngine
             if (val == null)
                 return default;
 
-            return Enum.Parse<TEnum>(val, ignoreCase);
+            Enum.TryParse(typeof(TEnum), val, ignoreCase, out var result);
+
+            return (TEnum)result;
         }
 
         /// <summary>
