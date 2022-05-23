@@ -122,7 +122,7 @@ namespace NSL.ConfigurationEngine
             if (val == null)
                 return default;
 
-            Enum.TryParse(typeof(TEnum), val, ignoreCase, out var result);
+            Enum.TryParse<TEnum>(val, ignoreCase, out var result);
 
             return (TEnum)result;
         }
