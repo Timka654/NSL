@@ -20,6 +20,7 @@
 	<ItemGroup>
 	  <ProjectReference Include="..\..\..\Core\NSL.SocketClient.Unity\NSL.SocketClient.Unity.csproj" />
 	  <ProjectReference Include="..\..\..\Core\Utils\NSL.Utils\NSL.Utils.csproj" />
+	  <ProjectReference Include="..\NSL.RestExtensions\NSL.RestExtensions.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

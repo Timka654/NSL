@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Net.Http;
 
-namespace NSL.RestExtensions.Unity
+namespace NSL.RestExtensions
 {
     public abstract class BaseHttpRequestResult : IDisposable
     {

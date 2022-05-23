@@ -3,7 +3,7 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace NSL.RestExtensions.Unity
+namespace NSL.RestExtensions
 {
     public class HttpClientPool
     {
