@@ -1,54 +1,76 @@
 ﻿using NSL.ConfigurationEngine.Info;
+using NSL.ConfigurationEngine.Providers;
 using NSL.SocketCore.Utils.Logger.Enums;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 
 namespace NSL.ConfigurationEngine
 {
-    public abstract class IConfigurationManager : ConfigurationStorage
+    public abstract class BaseConfigurationManager : ConfigurationStorage
     {
-        protected List<ConfigurationInfo> DefaultConfigurationList = new List<ConfigurationInfo>();
+        public static readonly NoProviderLoadingProvider NoProvider = new NoProviderLoadingProvider();
 
-        public string FileName { get; protected set; }
+        protected List<ConfigurationInfo> DefaultConfigurationList = new List<ConfigurationInfo>();
 
         public event Action<LoggerLevel, string> OnLog = (ll, v) => { };
 
         public event Action OnLoad = () => { };
 
-        public IConfigurationLoadingProvider Provider { get; protected set; }
+        public ReadOnlyCollection<IConfigurationProvider> Providers => new ReadOnlyCollection<IConfigurationProvider>(providers);
 
-        public IConfigurationManager(string fileName)
+        private List<IConfigurationProvider> providers { get; } = new List<IConfigurationProvider>();
+
+        public BaseConfigurationManager()
         {
-            FileName = fileName;
             OnLog(LoggerLevel.Info, $"ConfigurationManager Loaded");
         }
 
-        public bool ExistsFile()
+        public BaseConfigurationManager AddProvider(IConfigurationProvider provider)
         {
-            return File.Exists(FileName);
+            if (provider == null)
+                throw new ArgumentNullException(nameof(provider));
+
+            provider.Manager = this;
+
+            providers.Add(provider);
+
+            return this;
         }
 
         /// <summary>
-        /// Добавляет или измененияет значение и флаг найденой записи
+        /// Добавляет или изменяет значение и флаг найденой записи
         /// </summary>
         /// <param name="name"></param>
         /// <param name="value"></param>
         /// <param name="flags"></param>
         public void AddValue(string name, object value, string flags = "")
         {
-            base.AddValue(new ConfigurationInfo(name.ToLower(), value.ToString(), flags));
+            var v = base.GetValue(name);
+
+            AddValue(name.ToLower(), value.ToString(), v == null ? NoProvider : v.Provider, flags);
+        }
+
+        public void AddValue(string name, object value, IConfigurationProvider provider, string flags = "")
+        {
+            Update(new ConfigurationInfo(name.ToLower(), value.ToString(), provider, flags), true);
+        }
+
+        private void Update(ConfigurationInfo configuration, bool forceAdd)
+        {
+            configuration.Provider.Update(configuration, forceAdd);
         }
 
         /// <summary>
-        /// Добавляет или измененияет значение найденой записи
+        /// Добавляет или изменяет значение найденой записи
         /// </summary>
         /// <param name="name"></param>
         /// <param name="value"></param>
         public void AddValue(string name, object value)
         {
-            base.AddValue(new ConfigurationInfo(name.ToLower(), value.ToString(), ""));
+            AddValue(name.ToLower(), value.ToString(), "");
         }
 
         /// <summary>
@@ -110,7 +132,7 @@ namespace NSL.ConfigurationEngine
 
         public virtual bool SaveData()
         {
-            return Provider.SaveData(this);
+            return providers.All(e => e.SaveData());
         }
 
 
@@ -141,17 +163,17 @@ namespace NSL.ConfigurationEngine
             ClearStorage();
             DefaultConfigurationList?.ForEach(x => AddValue(x));
 
-            if (Provider == null)
-                throw new NullReferenceException($"{nameof(Provider)} cannot be null");
-            
-            return Provider.LoadData(this);
+            if (providers == null)
+                throw new NullReferenceException($"{nameof(providers)} cannot be null");
+
+            return providers.All(e => e.LoadData());
         }
     }
 
-    public abstract class IConfigurationManager<T> : IConfigurationManager
+    public abstract class IConfigurationManager<T> : BaseConfigurationManager
         where T : IConfigurationManager<T>
     {
-        public IConfigurationManager(string fileName) : base(fileName)
+        public IConfigurationManager(string fileName)
         {
 
         }

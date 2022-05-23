@@ -1,10 +1,11 @@
 ﻿using NSL.ConfigurationEngine;
 using NSL.ConfigurationEngine.Info;
+using NSL.ConfigurationEngine.Providers;
 using System.Collections.Generic;
 
 namespace ConfigurationEngine.Tests
 {
-    internal class TestConfigurationManager : IConfigurationManager
+    internal class TestConfigurationManager : BaseConfigurationManager
     {
         private static List<ConfigurationInfo> defaultCongiguration = new List<ConfigurationInfo>()
         {
@@ -13,10 +14,9 @@ namespace ConfigurationEngine.Tests
             new ConfigurationInfo("testName4.testName5.testName6", "456", string.Empty),
         };
 
-        public TestConfigurationManager(string fileName, IConfigurationLoadingProvider provider) : base(fileName)
+        public TestConfigurationManager(IConfigurationProvider provider)
         {
-            Provider = provider;
-
+            AddProvider(provider);
         }
 
         public bool ReloadWithDefaults()

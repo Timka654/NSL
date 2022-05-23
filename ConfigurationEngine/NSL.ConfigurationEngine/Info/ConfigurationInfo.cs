@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NSL.ConfigurationEngine.Providers;
+using System;
 
 namespace NSL.ConfigurationEngine.Info
 {
@@ -17,11 +18,12 @@ namespace NSL.ConfigurationEngine.Info
         /// <summary>
         /// Необходимо отправить клиенту
         /// </summary>
-        public string Flags { get => flags; set { flags = value; compiledFlag = (compiledFlag = value.EndsWith("%") ? value : value + "%"); } }
+        public string Flags { get => flags; set { flags = value; compiledFlag = (compiledFlag = value.TrimEnd('%') + "%"); } }
 
         private string flags;
 
         private string compiledFlag;
+        internal IConfigurationProvider Provider { get; set; }
 
         public bool ExistFlag(string flag)
         {
@@ -36,18 +38,23 @@ namespace NSL.ConfigurationEngine.Info
         protected ConfigurationInfo()
         { }
 
+        public ConfigurationInfo(string name, string value, string flags) : this(name, value, BaseConfigurationManager.NoProvider, flags)
+        { 
+        
+        }
+
         /// <summary>
         /// 
         /// </summary>
         /// <param name="name"></param>
         /// <param name="value"></param>
         /// <param name="flags">Флаги указываются с разделителем % (прим. %c%d)</param>
-        public ConfigurationInfo(string name, string value, string flags)
+        public ConfigurationInfo(string name, string value, IConfigurationProvider provider, string flags)
         {
             Path = name;
             Value = value;
+            this.Provider = provider;
             Flags = flags ?? "";
         }
-
     }
 }

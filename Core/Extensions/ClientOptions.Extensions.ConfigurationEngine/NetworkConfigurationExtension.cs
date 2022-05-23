@@ -6,7 +6,7 @@ namespace NSL.ClientOptions.Extensions.ConfigurationEngine
 {
     public static class NetworkConfigurationExtension
     {
-        public static ClientOptions<T> LoadConfigurationClientOptions<T>(this IConfigurationManager configuration, string networkNodePath)
+        public static ClientOptions<T> LoadConfigurationClientOptions<T>(this BaseConfigurationManager configuration, string networkNodePath)
             where T : BaseSocketNetworkClient
         {
             var r = configuration.LoadConfigurationCoreOptions<ClientOptions<T>, T>(networkNodePath);

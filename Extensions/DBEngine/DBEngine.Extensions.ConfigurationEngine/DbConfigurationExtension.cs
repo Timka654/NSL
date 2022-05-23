@@ -10,7 +10,7 @@ namespace NSL.Extensions.DBEngine.ConfigurationEngine
         /// </summary>
         /// <param name="name">название базы данных(сокр.)</param>
         /// <returns></returns>
-        public static DBType GetDbType(this IConfigurationManager configuration, string name)
+        public static DBType GetDbType(this BaseConfigurationManager configuration, string name)
         {
             switch (name.ToLower())
             {
@@ -23,7 +23,7 @@ namespace NSL.Extensions.DBEngine.ConfigurationEngine
             }
         }
 
-        public static ConnectionOptions LoadConfigurationDbConnectionOptions(this IConfigurationManager configuration, string dbNodePath, Func<ConnectionOptions, string> getConnectionString)
+        public static ConnectionOptions LoadConfigurationDbConnectionOptions(this BaseConfigurationManager configuration, string dbNodePath, Func<ConnectionOptions, string> getConnectionString)
         {
             ConnectionOptions connectionOptions = new ConnectionOptions();
             connectionOptions.CSOptions = new DbOptions

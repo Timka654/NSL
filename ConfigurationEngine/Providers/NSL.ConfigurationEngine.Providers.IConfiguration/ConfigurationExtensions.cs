@@ -6,7 +6,7 @@ namespace NSL.ConfigurationEngine.Providers.IConfiguration
 {
     public static class ConfigurationExtensions
     {
-        public static Microsoft.Extensions.Configuration.IConfiguration BuildConfiguration(this IConfigurationManager conf)
+        public static Microsoft.Extensions.Configuration.IConfiguration BuildConfiguration(this BaseConfigurationManager conf)
         {
             var b = new ConfigurationBuilder();
 

@@ -45,7 +45,7 @@ namespace NSL.ServerOptions.Extensions
         /// Менеджер конфигураций для установки значений в функциях по умолчанию
         /// Должен быть обзательно переопределен в случае если используеться хоть 1 функция по умолчанию
         /// </summary>
-        protected virtual IConfigurationManager ConfigurationManager { get; }
+        protected virtual BaseConfigurationManager ConfigurationManager { get; }
 
         #region Loading
 

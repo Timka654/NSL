@@ -6,11 +6,11 @@ using System.Collections.Generic;
 
 namespace NSL.SocketPhantom.AspNetCore
 {
-    internal class PhantomConfigurationManager : IConfigurationManager
+    internal class PhantomConfigurationManager : BaseConfigurationManager
     {
-        public PhantomConfigurationManager(string path, IConfiguration configuration) : base("")
+        public PhantomConfigurationManager(string path, IConfiguration configuration)
         {
-            Provider = new LoadingProvider() { Configuration = configuration };
+            AddProvider(new ConfigurationEngine.Providers.IConfiguration.IConfigurationProvider() { Configuration = configuration });
 
             SetDefaults(new List<ConfigurationInfo>()
             {

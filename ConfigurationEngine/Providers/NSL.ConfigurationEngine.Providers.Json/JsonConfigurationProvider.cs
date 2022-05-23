@@ -9,31 +9,41 @@ using System.Text;
 
 namespace NSL.ConfigurationEngine.Providers.Json
 {
-    public class LoadingProvider : IConfigurationLoadingProvider
+    public class JsonConfigurationProvider : FileConfigurationProvider
     {
         private static List<JTokenType> supportedTypes = new List<JTokenType>
         {
-            JTokenType.String,JTokenType.Date,JTokenType.Boolean,JTokenType.Integer,JTokenType.Float,JTokenType.Guid,JTokenType.TimeSpan
+            JTokenType.String,
+            JTokenType.Date,
+            JTokenType.Boolean,
+            JTokenType.Integer,
+            JTokenType.Float,
+            JTokenType.Guid,
+            JTokenType.TimeSpan
         };
 
-        public bool LoadData(IConfigurationManager manager)
+        public JsonConfigurationProvider(string fileName, bool required = false, bool reloadOnChange = false) : base(fileName, required, reloadOnChange)
+        {
+        }
+
+        public override bool LoadData()
         {
             try
             {
-                var json_text = File.ReadAllText(manager.FileName);
+                var json_text = File.ReadAllText(FileName);
                 var json_data = JObject.Parse(json_text);
 
-                ProcessJsonObject(manager, json_data);
+                ProcessJsonObject(json_data);
             }
             catch (Exception ex)
             {
-                manager.Log(LoggerLevel.Error, $"ConfigurationManager Exception: {ex.ToString()}");
+                Manager.Log(LoggerLevel.Error, $"ConfigurationManager Exception: {ex.ToString()}");
                 return false;
             }
             return true;
         }
 
-        private void ProcessJsonObject(IConfigurationManager manager, JObject obj, string parentPath = null)
+        private void ProcessJsonObject(JObject obj, string parentPath = null)
         {
             var result = obj.PropertyValues()
                 //.Where(x => supportedTypes.Contains(x.Type))
@@ -41,12 +51,12 @@ namespace NSL.ConfigurationEngine.Providers.Json
 
             foreach (var item in result)
             {
-                ReadJsonProperty(manager, item, parentPath);
+                ReadJsonProperty(item, parentPath);
                 //manager.AddValue(new ConfigurationInfo(CorrectPath(item, manager), item.Value<string>(), ""));
             }
         }
 
-        private void ReadJsonProperty(IConfigurationManager manager, JToken property, string parentPath = null)
+        private void ReadJsonProperty(JToken property, string parentPath = null)
         {
             switch (property.Type)
             {
@@ -58,17 +68,17 @@ namespace NSL.ConfigurationEngine.Providers.Json
                 case JTokenType.Float:
                 case JTokenType.String:
                 case JTokenType.Boolean:
-                    manager.AddValue(new ConfigurationInfo(CorrectPath(property.Parent as JProperty, parentPath), property.Value<string>(), ""));
+                    Update(new ConfigurationInfo(CorrectPath(property.Parent as JProperty, parentPath), property.Value<string>(), this, ""), true);
                     break;
                 case JTokenType.Raw:
                     break;
                 case JTokenType.None:
                     break;
                 case JTokenType.Object:
-                    ProcessJsonObject(manager, property as JObject, CorrectPath(property.Parent as JProperty, parentPath));
+                    ProcessJsonObject(property as JObject, CorrectPath(property.Parent as JProperty, parentPath));
                     break;
                 case JTokenType.Array:
-                    ReadJsonArray(manager, property, parentPath);
+                    ReadJsonArray(property, parentPath);
                     break;
                 case JTokenType.Constructor:
                     break;
@@ -87,13 +97,13 @@ namespace NSL.ConfigurationEngine.Providers.Json
             }
         }
 
-        private void ReadJsonArray(IConfigurationManager manager, JToken property, string parentPath)
+        private void ReadJsonArray(JToken property, string parentPath)
         {
             var name = CorrectPath(property.Parent as JProperty, parentPath);
 
             var arr = property as JArray;
 
-            manager.AddValue(new ConfigurationInfo($"{name}.count", arr.Count.ToString(), ""));
+            Update(new ConfigurationInfo($"{name}.count", arr.Count.ToString(), ""), true);
 
             for (int i = 0; i < arr.Count; i++)
             {
@@ -102,7 +112,7 @@ namespace NSL.ConfigurationEngine.Providers.Json
                 if (!supportedTypes.Contains(item.Type))
                     continue;
 
-                ReadJsonProperty(manager, item, $"{name}.{i}");
+                ReadJsonProperty(item, $"{name}.{i}");
             }
         }
 
@@ -121,26 +131,26 @@ namespace NSL.ConfigurationEngine.Providers.Json
             return npath.ToLower();
         }
 
-        public bool LoadData(IConfigurationManager manager, byte[] data)
+        public override bool LoadData(byte[] data)
         {
             try
             {
                 var json_text = Encoding.UTF8.GetString(data);
                 var json_data = JObject.Parse(json_text);
 
-                ProcessJsonObject(manager, json_data);
+                ProcessJsonObject(json_data);
             }
             catch (Exception ex)
             {
-                manager.Log(LoggerLevel.Error, $"ConfigurationManager Exception: {ex.ToString()}");
+                Manager.Log(LoggerLevel.Error, $"ConfigurationManager Exception: {ex.ToString()}");
                 return false;
             }
             return true;
         }
 
-        public bool SaveData(IConfigurationManager manager)
+        public override bool SaveData()
         {
-            var data = manager.GetAllValues().OrderBy(x => x.Path);
+            var data = Manager.GetAllValues().OrderBy(x => x.Path);
 
             try
             {
@@ -150,13 +160,13 @@ namespace NSL.ConfigurationEngine.Providers.Json
 
                 var json = jobj.ToString();
 
-                File.WriteAllText($"{manager.FileName}.d", json);
+                File.WriteAllText($"{FileName}.d", json);
 
                 return true;
             }
             catch (Exception ex)
             {
-                manager.Log(LoggerLevel.Error, $"ConfigurationManager Exception: {ex.ToString()}");
+                Manager.Log(LoggerLevel.Error, $"ConfigurationManager Exception: {ex.ToString()}");
                 return false;
             }
         }
@@ -188,7 +198,7 @@ namespace NSL.ConfigurationEngine.Providers.Json
 
                         jobj.Add(npath, obj);
                     }
-                    else if(!processed.Contains(fpath))
+                    else if (!processed.Contains(fpath))
                     {
                         processed.Add(fpath);
                         var obj = new JObject();
@@ -205,7 +215,6 @@ namespace NSL.ConfigurationEngine.Providers.Json
                 }
             }
         }
-
 
         private IEnumerable<ConfigurationInfo> GroupPropertyes(IEnumerable<ConfigurationInfo> data, string startWith)
         {

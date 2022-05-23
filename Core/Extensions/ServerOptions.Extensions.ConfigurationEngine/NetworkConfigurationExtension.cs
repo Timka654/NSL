@@ -6,7 +6,7 @@ namespace NSL.ServerOptions.Extensions.ConfigurationEngine
 {
     public static class NetworkConfigurationExtension
     {
-        public static ServerOptions<T> LoadConfigurationServerOptions<T>(this IConfigurationManager configuration, string networkNodePath)
+        public static ServerOptions<T> LoadConfigurationServerOptions<T>(this BaseConfigurationManager configuration, string networkNodePath)
             where T : IServerNetworkClient
         {
             var r = configuration.LoadConfigurationCoreOptions<ServerOptions<T>, T>(networkNodePath);

@@ -32,6 +32,7 @@
 
 	<ItemGroup>
 	  <ProjectReference Include="..\..\Core\NSL.SocketCore\NSL.SocketCore.csproj" />
+	  <ProjectReference Include="..\..\Core\Utils\NSL.Utils\NSL.Utils.csproj" />
 	</ItemGroup>
 
 </Project>

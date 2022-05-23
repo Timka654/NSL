@@ -1,15 +1,17 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Primitives;
+using NSL.ConfigurationEngine.Info;
 using System;
 
 namespace NSL.ConfigurationEngine.Providers.IConfiguration
 {
-    public class LoadingProvider : IConfigurationLoadingProvider
+    public class IConfigurationProvider : BaseConfigurationProvider
     {
         public Microsoft.Extensions.Configuration.IConfiguration Configuration { get; set; }
+
         private IChangeToken changeToken;
 
-        public bool LoadData(IConfigurationManager manager)
+        public override bool LoadData()
         {
             if (Configuration == null)
                 return false;
@@ -18,7 +20,7 @@ namespace NSL.ConfigurationEngine.Providers.IConfiguration
             {
                 Configuration.GetReloadToken().RegisterChangeCallback((obj) =>
                 {
-                    LoadData(manager);
+                    LoadData();
                 }, null);
 
                 changeToken = Configuration.GetReloadToken();
@@ -31,20 +33,20 @@ namespace NSL.ConfigurationEngine.Providers.IConfiguration
                 if (item.Value == null)
                     continue;
 
-                manager.AddValue(item.Key.Replace(":", "."), item.Value);
+                Update(new ConfigurationInfo(item.Key.Replace(":", "."), item.Value, this, default), true);
             }
 
             return true;
         }
 
-        public bool LoadData(IConfigurationManager manager, byte[] data)
+        public override bool LoadData(byte[] data)
         {
-            throw new NotSupportedException();
+            return true;
         }
 
-        public bool SaveData(IConfigurationManager manager)
+        public override bool SaveData()
         {
-            throw new NotSupportedException();
+            return true;
         }
     }
 }

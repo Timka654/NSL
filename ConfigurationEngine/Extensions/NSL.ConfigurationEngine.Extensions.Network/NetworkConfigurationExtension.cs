@@ -12,7 +12,7 @@ namespace NSL.ServerOptions.Extensions.ConfigurationEngine
         /// </summary>
         /// <param name="ver">Номер версии ип протокола</param>
         /// <returns></returns>
-        public static AddressFamily GetIPv(this IConfigurationManager configuration, string nodePath)
+        public static AddressFamily GetIPv(this BaseConfigurationManager configuration, string nodePath)
         {
             switch (configuration.GetValue<byte>(nodePath))
             {
@@ -29,7 +29,7 @@ namespace NSL.ServerOptions.Extensions.ConfigurationEngine
         /// </summary>
         /// <param name="name">Название протокола</param>
         /// <returns></returns>
-        public static ProtocolType GetProtocolType(this IConfigurationManager configuration, string nodePath)
+        public static ProtocolType GetProtocolType(this BaseConfigurationManager configuration, string nodePath)
         {
             switch (configuration.GetValue<string>(nodePath))
             {
@@ -41,7 +41,7 @@ namespace NSL.ServerOptions.Extensions.ConfigurationEngine
             }
         }
 
-        public static T LoadConfigurationCoreOptions<T, TType>(this IConfigurationManager configuration, string networkNodePath)
+        public static T LoadConfigurationCoreOptions<T, TType>(this BaseConfigurationManager configuration, string networkNodePath)
             where T : CoreOptions<TType>, new()
             where TType : INetworkClient
         {

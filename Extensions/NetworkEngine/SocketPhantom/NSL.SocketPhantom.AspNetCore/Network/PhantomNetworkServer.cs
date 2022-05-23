@@ -17,11 +17,11 @@ namespace NSL.SocketPhantom.AspNetCore.Network
         ILogger logger = new FileLogger();
         protected override ILogger Logger => logger;
 
-        IConfigurationManager configurationManager;
+        BaseConfigurationManager configurationManager;
         PhantomHubsManager manager;
         private PhantomCipherProvider cipher;
 
-        protected override IConfigurationManager ConfigurationManager => configurationManager;
+        protected override BaseConfigurationManager ConfigurationManager => configurationManager;
 
         public void Load(PhantomHubsManager manager, IConfiguration configuration, PhantomCipherProvider cipher)
         {

@@ -14,7 +14,7 @@ namespace ConfigurationEngine.Tests
         [Test]
         public void TestJsonLoading()
         {
-            var manager = new TestConfigurationManager(Path.Combine("Data", "jsonConfig.json"), new LoadingProvider());
+            var manager = new TestConfigurationManager(new JsonConfigurationProvider(Path.Combine("Data", "jsonConfig.json")));
 
             manager.ReloadWithDefaults();
 
@@ -27,7 +27,7 @@ namespace ConfigurationEngine.Tests
         [Test]
         public void TestJsonSave()
         {
-            var manager = new TestConfigurationManager(Path.Combine("Data", "jsonConfig.json"), new LoadingProvider());
+            var manager = new TestConfigurationManager(new JsonConfigurationProvider(Path.Combine("Data", "jsonConfig.json")));
 
             manager.ReloadWithDefaults();
             manager.SaveData();
@@ -38,7 +38,7 @@ namespace ConfigurationEngine.Tests
         [Test]
         public void TestJsonLoadingInvalidPath()
         {
-            var manager = new TestConfigurationManager(Path.Combine("Data", "jsonConfig_noex.json"), new LoadingProvider());
+            var manager = new TestConfigurationManager(new JsonConfigurationProvider(Path.Combine("Data", "jsonConfig_noex.json")));
 
             if (manager.ReloadWithDefaults())
                 Assert.Fail();
@@ -49,9 +49,10 @@ namespace ConfigurationEngine.Tests
         [Test]
         public void TestJsonLoadingNoProvider()
         {
-            var manager = new TestConfigurationManager(Path.Combine("Data", "jsonConfig.json"), null);
             try
             {
+                var manager = new TestConfigurationManager(null);
+
                 manager.ReloadWithDefaults();
 
                 Assert.Fail();

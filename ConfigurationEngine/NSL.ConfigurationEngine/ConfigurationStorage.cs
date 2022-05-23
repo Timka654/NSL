@@ -20,16 +20,19 @@ namespace NSL.ConfigurationEngine
         /// Добавить значение
         /// </summary>
         /// <param name="config">Данные конфигурации</param>
-        public void AddValue(ConfigurationInfo config)
+        public ConfigurationInfo AddValue(ConfigurationInfo config)
         {
             if (config_map.TryGetValue(config.Path, out ConfigurationInfo c))
             {
                 c.Value = config.Value;
                 c.Flags = config.Flags;
-                return;
+                c.Provider = config.Provider;
+                return c;
             }
 
             config_map.TryAdd(config.Path, config);
+
+            return config;
         }
 
         /// <summary>
