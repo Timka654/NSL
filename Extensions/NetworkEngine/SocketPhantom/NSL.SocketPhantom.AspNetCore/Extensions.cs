@@ -21,7 +21,7 @@ namespace NSL.SocketPhantom.AspNetCore
         public static void MapPhantomHub<Hub>(this IEndpointRouteBuilder endpoints, string relativeUrl)
             where Hub : PhantomHub
         {
-            MapPhantomHub<Hub>(endpoints, relativeUrl, new PhantomHubOptions() { DisconnectTimeOut = TimeSpan.FromSeconds(15) });
+            MapPhantomHub<Hub>(endpoints, relativeUrl, new PhantomHubOptions() { DisconnectTimeOut = TimeSpan.FromSeconds(30) });
         }
 
         public static void MapPhantomHub<Hub>(this IEndpointRouteBuilder endpoints, string relativeUrl, PhantomHubOptions options)

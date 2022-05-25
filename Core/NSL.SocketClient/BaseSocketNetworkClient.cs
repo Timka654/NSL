@@ -116,7 +116,7 @@ namespace NSL.SocketClient
             aliveLocker.Set();
         }
 
-        private AutoResetEvent aliveLocker { get; set; } = new AutoResetEvent(true);
+        private ManualResetEvent aliveLocker { get; set; } = new ManualResetEvent(true);
 
         #endregion
 

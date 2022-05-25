@@ -1,5 +1,6 @@
 ﻿using NSL.SocketCore.Utils;
 using NSL.SocketCore.Utils.Buffer;
+using NSL.SocketCore.Utils.SystemPackets;
 
 namespace NSL.SocketServer.Utils.SystemPackets
 {
@@ -7,6 +8,7 @@ namespace NSL.SocketServer.Utils.SystemPackets
     {
         public override void Receive(T client, InputPacketBuffer data)
         {
+            client.Network.SendEmpty(AliveConnectionPacket.PacketId);
         }
     }
 }

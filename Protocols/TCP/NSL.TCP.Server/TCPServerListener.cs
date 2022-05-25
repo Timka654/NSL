@@ -43,6 +43,15 @@ namespace NSL.TCP.Server
         /// </summary>
         private void Initialize()
         {
+            if (!IPAddress.TryParse(serverOptions.IpAddress, out var ip))
+                throw new ArgumentException($"invalid connection ip {serverOptions.IpAddress}", nameof(serverOptions.IpAddress));
+
+            if (serverOptions.AddressFamily == AddressFamily.Unspecified)
+                serverOptions.AddressFamily = ip.AddressFamily;
+
+            if (serverOptions.ProtocolType == ProtocolType.Unspecified)
+                serverOptions.ProtocolType = ProtocolType.Tcp;
+
             //Иницализация сокета, установка семейства адрессов, поточного сокета, протокола приема данных
             listener = new Socket(serverOptions.AddressFamily, SocketType.Stream, serverOptions.ProtocolType);
             //Инициализация прослушивания на определенном адресе адаптера, порте

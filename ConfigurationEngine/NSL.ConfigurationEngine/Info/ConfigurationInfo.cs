@@ -51,7 +51,7 @@ namespace NSL.ConfigurationEngine.Info
         /// <param name="flags">Флаги указываются с разделителем % (прим. %c%d)</param>
         public ConfigurationInfo(string name, string value, IConfigurationProvider provider, string flags)
         {
-            Path = name;
+            Path = name.ToLower();
             Value = value;
             this.Provider = provider;
             Flags = flags ?? "";
