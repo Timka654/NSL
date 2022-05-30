@@ -1,4 +1,5 @@
-﻿using NSL.SocketClient.Unity;
+﻿using NSL.RestExtensions.ResponseReaders;
+using NSL.SocketClient.Unity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,10 +10,32 @@ using UnityEngine;
 
 namespace NSL.RestExtensions.Unity
 {
-    public class BaseWebRequests : NSL.RestExtensions.BaseWebRequests
+    public class UnityBaseWebRequests : UnityBaseWebRequests<DefaultRestResponseReader>
+    { 
+    }
+
+    //public class UnityWGLBaseWebRequests<TConverter> : NSL.RestExtensions.BaseWebRequests<TConverter>
+    //    where TConverter : IRestResponseReader, new()
+    //{
+    //    protected override Task<TResult> ProcessBaseResponse<TResult>(HttpResponseMessage response)
+    //    {
+    //        throw new NotImplementedException();
+    //    }
+
+    //    protected override Task<HttpRequestResult> SafeRequest(string url, Action<HttpRequestMessage> request, bool dispose = false)
+    //    {
+    //        throw new NotImplementedException();
+    //    }
+
+    //    protected override Task<HttpRequestResult<TData>> SafeRequest<TData>(string url, Action<HttpRequestMessage> request = null, bool dispose = false)
+    //    {
+
+    //    }
+    //}
+
+    public class UnityBaseWebRequests<TConverter> : NSL.RestExtensions.WebRequestRepository<TConverter>
+        where TConverter : IRestResponseReader, new()
     {
-
-
         #region Utils
 
         public void ClearAuth()

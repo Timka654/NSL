@@ -33,20 +33,12 @@
 		<None Remove="Release\**" />
 	</ItemGroup>
 
-	<ItemGroup Condition="'$(Configuration)'=='Release'">
+	<ItemGroup>
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
 	</ItemGroup>
 
-	<ItemGroup Condition="'$(Configuration)'=='Debug'">
+	<ItemGroup>
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-	</ItemGroup>
-
-	<ItemGroup Condition="'$(Configuration)'=='UnityDebug'">
-		<PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
-	</ItemGroup>
-
-	<ItemGroup Condition="'$(Configuration)'=='Unity'">
-		<PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
 	</ItemGroup>
 
 </Project>

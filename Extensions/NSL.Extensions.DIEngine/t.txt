@@ -1,0 +1,46 @@
+public class DIProvider<T>
+{
+    public T GetValue() => DIManager.Instance.GetObject<T>();
+}
+
+public class DIManager
+{
+    public static DIManager Instance { get; private set; }
+
+    public DIManager()
+    {
+        Instance = new DIManager();
+    }
+
+    private Dictionary<Type, object> objectLib = new Dictionary<Type, object>();
+    private Dictionary<Type, object> scopedObjectLib = new Dictionary<Type, object>();
+
+    public void AddSingleton<TBase,T>(T obj)
+        where T : TBase
+    {
+        if (!objectLib.TryAdd(typeof(TBase), obj))
+            throw new NullReferenceException(nameof(obj));
+    }
+
+    public void AddSingleton<T>(T obj)
+        => AddSingleton<T, T>(obj);
+
+    public void AddScoped<TBase, T>(T obj)
+        where T : TBase
+    {
+        if (!scopedObjectLib.TryAdd(typeof(TBase), obj))
+            throw new NullReferenceException(nameof(obj));
+    }
+
+    public void AddScoped<T>(T obj)
+        => AddScoped<T, T>(obj);
+
+    public T GetObject<T>()
+    {
+        if (!scopedObjectLib.TryGetValue(typeof(T), out var obj))
+            if (!objectLib.TryGetValue(typeof(T), out obj))
+                throw new NullReferenceException(nameof(T));
+
+        return (T)obj;
+    }
+}

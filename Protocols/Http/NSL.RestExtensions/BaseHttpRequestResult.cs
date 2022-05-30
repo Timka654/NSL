@@ -6,6 +6,11 @@ namespace NSL.RestExtensions
 {
     public abstract class BaseHttpRequestResult : IDisposable
     {
+        public const int ThrowStatusCode = -1;
+
+        public const string DefaultJsonMimeType = "application/json";
+        public const string DefaultXmlMimeType = "application/xml";
+
         public HttpResponseMessage MessageResponse { get; set; }
 
         public Dictionary<string, List<string>> ErrorMessages { get; set; } = new Dictionary<string, List<string>>();

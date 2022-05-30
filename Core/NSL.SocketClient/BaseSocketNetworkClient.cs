@@ -57,6 +57,12 @@ namespace NSL.SocketClient
 
         private CancellationTokenSource pingPongTokenSource;
 
+        /// <summary>
+        /// Milliseconds
+        /// Важно! работает только при запуске цикла сообщений PingPongEnabled
+        /// </summary>
+        public int Ping { get; protected set; }
+
         public bool PingPongEnabled
         {
             get => pingPongEnabled; set
@@ -82,8 +88,6 @@ namespace NSL.SocketClient
 
         private async void RunAliveChecker(CancellationToken token)
         {
-            await Task.Delay(AliveCheckTimeOut, token);
-
             do
             {
                 RequestPing();
@@ -94,28 +98,38 @@ namespace NSL.SocketClient
 
         public void RequestPing()
         {
-            if (LastReceiveMessage > DateTime.UtcNow.AddMilliseconds(-AliveCheckTimeOut))
-            {
-                AliveState = true;
-                return;
-            }
+            //if (LastReceiveMessage > DateTime.UtcNow.AddMilliseconds(-AliveCheckTimeOut))
+            //{
+            //    AliveState = true;
+            //    return;
+            //} // invalid ping
 
             if (!aliveLocker.WaitOne(0))
                 return;
 
-            aliveLocker.Reset();
-
             if (Network != null)
+            {
+                aliveLocker.Reset();
+
+                aliveRequestTime = DateTime.UtcNow;
                 AliveConnectionPacket.SendRequest(Network);
+
+                AliveState = false;
+
+                return;
+
+            }
 
             AliveState = aliveLocker.WaitOne(AliveCheckTimeOut);
         }
 
         internal void PongProcess()
         {
+            Ping = (int)((DateTime.UtcNow - aliveRequestTime).TotalMilliseconds / 2) - 3/*correcting avg send-receive process*/;
             aliveLocker.Set();
         }
 
+        private DateTime aliveRequestTime;
         private ManualResetEvent aliveLocker { get; set; } = new ManualResetEvent(true);
 
         #endregion

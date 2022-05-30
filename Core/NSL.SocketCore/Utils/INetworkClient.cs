@@ -12,7 +12,7 @@ namespace NSL.SocketCore.Utils
 
         /// <summary>
         /// Состояние соединение на текущий момент
-        /// Важно! работает только при запуске цикла сообщений AliveConnection
+        /// Важно! работает только при запуске цикла сообщений PingPongEnabled
         /// </summary>
         public virtual bool AliveState { get; set; } = true;
 

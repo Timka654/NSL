@@ -29,7 +29,7 @@ namespace NSL.RestExtensions
 
         public static HttpRequestMessage SetRequestBody<TValue>(this HttpRequestMessage request, TValue data)
         {
-            request.Content = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, BaseWebRequests.DefaultJsonMimeType);
+            request.Content = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, BaseHttpRequestResult.DefaultJsonMimeType);
 
             return request;
         }
