@@ -1,75 +1,87 @@
-﻿using NSL.RestExtensions.ResponseReaders;
+﻿using NSL.RestExtensions.RESTContentProcessors;
 using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace NSL.RestExtensions
 {
-
-    public class WebRequestRepository : WebRequestRepository<DefaultRestResponseReader>
+    public class WebRequestRepository : WebRequestRepository<DefaultRestContentProcessor>
     {
     }
 
-    public class WebRequestRepository<TConverter> : BaseWebRequests<TConverter>
-        where TConverter : IRestResponseReader, new()
+    public class WebRequestRepository<TConverter> : WebRequestRepository<BaseHttpClientPool, HttpClient, TConverter>
+        where TConverter : IRestContentProcessor, new()
+    {
+        public WebRequestRepository() : base()
+        {
+            clientPool = new BaseHttpClientPool(() => GetBaseDomain());
+        }
+    }
+
+    public class WebRequestRepository<TClientPool, TClient, TConverter> : BaseWebRequests<TConverter>
+        where TConverter : IRestContentProcessor, new()
+        where TClient : HttpClient
+        where TClientPool : HttpClientPool<TClient>
     {
 
         #region Utils
 
         public virtual void SetDefaultHeader(string name, string value) => clientPool.SetDefaultHeader(name, value);
 
-        public void FreeClient(HttpClient client, BaseHttpRequestResult response = null) => FreeClient(client, response?.MessageResponse);
+        public void FreeClient(TClient client, BaseHttpRequestResult response = null) => FreeClient(client, response?.MessageResponse);
 
-        public void FreeClient(HttpClient client, HttpResponseMessage response = null) => clientPool.FreeClient(client, response);
+        public void FreeClient(TClient client, HttpResponseMessage response = null) => clientPool.FreeClient(client, response);
 
-        public void FreeClient(HttpClient client) => clientPool.FreeClient(client);
+        public void FreeClient(TClient client) => clientPool.FreeClient(client);
 
-        protected override async Task<HttpRequestResult> SafeRequest(string url, Action<HttpRequestMessage> request, bool dispose = false)
+        protected override async Task<HttpRequestResult> SafeRequest(string url, Action<HttpRequestMessage> request, bool dispose = false, CancellationToken? cancellationToken = null)
         {
             var client = await GetClient();
 
-            var result = await SafeRequest(client, url, request);
+            var result = await SafeRequest(client, url, request, cancellationToken);
 
             FreeClient(client, dispose ? result : null);
 
             return result;
         }
 
-        protected override async Task<HttpRequestResult<TData>> SafeRequest<TData>(string url, Action<HttpRequestMessage> request = null, bool dispose = false)
+        protected override async Task<HttpRequestResult<TData>> SafeRequest<TData>(string url, Action<HttpRequestMessage> request = null, bool dispose = false, CancellationToken? cancellationToken = null)
         {
             var client = await GetClient();
 
-            var result = await SafeRequest<TData>(client, url, request);
+            var result = await SafeRequest<TData>(client, url, request, cancellationToken);
 
             FreeClient(client, dispose ? result : null);
 
             return result;
         }
 
-        protected async Task<HttpRequestResult> SafeRequest(HttpClient client, string url, Action<HttpRequestMessage> request)
+        protected async Task<HttpRequestResult> SafeRequest(TClient client, string url, Action<HttpRequestMessage> request, CancellationToken? cancellationToken = null)
         {
             var message = new HttpRequestMessage(HttpMethod.Post, url);
 
             request.Invoke(message);
 
-            return await SafeRequest(client, message);
+            return await SafeRequest(client, message, cancellationToken);
         }
 
-        protected async Task<HttpRequestResult<TData>> SafeRequest<TData>(HttpClient client, string url, Action<HttpRequestMessage> request = null)
+        protected async Task<HttpRequestResult<TData>> SafeRequest<TData>(TClient client, string url, Action<HttpRequestMessage> request = null, CancellationToken? cancellationToken = null)
         {
             var message = new HttpRequestMessage(HttpMethod.Post, url);
 
             if (request != null)
                 request.Invoke(message);
 
-            return await SafeRequest<TData>(client, message);
+            return await SafeRequest<TData>(client, message, cancellationToken);
         }
-        protected async Task<HttpRequestResult> SafeRequest(HttpClient client, HttpRequestMessage request)
+
+        protected async Task<HttpRequestResult> SafeRequest(TClient client, HttpRequestMessage request, CancellationToken? cancellationToken = null)
         {
-            var result = await SafeSendRequest(client, request);
+            var result = await SafeSendRequest(client, request, cancellationToken);
 
             await LogRequestResult(result);
 
@@ -80,14 +92,14 @@ namespace NSL.RestExtensions
             return r;
         }
 
-        protected async Task<HttpRequestResult<TData>> SafeRequest<TData>(HttpClient client, HttpRequestMessage request)
+        protected async Task<HttpRequestResult<TData>> SafeRequest<TData>(TClient client, HttpRequestMessage request, CancellationToken? cancellationToken = null)
         {
-            var result = await SafeSendRequest(client, request);
+            var result = await SafeSendRequest(client, request, cancellationToken);
 
             await LogRequestResult(result);
 
-            HttpRequestResult<TData> r = await ProcessBaseResponse<HttpRequestResult<TData>>(result) ?? new HttpRequestResult<TData>(result, await HttpContentConverter.GetContent<TData>(result, result.Content));
-
+            HttpRequestResult<TData> r = await ProcessBaseResponse<HttpRequestResult<TData>>(result) ?? new HttpRequestResult<TData>(result, (result.Content == null ? default : await HttpContentConverter.GetContent<TData>(result, result.Content)));
+            
             FreeClient(client, result);
 
             return r;
@@ -108,13 +120,13 @@ namespace NSL.RestExtensions
             return new TResult() { MessageResponse = response };
         }
 
-        protected static async Task<HttpResponseMessage> SafeSendRequest(HttpClient client, HttpRequestMessage request)
+        protected virtual async Task<HttpResponseMessage> SafeSendRequest(TClient client, HttpRequestMessage request, CancellationToken? cancellationToken = null)
         {
             HttpResponseMessage result = default;
 
             try
             {
-                result = await client.SendAsync(request);
+                result = await client.SendAsync(request, cancellationToken ?? CancellationToken.None);
             }
             //Unity has throw on error status code and form data content, cannot find any fixes
             catch (ObjectDisposedException ex)
@@ -136,9 +148,9 @@ namespace NSL.RestExtensions
             return result;
         }
 
-        protected HttpClientPool clientPool;
+        protected TClientPool clientPool;
 
-        protected async Task<HttpClient> GetClient()
+        protected async Task<TClient> GetClient()
         {
             return await clientPool.GetClient(requestTimeout: TimeSpan.FromMilliseconds(GetTimeout()));
         }
@@ -150,17 +162,17 @@ namespace NSL.RestExtensions
 
         }
 
-        protected virtual async Task LogRequestResult(HttpResponseMessage result, string responseContent)
+        protected virtual Task LogRequestResult(HttpResponseMessage result, string responseContent)
         {
-
-        }
-
-        protected WebRequestRepository()
-        {
-            clientPool = new HttpClientPool(() => GetBaseDomain());
+            return Task.CompletedTask;
         }
 
         #endregion
+
+        public WebRequestRepository()
+        {
+
+        }
 
     }
 }

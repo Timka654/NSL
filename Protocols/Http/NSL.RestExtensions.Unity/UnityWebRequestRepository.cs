@@ -1,4 +1,4 @@
-﻿using NSL.RestExtensions.ResponseReaders;
+﻿using NSL.RestExtensions.RESTContentProcessors;
 using NSL.SocketClient.Unity;
 using System;
 using System.Collections.Generic;
@@ -10,31 +10,23 @@ using UnityEngine;
 
 namespace NSL.RestExtensions.Unity
 {
-    public class UnityBaseWebRequests : UnityBaseWebRequests<DefaultRestResponseReader>
-    { 
+    public class UnityWebRequestRepository : UnityWebRequestRepository<DefaultRestContentProcessor>
+    {
     }
 
-    //public class UnityWGLBaseWebRequests<TConverter> : NSL.RestExtensions.BaseWebRequests<TConverter>
-    //    where TConverter : IRestResponseReader, new()
-    //{
-    //    protected override Task<TResult> ProcessBaseResponse<TResult>(HttpResponseMessage response)
-    //    {
-    //        throw new NotImplementedException();
-    //    }
+    public class UnityWebRequestRepository<TConverter> : UnityWebRequestRepository<UnityHttpClientPool, UnityHttpClient, TConverter>
+        where TConverter : IRestContentProcessor, new()
+    {
+        public UnityWebRequestRepository() : base()
+        {
+            clientPool = new UnityHttpClientPool(() => GetBaseDomain());
+        }
+    }
 
-    //    protected override Task<HttpRequestResult> SafeRequest(string url, Action<HttpRequestMessage> request, bool dispose = false)
-    //    {
-    //        throw new NotImplementedException();
-    //    }
-
-    //    protected override Task<HttpRequestResult<TData>> SafeRequest<TData>(string url, Action<HttpRequestMessage> request = null, bool dispose = false)
-    //    {
-
-    //    }
-    //}
-
-    public class UnityBaseWebRequests<TConverter> : NSL.RestExtensions.WebRequestRepository<TConverter>
-        where TConverter : IRestResponseReader, new()
+    public class UnityWebRequestRepository<TClientPool, TClient, TConverter> : NSL.RestExtensions.WebRequestRepository<TClientPool, TClient, TConverter>
+        where TConverter : IRestContentProcessor, new()
+        where TClient : HttpClient
+        where TClientPool : HttpClientPool<TClient>
     {
         #region Utils
 
@@ -46,40 +38,12 @@ namespace NSL.RestExtensions.Unity
 
         protected async void SafeRequest(string url, WebResponseDelegate onResult, Action<HttpRequestMessage> request)
         {
-            var client = await GetClient();
-
-            var result = await SafeRequest(client, url, request);
-
-            FreeClient(client);
-
-            SafeInvoke(result, onResult);
+            SafeInvoke(await base.SafeRequest(url, request), onResult);
         }
 
         protected async void SafeRequest<TData>(string url, WebResponseDelegate<TData> onResult, Action<HttpRequestMessage> request = null)
         {
-            var client = await GetClient();
-
-            var result = await SafeRequest<TData>(client, url, request);
-
-            FreeClient(client);
-
-            SafeInvoke(result, onResult);
-        }
-
-        private async Task<TResult> ProcessBaseResponse<TResult>(HttpResponseMessage response)
-            where TResult : BaseHttpRequestResult, new()
-        {
-            if (response.IsSuccessStatusCode)
-                return default;
-            else if (response.StatusCode == HttpStatusCode.BadRequest)
-                return new TResult()
-                {
-                    MessageResponse = response,
-                    ErrorMessages = await response.GetResponseBody<Dictionary<string, List<string>>>()
-                };
-
-
-            return new TResult() { MessageResponse = response };
+            SafeInvoke(await base.SafeRequest<TData>(url, request), onResult);
         }
 
         protected override async Task LogRequestResult(HttpResponseMessage result, string responseContent)
@@ -87,18 +51,18 @@ namespace NSL.RestExtensions.Unity
             if (!GetLogging())
                 return;
 
-            var requestUriLine = $"RequestUri = { result.RequestMessage.RequestUri }\r\n";
-            var requestContentLine = result.RequestMessage.Content is StringContent sc ? $"RequestContent = { await sc.ReadAsStringAsync() }\r\n" : string.Empty;
-            var resultStatusCodeLine = $"ResultCode = { result.StatusCode }\r\n";
+            var requestUriLine = $"RequestUri = {result.RequestMessage.RequestUri}\r\n";
+            var requestContentLine = result.RequestMessage.Content is StringContent sc ? $"RequestContent = {await sc.ReadAsStringAsync()}\r\n" : string.Empty;
+            var resultStatusCodeLine = $"ResultCode = {((int)result.StatusCode)}{(Enum.IsDefined(typeof(HttpStatusCode), result.StatusCode) ? $"({result.StatusCode})" : "")}\r\n";
 
             if (responseContent != null)
             {
                 if (responseContent.Length < 10_000)
                 {
                     Debug.Log(requestUriLine + requestContentLine + resultStatusCodeLine +
-                              $"ResponseContent = { responseContent }\r\n" +
+                              $"ResponseContent = {responseContent}\r\n" +
                               $"================STACK TRACE================\r\n" +
-                              $"{ Environment.StackTrace }");
+                              $"{Environment.StackTrace}");
                 }
                 else
                 {
@@ -116,13 +80,13 @@ namespace NSL.RestExtensions.Unity
                     } while (charCollection.Any());
 
                     Debug.Log($"================STACK TRACE================\r\n" +
-                              $"{ Environment.StackTrace }");
+                              $"{Environment.StackTrace}");
                 }
             }
             else
                 Debug.Log(requestUriLine + requestContentLine + resultStatusCodeLine +
                           $"================STACK TRACE================\r\n" +
-                          $"{ Environment.StackTrace }");
+                          $"{Environment.StackTrace}");
 
         }
 

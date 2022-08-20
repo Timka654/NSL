@@ -1,9 +1,10 @@
-﻿using NSL.RestExtensions.ResponseReaders;
+﻿using NSL.RestExtensions.RESTContentProcessors;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace NSL.RestExtensions
@@ -18,7 +19,7 @@ namespace NSL.RestExtensions
 
 
     public abstract class BaseWebRequests<TConverter>
-        where TConverter : IRestResponseReader, new()
+        where TConverter : IRestContentProcessor, new()
     {
         public virtual int GetTimeout() => 10000;
 
@@ -33,9 +34,9 @@ namespace NSL.RestExtensions
 
         #region Utils
 
-        protected abstract Task<HttpRequestResult> SafeRequest(string url, Action<HttpRequestMessage> request, bool dispose = false);
+        protected abstract Task<HttpRequestResult> SafeRequest(string url, Action<HttpRequestMessage> request, bool dispose = false, CancellationToken? cancellationToken = null);
 
-        protected abstract Task<HttpRequestResult<TData>> SafeRequest<TData>(string url, Action<HttpRequestMessage> request = null, bool dispose = false);
+        protected abstract Task<HttpRequestResult<TData>> SafeRequest<TData>(string url, Action<HttpRequestMessage> request = null, bool dispose = false, CancellationToken? cancellationToken = null);
 
         protected abstract Task<TResult> ProcessBaseResponse<TResult>(HttpResponseMessage response)
             where TResult : BaseHttpRequestResult, new();

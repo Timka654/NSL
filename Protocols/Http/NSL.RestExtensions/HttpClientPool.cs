@@ -5,7 +5,8 @@ using System.Threading.Tasks;
 
 namespace NSL.RestExtensions
 {
-    public class HttpClientPool
+    public abstract class HttpClientPool<TClient>
+        where TClient : HttpClient
     {
         public const byte MaxParrallelRequestCount = byte.MaxValue;
 
@@ -24,20 +25,15 @@ namespace NSL.RestExtensions
             this.requestTimeout = requestTimeout ?? defaultTimeout;
         }
 
-        public async Task<HttpClient> GetClient(int timeout = 200, string baseUrl = null, TimeSpan? requestTimeout = null, HttpClientHandler customHandler = null)
+        public async Task<TClient> GetClient(int timeout = 20000, string baseUrl = null, TimeSpan? requestTimeout = null, HttpClientHandler customHandler = null)
         {
             if (!await locker.WaitAsync(timeout))
                 return default;
 
-
-            var client = new HttpClient(customHandler ?? new HttpClientHandler()
+            var client = CreateClient(baseUrl ?? this.baseUrl(), requestTimeout ?? this.requestTimeout, customHandler ?? new HttpClientHandler()
             {
                 AllowAutoRedirect = false
-            })
-            {
-                BaseAddress = new Uri(baseUrl ?? this.baseUrl()),
-                Timeout = requestTimeout ?? this.requestTimeout
-            };
+            });
 
             foreach (var item in headerMap)
             {
@@ -46,11 +42,13 @@ namespace NSL.RestExtensions
 
             return client;
         }
+        protected abstract TClient CreateClient(string baseUrl, TimeSpan requestTimeout, HttpClientHandler handler);
 
         public void FreeClient(HttpClient client, HttpResponseMessage response = null)
         {
             response?.Dispose();
             client.Dispose();
+
             locker.Release();
         }
 

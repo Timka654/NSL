@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Concurrent;
 using UnityEngine;
 
@@ -10,6 +11,13 @@ namespace NSL.SocketClient.Unity
 
         private static Action temp;
 
+        private static ThreadHelper Instance;
+
+        void Start()
+        {
+            Instance = this;
+        }
+
         public static void InvokeOnMain(Action action)
         {
             mainThreadActions.Enqueue(action);
@@ -18,6 +26,11 @@ namespace NSL.SocketClient.Unity
         public void FixedUpdate()
         {
             InvokeQueue();
+        }
+
+        public static void StartCoroutine(IEnumerator enumerator)
+        {
+            ((MonoBehaviour)Instance).StartCoroutine(enumerator);
         }
 
         public static void InvokeQueue()

@@ -5,9 +5,9 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NSL.RestExtensions.ResponseReaders
+namespace NSL.RestExtensions.RESTContentProcessors
 {
-    public class JsonSerializeRestResponseReader : IRestResponseReader
+    public class JsonSerializeRestContentProcessor : IRestContentProcessor
     {
         public virtual async Task<TValue> GetContent<TValue>(HttpResponseMessage message, HttpContent value)
         {
@@ -21,6 +21,11 @@ namespace NSL.RestExtensions.ResponseReaders
             var body = await message.Content.ReadAsStringAsync();
 
             return JsonConvert.DeserializeObject<Dictionary<string, List<string>>>(body);
+        }
+
+        public virtual void SetContent<TValue>(HttpRequestMessage message, TValue value, Encoding textEncoding = null)
+        {
+            message.Content = new StringContent(JsonConvert.SerializeObject(value), textEncoding ?? Encoding.UTF8);
         }
     }
 }
