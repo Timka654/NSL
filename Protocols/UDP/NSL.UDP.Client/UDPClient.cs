@@ -86,7 +86,7 @@ namespace NSL.UDP.Client
 
         protected override void AddWaitPacket(byte[] buffer, int offset, int length) => Data?.AddWaitPacket(buffer, offset, length);
 
-        ConcurrentDictionary<ushort, PacketTemp> packetBuffer = new();
+        ConcurrentDictionary<ushort, PacketTemp> packetBuffer = new ConcurrentDictionary<ushort, PacketTemp>();
 
         private static ushort ReadPID(Memory<byte> buffer) => BitConverter.ToUInt16(buffer.Span[1..]);
         private static bool ReadLP(Memory<byte> buffer) => buffer.Span[0] == 1;

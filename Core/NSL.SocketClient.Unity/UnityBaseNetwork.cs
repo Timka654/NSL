@@ -32,7 +32,7 @@ namespace NSL.SocketClient.Unity
             ReceiveBufferSize = 81960
         };
 
-        public UnityClient<T> NetworkClient { get; private set; }
+        public UnityTCPClient<T> NetworkClient { get; private set; }
 
         protected virtual async void Awake()
         {
@@ -59,7 +59,7 @@ namespace NSL.SocketClient.Unity
 
             LoadOptions();
 
-            NetworkClient = new UnityClient<T>(SocketOptions);
+            NetworkClient = new UnityTCPClient<T>(SocketOptions);
 
             NetworkClient.Version = Version;
 

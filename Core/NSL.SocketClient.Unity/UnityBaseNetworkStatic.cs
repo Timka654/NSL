@@ -11,7 +11,7 @@ namespace NSL.SocketClient.Unity
 
         public new static UnityClientOptions<T> SocketOptions => ((UnityBaseNetwork<T>)Instance).SocketOptions;
 
-        public new static UnityClient<T> NetworkClient => ((UnityBaseNetwork<T>)Instance).NetworkClient;
+        public new static UnityTCPClient<T> NetworkClient => ((UnityBaseNetwork<T>)Instance).NetworkClient;
 
 
         public new static event CoreOptions<T>.ExceptionHandle OnExtensionEvent

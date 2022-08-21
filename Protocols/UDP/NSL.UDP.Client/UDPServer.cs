@@ -24,7 +24,7 @@ namespace NSL.UDP.Client
             StopReceive();
         }
 
-        private ConcurrentDictionary<IPEndPoint, UDPClient<TClient>> clients = new();
+        private ConcurrentDictionary<IPEndPoint, UDPClient<TClient>> clients = new ConcurrentDictionary<IPEndPoint, UDPClient<TClient>>();
 
         protected override void Options_OnClientDisconnectEvent(TClient client)
         {
