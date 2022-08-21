@@ -3,14 +3,15 @@ using NSL.SocketClient.Utils.SystemPackets;
 using NSL.SocketCore.Utils;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Net;
 using System.Net.Sockets;
+using System.Net.WebSockets;
+using System.Text;
 
-namespace NSL.TCP.Client
+namespace NSL.WebSockets.Client
 {
-    /// <summary>
-    /// Класс обработки клиента
-    /// </summary>
-    public class TCPClient<T> : BaseTcpClient<T, TCPClient<T>>
+    public class WSClient<T> : BaseWSClient<T, WSClient<T>>
         where T : BaseSocketNetworkClient, new()
     {
         public long Version { get; set; }
@@ -21,7 +22,7 @@ namespace NSL.TCP.Client
         /// Инициализация прослушивания клиента
         /// </summary>
         /// <param name="options">общие настройки сервера</param>
-        public TCPClient(ClientOptions<T> options) : base()
+        public WSClient(ClientOptions<T> options) : base()
         {
             //установка переменной с общими настройками сервера
             this.options = options;
@@ -31,8 +32,20 @@ namespace NSL.TCP.Client
         /// Запуск цикла приема пакетов
         /// </summary>
         /// <param name="client">клиент</param>
-        public void Reconnect(Socket client)
+        public void Reconnect(WebSocket client, Uri endPoint)
         {
+            if (!IPAddress.TryParse(endPoint.Host, out var ip))
+            {
+                var dns = Dns.GetHostAddresses(endPoint.Host);
+
+                if (dns.Any())
+                    ip = dns.First();
+                else
+                    ip = IPAddress.None;
+            }
+
+            remoteEndPoint = new IPEndPoint(ip, endPoint.Port);
+
             disconnected = false;
             string[] keys = ConnectionOptions.ClientData?.RecoverySessionKeyArray;
             IEnumerable<byte[]> waitBuffer = ConnectionOptions.ClientData?.GetWaitPackets();
@@ -58,11 +71,6 @@ namespace NSL.TCP.Client
             //установка криптографии для шифровки исходящих данных, указана в общих настройках сервера
             this.outputCipher = ConnectionOptions.OutputCipher.CreateEntry();
 
-            //Bug fix, в системе Windows это значение берется из реестра, мы не сможем принять больше за раз чем прописанно в нем, если данных будет больше, то цикл зависнет
-            sclient.ReceiveBufferSize = ConnectionOptions.ReceiveBufferSize;
-
-            //Bug fix, отключение буфферизации пакетов для уменьшения трафика, если не отключить то получим фризы, в случае с игровым соединением эту опцию обычно нужно отключать
-            sclient.NoDelay = true;
             _sendLocker.Set();
 
             RunReceive();
@@ -92,6 +100,13 @@ namespace NSL.TCP.Client
             ConnectionOptions.ClientData?.AddWaitPacket(buffer, offset, length);
         }
 
-        protected override TCPClient<T> GetParent() => this;
+        protected override WSClient<T> GetParent() => this;
+
+        private IPEndPoint remoteEndPoint;
+
+        public override IPEndPoint GetRemotePoint()
+        {
+            return remoteEndPoint;
+        }
     }
 }

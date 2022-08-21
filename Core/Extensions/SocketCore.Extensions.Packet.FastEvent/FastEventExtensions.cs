@@ -64,7 +64,7 @@ namespace NSL.SocketCore.Extensions.Packet.FastEvent
                     IPacket<TClient> packet = default;
 
                     if (method.attributes.type == null)
-                        packet = Activator.CreateInstance<EventPacket<TClient>>();
+                        packet = new EventPacket<TClient>();
                     else if (method.attributes.large)
                         packet = (IPacket<TClient>)Activator.CreateInstance(typeof(EventJson32Packet<,>).MakeGenericType(typeof(TClient), method.attributes.type));
                     else if (!method.attributes.large)
@@ -80,6 +80,7 @@ namespace NSL.SocketCore.Extensions.Packet.FastEvent
         public static int RegisterFastEventHandlesFromType<TClient, TAttribute, TObj>(this CoreOptions<TClient> options)
             where TClient : INetworkClient
             where TAttribute : FastEventMethodAttribute
+            where TObj : new()
         {
             return RegisterFastEventHandlesFromInstance<TClient, TAttribute, TObj>(options, default);
 
@@ -88,9 +89,10 @@ namespace NSL.SocketCore.Extensions.Packet.FastEvent
         public static int RegisterFastEventHandlesFromInstance<TClient, TAttribute, TObj>(this CoreOptions<TClient> options, TObj o)
             where TClient : INetworkClient
             where TAttribute : FastEventMethodAttribute
+            where TObj : new()
         {
             if (o == null)
-                o = Activator.CreateInstance<TObj>();
+                o = new TObj();
 
             var methods = typeof(TObj).GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).Select(x => new { x, attribute = x.GetCustomAttribute<TAttribute>() }).Where(x => x.attribute != null).ToArray();
 

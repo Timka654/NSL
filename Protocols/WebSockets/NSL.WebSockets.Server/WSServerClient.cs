@@ -2,14 +2,15 @@
 using NSL.SocketServer;
 using NSL.SocketServer.Utils;
 using System;
+using System.Collections.Generic;
+using System.Net;
 using System.Net.Sockets;
+using System.Net.WebSockets;
+using System.Text;
 
-namespace NSL.TCP.Server
+namespace NSL.WebSockets.Server
 {
-    /// <summary>
-    /// Класс обработки клиента
-    /// </summary>
-    public class TCPServerClient<T> : BaseTcpClient<T, TCPServerClient<T>>
+    public class WSServerClient<T> : BaseWSClient<T, WSServerClient<T>>
         where T : IServerNetworkClient, new()
     {
         private T Data { get; set; }
@@ -20,7 +21,7 @@ namespace NSL.TCP.Server
         public ServerOptions<T> ServerOptions => (ServerOptions<T>)base.options;
 
 
-        protected TCPServerClient()
+        protected WSServerClient()
         {
 
         }
@@ -30,12 +31,15 @@ namespace NSL.TCP.Server
         /// </summary>
         /// <param name="client">клиент</param>
         /// <param name="options">общие настройки сервера</param>
-        public TCPServerClient(Socket client, ServerOptions<T> options) : base()
+        public WSServerClient(HttpListenerContext client, ServerOptions<T> options) : base()
         {
+            if (!client.Request.IsWebSocketRequest)
+                throw new Exception($"{client.Request.UserHostAddress} is not WebSocket request");
+
             Initialize(client, options);
         }
 
-        protected void Initialize(Socket client, ServerOptions<T> options)
+        protected void Initialize(HttpListenerContext context, ServerOptions<T> options)
         {
             Data = new T();
 
@@ -47,7 +51,8 @@ namespace NSL.TCP.Server
             Data.ServerOptions = options;
 
             //установка переменной содержащую поток клиента
-            sclient = client;
+
+            base.context = context;
 
             //установка массива для приема данных, размер указан в общих настройках сервера
             receiveBuffer = new byte[options.ReceiveBufferSize];
@@ -56,19 +61,25 @@ namespace NSL.TCP.Server
             //установка криптографии для шифровки исходящих данных, указана в общих настройках сервера
             outputCipher = options.OutputCipher.CreateEntry();
 
-            //Bug fix, в системе Windows это значение берется из реестра, мы не сможем принять больше за раз чем прописанно в нем, если данных будет больше, то цикл приема зависнет
-            sclient.ReceiveBufferSize = options.ReceiveBufferSize;
-
-            //Bug fix, отключение буфферизации пакетов для уменьшения трафика, если не отключить то получим фризы, в случае с игровым соединением эту опцию обычно нужно отключать
-            sclient.NoDelay = true;
-
             disconnected = false;
             //Начало приема пакетов от клиента
             options.RunClientConnect(Data);
         }
 
-        public void RunPacketReceiver() => RunReceive();
+        public async void RunPacketReceiver()
+        {
+            try
+            {
+                sclient = (await context.AcceptWebSocketAsync(null))?.WebSocket;
 
+                RunReceive();
+
+            }
+            catch (Exception)
+            {
+                Disconnect();
+            }
+        }
         public override void ChangeUserData(INetworkClient setClient)
         {
             if (setClient is T valid)
@@ -83,7 +94,7 @@ namespace NSL.TCP.Server
 
         public override object GetUserData() => Data;
 
-        protected override TCPServerClient<T> GetParent() => this;
+        protected override WSServerClient<T> GetParent() => this;
 
         protected override void AddWaitPacket(byte[] buffer, int offset, int length) => Data.AddWaitPacket(buffer, offset, length);
 

@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 namespace NSL.SocketClient.Unity
 {
     public class UnityBaseNetworkStatic<T> : UnityBaseNetwork<T>
-        where T : BaseSocketNetworkClient
+        where T : BaseSocketNetworkClient, new()
     {
         public static UnityBaseNetworkStatic<T> Instance { get; private set; }
 

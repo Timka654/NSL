@@ -12,7 +12,7 @@ namespace NSL.Extensions.DBEngine.Migrator
      * Entity Framework курильщика
     */
     public class MigrationManager<T, TSelectAttribute>
-        where T : DbConnection
+        where T : DbConnection, new()
         where TSelectAttribute : DBAutoMigrationAttribute
     {
         private static DbConnectionPool<T> connPool;
@@ -34,9 +34,10 @@ namespace NSL.Extensions.DBEngine.Migrator
             }
         }
 
-        private static void UpdateDbGenericConfig<TQ>() // where TQ : DBIdentityEntity
+        private static void UpdateDbGenericConfig<TQ>()
+            where TQ : new()// where TQ : DBIdentityEntity
         {
-            var inst = Activator.CreateInstance<TQ>();
+            var inst = new TQ();
 
             var type = MigrationTypeInfo.LoadType(typeof(TQ), inst is DBDataEntity dde ? dde.GetData() : new List<TQ>());
             MigrationTypeInfo.FillIds(type);

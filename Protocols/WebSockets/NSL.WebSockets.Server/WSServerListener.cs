@@ -1,21 +1,23 @@
 ﻿using NSL.SocketCore;
-using NSL.SocketServer;
 using NSL.SocketServer.Utils;
+using NSL.SocketServer;
 using System;
-using System.Net;
+using System.Collections.Generic;
 using System.Net.Sockets;
+using System.Net;
+using System.Text;
 
-namespace NSL.TCP.Server
+namespace NSL.WebSockets.Server
 {
-    public class TCPServerListener<T> : INetworkListener<T>
+    public class WSServerListener<T> : INetworkListener<T>
         where T : IServerNetworkClient, new()
     {
-        public event ReceivePacketDebugInfo<TCPServerClient<T>> OnReceivePacket;
-        public event SendPacketDebugInfo<TCPServerClient<T>> OnSendPacket;
+        public event ReceivePacketDebugInfo<WSServerClient<T>> OnReceivePacket;
+        public event SendPacketDebugInfo<WSServerClient<T>> OnSendPacket;
         /// <summary>
         /// Слушатель порта (сервер)
         /// </summary>
-        private Socket listener;
+        private HttpListener listener;
 
         private bool state;
 
@@ -27,13 +29,13 @@ namespace NSL.TCP.Server
         /// <summary>
         /// Настройки сервера
         /// </summary>
-        private ServerOptions<T> serverOptions;
+        private WSServerOptions<T> serverOptions;
 
         /// <summary>
         /// Инициализация сервера
         /// </summary>
         /// <param name="options">Настройки</param>
-        public TCPServerListener(ServerOptions<T> options)
+        public WSServerListener(WSServerOptions<T> options)
         {
             serverOptions = options;
         }
@@ -43,24 +45,16 @@ namespace NSL.TCP.Server
         /// </summary>
         private void Initialize()
         {
-            if (!IPAddress.TryParse(serverOptions.IpAddress, out var ip))
-                throw new ArgumentException($"invalid connection ip {serverOptions.IpAddress}", nameof(serverOptions.IpAddress));
-
-            if (serverOptions.AddressFamily == AddressFamily.Unspecified)
-                serverOptions.AddressFamily = ip.AddressFamily;
-
-            if (serverOptions.ProtocolType == ProtocolType.Unspecified)
-                serverOptions.ProtocolType = ProtocolType.Tcp;
-
             //Иницализация сокета, установка семейства адрессов, поточного сокета, протокола приема данных
-            listener = new Socket(serverOptions.AddressFamily, SocketType.Stream, serverOptions.ProtocolType);
+            listener = new HttpListener();
             //Инициализация прослушивания на определенном адресе адаптера, порте
-            listener.Bind(new IPEndPoint(IPAddress.Parse(serverOptions.IpAddress), serverOptions.Port));
 
-            serverOptions.Port = listener.LocalEndPoint is IPEndPoint ipep ? ipep.Port : serverOptions.Port;
+            foreach (var endPoint in serverOptions.EndPoints)
+            {
+                listener.Prefixes.Add(endPoint);
+            }
 
-            // Запуск прослушивания
-            listener.Listen(serverOptions.Backlog);
+            listener.Start();
         }
 
         /// <summary>
@@ -74,7 +68,7 @@ namespace NSL.TCP.Server
             //инициализация прослушивания
             Initialize();
             //Запуск ожидания приема клиентов
-            listener.BeginAccept(Accept, listener);
+            listener.BeginGetContext(Accept, listener);
             // установка статуса сервер = вкл
             state = true;
         }
@@ -90,7 +84,6 @@ namespace NSL.TCP.Server
             {
                 //Закрытие и уничножения слушателя
                 listener.Close();
-                listener.Dispose();
             }
             catch (Exception ex)
             {
@@ -110,15 +103,15 @@ namespace NSL.TCP.Server
                 return;
 
             //клиент
-            Socket client = null;
+            HttpListenerContext client = null;
 
             try
             {
                 //получения ожидающего подключения
-                client = listener.EndAccept(result);
+                client = listener.EndGetContext(result);
                 //инициализация слушателя клиента клиента
                 //#if DEBUG
-                var c = new TCPServerClient<T>(client, serverOptions);
+                var c = new WSServerClient<T>(client, serverOptions);
                 c.OnReceivePacket += OnReceivePacket;
                 c.OnSendPacket += OnSendPacket;
                 c.RunPacketReceiver();
@@ -131,10 +124,10 @@ namespace NSL.TCP.Server
                 serverOptions.RunException(ex, null);
             }
             //продолжаем принимать запросы
-            listener.BeginAccept(Accept, listener);
+            listener.BeginGetContext(Accept, listener);
         }
 
-        public int GetListenerPort() => serverOptions.Port;
+        public int GetListenerPort() => 0;
 
         public void Start() => Run();
 

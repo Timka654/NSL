@@ -23,7 +23,7 @@
 	  <ProjectReference Include="..\..\..\..\Core\NSL.SocketClient\NSL.SocketClient.csproj" />
 	  <ProjectReference Include="..\..\..\..\Core\NSL.SocketCore\NSL.SocketCore.csproj" />
 	  <ProjectReference Include="..\..\..\..\Core\Utils\NSL.Utils\NSL.Utils.csproj" />
-	  <ProjectReference Include="..\..\..\..\Protocols\TCP\NSL.TCP.Client\NSL.TCP.Client.csproj" />
+	  <ProjectReference Include="..\..\..\..\Protocols\WebSockets\NSL.WebSockets.Client\NSL.WebSockets.Client.csproj" />
 	  <ProjectReference Include="..\NSL.SocketPhantom\NSL.SocketPhantom.csproj" />
 	</ItemGroup>
 

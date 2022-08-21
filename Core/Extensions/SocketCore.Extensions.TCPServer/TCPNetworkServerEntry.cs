@@ -10,8 +10,8 @@ using System.Net;
 namespace NSL.SocketCore.Extensions.TCPServer
 {
     public class TCPNetworkServerEntry<T, CType> : BasicNetworkEntry<T, CType,ServerOptions<T>>
-        where T : IServerNetworkClient
-        where CType : TCPNetworkServerEntry<T,CType>
+        where T : IServerNetworkClient, new()
+        where CType : TCPNetworkServerEntry<T,CType>, new()
     {
         /// <summary>
         /// Слушатель подключений

@@ -9,14 +9,14 @@ namespace NSL.ServerOptions.Extensions
 {
     public class BasicNetworkEntry<T, CType, OType>
         where T : INetworkClient
-        where CType : BasicNetworkEntry<T, CType, OType>
+        where CType : BasicNetworkEntry<T, CType, OType>, new()
         where OType : CoreOptions<T>, new()
     {
         /// <summary>
         /// Инстанс singleton обьекта
         /// По умолчанию всегда инициализирован
         /// </summary>
-        public static CType Instance { get; private set; } = Activator.CreateInstance<CType>();
+        public static CType Instance { get; private set; } = new CType();
 
         /// <summary>
         /// Глобальные настройки сервера
@@ -169,7 +169,7 @@ namespace NSL.ServerOptions.Extensions
         {
             try
             {
-                Logger?.Append(LoggerLevel.Error, $"{ServerName} socket Error ({client?.Network?.GetSocket()?.RemoteEndPoint}) - {ex.ToString()}");
+                Logger?.Append(LoggerLevel.Error, $"{ServerName} socket Error ({client?.Network?.GetRemotePoint()}) - {ex.ToString()}");
             }
             catch
             {

@@ -16,12 +16,12 @@ namespace NSL.SocketCore
         /// <summary>
         /// Тип ип адресса, InterNetwork - IPv4, InterNetworkV6 - IPv6б по умолчанию AddressFamily.Unspecified - определяется автоматически
         /// </summary>
-        public AddressFamily AddressFamily { get; set; } = AddressFamily.Unspecified;
+        public virtual AddressFamily AddressFamily { get; set; } = AddressFamily.Unspecified;
 
         /// <summary>
         /// Протокол для передачи данных, по умолчанию ProtocolType.Unspecified - определяется автоматически
         /// </summary>
-        public ProtocolType ProtocolType { get; set; } = ProtocolType.Unspecified;
+        public virtual ProtocolType ProtocolType { get; set; } = ProtocolType.Unspecified;
 
         ///// <summary>
         ///// Ип адресс - используется для инициализации сервера на определенном адаптере (0.0.0.0 - для всех), или для подключения к серверу

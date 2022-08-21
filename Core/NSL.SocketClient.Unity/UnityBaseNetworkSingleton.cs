@@ -3,7 +3,8 @@ using UnityEngine;
 
 namespace NSL.SocketClient.Unity
 {
-    public class UnityBaseNetworkSingleton<T, TType> : UnityBaseNetwork<T> where T : BaseSocketNetworkClient
+    public class UnityBaseNetworkSingleton<T, TType> : UnityBaseNetwork<T> 
+        where T : BaseSocketNetworkClient, new()
         where TType : MonoBehaviour
     {
         #region Singletone

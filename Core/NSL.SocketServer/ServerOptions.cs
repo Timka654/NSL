@@ -38,12 +38,12 @@ namespace NSL.SocketServer
         /// <summary>
         /// Ип адресс - используется для инициализации слушателя на определенном адаптере (0.0.0.0 - для всех)
         /// </summary>
-        public string IpAddress { get; set; }
+        public virtual string IpAddress { get; set; }
 
         /// <summary>
         /// Порт - используется для инициализации слушателя на определенном порту 1 - 65,535
         /// </summary>
-        public int Port { get; set; }
+        public virtual int Port { get; set; }
 
         public IPAddress GetIPAddress() => IPAddress.Parse(IpAddress);
 

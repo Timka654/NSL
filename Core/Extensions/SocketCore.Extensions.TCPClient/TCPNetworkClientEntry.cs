@@ -10,8 +10,8 @@ using System.Threading.Tasks;
 namespace NSL.SocketCore.Extensions.TCPClient
 {
     public class TCPNetworkClientEntry<T, CType> : BasicNetworkEntry<T, CType, ClientOptions<T>>
-        where T : BaseSocketNetworkClient
-        where CType : TCPNetworkClientEntry<T, CType>
+        where T : BaseSocketNetworkClient, new()
+        where CType : TCPNetworkClientEntry<T, CType>, new()
     {
         /// <summary>
         /// Слушатель подключений

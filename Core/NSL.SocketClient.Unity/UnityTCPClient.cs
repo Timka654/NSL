@@ -3,7 +3,8 @@ using NSL.SocketCore.Utils.Buffer;
 
 namespace NSL.SocketClient.Unity
 {
-    public class UnityTCPClient<TClient> : TCPNetworkClient<TClient, UnityClientOptions<TClient>> where TClient : BaseSocketNetworkClient
+    public class UnityTCPClient<TClient> : TCPNetworkClient<TClient, UnityClientOptions<TClient>> 
+        where TClient : BaseSocketNetworkClient, new()
     {
         public UnityTCPClient(UnityClientOptions<TClient> options)
             : base(options)

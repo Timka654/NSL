@@ -21,7 +21,7 @@ namespace NSL.Extensions.DBEngine
     /// Пул подключений к базе данных
     /// </summary>
     /// <typeparam name="T">Тип подключения</typeparam>
-    public class DbConnectionPool<T> : DbConnectionPool where T : DbConnection
+    public class DbConnectionPool<T> : DbConnectionPool where T : DbConnection, new()
     {
         /// <summary>
         /// Событие генерируемое при возникновении ошибок
@@ -109,7 +109,7 @@ namespace NSL.Extensions.DBEngine
         {
             try
             {
-                    CreateConnection();
+                CreateConnection();
 
                 return true;
             }
@@ -220,7 +220,7 @@ namespace NSL.Extensions.DBEngine
 
         private void CreateConnection()
         {
-            T connection = Activator.CreateInstance<T>();
+            T connection = new T();
 
             connection.ConnectionString = ConnectionOptions.ConnectionString;
             connection.Open();
@@ -233,7 +233,7 @@ namespace NSL.Extensions.DBEngine
 
         private async Task CreateConnectionAsync()
         {
-            T connection = Activator.CreateInstance<T>();
+            T connection = new T();
 
             connection.ConnectionString = ConnectionOptions.ConnectionString;
             await connection.OpenAsync();

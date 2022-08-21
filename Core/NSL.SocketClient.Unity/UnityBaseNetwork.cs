@@ -7,7 +7,7 @@ using UnityEngine;
 namespace NSL.SocketClient.Unity
 {
     public class UnityBaseNetwork<T> : MonoBehaviour
-        where T : BaseSocketNetworkClient
+        where T : BaseSocketNetworkClient, new()
     {
         protected virtual string ClientType { get; }
 

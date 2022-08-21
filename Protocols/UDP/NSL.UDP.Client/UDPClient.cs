@@ -10,7 +10,7 @@ using System.Net.Sockets;
 namespace NSL.UDP.Client
 {
     public class UDPClient<T> : BaseUDPClient<T, UDPClient<T>>
-        where T : IServerNetworkClient
+        where T : IServerNetworkClient, new()
     {
         private class PacketTemp
         {
@@ -48,7 +48,7 @@ namespace NSL.UDP.Client
         {
             PacketHandles = options.GetHandleMap();
 
-            Data = Activator.CreateInstance<T>();
+            Data = new T();
 
             //обзятельная переменная в NetworkClient, для отправки данных, можно использовать привидения типов (Client)NetworkClient но это никому не поможет
             Data.Network = this;
