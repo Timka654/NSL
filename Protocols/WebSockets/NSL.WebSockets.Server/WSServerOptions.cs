@@ -14,26 +14,32 @@ namespace NSL.WebSockets.Server
     {
         public override AddressFamily AddressFamily
         {
-            get => throw new InvalidOperationException($"{nameof(AddressFamily)} not support for {nameof(WSServerOptions<TClient>)}");
-            set => throw new InvalidOperationException($"{nameof(AddressFamily)} not need for {nameof(WSServerOptions<TClient>)}");
+            get => throw new InvalidOperationException($"Property {nameof(AddressFamily)} not support for {nameof(WSServerOptions<TClient>)}");
+            set => throw new InvalidOperationException($"Property {nameof(AddressFamily)} not need for {nameof(WSServerOptions<TClient>)}");
         }
 
         public override ProtocolType ProtocolType
         {
-            get => throw new InvalidOperationException($"{nameof(ProtocolType)} not support for {nameof(WSServerOptions<TClient>)}");
-            set => throw new InvalidOperationException($"{nameof(ProtocolType)} not need for {nameof(WSServerOptions<TClient>)}");
+            get => throw new InvalidOperationException($"Property {nameof(ProtocolType)} not support for {nameof(WSServerOptions<TClient>)}");
+            set => throw new InvalidOperationException($"Property  {nameof(ProtocolType)} not need for {nameof(WSServerOptions<TClient>)}");
         }
 
         public override string IpAddress
         {
-            get => throw new InvalidOperationException($"{nameof(IpAddress)} not support for {nameof(WSServerOptions<TClient>)} use {nameof(EndPoints)}");
-            set => throw new InvalidOperationException($"{nameof(IpAddress)} not need for {nameof(WSServerOptions<TClient>)} use {nameof(EndPoints)}");
+            get => throw new InvalidOperationException($"Property {nameof(IpAddress)} not support for {nameof(WSServerOptions<TClient>)} use {nameof(EndPoints)}");
+            set => throw new InvalidOperationException($"Property {nameof(IpAddress)} not need for {nameof(WSServerOptions<TClient>)} use {nameof(EndPoints)}");
         }
 
         public override int Port
         {
-            get => throw new InvalidOperationException($"{nameof(Port)} not support for {nameof(WSServerOptions<TClient>)} use {nameof(EndPoints)}");
-            set => throw new InvalidOperationException($"{nameof(Port)} not need for {nameof(WSServerOptions<TClient>)} use {nameof(EndPoints)}");
+            get => throw new InvalidOperationException($"Property {nameof(Port)} not support for {nameof(WSServerOptions<TClient>)} use {nameof(EndPoints)}");
+            set => throw new InvalidOperationException($"Property {nameof(Port)} not need for {nameof(WSServerOptions<TClient>)} use {nameof(EndPoints)}");
+        }
+
+        public override int Backlog
+        {
+            get => throw new InvalidOperationException($"Property {nameof(Backlog)} not support for {nameof(WSServerOptions<TClient>)}");
+            set => throw new InvalidOperationException($"Property {nameof(Backlog)} not need for {nameof(WSServerOptions<TClient>)}");
         }
 
         /// <summary>

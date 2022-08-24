@@ -1,6 +1,6 @@
 ﻿using NSL.SocketClient;
-using NSL.TCP.Client;
 using NSL.SocketPhantom.Unity.Network.Packets;
+using NSL.TCP.Client;
 using System;
 using System.Linq;
 using System.Net;

@@ -6,7 +6,7 @@ using System.Text;
 
 namespace NSL.WebSockets.Client
 {
-    internal class WSClientOptions<TClient> : ClientOptions<TClient>
+    public class WSClientOptions<TClient> : ClientOptions<TClient>
         where TClient : BaseSocketNetworkClient
     {
         public override AddressFamily AddressFamily

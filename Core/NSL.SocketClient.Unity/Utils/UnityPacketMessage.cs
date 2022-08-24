@@ -1,9 +1,12 @@
-﻿namespace NSL.SocketClient.Unity.Utils
+﻿using NSL.SocketClient.Utils;
+using NSL.Utils.Unity;
+
+namespace NSL.SocketClient.Unity.Utils
 {
-    public class UnityPacketMessage<TClient, RDType> : NSL.SocketClient.Utils.IPacketMessage<TClient,RDType>
+    public class IUnityPacketMessage<TClient, RDType> : IPacketMessage<TClient,RDType>
         where TClient : BaseSocketNetworkClient
     {
-        public UnityPacketMessage(UnityClientOptions<TClient> options) : base(options)
+        public IUnityPacketMessage(ClientOptions<TClient> options) : base(options)
         {
         }
 
@@ -13,10 +16,10 @@
         }
     }
 
-    public class UnityPacketMessage<TClient> : NSL.SocketClient.Utils.IPacketMessage<TClient>
+    public class IUnityPacketMessage<TClient> : IPacketMessage<TClient>
         where TClient : BaseSocketNetworkClient
     {
-        public UnityPacketMessage(UnityClientOptions<TClient> options) : base(options)
+        public IUnityPacketMessage(ClientOptions<TClient> options) : base(options)
         {
         }
 

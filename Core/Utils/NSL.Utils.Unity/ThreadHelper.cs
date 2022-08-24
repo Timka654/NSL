@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Concurrent;
 using UnityEngine;
 
-namespace NSL.SocketClient.Unity
+namespace NSL.Utils.Unity
 {
     public class ThreadHelper : MonoBehaviour
     {

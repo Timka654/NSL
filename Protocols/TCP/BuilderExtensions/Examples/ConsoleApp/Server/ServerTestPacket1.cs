@@ -1,0 +1,44 @@
+﻿using NSL.SocketCore.Utils.Buffer;
+using NSL.SocketCore.Utils;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace ConsoleApp.Server
+{
+    public class ServerTestPacket1 : IPacket<TCPServerNetworkClient>
+    {
+        public override void Receive(TCPServerNetworkClient client, InputPacketBuffer data)
+        {
+            var str = data.ReadString16();
+
+            Console.WriteLine($"[Server]receive from {nameof(ServerTestPacket1)} - {str}");
+
+            var pkt = new OutputPacketBuffer();
+
+            pkt.PacketId = 1;
+
+            pkt.WriteString16(str);
+
+            client.Send(pkt);
+
+            pkt = new OutputPacketBuffer();
+
+            pkt.PacketId = 2;
+
+            pkt.WriteString16(str);
+
+            client.Send(pkt);
+
+            pkt = new OutputPacketBuffer();
+
+            pkt.PacketId = 3;
+
+            pkt.WriteString16(str);
+
+            client.Send(pkt);
+        }
+    }
+}

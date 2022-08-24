@@ -10,7 +10,7 @@ using System.Net.WebSockets;
 
 namespace NSL.WebSockets.Client
 {
-    internal class WSNetworkClient<T, TOptions> : WSClient<T>
+    public class WSNetworkClient<T, TOptions> : WSClient<T>
         where T : BaseSocketNetworkClient, new()
         where TOptions : WSClientOptions<T>
     {

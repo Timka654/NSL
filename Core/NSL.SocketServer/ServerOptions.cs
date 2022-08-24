@@ -15,7 +15,7 @@ namespace NSL.SocketServer
         /// <summary>
         /// Длина очереди для приема подключения
         /// </summary>
-        public int Backlog { get; set; }
+        public virtual int Backlog { get; set; }
 
         #endregion
 

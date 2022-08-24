@@ -9,8 +9,8 @@
 	  <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
 	  <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
 	  
-	  <Version>$(VersionSuffix)</Version>
 	  <Authors>Relife87</Authors>
+	  <Version>$(VersionSuffix)</Version>
   </PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)'=='Debug'">

@@ -1,0 +1,45 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<Configurations>Debug;Release;Unity;UnityDebug;</Configurations>
+
+		<PublishRepositoryUrl>true</PublishRepositoryUrl>
+		<EmbedUntrackedSources>true</EmbedUntrackedSources>
+		<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+		<GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
+
+		<Authors>Relife87</Authors>
+		<Version>$(VersionSuffix)</Version>
+
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)'=='Debug'">
+		<PackageId>$(MSBuildProjectName)_Debug</PackageId>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)'=='UnityDebug'">
+		<AssemblyName>Unity.$(MSBuildProjectName)</AssemblyName>
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<DefineConstants>DEBUG;TRACE</DefineConstants>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)'=='Unity'">
+		<AssemblyName>Unity.$(MSBuildProjectName)</AssemblyName>
+		<TargetFramework>netstandard2.0</TargetFramework>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\Extensions\SocketCore.Extensions.Packet\NSL.SocketCore.Extensions.Packet.csproj" />
+		<ProjectReference Include="..\..\NSL.SocketClient\NSL.SocketClient.csproj" />
+		<ProjectReference Include="..\..\Utils\NSL.Utils.Unity\NSL.Utils.Unity.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Reference Include="UnityEngine">
+	    <HintPath>..\..\..\Reference\UnityEngine.dll</HintPath>
+	  </Reference>
+	</ItemGroup>
+
+</Project>

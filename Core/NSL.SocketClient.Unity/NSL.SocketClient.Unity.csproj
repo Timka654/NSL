@@ -34,8 +34,8 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\..\Base\NSL.Cipher\NSL.Cipher.csproj" />
-		<ProjectReference Include="..\..\Protocols\TCP\NSL.TCP.Client\NSL.TCP.Client.csproj" />
 		<ProjectReference Include="..\NSL.SocketClient\NSL.SocketClient.csproj" />
+		<ProjectReference Include="..\Utils\NSL.Utils.Unity\NSL.Utils.Unity.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

@@ -30,6 +30,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <ProjectReference Include="..\NSL.EndPointBuilder\NSL.EndPointBuilder.csproj" />
 	  <ProjectReference Include="..\NSL.SocketCore\NSL.SocketCore.csproj" />
 	</ItemGroup>
 

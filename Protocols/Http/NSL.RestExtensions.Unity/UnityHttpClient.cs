@@ -1,4 +1,4 @@
-﻿using NSL.SocketClient.Unity;
+﻿using NSL.Utils.Unity;
 using System;
 using System.Collections;
 using System.Collections.Generic;

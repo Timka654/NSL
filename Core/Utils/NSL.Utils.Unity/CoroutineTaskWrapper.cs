@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using UnityEngine;
 
-namespace NSL.SocketClient.Unity
+namespace NSL.Utils.Unity
 {
     public static class CoroutineTaskWrapper
     {
