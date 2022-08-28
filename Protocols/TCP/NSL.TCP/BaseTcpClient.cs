@@ -193,7 +193,7 @@ namespace NSL.TCP
             OnSend(packet, "");
 #endif
 
-            Send(packet.CompilePacket(), 0, packet.PacketLenght);
+            packet.Send(this);
         }
 
         protected AutoResetEvent _sendLocker = new AutoResetEvent(true);

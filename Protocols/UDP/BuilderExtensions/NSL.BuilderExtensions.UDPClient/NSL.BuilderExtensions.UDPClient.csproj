@@ -28,4 +28,8 @@
 		<TargetFramework>netstandard2.1</TargetFramework>
 	</PropertyGroup>
 
+	<ItemGroup>
+	  <ProjectReference Include="..\NSL.BuilderExtensions.UDP\NSL.BuilderExtensions.UDP.csproj" />
+	</ItemGroup>
+
 </Project>

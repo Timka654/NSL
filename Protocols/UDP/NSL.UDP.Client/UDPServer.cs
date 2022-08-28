@@ -7,10 +7,14 @@ using System.Net.Sockets;
 
 namespace NSL.UDP.Client
 {
-    public class UDPServer<TClient> : UDPListener<TClient>, INetworkListener
+    public class UDPServer<TClient> : UDPListener<TClient, UDPServerOptions<TClient>>, INetworkListener
         where TClient : IServerNetworkClient, new()
     {
-        public UDPServer(UDPOptions<TClient> options) : base(options)
+        public event ReceivePacketDebugInfo<UDPClient<TClient>> OnReceivePacket;
+
+        public event SendPacketDebugInfo<UDPClient<TClient>> OnSendPacket;
+
+        public UDPServer(UDPServerOptions<TClient> options) : base(options)
         {
         }
 
@@ -34,12 +38,20 @@ namespace NSL.UDP.Client
 
         protected override void Args_Completed(object sender, SocketAsyncEventArgs e)
         {
-            if (!state)
+            if (!state || ListenerCTS.IsCancellationRequested)
                 return;
 
-            RunReceiveAsync();
+            RunReceiveAsync(ListenerCTS.Token);
 
-            clients.GetOrAdd(e.RemoteEndPoint as IPEndPoint, ipep => new UDPClient<TClient>(ipep, listener, options)).Receive(e);
+            var c = clients.GetOrAdd(e.RemoteEndPoint as IPEndPoint, ipep =>
+            {
+                var client = new UDPClient<TClient>(ipep, listener, options);
+                client.OnReceivePacket += OnReceivePacket;
+                client.OnSendPacket += OnSendPacket;
+                return client;
+            });
+
+            c.Receive(e);
         }
 
         public int GetListenerPort() => options.BindingPort;

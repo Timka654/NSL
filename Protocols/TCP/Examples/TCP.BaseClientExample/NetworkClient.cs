@@ -1,5 +1,4 @@
-﻿using SocketClient;
-using SocketServer.Utils;
+﻿using NSL.SocketClient;
 using System;
 using System.Collections.Generic;
 using System.Linq;

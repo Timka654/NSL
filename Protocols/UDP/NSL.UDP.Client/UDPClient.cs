@@ -1,4 +1,5 @@
-﻿using NSL.SocketCore.Utils;
+﻿using NSL.SocketCore;
+using NSL.SocketCore.Utils;
 using NSL.SocketServer;
 using NSL.SocketServer.Utils;
 using System;
@@ -10,7 +11,7 @@ using System.Net.Sockets;
 namespace NSL.UDP.Client
 {
     public class UDPClient<T> : BaseUDPClient<T, UDPClient<T>>
-        where T : IServerNetworkClient, new()
+        where T : INetworkClient, new()
     {
         private class PacketTemp
         {
@@ -37,7 +38,7 @@ namespace NSL.UDP.Client
 
         private T Data { get; set; }
 
-        public UDPClient(IPEndPoint receivePoint, Socket listenerSocket, ServerOptions<T> options) : base(receivePoint, listenerSocket)
+        public UDPClient(IPEndPoint receivePoint, Socket listenerSocket, CoreOptions<T> options) : base(receivePoint, listenerSocket)
         {
             this.options = options;
 
@@ -52,7 +53,7 @@ namespace NSL.UDP.Client
 
             //обзятельная переменная в NetworkClient, для отправки данных, можно использовать привидения типов (Client)NetworkClient но это никому не поможет
             Data.Network = this;
-            Data.ServerOptions = options;
+            //Data.ServerOptions = options;
 
             //установка криптографии для дешифровки входящих данных, указана в общих настройках сервера
             inputCipher = options.InputCipher.CreateEntry();
@@ -63,11 +64,6 @@ namespace NSL.UDP.Client
             //Начало приема пакетов от клиента
             options.RunClientConnect(Data);
         }
-
-        /// <summary>
-        /// Общие настройки сервера
-        /// </summary>
-        public ServerOptions<T> ServerOptions => (ServerOptions<T>)base.options;
 
         public override void ChangeUserData(INetworkClient old_client_data)
         {
@@ -124,8 +120,8 @@ namespace NSL.UDP.Client
             base.OnReceive(pid, len);
         }
 
-        protected override void RunDisconnect() => ServerOptions.RunClientDisconnect(Data);
+        protected override void RunDisconnect() => base.options.RunClientDisconnect(Data);
 
-        protected override void RunException(Exception ex) => ServerOptions.RunException(ex, Data);
+        protected override void RunException(Exception ex) => base.options.RunException(ex, Data);
     }
 }

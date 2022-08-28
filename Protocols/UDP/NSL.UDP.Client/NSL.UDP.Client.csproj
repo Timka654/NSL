@@ -14,6 +14,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\..\..\Core\NSL.SocketClient\NSL.SocketClient.csproj" />
 		<ProjectReference Include="..\..\..\Core\NSL.SocketServer\NSL.SocketServer.csproj" />
 		<ProjectReference Include="..\NSL.UDP\NSL.UDP.csproj" />
 	</ItemGroup>

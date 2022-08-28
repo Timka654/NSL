@@ -32,6 +32,7 @@
 		<ProjectReference Include="..\..\..\..\Core\BuilderExtensions\NSL.BuilderExtensions.SocketCore\NSL.BuilderExtensions.SocketCore.csproj" />
 		<ProjectReference Include="..\..\..\..\Core\NSL.EndPointBuilder\NSL.EndPointBuilder.csproj" />
 		<ProjectReference Include="..\..\..\..\Core\Utils\NSL.Utils\NSL.Utils.csproj" />
+		<ProjectReference Include="..\..\NSL.UDP.Client\NSL.UDP.Client.csproj" />
 	</ItemGroup>
 
 </Project>

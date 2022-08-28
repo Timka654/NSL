@@ -154,8 +154,9 @@ namespace NSL.UDP
             OnSend(packet, "");
 #endif
 
-            Send(packet.CompilePacket(), 0, packet.PacketLenght);
+            packet.Send(this);
         }
+
         public void Send(OutputPacketBuffer packet)
         {
             if (!(packet is DgramPacket dpkg))

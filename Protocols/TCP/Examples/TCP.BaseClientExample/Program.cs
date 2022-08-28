@@ -1,6 +1,5 @@
-﻿using NSL.TCP.Client;
-using SocketClient;
-using SocketServer;
+﻿using NSL.SocketClient;
+using NSL.TCP.Client;
 using System;
 using TCPExample.Client;
 

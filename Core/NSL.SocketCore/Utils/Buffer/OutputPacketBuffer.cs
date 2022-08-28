@@ -343,5 +343,12 @@ namespace NSL.SocketCore.Utils.Buffer
 
             return arr;
         }
+
+        public void Send(IClient client)
+        {
+            var pktData = CompilePacket();
+
+            client.Send(pktData, 0, PacketLenght);
+        }
     }
 }

@@ -1,22 +1,26 @@
-﻿using NSL.SocketServer.Utils;
+﻿using NSL.SocketCore;
+using NSL.SocketCore.Utils;
+using NSL.SocketServer.Utils;
 using System;
 using System.Buffers;
 using System.Net;
 using System.Net.Sockets;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace NSL.UDP.Client
 {
-    public class UDPListener<TClient>
-        where TClient : IServerNetworkClient, new()
+    public class UDPListener<TClient, TOptions>
+        where TClient : INetworkClient, new()
+        where TOptions : CoreOptions<TClient>, IBindingUDPOptions
     {
-        protected readonly UDPOptions<TClient> options;
+        protected readonly TOptions options;
 
         protected bool state = false;
 
         protected Socket listener;
 
-        public UDPListener(UDPOptions<TClient> options)
+        public UDPListener(TOptions options)
         {
             this.options = options;
 
@@ -32,8 +36,13 @@ namespace NSL.UDP.Client
             if (state)
                 return;
 
-            if (!IPAddress.TryParse(options.IpAddress, out var ip))
-                throw new ArgumentException($"invalid connection ip {options.IpAddress}", nameof(options.IpAddress));
+            if (ListenerCTS != null)
+                ListenerCTS.Cancel();
+
+            ListenerCTS = new CancellationTokenSource();
+
+            if (!IPAddress.TryParse(options.BindingIP, out var ip))
+                throw new ArgumentException($"invalid connection ip {options.BindingIP}", nameof(options.BindingIP));
 
             if (options.AddressFamily == AddressFamily.Unspecified)
                 options.AddressFamily = ip.AddressFamily;
@@ -52,7 +61,7 @@ namespace NSL.UDP.Client
 
             for (int i = 0; i < 3; i++)
             {
-                RunReceiveAsync();
+                RunReceiveAsync(ListenerCTS.Token);
             }
 
             state = true;
@@ -65,15 +74,22 @@ namespace NSL.UDP.Client
 
             state = false;
 
+            ListenerCTS.Cancel();
+
             listener.Close();
             listener.Dispose();
             listener = null;
         }
 
-        protected async void RunReceiveAsync() => await Task.Run(RunReceive);
+        protected async void RunReceiveAsync(CancellationToken token) => await Task.Run(()=>RunReceive(token), token);
 
-        protected void RunReceive()
+        protected CancellationTokenSource ListenerCTS;
+
+        protected void RunReceive(CancellationToken token)
         {
+            if (token.IsCancellationRequested)
+                return;
+
             var poolMem = MemoryPool<byte>.Shared.Rent(options.ReceiveBufferSize);
 
             SocketAsyncEventArgs args = new SocketAsyncEventArgs();
@@ -87,6 +103,10 @@ namespace NSL.UDP.Client
             {
                 if (!listener.ReceiveFromAsync(args))
                     StopReceive();
+            }
+            catch (SocketException sex)
+            {
+                throw;
             }
             catch (Exception ex)
             {
