@@ -3,13 +3,13 @@
 	<PropertyGroup>
 		<Configurations>Debug;Release;Unity;UnityDebug;DebugStable</Configurations>
 		<OutputType>Library</OutputType>
-		<TargetFramework>net5.0</TargetFramework>
+		<TargetFramework>net6.0</TargetFramework>
 		<Version>$(VersionSuffix)</Version>
+		<IsPackable>false</IsPackable>
 	</PropertyGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\Cipher(NET.Standard)\Cipher.csproj" />
-		<ProjectReference Include="..\NSL.UDP.Client\NSL.UDP.Client.csproj" />
+	  <ProjectReference Include="..\..\NSL.UDP.Client\NSL.UDP.Client.csproj" />
 	</ItemGroup>
 
 </Project>

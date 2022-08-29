@@ -1,33 +1,37 @@
 ﻿using NSL.BuilderExtensions.SocketCore;
-using NSL.BuilderExtensions.WebSocketsClient;
+using NSL.BuilderExtensions.UDPClient;
 using NSL.SocketClient;
 using NSL.SocketCore.Utils.Buffer;
-using NSL.WebSockets.Client;
+using NSL.UDP;
+using NSL.UDP.Client;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Builder.WebSockets.BaseExample.Client
+namespace Builder.UDP.BaseExample.Client
 {
-    internal class TestWebSocketsClient
+    internal class TestUDPClient
     {
         static CancellationTokenSource cts;
 
-        static WSNetworkClient<WebSocketsNetworkClient, WSClientOptions<WebSocketsNetworkClient>> client;
+        static UDPNetworkClient<UDPTestNetworkClient> client;
+
+        static UDPClient<UDPTestNetworkClient> GetNetworkClient() => client.GetClient();
 
         public static async Task RunClient()
         {
-            client = WebSocketsClientEndPointBuilder
+            client = UDPClientEndPointBuilder
                 .Create()
-                .WithClientProcessor<WebSocketsNetworkClient>()
-                .WithOptions<WSClientOptions<WebSocketsNetworkClient>>()
-                .WithUrl(new Uri("ws://127.0.0.1:20006"))
+                .WithClientProcessor<UDPTestNetworkClient>()
+                .WithOptions<UDPClientOptions<UDPTestNetworkClient>>()
+                .UseBindingPoint("0.0.0.0",20005)
+                .UseEndPoint("127.0.0.1", 20006)
                 .WithCode(builder =>
                 {
                     // builder.WithAddressFamily(System.Net.Sockets.AddressFamily.InterNetwork); //optional(setted on initialize to valid)
-                    // builder.WithProtocolType(System.Net.Sockets.ProtocolType.WebSockets); //optional(setted on initialize to valid)
+                    // builder.WithProtocolType(System.Net.Sockets.ProtocolType.UDP); //optional(setted on initialize to valid)
                     builder.WithBufferSize(8192); //optional
                 })
                 .WithCode(builder =>
@@ -74,8 +78,7 @@ namespace Builder.WebSockets.BaseExample.Client
                 .Build();
 
 
-            if (!await client.ConnectAsync())
-                throw new Exception($"cannot connect to remote host!!");
+            client.Connect();
         }
 
         public static async Task RunTest()
@@ -84,13 +87,13 @@ namespace Builder.WebSockets.BaseExample.Client
 
             Console.WriteLine("write any text and press <Enter>:");
 
-            var forpacket1 = new OutputPacketBuffer();
+            var forpacket1 = new DgramPacket();
 
             forpacket1.PacketId = 1;
 
             forpacket1.WriteString16(Console.ReadLine());
 
-            client.Send(forpacket1);
+            client.GetClient().Send(forpacket1);
 
             await Task.Run(cts.Token.WaitHandle.WaitOne);
         }
@@ -98,7 +101,7 @@ namespace Builder.WebSockets.BaseExample.Client
         public static void Disconnect()
         {
 
-            client.Disconnect();
+            client.Connect();
         }
     }
 }

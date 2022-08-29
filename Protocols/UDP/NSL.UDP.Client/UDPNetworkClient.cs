@@ -34,6 +34,11 @@ namespace NSL.UDP.Client
             });
         }
 
+        public void Disconnect()
+        {
+            StopReceive();
+        }
+
         protected override void Args_Completed(object sender, SocketAsyncEventArgs e)
         {
             if (!state)

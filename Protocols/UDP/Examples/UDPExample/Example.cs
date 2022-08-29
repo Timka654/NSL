@@ -1,10 +1,10 @@
-﻿using Cipher;
+﻿using NSL.SocketClient;
+using NSL.SocketCore;
+using NSL.SocketCore.Utils;
+using NSL.SocketCore.Utils.Buffer;
+using NSL.SocketCore.Utils.Cipher;
+using NSL.SocketServer.Utils;
 using NSL.UDP.Client;
-using SocketCore.Utils;
-using SocketCore.Utils.Buffer;
-using SocketCore.Utils.Cipher;
-using SocketServer;
-using SocketServer.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,45 +19,70 @@ namespace UDPExample
     {
         public override void Receive(NetworkClient client, InputPacketBuffer data)
         {
+            Console.WriteLine($"[{DateTime.UtcNow}] Client: Receive {nameof(TestPacket)}");
         }
     }
-    public class NetworkClient : IServerNetworkClient
+    public class TestPacketS : IPacket<NetworkClientForServer>
+    {
+        public override void Receive(NetworkClientForServer client, InputPacketBuffer data)
+        {
+            Console.WriteLine($"[{DateTime.UtcNow}] Receiver: Receive {nameof(TestPacketS)}");
+
+
+
+            using (var packet = new NSL.UDP.DgramPacket() { PacketId = 1 })
+            {
+                packet.WriteInt32(1);
+                packet.WriteInt32(2);
+                packet.WriteInt32(3);
+
+                client.Send(packet);
+            }
+        }
+    }
+    public class NetworkClient : BaseSocketNetworkClient
+    {
+
+    }
+    public class NetworkClientForServer : IServerNetworkClient
     {
 
     }
 
-    public class Example
+    public class Example<TOptions>
+        where TOptions : CoreOptions, IBindingUDPOptions, new ()
     {
-        protected UDPOptions<NetworkClient> options;
+        protected TOptions options;
 
         protected void Initialize()
         {
-            options = new UDPOptions<NetworkClient>();
+            options = new TOptions();
+
+            options.BindingIP = "0.0.0.0";
+
+            options.ReceiveBufferSize = 1024;
+
+            options.InputCipher = new PacketNoneCipher();
+
+            options.OutputCipher = new PacketNoneCipher();
+        }
+    }
+
+    public class SenderExample : Example<UDPClientOptions<NetworkClient>>
+    {
+        protected UDPNetworkClient<NetworkClient> client;
+        public SenderExample()
+        {
+            base.Initialize();
 
             options.IpAddress = "127.0.0.1";
 
             options.Port = 5553;
 
-            options.BindingIP = "0.0.0.0";
-
-            options.BindingPort = default;
-
-            options.ReceiveBufferSize = 1024;
-
-            options.inputCipher = new PacketNoneCipher();
-
-            options.outputCipher = new PacketNoneCipher();
+            options.BindingPort = 9994;
 
             options.AddPacket(1, new TestPacket());
-        }
-    }
 
-    public class SenderExample : Example
-    {
-        protected UDPConnection<NetworkClient> client;
-        public SenderExample()
-        {
-            base.Initialize();
 
             Run();
         }
@@ -65,7 +90,7 @@ namespace UDPExample
 
         private void Run()
         {
-            client = new UDPConnection<NetworkClient>(options);
+            client = new UDPNetworkClient<NetworkClient>(options);
             Thread.Sleep(1_500);
             client.Connect();
 
@@ -81,22 +106,24 @@ namespace UDPExample
         }
     }
 
-    public class ReceiverExample : Example
+    public class ReceiverExample : Example<UDPServerOptions<NetworkClientForServer>>
     {
-        protected UDPServer<NetworkClient> listener;
+        protected UDPServer<NetworkClientForServer> listener;
 
         public ReceiverExample()
         {
             base.Initialize();
 
-            base.options.BindingPort = base.options.Port;
+            options.BindingPort = 5553;
+
+            options.AddPacket(1, new TestPacketS());
 
             Run();
         }
 
         private void Run()
         {
-            listener = new UDPServer<NetworkClient>(options);
+            listener = new UDPServer<NetworkClientForServer>(options);
 
             listener.Start();
         }

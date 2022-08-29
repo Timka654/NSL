@@ -10,8 +10,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\Core\BuilderExtensions\NSL.BuilderExtensions.SocketCore\NSL.BuilderExtensions.SocketCore.csproj" />
-    <ProjectReference Include="..\..\BuilderExtensions\NSL.BuilderExtensions.WebSocketsClient\NSL.BuilderExtensions.WebSocketsClient.csproj" />
-    <ProjectReference Include="..\..\BuilderExtensions\NSL.BuilderExtensions.WebSocketsServer\NSL.BuilderExtensions.WebSocketsServer.csproj" />
+    <ProjectReference Include="..\..\BuilderExtensions\NSL.BuilderExtensions.UDPClient\NSL.BuilderExtensions.UDPClient.csproj" />
+    <ProjectReference Include="..\..\BuilderExtensions\NSL.BuilderExtensions.UDPServer\NSL.BuilderExtensions.UDPServer.csproj" />
   </ItemGroup>
 
 </Project>

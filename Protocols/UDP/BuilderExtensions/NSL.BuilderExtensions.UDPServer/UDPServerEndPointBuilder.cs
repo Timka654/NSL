@@ -86,8 +86,8 @@ namespace NSL.BuilderExtensions.UDPServer
 
         public UDPServerEndPointBuilder<TClient, TOptions> WithBindingPoint(string ip, int port)
         {
-            options.IpAddress = ip;
-            options.Port = port;
+            options.BindingIP = ip;
+            options.BindingPort = port;
 
             return this;
         }
