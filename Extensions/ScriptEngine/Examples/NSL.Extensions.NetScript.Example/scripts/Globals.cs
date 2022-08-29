@@ -6,6 +6,6 @@ using System.Text;
 #if !CompileScript
 public class Globals
 {
-    public NetScriptTest.TScript Character { get; set; }
+    public NSL.Extensions.NetScript.Example.TScript Character { get; set; }
 }
 #endif

@@ -21,9 +21,6 @@
 
     public int GetCallCount()
     {
-        var process = System.Diagnostics.Process.Start("/bin/bash", "-c \"sudo systemctl start apptask-api.service\"");
-
-        process.WaitForExit();
         return counter;
     }
 

@@ -1,42 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Text;
-using NetScript;
+using System.Threading.Tasks;
 
-namespace NetScriptTest
+namespace NSL.Extensions.NetScript.Example
 {
-    class Program
-    {
-        static Dictionary<int, TScript> scripts = new Dictionary<int, TScript>();
-        static void Main(string[] args)
-        {
-            //try
-            //{
-            //    throw new Exception("abc");
-            //}
-            //catch (Exception ex)
-            //{
-            //    string test = ex.ToString();
-            //}
-
-            scripts.Add(0, new TScript(0));
-            scripts.Add(1, new TScript(1));
-            Random r = new Random();
-            for (int i = 0; i < 21; i++)
-            {
-                scripts[r.Next(0, 2)].TestCall();
-            }
-            scripts[0].ShowCallCount();
-            scripts[1].ShowCallCount();
-            Console.ReadKey();
-        }
-    }
     public class TScript
     {
-        private static NetScript.Script cscript;
-        private NetScript.Script script;
+        private static Script cscript;
+        private Script script;
 
 
         public int id;
@@ -47,10 +20,10 @@ namespace NetScriptTest
             this.id = id;
             if (cscript == null)
             {
-                cscript = new NetScript.Script();
+                cscript = new Script();
                 cscript.AddFolder(Environment.CurrentDirectory + "\\scripts\\", true);
 
-                cscript.RegistrationReference("NetScript.dll");
+                //cscript.RegistrationReference("NetScript.dll");
                 cscript.RegisterCoreReference("System.Linq.dll");
                 cscript.RegisterCoreReference("System.ComponentModel.Primitives.dll");
                 cscript.RegisterCoreReference("System.Diagnostics.Process.dll");
@@ -58,7 +31,7 @@ namespace NetScriptTest
                 cscript.RegisterExecutableReference();
                 //foreach
 
-                cscript.GenerateVariable(typeof(TScript),"Character");
+                cscript.GenerateVariable(typeof(TScript), "Character");
                 try
                 {
                     cscript.Compile();
@@ -94,8 +67,8 @@ namespace NetScriptTest
         }
 
         public void ShowCallCount()
-        { 
-            Console.WriteLine(string.Format("CallCount {0} for id:{1}",script.InvokeMethod<int>("ScriptCore", "GetCallCount", script.GetCoreObject()),id));
+        {
+            Console.WriteLine(string.Format("CallCount {0} for id:{1}", script.InvokeMethod<int>("ScriptCore", "GetCallCount", script.GetCoreObject()), id));
         }
 
         public void Debug(string value)
