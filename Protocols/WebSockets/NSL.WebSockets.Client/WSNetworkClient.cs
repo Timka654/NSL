@@ -14,7 +14,7 @@ namespace NSL.WebSockets.Client
         where T : BaseSocketNetworkClient, new()
         where TOptions : WSClientOptions<T>
     {
-        ClientWebSocket client;
+        protected WebSocket client;
 
         public const int DefaultConnectionTimeout = 8_000;
 
@@ -65,27 +65,7 @@ namespace NSL.WebSockets.Client
             var options = (WSClientOptions<T>)base.options;
             try
             {
-                client = new ClientWebSocket();
-
-                CancellationTokenSource cts = new CancellationTokenSource();
-
-                cts.CancelAfter(DefaultConnectionTimeout);
-
-                await client.ConnectAsync(options.EndPoint, cts.Token);
-                //await client.ConnectAsync(ConnectionOptions.IpAddress, ConnectionOptions.Port);
-
-                var success = client.State == WebSocketState.Open;
-
-                if (success)
-                {
-                    Reconnect(client, options.EndPoint);
-                }
-                else
-                {
-                    ConnectionOptions.RunClientDisconnect();
-                }
-
-                return success;
+                return await ConnectProcess(options, connectionTimeOut);
             }
             catch (Exception ex)
             {
@@ -95,6 +75,44 @@ namespace NSL.WebSockets.Client
             }
 
             return false;
+        }
+
+        protected virtual async Task<bool> ConnectProcess(WSClientOptions<T> options, int connectionTimeOut)
+        {
+            client = CreateWS();
+
+            CancellationTokenSource cts = new CancellationTokenSource();
+
+            cts.CancelAfter(connectionTimeOut);
+
+            await ConnectAsync(options.EndPoint, cts.Token);
+            //await client.ConnectAsync(ConnectionOptions.IpAddress, ConnectionOptions.Port);
+
+            return ProcessState(options, client.State);
+        }
+
+        protected virtual WebSocket CreateWS()
+        {
+            return new ClientWebSocket();
+        }
+
+        protected virtual async Task ConnectAsync(Uri endPoint, CancellationToken cts)
+        {
+            await ((ClientWebSocket)client).ConnectAsync(endPoint, cts);
+        }
+
+        protected bool ProcessState(WSClientOptions<T> options, WebSocketState state)
+        {
+            if (state == WebSocketState.Open)
+            {
+                Reconnect(client, options.EndPoint);
+                return true;
+            }
+
+            ConnectionOptions.RunClientDisconnect();
+
+            return false;
+
         }
 
         private void Release()
