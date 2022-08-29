@@ -38,7 +38,7 @@ namespace NSL.SocketServer
         /// <summary>
         /// Ип адресс - используется для инициализации слушателя на определенном адаптере (0.0.0.0 - для всех)
         /// </summary>
-        public virtual string IpAddress { get; set; }
+        public virtual string IpAddress { get; set; } = "0.0.0.0";
 
         /// <summary>
         /// Порт - используется для инициализации слушателя на определенном порту 1 - 65,535

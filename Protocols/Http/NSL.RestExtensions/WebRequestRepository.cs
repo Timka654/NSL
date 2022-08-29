@@ -62,7 +62,7 @@ namespace NSL.RestExtensions
 
         protected async Task<HttpRequestResult> SafeRequest(TClient client, string url, Action<HttpRequestMessage> request, CancellationToken? cancellationToken = null)
         {
-            var message = new HttpRequestMessage(HttpMethod.Post, url);
+            var message = new HttpRequestMessage(GetHttpMethod(), url);
 
             request.Invoke(message);
 
@@ -71,7 +71,7 @@ namespace NSL.RestExtensions
 
         protected async Task<HttpRequestResult<TData>> SafeRequest<TData>(TClient client, string url, Action<HttpRequestMessage> request = null, CancellationToken? cancellationToken = null)
         {
-            var message = new HttpRequestMessage(HttpMethod.Post, url);
+            var message = new HttpRequestMessage(GetHttpMethod(), url);
 
             if (request != null)
                 request.Invoke(message);
