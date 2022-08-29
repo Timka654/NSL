@@ -6,11 +6,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Builder.TCP.BaseExample.Server
+namespace Builder.WebSockets.BaseExample.Server
 {
-    public class ServerTestPacket1 : IPacket<TCPServerNetworkClient>
+    public class ServerTestPacket1 : IPacket<WebSocketsServerNetworkClient>
     {
-        public override void Receive(TCPServerNetworkClient client, InputPacketBuffer data)
+        public override void Receive(WebSocketsServerNetworkClient client, InputPacketBuffer data)
         {
             var str = data.ReadString16();
 

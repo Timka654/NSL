@@ -1,4 +1,4 @@
-﻿using NSL.BuilderExtensions.TCPClient;
+﻿using NSL.BuilderExtensions.WebSocketsClient;
 using NSL.SocketClient;
 using NSL.SocketClient.Utils;
 using NSL.SocketCore.Extensions.Packet;
@@ -7,25 +7,25 @@ using NSL.SocketCore.Utils.Buffer;
 using NSL.BuilderExtensions.SocketCore;
 using System.Reflection;
 using System.Diagnostics;
-using NSL.BuilderExtensions.TCPServer;
+using NSL.BuilderExtensions.WebSocketsServer;
 using NSL.SocketServer.Utils;
 using NSL.SocketServer;
-using Builder.TCP.BaseExample.Server;
-using Builder.TCP.BaseExample.Client;
+using Builder.WebSockets.BaseExample.Server;
+using Builder.WebSockets.BaseExample.Client;
 
-namespace Builder.TCP.BaseExample
+namespace Builder.WebSockets.BaseExample
 {
     internal class Program
     {
         static async Task Main(string[] args)
         {
-            await TestTcpServer.RunServer();
+            await TestWebSocketsServer.RunServer();
 
-            await TestTcpClient.RunClient();
+            await TestWebSocketsClient.RunClient();
 
-            await TestTcpClient.RunTest();
+            await TestWebSocketsClient.RunTest();
 
-            TestTcpClient.Disconnect();
+            TestWebSocketsClient.Disconnect();
 
             Console.WriteLine("Press any key for exit");
             Console.ReadKey();

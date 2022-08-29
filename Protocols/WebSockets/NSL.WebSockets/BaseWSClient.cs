@@ -109,7 +109,7 @@ namespace NSL.WebSockets
                 if (sclient == null)
                     throw new ConnectionLostException(GetRemotePoint(), true);
 
-                var receiveData = await sclient.ReceiveAsync(new ArraySegment<byte>(receiveBuffer, 0, options.ReceiveBufferSize), CancellationToken.None);
+                var receiveData = await sclient.ReceiveAsync(new ArraySegment<byte>(receiveBuffer, offset, lenght), CancellationToken.None);
 
                 if (receiveData.CloseStatus.HasValue)
                 {
@@ -198,7 +198,7 @@ namespace NSL.WebSockets
         /// Отправка пакета
         /// </summary>
         /// <param name="packet">спец буффер содержащий в себе данные пакета</param>
-        public void Send(OutputPacketBuffer packet)
+        public void Send(OutputPacketBuffer packet, bool disposeOnSend = true)
         {
 #if DEBUG
             OnSend(packet, Environment.StackTrace);
@@ -206,7 +206,7 @@ namespace NSL.WebSockets
             OnSend(packet, "");
 #endif
 
-            packet.Send(this);
+            packet.Send(this, disposeOnSend);
         }
 
         protected AutoResetEvent _sendLocker = new AutoResetEvent(true);

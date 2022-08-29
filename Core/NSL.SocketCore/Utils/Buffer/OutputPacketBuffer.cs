@@ -325,7 +325,7 @@ namespace NSL.SocketCore.Utils.Buffer
         /// </summary>
         /// <param name="appendHash">добавить хеш в пакет</param>
         /// <returns></returns>
-        public byte[] CompilePacket()
+        public byte[] CompilePacket(bool dispose = true)
         {
             base.Seek(0, SeekOrigin.Begin);
 
@@ -339,14 +339,15 @@ namespace NSL.SocketCore.Utils.Buffer
 
             var arr = base.ToArray();
 
-            base.Dispose();
+            if (dispose)
+                base.Dispose();
 
             return arr;
         }
 
-        public void Send(IClient client)
+        public virtual void Send(IClient client, bool disposeOnSend)
         {
-            var pktData = CompilePacket();
+            var pktData = CompilePacket(disposeOnSend);
 
             client.Send(pktData, 0, PacketLenght);
         }

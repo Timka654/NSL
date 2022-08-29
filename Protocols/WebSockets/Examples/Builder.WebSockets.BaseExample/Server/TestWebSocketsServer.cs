@@ -1,28 +1,28 @@
 ﻿using NSL.BuilderExtensions.SocketCore;
-using NSL.BuilderExtensions.TCPServer;
+using NSL.BuilderExtensions.WebSocketsServer;
 using NSL.SocketServer;
+using NSL.WebSockets.Server;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Builder.TCP.BaseExample.Server
+namespace Builder.WebSockets.BaseExample.Server
 {
-    internal class TestTcpServer
+    internal class TestWebSocketsServer
     {
         public static Task RunServer()
         {
-            var server = TCPServerEndPointBuilder
+            var server = WebSocketsServerEndPointBuilder
                 .Create()
-                .WithClientProcessor<TCPServerNetworkClient>()
-                .WithOptions<ServerOptions<TCPServerNetworkClient>>()
-                .WithBindingPoint("0.0.0.0", 20006)
-                .WithBacklog(1)
+                .WithClientProcessor<WebSocketsServerNetworkClient>()
+                .WithOptions<WSServerOptions<WebSocketsServerNetworkClient>>()
+                .WithBindingPoint("http://+:20006/")
                 .WithCode(builder =>
                 {
                     // builder.WithAddressFamily(System.Net.Sockets.AddressFamily.InterNetwork); //optional(setted on initialize to valid)
-                    // builder.WithProtocolType(System.Net.Sockets.ProtocolType.Tcp); //optional(setted on initialize to valid)
+                    // builder.WithProtocolType(System.Net.Sockets.ProtocolType.WebSockets); //optional(setted on initialize to valid)
                     builder.WithBufferSize(8192); //optional
                 })
                 .WithCode(builder =>

@@ -16,8 +16,6 @@ namespace NSL.SocketCore
 
         void Send(byte[] buf, int offset, int lenght);
 
-        void Send(OutputPacketBuffer packet);
-
         void Disconnect();
 
         bool GetState();
@@ -31,11 +29,13 @@ namespace NSL.SocketCore
         System.Net.Sockets.Socket GetSocket();
 
         short GetTtl();
+
+        void Send(OutputPacketBuffer packet, bool disposeOnSend = true);
     }
 
     public interface IClient<TOPacket> : IClient
         where TOPacket : OutputPacketBuffer
     {
-        void Send(TOPacket packet);
+        void Send(TOPacket packet, bool disposeOnSend = true);
     }
 }

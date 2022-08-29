@@ -71,21 +71,13 @@ namespace NSL.BuilderExtensions.WebSocketsServer
             return this;
         }
 
-        public WebSocketsServerEndPointBuilder<TClient, TOptions> WithBindingPoint(IPEndPoint endpoint)
+        /// <summary>
+        /// EndPoint must have bindings in format http(/s)://{bindingAddress}:{bindingPort}/
+        /// WARNING!!! "0.0.0.0" unsupported, you can use "*" or "+"
+        /// </summary>
+        public WebSocketsServerEndPointBuilder<TClient, TOptions> WithBindingPoint(string bindingUrl)
         {
-            return WithBindingPoint(endpoint.Address, endpoint.Port);
-        }
-
-        public WebSocketsServerEndPointBuilder<TClient, TOptions> WithBindingPoint(IPAddress ip, int port)
-        {
-            return WithBindingPoint(ip.ToString(), port);
-        }
-
-        public WebSocketsServerEndPointBuilder<TClient, TOptions> WithBindingPoint(string ip, int port)
-        {
-            options.IpAddress = ip;
-            options.Port = port;
-
+            options.EndPoints.Add(bindingUrl);
             return this;
         }
 

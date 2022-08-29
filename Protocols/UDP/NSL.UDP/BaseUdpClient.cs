@@ -146,7 +146,7 @@ namespace NSL.UDP
             }
         }
 
-        public void Send(DgramPacket packet)
+        public void Send(DgramPacket packet, bool disposeOnSend = true)
         {
 #if DEBUG
             OnSend(packet, Environment.StackTrace);
@@ -154,15 +154,15 @@ namespace NSL.UDP
             OnSend(packet, "");
 #endif
 
-            packet.Send(this);
+            packet.Send(this, disposeOnSend);
         }
 
-        public void Send(OutputPacketBuffer packet)
+        public void Send(OutputPacketBuffer packet, bool disposeOnSend = true)
         {
             if (!(packet is DgramPacket dpkg))
                 throw new ArgumentException(nameof(packet));
 
-            Send(dpkg);
+            Send(dpkg, disposeOnSend);
         }
 
         public async void Send(byte[] buf, int offset, int lenght)

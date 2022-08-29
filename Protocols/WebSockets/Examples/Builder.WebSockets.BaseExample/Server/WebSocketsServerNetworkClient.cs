@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Builder.TCP.BaseExample.Server
+namespace Builder.WebSockets.BaseExample.Server
 {
-    public class TCPServerNetworkClient : IServerNetworkClient
+    public class WebSocketsServerNetworkClient : IServerNetworkClient
     {
 
     }

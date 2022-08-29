@@ -1,33 +1,33 @@
 ﻿using NSL.BuilderExtensions.SocketCore;
-using NSL.BuilderExtensions.TCPClient;
+using NSL.BuilderExtensions.WebSocketsClient;
 using NSL.SocketClient;
 using NSL.SocketCore.Utils.Buffer;
-using NSL.TCP.Client;
+using NSL.WebSockets.Client;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Builder.TCP.BaseExample.Client
+namespace Builder.WebSockets.BaseExample.Client
 {
-    internal class TestTcpClient
+    internal class TestWebSocketsClient
     {
         static CancellationTokenSource cts;
 
-        static TCPNetworkClient<TCPNetworkClient, ClientOptions<TCPNetworkClient>> client;
+        static WSNetworkClient<WebSocketsNetworkClient, WSClientOptions<WebSocketsNetworkClient>> client;
 
         public static async Task RunClient()
         {
-            client = TCPClientEndPointBuilder
+            client = WebSocketsClientEndPointBuilder
                 .Create()
-                .WithClientProcessor<TCPNetworkClient>()
-                .WithOptions<ClientOptions<TCPNetworkClient>>()
-                .WithEndPoint("127.0.0.1", 20006)
+                .WithClientProcessor<WebSocketsNetworkClient>()
+                .WithOptions<WSClientOptions<WebSocketsNetworkClient>>()
+                .WithUrl(new Uri("ws://127.0.0.1:20006"))
                 .WithCode(builder =>
                 {
                     // builder.WithAddressFamily(System.Net.Sockets.AddressFamily.InterNetwork); //optional(setted on initialize to valid)
-                    // builder.WithProtocolType(System.Net.Sockets.ProtocolType.Tcp); //optional(setted on initialize to valid)
+                    // builder.WithProtocolType(System.Net.Sockets.ProtocolType.WebSockets); //optional(setted on initialize to valid)
                     builder.WithBufferSize(8192); //optional
                 })
                 .WithCode(builder =>

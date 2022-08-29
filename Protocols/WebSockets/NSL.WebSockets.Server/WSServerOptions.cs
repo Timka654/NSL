@@ -44,6 +44,7 @@ namespace NSL.WebSockets.Server
 
         /// <summary>
         /// EndPoint list must have bindings in format http(/s)://{bindingAddress}:{bindingPort}/
+        /// WARNING!!! "0.0.0.0" unsupported, you can use "*" or "+"
         /// </summary>
         public List<string> EndPoints { get; } = new List<string>();
     }
