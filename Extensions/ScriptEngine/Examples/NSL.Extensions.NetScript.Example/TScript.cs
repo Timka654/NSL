@@ -47,7 +47,9 @@ namespace NSL.Extensions.NetScript.Example
                     }
                     Console.ReadLine();
                 }
+#if DEBUG
                 cscript.OnPerformanceMessageEvent += Cscript_OnPerformanceMessageEvent;
+#endif
             }
 
             script = cscript.Copy();

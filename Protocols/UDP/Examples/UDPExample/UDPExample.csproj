@@ -4,8 +4,8 @@
 		<Configurations>Debug;Release;Unity;UnityDebug;DebugStable</Configurations>
 		<OutputType>Library</OutputType>
 		<TargetFramework>net6.0</TargetFramework>
-		<Version>$(VersionSuffix)</Version>
 		<IsPackable>false</IsPackable>
+		<Version>$(VersionSuffix)</Version>
 	</PropertyGroup>
 
 	<ItemGroup>

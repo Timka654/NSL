@@ -112,5 +112,15 @@ namespace NSL.BuilderExtensions.UDPClient
 
             return result;
         }
+
+        public ReceivePacketDebugInfo<UDPClient<TClient>> GetReceiveHandles()
+        {
+            return OnReceiveHandles;
+        }
+
+        public SendPacketDebugInfo<UDPClient<TClient>> GetSendHandles()
+        {
+            return OnSendHandles;
+        }
     }
 }

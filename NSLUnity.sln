@@ -165,6 +165,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NSL.Utils.Unity", "Core\Uti
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NSL.BuilderExtensions.UDP", "Protocols\UDP\BuilderExtensions\NSL.BuilderExtensions.UDP\NSL.BuilderExtensions.UDP.csproj", "{49444D05-39A5-4262-8A1F-8910E69F0CF2}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NSL.WebSockets.UnityClient", "Protocols\WebSockets\NSL.WebSockets.UnityClient\NSL.WebSockets.UnityClient.csproj", "{B90CCDBE-EA41-4F13-8F8E-5DC3D80FFC2C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NSL.BuilderExtensions.WebSocketsClient.Unity", "Protocols\WebSockets\BuilderExtensions\NSL.BuilderExtensions.WebSocketsClient.Unity\NSL.BuilderExtensions.WebSocketsClient.Unity.csproj", "{6A915716-A267-4F77-8F12-6EC30B22003B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -653,6 +657,22 @@ Global
 		{49444D05-39A5-4262-8A1F-8910E69F0CF2}.Unity|Any CPU.Build.0 = Unity|Any CPU
 		{49444D05-39A5-4262-8A1F-8910E69F0CF2}.UnityDebug|Any CPU.ActiveCfg = UnityDebug|Any CPU
 		{49444D05-39A5-4262-8A1F-8910E69F0CF2}.UnityDebug|Any CPU.Build.0 = UnityDebug|Any CPU
+		{B90CCDBE-EA41-4F13-8F8E-5DC3D80FFC2C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B90CCDBE-EA41-4F13-8F8E-5DC3D80FFC2C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B90CCDBE-EA41-4F13-8F8E-5DC3D80FFC2C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B90CCDBE-EA41-4F13-8F8E-5DC3D80FFC2C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B90CCDBE-EA41-4F13-8F8E-5DC3D80FFC2C}.Unity|Any CPU.ActiveCfg = Unity|Any CPU
+		{B90CCDBE-EA41-4F13-8F8E-5DC3D80FFC2C}.Unity|Any CPU.Build.0 = Unity|Any CPU
+		{B90CCDBE-EA41-4F13-8F8E-5DC3D80FFC2C}.UnityDebug|Any CPU.ActiveCfg = UnityDebug|Any CPU
+		{B90CCDBE-EA41-4F13-8F8E-5DC3D80FFC2C}.UnityDebug|Any CPU.Build.0 = UnityDebug|Any CPU
+		{6A915716-A267-4F77-8F12-6EC30B22003B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6A915716-A267-4F77-8F12-6EC30B22003B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6A915716-A267-4F77-8F12-6EC30B22003B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6A915716-A267-4F77-8F12-6EC30B22003B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6A915716-A267-4F77-8F12-6EC30B22003B}.Unity|Any CPU.ActiveCfg = Debug|Any CPU
+		{6A915716-A267-4F77-8F12-6EC30B22003B}.Unity|Any CPU.Build.0 = Debug|Any CPU
+		{6A915716-A267-4F77-8F12-6EC30B22003B}.UnityDebug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6A915716-A267-4F77-8F12-6EC30B22003B}.UnityDebug|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -733,6 +753,8 @@ Global
 		{7D0DDF86-6CAC-4AF4-8473-903A734A8E98} = {A0493FE7-1FCE-4127-B3B3-583622174313}
 		{ABFEC9AA-4C55-4818-A3CA-3B0248E75D73} = {D944E107-18A6-44AE-89ED-673DAF1952D1}
 		{49444D05-39A5-4262-8A1F-8910E69F0CF2} = {C9D52716-D864-43BE-AD2A-3D81B6B8D450}
+		{B90CCDBE-EA41-4F13-8F8E-5DC3D80FFC2C} = {22949C88-0480-420F-BB4E-D46939884CBE}
+		{6A915716-A267-4F77-8F12-6EC30B22003B} = {A0493FE7-1FCE-4127-B3B3-583622174313}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {FAC0C61D-775D-4347-9BD3-3A114A731C7C}

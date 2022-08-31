@@ -58,6 +58,8 @@ namespace NSL.BuilderExtensions.WebSocketsClient
 
         public CoreOptions<TClient> GetCoreOptions() => options;
 
+        public TOptions GetWSClientOptions() => options;
+
         private WebSocketsClientEndPointBuilder() { }
 
         public static WebSocketsClientEndPointBuilder<TClient, TOptions> Create()
@@ -96,6 +98,16 @@ namespace NSL.BuilderExtensions.WebSocketsClient
             result.OnSendPacket += OnSendHandles;
 
             return result;
+        }
+
+        public ReceivePacketDebugInfo<WSClient<TClient>> GetReceiveHandles()
+        {
+            return OnReceiveHandles;
+        }
+
+        public SendPacketDebugInfo<WSClient<TClient>> GetSendHandles()
+        {
+            return OnSendHandles;
         }
     }
 }

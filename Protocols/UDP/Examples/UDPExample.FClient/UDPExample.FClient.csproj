@@ -6,8 +6,8 @@
 		<TargetFramework>net6.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
-		<Version>$(VersionSuffix)</Version>
 		<IsPackable>false</IsPackable>
+		<Version>$(VersionSuffix)</Version>
 	</PropertyGroup>
 
 	<ItemGroup>

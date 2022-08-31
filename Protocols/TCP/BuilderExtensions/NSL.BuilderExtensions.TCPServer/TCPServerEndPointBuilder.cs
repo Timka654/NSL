@@ -119,5 +119,15 @@ namespace NSL.BuilderExtensions.TCPServer
 
             return result;
         }
+
+        public ReceivePacketDebugInfo<TCPServerClient<TClient>> GetReceiveHandles()
+        {
+            return OnReceiveHandles;
+        }
+
+        public SendPacketDebugInfo<TCPServerClient<TClient>> GetSendHandles()
+        {
+            return OnSendHandles;
+        }
     }
 }

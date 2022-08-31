@@ -101,5 +101,15 @@ namespace NSL.BuilderExtensions.WebSocketsServer
 
             return result;
         }
+
+        public ReceivePacketDebugInfo<WSServerClient<TClient>> GetReceiveHandles()
+        {
+            return OnReceiveHandles;
+        }
+
+        public SendPacketDebugInfo<WSServerClient<TClient>> GetSendHandles()
+        {
+            return OnSendHandles;
+        }
     }
 }
