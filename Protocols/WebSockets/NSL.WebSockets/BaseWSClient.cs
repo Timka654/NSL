@@ -109,7 +109,7 @@ namespace NSL.WebSockets
                 if (sclient == null)
                     throw new ConnectionLostException(GetRemotePoint(), true);
 
-                var receiveData = await sclient.ReceiveAsync(new ArraySegment<byte>(receiveBuffer, offset, lenght), CancellationToken.None);
+                var receiveData = await sclient.ReceiveAsync(new ArraySegment<byte>(receiveBuffer, offset, lenght - offset), CancellationToken.None);
 
                 if (receiveData.CloseStatus.HasValue)
                 {

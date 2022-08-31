@@ -1,4 +1,5 @@
 ﻿using AOT;
+using NSL.Utils.Unity;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -9,6 +10,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Transactions;
+using UnityEngine;
 
 namespace NSL.WebSockets.UnityClient
 {
@@ -32,9 +34,18 @@ namespace NSL.WebSockets.UnityClient
 
         public override string SubProtocol => "";
 
+        public WGLWebSocket()
+        {
+            while (instances.ContainsKey(++index)) ;
+
+            instances.Add(index, this);
+        }
+
         public override void Abort()
         {
             CloseAsync(WebSocketCloseStatus.NormalClosure, String.Empty, CancellationToken.None);
+
+            lockedSegment = null;
         }
 
         public override Task CloseAsync(WebSocketCloseStatus closeStatus, string statusDescription, CancellationToken cancellationToken)
@@ -56,6 +67,7 @@ namespace NSL.WebSockets.UnityClient
         public override void Dispose()
         {
             Abort();
+            instances.Remove(index);
         }
 
         ArraySegment<byte>? lockedSegment = null;
@@ -71,9 +83,11 @@ namespace NSL.WebSockets.UnityClient
                 array.Add(lockedSegment.Value);
 
 
+            var rcount = buffer.Count;
+
             int totalCount = 0;
 
-            while ((totalCount = array.Sum(x => x.Count)) < buffer.Count && !cancellationToken.IsCancellationRequested && !openedCTS.IsCancellationRequested)
+            while ((totalCount = array.Sum(x => x.Count)) < rcount && !cancellationToken.IsCancellationRequested && !openedCTS.IsCancellationRequested)
             {
                 if (!receiveQueue.TryDequeue(out var newSegment))
                     await Task.Yield();
@@ -88,7 +102,7 @@ namespace NSL.WebSockets.UnityClient
 
             foreach (var item in array)
             {
-                var needCount = cloneOffset - buffer.Count > item.Count ? cloneOffset - buffer.Count : item.Count;
+                var needCount = rcount - cloneOffset < item.Count ? buffer.Count - cloneOffset : item.Count;
 
                 Buffer.BlockCopy(item.Array, item.Offset, buffer.Array, cloneOffset, needCount);
 
@@ -96,14 +110,20 @@ namespace NSL.WebSockets.UnityClient
             }
 
 
-            if (totalCount > buffer.Count)
+            if (totalCount > rcount)
             {
                 var latest = array.Last();
-                var offset = totalCount - buffer.Count;
-                lockedSegment = new ArraySegment<byte>(latest.Array, offset, latest.Count - offset);
-            }
+                var offset = rcount - array.Take(array.Count - 1).Sum(x => x.Count);
 
-            return new WebSocketReceiveResult(cloneOffset, WebSocketMessageType.Binary, true, CloseStatus, CloseStatusDescription);
+                if (latest.Count == offset)
+                    lockedSegment = latest;
+                else
+                    lockedSegment = new ArraySegment<byte>(latest.Array, offset, latest.Count - offset);
+            }
+            else
+                lockedSegment = null;
+
+            return new WebSocketReceiveResult(rcount, WebSocketMessageType.Binary, true, CloseStatus, CloseStatusDescription);
         }
 
         public override Task SendAsync(ArraySegment<byte> buffer, WebSocketMessageType messageType, bool endOfMessage, CancellationToken cancellationToken)
@@ -124,10 +144,13 @@ namespace NSL.WebSockets.UnityClient
 
         public async Task ConnectAsync(Uri endPoint, CancellationToken cts)
         {
+            if (state == WebSocketState.Open)
+                return;
+
             openCTS = new CancellationTokenSource();
 
             index = SimpleWebJSLib.Connect(endPoint.ToString(), OpenCallback, CloseCallBack, MessageCallback, ErrorCallback);
-            instances.Add(index, this);
+
             state = WebSocketState.Connecting;
 
             while (!openCTS.IsCancellationRequested)

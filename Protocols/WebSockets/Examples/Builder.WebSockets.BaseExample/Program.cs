@@ -21,6 +21,11 @@ namespace Builder.WebSockets.BaseExample
         {
             await TestWebSocketsServer.RunServer();
 
+            //while (true)
+            //{
+            //    await Task.Delay(100);
+            //}
+
             await TestWebSocketsClient.RunClient();
 
             await TestWebSocketsClient.RunTest();

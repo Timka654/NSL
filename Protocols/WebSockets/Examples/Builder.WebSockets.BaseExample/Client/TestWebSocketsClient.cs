@@ -23,7 +23,7 @@ namespace Builder.WebSockets.BaseExample.Client
                 .Create()
                 .WithClientProcessor<WebSocketsNetworkClient>()
                 .WithOptions<WSClientOptions<WebSocketsNetworkClient>>()
-                .WithUrl(new Uri("ws://127.0.0.1:20006"))
+                .WithUrl(new Uri("ws://localhost:20006"))
                 .WithCode(builder =>
                 {
                     // builder.WithAddressFamily(System.Net.Sockets.AddressFamily.InterNetwork); //optional(setted on initialize to valid)

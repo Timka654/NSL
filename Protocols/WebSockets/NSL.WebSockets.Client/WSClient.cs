@@ -36,10 +36,10 @@ namespace NSL.WebSockets.Client
         {
             if (!IPAddress.TryParse(endPoint.Host, out var ip))
             {
-                var dns = Dns.GetHostAddresses(endPoint.Host);
+                var dns = Dns.GetHostEntry(endPoint.Host);
 
-                if (dns.Any())
-                    ip = dns.First();
+                if (dns.AddressList.Any())
+                    ip = dns.AddressList.FirstOrDefault(x=>x.AddressFamily == AddressFamily.InterNetwork) ?? dns.AddressList.FirstOrDefault() ;
                 else
                     ip = IPAddress.None;
             }
