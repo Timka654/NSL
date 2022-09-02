@@ -3,6 +3,9 @@ Socket Library for development application with need network transfer data (supp
 
 It's library always in progress, I'm use this for my projects and you can free use this library on MIT license
 
+#NSL Unity
+For success build you must extract "UnityEngine.dll" file from "/Reference/UnityEngine.zip" to "/Reference/UnityEngine.dll"
+
 # Documentation
 in progress
 

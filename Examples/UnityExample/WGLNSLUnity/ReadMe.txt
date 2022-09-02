@@ -1,1 +1,1 @@
-First for success build you must build NSL library with run "BuildReleaseAll(.ps1)" script, and copy output "/build/Release/unity_dll_*/" to "*example*/Assets/Plugins/NSL"
+First for success build you must build NSL library with run "BuildReleaseAll(.ps1)" script, and copy output "/build/Release/unity_dll_*/*" to "*example*/Assets/Plugins/NSL/*"
