@@ -14,7 +14,7 @@ namespace NSL.Extensions.RPC
         protected TClient NetworkClient { get; set; }
 
         public virtual void InvokeMethod(InputPacketBuffer data) 
-        { 
+        {
 
         }
     }

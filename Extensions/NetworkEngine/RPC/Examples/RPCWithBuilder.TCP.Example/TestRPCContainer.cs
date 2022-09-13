@@ -13,7 +13,7 @@ namespace RPCWithBuilder.TCP.Example
     internal partial class TestRPCClientContainer : RPCHandleContainer<NetworkClient>
     {
         [RPCMethod]
-        public void abc1(int v1, int? v2, string v3, string? v4, testData v5, testStruct v6)
+        public virtual void abc1(int v1, int? v2, string v3, string? v4, testData v5, testStruct v6)
         {
 
         }

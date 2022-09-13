@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Text;
 
-namespace NSL.Extensions.RPC.Generator
+namespace NSL.Extensions.RPC.Generator.Utils
 {
     internal class CodeBuilder
     {

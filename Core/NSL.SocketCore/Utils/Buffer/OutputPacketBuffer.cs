@@ -77,6 +77,14 @@ namespace NSL.SocketCore.Utils.Buffer
         /// Запись значения float (4 bytes)
         /// </summary>
         /// <param name="value">значение</param>
+        public unsafe void WriteFloat(float value)
+            => WriteFloat32(value);
+
+        [Obsolete("Use \"WriteFloat\"")]
+        /// <summary>
+        /// Запись значения float (4 bytes)
+        /// </summary>
+        /// <param name="value">значение</param>
         public unsafe void WriteFloat32(float value)
         {
             uint TmpValue = *(uint*)&value;
@@ -94,6 +102,14 @@ namespace NSL.SocketCore.Utils.Buffer
                 Lenght = this.offset;
         }
 
+        /// <summary>
+        /// Запись значения double (8 bytes)
+        /// </summary>
+        /// <param name="value">значение</param>
+        public unsafe void WriteDouble(double value)
+            => WriteFloat64(value);
+
+        [Obsolete("Use \"WriteDouble\"")]
         /// <summary>
         /// Запись значения double (8 bytes)
         /// </summary>
