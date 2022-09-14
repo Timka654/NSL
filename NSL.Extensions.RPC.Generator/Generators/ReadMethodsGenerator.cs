@@ -16,7 +16,7 @@ namespace NSL.Extensions.RPC.Generator.Generators
 {
     internal class ReadMethodsGenerator
     {
-        private static string BuildParameterReader(MethodDecl methodDecl, MethodDeclarationSyntax method, ParameterSyntax parameter, SemanticModel semanticModel)
+        public static string BuildParameterReader(MethodDecl methodDecl, MethodDeclarationSyntax method, ParameterSyntax parameter, SemanticModel semanticModel)
         {
             CodeBuilder pb = new CodeBuilder();
 
@@ -32,7 +32,7 @@ namespace NSL.Extensions.RPC.Generator.Generators
             return pb.ToString();
         }
 
-        private static string GetValueReadSegment(ISymbol parameter, SemanticModel semanticModel, string path)
+        public static string GetValueReadSegment(ISymbol parameter, SemanticModel semanticModel, string path)
         {
             string valueReader = GetBaseTypeReadLine(parameter, semanticModel, path);
 
@@ -79,7 +79,7 @@ namespace NSL.Extensions.RPC.Generator.Generators
 
 
 
-            return $"packet.{nameof(InputPacketBuffer.ReadNullable)}(()=>{{ return {GetValueReadSegment(genericType, semanticModel, path)}; }})";
+            return $"dataPacket.{nameof(InputPacketBuffer.ReadNullable)}(()=>{{ return {GetValueReadSegment(genericType, semanticModel, path)}; }})";
         }
 
         private static string GetBaseTypeReadLine(ISymbol parameter, SemanticModel semanticModel, string path)
@@ -89,7 +89,7 @@ namespace NSL.Extensions.RPC.Generator.Generators
             if (!readTypeHandlers.TryGetValue(type.Name, out var tReadLine))
                 return default;
 
-            return $"packet.{tReadLine}()";
+            return $"dataPacket.{tReadLine}()";
         }
 
         private static void AddTypeMemberReadLine(ISymbol member, CodeBuilder rb, string path, SemanticModel semanticModel)
@@ -128,7 +128,7 @@ namespace NSL.Extensions.RPC.Generator.Generators
             CodeBuilder rb = new CodeBuilder();
 
 
-            rb.AppendLine($"packet.{nameof(InputPacketBuffer.ReadNullableClass)}(() => {{");
+            rb.AppendLine($"dataPacket.{nameof(InputPacketBuffer.ReadNullableClass)}(() => {{");
 
             rb.NextTab();
 
@@ -272,16 +272,17 @@ namespace NSL.Extensions.RPC.Generator.Generators
         {
             var mb = new CodeBuilder();
 
-            mb.AppendLine("public override void InvokeMethod(InputPacketBuffer data)");
+            mb.AppendLine("public override void InvokeMethod(InputPacketBuffer dataPacket)");
             mb.AppendLine("{");
 
             mb.NextTab(); // 1
 
-            mb.AppendLine($"string name = data.ReadString16();");
+            mb.AppendLine($"string name = dataPacket.ReadString16();");
             mb.AppendLine();
 
             mb.AppendLine($"switch (name)");
             mb.AppendLine($"{{");
+
 
 
             mb.NextTab(); // 2
@@ -289,7 +290,7 @@ namespace NSL.Extensions.RPC.Generator.Generators
             {
                 mb.AppendLine($"case \"{method.Name}\":");
                 mb.NextTab(); // 3
-                mb.AppendLine($"{RPCGenerator.GetMethodRPCHandleName(method.Name)}(data);");
+                mb.AppendLine($"{RPCGenerator.GetMethodRPCHandleName(method.Name)}(dataPacket);");
                 mb.AppendLine($"break;");
                 mb.PrevTab(); // 2
             }
@@ -316,12 +317,12 @@ namespace NSL.Extensions.RPC.Generator.Generators
         {
             CodeBuilder mb = new CodeBuilder();
 
-            mb.AppendLine($"private void {RPCGenerator.GetMethodRPCHandleName(methodDecl.Name)}(InputPacketBuffer packet)");
+            mb.AppendLine($"private void {RPCGenerator.GetMethodRPCHandleName(methodDecl.Name)}(InputPacketBuffer dataPacket)");
             mb.AppendLine("{");
 
             mb.NextTab(); // 1
 
-            mb.AppendLine("byte argCount = packet.ReadByte();");
+            mb.AppendLine("byte argCount = dataPacket.ReadByte();");
 
             mb.AppendLine();
 
@@ -330,10 +331,11 @@ namespace NSL.Extensions.RPC.Generator.Generators
 
             mb.NextTab(); // 2
 
+            var classSemanticModel = methodDecl.Class.Context.Compilation.GetSemanticModel(methodDecl.Class.Class.SyntaxTree);
+
             foreach (var mov in methodDecl.Overrides)
             {
                 mb.AppendLine($"case {mov.ParameterList.Parameters.Count}:");
-
 
                 mb.NextTab(); // 3
 
@@ -345,15 +347,99 @@ namespace NSL.Extensions.RPC.Generator.Generators
 
                 var semanticModel = methodDecl.Class.Context.Compilation.GetSemanticModel(mov.SyntaxTree);
 
+                var movSymbol = classSemanticModel.GetDeclaredSymbol(mov);
+
                 foreach (var item in mov.ParameterList.Parameters)
                 {
-                    mb.AppendLine(BuildParameterReader(methodDecl, mov, item,semanticModel));
+                    mb.AppendLine(BuildParameterReader(methodDecl, mov, item, semanticModel));
                     mb.AppendLine();
 
                     parameters.Add(item.Identifier.Text);
                 }
 
-                mb.AppendLine($"{methodDecl.Name}({string.Join(", ", parameters)});");
+
+                //if (!Debugger.IsAttached)
+                //    Debugger.Launch();
+
+
+                if (movSymbol.ReturnsVoid)
+                {
+
+                    mb.AppendLine("try {");
+
+                    mb.NextTab();
+
+                    mb.AppendLine($"var __packet = Processor.CreateAnswer(dataPacket.ReadGuid());");
+
+                    mb.AppendLine();
+
+                    mb.AppendLine($"base.{methodDecl.Name}({string.Join(", ", parameters)});");
+
+                    mb.AppendLine();
+
+                    mb.AppendLine($"Processor.SendAnswer(__packet);");
+
+                    mb.PrevTab();
+
+                    mb.AppendLine("}");
+
+                    mb.AppendLine("catch (Exception ex)");
+
+                    mb.AppendLine("{");
+
+                    mb.NextTab();
+
+                    mb.AppendLine($"var __packet = Processor.CreateException(dataPacket.ReadGuid(), ex);");
+
+                    mb.AppendLine($"Processor.SendAnswer(__packet);");
+
+                    mb.AppendLine($"throw;");
+
+                    mb.PrevTab();
+
+                    mb.AppendLine("}");
+                }
+                else
+                {
+
+                    mb.AppendLine("try {");
+
+                    mb.NextTab();
+
+                    mb.AppendLine($"var result = base.{methodDecl.Name}({string.Join(", ", parameters)});");
+
+                    mb.AppendLine();
+
+                    mb.AppendLine($"var __packet = Processor.CreateAnswer(dataPacket.ReadGuid());");
+
+                    mb.AppendLine();
+
+                    mb.AppendLine(WriteMethodsGenerator.BuildParameterWriter(movSymbol.ReturnType, "result"));
+
+                    mb.AppendLine();
+
+                    mb.AppendLine($"Processor.SendAnswer(__packet);");
+
+                    mb.PrevTab();
+
+                    mb.AppendLine("}");
+
+                    mb.AppendLine("catch (Exception ex)");
+
+                    mb.AppendLine("{");
+
+                    mb.NextTab();
+
+                    mb.AppendLine($"var __packet = Processor.CreateException(dataPacket.ReadGuid(), ex);");
+
+                    mb.AppendLine($"Processor.SendAnswer(__packet);");
+
+                    mb.AppendLine($"throw;");
+
+                    mb.PrevTab();
+
+                    mb.AppendLine("}");
+                }
 
                 mb.PrevTab(); // 3
 

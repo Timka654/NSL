@@ -14,6 +14,7 @@ namespace NSL.SocketCore.Utils.Buffer
         /// Текущая кодировка типа String
         /// </summary>
         Encoding coding = Encoding.UTF8;
+        private bool manualDisposing = false;
 
         /// <summary>
         /// маскировка хедера пакета
@@ -211,9 +212,31 @@ namespace NSL.SocketCore.Utils.Buffer
         /// Чтения значения string, с чтением заголовка c размером ushort (2 байта), до 36к симв
         /// </summary>
         /// <returns></returns>
-        public string ReadString16() => ReadString16(ReadUInt16());
+        public string ReadString16()
+        {
+            var len = ReadUInt16();
 
-        public async Task<string> ReadString16Async() => await ReadString16Async(await ReadUInt16Async());
+            if (len == ushort.MaxValue)
+                return null;
+
+            if (len == 0)
+                return String.Empty;
+
+            return ReadString16(len);
+        }
+
+        public async Task<string> ReadString16Async()
+        {
+            var len = await ReadUInt16Async();
+
+            if (len == ushort.MaxValue)
+                return null;
+
+            if (len == 0)
+                return String.Empty;
+
+            return await ReadString16Async(len);
+        }
 
         /// <summary>
         /// Чтения значения string
@@ -237,9 +260,31 @@ namespace NSL.SocketCore.Utils.Buffer
         /// Чтения значения string, с чтением заголовка c размером  (4 байта), до 1.2ккк симв
         /// </summary>
         /// <returns></returns>
-        public string ReadString32() => ReadString32(ReadUInt32());
+        public string ReadString32()
+        {
+            var len = ReadUInt32();
 
-        public async Task<string> ReadString32Async() => await ReadString32Async(await ReadUInt32Async());
+            if (len == uint.MaxValue)
+                return null;
+
+            if (len == 0)
+                return String.Empty;
+
+            return ReadString32(len);
+        }
+
+        public async Task<string> ReadString32Async()
+        {
+            var len = await ReadUInt32Async();
+
+            if (len == uint.MaxValue)
+                return null;
+
+            if (len == 0)
+                return String.Empty;
+
+            return await ReadString32Async(len);
+        }
 
         /// <summary>
         /// Чтения значения string
@@ -387,6 +432,23 @@ namespace NSL.SocketCore.Utils.Buffer
             Array.Copy(GetBuffer(), headerLenght, buf, 0, DataLength);
 
             return buf;
+        }
+
+        public bool ManualDisposing
+        {
+            get => manualDisposing;
+            set
+            {
+                if (manualDisposing && !value)
+                    throw new InvalidOperationException($"[Security] Cannot change {nameof(ManualDisposing)} back");
+
+                manualDisposing = value;
+            }
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
         }
     }
 }

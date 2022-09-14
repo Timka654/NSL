@@ -38,17 +38,18 @@ namespace NSL.Extensions.RPC.Generator.Generators
         {
             CodeBuilder cb = new CodeBuilder();
 
-            if (!Debugger.IsAttached)
-                Debugger.Launch();
+            //if (!Debugger.IsAttached)
+            //    Debugger.Launch();
 
             var modText = decl.Modifiers.Remove(decl.Modifiers.First(x => x.Text.Equals("virtual"))).Add(SyntaxFactory.Token(SyntaxKind.OverrideKeyword)).ToString();
 
-            cb.AppendLine($"{modText} {decl.ReturnType} {method.Name}({string.Join(",", decl.ParameterList.Parameters.Select(x => $"{x.Type} {x.Identifier.Text}"))})");
+            cb.AppendLine($"{modText} {decl.ReturnType} {method.Name}({string.Join(", ", decl.ParameterList.Parameters.Select(x => $"{x.Type} {x.Identifier.Text}"))})");
             cb.AppendLine("{");
 
             cb.NextTab();
 
-            cb.AppendLine($"var __packet = new OutputPacketBuffer();");
+
+            cb.AppendLine($"var __packet = Processor.CreateCall(GetContainerName(), \"{decl.Identifier.Text}\", {decl.ParameterList.Parameters.Count});");
 
             foreach (var parameter in decl.ParameterList.Parameters)
             {
@@ -63,7 +64,33 @@ namespace NSL.Extensions.RPC.Generator.Generators
 
             cb.AppendLine();
 
-            cb.AppendLine($"NetworkClient.Network.Send(__packet);");
+
+            //if (!Debugger.IsAttached)
+            //    Debugger.Launch();
+
+
+            var symbol = semanticModel.GetDeclaredSymbol(decl);
+            if (symbol.ReturnsVoid)
+            {
+                cb.AppendLine($"Processor.SendWait(__packet);");
+            }
+            else
+            {
+
+                cb.AppendLine($"var dataPacket = Processor.SendWithResultData(__packet);");
+
+                cb.AppendLine();
+
+                cb.AppendLine($"var result = {(ReadMethodsGenerator.GetValueReadSegment(symbol.ReturnType, semanticModel, "result"))}");
+
+                cb.AppendLine();
+
+                cb.AppendLine($"dataPacket.Dispose();");
+
+                cb.AppendLine();
+
+                cb.AppendLine($"return result;");
+            }
 
             cb.PrevTab();
 
@@ -71,7 +98,7 @@ namespace NSL.Extensions.RPC.Generator.Generators
             return cb.ToString();
         }
 
-        private static string BuildParameterWriter(ISymbol item, string path)
+        public static string BuildParameterWriter(ISymbol item, string path)
         {
             var writerLine = GetBaseTypeWriteLine(item, path);
 
@@ -81,9 +108,9 @@ namespace NSL.Extensions.RPC.Generator.Generators
 
                 if (writerLine == default)
                 {
-                    writerLine = GetClassWriteLine(item,path);
+                    writerLine = GetClassWriteLine(item, path);
 
-                    if(writerLine == default)
+                    if (writerLine == default)
                         writerLine = GetStructWriteLine(item, path);
                 }
             }

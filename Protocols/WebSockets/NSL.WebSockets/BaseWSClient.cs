@@ -169,7 +169,9 @@ namespace NSL.WebSockets
                             RunException(ex);
                         }
 
-                        pbuff.Dispose();
+
+                        if (!pbuff.ManualDisposing)
+                            pbuff.Dispose();
                     }
                 }
 

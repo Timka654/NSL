@@ -248,7 +248,7 @@ namespace NSL.SocketCore.Utils.Buffer
         {
             if (value == null)
             {
-                WriteUInt16(0);
+                WriteUInt16(ushort.MaxValue);
                 return;
             }
             byte[] buf = coding.GetBytes(value);
@@ -266,7 +266,7 @@ namespace NSL.SocketCore.Utils.Buffer
         {
             if (value == null)
             {
-                WriteUInt32(0);
+                WriteUInt32(uint.MaxValue);
                 return;
             }
 

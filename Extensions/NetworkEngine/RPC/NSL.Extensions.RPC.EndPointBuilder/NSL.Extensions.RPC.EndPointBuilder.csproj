@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<TargetFramework>netstandard2.0</TargetFramework>
@@ -8,11 +8,10 @@
 		<EmbedUntrackedSources>true</EmbedUntrackedSources>
 		<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
 		<GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
-		
-		<Description>Базовая библиотека для создания клиента с логикой взаимодействия совместимой с сервером созданным при помощи пакета SocketServer</Description>
+
 		<Version>$(VersionSuffix)</Version>
 		<Authors>Relife87</Authors>
-		
+
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 	</PropertyGroup>
 
@@ -30,8 +29,10 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\NSL.EndPointBuilder\NSL.EndPointBuilder.csproj" />
-	  <ProjectReference Include="..\NSL.SocketCore\NSL.SocketCore.csproj" />
+		<ProjectReference Include="..\..\..\..\Core\BuilderExtensions\NSL.BuilderExtensions.SocketCore\NSL.BuilderExtensions.SocketCore.csproj" />
+		<ProjectReference Include="..\..\..\..\Core\NSL.EndPointBuilder\NSL.EndPointBuilder.csproj" />
+		<ProjectReference Include="..\..\..\..\Core\NSL.SocketCore\NSL.SocketCore.csproj" />
+		<ProjectReference Include="..\NSL.Extensions.RPC\NSL.Extensions.RPC.csproj" />
 	</ItemGroup>
 
 </Project>

@@ -8,9 +8,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\..\NSL.Extensions.RPC.Generator\NSL.Extensions.RPC.Generator.csproj" OutputItemType="Analyzer"  />
+    <ProjectReference Include="..\..\..\..\..\NSL.Extensions.RPC.Generator\NSL.Extensions.RPC.Generator.csproj" OutputItemType="Analyzer" />
     <ProjectReference Include="..\..\..\..\..\Protocols\TCP\BuilderExtensions\NSL.BuilderExtensions.TCPClient\NSL.BuilderExtensions.TCPClient.csproj" />
     <ProjectReference Include="..\..\..\..\..\Protocols\TCP\BuilderExtensions\NSL.BuilderExtensions.TCPServer\NSL.BuilderExtensions.TCPServer.csproj" />
+    <ProjectReference Include="..\..\NSL.Extensions.RPC.EndPointBuilder\NSL.Extensions.RPC.EndPointBuilder.csproj" />
     <ProjectReference Include="..\..\NSL.Extensions.RPC\NSL.Extensions.RPC.csproj" />
   </ItemGroup>
 

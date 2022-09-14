@@ -207,13 +207,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UDPExample.SClient", "Proto
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NSL.Extensions.NetScript.Example", "Extensions\ScriptEngine\Examples\NSL.Extensions.NetScript.Example\NSL.Extensions.NetScript.Example.csproj", "{4DAB42D0-A12D-4F99-A133-60E826E91248}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NSL.Extensions.RPC", "Extensions\NetworkEngine\RPC\NSL.Extensions.RPC\NSL.Extensions.RPC.csproj", "{20185890-4957-4004-915F-F7353D8BFFCE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NSL.Extensions.RPC", "Extensions\NetworkEngine\RPC\NSL.Extensions.RPC\NSL.Extensions.RPC.csproj", "{20185890-4957-4004-915F-F7353D8BFFCE}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "RPC", "RPC", "{854F1AB4-1DBB-4809-87C4-7FDD525CC333}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RPCWithBuilder.TCP.Example", "Extensions\NetworkEngine\RPC\Examples\RPCWithBuilder.TCP.Example\RPCWithBuilder.TCP.Example.csproj", "{E7CEEAE6-715E-4E00-8D93-3D1D596A7E42}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RPCWithBuilder.TCP.Example", "Extensions\NetworkEngine\RPC\Examples\RPCWithBuilder.TCP.Example\RPCWithBuilder.TCP.Example.csproj", "{E7CEEAE6-715E-4E00-8D93-3D1D596A7E42}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NSL.Extensions.RPC.Generator", "NSL.Extensions.RPC.Generator\NSL.Extensions.RPC.Generator.csproj", "{2727D816-ABBE-4647-B040-85061DA9FC94}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NSL.Extensions.RPC.Generator", "NSL.Extensions.RPC.Generator\NSL.Extensions.RPC.Generator.csproj", "{2727D816-ABBE-4647-B040-85061DA9FC94}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NSL.Extensions.RPC.EndPointBuilder", "Extensions\NetworkEngine\RPC\NSL.Extensions.RPC.EndPointBuilder\NSL.Extensions.RPC.EndPointBuilder.csproj", "{EA752433-B226-4F8F-9237-4F96CAD9B4A6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -955,6 +957,16 @@ Global
 		{2727D816-ABBE-4647-B040-85061DA9FC94}.Unity|Any CPU.Build.0 = Debug|Any CPU
 		{2727D816-ABBE-4647-B040-85061DA9FC94}.UnityDebug|Any CPU.ActiveCfg = Debug|Any CPU
 		{2727D816-ABBE-4647-B040-85061DA9FC94}.UnityDebug|Any CPU.Build.0 = Debug|Any CPU
+		{EA752433-B226-4F8F-9237-4F96CAD9B4A6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EA752433-B226-4F8F-9237-4F96CAD9B4A6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EA752433-B226-4F8F-9237-4F96CAD9B4A6}.DebugStable|Any CPU.ActiveCfg = Debug|Any CPU
+		{EA752433-B226-4F8F-9237-4F96CAD9B4A6}.DebugStable|Any CPU.Build.0 = Debug|Any CPU
+		{EA752433-B226-4F8F-9237-4F96CAD9B4A6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EA752433-B226-4F8F-9237-4F96CAD9B4A6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EA752433-B226-4F8F-9237-4F96CAD9B4A6}.Unity|Any CPU.ActiveCfg = Debug|Any CPU
+		{EA752433-B226-4F8F-9237-4F96CAD9B4A6}.Unity|Any CPU.Build.0 = Debug|Any CPU
+		{EA752433-B226-4F8F-9237-4F96CAD9B4A6}.UnityDebug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EA752433-B226-4F8F-9237-4F96CAD9B4A6}.UnityDebug|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1059,6 +1071,7 @@ Global
 		{854F1AB4-1DBB-4809-87C4-7FDD525CC333} = {B5BB912E-7008-40C5-A3BE-CB3841AC7E78}
 		{E7CEEAE6-715E-4E00-8D93-3D1D596A7E42} = {81D177CF-FFA1-424C-8C36-008F4B046EDE}
 		{2727D816-ABBE-4647-B040-85061DA9FC94} = {854F1AB4-1DBB-4809-87C4-7FDD525CC333}
+		{EA752433-B226-4F8F-9237-4F96CAD9B4A6} = {854F1AB4-1DBB-4809-87C4-7FDD525CC333}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {FAC0C61D-775D-4347-9BD3-3A114A731C7C}

@@ -16,5 +16,7 @@ namespace NSL.Extensions.RPC.Generator.Declarations
         public Compilation Compilation => Context.Compilation;
 
         public IEnumerable<MethodDecl> Methods { get; set; }
+
+        public INamedTypeSymbol ClassSymbol { get; set; }
     }
 }

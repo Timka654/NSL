@@ -1,10 +1,13 @@
 ﻿using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using NSL.Extensions.RPC.Generator.Attributes;
 using NSL.Extensions.RPC.Generator.Comparers;
 using NSL.Extensions.RPC.Generator.Declarations;
 using NSL.Extensions.RPC.Generator.Generators;
 using NSL.Extensions.RPC.Generator.Utils;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 
@@ -71,7 +74,11 @@ namespace NSL.Extensions.RPC.Generator
                 BuildClass(context, classDecl);
             }
         }
-
+        private SyntaxList<UsingDirectiveSyntax> UpdateUsingDirectives(SyntaxTree originalTree)
+        {
+            var rootNode = originalTree.GetRoot() as CompilationUnitSyntax;
+            return rootNode.Usings;
+        }
         private void BuildClass(GeneratorExecutionContext context, ClassDecl classDecl)
         {
             var ns = classDecl.Class.Parent as NamespaceDeclarationSyntax;
@@ -92,10 +99,34 @@ namespace NSL.Extensions.RPC.Generator
             classBuilder.AppendLine($"using NSL.SocketCore.Utils.Buffer;");
             classBuilder.AppendLine($"using NSL.Extensions.RPC;");
 
+            var usings = UpdateUsingDirectives(classDecl.Class.SyntaxTree);
+
+            foreach (var u in usings)
+            {
+                classBuilder.AppendLine(u.ToString());
+            }
+
             classBuilder.AppendLine();
 
+            var classSemanticModel = classDecl.Compilation.GetSemanticModel(classDecl.Class.SyntaxTree);
 
-            classBuilder.AppendLine($"{GetClassFullModifier(classDecl.Class)} class {GetClassRPCHandleName(classDecl.Class)} : {classIdentityName}");
+            classDecl.ClassSymbol = classSemanticModel.GetDeclaredSymbol(classDecl.Class);
+
+
+            var generic = classDecl.Class.TypeParameterList.Parameters.Any() ? $"<{string.Join(",", classDecl.Class.TypeParameterList.Parameters.Select(x => x.Identifier.Text))}>" : string.Empty;
+
+
+            classBuilder.AppendLine($"{GetClassFullModifier(classDecl.Class)} class {GetClassRPCHandleName(classDecl.Class)}{generic} : {classIdentityName}{generic}");
+
+            classBuilder.NextTab();
+
+            foreach (var c in classDecl.Class.ConstraintClauses)
+            {
+                classBuilder.AppendLine(c.ToString());
+            }
+
+            classBuilder.PrevTab();
+
             classBuilder.AppendLine("{");
 
             classBuilder.NextTab();
@@ -110,6 +141,10 @@ namespace NSL.Extensions.RPC.Generator
             classBuilder.AppendLine();
 
             classBuilder.AppendLine(ReadMethodsGenerator.BuildNameHandle(classDecl.Methods));
+
+            classBuilder.AppendLine();
+
+            classBuilder.AppendLine(BuildContainerNameOverride(classDecl));
 
             classBuilder.PrevTab();
 
@@ -137,6 +172,14 @@ namespace NSL.Extensions.RPC.Generator
             File.WriteAllText($@"D:\Temp\gen\{classIdentityName}.rpcgen.cs", outputValue);
 
             context.AddSource($"{classIdentityName}.rpcgen.cs", outputValue);
+        }
+
+        private string BuildContainerNameOverride(ClassDecl classDecl)
+        {
+            var classNameSymbolDisplayFormat = new SymbolDisplayFormat(
+    typeQualificationStyle: SymbolDisplayTypeQualificationStyle.NameAndContainingTypesAndNamespaces);
+
+            return $"public override string GetContainerName() => \"{classDecl.ClassSymbol.ToDisplayString(classNameSymbolDisplayFormat)}\";";
         }
 
         public void Initialize(GeneratorInitializationContext context)
