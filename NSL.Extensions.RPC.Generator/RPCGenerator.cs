@@ -169,7 +169,9 @@ namespace NSL.Extensions.RPC.Generator
 
                 outputValue = nsBuilder.ToString();
             }
+#if DEVELOP
             File.WriteAllText($@"D:\Temp\gen\{classIdentityName}.rpcgen.cs", outputValue);
+#endif
 
             context.AddSource($"{classIdentityName}.rpcgen.cs", outputValue);
         }
