@@ -3,6 +3,7 @@ using NSL.Extensions.RPC.Generator;
 using NSL.Extensions.RPC.Generator.Attributes;
 using NSL.SocketCore.Utils;
 using NSL.SocketCore.Utils.Buffer;
+using RPCWithBuilder.TCP.Example.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,7 +17,7 @@ namespace RPCWithBuilder.TCP.Example
         where TClient : INetworkClient
     {
         [RPCMethod]
-        public virtual testStruct abc1(int v1, int? v2, string v3, string? v4, testData v5, testStruct v6)
+        public virtual TestStructModel abc1(int v1, int? v2, string v3, string? v4, TestDataModel v5, TestStructModel v6)
         {
             int random = Random.Shared.Next();
 
@@ -28,11 +29,11 @@ namespace RPCWithBuilder.TCP.Example
 
             abc2(random, v2, v3, v4, v5, v6);
 
-            return new testStruct() { tsValue = random };
+            return new TestStructModel() { tsValue = random };
         }
 
         [RPCMethod]
-        public virtual void abc2(int v1, int? v2, string v3, string? v4, testData v5, testStruct v6)
+        public virtual void abc2(int v1, int? v2, string v3, string? v4, TestDataModel v5, TestStructModel v6)
         {
 
             if (IsServer())

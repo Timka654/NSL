@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RPCWithBuilder.TCP.Example
+namespace RPCWithBuilder.TCP.Example.Models
 {
-    public struct testStruct
+    public struct TestStructModel
     {
         public int tsValue;
 
@@ -16,11 +16,5 @@ namespace RPCWithBuilder.TCP.Example
         {
             return (new { tsValue }).ToString();
         }
-    }
-    public struct testStruct2
-    {
-        public int ts2Value { get; set; }
-
-        public string ts2sval;
     }
 }

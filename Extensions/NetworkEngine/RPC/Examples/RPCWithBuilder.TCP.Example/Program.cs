@@ -6,7 +6,10 @@ using NSL.SocketClient;
 using NSL.SocketCore.Utils;
 using NSL.SocketServer;
 using RPCWithBuilder.TCP.Example;
+using RPCWithBuilder.TCP.Example.Models;
 using System.Security.AccessControl;
+
+//Server init
 
 var server = NSL.BuilderExtensions.TCPServer.TCPServerEndPointBuilder
     .Create()
@@ -38,19 +41,21 @@ var server = NSL.BuilderExtensions.TCPServer.TCPServerEndPointBuilder
         builder.AddSendHandle((client, pid, packet, stackTrace) =>
         {
             //Console.WriteLine($"[Client] Send packet({pid}) to {client.GetRemotePoint()} from\r\n{stackTrace}");
-            Console.WriteLine($"[Server] Send packet({pid}) - {GetPacketType(pid)} to {client.GetRemotePoint()}");
+            Console.WriteLine($"[Server] Send packet({pid}) - {GetRPCPacketType(pid)} to {client.GetRemotePoint()}");
         });
 
         builder.AddReceiveHandle((client, pid, packet) =>
         {
-            Console.WriteLine($"[Server] Receive packet({pid}) - {GetPacketType(pid)} from {client.GetRemotePoint()}");
+            Console.WriteLine($"[Server] Receive packet({pid}) - {GetRPCPacketType(pid)} from {client.GetRemotePoint()}");
         });
     })
     .Build();
 
+// Start server
+
 server.Start();
 
-
+// Client init
 
 var client = NSL.BuilderExtensions.TCPClient.TCPClientEndPointBuilder
     .Create()
@@ -87,30 +92,36 @@ var client = NSL.BuilderExtensions.TCPClient.TCPClientEndPointBuilder
         builder.AddSendHandle((client, pid, packet, stackTrace) =>
         {
             //Console.WriteLine($"[Client] Send packet({pid}) to {client.GetRemotePoint()} from\r\n{stackTrace}");
-            Console.WriteLine($"[Client] Send packet({pid}) - {GetPacketType(pid)} to {client.GetRemotePoint()}");
+            Console.WriteLine($"[Client] Send packet({pid}) - {GetRPCPacketType(pid)} to {client.GetRemotePoint()}");
         });
 
         builder.AddReceiveHandle((client, pid, packet) =>
         {
-            Console.WriteLine($"[Client] Receive packet({pid}) - {GetPacketType(pid)} from {client.GetRemotePoint()}");
+            Console.WriteLine($"[Client] Receive packet({pid}) - {GetRPCPacketType(pid)} from {client.GetRemotePoint()}");
         });
     })
     .Build();
 
+// Client try connect to server
+
 if (!client.Connect())
     throw new Exception();
 
+//Try call RPC from Client to Server
 
 Console.WriteLine($"[Client] Try call {nameof(TestRPCClientContainerRPCRepository<NetworkClient>.abc1)}");
 
-var rpcCallResult = client.ConnectionOptions.ClientData.RPCRepository.abc1(1, null, "abc", null, new testData() { tdValue = 10 }, new testStruct() { tsValue = 1010 });
-
+var rpcCallResult = client.ConnectionOptions.ClientData.RPCRepository.abc1(1, null, "abc", null, new TestDataModel() { tdValue = 10 }, new TestStructModel() { tsValue = 1010 });
 
 Console.WriteLine($"[Client] has result {rpcCallResult}");
 
+
+
 Console.ReadKey();
 
-string GetPacketType(ushort pid)
+
+
+string GetRPCPacketType(ushort pid)
 {
     switch (pid)
     {
