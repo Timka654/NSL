@@ -23,7 +23,7 @@ namespace NSL.SocketCore.Utils
 
         public object Get(string key) => this[key];
 
-        public object Get<TObject>(string key) => (TObject)this[key];
+        public TObject Get<TObject>(string key) => (TObject)this[key];
 
         public void Set(string key, object value) => this[key] = value;
 

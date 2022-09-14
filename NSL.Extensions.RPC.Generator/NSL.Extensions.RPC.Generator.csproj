@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<TargetFramework>netstandard2.0</TargetFramework>
@@ -8,11 +8,11 @@
 		<EmbedUntrackedSources>true</EmbedUntrackedSources>
 		<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
 		<GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
-		
-		<Description>Базовая библиотека для создания клиента с логикой взаимодействия совместимой с сервером созданным при помощи пакета SocketServer</Description>
-		<Version>$(VersionSuffix)</Version>
+
+		<Description>Библиотека генератор классов перегрузок для быстрых вызовов(RPC)</Description>
 		<Authors>Relife87</Authors>
-		
+		<Version>$(VersionSuffix)</Version>
+
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 	</PropertyGroup>
 
@@ -30,8 +30,15 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\NSL.EndPointBuilder\NSL.EndPointBuilder.csproj" />
-	  <ProjectReference Include="..\NSL.SocketCore\NSL.SocketCore.csproj" />
+		<PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.3">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.8.0" />
+		<PackageReference Include="System.Collections.Immutable" Version="5.0.0" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <ProjectReference Include="..\Core\NSL.SocketCore\NSL.SocketCore.csproj" />
+	</ItemGroup>
 </Project>

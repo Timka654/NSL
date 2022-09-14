@@ -157,7 +157,8 @@ namespace NSL.TCP
                             RunException(ex);
                         }
 
-                        pbuff.Dispose();
+                        if (!pbuff.ManualDisposing)
+                            pbuff.Dispose();
                     }
                 }
                 sclient.BeginReceive(receiveBuffer, offset, lenght - offset, SocketFlags.None, Receive, sclient);

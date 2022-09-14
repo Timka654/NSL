@@ -127,7 +127,9 @@ namespace NSL.UDP
                     RunException(ex);
                 }
 
-                pbuff.Dispose();
+
+                if (!pbuff.ManualDisposing)
+                    pbuff.Dispose();
             }
             catch (ConnectionLostException clex)
             {
