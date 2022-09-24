@@ -31,20 +31,26 @@ namespace NSL.Logger
 
         public override void Flush()
         {
-            //if this method throwns - unlock after 2s
             if (!flushLocker.WaitOne(2_000))
                 return;
 
-            base.FlushBuffer(message =>
+            try
             {
-                NextDay(message);
+                base.FlushBuffer(message =>
+                {
+                    NextDay(message);
 
-                stream.WriteLine(message.ToString());
-            });
+                    stream.WriteLine(message.ToString());
+                });
 
-            stream?.Flush();
+                stream?.Flush();
+            }
+            catch (System.Exception ex)
+            {
+                ConsoleLog(SocketCore.Utils.Logger.Enums.LoggerLevel.Error, ex.ToString());
+            }
 
-            flushLocker.Reset();
+            flushLocker.Set();
         }
 
         private void NextDay(LogMessageInfo msg)

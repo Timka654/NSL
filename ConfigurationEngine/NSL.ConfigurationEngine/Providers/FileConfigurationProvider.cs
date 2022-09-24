@@ -15,8 +15,6 @@ namespace NSL.ConfigurationEngine.Providers
 
         protected bool Required { get; }
 
-        public BaseConfigurationManager Manager { get; set; }
-
         public FileConfigurationProvider(string fileName, bool required = false, bool reloadOnChange = false)
         {
             FileName = fileName;
