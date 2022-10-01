@@ -3,18 +3,9 @@ using NSL.EndPointBuilder;
 using NSL.SocketClient;
 using NSL.SocketClient.Utils;
 using NSL.SocketCore;
-using NSL.SocketCore.Extensions.Packet;
-using NSL.SocketCore.Utils;
 using NSL.TCP.Client;
-using NSL.Utils;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
-using System.Net.Sockets;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace NSL.BuilderExtensions.TCPClient
 {

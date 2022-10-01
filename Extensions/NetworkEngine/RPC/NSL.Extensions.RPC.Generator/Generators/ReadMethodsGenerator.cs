@@ -4,13 +4,10 @@ using NSL.SocketCore.Utils.Buffer;
 using System;
 using System.Collections.Generic;
 using Microsoft.CodeAnalysis;
-using System.Diagnostics;
 using System.Linq;
-using System.Data;
-using System.IO;
-using System.Xml.Linq;
 using NSL.Extensions.RPC.Generator.Declarations;
 using NSL.Extensions.RPC.Generator.Utils;
+using System.Diagnostics;
 
 namespace NSL.Extensions.RPC.Generator.Generators
 {
@@ -58,6 +55,22 @@ namespace NSL.Extensions.RPC.Generator.Generators
                 return valueReader;
 
             return $"{linePrefix}{valueReader}{(valueReader.EndsWith(";") ? string.Empty : ";")}";
+        }
+
+        private static string BuildNullableTypeDef(IFieldSymbol field)
+        {
+            if (!field.NullableAnnotation.Equals(NullableAnnotation.Annotated))
+                return field.Type.Name;
+
+            if(!field.Type.IsValueType)
+                return field.Type.Name;
+
+            //if (!Debugger.IsAttached)
+            //    Debugger.Launch();
+
+            var genericType = ((INamedTypeSymbol)field.Type).TypeArguments.First();
+
+            return $"{genericType.Name}?";
         }
 
         private static string GetNullableTypeReadLine(ISymbol parameter, SemanticModel semanticModel, string path)
@@ -171,8 +184,17 @@ namespace NSL.Extensions.RPC.Generator.Generators
 
             var rb = new CodeBuilder();
 
+            if (type.IsTupleType)
+            {
+                //if (!Debugger.IsAttached)
+                //    Debugger.Launch();
 
-            rb.AppendLine($"new {type.Name}();");
+                var nts = type as INamedTypeSymbol;
+
+                rb.AppendLine($@"new {type.Name}<{string.Join(", ", nts.TupleElements.Select(x => BuildNullableTypeDef(x)))}>();");
+            }
+            else
+                rb.AppendLine($"new {type.Name}();");
 
             rb.AppendLine();
 

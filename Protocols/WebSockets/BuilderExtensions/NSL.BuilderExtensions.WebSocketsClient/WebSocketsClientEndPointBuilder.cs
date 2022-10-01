@@ -5,9 +5,6 @@ using NSL.SocketClient.Utils;
 using NSL.SocketCore;
 using NSL.WebSockets.Client;
 using System;
-using System.Collections.Generic;
-using System.Net;
-using System.Text;
 
 namespace NSL.BuilderExtensions.WebSocketsClient
 {

@@ -3,15 +3,10 @@ using NSL.Extensions.RPC.Generator.Declarations;
 using NSL.Extensions.RPC.Generator.Utils;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Linq;
-using System.Diagnostics;
 using Microsoft.CodeAnalysis.CSharp;
-using System.Reflection.Metadata;
 using Microsoft.CodeAnalysis;
 using NSL.SocketCore.Utils.Buffer;
-using System.Data.Common;
-using System.IO;
 
 namespace NSL.Extensions.RPC.Generator.Generators
 {

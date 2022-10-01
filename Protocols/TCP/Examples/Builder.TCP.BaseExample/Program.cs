@@ -1,16 +1,4 @@
-﻿using NSL.BuilderExtensions.TCPClient;
-using NSL.SocketClient;
-using NSL.SocketClient.Utils;
-using NSL.SocketCore.Extensions.Packet;
-using NSL.SocketCore.Utils;
-using NSL.SocketCore.Utils.Buffer;
-using NSL.BuilderExtensions.SocketCore;
-using System.Reflection;
-using System.Diagnostics;
-using NSL.BuilderExtensions.TCPServer;
-using NSL.SocketServer.Utils;
-using NSL.SocketServer;
-using Builder.TCP.BaseExample.Server;
+﻿using Builder.TCP.BaseExample.Server;
 using Builder.TCP.BaseExample.Client;
 
 namespace Builder.TCP.BaseExample

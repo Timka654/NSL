@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace RPCWithBuilder.TCP.Example.Models
+﻿namespace RPCWithBuilder.TCP.Example.Models
 {
     public struct TestStruct2Model
     {

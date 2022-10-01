@@ -1,7 +1,6 @@
 ﻿using NSL.SocketClient;
 using NSL.SocketCore.Utils.Buffer;
 using NSL.TCP.Client;
-using System;
 using TCPExample.Client;
 
 ClientOptions<NetworkClient> options = new ClientOptions<NetworkClient>();

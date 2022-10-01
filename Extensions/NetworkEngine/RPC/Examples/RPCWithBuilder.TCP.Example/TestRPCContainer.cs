@@ -1,14 +1,7 @@
 ﻿using NSL.Extensions.RPC;
-using NSL.Extensions.RPC.Generator;
 using NSL.Extensions.RPC.Generator.Attributes;
 using NSL.SocketCore.Utils;
-using NSL.SocketCore.Utils.Buffer;
 using RPCWithBuilder.TCP.Example.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace RPCWithBuilder.TCP.Example
 {
@@ -42,17 +35,17 @@ namespace RPCWithBuilder.TCP.Example
                 Console.WriteLine($"[Client] {nameof(abc2)} called... with {nameof(v1)} have value {v1}");
         }
 
-        //[RPCMethod]
-        //public void abc1(testData data, testData data2, testStruct str, int val, testStruct? emptyStr)
-        //{
 
-        //}
 
-        //[RPCMethod]
-        //public void abc2(testData data)
-        //{
+        [RPCMethod]
+        public virtual (int?, string?) testTupleReceive(int value)
+        {
 
-        //}
+            if (value > 10)
+                return (null, $"value more 10");
+
+            return (value, $"value is {value}");
+        }
 
         private bool IsServer()
         {

@@ -1,8 +1,6 @@
 ﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis;
-using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace NSL.Extensions.RPC.Generator.Declarations
 {

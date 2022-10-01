@@ -5,9 +5,6 @@ using NSL.SocketServer;
 using NSL.SocketServer.Utils;
 using NSL.WebSockets.Server;
 using System;
-using System.Collections.Generic;
-using System.Net;
-using System.Text;
 
 namespace NSL.BuilderExtensions.WebSocketsServer
 {

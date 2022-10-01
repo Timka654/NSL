@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Primitives;
 using NSL.ConfigurationEngine.Info;
-using System;
 
 namespace NSL.ConfigurationEngine.Providers.IConfiguration
 {

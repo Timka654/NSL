@@ -4,7 +4,6 @@ using NSL.SocketCore.Utils.Logger.Enums;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.IO;
 using System.Linq;
 
 namespace NSL.ConfigurationEngine

@@ -6,9 +6,6 @@ using NSL.Extensions.RPC.Generator.Comparers;
 using NSL.Extensions.RPC.Generator.Declarations;
 using NSL.Extensions.RPC.Generator.Generators;
 using NSL.Extensions.RPC.Generator.Utils;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
 using System.Linq;
 
 namespace NSL.Extensions.RPC.Generator
@@ -169,8 +166,8 @@ namespace NSL.Extensions.RPC.Generator
 
                 outputValue = nsBuilder.ToString();
             }
-#if DEVELOP
-            File.WriteAllText($@"D:\Temp\gen\{classIdentityName}.rpcgen.cs", outputValue);
+#if !DEVELOP
+            System.IO.File.WriteAllText($@"D:\Temp\gen\{classIdentityName}.rpcgen.cs", outputValue);
 #endif
 
             context.AddSource($"{classIdentityName}.rpcgen.cs", outputValue);

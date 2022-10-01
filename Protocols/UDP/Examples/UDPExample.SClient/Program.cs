@@ -1,5 +1,4 @@
-﻿using System.Threading;
-using UDPExample;
+﻿using UDPExample;
 
 new ReceiverExample();
 

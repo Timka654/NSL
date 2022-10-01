@@ -1,7 +1,5 @@
 ﻿using NSL.Extensions.RPC.Generator.Declarations;
-using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace NSL.Extensions.RPC.Generator.Comparers
 {

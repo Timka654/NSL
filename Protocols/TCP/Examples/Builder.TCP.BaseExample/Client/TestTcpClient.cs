@@ -3,11 +3,6 @@ using NSL.BuilderExtensions.TCPClient;
 using NSL.SocketClient;
 using NSL.SocketCore.Utils.Buffer;
 using NSL.TCP.Client;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Builder.TCP.BaseExample.Client
 {

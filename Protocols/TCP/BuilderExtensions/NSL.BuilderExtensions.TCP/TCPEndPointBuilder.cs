@@ -1,8 +1,4 @@
-﻿using NSL.SocketCore;
-using NSL.Utils;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using NSL.Utils;
 
 namespace NSL.BuilderExtensions.TCP
 {
