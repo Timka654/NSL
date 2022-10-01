@@ -1,14 +1,15 @@
-﻿using NSL.SocketCore.Utils.Logger.Enums;
+﻿using NSL.Logger.Interface;
+using NSL.SocketCore.Utils.Logger.Enums;
 using System;
 using System.Threading.Tasks;
 
 namespace NSL.Logger
 {
-    internal class ConsoleLogger
+    public class ConsoleLogger : ILogger
     {
         private static object _locked = new object();
 
-        public static async void WriteLog(LoggerLevel level, string text)
+        internal static async void WriteLog(LoggerLevel level, string text)
         {
             await Task.Run(() =>
             {
@@ -41,5 +42,30 @@ namespace NSL.Logger
                 }
             });
         }
+
+        public void Append(LoggerLevel level, string text)
+        {
+            WriteLog(level, text);
+        }
+
+        public void ConsoleLog(LoggerLevel level, string text)
+        {
+            Append(level, text);
+        }
+
+        public void Flush()
+        {
+        }
+
+        public void SetConsoleOutput(bool allow)
+        {
+        }
+
+        public void SetUnhandledExCatch(bool allow)
+        {
+        }
+
+        public static ConsoleLogger Create()
+            => new ConsoleLogger();
     }
 }

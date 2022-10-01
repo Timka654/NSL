@@ -109,6 +109,16 @@ namespace NSL.BuilderExtensions.TCPServer
             OnSendHandles += handle;
         }
 
+        public void AddBaseReceiveHandle(ReceivePacketDebugInfo<IClient> handle)
+        {
+            OnReceiveHandles += (client, pid, len) => handle(client, pid, len);
+        }
+
+        public void AddBaseSendHandle(SendPacketDebugInfo<IClient> handle)
+        {
+            OnSendHandles += (client, pid, len, stack) => handle(client, pid, len, stack);
+        }
+
         public TCPServerListener<TClient> Build()
         {
             var result = new TCPServerListener<TClient>(options);
@@ -118,16 +128,6 @@ namespace NSL.BuilderExtensions.TCPServer
             result.OnSendPacket += OnSendHandles;
 
             return result;
-        }
-
-        public ReceivePacketDebugInfo<TCPServerClient<TClient>> GetReceiveHandles()
-        {
-            return OnReceiveHandles;
-        }
-
-        public SendPacketDebugInfo<TCPServerClient<TClient>> GetSendHandles()
-        {
-            return OnSendHandles;
         }
     }
 }

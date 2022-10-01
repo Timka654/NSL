@@ -1,7 +1,10 @@
 ﻿
 using NSL.BuilderExtensions.SocketCore;
+using NSL.BuilderExtensions.TCPClient;
+using NSL.BuilderExtensions.TCPServer;
 using NSL.Extensions.RPC;
 using NSL.Extensions.RPC.EndPointBuilder;
+using NSL.Logger;
 using NSL.SocketClient;
 using NSL.SocketCore.Utils;
 using NSL.SocketServer;
@@ -18,36 +21,18 @@ var server = NSL.BuilderExtensions.TCPServer.TCPServerEndPointBuilder
     .WithBindingPoint("0.0.0.0", 5506)
     .WithCode(builder =>
     {
+        builder.SetLogger(ConsoleLogger.Create());
+
         builder.AddConnectHandle(client => { client.InitializeObjectBag(); });
 
         builder.RegisterRPCProcessor();
         builder.AddRPCContainer(_client => _client.RPCRepository);
 
-        builder.AddConnectHandle(client =>
-        {
-            Console.WriteLine($"[Server] Success connected");
-        });
-
-        builder.AddDisconnectHandle(client =>
-        {
-            Console.WriteLine($"[Server] Client disconnected");
-        });
-
-        builder.AddExceptionHandle((ex, client) =>
-        {
-            Console.WriteLine($"[Server] Exception error handle - {ex}");
-        });
-
-        builder.AddSendHandle((client, pid, packet, stackTrace) =>
-        {
-            //Console.WriteLine($"[Client] Send packet({pid}) to {client.GetRemotePoint()} from\r\n{stackTrace}");
-            Console.WriteLine($"[Server] Send packet({pid}) - {GetRPCPacketType(pid)} to {client.GetRemotePoint()}");
-        });
-
-        builder.AddReceiveHandle((client, pid, packet) =>
-        {
-            Console.WriteLine($"[Server] Receive packet({pid}) - {GetRPCPacketType(pid)} from {client.GetRemotePoint()}");
-        });
+        builder.AddDefaultEventHandlers<TCPServerEndPointBuilder<NetworkServerClient, ServerOptions<NetworkServerClient>>, NetworkServerClient>(
+            "[Server]",
+             DefaultEventHandlersEnum.All & ~DefaultEventHandlersEnum.HasSendStackTrace,
+             GetRPCPacketType,
+             GetRPCPacketType);
     })
     .Build();
 
@@ -64,41 +49,18 @@ var client = NSL.BuilderExtensions.TCPClient.TCPClientEndPointBuilder
     .WithEndPoint("127.0.0.1", 5506)
     .WithCode(builder =>
     {
+        builder.SetLogger(ConsoleLogger.Create());
+
         builder.AddConnectHandle(client => { client.InitializeObjectBag(); });
 
         builder.RegisterRPCProcessor();
         builder.AddRPCContainer(_client => _client.RPCRepository);
 
-        builder.AddConnectHandle(client =>
-        {
-            //client.RPCRepository.abc1(1,);
-        });
-
-        builder.AddConnectHandle(client =>
-        {
-            Console.WriteLine($"[Client] Success connected");
-        });
-
-        builder.AddDisconnectHandle(client =>
-        {
-            Console.WriteLine($"[Client] Client disconnected");
-        });
-
-        builder.AddExceptionHandle((ex, client) =>
-        {
-            Console.WriteLine($"[Client] Exception error handle - {ex}");
-        });
-
-        builder.AddSendHandle((client, pid, packet, stackTrace) =>
-        {
-            //Console.WriteLine($"[Client] Send packet({pid}) to {client.GetRemotePoint()} from\r\n{stackTrace}");
-            Console.WriteLine($"[Client] Send packet({pid}) - {GetRPCPacketType(pid)} to {client.GetRemotePoint()}");
-        });
-
-        builder.AddReceiveHandle((client, pid, packet) =>
-        {
-            Console.WriteLine($"[Client] Receive packet({pid}) - {GetRPCPacketType(pid)} from {client.GetRemotePoint()}");
-        });
+        builder.AddDefaultEventHandlers<TCPClientEndPointBuilder<NetworkClient, ClientOptions<NetworkClient>>, NetworkClient>(
+            "[Client]",
+             DefaultEventHandlersEnum.All & ~(DefaultEventHandlersEnum.DisplayEndPoint | DefaultEventHandlersEnum.HasSendStackTrace),
+            GetRPCPacketType,
+            GetRPCPacketType);
     })
     .Build();
 

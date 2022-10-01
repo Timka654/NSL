@@ -279,11 +279,33 @@ namespace NSL.SocketCore.Utils.Buffer
 
         public void WriteCollection<T>(IEnumerable<T> arr, Action<OutputPacketBuffer, T> writeAction)
         {
+            if (arr == default)
+            {
+                WriteInt32(-1);
+                return;
+            }
+
             WriteInt32(arr.Count());
 
             foreach (var item in arr)
             {
                 writeAction(this, item);
+            }
+        }
+
+        public void WriteCollection<T>(IEnumerable<T> arr, Action<T> writeAction)
+        {
+            if (arr == default)
+            {
+                WriteInt32(-1);
+                return;
+            }
+
+            WriteInt32(arr.Count());
+
+            foreach (var item in arr)
+            {
+                writeAction(item);
             }
         }
 

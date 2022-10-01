@@ -55,13 +55,13 @@ namespace NSL.SocketClient
 
             recoverySession.OnReceiveEvent += RunRecoverySession;
 
-            AddPacket(ClientSystemTimePacket<TClient>.PacketId,
+            AddPacket(ClientSystemTimePacket.PacketId,
                     new ClientSystemTimePacket<TClient>(this));
 
             AddPacket(AliveConnectionPacket.PacketId,
                 new ClientAliveConnectionPacket<TClient>(this));
 
-            AddPacket(RecoverySessionPacket<TClient>.PacketId,
+            AddPacket(RecoverySessionPacket.PacketId,
                 recoverySession);
         }
 

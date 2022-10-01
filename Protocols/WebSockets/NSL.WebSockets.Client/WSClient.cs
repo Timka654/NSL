@@ -76,7 +76,7 @@ namespace NSL.WebSockets.Client
             RunReceive();
 
             VersionPacket.Send(ConnectionOptions.ClientData, Version);
-            RecoverySessionPacket<T>.Send(ConnectionOptions.ClientData);
+            RecoverySessionPacket.Send(ConnectionOptions.ClientData);
 
             ConnectionOptions.RunClientConnect();
         }

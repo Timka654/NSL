@@ -22,7 +22,6 @@ namespace NSL.SocketPhantom.AspNetCore
         private IConfiguration configuration => baseProvider.GetRequiredService<IConfiguration>();
 
         private PhantomNetworkServer server;
-        private PhantomCipherProvider cipher;
 
         public PhantomHubsManager(IServiceProvider baseProvider) : this(baseProvider, new NonePhantomCipherProvider())
         {
@@ -31,9 +30,9 @@ namespace NSL.SocketPhantom.AspNetCore
         public PhantomHubsManager(IServiceProvider baseProvider, PhantomCipherProvider cipher)
         {
             this.baseProvider = baseProvider;
-            this.cipher = cipher;
 
             server = new PhantomNetworkServer();
+
             server.Load(this, configuration, cipher);
         }
 

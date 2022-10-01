@@ -5,8 +5,10 @@ using NSL.SocketCore;
 using NSL.SocketCore.Extensions.Packet;
 using NSL.SocketCore.Utils;
 using NSL.SocketCore.Utils.Logger;
+using NSL.SocketCore.Utils.Logger.Enums;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net.Sockets;
 using System.Reflection;
@@ -160,5 +162,95 @@ namespace NSL.BuilderExtensions.SocketCore
             builder.GetCoreOptions().HelperLogger = logger;
         }
 
+
+        #region DefaultHandles
+
+        private static Func<ushort, string> defaultGetNamePacketHandle = pid => default;
+
+        #endregion
+
+        public static void AddDefaultEventHandlers<TBuilder, TClient>(this TBuilder builder,
+            string prefix = default,
+            DefaultEventHandlersEnum handleOptions = DefaultEventHandlersEnum.All,
+            Func<ushort, string> getNameSendPacket = default,
+            Func<ushort, string> getNameReceivePacket = default)
+            where TBuilder : IOptionableEndPointBuilder<TClient>, IHandleIOBuilder
+            where TClient : INetworkClient, new()
+        {
+            if (prefix != null)
+                prefix = $"{prefix} ";
+
+            var options = builder
+               .GetCoreOptions();
+
+            var logger = builder
+               .GetCoreOptions()
+               .HelperLogger;
+
+            if (logger == default)
+                throw new InvalidOperationException($"{nameof(CoreOptions.HelperLogger)} has not setted in options");
+
+            if (getNameSendPacket == default)
+                getNameSendPacket = defaultGetNamePacketHandle;
+
+            if (getNameReceivePacket == default)
+                getNameReceivePacket = defaultGetNamePacketHandle;
+
+
+            if (handleOptions.HasFlag(DefaultEventHandlersEnum.Connect))
+                builder.AddConnectHandle(client
+                    => logger.Append(LoggerLevel.Info, $"{prefix}Success connected"
+                        + (handleOptions.HasFlag(DefaultEventHandlersEnum.DisplayEndPoint) ? $"({client.Network?.GetRemotePoint()})" : default)));
+
+            if (handleOptions.HasFlag(DefaultEventHandlersEnum.Disconnect))
+                builder.AddDisconnectHandle(client
+                    => logger.Append(LoggerLevel.Info, $"{prefix}Success disconnected"
+                        + (handleOptions.HasFlag(DefaultEventHandlersEnum.DisplayEndPoint) ? $"({client.Network?.GetRemotePoint()})" : default)));
+
+            if (handleOptions.HasFlag(DefaultEventHandlersEnum.Exception))
+                builder.AddExceptionHandle((ex, client)
+                    => logger.Append(LoggerLevel.Info, $"{prefix}Exception error handle - {ex}"));
+
+            if (handleOptions.HasFlag(DefaultEventHandlersEnum.Send))
+                builder.AddBaseSendHandle((client, pid, len, stackTrace) =>
+                {
+                    var name = getNameSendPacket(pid);
+
+                    if (name != default)
+                        name = $"({name})";
+
+                    logger.Append(LoggerLevel.Info,
+                        $"{prefix}Send packet {name}{pid}"
+                        + (handleOptions.HasFlag(DefaultEventHandlersEnum.DisplayEndPoint) ? $" to {client.GetRemotePoint()}" : default)
+                        + (handleOptions.HasFlag(DefaultEventHandlersEnum.HasSendStackTrace) ? $" {stackTrace}" : default));
+                });
+
+
+            if (handleOptions.HasFlag(DefaultEventHandlersEnum.Receive))
+                builder.AddBaseReceiveHandle((client, pid, len) =>
+                {
+                    var name = getNameReceivePacket(pid);
+
+                    if (name != default)
+                        name = $"({name})";
+
+                    logger.Append(LoggerLevel.Info,
+                        $"{prefix}Receive packet {name}{pid}"
+                        + (handleOptions.HasFlag(DefaultEventHandlersEnum.DisplayEndPoint) ? $" from {client.GetRemotePoint()}" : default));
+                });
+        }
+    }
+
+    [Flags]
+    public enum DefaultEventHandlersEnum
+    {
+        Disconnect = 1,
+        Connect = 2,
+        Send = 4,
+        HasSendStackTrace = 8,
+        Receive = 16,
+        Exception = 32,
+        DisplayEndPoint = 64,
+        All = int.MaxValue
     }
 }

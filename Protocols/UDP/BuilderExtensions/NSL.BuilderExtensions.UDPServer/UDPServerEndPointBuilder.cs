@@ -109,6 +109,16 @@ namespace NSL.BuilderExtensions.UDPServer
             OnSendHandles += handle;
         }
 
+        public void AddBaseReceiveHandle(ReceivePacketDebugInfo<IClient> handle)
+        {
+            OnReceiveHandles += (client, pid, len) => handle(client, pid, len);
+        }
+
+        public void AddBaseSendHandle(SendPacketDebugInfo<IClient> handle)
+        {
+            OnSendHandles += (client, pid, len, stack) => handle(client, pid, len, stack);
+        }
+
         public UDPServer<TClient> Build()
         {
             var result = new UDPServer<TClient>(options);
@@ -118,16 +128,6 @@ namespace NSL.BuilderExtensions.UDPServer
             result.OnSendPacket += OnSendHandles;
 
             return result;
-        }
-
-        public ReceivePacketDebugInfo<UDPClient<TClient>> GetReceiveHandles()
-        {
-            return OnReceiveHandles;
-        }
-
-        public SendPacketDebugInfo<UDPClient<TClient>> GetSendHandles()
-        {
-            return OnSendHandles;
         }
     }
 }

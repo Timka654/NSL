@@ -73,34 +73,14 @@ namespace NSL.Logger
         public void Append(LoggerLevel level, string text)
         {
             if (level != LoggerLevel.Performance)
-                throw new NotSupportedException();
+                throw new NotSupportedException($"This provider support only {LoggerLevel.Performance} level logs");
 
             outputLogger.Append(level, text);
         }
 
-        public void AppendDebug(string text)
-        {
-            outputLogger.Append(LoggerLevel.Debug, text);
-        }
-
-        public void AppendError(string text)
-        {
-            throw new NotSupportedException();
-        }
-
-        public void AppendInfo(string text)
-        {
-            throw new NotSupportedException();
-        }
-
-        public void AppendLog(string text)
-        {
-            throw new NotSupportedException();
-        }
-
         public void ConsoleLog(LoggerLevel level, string text)
         {
-            throw new NotSupportedException();
+            ConsoleLogger.WriteLog(level, text);
         }
 
         public void Flush()

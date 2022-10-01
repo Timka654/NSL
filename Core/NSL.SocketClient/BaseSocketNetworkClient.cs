@@ -153,7 +153,7 @@ namespace NSL.SocketClient
 
         public void RequestServerTimeOffset()
         {
-            ClientSystemTimePacket<BaseSocketNetworkClient>.SendRequest(this);
+            ClientSystemTimePacket.SendRequest(this.Network);
         }
 
         #endregion

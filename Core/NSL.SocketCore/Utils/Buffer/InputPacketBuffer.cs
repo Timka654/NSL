@@ -319,11 +319,31 @@ namespace NSL.SocketCore.Utils.Buffer
         {
             int len = ReadInt32();
 
+            if (len == -1)
+                return default;
+
             List<T> result = new List<T>(len);
 
             for (int i = 0; i < len; i++)
             {
                 result.Add(readAction(this));
+            }
+
+            return result;
+        }
+
+        public IEnumerable<T> ReadCollection<T>(Func<T> readAction)
+        {
+            int len = ReadInt32();
+
+            if (len == -1)
+                return default;
+
+            List<T> result = new List<T>(len);
+
+            for (int i = 0; i < len; i++)
+            {
+                result.Add(readAction());
             }
 
             return result;

@@ -1,5 +1,6 @@
 ﻿using NSL.SocketCore.Utils;
 using NSL.SocketCore.Utils.Buffer;
+using System.Linq;
 
 namespace NSL.SocketServer.Utils
 {
@@ -24,14 +25,10 @@ namespace NSL.SocketServer.Utils.SystemPackets
         {
             string session = data.ReadString16();
 
-            int count = data.ReadInt32();
+            var keys = data.ReadCollection(data.ReadString16).ToArray();
 
-            string[] keys = new string[count];
-
-            for (int i = 0; i < count; i++)
-            {
-                keys[i] = data.ReadString16();
-            }
+            if (session == default && keys == default)
+                return;
 
             OnRecoverySessionReceiveEvent?.Invoke(client, session, keys);
         }

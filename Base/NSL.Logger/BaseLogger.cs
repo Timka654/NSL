@@ -29,26 +29,6 @@ namespace NSL.Logger
 
         internal bool Disponsed = false;
 
-        public void AppendLog(string text)
-        {
-            Append(LoggerLevel.Log, text);
-        }
-
-        public void AppendDebug(string text)
-        {
-            Append(LoggerLevel.Debug, text);
-        }
-
-        public void AppendError(string text)
-        {
-            Append(LoggerLevel.Error, text);
-        }
-
-        public void AppendInfo(string text)
-        {
-            Append(LoggerLevel.Info, text);
-        }
-
         public void Append(LoggerLevel level, string text)
         {
             if (!Initialized)

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace NSL.SocketPhantom.AspNetCore
 {
-    public static class Extensions
+    public static class RegisterExtensions
     {
         public static void AddPhantomProtocol(this IServiceCollection collection)
         {

@@ -91,6 +91,16 @@ namespace NSL.BuilderExtensions.WebSocketsServer
             OnSendHandles += handle;
         }
 
+        public void AddBaseReceiveHandle(ReceivePacketDebugInfo<IClient> handle)
+        {
+            OnReceiveHandles += (client, pid, len) => handle(client, pid, len);
+        }
+
+        public void AddBaseSendHandle(SendPacketDebugInfo<IClient> handle)
+        {
+            OnSendHandles += (client, pid, len, stack) => handle(client, pid, len, stack);
+        }
+
         public WSServerListener<TClient> Build()
         {
             var result = new WSServerListener<TClient>(options);
@@ -100,16 +110,6 @@ namespace NSL.BuilderExtensions.WebSocketsServer
             result.OnSendPacket += OnSendHandles;
 
             return result;
-        }
-
-        public ReceivePacketDebugInfo<WSServerClient<TClient>> GetReceiveHandles()
-        {
-            return OnReceiveHandles;
-        }
-
-        public SendPacketDebugInfo<WSServerClient<TClient>> GetSendHandles()
-        {
-            return OnSendHandles;
         }
     }
 }
