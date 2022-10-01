@@ -3,9 +3,9 @@ using System.Collections.Generic;
 
 namespace NSL.Extensions.RPC.Generator.Declarations
 {
-    internal class MethodDecl
+    internal class MethodDeclModel
     {
-        public ClassDecl Class { get; set; }
+        public ClassDeclModel Class { get; set; }
 
         public string Name { get; set; }
 

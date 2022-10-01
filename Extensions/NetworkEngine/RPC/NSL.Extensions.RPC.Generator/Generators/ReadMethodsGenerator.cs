@@ -8,42 +8,53 @@ using System.Linq;
 using NSL.Extensions.RPC.Generator.Declarations;
 using NSL.Extensions.RPC.Generator.Utils;
 using System.Diagnostics;
+using NSL.Extensions.RPC.Generator.Models;
+using NSL.Extensions.RPC.Generator.Generators.Handlers;
 
 namespace NSL.Extensions.RPC.Generator.Generators
 {
+    internal delegate string CustomTypeHandle(INamedTypeSymbol type, MethodContextModel methodContext, string path);
+    internal delegate string GenerateHandle(ISymbol type, MethodContextModel methodContext, string path);
+
     internal class ReadMethodsGenerator
     {
-        public static string BuildParameterReader(MethodDecl methodDecl, MethodDeclarationSyntax method, ParameterSyntax parameter, SemanticModel semanticModel)
+        private static List<GenerateHandle> generators = new List<GenerateHandle>();
+
+        static ReadMethodsGenerator()
+        {
+            generators.Add(CustomTypeGenerator.GetReadLine);
+            generators.Add(ArrayTypeGenerator.GetReadLine);
+            generators.Add(BaseTypeGenerator.GetReadLine);
+            generators.Add(NullableTypeGenerator.GetReadLine);
+            generators.Add(ClassTypeGenerator.GetReadLine);
+            generators.Add(StructTypeGenerator.GetReadLine);
+        }
+
+        public static string BuildParameterReader(ParameterSyntax parameterSyntax, MethodContextModel parameter)
         {
             CodeBuilder pb = new CodeBuilder();
-
             //if (!Debugger.IsAttached)
             //    Debugger.Launch();
 
-            var parameterSymbol = semanticModel.GetDeclaredSymbol(parameter);
+            var parameterSymbol = parameter.SemanticModel.GetDeclaredSymbol(parameterSyntax);
 
-            string valueReader = GetValueReadSegment(parameterSymbol, semanticModel, null);
+            string valueReader = GetValueReadSegment(parameterSymbol, parameter, null);
 
             pb.AppendLine(valueReader);
 
             return pb.ToString();
         }
 
-        public static string GetValueReadSegment(ISymbol parameter, SemanticModel semanticModel, string path)
+        public static string GetValueReadSegment(ISymbol parameter, MethodContextModel methodContext, string path)
         {
-            string valueReader = GetBaseTypeReadLine(parameter, semanticModel, path);
+            string valueReader = default;
 
-            if (valueReader == default)
+            foreach (var gen in generators)
             {
-                valueReader = GetNullableTypeReadLine(parameter, semanticModel, path);
+                valueReader = gen(parameter, methodContext, path);
 
-                if (valueReader == default)
-                {
-                    valueReader = GetClassReadLine(parameter, semanticModel, path);
-
-                    if (valueReader == default)
-                        valueReader = GetStructReadLine(parameter, semanticModel, path);
-                }
+                if (valueReader != default)
+                    break;
             }
 
             if (valueReader == default)
@@ -57,12 +68,12 @@ namespace NSL.Extensions.RPC.Generator.Generators
             return $"{linePrefix}{valueReader}{(valueReader.EndsWith(";") ? string.Empty : ";")}";
         }
 
-        private static string BuildNullableTypeDef(IFieldSymbol field)
+        public static string BuildNullableTypeDef(IFieldSymbol field)
         {
             if (!field.NullableAnnotation.Equals(NullableAnnotation.Annotated))
                 return field.Type.Name;
 
-            if(!field.Type.IsValueType)
+            if (!field.Type.IsValueType)
                 return field.Type.Name;
 
             //if (!Debugger.IsAttached)
@@ -73,39 +84,7 @@ namespace NSL.Extensions.RPC.Generator.Generators
             return $"{genericType.Name}?";
         }
 
-        private static string GetNullableTypeReadLine(ISymbol parameter, SemanticModel semanticModel, string path)
-        {
-            CodeBuilder rb = new CodeBuilder();
-
-            var type = parameter.GetTypeSymbol();
-
-            if (!type.NullableAnnotation.Equals(NullableAnnotation.Annotated))
-                return default;
-
-            //if (!Debugger.IsAttached)
-            //    Debugger.Launch();
-
-            var genericType = ((INamedTypeSymbol)type).TypeArguments.First();
-
-            if (!genericType.IsValueType)
-                return default;
-
-
-
-            return $"dataPacket.{nameof(InputPacketBuffer.ReadNullable)}(()=>{{ return {GetValueReadSegment(genericType, semanticModel, path)}; }})";
-        }
-
-        private static string GetBaseTypeReadLine(ISymbol parameter, SemanticModel semanticModel, string path)
-        {
-            var type = parameter.GetTypeSymbol();
-
-            if (!readTypeHandlers.TryGetValue(type.Name, out var tReadLine))
-                return default;
-
-            return $"dataPacket.{tReadLine}()";
-        }
-
-        private static void AddTypeMemberReadLine(ISymbol member, CodeBuilder rb, string path, SemanticModel semanticModel)
+        public static void AddTypeMemberReadLine(ISymbol member, CodeBuilder rb, string path, MethodContextModel methodContext)
         {
             if (member.DeclaredAccessibility.HasFlag(Accessibility.Public) == false || member.IsStatic)
                 return;
@@ -116,7 +95,7 @@ namespace NSL.Extensions.RPC.Generator.Generators
                 {
                     var ptype = ps.GetTypeSymbol();
 
-                    rb.AppendLine($"{path} = {GetValueReadSegment(ptype, semanticModel, path)};");
+                    rb.AppendLine($"{path} = {GetValueReadSegment(ptype, methodContext, path)};");
 
                     rb.AppendLine();
                 }
@@ -125,93 +104,10 @@ namespace NSL.Extensions.RPC.Generator.Generators
             {
                 var ftype = fs.GetTypeSymbol();
 
-                rb.AppendLine($"{path} = {GetValueReadSegment(ftype, semanticModel, path)};");
+                rb.AppendLine($"{path} = {GetValueReadSegment(ftype, methodContext, path)};");
 
                 rb.AppendLine();
             }
-        }
-
-        private static string GetClassReadLine(ISymbol parameter, SemanticModel semanticModel, string path)
-        {
-            var type = parameter.GetTypeSymbol();
-
-            if (type.IsValueType)
-                return default;
-
-            CodeBuilder rb = new CodeBuilder();
-
-
-            rb.AppendLine($"dataPacket.{nameof(InputPacketBuffer.ReadNullableClass)}(() => {{");
-
-            rb.NextTab();
-
-            rb.AppendLine();
-
-            rb.AppendLine($"var data = new {type.Name}();");
-
-            rb.AppendLine();
-
-            var members = type.GetMembers();
-
-
-            path = "data";
-
-            foreach (var member in members)
-            {
-                AddTypeMemberReadLine(member, rb, string.Join(".", path, member.Name), semanticModel);
-            }
-
-            //foreach (var item in typeSymbol.GetMembers())
-            //{
-
-            //}
-
-            rb.AppendLine("return data;");
-
-            rb.PrevTab();
-
-            rb.AppendLine("})");
-
-            return rb.ToString();// test only
-        }
-
-        private static string GetStructReadLine(ISymbol parameter, SemanticModel semanticModel, string path)
-        {
-            var type = parameter.GetTypeSymbol();
-
-            if (!type.IsValueType)
-                return default;
-
-            var rb = new CodeBuilder();
-
-            if (type.IsTupleType)
-            {
-                //if (!Debugger.IsAttached)
-                //    Debugger.Launch();
-
-                var nts = type as INamedTypeSymbol;
-
-                rb.AppendLine($@"new {type.Name}<{string.Join(", ", nts.TupleElements.Select(x => BuildNullableTypeDef(x)))}>();");
-            }
-            else
-                rb.AppendLine($"new {type.Name}();");
-
-            rb.AppendLine();
-
-            path = parameter.GetName(path) ?? default;
-
-            var members = type.GetMembers();
-
-
-            foreach (var member in members)
-            {
-                AddTypeMemberReadLine(member, rb, string.Join(".", path, member.Name), semanticModel);
-            }
-
-
-
-
-            return rb.ToString();// test only
         }
 
         private static string GetLinePrefix(ISymbol symbol, string path)
@@ -234,63 +130,8 @@ namespace NSL.Extensions.RPC.Generator.Generators
         }
 
 
-        private static Dictionary<string, string> readTypeHandlers = new Dictionary<string, string>()
-        {
-            {
-                typeof(bool).Name,
-                nameof(InputPacketBuffer.ReadBool)
-            },
-            {
-                typeof(byte).Name,
-                nameof(InputPacketBuffer.ReadByte)
-            },
-            {
-                typeof(short).Name,
-                nameof(InputPacketBuffer.ReadInt16)
-            },
-            {
-                typeof(int).Name,
-                nameof(InputPacketBuffer.ReadInt32)
-            },
-            {
-                typeof(long).Name,
-                nameof(InputPacketBuffer.ReadInt64)
-            },
-            {
-                typeof(ushort).Name,
-                nameof(InputPacketBuffer.ReadUInt16)
-            },
-            {
-                typeof(uint).Name,
-                nameof(InputPacketBuffer.ReadUInt32)
-            },
-            {
-                typeof(ulong).Name,
-                nameof(InputPacketBuffer.ReadUInt64)
-            },
-            {
-                typeof(float).Name,
-                nameof(InputPacketBuffer.ReadFloat)
-            },
-            {
-                typeof(double).Name,
-                nameof(InputPacketBuffer.ReadDouble)
-            },
-            {
-                typeof(string).Name,
-                nameof(InputPacketBuffer.ReadString32)
-            },
-            {
-                typeof(DateTime).Name,
-                nameof(InputPacketBuffer.ReadDateTime)
-            },
-            {
-                typeof(TimeSpan).Name,
-                nameof(InputPacketBuffer.ReadTimeSpan)
-            },
-        };
 
-        public static string BuildNameHandle(IEnumerable<MethodDecl> methodDecl)
+        public static string BuildNameHandle(IEnumerable<MethodDeclModel> methodDecl)
         {
             var mb = new CodeBuilder();
 
@@ -335,7 +176,7 @@ namespace NSL.Extensions.RPC.Generator.Generators
             return mb.ToString();
         }
 
-        public static string BuildMethod(MethodDecl methodDecl)
+        public static string BuildMethod(MethodDeclModel methodDecl)
         {
             CodeBuilder mb = new CodeBuilder();
 
@@ -371,9 +212,17 @@ namespace NSL.Extensions.RPC.Generator.Generators
 
                 var movSymbol = classSemanticModel.GetDeclaredSymbol(mov);
 
+                var p = new MethodContextModel()
+                {
+                    Method = methodDecl,
+                    methodSyntax = mov,
+                    SemanticModel = semanticModel
+                };
+
                 foreach (var item in mov.ParameterList.Parameters)
                 {
-                    mb.AppendLine(BuildParameterReader(methodDecl, mov, item, semanticModel));
+
+                    mb.AppendLine(BuildParameterReader(item, p));
                     mb.AppendLine();
 
                     parameters.Add(item.Identifier.Text);
@@ -436,7 +285,7 @@ namespace NSL.Extensions.RPC.Generator.Generators
 
                     mb.AppendLine();
 
-                    mb.AppendLine(WriteMethodsGenerator.BuildParameterWriter(movSymbol.ReturnType, "result"));
+                    mb.AppendLine(WriteMethodsGenerator.BuildParameterWriter(movSymbol.ReturnType, p, "result"));
 
                     mb.AppendLine();
 

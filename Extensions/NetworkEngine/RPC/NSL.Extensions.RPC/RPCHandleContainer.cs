@@ -1,5 +1,7 @@
-﻿using NSL.SocketCore.Utils;
+﻿using NSL.SocketClient;
+using NSL.SocketCore.Utils;
 using NSL.SocketCore.Utils.Buffer;
+using NSL.SocketServer.Utils;
 
 namespace NSL.Extensions.RPC
 {
@@ -17,5 +19,20 @@ namespace NSL.Extensions.RPC
 
         public virtual string GetContainerName()
             => default;
+
+        protected bool IsServer()
+        {
+            return NetworkClient is IServerNetworkClient;
+        }
+
+        protected bool IsClient()
+        {
+            return NetworkClient is BaseSocketNetworkClient;
+        }
+
+        protected bool IsLocal()
+        {
+            return NetworkClient == null;
+        }
     }
 }

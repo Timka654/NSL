@@ -6,6 +6,8 @@ using NSL.Extensions.RPC.Generator.Comparers;
 using NSL.Extensions.RPC.Generator.Declarations;
 using NSL.Extensions.RPC.Generator.Generators;
 using NSL.Extensions.RPC.Generator.Utils;
+using System;
+using System.Diagnostics;
 using System.Linq;
 
 namespace NSL.Extensions.RPC.Generator
@@ -47,12 +49,12 @@ namespace NSL.Extensions.RPC.Generator
                     Class = (ClassDeclarationSyntax)x.Parent,
                     Method = x
                 })
-                .GroupBy(x => new ClassDecl { Class = x.Class, Context = context }, classDeclComparer)
+                .GroupBy(x => new ClassDeclModel { Class = x.Class, Context = context }, classDeclComparer)
 
                 .Select(item =>
                 {
                     item.Key.Methods = item.GroupBy(b => b.Method, methodDeclarationSyntaxComparer)
-                            .Select(j => new MethodDecl()
+                            .Select(j => new MethodDeclModel()
                             {
                                 Class = item.Key,
                                 Name = j.Key.Identifier.Text,
@@ -63,8 +65,6 @@ namespace NSL.Extensions.RPC.Generator
                 })
                 .ToArray();
 
-            //if (!Debugger.IsAttached)
-            //    Debugger.Launch();
 
             foreach (var classDecl in data)
             {
@@ -76,7 +76,7 @@ namespace NSL.Extensions.RPC.Generator
             var rootNode = originalTree.GetRoot() as CompilationUnitSyntax;
             return rootNode.Usings;
         }
-        private void BuildClass(GeneratorExecutionContext context, ClassDecl classDecl)
+        private void BuildClass(GeneratorExecutionContext context, ClassDeclModel classDecl)
         {
             var ns = classDecl.Class.Parent as NamespaceDeclarationSyntax;
 
@@ -130,6 +130,9 @@ namespace NSL.Extensions.RPC.Generator
 
             foreach (var method in classDecl.Methods)
             {
+                //if (!Debugger.IsAttached)
+                //    Debugger.Launch();
+
                 classBuilder.AppendLine(WriteMethodsGenerator.BuildWriteMethods(method));
                 classBuilder.AppendLine();
                 classBuilder.AppendLine(ReadMethodsGenerator.BuildMethod(method));
@@ -173,7 +176,7 @@ namespace NSL.Extensions.RPC.Generator
             context.AddSource($"{classIdentityName}.rpcgen.cs", outputValue);
         }
 
-        private string BuildContainerNameOverride(ClassDecl classDecl)
+        private string BuildContainerNameOverride(ClassDeclModel classDecl)
         {
             var classNameSymbolDisplayFormat = new SymbolDisplayFormat(
     typeQualificationStyle: SymbolDisplayTypeQualificationStyle.NameAndContainingTypesAndNamespaces);

@@ -6,9 +6,22 @@ using RPCWithBuilder.TCP.Example.Models;
 namespace RPCWithBuilder.TCP.Example
 {
 
-    internal partial class TestRPCClientContainer<TClient> : RPCHandleContainer<TClient>
+    internal class TestRPCClientContainer<TClient> : RPCHandleContainer<TClient>
         where TClient : INetworkClient
     {
+        [RPCMethod]
+        public virtual int[] testArr(int value)
+        {
+            return new int[] { value };
+        }
+
+
+        [RPCMethod]
+        public virtual Dictionary<int, TestStructModel> testDictionaryReceive(int value)
+        {
+            return new Dictionary<int, TestStructModel>() { { value, new TestStructModel() { tsValue = value } } };
+        }
+
         [RPCMethod]
         public virtual TestStructModel abc1(int v1, int? v2, string v3, string? v4, TestDataModel v5, TestStructModel v6)
         {
@@ -47,14 +60,11 @@ namespace RPCWithBuilder.TCP.Example
             return (value, $"value is {value}");
         }
 
-        private bool IsServer()
+        [RPCMethod]
+        public virtual List<TestStructModel> testListReceive(int value)
         {
-            return NetworkClient is NetworkServerClient;
-        }
 
-        private bool IsClient()
-        {
-            return NetworkClient is NetworkClient;
+            return new List<TestStructModel>() { new TestStructModel() { tsValue = value } };
         }
     }
 }

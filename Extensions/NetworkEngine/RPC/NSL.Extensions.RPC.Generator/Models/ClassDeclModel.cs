@@ -4,8 +4,7 @@ using System.Collections.Generic;
 
 namespace NSL.Extensions.RPC.Generator.Declarations
 {
-
-    internal class ClassDecl
+    internal class ClassDeclModel
     {
         public ClassDeclarationSyntax Class { get; set; }
 
@@ -13,7 +12,7 @@ namespace NSL.Extensions.RPC.Generator.Declarations
 
         public Compilation Compilation => Context.Compilation;
 
-        public IEnumerable<MethodDecl> Methods { get; set; }
+        public IEnumerable<MethodDeclModel> Methods { get; set; }
 
         public INamedTypeSymbol ClassSymbol { get; set; }
     }
