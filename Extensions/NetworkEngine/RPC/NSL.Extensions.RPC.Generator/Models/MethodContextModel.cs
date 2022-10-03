@@ -17,5 +17,8 @@ namespace NSL.Extensions.RPC.Generator.Models
 
         public Compilation Compilation => Method.Class.Compilation;
 
+        public ParameterSyntax CurrentParameter { get; set; }
+
+        public IParameterSymbol CurrentParameterSymbol { get; set; }
     }
 }

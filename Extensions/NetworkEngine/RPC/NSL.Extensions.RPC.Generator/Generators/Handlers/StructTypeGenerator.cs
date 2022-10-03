@@ -10,7 +10,7 @@ namespace NSL.Extensions.RPC.Generator.Generators.Handlers
 {
     internal class StructTypeGenerator
     {
-        public static string GetReadLine(ISymbol parameter, MethodContextModel methodContext, string path)
+        public static string GetReadLine(ISymbol parameter, MethodContextModel methodContext, string path, IEnumerable<string> ignoreMembers)
         {
             var type = parameter.GetTypeSymbol();
 
@@ -40,13 +40,16 @@ namespace NSL.Extensions.RPC.Generator.Generators.Handlers
 
             foreach (var member in members)
             {
+                if (ignoreMembers != null && ignoreMembers.Any(x => x.Equals(member.Name, StringComparison.InvariantCultureIgnoreCase)))
+                    continue;
+
                 ReadMethodsGenerator.AddTypeMemberReadLine(member, rb, string.Join(".", path, member.Name), methodContext);
             }
 
             return rb.ToString();// test only
         }
 
-        public static string GetWriteLine(ISymbol item, MethodContextModel mcm, string path)
+        public static string GetWriteLine(ISymbol item, MethodContextModel mcm, string path, IEnumerable<string> ignoreMembers)
         {
             var type = item.GetTypeSymbol();
 
@@ -59,6 +62,9 @@ namespace NSL.Extensions.RPC.Generator.Generators.Handlers
 
             foreach (var member in members)
             {
+                if (ignoreMembers != null && ignoreMembers.Any(x => x.Equals(member.Name, StringComparison.InvariantCultureIgnoreCase)))
+                    continue;
+
                 WriteMethodsGenerator.AddTypeMemberWriteLine(member, mcm, cb, string.Join(".", path, member.Name));
             }
 

@@ -9,6 +9,11 @@ namespace NSL.Extensions.RPC.Generator.Declarations
 
         public string Name { get; set; }
 
-        public IEnumerable<MethodDeclarationSyntax> Overrides { get; set; }
+        public IEnumerable<MethodOverrideDeclModel> Overrides { get; set; }
+    }
+
+    internal class MethodOverrideDeclModel
+    {
+        public MethodDeclarationSyntax DeclSyntax { get; set; }
     }
 }

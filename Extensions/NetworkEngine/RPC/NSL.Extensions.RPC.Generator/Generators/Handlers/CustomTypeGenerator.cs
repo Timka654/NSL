@@ -31,7 +31,7 @@ namespace NSL.Extensions.RPC.Generator.Generators.Handlers
             return false;
         }
 
-        public static string GetReadLine(ISymbol parameter, MethodContextModel methodContext, string path)
+        public static string GetReadLine(ISymbol parameter, MethodContextModel methodContext, string path, IEnumerable<string> ignoreMembers)
         {
             INamedTypeSymbol type = parameter.GetTypeSymbol() as INamedTypeSymbol;
 
@@ -44,7 +44,7 @@ namespace NSL.Extensions.RPC.Generator.Generators.Handlers
             return default;
         }
 
-        public static string GetWriteLine(ISymbol parameter, MethodContextModel methodContext, string path)
+        public static string GetWriteLine(ISymbol parameter, MethodContextModel methodContext, string path, IEnumerable<string> ignoreMembers)
         {
             INamedTypeSymbol type = parameter.GetTypeSymbol() as INamedTypeSymbol;
 

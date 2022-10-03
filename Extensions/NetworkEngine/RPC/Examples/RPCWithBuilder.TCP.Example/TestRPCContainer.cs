@@ -23,7 +23,7 @@ namespace RPCWithBuilder.TCP.Example
         }
 
         [RPCMethod]
-        public virtual TestStructModel abc1(int v1, int? v2, string v3, string? v4, TestDataModel v5, TestStructModel v6)
+        public virtual TestStructModel abc1(int v1, int? v2, string v3, string? v4, [RPCCustomMemberIgnore] TestDataModel v5, [RPCCustomMemberIgnore(nameof(TestStructModel.tsValue), "abc")] TestStructModel v6)
         {
             int random = Random.Shared.Next();
 

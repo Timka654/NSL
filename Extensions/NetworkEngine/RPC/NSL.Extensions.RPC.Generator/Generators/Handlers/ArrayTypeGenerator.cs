@@ -11,7 +11,7 @@ namespace NSL.Extensions.RPC.Generator.Generators.Handlers
 {
     internal class ArrayTypeGenerator
     {
-        public static string GetReadLine(ISymbol parameter, MethodContextModel methodContext, string path)
+        public static string GetReadLine(ISymbol parameter, MethodContextModel methodContext, string path, IEnumerable<string> ignoreMembers)
         {
             if (parameter is IArrayTypeSymbol array)
             {
@@ -40,7 +40,7 @@ namespace NSL.Extensions.RPC.Generator.Generators.Handlers
         }
 
 
-        public static string GetWriteLine(ISymbol parameter, MethodContextModel methodContext, string path)
+        public static string GetWriteLine(ISymbol parameter, MethodContextModel methodContext, string path, IEnumerable<string> ignoreMembers)
         {
             if (parameter is IArrayTypeSymbol array)
             {
@@ -52,7 +52,7 @@ namespace NSL.Extensions.RPC.Generator.Generators.Handlers
 
                 cb.NextTab();
 
-                cb.AppendLine(WriteMethodsGenerator.BuildParameterWriter(farg, methodContext, "i"));
+                cb.AppendLine(WriteMethodsGenerator.BuildParameterWriter(farg, methodContext, "i", null));
 
                 cb.PrevTab();
 

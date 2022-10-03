@@ -54,9 +54,9 @@ namespace NSL.Extensions.RPC.Generator.Generators.Handlers.CustomHandlers
 
             cb.NextTab();
 
-            cb.AppendLine(WriteMethodsGenerator.BuildParameterWriter(farg, methodContext, "i.Key"));
+            cb.AppendLine(WriteMethodsGenerator.BuildParameterWriter(farg, methodContext, "i.Key", null));
             cb.AppendLine();
-            cb.AppendLine(WriteMethodsGenerator.BuildParameterWriter(sarg, methodContext, "i.Value"));
+            cb.AppendLine(WriteMethodsGenerator.BuildParameterWriter(sarg, methodContext, "i.Value", null));
 
             cb.PrevTab();
 

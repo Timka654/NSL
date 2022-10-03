@@ -37,12 +37,12 @@ namespace NSL.Extensions.RPC.Generator.Generators
 
             foreach (var mov in methodDecl.Overrides)
             {
-                if (!mov.Modifiers.Any(x => x.Text.Equals("virtual")))
+                if (!mov.DeclSyntax.Modifiers.Any(x => x.Text.Equals("virtual")))
                     continue;
 
-                var semanticModel = methodDecl.Class.Context.Compilation.GetSemanticModel(mov.SyntaxTree);
+                var semanticModel = methodDecl.Class.Context.Compilation.GetSemanticModel(mov.DeclSyntax.SyntaxTree);
 
-                MethodContextModel mcm = new MethodContextModel() { Method = methodDecl, SemanticModel = semanticModel, methodSyntax = mov };
+                MethodContextModel mcm = new MethodContextModel() { Method = methodDecl, SemanticModel = semanticModel, methodSyntax = mov.DeclSyntax };
 
                 cb.AppendLine(BuildWriteMethod(mcm));
             }
@@ -72,11 +72,15 @@ namespace NSL.Extensions.RPC.Generator.Generators
             {
                 var parameterSymbol = mcm.SemanticModel.GetDeclaredSymbol(parameter);
 
+                mcm.CurrentParameter = parameter;
+
+                mcm.CurrentParameterSymbol = parameterSymbol;
+
                 string path = parameter.Identifier.Text;
 
                 cb.AppendLine();
 
-                cb.AppendLine(BuildParameterWriter(parameterSymbol, mcm, path));
+                cb.AppendLine(BuildParameterWriter(parameterSymbol, mcm, path, RPCGenerator.GetParameterIgnoreMembers(parameterSymbol, mcm)));
             }
 
             cb.AppendLine();
@@ -115,16 +119,19 @@ namespace NSL.Extensions.RPC.Generator.Generators
             return cb.ToString();
         }
 
-        public static string BuildParameterWriter(ISymbol item, MethodContextModel mcm, string path)
+        public static string BuildParameterWriter(ISymbol item, MethodContextModel mcm, string path, IEnumerable<string> ignoreMembers)
         {
             string writerLine = default;
 
-            foreach (var gen in generators)
+            if (ignoreMembers == null || !ignoreMembers.Any(x => x.Equals("*")))
             {
-                writerLine = gen(item, mcm, path);
+                foreach (var gen in generators)
+                {
+                    writerLine = gen(item, mcm, path, ignoreMembers);
 
-                if (writerLine != default)
-                    break;
+                    if (writerLine != default)
+                        break;
+                }
             }
 
             return writerLine ?? ""; //debug only
@@ -136,12 +143,15 @@ namespace NSL.Extensions.RPC.Generator.Generators
             if (member.DeclaredAccessibility.HasFlag(Accessibility.Public) == false || member.IsStatic)
                 return;
 
+            if (RPCGenerator.IsIgnoreMember(member, mcm))
+                return;
+
             if (member is IPropertySymbol ps)
             {
                 if (ps.SetMethod != null)
                 {
                     var ptype = ps.GetTypeSymbol();
-                    cb.AppendLine(BuildParameterWriter(ptype, mcm, path));
+                    cb.AppendLine(BuildParameterWriter(ptype, mcm, path, null));
 
                     cb.AppendLine();
                 }
@@ -149,7 +159,7 @@ namespace NSL.Extensions.RPC.Generator.Generators
             else if (member is IFieldSymbol fs)
             {
                 var ftype = fs.GetTypeSymbol();
-                cb.AppendLine(BuildParameterWriter(ftype, mcm, path));
+                cb.AppendLine(BuildParameterWriter(ftype, mcm, path, null));
                 cb.AppendLine();
             }
         }

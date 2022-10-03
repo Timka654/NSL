@@ -4,13 +4,15 @@ using NSL.Extensions.RPC.Generator.Utils;
 using NSL.SocketCore.Utils.Buffer;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 using System.Text;
 
 namespace NSL.Extensions.RPC.Generator.Generators.Handlers
 {
     internal class ClassTypeGenerator
     {
-        public static string GetReadLine(ISymbol parameter, MethodContextModel methodContext, string path)
+        public static string GetReadLine(ISymbol parameter, MethodContextModel methodContext, string path, IEnumerable<string> ignoreMembers)
         {
             var type = parameter.GetTypeSymbol();
 
@@ -35,8 +37,14 @@ namespace NSL.Extensions.RPC.Generator.Generators.Handlers
 
             path = "data";
 
+            //if (!Debugger.IsAttached && ignoreMembers.Any())
+            //    Debugger.Launch();
+
             foreach (var member in members)
             {
+                if (ignoreMembers != null && ignoreMembers.Any(x => x.Equals(member.Name, StringComparison.InvariantCultureIgnoreCase)))
+                    continue;
+
                 ReadMethodsGenerator.AddTypeMemberReadLine(member, rb, string.Join(".", path, member.Name), methodContext);
             }
 
@@ -49,7 +57,7 @@ namespace NSL.Extensions.RPC.Generator.Generators.Handlers
             return rb.ToString();// test only
         }
 
-        public static string GetWriteLine(ISymbol item, MethodContextModel mcm, string path)
+        public static string GetWriteLine(ISymbol item, MethodContextModel mcm, string path, IEnumerable<string> ignoreMembers)
         {
             var type = item.GetTypeSymbol();
 
@@ -70,6 +78,9 @@ namespace NSL.Extensions.RPC.Generator.Generators.Handlers
 
             foreach (var member in members)
             {
+                if (ignoreMembers != null && ignoreMembers.Any(x => x.Equals(member.Name, StringComparison.InvariantCultureIgnoreCase)))
+                    continue;
+
                 WriteMethodsGenerator.AddTypeMemberWriteLine(member, mcm, cb, string.Join(".", path, member.Name));
             }
 

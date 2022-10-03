@@ -11,7 +11,7 @@ namespace NSL.Extensions.RPC.Generator.Generators.Handlers
     internal class BaseTypeGenerator
     {
 
-        public static string GetReadLine(ISymbol parameter, MethodContextModel methodContext, string path)
+        public static string GetReadLine(ISymbol parameter, MethodContextModel methodContext, string path, IEnumerable<string> ignoreMembers)
         {
             var type = parameter.GetTypeSymbol();
 
@@ -21,7 +21,7 @@ namespace NSL.Extensions.RPC.Generator.Generators.Handlers
             return $"dataPacket.{tReadLine}()";
         }
 
-        public static string GetWriteLine(ISymbol item, MethodContextModel methodContext, string path)
+        public static string GetWriteLine(ISymbol item, MethodContextModel methodContext, string path, IEnumerable<string> ignoreMembers)
         {
             var type = item.GetTypeSymbol();
 

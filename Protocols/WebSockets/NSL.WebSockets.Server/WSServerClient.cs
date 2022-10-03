@@ -32,10 +32,12 @@ namespace NSL.WebSockets.Server
             if (!client.Request.IsWebSocketRequest)
                 throw new Exception($"{client.Request.UserHostAddress} is not WebSocket request");
 
-            Initialize(client, options);
+            base.context = context;
+
+            Initialize(options);
         }
 
-        protected void Initialize(HttpListenerContext context, ServerOptions<T> options)
+        protected void Initialize(ServerOptions<T> options)
         {
             Data = new T();
 
@@ -45,10 +47,6 @@ namespace NSL.WebSockets.Server
             //обзятельная переменная в NetworkClient, для отправки данных, можно использовать привидения типов (Client)NetworkClient но это никому не поможет
             Data.Network = this;
             Data.ServerOptions = options;
-
-            //установка переменной содержащую поток клиента
-
-            base.context = context;
 
             //установка массива для приема данных, размер указан в общих настройках сервера
             receiveBuffer = new byte[options.ReceiveBufferSize];
@@ -62,7 +60,7 @@ namespace NSL.WebSockets.Server
             options.RunClientConnect(Data);
         }
 
-        public async void RunPacketReceiver()
+        public virtual async void RunPacketReceiver()
         {
             try
             {

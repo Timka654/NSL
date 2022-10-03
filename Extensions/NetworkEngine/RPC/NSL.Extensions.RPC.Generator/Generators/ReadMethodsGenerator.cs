@@ -10,11 +10,12 @@ using NSL.Extensions.RPC.Generator.Utils;
 using System.Diagnostics;
 using NSL.Extensions.RPC.Generator.Models;
 using NSL.Extensions.RPC.Generator.Generators.Handlers;
+using NSL.Extensions.RPC.Generator.Attributes;
 
 namespace NSL.Extensions.RPC.Generator.Generators
 {
     internal delegate string CustomTypeHandle(INamedTypeSymbol type, MethodContextModel methodContext, string path);
-    internal delegate string GenerateHandle(ISymbol type, MethodContextModel methodContext, string path);
+    internal delegate string GenerateHandle(ISymbol type, MethodContextModel methodContext, string path, IEnumerable<string> ignoreMembers);
 
     internal class ReadMethodsGenerator
     {
@@ -30,35 +31,44 @@ namespace NSL.Extensions.RPC.Generator.Generators
             generators.Add(StructTypeGenerator.GetReadLine);
         }
 
-        public static string BuildParameterReader(ParameterSyntax parameterSyntax, MethodContextModel parameter)
+        public static string BuildParameterReader(ParameterSyntax parameterSyntax, MethodContextModel mcm)
         {
             CodeBuilder pb = new CodeBuilder();
             //if (!Debugger.IsAttached)
             //    Debugger.Launch();
 
-            var parameterSymbol = parameter.SemanticModel.GetDeclaredSymbol(parameterSyntax);
+            var parameterSymbol = mcm.SemanticModel.GetDeclaredSymbol(parameterSyntax);
 
-            string valueReader = GetValueReadSegment(parameterSymbol, parameter, null);
+            mcm.CurrentParameter = parameterSyntax;
+
+            mcm.CurrentParameterSymbol = parameterSymbol;
+
+            string valueReader = GetValueReadSegment(parameterSymbol, mcm, null, RPCGenerator.GetParameterIgnoreMembers(parameterSymbol, mcm));
 
             pb.AppendLine(valueReader);
 
             return pb.ToString();
         }
 
-        public static string GetValueReadSegment(ISymbol parameter, MethodContextModel methodContext, string path)
+        public static string GetValueReadSegment(ISymbol parameter, MethodContextModel methodContext, string path, IEnumerable<string> ignoreMembers = null)
         {
             string valueReader = default;
 
-            foreach (var gen in generators)
+            if (ignoreMembers == null || !ignoreMembers.Any(v => v.Equals("*")))
             {
-                valueReader = gen(parameter, methodContext, path);
+                foreach (var gen in generators)
+                {
+                    valueReader = gen(parameter, methodContext, path, ignoreMembers);
 
-                if (valueReader != default)
-                    break;
+                    if (valueReader != default)
+                        break;
+                }
             }
+            //else if (!Debugger.IsAttached)
+            //    Debugger.Launch();
 
             if (valueReader == default)
-                return $"({parameter.GetTypeSymbol().Name})default;";
+                valueReader = $"({parameter.GetTypeSymbol().Name})default;";
 
             var linePrefix = GetLinePrefix(parameter, path);
 
@@ -87,6 +97,9 @@ namespace NSL.Extensions.RPC.Generator.Generators
         public static void AddTypeMemberReadLine(ISymbol member, CodeBuilder rb, string path, MethodContextModel methodContext)
         {
             if (member.DeclaredAccessibility.HasFlag(Accessibility.Public) == false || member.IsStatic)
+                return;
+
+            if (RPCGenerator.IsIgnoreMember(member, methodContext))
                 return;
 
             if (member is IPropertySymbol ps)
@@ -198,7 +211,7 @@ namespace NSL.Extensions.RPC.Generator.Generators
 
             foreach (var mov in methodDecl.Overrides)
             {
-                mb.AppendLine($"case {mov.ParameterList.Parameters.Count}:");
+                mb.AppendLine($"case {mov.DeclSyntax.ParameterList.Parameters.Count}:");
 
                 mb.NextTab(); // 3
 
@@ -208,18 +221,18 @@ namespace NSL.Extensions.RPC.Generator.Generators
 
                 List<string> parameters = new List<string>();
 
-                var semanticModel = methodDecl.Class.Context.Compilation.GetSemanticModel(mov.SyntaxTree);
+                var semanticModel = methodDecl.Class.Context.Compilation.GetSemanticModel(mov.DeclSyntax.SyntaxTree);
 
-                var movSymbol = classSemanticModel.GetDeclaredSymbol(mov);
+                var movSymbol = classSemanticModel.GetDeclaredSymbol(mov.DeclSyntax);
 
                 var p = new MethodContextModel()
                 {
                     Method = methodDecl,
-                    methodSyntax = mov,
+                    methodSyntax = mov.DeclSyntax,
                     SemanticModel = semanticModel
                 };
 
-                foreach (var item in mov.ParameterList.Parameters)
+                foreach (var item in mov.DeclSyntax.ParameterList.Parameters)
                 {
 
                     mb.AppendLine(BuildParameterReader(item, p));
@@ -285,7 +298,7 @@ namespace NSL.Extensions.RPC.Generator.Generators
 
                     mb.AppendLine();
 
-                    mb.AppendLine(WriteMethodsGenerator.BuildParameterWriter(movSymbol.ReturnType, p, "result"));
+                    mb.AppendLine(WriteMethodsGenerator.BuildParameterWriter(movSymbol.ReturnType, p, "result", null));
 
                     mb.AppendLine();
 

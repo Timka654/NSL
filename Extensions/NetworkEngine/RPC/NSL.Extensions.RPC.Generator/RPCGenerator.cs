@@ -1,12 +1,15 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Scripting;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using NSL.Extensions.RPC.Generator.Attributes;
 using NSL.Extensions.RPC.Generator.Comparers;
 using NSL.Extensions.RPC.Generator.Declarations;
 using NSL.Extensions.RPC.Generator.Generators;
+using NSL.Extensions.RPC.Generator.Models;
 using NSL.Extensions.RPC.Generator.Utils;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 
@@ -36,14 +39,10 @@ namespace NSL.Extensions.RPC.Generator
         internal static string GetMethodRPCHandleName(string methodName)
             => $"__{methodName}RPCRecvHandle";
 
-        public void Execute(GeneratorExecutionContext context)
+        private void ProcessRPCMethods(GeneratorExecutionContext context, RPCMethodAttributeSyntaxReceiver syntaxReceiver)
         {
-            if (!(context.SyntaxReceiver is RPCMethodAttributeSyntaxReceiver<RPCMethodAttribute> syntaxReceiver))
-            {
-                return;
-            }
 
-            var data = syntaxReceiver.Methods
+            var data = syntaxReceiver.RPCMethods
                 .Select(x => new
                 {
                     Class = (ClassDeclarationSyntax)x.Parent,
@@ -58,7 +57,7 @@ namespace NSL.Extensions.RPC.Generator
                             {
                                 Class = item.Key,
                                 Name = j.Key.Identifier.Text,
-                                Overrides = j.Select(t => t.Method)
+                                Overrides = j.Select(t => new MethodOverrideDeclModel() { DeclSyntax = t.Method }).ToArray()
                             });
 
                     return item.Key;
@@ -71,6 +70,24 @@ namespace NSL.Extensions.RPC.Generator
                 BuildClass(context, classDecl);
             }
         }
+
+        private void ProcessRPCTypeHandlers(GeneratorExecutionContext context, RPCMethodAttributeSyntaxReceiver handleSyntaxReceiver)
+        {
+            foreach (var method in handleSyntaxReceiver.RPCMethods)
+            {
+                var m = context.Compilation.GetSemanticModel(method.SyntaxTree) as IMethodSymbol;
+            }
+        }
+
+        public void Execute(GeneratorExecutionContext context)
+        {
+            //if (!Debugger.IsAttached)
+            //    Debugger.Launch();
+
+            if (context.SyntaxReceiver is RPCMethodAttributeSyntaxReceiver methodSyntaxReceiver)
+                ProcessRPCMethods(context, methodSyntaxReceiver);
+        }
+
         private SyntaxList<UsingDirectiveSyntax> UpdateUsingDirectives(SyntaxTree originalTree)
         {
             var rootNode = originalTree.GetRoot() as CompilationUnitSyntax;
@@ -169,7 +186,8 @@ namespace NSL.Extensions.RPC.Generator
 
                 outputValue = nsBuilder.ToString();
             }
-#if !DEVELOP
+            // Visual studio have lag(or ...) cannot show changes any time
+#if DEVELOP
             System.IO.File.WriteAllText($@"D:\Temp\gen\{classIdentityName}.rpcgen.cs", outputValue);
 #endif
 
@@ -186,8 +204,48 @@ namespace NSL.Extensions.RPC.Generator
 
         public void Initialize(GeneratorInitializationContext context)
         {
+            //context.RegisterForSyntaxNotifications(() =>
+            //    new RPCMethodAttributeSyntaxReceiver<RPCTypeHandleAttribute>());
             context.RegisterForSyntaxNotifications(() =>
-                new RPCMethodAttributeSyntaxReceiver<RPCMethodAttribute>());
+                new RPCMethodAttributeSyntaxReceiver());
+        }
+
+
+        static INamedTypeSymbol IgnoreAttributeOriginType;
+
+        public static bool IsIgnoreMember(ISymbol member, MethodContextModel methodContext)
+        {
+            var attr = member.GetAttributes();
+
+            if (IgnoreAttributeOriginType == default)
+                IgnoreAttributeOriginType = methodContext.Compilation.GetTypeByMetadataName(typeof(RPCMemberIgnoreAttribute).FullName);
+
+            return attr.Any(x => x.AttributeClass.Equals(IgnoreAttributeOriginType));
+        }
+
+        static INamedTypeSymbol CustomMemberIgnoreOriginType;
+
+        public static IEnumerable<string> GetParameterIgnoreMembers(ISymbol parameter, MethodContextModel methodContext)
+        {
+            var attrbs = parameter.GetAttributes();
+
+            if (CustomMemberIgnoreOriginType == default)
+                CustomMemberIgnoreOriginType = methodContext.Compilation.GetTypeByMetadataName(typeof(RPCCustomMemberIgnoreAttribute).FullName);
+
+            var attr = attrbs.FirstOrDefault(x => x.AttributeClass.Equals(CustomMemberIgnoreOriginType));
+
+            if (attr == null)
+                return new List<string>();
+            //if (!Debugger.IsAttached)
+            //    Debugger.Launch();
+
+            if (!attr.ConstructorArguments.Any())
+                return Enumerable.Range(0, 1).Select(x => "*").ToArray();
+            //attr.NamedArguments
+
+            var arg = attr.ConstructorArguments.First();
+
+            return arg.Values.Select(x => (string)x.Value).ToArray();
         }
     }
 }

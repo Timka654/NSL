@@ -11,7 +11,7 @@ namespace NSL.Extensions.RPC.Generator.Generators.Handlers
 {
     internal class NullableTypeGenerator
     {
-        public static string GetReadLine(ISymbol parameter, MethodContextModel methodContext, string path)
+        public static string GetReadLine(ISymbol parameter, MethodContextModel methodContext, string path, IEnumerable<string> ignoreMembers)
         {
             CodeBuilder rb = new CodeBuilder();
 
@@ -31,7 +31,7 @@ namespace NSL.Extensions.RPC.Generator.Generators.Handlers
             return $"dataPacket.{nameof(InputPacketBuffer.ReadNullable)}(()=>{{ return {ReadMethodsGenerator.GetValueReadSegment(genericType, methodContext, path)}; }})";
         }
 
-        public static string GetWriteLine(ISymbol parameter, MethodContextModel mcm, string path)
+        public static string GetWriteLine(ISymbol parameter, MethodContextModel mcm, string path, IEnumerable<string> ignoreMembers)
         {
             var type = parameter.GetTypeSymbol();
 
@@ -43,7 +43,7 @@ namespace NSL.Extensions.RPC.Generator.Generators.Handlers
             if (!genericType.IsValueType)
                 return default;
 
-            return $"__packet.{nameof(OutputPacketBuffer.WriteNullable)}({path},()=>{{ {WriteMethodsGenerator.BuildParameterWriter(genericType, mcm, $"{path}.Value")} }});";
+            return $"__packet.{nameof(OutputPacketBuffer.WriteNullable)}({path},()=>{{ {WriteMethodsGenerator.BuildParameterWriter(genericType, mcm, $"{path}.Value", null)} }});";
         }
     }
 }
