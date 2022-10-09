@@ -126,8 +126,7 @@ namespace NSL.Extensions.RPC.Generator
 
             classDecl.ClassSymbol = classSemanticModel.GetDeclaredSymbol(classDecl.Class);
 
-
-            var generic = classDecl.Class.TypeParameterList.Parameters.Any() ? $"<{string.Join(",", classDecl.Class.TypeParameterList.Parameters.Select(x => x.Identifier.Text))}>" : string.Empty;
+            var generic = classDecl.Class.TypeParameterList?.Parameters.Any() == true ? $"<{string.Join(",", classDecl.Class.TypeParameterList.Parameters.Select(x => x.Identifier.Text))}>" : string.Empty;
 
 
             classBuilder.AppendLine($"{GetClassFullModifier(classDecl.Class)} class {GetClassRPCHandleName(classDecl.Class)}{generic} : {classIdentityName}{generic}");
@@ -147,8 +146,6 @@ namespace NSL.Extensions.RPC.Generator
 
             foreach (var method in classDecl.Methods)
             {
-                //if (!Debugger.IsAttached)
-                //    Debugger.Launch();
 
                 classBuilder.AppendLine(WriteMethodsGenerator.BuildWriteMethods(method));
                 classBuilder.AppendLine();
@@ -187,9 +184,12 @@ namespace NSL.Extensions.RPC.Generator
                 outputValue = nsBuilder.ToString();
             }
             // Visual studio have lag(or ...) cannot show changes any time
-#if DEVELOP
+#if !DEVELOP
             System.IO.File.WriteAllText($@"D:\Temp\gen\{classIdentityName}.rpcgen.cs", outputValue);
 #endif
+
+            //if (!Debugger.IsAttached)
+            //    Debugger.Launch();
 
             context.AddSource($"{classIdentityName}.rpcgen.cs", outputValue);
         }

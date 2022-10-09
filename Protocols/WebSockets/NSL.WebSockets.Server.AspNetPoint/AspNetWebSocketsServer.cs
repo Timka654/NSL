@@ -11,12 +11,12 @@ using System.Threading.Tasks;
 namespace NSL.WebSockets.Server.AspNetPoint
 {
     public class AspNetWebSocketsServer<T> : INetworkListener<T>
-        where T : IServerNetworkClient, new()
+        where T : AspNetWSNetworkServerClient, new()
     {
         public event ReceivePacketDebugInfo<WSServerClient<T>> OnReceivePacket;
         public event SendPacketDebugInfo<WSServerClient<T>> OnSendPacket;
 
-        private readonly IEndpointRouteBuilder router;
+        public delegate Task AcceptDelegate(HttpContext context);
 
         /// <summary>
         /// Настройки сервера
@@ -27,15 +27,17 @@ namespace NSL.WebSockets.Server.AspNetPoint
         /// Инициализация сервера
         /// </summary>
         /// <param name="options">Настройки</param>
-        public AspNetWebSocketsServer(IEndpointRouteBuilder router, WSServerOptions<T> options)
+        public AspNetWebSocketsServer(IEndpointRouteBuilder router, WSServerOptions<T> options) : this(options)
         {
-            this.router = router;
-            serverOptions = options;
-
             foreach (var item in options.EndPoints)
             {
                 router.MapGet(item, Accept);
             }
+        }
+
+        public AspNetWebSocketsServer(WSServerOptions<T> options)
+        {
+            serverOptions = options;
         }
 
         /// <summary>
@@ -66,8 +68,6 @@ namespace NSL.WebSockets.Server.AspNetPoint
                 return;
             }
 
-            using var webSocket = await context.WebSockets.AcceptWebSocketAsync();
-
             try
             {
                 //инициализация слушателя клиента клиента
@@ -75,7 +75,7 @@ namespace NSL.WebSockets.Server.AspNetPoint
                 var c = new AspNetWSServerClient<T>(context, serverOptions);
                 c.OnReceivePacket += OnReceivePacket;
                 c.OnSendPacket += OnSendPacket;
-                c.RunPacketReceiver();
+                await c.RunPacketReceiver();
                 //#else
                 //                new ServerClient<T>(client, serverOptions).RunPacketReceiver();
                 //#endif
@@ -85,6 +85,8 @@ namespace NSL.WebSockets.Server.AspNetPoint
                 serverOptions.RunException(ex, null);
             }
         }
+
+        public AcceptDelegate GetAcceptDelegate() => Accept;
 
         public int GetListenerPort() => 0;
 

@@ -11,7 +11,7 @@ using NSL.WebSockets.Server.AspNetPoint;
 namespace NSL.BuilderExtensions.WebSocketsServer.AspNet
 {
     public class AspNetWebSocketsServerEndPointBuilder<TClient, TOptions> : WebSocketsEndPointBuilder, IOptionableEndPointServerBuilder<TClient>, IHandleIOBuilder<WSServerClient<TClient>>
-            where TClient : IServerNetworkClient, new()
+            where TClient : AspNetWSNetworkServerClient, new()
             where TOptions : WSServerOptions<TClient>, new()
     {
         TOptions options = new TOptions();
@@ -69,6 +69,17 @@ namespace NSL.BuilderExtensions.WebSocketsServer.AspNet
         public AspNetWebSocketsServer<TClient> Build(IEndpointRouteBuilder router)
         {
             var result = new AspNetWebSocketsServer<TClient>(router, options);
+
+            result.OnReceivePacket += OnReceiveHandles;
+
+            result.OnSendPacket += OnSendHandles;
+
+            return result;
+        }
+
+        public AspNetWebSocketsServer<TClient> BuildWithoutRoute()
+        {
+            var result = new AspNetWebSocketsServer<TClient>(options);
 
             result.OnReceivePacket += OnReceiveHandles;
 

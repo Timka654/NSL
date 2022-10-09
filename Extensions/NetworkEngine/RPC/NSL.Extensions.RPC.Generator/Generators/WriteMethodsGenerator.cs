@@ -102,7 +102,9 @@ namespace NSL.Extensions.RPC.Generator.Generators
 
                 cb.AppendLine();
 
-                cb.AppendLine($"var result = {(ReadMethodsGenerator.GetValueReadSegment(symbol.ReturnType, mcm, "result"))}");
+                var sr = ReadMethodsGenerator.GetValueReadSegment(symbol.ReturnType, mcm, "result");
+
+                cb.AppendLine($"var result = {sr.TrimEnd(';')};");
 
                 cb.AppendLine();
 

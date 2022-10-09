@@ -7,12 +7,20 @@ namespace NSL.Extensions.RPC.EndPointBuilder
 {
     public static class RPCChannelProcessorExtensions
     {
-        public static void RegisterRPCProcessor<TClient>(this IOptionableEndPointBuilder<TClient> builder)
+        /// <summary>
+        /// Previously call InitializeObjectBag method for each client in sync connection handle for normal work
+        /// </summary>
+        /// <typeparam name="TClient"></typeparam>
+        /// <param name="builder"></param>
+        /// <param name="callPID"></param>
+        /// <param name="resultPid"></param>
+        /// <exception cref="NullReferenceException"></exception>
+        public static void RegisterRPCProcessor<TClient>(this IOptionableEndPointBuilder<TClient> builder, ushort callPID = RPCChannelProcessor.DefaultCallPacketId, ushort resultPid = RPCChannelProcessor.DefaultResultPacketId)
             where TClient : INetworkClient, new()
         {
             builder.AddConnectHandle(_client =>
             {
-                var proc = new RPCChannelProcessor<TClient>(_client, RPCChannelProcessor.DefaultCallPacketId, RPCChannelProcessor.DefaultResultPacketId);
+                var proc = new RPCChannelProcessor<TClient>(_client, callPID, resultPid);
 
                 if (_client.ObjectBag == null)
                     throw new NullReferenceException($"First you must initialize ObjectBag for use RPC");
@@ -21,7 +29,7 @@ namespace NSL.Extensions.RPC.EndPointBuilder
             });
 
 
-            builder.AddPacketHandle(RPCChannelProcessor.DefaultResultPacketId, (c, p) =>
+            builder.AddPacketHandle(resultPid, (c, p) =>
             {
                 c.ObjectBag
                 .Get<RPCChannelProcessor<TClient>>(RPCChannelProcessor.DefaultBagKey)
@@ -29,14 +37,21 @@ namespace NSL.Extensions.RPC.EndPointBuilder
             });
 
 
-            builder.AddPacketHandle(RPCChannelProcessor.DefaultCallPacketId, (c, p) =>
+            builder.AddPacketHandle(callPID, (c, p) =>
             {
                 c.ObjectBag
                 .Get<RPCChannelProcessor<TClient>>(RPCChannelProcessor.DefaultBagKey)
                 .CallPacketHandle(p);
             });
         }
-
+        /// <summary>
+        /// Previously call InitializeObjectBag method for each client in sync connection handle for normal work
+        /// Previously call RegisterRPCProcessor method for each client in sync connection handle for normal work
+        /// </summary>
+        /// <typeparam name="TClient"></typeparam>
+        /// <typeparam name="TContainer"></typeparam>
+        /// <param name="builder"></param>
+        /// <param name="container"></param>
         public static void AddRPCContainer<TClient, TContainer>(this IOptionableEndPointBuilder<TClient> builder, Func<TClient, TContainer> container)
             where TClient : INetworkClient, new()
             where TContainer : RPCHandleContainer<TClient>
@@ -53,6 +68,14 @@ namespace NSL.Extensions.RPC.EndPointBuilder
             });
         }
 
+        /// <summary>
+        /// Previously call InitializeObjectBag method for each client in sync connection handle for normal work
+        /// Previously call RegisterRPCProcessor method for each client in sync connection handle for normal work
+        /// </summary>
+        /// <typeparam name="TClient"></typeparam>
+        /// <typeparam name="TContainer"></typeparam>
+        /// <param name="builder"></param>
+        /// <param name="container"></param>
         public static void AddRPCContainer<TClient, TContainer>(this IOptionableEndPointBuilder<TClient> builder, TContainer container)
             where TClient : INetworkClient, new()
             where TContainer : RPCHandleContainer<TClient>

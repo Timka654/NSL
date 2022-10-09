@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "NSL.BuilderExtensions.WebSocketsServer.AspNet": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:38346;http://localhost:38348"
+    }
+  }
+}

@@ -3,6 +3,7 @@ using NSL.SocketServer;
 using NSL.SocketServer.Utils;
 using System;
 using System.Net;
+using System.Threading.Tasks;
 
 namespace NSL.WebSockets.Server
 {
@@ -32,7 +33,7 @@ namespace NSL.WebSockets.Server
             if (!client.Request.IsWebSocketRequest)
                 throw new Exception($"{client.Request.UserHostAddress} is not WebSocket request");
 
-            base.context = context;
+            base.context = client;
 
             Initialize(options);
         }
@@ -56,18 +57,19 @@ namespace NSL.WebSockets.Server
             outputCipher = options.OutputCipher.CreateEntry();
 
             disconnected = false;
+
+            InitReceiver();
             //Начало приема пакетов от клиента
             options.RunClientConnect(Data);
         }
 
-        public virtual async void RunPacketReceiver()
+        public virtual async Task RunPacketReceiver()
         {
             try
             {
                 sclient = (await context.AcceptWebSocketAsync(null))?.WebSocket;
 
-                RunReceive();
-
+                RunReceiveAsync();
             }
             catch (Exception)
             {

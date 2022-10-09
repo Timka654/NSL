@@ -93,7 +93,7 @@ namespace NSL.WebSockets.Server
         /// Синхронно принимаем входящие запросы на подключение
         /// </summary>
         /// <param name="result"></param>
-        private void Accept(IAsyncResult result)
+        private async void Accept(IAsyncResult result)
         {
             //завершить цикл приема если сервер выключен
             if (!state)
@@ -111,7 +111,7 @@ namespace NSL.WebSockets.Server
                 var c = new WSServerClient<T>(client, serverOptions);
                 c.OnReceivePacket += OnReceivePacket;
                 c.OnSendPacket += OnSendPacket;
-                c.RunPacketReceiver();
+                await c.RunPacketReceiver();
                 //#else
                 //                new ServerClient<T>(client, serverOptions).RunPacketReceiver();
                 //#endif

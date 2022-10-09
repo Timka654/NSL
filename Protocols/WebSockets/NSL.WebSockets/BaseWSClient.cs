@@ -8,6 +8,7 @@ using System.Net.Sockets;
 using System.Net;
 using System.Threading;
 using System.Net.WebSockets;
+using System.Threading.Tasks;
 
 namespace NSL.WebSockets
 {
@@ -87,7 +88,7 @@ namespace NSL.WebSockets
             offset = 0;
         }
 
-        protected void RunReceive()
+        protected void InitReceiver()
         {
             disconnected = false;
 
@@ -95,12 +96,23 @@ namespace NSL.WebSockets
 
             //Возвращает значения в исходное положение
             ResetBuffer();
-
-            //Начало приема пакетов от клиента
-            Receive();
         }
 
-        private async void Receive()
+        protected async void RunReceiveAsync()
+        {
+            await ReceiveLoop();
+        }
+
+        protected async Task ReceiveLoop()
+        {
+            do
+            {
+                await Receive();
+
+            } while (!disconnected);
+        }
+
+        private async Task Receive()
         {
             //замыкаем это все в блок try, если клиент отключился то EndReceive может вернуть ошибку
             try
@@ -173,8 +185,6 @@ namespace NSL.WebSockets
                             pbuff.Dispose();
                     }
                 }
-
-                Receive();
             }
             catch (ConnectionLostException clex)
             {

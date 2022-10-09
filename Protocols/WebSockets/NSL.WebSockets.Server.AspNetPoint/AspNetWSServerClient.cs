@@ -3,30 +3,35 @@ using NSL.SocketServer;
 using NSL.SocketServer.Utils;
 using System;
 using System.Net;
+using System.Threading.Tasks;
 
 namespace NSL.WebSockets.Server.AspNetPoint
 {
     public class AspNetWSServerClient<T> : WSServerClient<T>
-        where T : IServerNetworkClient, new()
+        where T : AspNetWSNetworkServerClient, new()
     {
-        private readonly HttpContext context;
+        private new readonly HttpContext context;
 
         public AspNetWSServerClient(HttpContext context, ServerOptions<T> options) : base()
         {
             this.context = context;
             Initialize(options);
+
+            var client = (T)GetUserData();
+
+            client.SetContext(context);
         }
 
-        public override async void RunPacketReceiver()
+        public override async Task RunPacketReceiver()
         {
             try
             {
-                sclient = await context.WebSockets.AcceptWebSocketAsync((string)null);
+                sclient = await context.WebSockets.AcceptWebSocketAsync();
 
-                RunReceive();
+                await base.ReceiveLoop();
 
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 Disconnect();
             }

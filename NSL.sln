@@ -217,7 +217,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NSL.Extensions.RPC.Generato
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NSL.WebSockets.Server.AspNetPoint", "Protocols\WebSockets\NSL.WebSockets.Server.AspNetPoint\NSL.WebSockets.Server.AspNetPoint.csproj", "{3DC79637-4866-413F-84EB-7E9D9BA92D80}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NSL.BuilderExtensions.WebSocketsServer.AspNet", "Protocols\WebSockets\BuilderExtensions\NSL.BuilderExtensions.WebSocketsServer.AspNet\NSL.BuilderExtensions.WebSocketsServer.AspNet.csproj", "{2C62E0D1-715F-4DD9-9952-10E27313EB6E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NSL.BuilderExtensions.WebSocketsServer.AspNet", "Protocols\WebSockets\BuilderExtensions\NSL.BuilderExtensions.WebSocketsServer.AspNet\NSL.BuilderExtensions.WebSocketsServer.AspNet.csproj", "{2C62E0D1-715F-4DD9-9952-10E27313EB6E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Builder.WebSockets.AspNetCoreIntegrationExample", "Protocols\WebSockets\Examples\Builder.WebSockets.AspNetCoreIntegrationExample\Builder.WebSockets.AspNetCoreIntegrationExample.csproj", "{286875CB-C155-4792-9590-D0B2AE8BFCCE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -979,6 +981,16 @@ Global
 		{2C62E0D1-715F-4DD9-9952-10E27313EB6E}.Unity|Any CPU.Build.0 = Debug|Any CPU
 		{2C62E0D1-715F-4DD9-9952-10E27313EB6E}.UnityDebug|Any CPU.ActiveCfg = Debug|Any CPU
 		{2C62E0D1-715F-4DD9-9952-10E27313EB6E}.UnityDebug|Any CPU.Build.0 = Debug|Any CPU
+		{286875CB-C155-4792-9590-D0B2AE8BFCCE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{286875CB-C155-4792-9590-D0B2AE8BFCCE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{286875CB-C155-4792-9590-D0B2AE8BFCCE}.DebugStable|Any CPU.ActiveCfg = Debug|Any CPU
+		{286875CB-C155-4792-9590-D0B2AE8BFCCE}.DebugStable|Any CPU.Build.0 = Debug|Any CPU
+		{286875CB-C155-4792-9590-D0B2AE8BFCCE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{286875CB-C155-4792-9590-D0B2AE8BFCCE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{286875CB-C155-4792-9590-D0B2AE8BFCCE}.Unity|Any CPU.ActiveCfg = Debug|Any CPU
+		{286875CB-C155-4792-9590-D0B2AE8BFCCE}.Unity|Any CPU.Build.0 = Debug|Any CPU
+		{286875CB-C155-4792-9590-D0B2AE8BFCCE}.UnityDebug|Any CPU.ActiveCfg = Debug|Any CPU
+		{286875CB-C155-4792-9590-D0B2AE8BFCCE}.UnityDebug|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1085,6 +1097,7 @@ Global
 		{B0D07AD7-44E3-4B20-B4DF-B7F444B42215} = {854F1AB4-1DBB-4809-87C4-7FDD525CC333}
 		{3DC79637-4866-413F-84EB-7E9D9BA92D80} = {B997D07D-A25B-43EA-8046-8BF3D436321F}
 		{2C62E0D1-715F-4DD9-9952-10E27313EB6E} = {5A1F7474-AB8C-42DA-8E79-5BA461B00150}
+		{286875CB-C155-4792-9590-D0B2AE8BFCCE} = {DE02816C-37B4-4188-8DD7-6E243420B026}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {FAC0C61D-775D-4347-9BD3-3A114A731C7C}

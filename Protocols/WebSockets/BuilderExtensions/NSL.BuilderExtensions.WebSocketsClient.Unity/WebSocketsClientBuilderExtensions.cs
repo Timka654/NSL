@@ -13,7 +13,6 @@ namespace NSL.BuilderExtensions.WebSocketsClient.Unity
         where TClient : BaseSocketNetworkClient, new()
         where TOptions : WSClientOptions<TClient>, new()
         {
-
             var result = new WGLWSNetworkClient<TClient, TOptions>(builder.GetWSClientOptions());
 
             result.OnReceivePacket += builder.GetReceiveHandles();
