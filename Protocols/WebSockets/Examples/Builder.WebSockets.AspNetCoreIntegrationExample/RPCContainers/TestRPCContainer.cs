@@ -13,5 +13,27 @@ namespace Builder.WebSockets.AspNetCoreIntegrationExample.RPCContainers
         {
             return (value * 2);
         }
+
+        [RPCMethod]
+        public virtual async void testasyncvoid(int value)
+        {
+            await Task.Delay(1000);
+            Console.WriteLine($"{nameof(testasyncvoid)} - {value}");
+        }
+
+        [RPCMethod]
+        public virtual async Task testasyncTask(int value)
+        {
+            await Task.Run(() =>
+            {
+                Console.WriteLine($"{nameof(testasyncTask)} - {value}");
+            });
+        }
+
+        [RPCMethod]
+        public virtual async Task<int> testasynctaskwithresult(int value)
+        {
+            return await Task.FromResult(value * 2);
+        }
     }
 }

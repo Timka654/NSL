@@ -11,6 +11,7 @@ using System.Diagnostics;
 using NSL.Extensions.RPC.Generator.Models;
 using NSL.Extensions.RPC.Generator.Generators.Handlers;
 using NSL.Extensions.RPC.Generator.Attributes;
+using System.Reflection;
 
 namespace NSL.Extensions.RPC.Generator.Generators
 {
@@ -23,6 +24,7 @@ namespace NSL.Extensions.RPC.Generator.Generators
 
         static ReadMethodsGenerator()
         {
+            //generators.Add(TaskTypeGenerator.GetReadLine);
             generators.Add(CustomTypeGenerator.GetReadLine);
             generators.Add(ArrayTypeGenerator.GetReadLine);
             generators.Add(BaseTypeGenerator.GetReadLine);
@@ -202,6 +204,10 @@ namespace NSL.Extensions.RPC.Generator.Generators
 
             mb.AppendLine();
 
+            mb.AppendLine($"Guid rid = dataPacket.ReadGuid();");
+
+            mb.AppendLine();
+
             mb.AppendLine("switch (argCount)");
             mb.AppendLine("{");
 
@@ -223,13 +229,17 @@ namespace NSL.Extensions.RPC.Generator.Generators
 
                 var semanticModel = methodDecl.Class.Context.Compilation.GetSemanticModel(mov.DeclSyntax.SyntaxTree);
 
+                var returnTypeInfo = semanticModel.GetTypeInfo(mov.DeclSyntax.ReturnType);
+
                 var movSymbol = classSemanticModel.GetDeclaredSymbol(mov.DeclSyntax);
 
                 var p = new MethodContextModel()
                 {
                     Method = methodDecl,
                     methodSyntax = mov.DeclSyntax,
-                    SemanticModel = semanticModel
+                    SemanticModel = semanticModel,
+                    IsAsync = mov.DeclSyntax.Modifiers.Any(x => x.ValueText.Equals("async")),
+                    IsTask = returnTypeInfo.Type.GetMembers().Any(x => x.MetadataName.Equals("GetAwaiter"))
                 };
 
                 foreach (var item in mov.DeclSyntax.ParameterList.Parameters)
@@ -248,81 +258,44 @@ namespace NSL.Extensions.RPC.Generator.Generators
 
                 if (movSymbol.ReturnsVoid)
                 {
-
-                    mb.AppendLine("try {");
-
-                    mb.NextTab();
-
-                    mb.AppendLine($"var __packet = Processor.CreateAnswer(dataPacket.ReadGuid());");
-
-                    mb.AppendLine();
-
-                    mb.AppendLine($"base.{methodDecl.Name}({string.Join(", ", parameters)});");
-
-                    mb.AppendLine();
-
-                    mb.AppendLine($"Processor.SendAnswer(__packet);");
-
-                    mb.PrevTab();
-
-                    mb.AppendLine("}");
-
-                    mb.AppendLine("catch (Exception ex)");
-
-                    mb.AppendLine("{");
-
-                    mb.NextTab();
-
-                    mb.AppendLine($"var __packet = Processor.CreateException(dataPacket.ReadGuid(), ex);");
-
-                    mb.AppendLine($"Processor.SendAnswer(__packet);");
-
-                    mb.AppendLine($"throw;");
-
-                    mb.PrevTab();
-
-                    mb.AppendLine("}");
+                    BuildTrySegment(mb, b =>
+                    {
+                        mb.AppendLine($"base.{methodDecl.Name}({string.Join(", ", parameters)});");
+                    });
                 }
                 else
                 {
 
-                    mb.AppendLine("try {");
+                    var rType = movSymbol.ReturnType;
+                    bool trun = false;
+                    if (p.IsTask && rType is INamedTypeSymbol nts && nts.TypeArguments.Any())
+                    {
+                        rType = nts.TypeArguments.First();
 
-                    mb.NextTab();
+                        //if (!Debugger.IsAttached)
+                        //    Debugger.Break();
 
-                    mb.AppendLine($"var result = base.{methodDecl.Name}({string.Join(", ", parameters)});");
+                        trun = true;
 
-                    mb.AppendLine();
+                        mb.AppendLine("System.Threading.Tasks.Task.Run(async () => {");
+                        mb.NextTab();
+                    }
 
-                    mb.AppendLine($"var __packet = Processor.CreateAnswer(dataPacket.ReadGuid());");
+                    BuildTrySegment(mb, b =>
+                    {
+                        mb.AppendLine($"var result = {(trun? "await" : string.Empty)} base.{methodDecl.Name}({string.Join(", ", parameters)});");
 
-                    mb.AppendLine();
+                        mb.AppendLine();
 
-                    mb.AppendLine(WriteMethodsGenerator.BuildParameterWriter(movSymbol.ReturnType, p, "result", null));
+                        mb.AppendLine(WriteMethodsGenerator.BuildParameterWriter(rType, p, "result", null));
+                    });
 
-                    mb.AppendLine();
+                    if (trun)
+                    {
+                        mb.PrevTab();
+                        mb.AppendLine("});");
+                    }
 
-                    mb.AppendLine($"Processor.SendAnswer(__packet);");
-
-                    mb.PrevTab();
-
-                    mb.AppendLine("}");
-
-                    mb.AppendLine("catch (Exception ex)");
-
-                    mb.AppendLine("{");
-
-                    mb.NextTab();
-
-                    mb.AppendLine($"var __packet = Processor.CreateException(dataPacket.ReadGuid(), ex);");
-
-                    mb.AppendLine($"Processor.SendAnswer(__packet);");
-
-                    mb.AppendLine($"throw;");
-
-                    mb.PrevTab();
-
-                    mb.AppendLine("}");
                 }
 
                 mb.PrevTab(); // 3
@@ -354,6 +327,46 @@ namespace NSL.Extensions.RPC.Generator.Generators
             mb.AppendLine("}");
 
             return mb.ToString();
+        }
+
+        private static string BuildTrySegment(CodeBuilder cb, Action<CodeBuilder> code)
+        {
+
+            cb.AppendLine($"OutputPacketBuffer __packet = default;");
+
+            cb.AppendLine("try {");
+
+            cb.NextTab();
+
+            cb.AppendLine($"__packet = Processor.CreateAnswer(rid);");
+
+            code(cb);
+
+            cb.AppendLine();
+
+            cb.AppendLine($"Processor.SendAnswer(__packet);");
+
+            cb.PrevTab();
+
+            cb.AppendLine("}");
+
+            cb.AppendLine("catch (Exception ex)");
+
+            cb.AppendLine("{");
+
+            cb.NextTab();
+
+            cb.AppendLine($"__packet = Processor.CreateException(rid, ex);");
+
+            cb.AppendLine($"Processor.SendAnswer(__packet);");
+
+            cb.AppendLine($"throw;");
+
+            cb.PrevTab();
+
+            cb.AppendLine("}");
+
+            return cb.ToString();
         }
 
     }

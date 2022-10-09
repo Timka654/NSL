@@ -12,6 +12,7 @@ using System.Diagnostics;
 using System.Reflection.Metadata;
 using NSL.Extensions.RPC.Generator.Generators.Handlers;
 using System.Data.Common;
+using System.Buffers;
 
 namespace NSL.Extensions.RPC.Generator.Generators
 {
@@ -42,7 +43,19 @@ namespace NSL.Extensions.RPC.Generator.Generators
 
                 var semanticModel = methodDecl.Class.Context.Compilation.GetSemanticModel(mov.DeclSyntax.SyntaxTree);
 
-                MethodContextModel mcm = new MethodContextModel() { Method = methodDecl, SemanticModel = semanticModel, methodSyntax = mov.DeclSyntax };
+                var returnTypeInfo = semanticModel.GetTypeInfo(mov.DeclSyntax.ReturnType);
+
+                //if (!Debugger.IsAttached)
+                //    Debugger.Launch();
+
+                MethodContextModel mcm = new MethodContextModel()
+                {
+                    Method = methodDecl,
+                    SemanticModel = semanticModel,
+                    methodSyntax = mov.DeclSyntax,
+                    IsAsync = mov.DeclSyntax.Modifiers.Any(x => x.ValueText.Equals("async")),
+                    IsTask = returnTypeInfo.Type.GetMembers().Any(x => x.MetadataName.Equals("GetAwaiter"))
+                };
 
                 cb.AppendLine(BuildWriteMethod(mcm));
             }
@@ -90,8 +103,31 @@ namespace NSL.Extensions.RPC.Generator.Generators
             //    Debugger.Launch();
 
 
-            var symbol = mcm.SemanticModel.GetDeclaredSymbol(mcm.methodSyntax);
-            if (symbol.ReturnsVoid)
+            var movSymbol = mcm.SemanticModel.GetDeclaredSymbol(mcm.methodSyntax);
+
+
+
+
+            var rType = movSymbol.ReturnType;
+            bool trun = false;
+            if (mcm.IsTask && rType is INamedTypeSymbol nts)
+            {
+                if (nts.TypeArguments.Any())
+                    rType = nts.TypeArguments.First();
+                else
+                    rType = default;
+
+                //if (!Debugger.IsAttached)
+                //    Debugger.Launch();
+
+                trun = true;
+
+                cb.AppendLine($"{(mcm.IsAsync ? ((rType != null ? "return " :String.Empty) + "await") : "return")} System.Threading.Tasks.Task.Run(() => {{");
+                cb.NextTab();
+            }
+
+
+            if (movSymbol.ReturnsVoid || rType == default)
             {
                 cb.AppendLine($"Processor.SendWait(__packet);");
             }
@@ -102,7 +138,7 @@ namespace NSL.Extensions.RPC.Generator.Generators
 
                 cb.AppendLine();
 
-                var sr = ReadMethodsGenerator.GetValueReadSegment(symbol.ReturnType, mcm, "result");
+                var sr = ReadMethodsGenerator.GetValueReadSegment(rType, mcm, "result");
 
                 cb.AppendLine($"var result = {sr.TrimEnd(';')};");
 
@@ -113,6 +149,12 @@ namespace NSL.Extensions.RPC.Generator.Generators
                 cb.AppendLine();
 
                 cb.AppendLine($"return result;");
+            }
+
+            if (trun)
+            {
+                cb.PrevTab();
+                cb.AppendLine("});");
             }
 
             cb.PrevTab();

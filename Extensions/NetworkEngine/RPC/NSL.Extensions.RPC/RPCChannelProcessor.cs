@@ -10,6 +10,12 @@ using System.Threading.Tasks;
 
 namespace NSL.Extensions.RPC
 {
+
+    public class RPCOutputPacketBuffer : OutputPacketBuffer
+    {
+        public int GuidOffset { get; set; }
+    }
+
     public abstract class RPCChannelProcessor
     {
         public const ushort DefaultCallPacketId = ushort.MaxValue - 235;
@@ -135,13 +141,17 @@ namespace NSL.Extensions.RPC
 
         public OutputPacketBuffer CreateCall(string containerName, string methodName, byte argCount)
         {
-            var packet = new OutputPacketBuffer();
+            var packet = new RPCOutputPacketBuffer();
 
             packet.WriteString16(containerName);
 
             packet.WriteString16(methodName);
 
             packet.WriteByte(argCount);
+
+            packet.GuidOffset = (int)packet.Position;
+
+            packet.WriteGuid(Guid.NewGuid());
 
             return packet;
         }
@@ -171,6 +181,9 @@ namespace NSL.Extensions.RPC
                     ProcessException(pin);
 
             }));
+
+            if (packet is RPCOutputPacketBuffer rpc)
+                packet.Seek(rpc.GuidOffset, SeekOrigin.Begin);
 
             packet.WriteGuid(newWID);
 

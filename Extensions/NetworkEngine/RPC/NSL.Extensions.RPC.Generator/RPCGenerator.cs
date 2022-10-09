@@ -184,7 +184,7 @@ namespace NSL.Extensions.RPC.Generator
                 outputValue = nsBuilder.ToString();
             }
             // Visual studio have lag(or ...) cannot show changes any time
-#if !DEVELOP
+#if DEVELOP
             System.IO.File.WriteAllText($@"D:\Temp\gen\{classIdentityName}.rpcgen.cs", outputValue);
 #endif
 

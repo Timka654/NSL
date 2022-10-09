@@ -120,6 +120,24 @@ namespace Builder.WebSockets.AspNetCoreIntegrationExample
                 r = connection.TestRepo.test(44);
 
                 app.Logger.LogInformation($"[Client] Try call \"test\" with 44 return {r} value");
+
+                app.Logger.LogInformation($"[Client] Try call \"testasynctaskwithresult\" with 66");
+
+                r = await connection.TestRepo.testasynctaskwithresult(66);
+
+                app.Logger.LogInformation($"[Client] Try call \"testasynctaskwithresult\" with 66 return {r} value");
+
+                app.Logger.LogInformation($"[Client] Try call \"testasyncvoid\" with 122");
+
+                connection.TestRepo.testasyncvoid(122);
+
+                app.Logger.LogInformation($"[Client] Try call \"testasyncvoid\" has not result");
+
+                app.Logger.LogInformation($"[Client] Try call \"testasyncTask\" with 244");
+
+                await connection.TestRepo.testasyncTask(244);
+
+                app.Logger.LogInformation($"[Client] Try call \"testasyncTask\" has not result");
             }
 
             await Task.Delay(2000);

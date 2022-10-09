@@ -20,5 +20,9 @@ namespace NSL.Extensions.RPC.Generator.Models
         public ParameterSyntax CurrentParameter { get; set; }
 
         public IParameterSymbol CurrentParameterSymbol { get; set; }
+
+        public bool IsAsync { get; set; }
+
+        public bool IsTask { get; set; }
     }
 }
