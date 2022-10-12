@@ -15,7 +15,7 @@ namespace NSL.ConfigurationEngine.Providers
             FileName = fileName;
             Required = required;
 
-            if (reloadOnChange && (required && File.Exists(fileName)))
+            if (reloadOnChange && (required || File.Exists(fileName)))
                 loadWatcher();
         }
 

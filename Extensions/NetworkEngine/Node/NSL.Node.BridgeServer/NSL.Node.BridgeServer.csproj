@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\Base\NSL.Logger\NSL.Logger.csproj" />
+    <ProjectReference Include="..\..\..\..\ConfigurationEngine\Providers\NSL.ConfigurationEngine.Providers.Json\NSL.ConfigurationEngine.Providers.Json.csproj" />
+    <ProjectReference Include="..\..\..\..\Core\BuilderExtensions\NSL.BuilderExtensions.SocketCore\NSL.BuilderExtensions.SocketCore.csproj" />
+    <ProjectReference Include="..\..\..\..\Protocols\WebSockets\BuilderExtensions\NSL.BuilderExtensions.WebSocketsClient\NSL.BuilderExtensions.WebSocketsClient.csproj" />
+    <ProjectReference Include="..\..\..\..\Protocols\WebSockets\BuilderExtensions\NSL.BuilderExtensions.WebSocketsServer\NSL.BuilderExtensions.WebSocketsServer.csproj" />
+  </ItemGroup>
+
+</Project>

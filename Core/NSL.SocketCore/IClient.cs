@@ -8,15 +8,9 @@ namespace NSL.SocketCore
 
     public delegate void SendPacketDebugInfo<T>(T client, ushort pid, int len, string stacktrace) where T : IClient;
 
-    public interface IClient
+    public interface IClient : INetworkNode
     {
         CoreOptions Options { get; }
-
-        void SendEmpty(ushort packetId);
-
-        void Send(byte[] buf, int offset, int lenght);
-
-        void Disconnect();
 
         bool GetState();
 
@@ -29,8 +23,6 @@ namespace NSL.SocketCore
         System.Net.Sockets.Socket GetSocket();
 
         short GetTtl();
-
-        void Send(OutputPacketBuffer packet, bool disposeOnSend = true);
     }
 
     public interface IClient<TOPacket> : IClient

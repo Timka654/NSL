@@ -1,16 +1,18 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
-  <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-    <Nullable>enable</Nullable>
-    <ImplicitUsings>enable</ImplicitUsings>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<IsPackable>false</IsPackable>
+		<Version>$(VersionSuffix)</Version>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\..\Extensions\NetworkEngine\RPC\NSL.Extensions.RPC.EndPointBuilder\NSL.Extensions.RPC.EndPointBuilder.csproj" />
-    <ProjectReference Include="..\..\..\..\Extensions\NetworkEngine\RPC\NSL.Extensions.RPC.Generator\NSL.Extensions.RPC.Generator.csproj" OutputItemType="Analyzer" />
-    <ProjectReference Include="..\..\BuilderExtensions\NSL.BuilderExtensions.WebSocketsClient\NSL.BuilderExtensions.WebSocketsClient.csproj" />
-    <ProjectReference Include="..\..\BuilderExtensions\NSL.BuilderExtensions.WebSocketsServer.AspNet\NSL.BuilderExtensions.WebSocketsServer.AspNet.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\..\..\..\Extensions\NetworkEngine\RPC\NSL.Extensions.RPC.EndPointBuilder\NSL.Extensions.RPC.EndPointBuilder.csproj" />
+		<ProjectReference Include="..\..\..\..\Extensions\NetworkEngine\RPC\NSL.Extensions.RPC.Generator\NSL.Extensions.RPC.Generator.csproj" OutputItemType="Analyzer" />
+		<ProjectReference Include="..\..\BuilderExtensions\NSL.BuilderExtensions.WebSocketsClient\NSL.BuilderExtensions.WebSocketsClient.csproj" />
+		<ProjectReference Include="..\..\BuilderExtensions\NSL.BuilderExtensions.WebSocketsServer.AspNet\NSL.BuilderExtensions.WebSocketsServer.AspNet.csproj" />
+	</ItemGroup>
 
 </Project>

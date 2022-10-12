@@ -219,7 +219,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NSL.WebSockets.Server.AspNe
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NSL.BuilderExtensions.WebSocketsServer.AspNet", "Protocols\WebSockets\BuilderExtensions\NSL.BuilderExtensions.WebSocketsServer.AspNet\NSL.BuilderExtensions.WebSocketsServer.AspNet.csproj", "{2C62E0D1-715F-4DD9-9952-10E27313EB6E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Builder.WebSockets.AspNetCoreIntegrationExample", "Protocols\WebSockets\Examples\Builder.WebSockets.AspNetCoreIntegrationExample\Builder.WebSockets.AspNetCoreIntegrationExample.csproj", "{286875CB-C155-4792-9590-D0B2AE8BFCCE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Builder.WebSockets.AspNetCoreIntegrationExample", "Protocols\WebSockets\Examples\Builder.WebSockets.AspNetCoreIntegrationExample\Builder.WebSockets.AspNetCoreIntegrationExample.csproj", "{286875CB-C155-4792-9590-D0B2AE8BFCCE}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NSL.Node.BridgeServer", "Extensions\NetworkEngine\Node\NSL.Node.BridgeServer\NSL.Node.BridgeServer.csproj", "{7CB023C2-4475-4AA1-8AFF-573A3CC34DF8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -991,6 +993,16 @@ Global
 		{286875CB-C155-4792-9590-D0B2AE8BFCCE}.Unity|Any CPU.Build.0 = Debug|Any CPU
 		{286875CB-C155-4792-9590-D0B2AE8BFCCE}.UnityDebug|Any CPU.ActiveCfg = Debug|Any CPU
 		{286875CB-C155-4792-9590-D0B2AE8BFCCE}.UnityDebug|Any CPU.Build.0 = Debug|Any CPU
+		{7CB023C2-4475-4AA1-8AFF-573A3CC34DF8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7CB023C2-4475-4AA1-8AFF-573A3CC34DF8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7CB023C2-4475-4AA1-8AFF-573A3CC34DF8}.DebugStable|Any CPU.ActiveCfg = Debug|Any CPU
+		{7CB023C2-4475-4AA1-8AFF-573A3CC34DF8}.DebugStable|Any CPU.Build.0 = Debug|Any CPU
+		{7CB023C2-4475-4AA1-8AFF-573A3CC34DF8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7CB023C2-4475-4AA1-8AFF-573A3CC34DF8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7CB023C2-4475-4AA1-8AFF-573A3CC34DF8}.Unity|Any CPU.ActiveCfg = Debug|Any CPU
+		{7CB023C2-4475-4AA1-8AFF-573A3CC34DF8}.Unity|Any CPU.Build.0 = Debug|Any CPU
+		{7CB023C2-4475-4AA1-8AFF-573A3CC34DF8}.UnityDebug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7CB023C2-4475-4AA1-8AFF-573A3CC34DF8}.UnityDebug|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1098,6 +1110,7 @@ Global
 		{3DC79637-4866-413F-84EB-7E9D9BA92D80} = {B997D07D-A25B-43EA-8046-8BF3D436321F}
 		{2C62E0D1-715F-4DD9-9952-10E27313EB6E} = {5A1F7474-AB8C-42DA-8E79-5BA461B00150}
 		{286875CB-C155-4792-9590-D0B2AE8BFCCE} = {DE02816C-37B4-4188-8DD7-6E243420B026}
+		{7CB023C2-4475-4AA1-8AFF-573A3CC34DF8} = {79E423DA-3137-4D4C-9A35-EB0EEB22D08D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {FAC0C61D-775D-4347-9BD3-3A114A731C7C}

@@ -97,12 +97,12 @@ namespace NSL.ConfigurationEngine
         /// <param name="path"></param>
         /// <param name="existFlag">Оставить стандартным для получения значения без учета флага</param>
         /// <returns></returns>
-        public T GetValue<T>(string path, string existFlag = "")
+        public T GetValue<T>(string path, T defaultValue = default, string existFlag = "")
         {
             var val = GetValue(path, existFlag);
 
             if (val == null)
-                return default;
+                return defaultValue;
 
             return (T)Convert.ChangeType(val, typeof(T));
         }
