@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -6,5 +6,24 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\..\Core\BuilderExtensions\NSL.BuilderExtensions.SocketCore\NSL.BuilderExtensions.SocketCore.csproj" />
+    <ProjectReference Include="..\..\..\..\..\Core\Extensions\SocketCore.Extensions.Buffer\NSL.SocketCore.Extensions.Buffer.csproj" />
+    <ProjectReference Include="..\..\..\..\..\Core\NSL.EndPointBuilder\NSL.EndPointBuilder.csproj" />
+    <ProjectReference Include="..\..\..\..\..\Core\NSL.SocketCore\NSL.SocketCore.csproj" />
+    <ProjectReference Include="..\..\..\..\..\Core\NSL.SocketServer\NSL.SocketServer.csproj" />
+    <ProjectReference Include="..\..\..\..\..\Protocols\WebSockets\BuilderExtensions\NSL.BuilderExtensions.WebSocketsClient\NSL.BuilderExtensions.WebSocketsClient.csproj" />
+    <ProjectReference Include="..\..\..\..\..\Protocols\WebSockets\BuilderExtensions\NSL.BuilderExtensions.WebSocketsServer.AspNet\NSL.BuilderExtensions.WebSocketsServer.AspNet.csproj" />
+    <ProjectReference Include="..\..\..\..\..\Protocols\WebSockets\BuilderExtensions\NSL.BuilderExtensions.WebSockets\NSL.BuilderExtensions.WebSockets.csproj" />
+    <ProjectReference Include="..\..\..\..\..\Protocols\WebSockets\NSL.WebSockets.Client\NSL.WebSockets.Client.csproj" />
+    <ProjectReference Include="..\..\..\..\..\Protocols\WebSockets\NSL.WebSockets.Server.AspNetPoint\NSL.WebSockets.Server.AspNetPoint.csproj" />
+    <ProjectReference Include="..\..\..\..\..\Protocols\WebSockets\NSL.WebSockets.Server\NSL.WebSockets.Server.csproj" />
+    <ProjectReference Include="..\..\NSL.Node.BridgeLobbyClient\NSL.Node.BridgeLobbyClient.csproj" />
+  </ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="6.0.9"></PackageReference>
+	</ItemGroup>
 
 </Project>

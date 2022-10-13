@@ -17,7 +17,7 @@ namespace NSL.Node.BridgeServer
         {
             ClientServer.Run();
             LobbyServer.Run();
-            TranslateServer.Run();
+            TransportServer.Run();
 
             Thread.Sleep(Timeout.InfiniteTimeSpan);
         }

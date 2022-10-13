@@ -2,7 +2,7 @@
 
 namespace NSL.Node.BridgeServer.TS
 {
-    internal class TranslateServerNetworkClient : IServerNetworkClient
+    internal class TransportServerNetworkClient : IServerNetworkClient
     {
     }
 }

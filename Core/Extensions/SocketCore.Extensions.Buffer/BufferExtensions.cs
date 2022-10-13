@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using NSL.SocketCore.Utils.Buffer;
 using System;
+using System.Net.Sockets;
 
 namespace NSL.SocketCore.Extensions.Buffer
 {
@@ -287,6 +288,37 @@ namespace NSL.SocketCore.Extensions.Buffer
             {
                 PacketId = packetId
             });
+        }
+
+        /// <summary>
+        /// Create response for wait request
+        /// Warning!! Input packet have identity - 16 first byte or request, execute this method before read any data
+        /// </summary>
+        /// <typeparam name="TClient"></typeparam>
+        /// <param name="client"></param>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        public static OutputPacketBuffer CreateWaitBufferResponse<TClient>(this TClient client, InputPacketBuffer data)
+            where TClient : IClient
+        {
+            return data.CreateWaitBufferResponse();
+        }
+
+        /// <summary>
+        /// Create response for wait request
+        /// Warning!! Input packet have identity - 16 first byte or request, execute this method before read any data
+        /// </summary>
+        /// <typeparam name="TClient"></typeparam>
+        /// <param name="client"></param>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        public static OutputPacketBuffer CreateWaitBufferResponse(this InputPacketBuffer data)
+        {
+            var packet = new OutputPacketBuffer();
+
+            packet.WriteGuid(data.ReadGuid());
+
+            return packet;
         }
     }
 

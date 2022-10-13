@@ -132,7 +132,7 @@ namespace NSL.SocketCore.Utils
             RecoverySessionKeyArray = recoveryKeys;
         }
 
-        public void Dispose()
+        public virtual void Dispose()
         {
             ObjectBag?.Dispose(); 
             Network?.Disconnect();

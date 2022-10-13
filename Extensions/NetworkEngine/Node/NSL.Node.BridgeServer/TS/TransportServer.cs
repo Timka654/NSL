@@ -4,23 +4,23 @@ using NSL.Logger;
 using NSL.SocketCore.Utils.Buffer;
 using NSL.BuilderExtensions.SocketCore;
 
-using NetworkClient = NSL.Node.BridgeServer.TS.TranslateServerNetworkClient;
-using NetworkOptions = NSL.WebSockets.Server.WSServerOptions<NSL.Node.BridgeServer.TS.TranslateServerNetworkClient>;
-using NetworkListener = NSL.WebSockets.Server.WSServerListener<NSL.Node.BridgeServer.TS.TranslateServerNetworkClient>;
+using NetworkClient = NSL.Node.BridgeServer.TS.TransportServerNetworkClient;
+using NetworkOptions = NSL.WebSockets.Server.WSServerOptions<NSL.Node.BridgeServer.TS.TransportServerNetworkClient>;
+using NetworkListener = NSL.WebSockets.Server.WSServerListener<NSL.Node.BridgeServer.TS.TransportServerNetworkClient>;
 
 namespace NSL.Node.BridgeServer.TS
 {
-    internal class TranslateServer
+    internal class TransportServer
     {
         private const ushort SignSessionPID = 1;
 
         private const ushort SignSessionResultPID = SignSessionPID;
 
-        public static int BindingPort => Program.Configuration.GetValue("translate.server.port", 6999);
+        public static int BindingPort => Program.Configuration.GetValue("transport.server.port", 6998);
 
         public static NetworkListener Listener { get; private set; }
 
-        public static ILogger Logger { get; } = new PrefixableLoggerProxy(Program.Logger, "[TranslateServer]");
+        public static ILogger Logger { get; } = new PrefixableLoggerProxy(Program.Logger, "[TransportServer]");
 
         public static void Run()
         {

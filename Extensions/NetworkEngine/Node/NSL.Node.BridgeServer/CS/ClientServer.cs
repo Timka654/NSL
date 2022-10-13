@@ -7,6 +7,7 @@ using NSL.SocketCore.Utils.Buffer;
 using NetworkClient = NSL.Node.BridgeServer.CS.ClientServerNetworkClient;
 using NetworkOptions = NSL.WebSockets.Server.WSServerOptions<NSL.Node.BridgeServer.CS.ClientServerNetworkClient>;
 using NetworkListener = NSL.WebSockets.Server.WSServerListener<NSL.Node.BridgeServer.CS.ClientServerNetworkClient>;
+using NSL.Node.BridgeServer.LS;
 
 namespace NSL.Node.BridgeServer.CS
 {
@@ -42,10 +43,26 @@ namespace NSL.Node.BridgeServer.CS
 
         #region Handles
 
-        private static void SignSessionReceiveHandle(NetworkClient client, InputPacketBuffer data)
+        private static async void SignSessionReceiveHandle(NetworkClient client, InputPacketBuffer data)
         {
             client.ServerIdentity = data.ReadString16();
             client.SessionIdentity = data.ReadString16();
+
+            var result = await LobbyServer.ValidateSession(client.ServerIdentity, client.SessionIdentity);
+
+            var packet = new OutputPacketBuffer()
+            {
+                PacketId = SignSessionResultPID
+            };
+
+            packet.WriteBool(result);
+
+            if (result)
+            { 
+            
+            }
+
+            client.Network.Send(packet);
         }
 
         #endregion
