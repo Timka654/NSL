@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using NSL.SocketCore.Extensions.Buffer;
+using NSL.SocketCore.Utils.Buffer;
 using NSL.SocketPhantom.Enums;
 using NSL.SocketServer.Utils;
 using System.Security.Claims;
@@ -26,9 +27,7 @@ namespace NSL.SocketPhantom.AspNetCore.Network
 
         public Task SendCoreAsync(string method, object[] args, CancellationToken cancellationToken = default)
         {
-            var p = new OutputPacketBuffer<PacketEnum>();
-
-            p.PacketId = PacketEnum.Invoke;
+            var p = OutputPacketBuffer.Create(PacketEnum.Invoke);
 
             p.WriteString16(method);
 
