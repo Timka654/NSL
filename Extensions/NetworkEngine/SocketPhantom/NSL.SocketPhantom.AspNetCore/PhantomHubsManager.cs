@@ -4,12 +4,17 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using NSL.BuilderExtensions.SocketCore;
+using NSL.BuilderExtensions.WebSocketsServer.AspNet;
 using NSL.SocketPhantom.AspNetCore.Network;
+using NSL.SocketPhantom.AspNetCore.Network.Packets;
 using NSL.SocketPhantom.Cipher;
+using NSL.SocketPhantom.Enums;
 using System;
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 
 namespace NSL.SocketPhantom.AspNetCore
 {
@@ -18,10 +23,7 @@ namespace NSL.SocketPhantom.AspNetCore
         private ConcurrentDictionary<Type, BasePhantomHub> hubs = new ConcurrentDictionary<Type, BasePhantomHub>();
         private ConcurrentDictionary<string, BasePhantomHub> hubPath = new ConcurrentDictionary<string, BasePhantomHub>();
         private readonly IServiceProvider baseProvider;
-
-        private IConfiguration configuration => baseProvider.GetRequiredService<IConfiguration>();
-
-        private PhantomNetworkServer server;
+        private readonly PhantomCipherProvider cipher;
 
         public PhantomHubsManager(IServiceProvider baseProvider) : this(baseProvider, new NonePhantomCipherProvider())
         {
@@ -30,10 +32,7 @@ namespace NSL.SocketPhantom.AspNetCore
         public PhantomHubsManager(IServiceProvider baseProvider, PhantomCipherProvider cipher)
         {
             this.baseProvider = baseProvider;
-
-            server = new PhantomNetworkServer();
-
-            server.Load(this, configuration, cipher);
+            this.cipher = cipher;
         }
 
         public void RegisterHub<TBase, THub>(IEndpointRouteBuilder endpoints, string url, PhantomHubOptions options)
@@ -47,26 +46,44 @@ namespace NSL.SocketPhantom.AspNetCore
 
             hubs.TryAdd(typeof(TBase), hub);
 
-            var action = endpoints.MapGet(url.TrimStart('/'), async context =>
+            var action = endpoints.MapWebSocketsPoint<PhantomHubClientProxy>(url, builder =>
             {
-                context.Request.Query.TryGetValue("session", out var session);
+                cipher.SetProvider(builder.GetCoreOptions());
 
-                session = hub.GetSession(context, session);
-
-                if (string.IsNullOrWhiteSpace(session))
+                builder.AddPacket(PacketEnum.SignIn, new SessionPacket(this));
+                builder.AddPacket(PacketEnum.Invoke, new InvokePacket());
+            }, async context =>
+            {
+                if (!context.WebSockets.IsWebSocketRequest)
                 {
-                    context.Response.StatusCode = 400;
-                    return;
+                    context.Request.Query.TryGetValue("session", out var session);
+
+                    session = hub.GetSession(context, session);
+
+                    if (string.IsNullOrWhiteSpace(session))
+                    {
+                        context.Response.StatusCode = 400;
+                    }
+                    else
+                    {
+                        context.Response.StatusCode = 200;
+
+                        await context.Response.WriteAsJsonAsync(new
+                        {
+                            session = session.First(),
+                            path = url
+                        });
+                    }
+                    //context.Connection.RequestClose();
+
+                    return false;
                 }
 
-                context.Response.StatusCode = 200;
-
-                await context.Response.WriteAsJsonAsync(new { session = session.First(), path = url, url = $"sp://{context.Request.Host.Host}:{server.GetOptions().Port}" });
+                return true;
             });
 
             if (hub.RequiredAuth)
                 action.WithMetadata(authAttribute);
-
         }
 
         public BasePhantomHub GetHub(string relativeUrl)

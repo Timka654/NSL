@@ -19,6 +19,8 @@ namespace NSL.WebSockets
         public event ReceivePacketDebugInfo<TParent> OnReceivePacket;
         public event SendPacketDebugInfo<TParent> OnSendPacket;
 
+        public abstract TClient Data { get; }
+
         #region Network
 
         /// <summary>
@@ -173,13 +175,12 @@ namespace NSL.WebSockets
                         try
                         {
                             //ищем пакет и выполняем его, передаем ему данные сессии, полученные данные
-                            PacketHandles[pbuff.PacketId]((TClient)GetUserData(), pbuff);
+                            PacketHandles[pbuff.PacketId](Data, pbuff);
                         }
                         catch (Exception ex)
                         {
                             RunException(ex);
                         }
-
 
                         if (!pbuff.ManualDisposing)
                             pbuff.Dispose();
@@ -307,7 +308,7 @@ namespace NSL.WebSockets
 
         public abstract void ChangeUserData(INetworkClient data);
 
-        public abstract object GetUserData();
+        public object GetUserData() => Data;
 
         public Socket GetSocket() => default;
 

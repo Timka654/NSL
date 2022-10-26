@@ -249,7 +249,6 @@ namespace NSL.SocketPhantom.AspNetCore
         {
             PhantomHubClientProxy client;
 
-
             clearClientsLocker.Wait();
 
             if (session != default)

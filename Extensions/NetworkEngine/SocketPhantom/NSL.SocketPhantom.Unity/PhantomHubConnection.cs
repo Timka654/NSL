@@ -5,12 +5,15 @@ using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using NSL.RestExtensions.Unity;
 using NSL.SocketCore.Extensions.Buffer;
+using NSL.SocketCore.Utils;
 using NSL.SocketCore.Utils.Buffer;
 using NSL.SocketPhantom.Unity.Network;
 
 namespace NSL.SocketPhantom.Unity
 {
+
     public class PhantomHubConnection : IDisposable
     {
         public string Session { get; private set; }
@@ -94,35 +97,35 @@ namespace NSL.SocketPhantom.Unity
                 if (!reconnect)
                     state = HubConnectionState.Connecting;
 
-                using (HttpClient hc = new HttpClient())
+                string endUrl = string.Empty;
+
+                if (!string.IsNullOrWhiteSpace(Session))
+                    endUrl += $"?session={Session}";
+
+                if (options.AccessTokenProvider != null)
+                {
+                    var token = await options.AccessTokenProvider();
+
+                    if (!string.IsNullOrWhiteSpace(token))
+                    {
+                        if (string.IsNullOrWhiteSpace(endUrl))
+                            endUrl = "?";
+                        else
+                            endUrl += $"&";
+
+                        endUrl += $"access_token={await options.AccessTokenProvider()}";
+                    }
+                }
+
+                var url = await options.Url() + endUrl;
+
+                DebugException($"Try request to {url}");
+
+                HttpRequestMessage msg = new HttpRequestMessage(HttpMethod.Get, url);
+
+                using (HttpClient hc = new UnityHttpClient())
                 {
                     hc.Timeout = HandshakeTimeout;
-
-                    string endUrl = string.Empty;
-
-                    if (!string.IsNullOrWhiteSpace(Session))
-                        endUrl += $"?session={Session}";
-
-                    if (options.AccessTokenProvider != null)
-                    {
-                        var token = await options.AccessTokenProvider();
-
-                        if (!string.IsNullOrWhiteSpace(token))
-                        {
-                            if (string.IsNullOrWhiteSpace(endUrl))
-                                endUrl = "?";
-                            else
-                                endUrl += $"&";
-
-                            endUrl += $"access_token={ await options.AccessTokenProvider()}";
-                        }
-                    }
-
-                    var url = await options.Url() + endUrl;
-
-                    DebugException($"Try request to {url}");
-
-                    HttpRequestMessage msg = new HttpRequestMessage(HttpMethod.Get, url);
 
                     var response = await hc.SendAsync(msg);
 
@@ -233,11 +236,11 @@ namespace NSL.SocketPhantom.Unity
 
         public void On<T1>(string methodName, Action<T1> handle)
         {
-            methodDelegates.Add($"{methodName.ToLower()}_1", (_) =>
+            methodDelegates.Add($"{methodName.ToLower()}_1", packet =>
             {
                 try
                 {
-                    handle(_.ReadJson16<T1>());
+                    handle(packet.ReadJson16<T1>());
                 }
                 catch (Exception ex)
                 {
@@ -250,11 +253,11 @@ namespace NSL.SocketPhantom.Unity
 
         public void On<T1, T2>(string methodName, Action<T1, T2> handle)
         {
-            methodDelegates.Add($"{methodName.ToLower()}_2", (_) =>
+            methodDelegates.Add($"{methodName.ToLower()}_2", packet =>
             {
                 try
                 {
-                    handle(_.ReadJson16<T1>(), _.ReadJson16<T2>());
+                    handle(packet.ReadJson16<T1>(), packet.ReadJson16<T2>());
                 }
                 catch (Exception ex)
                 {
@@ -267,11 +270,11 @@ namespace NSL.SocketPhantom.Unity
 
         public void On<T1, T2, T3>(string methodName, Action<T1, T2, T3> handle)
         {
-            methodDelegates.Add($"{methodName.ToLower()}_3", (_) =>
+            methodDelegates.Add($"{methodName.ToLower()}_3", packet =>
             {
                 try
                 {
-                    handle(_.ReadJson16<T1>(), _.ReadJson16<T2>(), _.ReadJson16<T3>());
+                    handle(packet.ReadJson16<T1>(), packet.ReadJson16<T2>(), packet.ReadJson16<T3>());
                 }
                 catch (Exception ex)
                 {
@@ -284,11 +287,11 @@ namespace NSL.SocketPhantom.Unity
 
         public void On<T1, T2, T3, T4>(string methodName, Action<T1, T2, T3, T4> handle)
         {
-            methodDelegates.Add($"{methodName.ToLower()}_4", (_) =>
+            methodDelegates.Add($"{methodName.ToLower()}_4", packet =>
             {
                 try
                 {
-                    handle(_.ReadJson16<T1>(), _.ReadJson16<T2>(), _.ReadJson16<T3>(), _.ReadJson16<T4>());
+                    handle(packet.ReadJson16<T1>(), packet.ReadJson16<T2>(), packet.ReadJson16<T3>(), packet.ReadJson16<T4>());
                 }
                 catch (Exception ex)
                 {
@@ -358,8 +361,6 @@ namespace NSL.SocketPhantom.Unity
             public string Path { get; set; }
 
             public string Session { get; set; }
-
-            public string Url { get; set; }
         }
     }
 }

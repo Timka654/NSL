@@ -3,13 +3,14 @@ using NSL.SocketCore.Extensions.Buffer;
 using NSL.SocketCore.Utils.Buffer;
 using NSL.SocketPhantom.Enums;
 using NSL.SocketServer.Utils;
+using NSL.WebSockets.Server.AspNetPoint;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace NSL.SocketPhantom.AspNetCore.Network
 {
-    public class PhantomHubClientProxy : IServerNetworkClient, IClientProxy
+    public class PhantomHubClientProxy : AspNetWSNetworkServerClient, IClientProxy
     {
         public PhantomHubCallerContext Context { get; private set; }
 

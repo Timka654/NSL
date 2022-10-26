@@ -1,67 +1,56 @@
-﻿using NSL.SocketClient;
+﻿using NSL.BuilderExtensions.SocketCore;
+using NSL.BuilderExtensions.WebSocketsClient;
+using NSL.BuilderExtensions.WebSocketsClient.Unity;
 using NSL.SocketPhantom.Unity.Network.Packets;
-using NSL.TCP.Client;
+using NSL.WebSockets.Client;
 using System;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using UnityEngine;
 using static NSL.SocketPhantom.Unity.PhantomHubConnection;
 
 namespace NSL.SocketPhantom.Unity.Network
 {
     internal class PhantomNetworkClient
     {
-        ClientOptions<PhantomSocketNetworkClient> clientOptions;
-
-        internal TCPNetworkClient<PhantomSocketNetworkClient, ClientOptions<PhantomSocketNetworkClient>> client;
+        internal WSNetworkClient<PhantomSocketNetworkClient, WSClientOptions<PhantomSocketNetworkClient>> client;
 
         public async Task InitializeClient(PhantomRequestResult data)
         {
-            var connectUrl = new Uri(data.Url);
+            var connectUrl = new Uri(await phantomHubConnection.Options.Url());
 
-            phantomHubConnection.DebugException($"Initialize client with host {data.Url}");
+            phantomHubConnection.DebugException($"Initialize client with host {connectUrl}");
 
-            var dnss = Dns.GetHostAddresses(connectUrl.Host);
+            var builder = WebSocketsClientEndPointBuilder.Create()
+                .WithClientProcessor<PhantomSocketNetworkClient>()
+                .WithOptions<WSClientOptions<PhantomSocketNetworkClient>>()
+                .WithUrl(connectUrl)
+                .WithCode(_ =>
+                {
+                    _.AddConnectHandle(ClientOptions_OnClientConnectEvent);
+                    _.AddDisconnectHandle(ClientOptions_OnClientDisconnectEvent);
+                    _.AddExceptionHandle(ClientOptions_OnExceptionEvent);
 
-            phantomHubConnection.DebugException($"Founded {dnss.Length} dns count - {string.Join(",", dnss.Select(x => x.ToString()))}");
+                    _.AddPacket(1, new SessionPacket(phantomHubConnection));
+                    _.AddPacket(2, new InvokePacket());
+                });
 
-            var dns = dnss.FirstOrDefault(x => x.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork) ?? dnss.FirstOrDefault(x => x.AddressFamily == System.Net.Sockets.AddressFamily.InterNetworkV6);
-
-            if (dns == null)
-                throw new Exception($"dns for {data.Url} not found");
-
-            phantomHubConnection.DebugException($"Selected IPAddress = {dns}");
-
-            clientOptions = new ClientOptions<PhantomSocketNetworkClient>();
-
-            var ip = IPAddress.Parse(dns.ToString());
-
-            clientOptions.OnClientConnectEvent += ClientOptions_OnClientConnectEvent;
-            clientOptions.OnClientDisconnectEvent += ClientOptions_OnClientDisconnectEvent;
-            clientOptions.OnExceptionEvent += ClientOptions_OnExceptionEvent;
-
-            clientOptions.AddPacket(1, new SessionPacket(phantomHubConnection));
-            clientOptions.AddPacket(2, new InvokePacket());
-
-            phantomHubConnection.Options.CipherProvider.SetProvider(clientOptions);
-
-            client = new TCPNetworkClient<PhantomSocketNetworkClient, ClientOptions<PhantomSocketNetworkClient>>(clientOptions);
+            client = Application.platform == RuntimePlatform.WebGLPlayer ? builder.BuildForWGLPlatform() : builder.Build();
 
             bool oldConnectionState = SuccessConnected;
 
             SuccessConnected = false;
 
-            if (!await client.ConnectAsync(ip.ToString(),
-                connectUrl.Port,
-                (int)phantomHubConnection.ConnectionTimeout.TotalMilliseconds) && oldConnectionState)
+            if (!await client.ConnectAsync((int)phantomHubConnection.ConnectionTimeout.TotalMilliseconds) && oldConnectionState)
             {
-                phantomHubConnection.DebugException($"Failed connected - {ip.ToString()}:{connectUrl.Port}");
+                phantomHubConnection.DebugException($"Failed connected - {connectUrl}");
                 SuccessConnected = true;
                 ClientOptions_OnClientDisconnectEvent(null);
                 return;
             }
 
-            phantomHubConnection.DebugException($"Success connected {ip.ToString()}:{connectUrl.Port}");
+            phantomHubConnection.DebugException($"Success connected {connectUrl}");
         }
 
         internal int retryCount = 0;

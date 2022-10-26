@@ -14,6 +14,8 @@ namespace NSL.TCP
         where TClient : INetworkClient
         where TParent : BaseTcpClient<TClient, TParent>
     {
+        public abstract TClient Data { get; }
+
         public event ReceivePacketDebugInfo<TParent> OnReceivePacket;
         public event SendPacketDebugInfo<TParent> OnSendPacket;
 
@@ -150,7 +152,7 @@ namespace NSL.TCP
                         try
                         {
                             //ищем пакет и выполняем его, передаем ему данные сессии, полученные данные
-                            PacketHandles[pbuff.PacketId]((TClient)GetUserData(), pbuff);
+                            PacketHandles[pbuff.PacketId](Data, pbuff);
                         }
                         catch (Exception ex)
                         {
@@ -312,7 +314,7 @@ namespace NSL.TCP
 
         public abstract void ChangeUserData(INetworkClient data);
 
-        public abstract object GetUserData();
+        public object GetUserData() => Data;
 
         public Socket GetSocket() => sclient;
 

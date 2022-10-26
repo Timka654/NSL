@@ -12,7 +12,9 @@ namespace NSL.TCP.Server
     public class TCPServerClient<T> : BaseTcpClient<T, TCPServerClient<T>>
         where T : IServerNetworkClient, new()
     {
-        private T Data { get; set; }
+        private T data;
+
+        public override T Data => data;
 
         /// <summary>
         /// Общие настройки сервера
@@ -37,7 +39,7 @@ namespace NSL.TCP.Server
 
         protected void Initialize(Socket client, ServerOptions<T> options)
         {
-            Data = new T();
+            data = new T();
 
             //установка переменной с общими настройками сервера
             base.options = options;
@@ -73,15 +75,13 @@ namespace NSL.TCP.Server
         {
             if (setClient is T valid)
             {
-                Data = valid;
+                data = valid;
                 Data.Network = this;
                 Data.ServerOptions = options;
             }
             else
                 throw new ArgumentException("Invalid type", nameof(setClient));
         }
-
-        public override object GetUserData() => Data;
 
         protected override TCPServerClient<T> GetParent() => this;
 

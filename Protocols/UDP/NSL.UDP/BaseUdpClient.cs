@@ -14,6 +14,8 @@ namespace NSL.UDP
         where TClient : INetworkClient
         where TParent : BaseUDPClient<TClient, TParent>
     {
+        public abstract TClient Data { get; }
+
         public event ReceivePacketDebugInfo<TParent> OnReceivePacket;
         public event SendPacketDebugInfo<TParent> OnSendPacket;
 
@@ -81,7 +83,7 @@ namespace NSL.UDP
 
         public abstract void ChangeUserData(INetworkClient data);
 
-        public abstract object GetUserData();
+        public object GetUserData() => Data;
 
         public void Disconnect()
         {
@@ -120,13 +122,12 @@ namespace NSL.UDP
                 try
                 {
                     //ищем пакет и выполняем его, передаем ему данные сессии, полученные данные
-                    PacketHandles[pbuff.PacketId]((TClient)GetUserData(), pbuff);
+                    PacketHandles[pbuff.PacketId](Data, pbuff);
                 }
                 catch (Exception ex)
                 {
                     RunException(ex);
                 }
-
 
                 if (!pbuff.ManualDisposing)
                     pbuff.Dispose();

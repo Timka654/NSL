@@ -13,6 +13,7 @@ namespace NSL.SocketPhantom.AspNetCore
         {
             collection.AddSingleton(s => new PhantomHubsManager(s));
         }
+
         public static void AddPhantomProtocol(this IServiceCollection collection, PhantomCipherProvider cipher)
         {
             collection.AddSingleton(s => new PhantomHubsManager(s, cipher));

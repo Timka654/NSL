@@ -17,9 +17,7 @@ namespace NSL.WebSockets.Server.AspNetPoint
             this.context = context;
             Initialize(options);
 
-            var client = (T)GetUserData();
-
-            client.SetContext(context);
+            Data.SetContext(context);
         }
 
         public override async Task RunPacketReceiver()

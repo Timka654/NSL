@@ -27,6 +27,10 @@
 	  <ProjectReference Include="..\..\..\..\Core\Extensions\SocketCore.Extensions.Buffer\NSL.SocketCore.Extensions.Buffer.csproj" />
 	  <ProjectReference Include="..\..\..\..\Core\Extensions\SocketCore.Extensions.TCPServer\NSL.SocketCore.Extensions.TCPServer.csproj" />
 	  <ProjectReference Include="..\..\..\..\Core\NSL.SocketServer\NSL.SocketServer.csproj" />
+	  <ProjectReference Include="..\..\..\..\Protocols\WebSockets\BuilderExtensions\NSL.BuilderExtensions.WebSocketsServer.AspNet\NSL.BuilderExtensions.WebSocketsServer.AspNet.csproj" />
+	  <ProjectReference Include="..\..\..\..\Protocols\WebSockets\BuilderExtensions\NSL.BuilderExtensions.WebSocketsServer\NSL.BuilderExtensions.WebSocketsServer.csproj" />
+	  <ProjectReference Include="..\..\..\..\Protocols\WebSockets\Examples\Builder.WebSockets.AspNetCoreIntegrationExample\Builder.WebSockets.AspNetCoreIntegrationExample.csproj" />
+	  <ProjectReference Include="..\..\..\..\Protocols\WebSockets\NSL.WebSockets.Server.AspNetPoint\NSL.WebSockets.Server.AspNetPoint.csproj" />
 	  <ProjectReference Include="..\NSL.SocketPhantom\NSL.SocketPhantom.csproj" />
 	</ItemGroup>
 

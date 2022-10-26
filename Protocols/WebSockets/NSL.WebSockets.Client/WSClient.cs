@@ -13,6 +13,8 @@ namespace NSL.WebSockets.Client
     public class WSClient<T> : BaseWSClient<T, WSClient<T>>
         where T : BaseSocketNetworkClient, new()
     {
+        public override T Data => ConnectionOptions.ClientData;
+
         public long Version { get; set; }
 
         public ClientOptions<T> ConnectionOptions => (ClientOptions<T>)base.options;
@@ -81,8 +83,6 @@ namespace NSL.WebSockets.Client
 
             ConnectionOptions.RunClientConnect();
         }
-
-        public override object GetUserData() => ConnectionOptions.ClientData;
 
         public override void ChangeUserData(INetworkClient data) => ConnectionOptions.InitializeClient((T)data);
 

@@ -14,7 +14,6 @@ namespace NSL.SocketCore.Utils.Buffer
         /// Текущая кодировка типа String
         /// </summary>
         Encoding coding = Encoding.UTF8;
-        private bool manualDisposing = false;
 
         /// <summary>
         /// маскировка хедера пакета
@@ -22,6 +21,8 @@ namespace NSL.SocketCore.Utils.Buffer
         int offset { get { return (int)base.Position; } set { base.Position = value; } }
 
         readonly int lenght;
+
+        bool manualDisposing = false;
 
         /// <summary>
         /// Текущая позиция чтения в потоке
@@ -34,6 +35,22 @@ namespace NSL.SocketCore.Utils.Buffer
         public int Lenght { get { return lenght; } }
 
         public int DataLength => Lenght - headerLenght;
+
+        /// <summary>
+        /// This variable using for set "not automatic disposing", if need in custom scenarios
+        /// Cannot return back, use Dispose method after need operations
+        /// </summary>
+        public bool ManualDisposing
+        {
+            get => manualDisposing;
+            set
+            {
+                if (manualDisposing && !value)
+                    throw new InvalidOperationException($"[Security] Cannot change {nameof(ManualDisposing)} back");
+
+                manualDisposing = value;
+            }
+        }
 
         /// <summary>
         /// Индификатор пакета
@@ -452,18 +469,6 @@ namespace NSL.SocketCore.Utils.Buffer
             Array.Copy(GetBuffer(), headerLenght, buf, 0, DataLength);
 
             return buf;
-        }
-
-        public bool ManualDisposing
-        {
-            get => manualDisposing;
-            set
-            {
-                if (manualDisposing && !value)
-                    throw new InvalidOperationException($"[Security] Cannot change {nameof(ManualDisposing)} back");
-
-                manualDisposing = value;
-            }
         }
 
         protected override void Dispose(bool disposing)

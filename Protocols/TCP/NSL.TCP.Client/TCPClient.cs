@@ -15,6 +15,8 @@ namespace NSL.TCP.Client
     {
         public long Version { get; set; }
 
+        public override T Data => ConnectionOptions.ClientData;
+
         public ClientOptions<T> ConnectionOptions => (ClientOptions<T>)base.options;
 
         /// <summary>
@@ -73,8 +75,6 @@ namespace NSL.TCP.Client
 
             ConnectionOptions.RunClientConnect();
         }
-
-        public override object GetUserData() => ConnectionOptions.ClientData;
 
         public override void ChangeUserData(INetworkClient data) => ConnectionOptions.InitializeClient((T)data);
 

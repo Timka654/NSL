@@ -34,7 +34,9 @@ namespace NSL.UDP.Client
             public bool Ready() => Lenght > 0 && Parts.Count == Lenght;
         }
 
-        private T Data { get; set; }
+        private T data;
+
+        public override T Data => data;
 
         public UDPClient(IPEndPoint receivePoint, Socket listenerSocket, CoreOptions<T> options) : base(receivePoint, listenerSocket)
         {
@@ -47,7 +49,7 @@ namespace NSL.UDP.Client
         {
             PacketHandles = options.GetHandleMap();
 
-            Data = new T();
+            data = new T();
 
             //обзятельная переменная в NetworkClient, для отправки данных, можно использовать привидения типов (Client)NetworkClient но это никому не поможет
             Data.Network = this;
@@ -67,14 +69,12 @@ namespace NSL.UDP.Client
         {
             if (old_client_data == null)
             {
-                Data = null;
+                data = null;
                 return;
             }
 
             old_client_data.ChangeOwner(Data);
         }
-
-        public override object GetUserData() => Data;
 
         protected override UDPClient<T> GetParent() => this;
 
