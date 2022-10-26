@@ -20,10 +20,13 @@ namespace NSL.Node.BridgeLobbyClient
         private const ushort ValidateSessionPID = 2;
         private const ushort ValidateSessionResultPID = ValidateSessionPID;
 
-        private readonly Uri wsUrl;
-        private readonly string serverIdentity;
-        private readonly string identityKey;
-        private WSNetworkClient<BridgeLobbyNetworkClient, WSClientOptions<BridgeLobbyNetworkClient>> network;
+        public Uri WsUrl { get; }
+
+        public string ServerIdentity { get; }
+
+        public string IdentityKey { get; }
+
+        protected WSNetworkClient<BridgeLobbyNetworkClient, WSClientOptions<BridgeLobbyNetworkClient>> network { get; private set; }
 
         public BridgeLobbyNetwork(
             Uri wsUrl,
@@ -31,9 +34,9 @@ namespace NSL.Node.BridgeLobbyClient
             string identityKey,
             Action<WebSocketsClientEndPointBuilder<BridgeLobbyNetworkClient, WSClientOptions<BridgeLobbyNetworkClient>>> onBuild = null)
         {
-            this.wsUrl = wsUrl;
-            this.serverIdentity = serverIdentity;
-            this.identityKey = identityKey;
+            WsUrl = wsUrl;
+            ServerIdentity = serverIdentity;
+            IdentityKey = identityKey;
             network = WebSocketsClientEndPointBuilder.Create()
                 .WithClientProcessor<BridgeLobbyNetworkClient>()
                 .WithOptions<WSClientOptions<BridgeLobbyNetworkClient>>()
@@ -127,9 +130,9 @@ namespace NSL.Node.BridgeLobbyClient
 
                 output.PacketId = SignServerPID;
 
-                output.WriteString16(serverIdentity);
+                output.WriteString16(ServerIdentity);
 
-                output.WriteString16(identityKey);
+                output.WriteString16(IdentityKey);
 
                 network.Send(output);
 

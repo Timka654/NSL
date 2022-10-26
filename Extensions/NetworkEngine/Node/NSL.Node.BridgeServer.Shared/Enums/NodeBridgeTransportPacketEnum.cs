@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 
 namespace NSL.Node.BridgeServer.Shared.Enums
 {
-    public enum BridgeServerReceivePacketEnum
+    public enum NodeBridgeTransportPacketEnum : ushort
     {
-    }
+        SignSessionPID = 1,
+        SignSessionResultPID = SignSessionPID
+}
 }

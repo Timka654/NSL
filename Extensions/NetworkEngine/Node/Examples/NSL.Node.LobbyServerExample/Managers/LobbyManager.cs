@@ -89,7 +89,6 @@ namespace NSL.Node.LobbyServerExample.Managers
 
         #region PacketHandle
 
-        [Packet((ushort)ServerReceivePacketEnum.CreateRoom)]
         private void CreateRoomRequestHandle(LobbyNetworkClientModel client, InputPacketBuffer data)
         {
             LobbyRoomInfoModel room = data.ReadJson16<LobbyRoomInfoModel>();

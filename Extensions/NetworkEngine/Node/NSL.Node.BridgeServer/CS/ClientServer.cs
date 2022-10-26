@@ -8,15 +8,12 @@ using NetworkClient = NSL.Node.BridgeServer.CS.ClientServerNetworkClient;
 using NetworkOptions = NSL.WebSockets.Server.WSServerOptions<NSL.Node.BridgeServer.CS.ClientServerNetworkClient>;
 using NetworkListener = NSL.WebSockets.Server.WSServerListener<NSL.Node.BridgeServer.CS.ClientServerNetworkClient>;
 using NSL.Node.BridgeServer.LS;
+using NSL.Node.BridgeServer.Shared.Enums;
 
 namespace NSL.Node.BridgeServer.CS
 {
     internal class ClientServer
     {
-        private const ushort SignSessionPID = 1;
-
-        private const ushort SignSessionResultPID = SignSessionPID;
-
         public static int BindingPort => Program.Configuration.GetValue("client.server.port", 7000);
 
         public static NetworkListener Listener { get; private set; }
@@ -33,7 +30,7 @@ namespace NSL.Node.BridgeServer.CS
                     builder.SetLogger(Logger);
                     builder.AddDefaultEventHandlers<WebSocketsServerEndPointBuilder<NetworkClient, NetworkOptions>, NetworkClient>();
 
-                    builder.AddPacketHandle(SignSessionPID, SignSessionReceiveHandle);
+                    builder.AddPacketHandle(NodeBridgeClientPacketEnum.SignSessionPID, SignSessionReceiveHandle);
                 })
                 .WithBindingPoint($"http://*:{BindingPort}")
                 .Build();
@@ -50,10 +47,7 @@ namespace NSL.Node.BridgeServer.CS
 
             var result = await LobbyServer.ValidateSession(client.ServerIdentity, client.SessionIdentity);
 
-            var packet = new OutputPacketBuffer()
-            {
-                PacketId = SignSessionResultPID
-            };
+            var packet = OutputPacketBuffer.Create(NodeBridgeClientPacketEnum.SignSessionResultPID);
 
             packet.WriteBool(result);
 

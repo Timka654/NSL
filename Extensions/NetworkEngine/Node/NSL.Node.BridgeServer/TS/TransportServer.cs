@@ -7,15 +7,12 @@ using NSL.BuilderExtensions.SocketCore;
 using NetworkClient = NSL.Node.BridgeServer.TS.TransportServerNetworkClient;
 using NetworkOptions = NSL.WebSockets.Server.WSServerOptions<NSL.Node.BridgeServer.TS.TransportServerNetworkClient>;
 using NetworkListener = NSL.WebSockets.Server.WSServerListener<NSL.Node.BridgeServer.TS.TransportServerNetworkClient>;
+using NSL.Node.BridgeServer.Shared.Enums;
 
 namespace NSL.Node.BridgeServer.TS
 {
     internal class TransportServer
     {
-        private const ushort SignSessionPID = 1;
-
-        private const ushort SignSessionResultPID = SignSessionPID;
-
         public static int BindingPort => Program.Configuration.GetValue("transport.server.port", 6998);
 
         public static NetworkListener Listener { get; private set; }
@@ -33,7 +30,7 @@ namespace NSL.Node.BridgeServer.TS
 
                     builder.AddDefaultEventHandlers<WebSocketsServerEndPointBuilder<NetworkClient, NetworkOptions>, NetworkClient>();
 
-                    builder.AddPacketHandle(SignSessionPID, SignSessionReceiveHandle);
+                    builder.AddPacketHandle(NodeBridgeTransportPacketEnum.SignSessionPID, SignSessionReceiveHandle);
                 })
                 .WithBindingPoint($"http://*:{BindingPort}")
                 .Build();

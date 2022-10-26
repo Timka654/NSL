@@ -6,6 +6,15 @@ using System.Text;
 
 namespace NSL.SocketCore.Utils.Buffer
 {
+    public class OutputPacketBuffer<TPID> : OutputPacketBuffer
+        where TPID : struct, Enum, IConvertible
+    {
+        public OutputPacketBuffer(TPID packetId, int len = 32) : base(len)
+        {
+            PacketId = packetId.ToUInt16(null);
+        }
+    }
+
     public class OutputPacketBuffer : MemoryStream
     {
         private static readonly DateTime MinDatetimeValue = new DateTime(1970, 1, 1);
@@ -58,6 +67,20 @@ namespace NSL.SocketCore.Utils.Buffer
         /// Размер шапки пакета
         /// </summary>
         public const int headerLenght = 7;
+
+        public static OutputPacketBuffer Create<TEnum>(TEnum packetId, int len = 32)
+            where TEnum : struct, Enum, IConvertible
+        {
+            return new OutputPacketBuffer(len).WithPid(packetId);
+        }
+
+        public OutputPacketBuffer WithPid<TEnum>(TEnum packetId)
+            where TEnum : struct, Enum, IConvertible
+        {
+            PacketId = packetId.ToUInt16(null);
+
+            return this;
+        }
 
         /// <summary>
         /// Инициализация

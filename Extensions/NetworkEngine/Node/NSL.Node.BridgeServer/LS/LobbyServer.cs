@@ -8,18 +8,12 @@ using NetworkClient = NSL.Node.BridgeServer.LS.LobbyServerNetworkClient;
 using NetworkOptions = NSL.WebSockets.Server.WSServerOptions<NSL.Node.BridgeServer.LS.LobbyServerNetworkClient>;
 using NetworkListener = NSL.WebSockets.Server.WSServerListener<NSL.Node.BridgeServer.LS.LobbyServerNetworkClient>;
 using System.Collections.Concurrent;
+using NSL.Node.BridgeServer.Shared.Enums;
 
 namespace NSL.Node.BridgeServer.LS
 {
     internal class LobbyServer
     {
-        private const ushort SignServerPID = 1;
-
-        private const ushort SignServerResultPID = SignServerPID;
-
-        private const ushort ValidateSessionPID = 2;
-        private const ushort ValidateSessionResultPID = ValidateSessionPID;
-
         public static int BindingPort => Program.Configuration.GetValue("lobby.server.port", 6999);
 
         public static NetworkListener Listener { get; private set; }
@@ -37,9 +31,9 @@ namespace NSL.Node.BridgeServer.LS
 
                     builder.AddDefaultEventHandlers<WebSocketsServerEndPointBuilder<NetworkClient, NetworkOptions>, NetworkClient>();
 
-                    builder.AddPacketHandle(SignServerPID, SignServerReceiveHandle);
+                    builder.AddPacketHandle(NodeBridgeLobbyPacketEnum.SignServerPID, SignServerReceiveHandle);
 
-                    builder.AddPacketHandle(ValidateSessionResultPID, ValidateSessionReceiveHandle);
+                    builder.AddPacketHandle(NodeBridgeLobbyPacketEnum.ValidateSessionResultPID, ValidateSessionReceiveHandle);
                 })
                 .WithBindingPoint($"http://*:{BindingPort}")
                 .Build();
@@ -63,10 +57,7 @@ namespace NSL.Node.BridgeServer.LS
                 connectedServers.TryAdd(client.Identity, client);
             }
 
-            var packet = new OutputPacketBuffer()
-            {
-                PacketId = SignServerResultPID
-            };
+            var packet = OutputPacketBuffer.Create(NodeBridgeLobbyPacketEnum.SignServerResultPID);
 
             packet.WriteBool(result);
 
@@ -87,7 +78,7 @@ namespace NSL.Node.BridgeServer.LS
 
             await server.ValidateRequestBuffer.CreateWaitRequest(packet =>
             {
-                packet.PacketId = ValidateSessionPID;
+                packet.WithPid(NodeBridgeLobbyPacketEnum.ValidateSessionPID);
 
                 packet.WriteString16(session);
             }, data =>

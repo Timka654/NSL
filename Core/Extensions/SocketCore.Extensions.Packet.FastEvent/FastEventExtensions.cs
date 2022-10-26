@@ -1,4 +1,5 @@
 ﻿using NSL.SocketCore.Extensions.Packet.FastEvent.Attributes;
+using NSL.SocketCore.Extensions.Packet.FastEvent.Packets;
 using NSL.SocketCore.Utils;
 using NSL.SocketCore.Utils.Buffer;
 using System;
@@ -7,7 +8,6 @@ using System.Reflection;
 
 namespace NSL.SocketCore.Extensions.Packet.FastEvent
 {
-
     public static class FastEventExtensions
     {
         public static int GenerateFastEvents<TClient, TContainer, TAttribute>(this CoreOptions<TClient> options)

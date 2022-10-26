@@ -27,7 +27,10 @@ namespace NSL.SocketCore.Extensions.Packet
         {
             int result = 0;
 
-            var types = assembly.GetTypes().Select(x => new { x, attributes = x.GetCustomAttributes<TContainer>() }).Where(x => x.attributes?.Any() == true).ToArray();
+            var types = assembly.GetTypes()
+                .Select(x => new { x, attributes = x.GetCustomAttributes<TContainer>() })
+                .Where(x => x.attributes?.Any() == true)
+                .ToArray();
 
             foreach (var type in types)
             {

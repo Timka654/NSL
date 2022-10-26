@@ -19,9 +19,7 @@ namespace NSL.SocketPhantom.AspNetCore.Network.Packets
 
             client.Session = data.ReadString16();
 
-            var sessionResultPacket = new OutputPacketBuffer<PacketEnum>();
-
-            sessionResultPacket.PacketId = PacketEnum.SignInResult;
+            var sessionResultPacket = OutputPacketBuffer.Create(PacketEnum.SignInResult);
 
             if (manager.ProcessClient(client, path, out var hub))
                 sessionResultPacket.WriteByte(byte.MaxValue);

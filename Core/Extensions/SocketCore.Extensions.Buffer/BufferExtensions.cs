@@ -117,12 +117,10 @@ namespace NSL.SocketCore.Extensions.Buffer
             where TClient : IClient
             where TPacket : struct, Enum, IConvertible
         {
-            OutputPacketBuffer<TPacket> rbuff = new OutputPacketBuffer<TPacket>
-            {
-                PacketId = packetId
-            };
+            var rbuff = OutputPacketBuffer.Create(packetId);
 
             rbuff.WriteInt32(value);
+
             client.Send(rbuff);
         }
 
@@ -130,10 +128,7 @@ namespace NSL.SocketCore.Extensions.Buffer
             where TClient : IClient
             where TPacket : struct, Enum, IConvertible
         {
-            OutputPacketBuffer<TPacket> rbuff = new OutputPacketBuffer<TPacket>
-            {
-                PacketId = packetId
-            };
+            var rbuff = OutputPacketBuffer.Create(packetId);
 
             rbuff.WriteByte(value);
 
@@ -144,10 +139,7 @@ namespace NSL.SocketCore.Extensions.Buffer
             where TClient : IClient
             where TPacket : struct, Enum, IConvertible
         {
-            OutputPacketBuffer<TPacket> rbuff = new OutputPacketBuffer<TPacket>
-            {
-                PacketId = packetId
-            };
+            var rbuff = OutputPacketBuffer.Create(packetId);
 
             rbuff.WriteBool(value);
 
@@ -158,10 +150,7 @@ namespace NSL.SocketCore.Extensions.Buffer
             where TClient : IClient
             where TPacket : struct, Enum, IConvertible
         {
-            OutputPacketBuffer<TPacket> rbuff = new OutputPacketBuffer<TPacket>
-            {
-                PacketId = packetId
-            };
+            var rbuff = OutputPacketBuffer.Create(packetId);
 
             rbuff.WriteInt32(value);
 
@@ -172,10 +161,7 @@ namespace NSL.SocketCore.Extensions.Buffer
             where TClient : IClient
             where TPacket : struct, Enum, IConvertible
         {
-            OutputPacketBuffer<TPacket> rbuff = new OutputPacketBuffer<TPacket>
-            {
-                PacketId = packetId
-            };
+            var rbuff = OutputPacketBuffer.Create(packetId);
 
             rbuff.WriteInt32(value);
 
@@ -186,10 +172,7 @@ namespace NSL.SocketCore.Extensions.Buffer
             where TClient : IClient
             where TPacket : struct, Enum, IConvertible
         {
-            OutputPacketBuffer<TPacket> rbuff = new OutputPacketBuffer<TPacket>
-            {
-                PacketId = packetId
-            };
+            var rbuff = OutputPacketBuffer.Create(packetId);
 
             rbuff.WriteUInt32(value);
 
@@ -200,10 +183,7 @@ namespace NSL.SocketCore.Extensions.Buffer
             where TClient : IClient
             where TPacket : struct, Enum, IConvertible
         {
-            OutputPacketBuffer<TPacket> rbuff = new OutputPacketBuffer<TPacket>
-            {
-                PacketId = packetId
-            };
+            var rbuff = OutputPacketBuffer.Create(packetId);
 
             rbuff.WriteInt64(value);
 
@@ -214,10 +194,7 @@ namespace NSL.SocketCore.Extensions.Buffer
             where TClient : IClient
             where TPacket : struct, Enum, IConvertible
         {
-            OutputPacketBuffer<TPacket> rbuff = new OutputPacketBuffer<TPacket>
-            {
-                PacketId = packetId
-            };
+            var rbuff = OutputPacketBuffer.Create(packetId);
 
             rbuff.WriteUInt64(value);
 
@@ -228,12 +205,9 @@ namespace NSL.SocketCore.Extensions.Buffer
             where TClient : IClient
             where TPacket : struct, Enum, IConvertible
         {
-            OutputPacketBuffer<TPacket> rbuff = new OutputPacketBuffer<TPacket>
-            {
-                PacketId = packetId
-            };
+            var rbuff = OutputPacketBuffer.Create(packetId);
 
-            rbuff.WriteFloat32(value);
+            rbuff.WriteFloat(value);
 
             client.Send(rbuff);
         }
@@ -242,12 +216,9 @@ namespace NSL.SocketCore.Extensions.Buffer
             where TClient : IClient
             where TPacket : struct, Enum, IConvertible
         {
-            OutputPacketBuffer<TPacket> rbuff = new OutputPacketBuffer<TPacket>
-            {
-                PacketId = packetId
-            };
+            var rbuff = OutputPacketBuffer.Create(packetId);
 
-            rbuff.WriteFloat64(value);
+            rbuff.WriteDouble(value);
 
             client.Send(rbuff.CompilePacket(), 0, rbuff.PacketLenght);
         }
@@ -256,10 +227,7 @@ namespace NSL.SocketCore.Extensions.Buffer
             where TClient : IClient
             where TPacket : struct, Enum, IConvertible
         {
-            OutputPacketBuffer<TPacket> rbuff = new OutputPacketBuffer<TPacket>
-            {
-                PacketId = packetId
-            };
+            var rbuff = OutputPacketBuffer.Create(packetId);
 
             rbuff.WriteDateTime(value);
 
@@ -270,10 +238,7 @@ namespace NSL.SocketCore.Extensions.Buffer
             where TClient : IClient
             where TPacket : struct, Enum, IConvertible
         {
-            OutputPacketBuffer<TPacket> rbuff = new OutputPacketBuffer<TPacket>
-            {
-                PacketId = packetId
-            };
+            var rbuff = OutputPacketBuffer.Create(packetId);
 
             rbuff.WriteString16(value);
 
@@ -284,10 +249,7 @@ namespace NSL.SocketCore.Extensions.Buffer
             where TClient : IClient
             where TPacket : struct, Enum, IConvertible
         {
-            client.Send(new OutputPacketBuffer<TPacket>
-            {
-                PacketId = packetId
-            });
+            client.Send(OutputPacketBuffer.Create(packetId));
         }
 
         /// <summary>
@@ -320,11 +282,5 @@ namespace NSL.SocketCore.Extensions.Buffer
 
             return packet;
         }
-    }
-
-    public class OutputPacketBuffer<TPacketId> : OutputPacketBuffer
-        where TPacketId : struct, Enum, IConvertible
-    {
-        public new TPacketId PacketId { get => (TPacketId)Enum.ToObject(typeof(TPacketId), base.PacketId); set => base.PacketId = Convert.ToUInt16(value); }
     }
 }
