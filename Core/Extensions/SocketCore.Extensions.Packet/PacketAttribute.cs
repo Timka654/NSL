@@ -5,7 +5,7 @@ namespace NSL.SocketCore.Extensions.Packet
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, AllowMultiple = false, Inherited = false)]
     public class PacketAttribute : Attribute
     {
-        public ushort PacketId { get; set; }
+        public ushort PacketId { get; }
 
         public PacketAttribute(ushort packetId)
         {

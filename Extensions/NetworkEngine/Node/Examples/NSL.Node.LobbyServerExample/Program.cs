@@ -3,7 +3,7 @@ using NSL.BuilderExtensions.SocketCore;
 using NSL.BuilderExtensions.WebSocketsServer.AspNet;
 using NSL.Node.BridgeLobbyClient;
 using NSL.Node.LobbyServerExample.Managers;
-using NSL.Node.LobbyServerExample.Models;
+using NSL.Node.LobbyServerExample.Shared.Models;
 
 namespace NSL.Node.LobbyServerExample
 {
@@ -33,7 +33,7 @@ namespace NSL.Node.LobbyServerExample
 
             app.UseWebSockets();
 
-            app.MapWebSocketsPoint<LobbyNetworkClient>("/lobby_ws", builder =>
+            app.MapWebSocketsPoint<LobbyNetworkClientModel>("/lobby_ws", builder =>
             {
                 app.Services.GetRequiredService<LobbyManager>().BuildNetwork(builder);
             });

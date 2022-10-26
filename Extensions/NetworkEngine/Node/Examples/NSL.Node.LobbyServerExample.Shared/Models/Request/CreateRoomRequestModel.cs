@@ -1,4 +1,4 @@
-﻿namespace NSL.Node.LobbyServerExample.Models.Request
+﻿namespace NSL.Node.LobbyServerExample.Shared.Models.Request
 {
     public class CreateRoomRequestModel
     {

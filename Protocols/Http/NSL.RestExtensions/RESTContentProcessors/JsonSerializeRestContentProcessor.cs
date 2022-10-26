@@ -24,7 +24,7 @@ namespace NSL.RestExtensions.RESTContentProcessors
 
         public virtual void SetContent<TValue>(HttpRequestMessage message, TValue value, Encoding textEncoding = null)
         {
-            message.Content = new StringContent(JsonConvert.SerializeObject(value), textEncoding ?? Encoding.UTF8);
+            message.Content = new StringContent(JsonConvert.SerializeObject(value), textEncoding ?? Encoding.UTF8, "application/json");
         }
     }
 }

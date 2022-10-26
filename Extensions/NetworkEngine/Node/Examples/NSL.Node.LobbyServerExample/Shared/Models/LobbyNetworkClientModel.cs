@@ -1,8 +1,8 @@
 ﻿using NSL.WebSockets.Server.AspNetPoint;
 
-namespace NSL.Node.LobbyServerExample.Models
+namespace NSL.Node.LobbyServerExample.Shared.Models
 {
-    public class LobbyNetworkClient : AspNetWSNetworkServerClient
+    public class LobbyNetworkClientModel : AspNetWSNetworkServerClient
     {
         public Guid UID { get; set; }
 

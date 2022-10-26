@@ -1,4 +1,5 @@
-﻿using NSL.SocketCore.Utils;
+﻿using NSL.SocketCore.Extensions.Packet.FastEvent.Attributes;
+using NSL.SocketCore.Utils;
 using NSL.SocketCore.Utils.Buffer;
 using System;
 using System.Linq;
@@ -6,33 +7,6 @@ using System.Reflection;
 
 namespace NSL.SocketCore.Extensions.Packet.FastEvent
 {
-    [AttributeUsage(AttributeTargets.Enum)]
-    public class FastEventEnumAttribute : Attribute
-    {
-
-    }
-
-    public class FastEventMethodAttribute : Attribute
-    {
-        internal readonly ushort packetId;
-
-        public FastEventMethodAttribute(ushort packetId)
-        {
-            this.packetId = packetId;
-        }
-    }
-
-    public class FastEventPacketAttribute : Attribute
-    {
-        internal readonly Type type;
-        internal readonly bool large;
-
-        public FastEventPacketAttribute(Type type = null, bool large = false)
-        {
-            this.type = type;
-            this.large = large;
-        }
-    }
 
     public static class FastEventExtensions
     {
@@ -63,12 +37,12 @@ namespace NSL.SocketCore.Extensions.Packet.FastEvent
 
                     IPacket<TClient> packet = default;
 
-                    if (method.attributes.type == null)
+                    if (method.attributes.Type == null)
                         packet = new EventPacket<TClient>();
-                    else if (method.attributes.large)
-                        packet = (IPacket<TClient>)Activator.CreateInstance(typeof(EventJson32Packet<,>).MakeGenericType(typeof(TClient), method.attributes.type));
-                    else if (!method.attributes.large)
-                        packet = (IPacket<TClient>)Activator.CreateInstance(typeof(EventJson16Packet<,>).MakeGenericType(typeof(TClient), method.attributes.type));
+                    else if (method.attributes.Large)
+                        packet = (IPacket<TClient>)Activator.CreateInstance(typeof(EventJson32Packet<,>).MakeGenericType(typeof(TClient), method.attributes.Type));
+                    else if (!method.attributes.Large)
+                        packet = (IPacket<TClient>)Activator.CreateInstance(typeof(EventJson16Packet<,>).MakeGenericType(typeof(TClient), method.attributes.Type));
 
                     if (options.AddPacket(pid, packet))
                         result++;
@@ -100,11 +74,11 @@ namespace NSL.SocketCore.Extensions.Packet.FastEvent
             {
                 var p = item.x.GetParameters();
 
-                var packet = options.GetPacket(item.attribute.packetId);
+                var packet = options.GetPacket(item.attribute.PacketId);
 
                 if (packet == null)
                 {
-                    throw new Exception($"cannot find packet {item.attribute.packetId}");
+                    throw new Exception($"cannot find packet {item.attribute.PacketId}");
                 }
 
                 if (p.Count() == 1)

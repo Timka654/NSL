@@ -5,7 +5,7 @@ using NSL.WebSockets.Server.AspNetPoint;
 using System.Collections.Concurrent;
 using System.Diagnostics.Metrics;
 
-namespace NSL.Node.LobbyServerExample.Models
+namespace NSL.Node.LobbyServerExample.Shared.Models
 {
     public class LobbyRoomInfoModel
     {
@@ -23,7 +23,7 @@ namespace NSL.Node.LobbyServerExample.Models
 
         private ConcurrentDictionary<Guid, LobbyRoomMemberModel> members = new ConcurrentDictionary<Guid, LobbyRoomMemberModel>();
 
-        public JoinResultEnum JoinMember(LobbyNetworkClient client)
+        public JoinResultEnum JoinMember(LobbyNetworkClientModel client)
         {
             var member = new LobbyRoomMemberModel()
             {
@@ -47,7 +47,7 @@ namespace NSL.Node.LobbyServerExample.Models
             return JoinResultEnum.Ok;
         }
 
-        public void LeaveMember(LobbyNetworkClient client)
+        public void LeaveMember(LobbyNetworkClientModel client)
         {
             if (members.TryRemove(client.UID, out var member))
             {
@@ -76,7 +76,7 @@ namespace NSL.Node.LobbyServerExample.Models
             BroadcastRemoveRoom();
         }
 
-        internal void SendChatMessage(LobbyNetworkClient client, string v)
+        internal void SendChatMessage(LobbyNetworkClientModel client, string v)
         {
             BroadcastChatMessage(client, v);
         }
@@ -104,7 +104,7 @@ namespace NSL.Node.LobbyServerExample.Models
                 item.Value.Client.Network.Send(packet);
             }
         }
-        private void BroadcastChatMessage(LobbyNetworkClient client, string text)
+        private void BroadcastChatMessage(LobbyNetworkClientModel client, string text)
         {
             var packet = new OutputPacketBuffer();
 
@@ -167,7 +167,7 @@ namespace NSL.Node.LobbyServerExample.Models
 
     public class LobbyRoomMemberModel
     {
-        public LobbyNetworkClient Client { get; set; }
+        public LobbyNetworkClientModel Client { get; set; }
     }
 
     public enum LobbyRoomState

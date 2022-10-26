@@ -1,8 +1,9 @@
 ﻿using NSL.BuilderExtensions.SocketCore;
 using NSL.BuilderExtensions.WebSocketsServer.AspNet;
-using NSL.Node.LobbyServerExample.Models;
 using NSL.Node.LobbyServerExample.Shared.Enums;
+using NSL.Node.LobbyServerExample.Shared.Models;
 using NSL.SocketCore.Extensions.Buffer;
+using NSL.SocketCore.Extensions.Packet;
 using NSL.SocketCore.Utils.Buffer;
 using NSL.WebSockets.Server;
 using NSL.WebSockets.Server.AspNetPoint;
@@ -13,14 +14,14 @@ namespace NSL.Node.LobbyServerExample.Managers
 {
     public class LobbyManager
     {
-        private ConcurrentDictionary<Guid, LobbyNetworkClient> clientMap = new ConcurrentDictionary<Guid, LobbyNetworkClient>();
+        private ConcurrentDictionary<Guid, LobbyNetworkClientModel> clientMap = new ConcurrentDictionary<Guid, LobbyNetworkClientModel>();
 
 
         private ConcurrentDictionary<Guid, LobbyRoomInfoModel> roomMap = new ConcurrentDictionary<Guid, LobbyRoomInfoModel>();
 
         private ConcurrentDictionary<Guid, LobbyRoomInfoModel> processingRoomMap = new ConcurrentDictionary<Guid, LobbyRoomInfoModel>();
 
-        internal void BuildNetwork(AspNetWebSocketsServerEndPointBuilder<LobbyNetworkClient, WSServerOptions<LobbyNetworkClient>> builder)
+        internal void BuildNetwork(AspNetWebSocketsServerEndPointBuilder<LobbyNetworkClientModel, WSServerOptions<LobbyNetworkClientModel>> builder)
         {
             builder.AddConnectHandle(OnClientConnectedHandle);
 
@@ -36,7 +37,7 @@ namespace NSL.Node.LobbyServerExample.Managers
 
         #region NetworkHandle
 
-        private void OnClientConnectedHandle(LobbyNetworkClient client)
+        private void OnClientConnectedHandle(LobbyNetworkClientModel client)
         {
             do
             {
@@ -54,7 +55,7 @@ namespace NSL.Node.LobbyServerExample.Managers
             client.Network.Send(packet);
         }
 
-        private void OnClientDisconnectedHandle(LobbyNetworkClient client)
+        private void OnClientDisconnectedHandle(LobbyNetworkClientModel client)
         {
             var uid = client?.UID;
 
@@ -88,7 +89,8 @@ namespace NSL.Node.LobbyServerExample.Managers
 
         #region PacketHandle
 
-        private void CreateRoomRequestHandle(LobbyNetworkClient client, InputPacketBuffer data)
+        [Packet((ushort)ServerReceivePacketEnum.CreateRoom)]
+        private void CreateRoomRequestHandle(LobbyNetworkClientModel client, InputPacketBuffer data)
         {
             LobbyRoomInfoModel room = data.ReadJson16<LobbyRoomInfoModel>();
 
@@ -116,7 +118,7 @@ namespace NSL.Node.LobbyServerExample.Managers
             BroadcastNewLobbyRoom(room);
         }
 
-        private void RemoveRoomRequestHandle(LobbyNetworkClient client, InputPacketBuffer data)
+        private void RemoveRoomRequestHandle(LobbyNetworkClientModel client, InputPacketBuffer data)
         {
             if (client.CurrentRoom == null)
                 return;
@@ -131,14 +133,14 @@ namespace NSL.Node.LobbyServerExample.Managers
             }
         }
 
-        private void RunRoomRequestHandle(LobbyNetworkClient client, InputPacketBuffer data)
+        private void RunRoomRequestHandle(LobbyNetworkClientModel client, InputPacketBuffer data)
         {
             if (client.CurrentRoom == null)
                 return;
 
             var room = client.CurrentRoom;
 
-            if (client.UID == room.OwnerId)
+            if (client.UID == room.OwnerId) // only owner can run game
             {
                 room.StartRoom();
 
@@ -149,7 +151,7 @@ namespace NSL.Node.LobbyServerExample.Managers
                 BroadcastRemoveLobbyRoom(room);
             }
         }
-        private void SendChatMessageRequestHandle(LobbyNetworkClient client, InputPacketBuffer data)
+        private void SendChatMessageRequestHandle(LobbyNetworkClientModel client, InputPacketBuffer data)
         {
             if (client.CurrentRoom == null)
                 return;
@@ -157,7 +159,7 @@ namespace NSL.Node.LobbyServerExample.Managers
             client.CurrentRoom.SendChatMessage(client, data.ReadString16());
         }
 
-        private void JoinRoomRequestHandle(LobbyNetworkClient client, InputPacketBuffer data)
+        private void JoinRoomRequestHandle(LobbyNetworkClientModel client, InputPacketBuffer data)
         {
             var packet = new OutputPacketBuffer();
 
@@ -183,7 +185,7 @@ namespace NSL.Node.LobbyServerExample.Managers
             client.Network.Send(packet);
         }
 
-        private void LeaveRoomRequestHandle(LobbyNetworkClient client, InputPacketBuffer data)
+        private void LeaveRoomRequestHandle(LobbyNetworkClientModel client, InputPacketBuffer data)
         {
             var packet = new OutputPacketBuffer();
 

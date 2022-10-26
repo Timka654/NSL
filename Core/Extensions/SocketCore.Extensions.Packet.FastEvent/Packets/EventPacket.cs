@@ -1,9 +1,12 @@
-﻿using NSL.SocketCore.Extensions.Buffer;
+﻿using NSL.SocketCore.Utils.Buffer;
 using NSL.SocketCore.Utils;
-using NSL.SocketCore.Utils.Buffer;
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace NSL.SocketCore.Extensions.Packet.FastEvent
+namespace NSL.SocketCore.Extensions.Packet.FastEvent.Packets
 {
     public class EventPacket<TClient, ReceiveType> : IPacket<TClient>
         where TClient : INetworkClient
@@ -28,24 +31,6 @@ namespace NSL.SocketCore.Extensions.Packet.FastEvent
         public override void Receive(TClient client, InputPacketBuffer data)
         {
             OnReceive(client, data);
-        }
-    }
-
-    public class EventJson16Packet<TClient, ReceiveType> : EventPacket<TClient, ReceiveType>
-        where TClient : INetworkClient
-    {
-        public override void Receive(TClient client, InputPacketBuffer data)
-        {
-            InvokeEvent(client, data.ReadJson16<ReceiveType>());
-        }
-    }
-
-    public class EventJson32Packet<TClient, ReceiveType> : EventPacket<TClient, ReceiveType>
-        where TClient : INetworkClient
-    {
-        public override void Receive(TClient client, InputPacketBuffer data)
-        {
-            InvokeEvent(client, data.ReadJson32<ReceiveType>());
         }
     }
 }
