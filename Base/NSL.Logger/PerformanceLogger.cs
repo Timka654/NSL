@@ -9,7 +9,7 @@ namespace NSL.Logger
 {
     public class PerformanceLogger : ILogger
     {
-        BaseLogger outputLogger;
+        ILogger outputLogger;
 
         /// <summary>
         /// Create FileLogger with parameters 
@@ -34,7 +34,7 @@ namespace NSL.Logger
 
         }
 
-        public PerformanceLogger(BaseLogger outputLogger)
+        public PerformanceLogger(ILogger outputLogger)
         {
             this.outputLogger = outputLogger;
         }

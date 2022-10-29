@@ -9,28 +9,28 @@ if (Test-Path $buildPath ) {
 ./BuildReleaseUnity $ver
 
 
-$patternHere  = 'Binary'
+# $patternHere  = 'Binary'
 
-$directoryInfo = [System.IO.DirectoryInfo]::new($buildPath)
+# $directoryInfo = [System.IO.DirectoryInfo]::new($buildPath)
 
-foreach($item in ($directoryInfo.GetFiles("*", 1)))
-{
-    if($item.Name.Contains($patternHere))
-    {
-        Write-Output "Remove file $($item.FullName)"
-        $item.Delete()
-    }
-}
+# foreach($item in ($directoryInfo.GetFiles("*", 1)))
+# {
+    # if($item.Name.Contains($patternHere))
+    # {
+        # Write-Output "Remove file $($item.FullName)"
+        # $item.Delete()
+    # }
+# }
 
-$patternHere  = '.Node'
+# $patternHere  = '.Node'
 
-$directoryInfo = [System.IO.DirectoryInfo]::new($buildPath)
+# $directoryInfo = [System.IO.DirectoryInfo]::new($buildPath)
 
-foreach($item in ($directoryInfo.GetFiles("*", 1)))
-{
-    if($item.Name.Contains($patternHere))
-    {
-        Write-Output "Remove file $($item.FullName)"
-        $item.Delete()
-    }
-}
+# foreach($item in ($directoryInfo.GetFiles("*", 1)))
+# {
+    # if($item.Name.Contains($patternHere))
+    # {
+        # Write-Output "Remove file $($item.FullName)"
+        # $item.Delete()
+    # }
+# }

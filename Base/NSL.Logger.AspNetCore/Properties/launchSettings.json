@@ -1,12 +1,12 @@
 {
   "profiles": {
-    "NSL.Node.LobbyServerExample": {
+    "NSL.Logger.AspNetCore": {
       "commandName": "Project",
       "launchBrowser": true,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
-      "applicationUrl": "https://localhost:50981;http://localhost:50982"
+      "applicationUrl": "https://localhost:49458;http://localhost:49459"
     }
   }
 }

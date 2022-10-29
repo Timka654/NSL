@@ -29,7 +29,6 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\..\BinarySerializer\NSL.Extensions.BinarySerializer\NSL.Extensions.BinarySerializer.csproj" />
 		<ProjectReference Include="..\..\NSL.SocketCore\NSL.SocketCore.csproj" />
 	</ItemGroup>
 

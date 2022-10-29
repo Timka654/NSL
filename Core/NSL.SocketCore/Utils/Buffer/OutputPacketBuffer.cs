@@ -74,14 +74,6 @@ namespace NSL.SocketCore.Utils.Buffer
             return new OutputPacketBuffer(len).WithPid(packetId);
         }
 
-        public OutputPacketBuffer WithPid<TEnum>(TEnum packetId)
-            where TEnum : struct, Enum, IConvertible
-        {
-            PacketId = packetId.ToUInt16(null);
-
-            return this;
-        }
-
         /// <summary>
         /// Инициализация
         /// </summary>
@@ -411,6 +403,18 @@ namespace NSL.SocketCore.Utils.Buffer
             var pktData = CompilePacket(disposeOnSend);
 
             client.Send(pktData, 0, PacketLenght);
+        }
+    }
+
+    public static class _Extensions
+    {
+        public static TBuffer WithPid<TBuffer, TEnum>(this TBuffer buffer,TEnum packetId)
+            where TBuffer : OutputPacketBuffer
+            where TEnum : struct, Enum, IConvertible
+        {
+            buffer.PacketId = packetId.ToUInt16(null);
+
+            return buffer;
         }
     }
 }
