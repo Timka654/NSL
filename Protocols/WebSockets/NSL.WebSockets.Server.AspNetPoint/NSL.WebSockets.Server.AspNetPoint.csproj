@@ -11,6 +11,8 @@
 
 		<Authors>Relife87</Authors>
 		<Version>$(VersionSuffix)</Version>
+		
+		<IsPackable>true</IsPackable>
 		<OutputType>Library</OutputType>
 	</PropertyGroup>
 
