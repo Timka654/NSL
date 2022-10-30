@@ -18,7 +18,7 @@ namespace NSL.Extensions.NAT.Proxy.Data.Packets
 
         public void Send(byte[] data)
         {
-            OutputPacketBuffer packet = new OutputPacketBuffer(data.Length + OutputPacketBuffer.headerLenght)
+            OutputPacketBuffer packet = new OutputPacketBuffer(data.Length + OutputPacketBuffer.DefaultHeaderLenght)
             {
                 PacketId = (ushort)ServerPacketsEnum.Transport
             };

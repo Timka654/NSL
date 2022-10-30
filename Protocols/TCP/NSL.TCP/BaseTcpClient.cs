@@ -55,7 +55,7 @@ namespace NSL.TCP
         /// <summary>
         /// Размер читаемых данных при следующем вызове BeginReceive
         /// </summary>
-        protected int lenght = InputPacketBuffer.headerLenght;
+        protected int lenght = InputPacketBuffer.DefaultHeaderLenght;
 
         protected bool data = false;
 
@@ -82,7 +82,7 @@ namespace NSL.TCP
         protected void ResetBuffer()
         {
             data = false;
-            lenght = InputPacketBuffer.headerLenght;
+            lenght = InputPacketBuffer.DefaultHeaderLenght;
             offset = 0;
         }
 
@@ -198,6 +198,9 @@ namespace NSL.TCP
 
             packet.Send(this, disposeOnSend);
         }
+
+        public void Send(byte[] buffer)
+            => Send(buffer, 0, buffer.Length);
 
         protected AutoResetEvent _sendLocker = new AutoResetEvent(true);
 

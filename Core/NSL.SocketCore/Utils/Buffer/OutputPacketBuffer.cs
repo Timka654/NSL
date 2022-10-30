@@ -25,33 +25,25 @@ namespace NSL.SocketCore.Utils.Buffer
         Encoding coding = Encoding.UTF8;
 
         /// <summary>
-        /// Буффер с полученными данными
+        /// Temp buffer for convert data
         /// </summary>
         byte[] _buffer = new byte[16];
 
         /// <summary>
-        /// маскировка хедера пакета
+        /// <see cref="System.IO.MemoryStream.Position"/> without <see cref="DefaultHeaderLenght"/> bytes header offset
         /// </summary>
-
-        int offset
+        public virtual long DataPosition
         {
-            get { return (int)base.Position - headerLenght; }
-            set { base.Position = value + headerLenght; }
-        }
-
-        /// <summary>
-        /// Размер данных пакета
-        /// </summary>
-        public int Lenght
-        {
-            get;
-            private set;
+            get => base.Position - DefaultHeaderLenght;
+            set => base.Position = value + DefaultHeaderLenght;
         }
 
         /// <summary>
         /// Полный размер пакета
         /// </summary>
-        public int PacketLenght => Lenght + headerLenght;
+        public int PacketLenght => (int)base.Length;
+
+        public virtual int DataLenght => (int)base.Length - DefaultHeaderLenght;
 
         /// <summary>
         /// Индификатор пакета
@@ -66,7 +58,7 @@ namespace NSL.SocketCore.Utils.Buffer
         /// <summary>
         /// Размер шапки пакета
         /// </summary>
-        public const int headerLenght = 7;
+        public const int DefaultHeaderLenght = 7;
 
         public static OutputPacketBuffer Create<TEnum>(TEnum packetId, int len = 32)
             where TEnum : struct, Enum, IConvertible
@@ -83,9 +75,9 @@ namespace NSL.SocketCore.Utils.Buffer
             //начальный размер буффера необходим для оптимизации пакетов, в случае если пакет имеет заведомо известный размер, его не придется увеличивать что будет экономить время
             //инициализация буффера
             //установка размера буффера
-            SetLength(len + headerLenght);
+            SetLength(len + DefaultHeaderLenght);
 
-            offset = 0;
+            DataPosition = 0;
         }
 
         /// <summary>
@@ -93,14 +85,6 @@ namespace NSL.SocketCore.Utils.Buffer
         /// </summary>
         /// <param name="value">значение</param>
         public unsafe void WriteFloat(float value)
-            => WriteFloat32(value);
-
-        [Obsolete("Use \"WriteFloat\"")]
-        /// <summary>
-        /// Запись значения float (4 bytes)
-        /// </summary>
-        /// <param name="value">значение</param>
-        public unsafe void WriteFloat32(float value)
         {
             uint TmpValue = *(uint*)&value;
             _buffer[0] = (byte)TmpValue;
@@ -110,26 +94,19 @@ namespace NSL.SocketCore.Utils.Buffer
             Write(_buffer, 0, 4);
         }
 
-        public override void Write(byte[] buffer, int offset, int count)
-        {
-            base.Write(buffer, offset, count);
-            if (this.offset > Lenght)
-                Lenght = this.offset;
-        }
+        [Obsolete("Use \"WriteFloat\"")]
+        /// <summary>
+        /// Запись значения float (4 bytes)
+        /// </summary>
+        /// <param name="value">значение</param>
+        public unsafe void WriteFloat32(float value)
+            => WriteFloat(value);
 
         /// <summary>
         /// Запись значения double (8 bytes)
         /// </summary>
         /// <param name="value">значение</param>
         public unsafe void WriteDouble(double value)
-            => WriteFloat64(value);
-
-        [Obsolete("Use \"WriteDouble\"")]
-        /// <summary>
-        /// Запись значения double (8 bytes)
-        /// </summary>
-        /// <param name="value">значение</param>
-        public unsafe void WriteFloat64(double value)
         {
             ulong TmpValue = *(ulong*)&value;
             _buffer[0] = (byte)TmpValue;
@@ -143,13 +120,21 @@ namespace NSL.SocketCore.Utils.Buffer
             Write(_buffer, 0, 8);
         }
 
+        [Obsolete("Use \"WriteDouble\"")]
+        /// <summary>
+        /// Запись значения double (8 bytes)
+        /// </summary>
+        /// <param name="value">значение</param>
+        public unsafe void WriteFloat64(double value)
+            => WriteDouble(value);
+
         /// <summary>
         /// не реализовано
         /// </summary>
         /// <param name="value">значение</param>
         public void WriteDecimal(decimal value)
         {
-            throw new Exception();
+            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -241,18 +226,6 @@ namespace NSL.SocketCore.Utils.Buffer
         public void WriteBool(bool value)
         {
             WriteByte((byte)(value ? 1 : 0));
-        }
-
-        /// <summary>
-        /// Запись значения byte (1 байт)
-        /// </summary>
-        /// <param name="value">значение</param>
-        public override void WriteByte(byte value)
-        {
-            base.WriteByte(value);
-            if (this.offset > Lenght)
-                Lenght = this.offset;
-
         }
 
         /// <summary>
@@ -362,9 +335,7 @@ namespace NSL.SocketCore.Utils.Buffer
         {
             var arr = value.ToByteArray();
 
-            WriteByte((byte)arr.Length);
-
-            Write(arr, 0, arr.Length);
+            Write(arr, 0, 16);
         }
 
         public void Write(byte[] buf)
@@ -386,9 +357,7 @@ namespace NSL.SocketCore.Utils.Buffer
             WriteUInt16(PacketId);
 
             if (AppendHash)
-            {
-                WriteByte((byte)((Lenght + PacketId) % 14));
-            }
+                WriteByte((byte)((PacketLenght + PacketId) % 255));
 
             var arr = base.ToArray();
 
@@ -399,16 +368,12 @@ namespace NSL.SocketCore.Utils.Buffer
         }
 
         public virtual void Send(IClient client, bool disposeOnSend)
-        {
-            var pktData = CompilePacket(disposeOnSend);
-
-            client.Send(pktData, 0, PacketLenght);
-        }
+            => client.Send(CompilePacket(disposeOnSend));
     }
 
     public static class _Extensions
     {
-        public static TBuffer WithPid<TBuffer, TEnum>(this TBuffer buffer,TEnum packetId)
+        public static TBuffer WithPid<TBuffer, TEnum>(this TBuffer buffer, TEnum packetId)
             where TBuffer : OutputPacketBuffer
             where TEnum : struct, Enum, IConvertible
         {

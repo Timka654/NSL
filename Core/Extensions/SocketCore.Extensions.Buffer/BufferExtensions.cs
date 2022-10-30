@@ -268,19 +268,39 @@ namespace NSL.SocketCore.Extensions.Buffer
 
         /// <summary>
         /// Create response for wait request
-        /// Warning!! Input packet have identity - 16 first byte or request, execute this method before read any data
         /// </summary>
         /// <typeparam name="TClient"></typeparam>
         /// <param name="client"></param>
         /// <param name="data"></param>
         /// <returns></returns>
         public static OutputPacketBuffer CreateWaitBufferResponse(this InputPacketBuffer data)
+            => new OutputPacketBuffer()
+                .WithWaitableAnswer(data);
+
+        public static OutputPacketBuffer WithWaitableAnswer(this OutputPacketBuffer buffer, InputPacketBuffer data)
         {
-            var packet = new OutputPacketBuffer();
+            var boffset = buffer.Position;
 
-            packet.WriteGuid(data.ReadGuid());
+            var doffset = data.Position;
 
-            return packet;
+            data.DataPosition = 0;
+
+            buffer.DataPosition = 0;
+
+            buffer.WriteGuid(data.ReadGuid());
+
+            if (boffset > WaitablePacketBuffer.DefaultHeaderLenght)
+                buffer.Position = boffset;
+            else
+                buffer.DataPosition = 16;
+
+            if (doffset > WaitablePacketBuffer.DefaultHeaderLenght)
+                data.Position = doffset;
+            else
+                data.DataPosition = 16;
+
+            return buffer;
         }
+
     }
 }

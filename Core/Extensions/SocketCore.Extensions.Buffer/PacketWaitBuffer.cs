@@ -25,8 +25,6 @@ namespace NSL.SocketCore.Extensions.Buffer
 
         public async Task SendWaitRequest(WaitablePacketBuffer buffer, Func<InputPacketBuffer, Task> onResult, bool disposeOnSend = true)
         {
-            buffer.Position = OutputPacketBuffer.headerLenght;
-
             ManualResetEvent locker = new ManualResetEvent(false);
 
             Guid rid;

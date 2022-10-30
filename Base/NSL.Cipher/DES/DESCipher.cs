@@ -63,7 +63,7 @@ namespace NSL.Cipher.DES
 
         public byte[] Peek(byte[] buffer)
         {
-            return decrypt.TransformFinalBlock(buffer, 0, InputPacketBuffer.headerLenght);
+            return decrypt.TransformFinalBlock(buffer, 0, InputPacketBuffer.DefaultHeaderLenght);
         }
 
         public IPacketCipher CreateEntry()

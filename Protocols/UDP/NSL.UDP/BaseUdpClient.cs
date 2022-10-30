@@ -116,7 +116,7 @@ namespace NSL.UDP
             try
             {
                 //дешефруем и засовываем это все в спец буффер в котором реализованы методы чтения типов, своего рода поток
-                InputPacketBuffer pbuff = new InputPacketBuffer(inputCipher.Decode(result, 0, result.Length));
+                InputPacketBuffer pbuff = new InputPacketBuffer(inputCipher.Decode(result, 0, result.Length), true);
 
                 //предотвращение ошибок в пакете
                 try
@@ -167,6 +167,9 @@ namespace NSL.UDP
 
             Send(dpkg, disposeOnSend);
         }
+
+        public void Send(byte[] buffer)
+            => Send(buffer, 0, buffer.Length);
 
         public async void Send(byte[] buf, int offset, int lenght)
         {

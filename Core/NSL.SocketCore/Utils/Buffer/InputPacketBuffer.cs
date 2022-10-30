@@ -9,7 +9,13 @@ namespace NSL.SocketCore.Utils.Buffer
 {
     public class InputPacketBuffer : MemoryStream
     {
+        /// <summary>
+        /// Размер шапки пакета
+        /// </summary>
+        public const int DefaultHeaderLenght = 7;
+
         private static readonly DateTime MinDatetimeValue = new DateTime(1970, 1, 1);
+
         /// <summary>
         /// Текущая кодировка типа String
         /// </summary>
@@ -18,23 +24,22 @@ namespace NSL.SocketCore.Utils.Buffer
         /// <summary>
         /// маскировка хедера пакета
         /// </summary>
-        int offset { get { return (int)base.Position; } set { base.Position = value; } }
+        public int DataPosition
+        {
+            get { return (int)base.Position - DefaultHeaderLenght; }
+            set { base.Position = value + DefaultHeaderLenght; }
+        }
 
         readonly int lenght;
 
         bool manualDisposing = false;
 
         /// <summary>
-        /// Текущая позиция чтения в потоке
-        /// </summary>
-        public int Offset { get { return offset; } }
-
-        /// <summary>
         /// Размер пакета
         /// </summary>
         public int Lenght { get { return lenght; } }
 
-        public int DataLength => Lenght - headerLenght;
+        public int DataLength => Lenght - DefaultHeaderLenght;
 
         /// <summary>
         /// This variable using for set "not automatic disposing", if need in custom scenarios
@@ -57,11 +62,6 @@ namespace NSL.SocketCore.Utils.Buffer
         /// </summary>
         public ushort PacketId { get; set; }
 
-        /// <summary>
-        /// Размер шапки пакета
-        /// </summary>
-        public const int headerLenght = 7;
-
         public InputPacketBuffer()
         {
 
@@ -77,7 +77,7 @@ namespace NSL.SocketCore.Utils.Buffer
             //присвоение буффера
             //buffer = buf;
             //установка позиции на 0 без смещения
-            offset = 0;
+            Position = 0;
 
             //чтение размера пакета
             lenght = ReadInt32();
@@ -95,22 +95,15 @@ namespace NSL.SocketCore.Utils.Buffer
             }
 
             //установка позиции на текущий размер хедера, для дальнейшего чтения
-            offset = headerLenght;
+            DataPosition = 0;
         }
 
         /// <summary>
-        /// Проверка хеша
+        /// Check header hash
         /// </summary>
         /// <returns></returns>
         public bool CheckHash()
-        {
-            //проверяем хеш по спец формуле
-            if (GetBuffer()[6] != ((lenght - headerLenght) + PacketId) % 14)
-            {
-                return false;
-            }
-            return true;
-        }
+            => GetBuffer()[6] == ((lenght) + PacketId) % 255;
 
         /// <summary>
         /// Чтение значения float (4 bytes)
@@ -118,8 +111,8 @@ namespace NSL.SocketCore.Utils.Buffer
         /// <returns></returns>
         public float ReadFloat()
         {
-            offset += 4;
-            return BitConverter.ToSingle(GetBuffer(), offset - 4);
+            DataPosition += 4;
+            return BitConverter.ToSingle(GetBuffer(), (int)Position - 4);
         }
 
         public async Task<float> ReadFloatAsync() => await Task.FromResult<float>(ReadFloat());
@@ -130,8 +123,8 @@ namespace NSL.SocketCore.Utils.Buffer
         /// <returns></returns>
         public double ReadDouble()
         {
-            offset += 8;
-            return BitConverter.ToDouble(GetBuffer(), offset - 8);
+            DataPosition += 8;
+            return BitConverter.ToDouble(GetBuffer(), (int)Position - 8);
         }
 
         public async Task<double> ReadDoubleAsync() => await Task.FromResult<double>(ReadDouble());
@@ -151,8 +144,8 @@ namespace NSL.SocketCore.Utils.Buffer
         /// <returns></returns>
         public short ReadInt16()
         {
-            offset += 2;
-            return BitConverter.ToInt16(GetBuffer(), offset - 2);
+            DataPosition += 2;
+            return BitConverter.ToInt16(GetBuffer(), (int)Position - 2);
         }
 
         public async Task<short> ReadInt16Async() => await Task.FromResult(ReadInt16());
@@ -163,8 +156,8 @@ namespace NSL.SocketCore.Utils.Buffer
         /// <returns></returns>
         public ushort ReadUInt16()
         {
-            offset += 2;
-            return BitConverter.ToUInt16(GetBuffer(), offset - 2);
+            DataPosition += 2;
+            return BitConverter.ToUInt16(GetBuffer(), (int)Position - 2);
         }
 
         public async Task<ushort> ReadUInt16Async() => await Task.FromResult(ReadUInt16());
@@ -175,8 +168,8 @@ namespace NSL.SocketCore.Utils.Buffer
         /// <returns></returns>
         public int ReadInt32()
         {
-            offset += 4;
-            return BitConverter.ToInt32(GetBuffer(), offset - 4);
+            DataPosition += 4;
+            return BitConverter.ToInt32(GetBuffer(), (int)Position - 4);
         }
 
         public async Task<int> ReadInt32Async() => await Task.FromResult(ReadInt32());
@@ -187,8 +180,8 @@ namespace NSL.SocketCore.Utils.Buffer
         /// <returns></returns>
         public uint ReadUInt32()
         {
-            offset += 4;
-            return BitConverter.ToUInt32(GetBuffer(), offset - 4);
+            DataPosition += 4;
+            return BitConverter.ToUInt32(GetBuffer(), (int)Position - 4);
         }
 
         public async Task<uint> ReadUInt32Async() => await Task.FromResult(ReadUInt32());
@@ -199,8 +192,8 @@ namespace NSL.SocketCore.Utils.Buffer
         /// <returns></returns>
         public long ReadInt64()
         {
-            offset += 8;
-            return BitConverter.ToInt64(GetBuffer(), offset - 8);
+            DataPosition += 8;
+            return BitConverter.ToInt64(GetBuffer(), (int)Position - 8);
         }
 
         public async Task<long> ReadInt64Async() => await Task.FromResult(ReadInt64());
@@ -211,8 +204,8 @@ namespace NSL.SocketCore.Utils.Buffer
         /// <returns></returns>
         public ulong ReadUInt64()
         {
-            offset += 8;
-            return BitConverter.ToUInt64(GetBuffer(), offset - 8);
+            DataPosition += 8;
+            return BitConverter.ToUInt64(GetBuffer(), (int)Position - 8);
         }
 
         public async Task<ulong> ReadUInt64Async() => await Task.FromResult(ReadUInt64());
@@ -390,7 +383,7 @@ namespace NSL.SocketCore.Utils.Buffer
 
         public Guid ReadGuid()
         {
-            return new Guid(Read(ReadByte()));
+            return new Guid(Read(16));
         }
 
         /// <summary>
@@ -430,21 +423,21 @@ namespace NSL.SocketCore.Utils.Buffer
         {
             if (seek == SeekOrigin.Begin)
             {
-                offset = len + headerLenght;
+                DataPosition = len;
             }
             else if (seek == SeekOrigin.Current)
             {
-                offset = offset + len;
+                DataPosition = DataPosition + len;
             }
             else if (seek == SeekOrigin.End)
             {
-                offset = lenght + len;
+                DataPosition = lenght + len;
             }
 
-            if (offset < headerLenght)
-                offset = headerLenght;
+            if (DataPosition < 0)
+                DataPosition = 0;
 
-            return offset;
+            return DataPosition;
         }
 
         /// <summary>
@@ -454,19 +447,19 @@ namespace NSL.SocketCore.Utils.Buffer
         /// <param name="off">позиция начала копирования</param>
         public void AppendBody(byte[] buffer, int off)
         {
-            int tempPos = offset;
+            int tempPos = DataPosition;
 
-            offset = 7;
+            DataPosition = 0;
 
             Write(buffer, off, this.lenght - 7);
 
-            offset = tempPos;
+            DataPosition = tempPos;
         }
 
         public byte[] GetBody()
         {
             byte[] buf = new byte[DataLength];
-            Array.Copy(GetBuffer(), headerLenght, buf, 0, DataLength);
+            Array.Copy(GetBuffer(), DefaultHeaderLenght, buf, 0, DataLength);
 
             return buf;
         }
