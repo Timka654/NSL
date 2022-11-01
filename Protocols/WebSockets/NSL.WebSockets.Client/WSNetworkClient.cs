@@ -31,7 +31,7 @@ namespace NSL.WebSockets.Client
 
             Task.Run(async () =>
             {
-                if (await ConnectAsync())
+                if (await ConnectAsync(connectionTimeOut))
                     _lock.Set();
             });
 

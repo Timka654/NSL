@@ -33,7 +33,6 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\Base\NSL.Cipher\NSL.Cipher.csproj" />
 		<ProjectReference Include="..\NSL.SocketClient\NSL.SocketClient.csproj" />
 		<ProjectReference Include="..\Utils\NSL.Utils.Unity\NSL.Utils.Unity.csproj" />
 	</ItemGroup>
