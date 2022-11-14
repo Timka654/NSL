@@ -235,6 +235,7 @@ namespace NSL.WebSockets
         public async void Send(byte[] buf, int offset, int lenght)
         {
             _sendLocker.WaitOne();
+
             try
             {
                 //шифруем данные

@@ -230,8 +230,10 @@ namespace NSL.TCP
                 //отключаем клиента, лишним не будет
                 Disconnect();
             }
-
-            _sendLocker.Set();
+            finally
+            {
+                _sendLocker.Set();
+            }
         }
 
         /// <summary>

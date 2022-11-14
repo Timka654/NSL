@@ -61,8 +61,6 @@ namespace NSL.WebSockets.Server
             disconnected = false;
 
             InitReceiver();
-            //Начало приема пакетов от клиента
-            options.RunClientConnect(Data);
         }
 
         public virtual async Task RunPacketReceiver()
@@ -70,6 +68,9 @@ namespace NSL.WebSockets.Server
             try
             {
                 sclient = (await context.AcceptWebSocketAsync(null))?.WebSocket;
+
+                //Начало приема пакетов от клиента
+                options.RunClientConnect(Data);
 
                 RunReceiveAsync();
             }
