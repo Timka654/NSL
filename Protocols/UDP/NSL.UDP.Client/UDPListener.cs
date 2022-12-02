@@ -1,7 +1,12 @@
 ﻿using NSL.SocketCore;
 using NSL.SocketCore.Utils;
+using NSL.UDP.Client.Info;
+using NSL.UDP.Client.Interface;
+using STUN;
 using System;
 using System.Buffers;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
@@ -18,6 +23,8 @@ namespace NSL.UDP.Client
         protected bool state = false;
 
         protected Socket listener;
+
+        public STUNQueryResult StunInformation { get; private set; }
 
         public UDPListener(TOptions options)
         {
@@ -43,6 +50,7 @@ namespace NSL.UDP.Client
             if (!IPAddress.TryParse(options.BindingIP, out var ip))
                 throw new ArgumentException($"invalid connection ip {options.BindingIP}", nameof(options.BindingIP));
 
+
             if (options.AddressFamily == AddressFamily.Unspecified)
                 options.AddressFamily = ip.AddressFamily;
 
@@ -54,6 +62,19 @@ namespace NSL.UDP.Client
             listener.Bind(options.GetBindingIPEndPoint());
 
             options.BindingPort = listener.LocalEndPoint is IPEndPoint ipep ? ipep.Port : options.BindingPort;
+
+            STUNClient.ReceiveTimeout = 700;
+
+            if (options.StunServers.Any())
+            {
+                foreach (var item in options.StunServers)
+                {
+                    StunInformation = STUNClient.Query(listener, new IPEndPoint(Dns.GetHostAddresses(item.Address).FirstOrDefault(), item.Port), STUNQueryType.ExactNAT);
+
+                    if (StunInformation.QueryError != STUNQueryError.Success)
+                        options.RunException(new StunExceptionInfo(StunInformation), default);
+                }
+            }
 
             if (afterBind != null)
                 afterBind();
@@ -80,7 +101,7 @@ namespace NSL.UDP.Client
             listener = null;
         }
 
-        protected async void RunReceiveAsync(CancellationToken token) => await Task.Run(()=>RunReceive(token), token);
+        protected async void RunReceiveAsync(CancellationToken token) => await Task.Run(() => RunReceive(token), token);
 
         protected CancellationTokenSource ListenerCTS;
 

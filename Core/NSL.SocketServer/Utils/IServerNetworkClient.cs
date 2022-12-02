@@ -10,7 +10,6 @@ namespace NSL.SocketServer.Utils
         public override bool AliveState
         {
             get => base.LastReceiveMessage.HasValue == false || base.LastReceiveMessage.Value.AddMilliseconds(AliveCheckTimeOut) > DateTime.UtcNow;
-            set => throw new InvalidOperationException();
         }
 
         public CoreOptions ServerOptions { get; set; }

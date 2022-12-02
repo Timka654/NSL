@@ -1,32 +1,21 @@
 ﻿using NSL.SocketClient;
 using NSL.SocketServer;
 using NSL.SocketServer.Utils;
+using NSL.UDP.Client.Info;
+using NSL.UDP.Client.Interface;
+using System.Collections.Generic;
 using System.Net;
 
 namespace NSL.UDP.Client
 {
-    //public class UDPOptions<TClient> : ClientOptions<TClient>
-    //    where TClient : BaseSocketNetworkClient
-    //{ 
-
-    //}
-
-    public interface IBindingUDPOptions
-    {
-        string BindingIP { get; set; }
-        int BindingPort { get; set; }
-
-        IPAddress GetBindingIPAddress();
-        IPEndPoint GetBindingIPEndPoint();
-    }
-
-
     public class UDPClientOptions<TClient> : ClientOptions<TClient>, IBindingUDPOptions
         where TClient : BaseSocketNetworkClient
     {
         public string BindingIP { get; set; }
 
         public int BindingPort { get; set; }
+
+        public List<StunServerInfo> StunServers { get; } = new List<StunServerInfo>();
 
         public IPAddress GetBindingIPAddress() => IPAddress.Parse(BindingIP);
 
@@ -39,6 +28,8 @@ namespace NSL.UDP.Client
         public string BindingIP { get; set; }
 
         public int BindingPort { get; set; }
+
+        public List<StunServerInfo> StunServers { get; } = new List<StunServerInfo>();
 
         public IPAddress GetBindingIPAddress() => IPAddress.Parse(BindingIP);
 

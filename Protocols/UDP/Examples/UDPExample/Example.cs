@@ -5,6 +5,7 @@ using NSL.SocketCore.Utils.Buffer;
 using NSL.SocketCore.Utils.Cipher;
 using NSL.SocketServer.Utils;
 using NSL.UDP.Client;
+using NSL.UDP.Client.Interface;
 using System;
 using System.Threading;
 
@@ -14,14 +15,14 @@ namespace UDPExample
     {
         public override void Receive(NetworkClient client, InputPacketBuffer data)
         {
-            Console.WriteLine($"[{DateTime.UtcNow}] Client: Receive {nameof(TestPacket)}");
+            Console.WriteLine($"[{DateTime.UtcNow}] Client: Receive {nameof(TestPacket)} - {data.ReadInt32()} - {data.ReadInt32()} - {data.ReadInt32()}");
         }
     }
     public class TestPacketS : IPacket<NetworkClientForServer>
     {
         public override void Receive(NetworkClientForServer client, InputPacketBuffer data)
         {
-            Console.WriteLine($"[{DateTime.UtcNow}] Receiver: Receive {nameof(TestPacketS)}");
+            Console.WriteLine($"[{DateTime.UtcNow}] Receiver: Receive {nameof(TestPacketS)} - {data.ReadInt32()} - {data.ReadInt32()} - {data.ReadInt32()}");
 
 
 
@@ -57,6 +58,12 @@ namespace UDPExample
 
             options.ReceiveBufferSize = 1024;
 
+            options.StunServers.Add(new NSL.UDP.Client.Info.StunServerInfo("stun.l.google.com:19302"));
+            options.StunServers.Add(new NSL.UDP.Client.Info.StunServerInfo("stun1.l.google.com:19302"));
+            options.StunServers.Add(new NSL.UDP.Client.Info.StunServerInfo("stun2.l.google.com:19302"));
+            options.StunServers.Add(new NSL.UDP.Client.Info.StunServerInfo("stun3.l.google.com:19302"));
+            options.StunServers.Add(new NSL.UDP.Client.Info.StunServerInfo("stun4.l.google.com:19302"));
+
             options.InputCipher = new PacketNoneCipher();
 
             options.OutputCipher = new PacketNoneCipher();
@@ -88,6 +95,7 @@ namespace UDPExample
             client = new UDPNetworkClient<NetworkClient>(options);
             Thread.Sleep(1_500);
             client.Connect();
+
 
             using (var packet = new NSL.UDP.DgramPacket() { PacketId = 1 })
             {

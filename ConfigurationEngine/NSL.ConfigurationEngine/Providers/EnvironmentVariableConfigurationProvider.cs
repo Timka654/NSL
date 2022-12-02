@@ -11,7 +11,7 @@ namespace NSL.ConfigurationEngine.Providers
 
             foreach (string item in table.Keys)
             {
-                Update(new Info.ConfigurationInfo(item, (string)table[item], this, ""), true);
+                Update(new Info.ConfigurationInfo(item.Replace("__", "."), (string)table[item], this, ""), true);
             }
 
             return true;

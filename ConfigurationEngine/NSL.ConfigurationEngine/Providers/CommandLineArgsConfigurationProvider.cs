@@ -8,7 +8,7 @@ namespace NSL.ConfigurationEngine.Providers
         {
             foreach (var item in (new CommandLineArgs()).GetArgs())
             {
-                Update(new Info.ConfigurationInfo(item.Key, item.Value, this, ""), true);
+                Update(new Info.ConfigurationInfo(item.Key.Replace("__", "."), item.Value, this, ""), true);
             }
 
             return true;

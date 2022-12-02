@@ -91,19 +91,14 @@ namespace NSL.SocketClient
             do
             {
                 RequestPing();
+
                 await Task.Delay(AliveCheckTimeOut, token);
             }
-            while (Network.GetState() && pingPongEnabled && !token.IsCancellationRequested);
+            while (!token.IsCancellationRequested && pingPongEnabled && Network?.GetState() == true);
         }
 
         public void RequestPing()
         {
-            //if (LastReceiveMessage > DateTime.UtcNow.AddMilliseconds(-AliveCheckTimeOut))
-            //{
-            //    AliveState = true;
-            //    return;
-            //} // invalid ping
-
             if (!aliveLocker.WaitOne(0))
                 return;
 
@@ -111,25 +106,21 @@ namespace NSL.SocketClient
             {
                 aliveLocker.Reset();
 
-                aliveRequestTime = DateTime.UtcNow;
                 AliveConnectionPacket.SendRequest(Network);
 
-                AliveState = false;
-
-                return;
-
+                aliveRequestTime = DateTime.UtcNow;
             }
-
-            AliveState = aliveLocker.WaitOne(AliveCheckTimeOut);
         }
 
         internal void PongProcess()
         {
-            Ping = (int)((DateTime.UtcNow - aliveRequestTime).TotalMilliseconds / 2) - 3/*correcting avg send-receive process*/;
+            Ping = (int)((DateTime.UtcNow - aliveRequestTime.AddMilliseconds(-2)).TotalMilliseconds / 2);
+
             aliveLocker.Set();
         }
 
         private DateTime aliveRequestTime;
+
         private ManualResetEvent aliveLocker { get; set; } = new ManualResetEvent(true);
 
         #endregion
@@ -186,6 +177,12 @@ namespace NSL.SocketClient
             //    {
             //        NetworkClient.Send(buffer, 0, buffer.Length);
             //    }
+        }
+
+        public override void Dispose()
+        {
+            aliveLocker.Dispose();
+            base.Dispose();
         }
     }
 }

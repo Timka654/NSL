@@ -14,7 +14,7 @@ namespace NSL.SocketCore.Utils
         /// Состояние соединение на текущий момент
         /// Важно! работает только при запуске цикла сообщений PingPongEnabled
         /// </summary>
-        public virtual bool AliveState { get; set; } = true;
+        public virtual bool AliveState => LastReceiveMessage == null || LastReceiveMessage.Value.AddMilliseconds(AliveCheckTimeOut) > DateTime.UtcNow;
 
         public bool GetState(bool ignoreAlive = false) => Network?.GetState() == true && (ignoreAlive || AliveState);
 

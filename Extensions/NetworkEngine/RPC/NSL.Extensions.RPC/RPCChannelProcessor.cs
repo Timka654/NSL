@@ -45,34 +45,36 @@ namespace NSL.Extensions.RPC
 
         public InputPacketBuffer SendWithResultData(OutputPacketBuffer packet)
         {
-            ManualResetEvent locker = new ManualResetEvent(false);
-
             InputPacketBuffer result = default;
 
-            Send(packet, _data =>
+            using (ManualResetEvent locker = new ManualResetEvent(false))
             {
-                _data.ManualDisposing = true;
+                Send(packet, _data =>
+                {
+                    _data.ManualDisposing = true;
 
-                result = _data;
+                    result = _data;
 
-                locker.Set();
-            });
+                    locker.Set();
+                });
 
-            locker.WaitOne();
+                locker.WaitOne();
+            }
 
             return result;
         }
 
         public void SendWait(OutputPacketBuffer packet)
         {
-            ManualResetEvent locker = new ManualResetEvent(false);
-
-            Send(packet, _ =>
+            using (ManualResetEvent locker = new ManualResetEvent(false))
             {
-                locker.Set();
-            });
+                Send(packet, _ =>
+                {
+                    locker.Set();
+                });
 
-            locker.WaitOne();
+                locker.WaitOne();
+            }
         }
 
         public Task SendWaitAsync(OutputPacketBuffer packet)

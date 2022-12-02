@@ -25,37 +25,44 @@ namespace NSL.SocketCore.Extensions.Buffer
 
         public async Task SendWaitRequest(WaitablePacketBuffer buffer, Func<InputPacketBuffer, Task> onResult, bool disposeOnSend = true)
         {
-            ManualResetEvent locker = new ManualResetEvent(false);
-
-            Guid rid;
-
             InputPacketBuffer data = default;
 
-            do
+            using (ManualResetEvent locker = new ManualResetEvent(false))
             {
-                rid = Guid.NewGuid();
-            } while (!requests.TryAdd(rid, (input) => { data = input; locker.Set(); }));
+                Guid rid;
 
-            buffer.WithRecvIdentity(rid);
+                do
+                {
+                    rid = Guid.NewGuid();
+                } while (!requests.TryAdd(rid, (input) => { data = input; locker.Set(); }));
 
-            client.Network.Send(buffer, disposeOnSend);
+                buffer.WithRecvIdentity(rid);
 
-            await Task.Run(() => locker.WaitOne());
+                client.Network.Send(buffer, disposeOnSend);
 
-            locker.Dispose();
+                while (!await Task.Run(() => locker.WaitOne(client.AliveState ? client.AliveCheckTimeOut / 2 : 1000)))
+                {
+                    if (client?.GetState() == false)
+                    {
+                        requests.TryRemove(rid, out _);
+                        break;
+                    }
+                }
+
+            }
 
             await onResult(data);
 
-            data.Dispose();
-
+            data?.Dispose();
         }
 
         public void ProcessWaitResponse(InputPacketBuffer data)
         {
-            data.ManualDisposing = true;
-
             if (requests.TryRemove(data.ReadGuid(), out var waitAction))
+            {
+                data.ManualDisposing = true;
                 waitAction(data);
+            }
         }
 
         public void Dispose()

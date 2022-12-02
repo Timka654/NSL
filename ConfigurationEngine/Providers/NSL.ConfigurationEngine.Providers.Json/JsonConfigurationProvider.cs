@@ -28,6 +28,12 @@ namespace NSL.ConfigurationEngine.Providers.Json
 
         public override bool LoadData()
         {
+            if (!File.Exists(FileName))
+            {
+                if (!Required)
+                    return true;
+            }
+
             try
             {
                 var json_text = File.ReadAllText(FileName);

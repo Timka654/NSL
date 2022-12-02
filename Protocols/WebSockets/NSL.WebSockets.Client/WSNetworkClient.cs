@@ -27,21 +27,22 @@ namespace NSL.WebSockets.Client
 
         public bool Connect(int connectionTimeOut = DefaultConnectionTimeout)
         {
-            ManualResetEvent _lock = new ManualResetEvent(false);
-
-            Task.Run(async () =>
+            using (ManualResetEvent _lock = new ManualResetEvent(false))
             {
-                if (await ConnectAsync(connectionTimeOut))
-                    _lock.Set();
-            });
+                Task.Run(async () =>
+                {
+                    if (await ConnectAsync(connectionTimeOut))
+                        _lock.Set();
+                });
 
-            if (!_lock.WaitOne(connectionTimeOut))
-            {
-                Release();
-                return false;
+                if (!_lock.WaitOne(connectionTimeOut))
+                {
+                    Release();
+                    return false;
+                }
+
+                return true;
             }
-
-            return true;
         }
 
         public async Task<bool> ConnectAsync(string ip, int port, int connectionTimeOut = DefaultConnectionTimeout)
