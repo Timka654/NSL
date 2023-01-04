@@ -1,4 +1,5 @@
 ﻿using NSL.UDP.Client.Info;
+using STUN;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,5 +11,7 @@ namespace NSL.UDP.Client.Interface
     public interface ISTUNOptions
     {
         List<StunServerInfo> StunServers { get; }
+
+        STUNQueryType StunQueryType { get; set; }
     }
 }

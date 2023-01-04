@@ -3,6 +3,7 @@ using NSL.SocketServer;
 using NSL.SocketServer.Utils;
 using NSL.UDP.Client.Info;
 using NSL.UDP.Client.Interface;
+using STUN;
 using System.Collections.Generic;
 using System.Net;
 
@@ -17,6 +18,8 @@ namespace NSL.UDP.Client
 
         public List<StunServerInfo> StunServers { get; } = new List<StunServerInfo>();
 
+        public STUNQueryType StunQueryType { get; set; } = STUNQueryType.ExactNAT;
+
         public IPAddress GetBindingIPAddress() => IPAddress.Parse(BindingIP);
 
         public IPEndPoint GetBindingIPEndPoint() => new IPEndPoint(GetBindingIPAddress(), BindingPort);
@@ -30,6 +33,8 @@ namespace NSL.UDP.Client
         public int BindingPort { get; set; }
 
         public List<StunServerInfo> StunServers { get; } = new List<StunServerInfo>();
+
+        public STUNQueryType StunQueryType { get; set; } = STUNQueryType.ExactNAT;
 
         public IPAddress GetBindingIPAddress() => IPAddress.Parse(BindingIP);
 

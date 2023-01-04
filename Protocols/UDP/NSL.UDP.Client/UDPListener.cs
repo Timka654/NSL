@@ -63,16 +63,39 @@ namespace NSL.UDP.Client
 
             options.BindingPort = listener.LocalEndPoint is IPEndPoint ipep ? ipep.Port : options.BindingPort;
 
-            STUNClient.ReceiveTimeout = 700;
+            STUNClient.ReceiveTimeout = 1700;
 
             if (options.StunServers.Any())
             {
                 foreach (var item in options.StunServers)
                 {
-                    StunInformation = STUNClient.Query(listener, new IPEndPoint(Dns.GetHostAddresses(item.Address).FirstOrDefault(), item.Port), STUNQueryType.ExactNAT);
+                    try
+                    {
+                        var dnsIPs = Dns.GetHostAddresses(item.Address).OrderByDescending(x => x.AddressFamily == options.AddressFamily);
 
-                    if (StunInformation.QueryError != STUNQueryError.Success)
-                        options.RunException(new StunExceptionInfo(StunInformation), default);
+                        if (!dnsIPs.Any())
+                            options.RunException(new StunExceptionInfo(
+                                item,
+                                null,
+                                StunExceptionInfo.ErrorTypeEnum.DNSIPAddressParseError,
+                                null), default);
+
+                        var stunIP = dnsIPs.FirstOrDefault();
+
+                        var stunEndPoint = new IPEndPoint(stunIP, item.Port);
+
+                        StunInformation = STUNClient.Query(stunEndPoint, options.StunQueryType, false);
+
+                        if (StunInformation.QueryError != STUNQueryError.Success)
+                            options.RunException(new StunExceptionInfo(item, StunInformation, StunExceptionInfo.ErrorTypeEnum.QueryResultError, stunEndPoint), default);
+                        else
+                            break;
+                    }
+                    catch (SocketException) { }
+                    catch (Exception ex)
+                    {
+                        throw;
+                    }
                 }
             }
 

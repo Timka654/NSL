@@ -63,6 +63,23 @@ namespace UDPExample
             options.StunServers.Add(new NSL.UDP.Client.Info.StunServerInfo("stun2.l.google.com:19302"));
             options.StunServers.Add(new NSL.UDP.Client.Info.StunServerInfo("stun3.l.google.com:19302"));
             options.StunServers.Add(new NSL.UDP.Client.Info.StunServerInfo("stun4.l.google.com:19302"));
+            options.StunServers.Add(new NSL.UDP.Client.Info.StunServerInfo("stun.node4.co.uk"));
+            options.StunServers.Add(new NSL.UDP.Client.Info.StunServerInfo("stun.nventure.com"));
+            options.StunServers.Add(new NSL.UDP.Client.Info.StunServerInfo("stun.patlive.com"));
+            options.StunServers.Add(new NSL.UDP.Client.Info.StunServerInfo("stun.petcube.com"));
+            options.StunServers.Add(new NSL.UDP.Client.Info.StunServerInfo("stun.phoneserve.com"));
+            options.StunServers.Add(new NSL.UDP.Client.Info.StunServerInfo("stun.prizee.com"));
+            options.StunServers.Add(new NSL.UDP.Client.Info.StunServerInfo("stun.qvod.com"));
+            options.StunServers.Add(new NSL.UDP.Client.Info.StunServerInfo("stun.refint.net"));
+            options.StunServers.Add(new NSL.UDP.Client.Info.StunServerInfo("stun.remote-learner.net"));
+            options.StunServers.Add(new NSL.UDP.Client.Info.StunServerInfo("stun.rounds.com"));
+            options.StunServers.Add(new NSL.UDP.Client.Info.StunServerInfo("stun.samsungsmartcam.com"));
+            options.StunServers.Add(new NSL.UDP.Client.Info.StunServerInfo("stun.sysadminman.net"));
+            options.StunServers.Add(new NSL.UDP.Client.Info.StunServerInfo("stun.tatneft.ru"));
+            options.StunServers.Add(new NSL.UDP.Client.Info.StunServerInfo("stun.telefacil.com"));
+            options.StunServers.Add(new NSL.UDP.Client.Info.StunServerInfo("stun.ucallweconn.net"));
+            options.StunServers.Add(new NSL.UDP.Client.Info.StunServerInfo("stun.virtual-call.com"));
+            options.StunServers.Add(new NSL.UDP.Client.Info.StunServerInfo("stun.voxgratia.org"));
 
             options.InputCipher = new PacketNoneCipher();
 

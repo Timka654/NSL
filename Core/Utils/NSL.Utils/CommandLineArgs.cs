@@ -50,6 +50,14 @@ namespace NSL.Utils
             return _args.ContainsKey(key);
         }
 
+        public T GetValue<T>(string key, T defaultValue)
+        {
+            if (_args.TryGetValue(key, out var text))
+                return (T)Convert.ChangeType(text, typeof(T));
+
+            return defaultValue;
+        }
+
         public bool TryGetValue<T>(string key, ref T result)
         {
             if (_args.TryGetValue(key, out var text))
