@@ -232,7 +232,7 @@ namespace NSL.WebSockets
         /// <param name="buf">массив байт</param>
         /// <param name="offset">смещение с которого начинается передача</param>
         /// <param name="lenght">размер передаваемых данных</param>
-        public async void Send(byte[] buf, int offset, int lenght)
+        public void Send(byte[] buf, int offset, int lenght)
         {
             _sendLocker.WaitOne();
 
@@ -243,7 +243,9 @@ namespace NSL.WebSockets
 
                 //начинаем отправку данных
                 if (sclient != null)
-                    await sclient.SendAsync(new ArraySegment<byte>(sndBuffer, offset, lenght), WebSocketMessageType.Binary, true, CancellationToken.None);
+                     sclient.SendAsync(new ArraySegment<byte>(sndBuffer, offset, lenght), WebSocketMessageType.Binary, true, CancellationToken.None).ContinueWith(t => {
+                         _sendLocker.Set();
+                     });
             }
             catch (Exception ex)
             {
@@ -252,9 +254,9 @@ namespace NSL.WebSockets
 
                 //отключаем клиента, лишним не будет
                 Disconnect();
+                _sendLocker.Set();
             }
 
-            _sendLocker.Set();
         }
 
         public void SendEmpty(ushort packetId)
