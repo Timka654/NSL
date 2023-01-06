@@ -27,17 +27,22 @@ namespace NSL.SocketClient.Utils.SystemPackets
         {
         }
 
-        private DateTime mark;
-
         protected override void Receive(InputPacketBuffer data)
         {
             try
-            {
-                var now = DateTime.UtcNow;
+            { 
+                var now = data.ReadDateTime();
+                
+                now = DateTime.UtcNow; // todo check logic
+                
+                var serverDT = data.ReadDateTime();
 
-                var dt = data.ReadDateTime().AddMilliseconds(((now - mark).TotalMilliseconds / 2));
+                now = now.AddMilliseconds(-(base.Client.Ping / 2));
 
-                Client.ServerDateTimeOffset = now - dt;
+                Client.LocalDateTime = now;
+                Client.ServerDateTime = serverDT;
+
+                Client.ServerDateTimeOffset = now - serverDT;
             }
             catch (Exception ex)
             {

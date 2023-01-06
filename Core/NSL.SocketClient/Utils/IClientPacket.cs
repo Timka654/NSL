@@ -34,7 +34,7 @@ namespace NSL.SocketClient.Utils
                 return;
             }
 
-            Options.RunException(new Exception("Не возможно отправить сообщение, соединение не установлено"));
+            Options.RunException(new Exception($"Не возможно отправить сообщение '{packet.PacketId}', соединение не установлено"));
             SuccessSend = false;
         }
 

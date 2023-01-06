@@ -83,6 +83,8 @@ namespace NSL.SocketClient
 
                     RunAliveChecker(pingPongTokenSource.Token);
                 }
+                else
+                    Ping = 0;
             }
         }
 
@@ -128,6 +130,10 @@ namespace NSL.SocketClient
         #region ServerTime
 
         public TimeSpan ServerDateTimeOffset { get; internal set; }
+
+        public DateTime ServerDateTime { get; internal set; }
+
+        public DateTime LocalDateTime { get; internal set; }
 
         public DateTime? GetClientDateTime(DateTime? dateTime)
         {

@@ -14,15 +14,17 @@ namespace NSL.SocketServer.Utils.SystemPackets
 
         public override void Receive(T client, InputPacketBuffer data)
         {
-            Send(client);
+            Send(client, data.ReadDateTime());
         }
 
-        public static void Send(IServerNetworkClient client)
+        private static void Send(IServerNetworkClient client, DateTime clientTime)
         {
             var packet = new OutputPacketBuffer()
             {
                 PacketId = PacketId
             };
+
+            packet.WriteDateTime(clientTime);
 
             packet.WriteDateTime(DateTime.UtcNow);
 
