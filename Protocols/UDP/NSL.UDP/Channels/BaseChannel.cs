@@ -171,7 +171,13 @@ namespace NSL.UDP.Channels
             emptySumBytes.CopyTo(buffer[8..]);
             //using var hasher = new SHA256()
             //    #if NET
+#if  NET5_0_OR_GREATER
             return (ushort)(SHA256.HashData(buffer.ToArray()).Sum(x => x) % ushort.MaxValue);
+#endif
+            using (var hasher = SHA256.Create())
+            {
+                return (ushort)(hasher.ComputeHash(buffer.ToArray()).Sum(x => x) % ushort.MaxValue);
+            }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
