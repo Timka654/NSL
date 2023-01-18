@@ -5,7 +5,6 @@ using NSL.UDP.Client.Interface;
 using STUN;
 using System;
 using System.Buffers;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;

@@ -1,6 +1,5 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Scripting;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using NSL.Extensions.RPC.Generator.Attributes;
 using NSL.Extensions.RPC.Generator.Comparers;
@@ -8,9 +7,7 @@ using NSL.Extensions.RPC.Generator.Declarations;
 using NSL.Extensions.RPC.Generator.Generators;
 using NSL.Extensions.RPC.Generator.Models;
 using NSL.Extensions.RPC.Generator.Utils;
-using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 
 namespace NSL.Extensions.RPC.Generator

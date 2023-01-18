@@ -30,6 +30,7 @@
 
 	<ItemGroup>
 	  <ProjectReference Include="..\..\..\..\Core\Extensions\SocketCore.Extensions.Packet\NSL.SocketCore.Extensions.Packet.csproj" />
+	  <ProjectReference Include="..\..\..\..\Core\NSL.SocketClient\NSL.SocketClient.csproj" />
 	  <ProjectReference Include="..\..\NSL.TCP.Client\NSL.TCP.Client.csproj" />
 	  <ProjectReference Include="..\NSL.BuilderExtensions.TCP\NSL.BuilderExtensions.TCP.csproj" />
 	</ItemGroup>

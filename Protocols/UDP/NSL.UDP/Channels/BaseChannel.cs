@@ -4,12 +4,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
-using System.Net;
-using System.Text;
 using System.Threading.Tasks;
 using NSL.UDP.Interface;
 using System.Collections.Concurrent;
-using System.Transactions;
 using System.Security.Cryptography;
 using System.Runtime.CompilerServices;
 
@@ -172,7 +169,8 @@ namespace NSL.UDP.Channels
         public static ushort GetChecksum(Memory<byte> buffer)
         {
             emptySumBytes.CopyTo(buffer[8..]);
-
+            //using var hasher = new SHA256()
+            //    #if NET
             return (ushort)(SHA256.HashData(buffer.ToArray()).Sum(x => x) % ushort.MaxValue);
         }
 

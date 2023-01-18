@@ -1,7 +1,6 @@
 ﻿using Newtonsoft.Json;
 using NSL.SocketCore.Utils.Buffer;
 using System;
-using System.Net.Sockets;
 
 namespace NSL.SocketCore.Extensions.Buffer
 {

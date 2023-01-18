@@ -1,8 +1,8 @@
-﻿using NSL.SocketCore;
-using System.Net;
+﻿using System.Net;
 using System;
 using System.Net.Sockets;
 using NSL.SocketClient;
+using NSL.SocketCore;
 
 namespace NSL.UDP.Client
 {

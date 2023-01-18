@@ -14,15 +14,18 @@ namespace NSL.UDP
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override void Send(IClient client, bool disposeOnSend)
         {
-            if (client is not IUDPClient c)
-                throw new Exception($"{nameof(DgramPacket)} cannot be send with no {nameof(IClient<DgramPacket>)}");
+            if (client is IUDPClient c)
+            {
+                AppendHash = true;
 
-            AppendHash = true;
+                var buffer = CompilePacket(disposeOnSend);
 
-            var buffer = CompilePacket(disposeOnSend);
+                c.Send(Channel, buffer);
 
-            c.Send(Channel, buffer);
-
+                return;
+            }
+            
+            throw new Exception($"{nameof(DgramPacket)} cannot be send with no {nameof(IClient<DgramPacket>)}");
         }
     }
 }

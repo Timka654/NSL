@@ -10,9 +10,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
-using System.Threading;
-using System.Threading.Channels;
-using System.Threading.Tasks;
 
 namespace NSL.UDP
 {
@@ -27,7 +24,7 @@ namespace NSL.UDP
 
         #region Channels
 
-        protected Dictionary<UDPChannelEnum, BaseChannel<TClient, TParent>> channels = new();
+        protected Dictionary<UDPChannelEnum, BaseChannel<TClient, TParent>> channels = new Dictionary<UDPChannelEnum, BaseChannel<TClient, TParent>>();
 
         #endregion
 
