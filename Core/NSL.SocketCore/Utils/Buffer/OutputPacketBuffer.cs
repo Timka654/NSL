@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace NSL.SocketCore.Utils.Buffer
@@ -84,6 +85,7 @@ namespace NSL.SocketCore.Utils.Buffer
         /// Запись значения float (4 bytes)
         /// </summary>
         /// <param name="value">значение</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public unsafe void WriteFloat(float value)
         {
             uint TmpValue = *(uint*)&value;
@@ -99,6 +101,7 @@ namespace NSL.SocketCore.Utils.Buffer
         /// Запись значения float (4 bytes)
         /// </summary>
         /// <param name="value">значение</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public unsafe void WriteFloat32(float value)
             => WriteFloat(value);
 
@@ -106,6 +109,7 @@ namespace NSL.SocketCore.Utils.Buffer
         /// Запись значения double (8 bytes)
         /// </summary>
         /// <param name="value">значение</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public unsafe void WriteDouble(double value)
         {
             ulong TmpValue = *(ulong*)&value;
@@ -125,6 +129,7 @@ namespace NSL.SocketCore.Utils.Buffer
         /// Запись значения double (8 bytes)
         /// </summary>
         /// <param name="value">значение</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public unsafe void WriteFloat64(double value)
             => WriteDouble(value);
 
@@ -141,6 +146,7 @@ namespace NSL.SocketCore.Utils.Buffer
         /// Запись значения short (int16, 2 байта)
         /// </summary>
         /// <param name="value">значение</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void WriteInt16(short value)
         {
             _buffer[0] = (byte)value;
@@ -152,6 +158,7 @@ namespace NSL.SocketCore.Utils.Buffer
         /// Запись значения ushort (uint16, 2 байта)
         /// </summary>
         /// <param name="value">значение</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void WriteUInt16(ushort value)
         {
             _buffer[0] = (byte)value;
@@ -163,6 +170,7 @@ namespace NSL.SocketCore.Utils.Buffer
         /// Запись значения int (int32, 4 байта)
         /// </summary>
         /// <param name="value">значение</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void WriteInt32(int value)
         {
             _buffer[0] = (byte)value;
@@ -176,6 +184,7 @@ namespace NSL.SocketCore.Utils.Buffer
         /// Запись значения uint (uint32, 4 байта)
         /// </summary>
         /// <param name="value">значение</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void WriteUInt32(uint value)
         {
             _buffer[0] = (byte)value;
@@ -189,6 +198,7 @@ namespace NSL.SocketCore.Utils.Buffer
         /// Запись значения long (int64, 8 байта)
         /// </summary>
         /// <param name="value">значение</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void WriteInt64(long value)
         {
             _buffer[0] = (byte)value;
@@ -206,6 +216,7 @@ namespace NSL.SocketCore.Utils.Buffer
         /// Запись значения ulong (uint64, 8 байта)
         /// </summary>
         /// <param name="value">значение</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void WriteUInt64(ulong value)
         {
             _buffer[0] = (byte)value;
@@ -223,6 +234,7 @@ namespace NSL.SocketCore.Utils.Buffer
         /// Запись значения bool (1 байт)
         /// </summary>
         /// <param name="value">значение</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void WriteBool(bool value)
         {
             WriteByte((byte)(value ? 1 : 0));
@@ -232,6 +244,7 @@ namespace NSL.SocketCore.Utils.Buffer
         /// Запись значения string, с записью заголовка c размером ushort (2 байта), до 36к симв
         /// </summary>
         /// <param name="value">значение</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void WriteString16(string value)
         {
             if (value == null)
@@ -250,6 +263,7 @@ namespace NSL.SocketCore.Utils.Buffer
         /// Запись значения string, с записью заголовка c размером  (4 байта), до 1.2ккк симв
         /// </summary>
         /// <param name="value">текст</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void WriteString32(string value)
         {
             if (value == null)
@@ -265,6 +279,7 @@ namespace NSL.SocketCore.Utils.Buffer
                 Write(buf);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void WriteCollection<T>(IEnumerable<T> arr, Action<OutputPacketBuffer, T> writeAction)
         {
             if (arr == default)
@@ -281,6 +296,7 @@ namespace NSL.SocketCore.Utils.Buffer
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void WriteCollection<T>(IEnumerable<T> arr, Action<T> writeAction)
         {
             if (arr == default)
@@ -297,6 +313,7 @@ namespace NSL.SocketCore.Utils.Buffer
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void WriteNullable<T>(Nullable<T> value, Action trueAction)
             where T : struct
         {
@@ -309,6 +326,7 @@ namespace NSL.SocketCore.Utils.Buffer
             WriteBool(false);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void WriteNullableClass<T>(T value, Action trueAction)
             where T : class
         {
@@ -321,16 +339,19 @@ namespace NSL.SocketCore.Utils.Buffer
             WriteBool(false);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void WriteDateTime(DateTime value)
         {
             WriteInt64((value - MinDatetimeValue).Ticks);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void WriteTimeSpan(TimeSpan value)
         {
             WriteInt64(value.Ticks);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void WriteGuid(Guid value)
         {
             var arr = value.ToByteArray();
@@ -338,6 +359,7 @@ namespace NSL.SocketCore.Utils.Buffer
             Write(arr, 0, 16);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Write(byte[] buf)
         {
             Write(buf, 0, buf.Length);
@@ -349,6 +371,7 @@ namespace NSL.SocketCore.Utils.Buffer
         /// </summary>
         /// <param name="appendHash">добавить хеш в пакет</param>
         /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public byte[] CompilePacket(bool dispose = true)
         {
             base.Seek(0, SeekOrigin.Begin);

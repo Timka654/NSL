@@ -132,13 +132,11 @@ namespace NSL.UDP.Client
         {
             if (token.IsCancellationRequested)
                 return;
-
-            var poolMem = MemoryPool<byte>.Shared.Rent(options.ReceiveBufferSize);
+            var poolMem = ArrayPool<byte>.Shared.Rent(options.ReceiveBufferSize);
 
             SocketAsyncEventArgs args = new SocketAsyncEventArgs();
 
-            args.SetBuffer(poolMem.Memory);
-            args.UserToken = poolMem;
+            args.SetBuffer(poolMem);
             args.RemoteEndPoint = new IPEndPoint(IPAddress.Any, 0);
             args.Completed += Args_Completed;
 

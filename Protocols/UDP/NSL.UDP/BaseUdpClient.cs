@@ -2,15 +2,21 @@
 using NSL.SocketCore.Utils;
 using NSL.SocketCore.Utils.Buffer;
 using NSL.SocketCore.Utils.Exceptions;
+using NSL.UDP.Channels;
+using NSL.UDP.Enums;
+using NSL.UDP.Interface;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Threading;
+using System.Threading.Channels;
 using System.Threading.Tasks;
 
 namespace NSL.UDP
 {
-    public abstract class BaseUDPClient<TClient, TParent> : IClient<DgramPacket>
+    public abstract class BaseUDPClient<TClient, TParent> : IClient<DgramPacket>, IUDPClient
         where TClient : INetworkClient
         where TParent : BaseUDPClient<TClient, TParent>
     {
@@ -18,6 +24,12 @@ namespace NSL.UDP
 
         public event ReceivePacketDebugInfo<TParent> OnReceivePacket;
         public event SendPacketDebugInfo<TParent> OnSendPacket;
+
+        #region Channels
+
+        protected Dictionary<UDPChannelEnum, BaseChannel<TClient, TParent>> channels = new();
+
+        #endregion
 
         #region Network
 
@@ -66,6 +78,13 @@ namespace NSL.UDP
             this.endPoint = endPoint;
             this.listenerSocket = listenerSocket;
         }
+
+        protected virtual void Initialize()
+        { 
+            channels.Add(UDPChannelEnum.Reliable, new ReliableChannel<TClient, TParent>(this));
+            channels.Add(UDPChannelEnum.Unreliable, new UnreliableChannel<TClient, TParent>(this));
+        }
+
 
         protected abstract TParent GetParent();
 
@@ -168,89 +187,45 @@ namespace NSL.UDP
             Send(dpkg, disposeOnSend);
         }
 
-        public void Send(byte[] buffer)
-            => Send(buffer, 0, buffer.Length);
+        public void Send(UDPChannelEnum channel, byte[] buffer)
+        {
+            var sndBuf = outputCipher.Encode(buffer, 0, buffer.Length);
 
-        public async void Send(byte[] buf, int offset, int lenght)
+            channels.First(x=> channel.HasFlag(x.Key)).Value.Send(channel, sndBuf);
+        }
+
+        public void Send(byte[] buffer)
+            => throw new NotImplementedException();
+
+        public void Send(byte[] buf, int offset, int lenght)
+            => throw new NotImplementedException();
+
+        internal void SocketSend(byte[] sndBuffer)
         {
             try
             {
                 if (listenerSocket == null)
                     return;
 
-                //шифруем данные
-                byte[] sndBuffer = outputCipher.Encode(buf, offset, lenght);
-
-                await Fragmentate(sndBuffer);
+                listenerSocket.SendTo(sndBuffer, SocketFlags.None, endPoint);
             }
             catch (Exception ex)
             {
-                AddWaitPacket(buf, offset, lenght);
+                AddWaitPacket(sndBuffer, 0, sndBuffer.Length);
                 RunException(ex);
 
                 //отключаем клиента, лишним не будет
                 Disconnect();
             }
-
         }
 
-        ushort currentPID = 0;
+        uint currentPID = 0;
 
-        byte[] nlpBytes = new byte[] { 0 };
-
-        private ushort GetPID()
+        public uint CreatePID()
         {
             lock (this)
             {
                 return currentPID++;
-            }
-        }
-
-        private async Task Fragmentate(byte[] arr)
-        {
-            var count = (int)Math.Ceiling(arr.Length * 1.0 / options.ReceiveBufferSize);
-
-            var ppid = GetPID();
-
-            var pidBytes = BitConverter.GetBytes(ppid);
-
-            #region LP
-
-            var lpBuf = (Memory<byte>)new byte[5];
-
-            BitConverter.GetBytes((byte)1)
-                .CopyTo(lpBuf);
-
-            pidBytes
-                .CopyTo(lpBuf[1..]);
-
-            BitConverter.GetBytes((ushort)count)
-                .CopyTo(lpBuf[3..]);
-
-            await listenerSocket.SendToAsync(lpBuf.ToArray(), SocketFlags.None, endPoint);
-
-            #endregion
-
-            ushort h = default;
-            for (int i = 0; i < arr.Length; i += options.ReceiveBufferSize)
-            {
-                var dest = i + options.ReceiveBufferSize > arr.Length ? arr[i..] : arr[i..(i + options.ReceiveBufferSize)];
-
-                Memory<byte> pbuf = new byte[5 + dest.Length];
-
-                nlpBytes
-                    .CopyTo(pbuf);
-
-                pidBytes
-                    .CopyTo(pbuf[1..]);
-
-                BitConverter.GetBytes(h++)
-                    .CopyTo(pbuf[3..]);
-
-                dest
-                    .CopyTo(pbuf[5..]);
-
-                await listenerSocket.SendToAsync(pbuf.ToArray(), SocketFlags.None, endPoint);
             }
         }
 
@@ -280,34 +255,6 @@ namespace NSL.UDP
         protected virtual void OnSend(DgramPacket rbuff, string stackTrace = "")
         {
             OnSendPacket?.Invoke(parent, rbuff.PacketId, rbuff.PacketLenght, stackTrace);
-        }
-
-        /// <summary>
-        /// Завершение отправки данных
-        /// </summary>
-        /// <param name="r"></param>
-        private void EndSend(IAsyncResult r)
-        {
-            //замыкаем это все в блок try, если клиент отключился то EndSend может вернуть ошибку
-            try
-            {
-                //получаем размер переданных данных
-                int len = listenerSocket?.EndSend(r) ?? 0;
-                //при некоторых ошибках размер возвращает 0 или -1, проверяем
-                if (len < 1)
-                    throw new ConnectionLostException(GetRemotePoint(), false);
-            }
-            catch (Exception ex)
-            {
-                var sas = ((SendAsyncState)r.AsyncState);
-                AddWaitPacket(sas.buf, sas.offset, sas.len);
-                RunException(ex);
-                Disconnect();
-            }
-            catch
-            {
-                Disconnect();
-            }
         }
     }
 }
