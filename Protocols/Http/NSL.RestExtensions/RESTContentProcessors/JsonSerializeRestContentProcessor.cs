@@ -10,14 +10,26 @@ namespace NSL.RestExtensions.RESTContentProcessors
     {
         public virtual async Task<TValue> GetContent<TValue>(HttpResponseMessage message, HttpContent value)
         {
+            if (message?.Content == null)
+                return default;
+
             var body = await message.Content.ReadAsStringAsync();
+
+            if (string.IsNullOrWhiteSpace(body))
+                return default;
 
             return JsonConvert.DeserializeObject<TValue>(body);
         }
 
         public async Task<Dictionary<string, List<string>>> GetErrors(HttpResponseMessage message, HttpContent value)
         {
+            if (message?.Content == null)
+                return new Dictionary<string, List<string>>();
+
             var body = await message.Content.ReadAsStringAsync();
+
+            if (string.IsNullOrWhiteSpace(body))
+                return new Dictionary<string, List<string>>();
 
             return JsonConvert.DeserializeObject<Dictionary<string, List<string>>>(body);
         }

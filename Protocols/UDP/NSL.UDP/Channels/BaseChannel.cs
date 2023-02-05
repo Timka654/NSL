@@ -169,8 +169,7 @@ namespace NSL.UDP.Channels
         public static ushort GetChecksum(Memory<byte> buffer)
         {
             emptySumBytes.CopyTo(buffer[8..]);
-            //using var hasher = new SHA256()
-            //    #if NET
+
 #if  NET5_0_OR_GREATER
             return (ushort)(SHA256.HashData(buffer.ToArray()).Sum(x => x) % ushort.MaxValue);
 #endif
