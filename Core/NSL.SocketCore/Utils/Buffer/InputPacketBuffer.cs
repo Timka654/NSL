@@ -393,15 +393,25 @@ namespace NSL.SocketCore.Utils.Buffer
         /// <returns></returns>
         public byte[] Read(int len)
         {
+            if (base.Length - this.Position < len)
+                throw new OutOfMemoryException();
+
             byte[] buf = new byte[len];
+
             base.Read(buf, 0, len);
+
             return buf;
         }
 
         public async Task<byte[]> ReadAsync(int len)
         {
+            if (base.Length - this.Position < len)
+                throw new OutOfMemoryException();
+
             byte[] buf = new byte[len];
+
             await base.ReadAsync(buf, 0, len);
+
             return buf;
         }
 
