@@ -1,4 +1,6 @@
-﻿namespace NSL.SocketCore.Utils.Cipher
+﻿using System;
+
+namespace NSL.SocketCore.Utils.Cipher
 {
     public class PacketNoneCipher : IPacketCipher
     {
@@ -9,6 +11,10 @@
 
         public byte[] Decode(byte[] buffer, int offset, int lenght)
         {
+            byte[] dest = new byte[lenght - offset];
+
+            System.Buffer.BlockCopy(buffer, offset, dest, 0, dest.Length);
+
             return buffer;
         }
 
