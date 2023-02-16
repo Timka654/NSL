@@ -11,11 +11,11 @@ namespace NSL.SocketCore.Utils.Cipher
 
         public byte[] Decode(byte[] buffer, int offset, int lenght)
         {
-            byte[] dest = new byte[lenght - offset];
+            byte[] dest = new byte[lenght];
 
-            System.Buffer.BlockCopy(buffer, offset, dest, 0, dest.Length);
+            System.Buffer.BlockCopy(buffer, offset, dest, 0, lenght);
 
-            return buffer;
+            return dest;
         }
 
         public void Dispose()
