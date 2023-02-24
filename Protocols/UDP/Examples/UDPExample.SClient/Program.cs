@@ -3,21 +3,32 @@ using UDPExample;
 
 var discoverer = new NatDiscoverer();
 
-var device = await discoverer.DiscoverDeviceAsync( PortMapper.Pmp, new CancellationTokenSource());
+var discoverToken = new CancellationTokenSource();
 
-//var exMappings = device.GetAllMappingsAsync();
+discoverToken.CancelAfter(6_000);
+
 try
 {
-    await device.CreatePortMapAsync(new Mapping(Protocol.Udp, 5553, 5553));
-}
-catch (MappingException mex)
-{
+	var device = await discoverer.DiscoverDeviceAsync(PortMapper.Pmp, discoverToken);
 
+	//var exMappings = device.GetAllMappingsAsync();
+	try
+	{
+		await device.CreatePortMapAsync(new Mapping(Protocol.Udp, 5553, 5553));
+	}
+	catch (MappingException mex)
+	{
+
+	}
+
+}
+catch (TaskCanceledException)
+{
 }
 
 new ReceiverExample();
 
 while (true)
 {
-    Thread.Sleep(100);
+	Thread.Sleep(100);
 }
