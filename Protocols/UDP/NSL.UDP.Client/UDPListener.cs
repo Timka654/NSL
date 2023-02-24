@@ -83,7 +83,7 @@ namespace NSL.UDP.Client
 
                         var stunEndPoint = new IPEndPoint(stunIP, item.Port);
 
-                        StunInformation = STUNClient.Query(stunEndPoint, options.StunQueryType, false);
+                        StunInformation = STUNClient.Query(listener, stunEndPoint, options.StunQueryType);
 
                         if (StunInformation.QueryError != STUNQueryError.Success)
                             options.RunException(new StunExceptionInfo(item, StunInformation, StunExceptionInfo.ErrorTypeEnum.QueryResultError, stunEndPoint), default);

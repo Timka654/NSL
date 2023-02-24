@@ -11,6 +11,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\..\Open.NAT\Open.NAT\Open.Nat.csproj" />
 		<ProjectReference Include="..\UDPExample\UDPExample.csproj" />
 	</ItemGroup>
 
