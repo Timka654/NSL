@@ -9,256 +9,181 @@ using NSL.UDP.Interface;
 using System.Collections.Concurrent;
 using System.Security.Cryptography;
 using System.Runtime.CompilerServices;
+using NSL.UDP.Packet;
 
 namespace NSL.UDP.Channels
 {
-    public abstract class BaseChannel<TClient, TParent>
-        where TClient : INetworkClient
-        where TParent : BaseUDPClient<TClient, TParent>
-    {
-        protected readonly BaseUDPClient<TClient, TParent> udpClient;
+	public abstract class BaseChannel<TClient, TParent>
+		where TClient : INetworkClient
+		where TParent : BaseUDPClient<TClient, TParent>
+	{
+		protected readonly BaseUDPClient<TClient, TParent> udpClient;
 
-        protected readonly IUDPOptions UDPOptions;
+		protected readonly IUDPOptions UDPOptions;
 
-        public abstract UDPChannelEnum Channel { get; }
+		public abstract UDPChannelEnum Channel { get; }
 
-        public BaseChannel(BaseUDPClient<TClient, TParent> udpClient)
-        {
-            this.udpClient = udpClient;
+		public BaseChannel(BaseUDPClient<TClient, TParent> udpClient)
+		{
+			this.udpClient = udpClient;
 
-            UDPOptions = udpClient.Options as IUDPOptions;
-        }
+			UDPOptions = udpClient.Options as IUDPOptions;
+		}
 
-        protected virtual void AfterBuild(BaseChannel<TClient, TParent> fromChannel, PacketWaitTemp packet) { }
+		protected virtual void AfterBuild(BaseChannel<TClient, TParent> fromChannel, PacketWaitTemp packet) { }
 
-        protected virtual void InvalidRecvChecksum(BaseChannel<TClient, TParent> fromChannel, SocketAsyncEventArgs packet) { }
+		protected virtual void InvalidRecvChecksum(BaseChannel<TClient, TParent> fromChannel, SocketAsyncEventArgs packet) { }
 
-        public virtual void Send(UDPChannelEnum channel, byte[] data)
-        {
-            var count = (int)Math.Ceiling((double)data.Length / UDPOptions.SendFragmentSize);
+		public virtual void Send(UDPChannelEnum channel, byte[] data)
+		{
+			var count = (int)Math.Ceiling((double)data.Length / UDPOptions.SendFragmentSize);
 
-            var ppid = udpClient.CreatePID();
+			var ppid = CreatePID();
 
-            var pidBytes = BitConverter.GetBytes(ppid);
+			var pidBytes = BitConverter.GetBytes(ppid);
 
-            var channelBytes = new byte[] { (byte)channel };
+			var packet = new PacketWaitTemp()
+			{
+				PID = ppid,
+				Head = LPacket.CreateHeader(pidBytes, (byte)channel, (ushort)count),
+				Parts = DataPacket.CreateParts(pidBytes, (byte)channel, data, UDPOptions)
+			};
 
-            var packet = new PacketWaitTemp()
-            {
-                PID = ppid,
-                Head = CreateHeader(pidBytes, channelBytes, (ushort)count),
-                Parts = CreateParts(pidBytes, channelBytes, data)
-            };
+			AfterBuild(this, packet);
 
-            AfterBuild(this, packet);
+			SendFull(packet);
+		}
 
-            SendFull(packet);
-        }
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		protected void SendFull(PacketWaitTemp packet)
+		{
+			SendHead(packet);
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private Memory<byte> CreateHeader(byte[] pidBytes, byte[] channelBytes, ushort count)
-        {
-            var lpBuf = (Memory<byte>)new byte[10];
+			SendParts(packet);
+		}
 
-            lpBytes
-                .CopyTo(lpBuf);
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		protected void SendHead(PacketWaitTemp packet)
+		{
+			udpClient.SocketSend(packet.Head.ToArray());
+		}
 
-            pidBytes
-                .CopyTo(lpBuf[1..]);
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		protected void SendParts(PacketWaitTemp packet)
+		{
+			Parallel.ForEach(packet.Parts, data => udpClient.SocketSend(data.ToArray()));
+		}
 
-            channelBytes
-                .CopyTo(lpBuf[5..]);
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		protected void SendParts(PacketWaitTemp packet, int fromPartInc, int toPartExc)
+		{
+			Parallel.For(fromPartInc, toPartExc, idx => udpClient.SocketSend(packet.Parts.ElementAt(idx).ToArray()));
+		}
 
-            BitConverter.GetBytes(count)
-                .CopyTo(lpBuf[6..]);
+		protected ConcurrentDictionary<uint, PacketReciveTemp> packetReceiveBuffer = new ConcurrentDictionary<uint, PacketReciveTemp>();
 
-            var lpBufRes = lpBuf.ToArray();
+		public virtual void Receive(UDPChannelEnum channel, SocketAsyncEventArgs result)
+		{
+			var data = result.MemoryBuffer[..result.BytesTransferred];
 
-            var cs = GetChecksum(lpBufRes);
+			var checksum = UDPPacket.ReadChecksum(data);
 
-            BitConverter.GetBytes(cs)
-                .CopyTo(lpBuf[8..]);
+			if (!checksum.Equals(UDPPacket.GetChecksum(data)))
+			{
+				InvalidRecvChecksum(this, result);
+				return;
+			}
 
-            return lpBuf;
-        }
+			var pid = UDPPacket.ReadPID(data);
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private IEnumerable<Memory<byte>> CreateParts(byte[] pidBytes, byte[] channelBytes, byte[] data)
-        {
-            List<Memory<byte>> result = new List<Memory<byte>>();
+			var packet = packetReceiveBuffer.GetOrAdd(
+				pid,
+				id => new PacketReciveTemp(id));
 
-            ushort h = default;
+			if (LPacket.ReadISLP(data))
+			{
+				packet.Lenght = LPacket.ReadPacketLen(data);
 
-            for (int i = 0; i < data.Length; i += UDPOptions.SendFragmentSize)
-            {
-                var dest = i + UDPOptions.SendFragmentSize > data.Length ? data[i..] : data[i..(i + UDPOptions.SendFragmentSize)];
+				return;
+			}
 
-                Memory<byte> pbuf = new byte[10 + dest.Length];
+			if (CompPacket.ReadISComp(data))
+			{
 
-                dataBytes
-                    .CopyTo(pbuf);
+				return;
+			}
 
-                pidBytes
-                    .CopyTo(pbuf[1..]);
+			lock (packet.ContainsParts)
+			{
+				if (packet.ContainsParts.Contains(pid))
+					return;
 
-                channelBytes
-                    .CopyTo(pbuf[5..]);
+				packet.ContainsParts.Add(pid);
+			}
 
-                BitConverter.GetBytes(h++)
-                    .CopyTo(pbuf[6..]);
+			packet.Parts.Add(data[6..result.BytesTransferred]);
 
-                dest
-                    .CopyTo(pbuf[10..]);
+			if (packet.Ready() &&
+				packetReceiveBuffer.TryRemove(packet.PID, out packet))
+			{
+				udpClient.Receive(packet.Parts
+				.OrderBy(x => PacketReciveTemp.ReadPartDataOffset(x))
+				.SelectMany(x => x[2..].ToArray())
+				.ToArray());
+			}
+		}
 
-                var pbufResult = pbuf.ToArray();
 
-                BitConverter.GetBytes(GetChecksum(pbufResult))
-                    .CopyTo(pbuf[8..]);
 
-                result.Add(pbuf);
-            }
+		protected struct PacketWaitTemp
+		{
+			public uint PID;
 
-            return result;
-        }
+			public Memory<byte> Head;
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected void SendFull(PacketWaitTemp packet)
-        {
-            SendHead(packet);
+			public IEnumerable<Memory<byte>> Parts;
+		}
 
-            SendParts(packet);
-        }
+		protected class PacketReciveTemp
+		{
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			public static ushort ReadPartDataOffset(Memory<byte> buffer) => BitConverter.ToUInt16(buffer.Span);
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected void SendHead(PacketWaitTemp packet)
-        {
-            udpClient.SocketSend(packet.Head.ToArray());
-        }
+			public uint PID;
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected void SendParts(PacketWaitTemp packet)
-        {
-            Parallel.ForEach(packet.Parts, data => udpClient.SocketSend(data.ToArray()));
-        }
+			public ushort Lenght;
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected void SendParts(PacketWaitTemp packet, int fromPartInc, int toPartExc)
-        {
-            Parallel.For(fromPartInc, toPartExc, idx => udpClient.SocketSend(packet.Parts.ElementAt(idx).ToArray()));
-        }
+			public ConcurrentBag<Memory<byte>> Parts;
 
-        protected static byte[] dataBytes = new byte[] { 1 };
-        protected static byte[] lpBytes = new byte[] { 0 };
-        protected static byte[] emptySumBytes = new byte[] { 0, 0 };
+			public ConcurrentBag<ushort> ContainsParts;
 
+			public PacketReciveTemp(uint PID, ushort len) : this(PID)
+			{
+				this.Lenght = len;
+			}
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ushort ReadPID(Memory<byte> buffer) => BitConverter.ToUInt16(buffer.Span[1..]);
+			public PacketReciveTemp(uint PID)
+			{
+				this.PID = PID;
+				this.Lenght = 0;
+				Parts = new ConcurrentBag<Memory<byte>>();
+				ContainsParts = new ConcurrentBag<ushort>();
+			}
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static UDPChannelEnum ReadChannel(Memory<byte> buffer) => (UDPChannelEnum)buffer.Span[5];
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			public bool Ready() => Lenght > 0 && Parts.Count == Lenght;
+		}
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ushort ReadChecksum(Memory<byte> buffer) => BitConverter.ToUInt16(buffer.Span[8..]);
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ushort GetChecksum(byte[] buffer)
-            => GetChecksum(buffer.AsMemory());
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ushort GetChecksum(Memory<byte> buffer)
-        {
-            emptySumBytes.CopyTo(buffer[8..]);
+		uint currentPID = 0;
 
-#if  NET5_0_OR_GREATER
-            return (ushort)(SHA256.HashData(buffer.ToArray()).Sum(x => x) % ushort.MaxValue);
-#endif
-            using (var hasher = SHA256.Create())
-            {
-                return (ushort)(hasher.ComputeHash(buffer.ToArray()).Sum(x => x) % ushort.MaxValue);
-            }
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool ReadLP(Memory<byte> buffer) => (DgramHeadTypeEnum)buffer.Span[0] == DgramHeadTypeEnum.LP;
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ushort ReadLPLen(Memory<byte> buffer) => BitConverter.ToUInt16(buffer.Span[6..]);
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ushort ReadPDataOffset(Memory<byte> buffer) => BitConverter.ToUInt16(buffer.Span);
-
-
-        protected ConcurrentDictionary<uint, PacketReciveTemp> packetReceiveBuffer = new ConcurrentDictionary<uint, PacketReciveTemp>();
-
-        public virtual void Receive(UDPChannelEnum channel, SocketAsyncEventArgs result)
-        {
-            var data = result.MemoryBuffer[..result.BytesTransferred];
-
-            var checksum = ReadChecksum(data);
-
-            if (!checksum.Equals(GetChecksum(data)))
-            {
-                InvalidRecvChecksum(this, result);
-                return;
-            }
-
-            var pid = ReadPID(data);
-
-            var isLP = ReadLP(data);
-
-
-            var packet = packetReceiveBuffer.GetOrAdd(
-                pid,
-                id => new PacketReciveTemp(id));
-
-            if (isLP)
-                packet.Lenght = ReadLPLen(data);
-            else
-                packet.Parts.Add(data[6..result.BytesTransferred]);
-
-            if (packet.Ready() &&
-                packetReceiveBuffer.TryRemove(packet.PID, out packet))
-            {
-                udpClient.Receive(packet.Parts
-                .OrderBy(x => ReadPDataOffset(x))
-                .SelectMany(x => x[10..].ToArray())
-                .ToArray());
-            }
-        }
-
-        protected struct PacketWaitTemp
-        {
-            public uint PID;
-
-            public Memory<byte> Head;
-
-            public IEnumerable<Memory<byte>> Parts;
-        }
-
-
-        protected class PacketReciveTemp
-        {
-            public uint PID;
-
-            public ushort Lenght;
-
-            public ConcurrentBag<Memory<byte>> Parts;
-
-            public PacketReciveTemp(uint PID, ushort len) : this(PID)
-            {
-                this.Lenght = len;
-            }
-
-            public PacketReciveTemp(uint PID)
-            {
-                this.PID = PID;
-                this.Lenght = 0;
-                Parts = new ConcurrentBag<Memory<byte>>();
-            }
-
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public bool Ready() => Lenght > 0 && Parts.Count == Lenght;
-        }
-    }
+		public uint CreatePID()
+		{
+			lock (this)
+			{
+				return currentPID++;
+			}
+		}
+	}
 }

@@ -11,26 +11,33 @@ namespace NSL.UDP.Channels
     {
         public override UDPChannelEnum Channel => UDPChannelEnum.Unreliable;
 
-        Dictionary<UDPChannelEnum, BaseChannel<TClient, TParent>> channels = new Dictionary<UDPChannelEnum, BaseChannel<TClient, TParent>>();
+		BaseChannel<TClient, TParent> orderedChannel;
+		BaseChannel<TClient, TParent> unorderedChannel;
 
-        public UnreliableChannel(BaseUDPClient<TClient, TParent> udpClient) : base(udpClient)
-        {
-            channels.Add(UDPChannelEnum.UnreliableOrdered, new OrderedChannel<TClient, TParent>(udpClient, this));
-            channels.Add(UDPChannelEnum.UnreliableUnordered, new UnorderedChannel<TClient, TParent>(udpClient, this));
-        }
+		public UnreliableChannel(BaseUDPClient<TClient, TParent> udpClient) : base(udpClient)
+		{
+			orderedChannel = new OrderedChannel<TClient, TParent>(udpClient, this);
+			unorderedChannel = new UnorderedChannel<TClient, TParent>(udpClient, this);
+		}
 
-        public override void Send(UDPChannelEnum channel, byte[] data)
-        {
-            if (!channels.TryGetValue(channel, out var c_channel))
-                throw new KeyNotFoundException();
+		public override void Send(UDPChannelEnum channel, byte[] data)
+		{
+			if (channel.HasFlag(UDPChannelEnum.Ordered))
+				orderedChannel.Send(channel, data);
+			else if (channel.HasFlag(UDPChannelEnum.Unordered))
+				unorderedChannel.Send(channel, data);
+			else
+				throw new KeyNotFoundException(channel.ToString());
+		}
 
-            c_channel.Send(channel, data);
-        }
-
-        public override void Receive(UDPChannelEnum channel, SocketAsyncEventArgs result)
-        {
-            if (channels.TryGetValue(channel, out var ch))
-                ch.Receive(channel, result);
-        }
-    }
+		public override void Receive(UDPChannelEnum channel, SocketAsyncEventArgs result)
+		{
+			if (channel.HasFlag(UDPChannelEnum.Ordered))
+				orderedChannel.Receive(channel, result);
+			else if (channel.HasFlag(UDPChannelEnum.Unordered))
+				unorderedChannel.Receive(channel, result);
+			else
+				throw new KeyNotFoundException(channel.ToString());
+		}
+	}
 }

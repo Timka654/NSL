@@ -19,6 +19,39 @@ namespace NSL.SocketCore.Extensions.Buffer
 
         private readonly INetworkClient client;
 
+        //public async Task SendWaitRequest(WaitablePacketBuffer buffer, Func<InputPacketBuffer, Task> onResult, bool disposeOnSend = true)
+        //{
+        //    InputPacketBuffer data = default;
+
+        //    using (ManualResetEvent locker = new ManualResetEvent(false))
+        //    {
+        //        Guid rid;
+
+        //        do
+        //        {
+        //            rid = Guid.NewGuid();
+        //        } while (!requests.TryAdd(rid, (input) => { data = input; locker.Set(); }));
+
+        //        buffer.WithRecvIdentity(rid);
+
+        //        client.Network.Send(buffer, disposeOnSend);
+
+        //        while (!await Task.Run(() => locker.WaitOne(client.AliveState ? client.AliveCheckTimeOut / 2 : 1000)))
+        //        {
+        //            if (client?.GetState() == false)
+        //            {
+        //                requests.TryRemove(rid, out _);
+        //                break;
+        //            }
+        //        }
+
+        //    }
+
+        //    await onResult(data);
+
+        //    data?.Dispose();
+        //}
+
         public async Task SendWaitRequest(WaitablePacketBuffer buffer, Func<InputPacketBuffer, Task> onResult, bool disposeOnSend = true)
         {
             InputPacketBuffer data = default;
@@ -30,21 +63,20 @@ namespace NSL.SocketCore.Extensions.Buffer
                 do
                 {
                     rid = Guid.NewGuid();
-                } while (!requests.TryAdd(rid, (input) => { data = input; locker.Set(); }));
+                } while (!requests.TryAdd(rid, (input) => 
+                { 
+                    data = input; 
+                    locker.Set();
+                    requests.TryRemove(rid, out _);
+                }));
 
                 buffer.WithRecvIdentity(rid);
 
                 client.Network.Send(buffer, disposeOnSend);
 
-                while (!await Task.Run(() => locker.WaitOne(client.AliveState ? client.AliveCheckTimeOut / 2 : 1000)))
+                while (requests.ContainsKey(rid) && !await Task.Run(() => locker.WaitOne(client.AliveState ? client.AliveCheckTimeOut / 2 : 1000)))
                 {
-                    if (client?.GetState() == false)
-                    {
-                        requests.TryRemove(rid, out _);
-                        break;
-                    }
                 }
-
             }
 
             await onResult(data);
@@ -54,7 +86,7 @@ namespace NSL.SocketCore.Extensions.Buffer
 
         public void ProcessWaitResponse(InputPacketBuffer data)
         {
-            if (requests.TryRemove(data.ReadGuid(), out var waitAction))
+            if (requests.TryGetValue(data.ReadGuid(), out var waitAction))
             {
                 data.ManualDisposing = true;
                 waitAction(data);
@@ -65,8 +97,7 @@ namespace NSL.SocketCore.Extensions.Buffer
         {
             foreach (var item in requests.Keys.ToArray())
             {
-                if (requests.TryRemove(item, out var value))
-                    value.Invoke(null);
+                requests.TryRemove(item, out var value);
             }
         }
     }

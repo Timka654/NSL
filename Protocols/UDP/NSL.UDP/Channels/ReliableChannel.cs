@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using NSL.UDP.Enums;
 using System.Net.Sockets;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace NSL.UDP.Channels
 {
@@ -11,26 +12,33 @@ namespace NSL.UDP.Channels
     {
         public override UDPChannelEnum Channel => UDPChannelEnum.Reliable;
 
-        Dictionary<UDPChannelEnum, BaseChannel<TClient, TParent>> channels = new Dictionary<UDPChannelEnum, BaseChannel<TClient, TParent>>();
+        BaseChannel<TClient, TParent> orderedChannel;
+        BaseChannel<TClient, TParent> unorderedChannel;
 
-        public ReliableChannel(BaseUDPClient<TClient, TParent> udpClient) : base(udpClient)
+		public ReliableChannel(BaseUDPClient<TClient, TParent> udpClient) : base(udpClient)
         {
-            channels.Add(UDPChannelEnum.ReliableOrdered, new OrderedChannel<TClient, TParent>(udpClient, this));
-            channels.Add(UDPChannelEnum.ReliableUnordered, new UnorderedChannel<TClient, TParent>(udpClient, this));
+			orderedChannel = new OrderedChannel<TClient, TParent>(udpClient, this);
+			unorderedChannel = new UnorderedChannel<TClient, TParent>(udpClient, this);
         }
 
         public override void Send(UDPChannelEnum channel, byte[] data)
         {
-            if (!channels.TryGetValue(channel, out var c_channel))
-                throw new KeyNotFoundException();
-
-            c_channel.Send(channel, data);
+            if (channel.HasFlag(UDPChannelEnum.Ordered))
+                orderedChannel.Send(channel, data);
+            else if (channel.HasFlag(UDPChannelEnum.Unordered))
+                unorderedChannel.Send(channel, data);
+            else
+                throw new KeyNotFoundException(channel.ToString());
         }
 
         public override void Receive(UDPChannelEnum channel, SocketAsyncEventArgs result)
-        {
-            if (channels.TryGetValue(channel, out var ch))
-                ch.Receive(channel, result);
+		{
+			if (channel.HasFlag(UDPChannelEnum.Ordered))
+				orderedChannel.Receive(channel, result);
+			else if (channel.HasFlag(UDPChannelEnum.Unordered))
+				unorderedChannel.Receive(channel, result);
+			else
+				throw new KeyNotFoundException(channel.ToString());
         }
     }
 }

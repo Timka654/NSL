@@ -2,6 +2,7 @@
 using NSL.SocketCore.Utils.Buffer;
 using NSL.UDP.Enums;
 using NSL.UDP.Interface;
+using NSL.UDP.Packet;
 using System;
 using System.Runtime.CompilerServices;
 
@@ -11,7 +12,11 @@ namespace NSL.UDP
     {
         public UDPChannelEnum Channel { get; set; } = UDPChannelEnum.ReliableOrdered;
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static UDPChannelEnum ReadChannel(Memory<byte> buffer) => UDPPacket.ReadChannel(buffer);
+
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override void Send(IClient client, bool disposeOnSend)
         {
             if (client is IUDPClient c)

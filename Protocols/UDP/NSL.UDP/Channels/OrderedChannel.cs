@@ -22,8 +22,6 @@ namespace NSL.UDP.Channels
             base.Send(channel, data);
         }
 
-        private uint CurrentPPID = 0;
-
 
     }
 }

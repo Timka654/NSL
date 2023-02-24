@@ -364,6 +364,18 @@ namespace NSL.SocketCore.Utils.Buffer
         {
             Write(buf, 0, buf.Length);
         }
+        
+
+        /// <summary>
+        /// Write byte array with header(Int32)
+        /// </summary>
+        /// <param name="buf"></param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void WriteByteArray(byte[] buf)
+        {
+            WriteInt32(buf.Length);
+            Write(buf, 0, buf.Length);
+        }
 
 
         /// <summary>

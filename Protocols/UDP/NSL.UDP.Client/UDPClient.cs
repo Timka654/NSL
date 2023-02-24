@@ -1,6 +1,7 @@
 ﻿using NSL.SocketCore;
 using NSL.SocketCore.Utils;
 using NSL.UDP.Channels;
+using NSL.UDP.Enums;
 using System;
 using System.Buffers;
 using System.Net;
@@ -63,10 +64,12 @@ namespace NSL.UDP.Client
         {
             using (result)
             {
-                var channel = BaseChannel<T, UDPClient<T>>.ReadChannel(result.MemoryBuffer);
+                var channel = DgramPacket.ReadChannel(result.MemoryBuffer);
 
-                if (channels.TryGetValue(channel & ~Enums.UDPChannelEnum.Ordered & ~Enums.UDPChannelEnum.Unordered, out var ch))
-                    ch.Receive(channel, result);
+                if (channel.HasFlag(UDPChannelEnum.Reliable))
+                    reliableChannel.Receive(channel, result);
+				else if(channel.HasFlag(UDPChannelEnum.Unreliable))
+                    unreliableChannel.Receive(channel, result);
 
                 ArrayPool<byte>.Shared.Return(result.MemoryBuffer.ToArray());
             }

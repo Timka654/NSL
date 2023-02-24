@@ -24,13 +24,14 @@ namespace NSL.UDP
 
         #region Channels
 
-        protected Dictionary<UDPChannelEnum, BaseChannel<TClient, TParent>> channels = new Dictionary<UDPChannelEnum, BaseChannel<TClient, TParent>>();
+        protected BaseChannel<TClient, TParent> reliableChannel;
+		protected BaseChannel<TClient, TParent> unreliableChannel;
 
-        #endregion
+		#endregion
 
-        #region Network
+		#region Network
 
-        public const int PHeadLenght = 5;
+		public const int PHeadLenght = 5;
 
         #region Cipher
 
@@ -77,9 +78,9 @@ namespace NSL.UDP
         }
 
         protected virtual void Initialize()
-        { 
-            channels.Add(UDPChannelEnum.Reliable, new ReliableChannel<TClient, TParent>(this));
-            channels.Add(UDPChannelEnum.Unreliable, new UnreliableChannel<TClient, TParent>(this));
+        {
+			reliableChannel = new ReliableChannel<TClient, TParent>(this);
+			unreliableChannel = new UnreliableChannel<TClient, TParent>(this);
         }
 
 
@@ -188,7 +189,10 @@ namespace NSL.UDP
         {
             var sndBuf = outputCipher.Encode(buffer, 0, buffer.Length);
 
-            channels.First(x=> channel.HasFlag(x.Key)).Value.Send(channel, sndBuf);
+            if (channel.HasFlag(UDPChannelEnum.Reliable))
+                reliableChannel.Send(channel, sndBuf);
+            else
+                unreliableChannel.Send(channel, sndBuf);
         }
 
         public void Send(byte[] buffer)
@@ -213,16 +217,6 @@ namespace NSL.UDP
 
                 //отключаем клиента, лишним не будет
                 Disconnect();
-            }
-        }
-
-        uint currentPID = 0;
-
-        public uint CreatePID()
-        {
-            lock (this)
-            {
-                return currentPID++;
             }
         }
 

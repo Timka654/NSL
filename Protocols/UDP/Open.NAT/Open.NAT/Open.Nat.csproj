@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.1</TargetFrameworks>
+    <Platforms>AnyCPU;x64;x86</Platforms>
+    <PackageId>Open.Nat</PackageId>
+    <Authors>Alan McGovern, Ben Motmans, Lucas Ontivero</Authors>
+    <Product>Open.Nat</Product>
+    <PackageTags>Networking</PackageTags>
+    <PackageReleaseNotes></PackageReleaseNotes>
+    <Description>.NET Library for automatic network address translation</Description>
+    <NeutralLanguage>en</NeutralLanguage>
+    <Copyright>Copyright Alan McGovern, Ben Motmans, Lucas Ontivero ©  2006-2014</Copyright>
+    <Version>2.1.0.0</Version>
+    <FileVersion>1.0.1.0</FileVersion>
+    <OutputType>Library</OutputType>
+    <Configurations>Debug;Release;DebugExamples</Configurations>
+  </PropertyGroup>
+	
+  <ItemGroup>
+    <Compile Remove="Upnp\Messages\Responses\AddPortMappingResponseMessage.cs" />
+    <Compile Remove="Upnp\Messages\Responses\DeletePortMappingResponseMessage.cs" />
+  </ItemGroup>
+</Project>

@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<Configurations>Debug;Release;Unity;UnityDebug;DebugStable</Configurations>
+		<Configurations>Debug;Release;Unity;UnityDebug;DebugStable;DebugExamples</Configurations>
 		<OutputType>Library</OutputType>
 		<TargetFramework>net7.0</TargetFramework>
 		<IsPackable>false</IsPackable>

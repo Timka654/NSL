@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -102,6 +103,7 @@ namespace NSL.SocketCore.Utils.Buffer
         /// Check header hash
         /// </summary>
         /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool CheckHash()
             => GetBuffer()[6] == ((lenght) + PacketId) % 255;
 
@@ -109,24 +111,28 @@ namespace NSL.SocketCore.Utils.Buffer
         /// Чтение значения float (4 bytes)
         /// </summary>
         /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public float ReadFloat()
         {
             DataPosition += 4;
             return BitConverter.ToSingle(GetBuffer(), (int)Position - 4);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public async Task<float> ReadFloatAsync() => await Task.FromResult<float>(ReadFloat());
 
         /// <summary>
         /// Чтение значения double (8 bytes)
         /// </summary>
         /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public double ReadDouble()
         {
             DataPosition += 8;
             return BitConverter.ToDouble(GetBuffer(), (int)Position - 8);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public async Task<double> ReadDoubleAsync() => await Task.FromResult<double>(ReadDouble());
 
         /// <summary>
@@ -142,86 +148,101 @@ namespace NSL.SocketCore.Utils.Buffer
         /// Чтения значения short (int16, 2 байта)
         /// </summary>
         /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public short ReadInt16()
         {
             DataPosition += 2;
             return BitConverter.ToInt16(GetBuffer(), (int)Position - 2);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public async Task<short> ReadInt16Async() => await Task.FromResult(ReadInt16());
 
         /// <summary>
         /// Чтения значения ushort (uint16, 2 байта)
         /// </summary>
         /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ushort ReadUInt16()
         {
             DataPosition += 2;
             return BitConverter.ToUInt16(GetBuffer(), (int)Position - 2);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public async Task<ushort> ReadUInt16Async() => await Task.FromResult(ReadUInt16());
 
         /// <summary>
         /// Чтения значения int (int32, 4 байта)
         /// </summary>
         /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int ReadInt32()
         {
             DataPosition += 4;
             return BitConverter.ToInt32(GetBuffer(), (int)Position - 4);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public async Task<int> ReadInt32Async() => await Task.FromResult(ReadInt32());
 
         /// <summary>
         /// Чтения значения uint (uint32, 4 байта)
         /// </summary>
         /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public uint ReadUInt32()
         {
             DataPosition += 4;
             return BitConverter.ToUInt32(GetBuffer(), (int)Position - 4);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public async Task<uint> ReadUInt32Async() => await Task.FromResult(ReadUInt32());
 
         /// <summary>
         /// Чтения значения long (int64, 8 байта)
         /// </summary>
         /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public long ReadInt64()
         {
             DataPosition += 8;
             return BitConverter.ToInt64(GetBuffer(), (int)Position - 8);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public async Task<long> ReadInt64Async() => await Task.FromResult(ReadInt64());
 
         /// <summary>
         /// Чтения значения ulong (uint64, 8 байта)
         /// </summary>
         /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ulong ReadUInt64()
         {
             DataPosition += 8;
             return BitConverter.ToUInt64(GetBuffer(), (int)Position - 8);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public async Task<ulong> ReadUInt64Async() => await Task.FromResult(ReadUInt64());
 
         /// <summary>
         /// Чтения значения byte (1 байт)
         /// </summary>
         /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public new byte ReadByte() => (byte)base.ReadByte();
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public async Task<byte> ReadByteAsync() => await Task.FromResult<byte>(ReadByte());
 
         /// <summary>
         /// Чтения значения string, с чтением заголовка c размером ushort (2 байта), до 36к симв
         /// </summary>
         /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public string ReadString16()
         {
             var len = ReadUInt16();
@@ -235,6 +256,7 @@ namespace NSL.SocketCore.Utils.Buffer
             return ReadString16(len);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public async Task<string> ReadString16Async()
         {
             var len = await ReadUInt16Async();
@@ -252,6 +274,7 @@ namespace NSL.SocketCore.Utils.Buffer
         /// Чтения значения string
         /// </summary>
         /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public string ReadString16(ushort len)
         {
             if (len < 1)
@@ -259,6 +282,7 @@ namespace NSL.SocketCore.Utils.Buffer
             return coding.GetString(Read(len));
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public async Task<string> ReadString16Async(ushort len)
         {
             if (len < 1)
@@ -270,6 +294,7 @@ namespace NSL.SocketCore.Utils.Buffer
         /// Чтения значения string, с чтением заголовка c размером  (4 байта), до 1.2ккк симв
         /// </summary>
         /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public string ReadString32()
         {
             var len = ReadUInt32();
@@ -283,6 +308,7 @@ namespace NSL.SocketCore.Utils.Buffer
             return ReadString32(len);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public async Task<string> ReadString32Async()
         {
             var len = await ReadUInt32Async();
@@ -300,6 +326,7 @@ namespace NSL.SocketCore.Utils.Buffer
         /// Чтения значения string
         /// </summary>
         /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public string ReadString32(uint len)
         {
             if (len < 1)
@@ -307,6 +334,7 @@ namespace NSL.SocketCore.Utils.Buffer
             return coding.GetString(Read((int)len));
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public async Task<string> ReadString32Async(uint len)
         {
             if (len < 1)
@@ -314,17 +342,20 @@ namespace NSL.SocketCore.Utils.Buffer
             return await Task.FromResult(coding.GetString(Read((int)len)));
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public DateTime ReadDateTime()
         {
             return MinDatetimeValue.AddTicks(ReadInt64());
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public TimeSpan ReadTimeSpan()
         {
             return TimeSpan.FromTicks(ReadInt64());
         }
 
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public IEnumerable<T> ReadCollection<T>(Func<InputPacketBuffer, T> readAction)
         {
             int len = ReadInt32();
@@ -342,6 +373,7 @@ namespace NSL.SocketCore.Utils.Buffer
             return result;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public IEnumerable<T> ReadCollection<T>(Func<T> readAction)
         {
             int len = ReadInt32();
@@ -359,6 +391,7 @@ namespace NSL.SocketCore.Utils.Buffer
             return result;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public T? ReadNullable<T>(Func<T> trueAction)
             where T : struct
         {
@@ -370,6 +403,7 @@ namespace NSL.SocketCore.Utils.Buffer
             return null;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public T ReadNullableClass<T>(Func<T> trueAction)
             where T : class
         {
@@ -381,9 +415,22 @@ namespace NSL.SocketCore.Utils.Buffer
             return null;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Guid ReadGuid()
         {
             return new Guid(Read(16));
+        }
+
+        /// <summary>
+        /// Read byte array with count(ReadInt32) header
+        /// </summary>
+        /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public byte[] ReadByteArray()
+        {
+            int len = ReadInt32();
+
+            return Read(len);
         }
 
         /// <summary>
@@ -391,6 +438,7 @@ namespace NSL.SocketCore.Utils.Buffer
         /// </summary>
         /// <param name="len">размер</param>
         /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public byte[] Read(int len)
         {
             if (base.Length - this.Position < len)
@@ -403,6 +451,7 @@ namespace NSL.SocketCore.Utils.Buffer
             return buf;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public async Task<byte[]> ReadAsync(int len)
         {
             if (base.Length - this.Position < len)
@@ -419,8 +468,10 @@ namespace NSL.SocketCore.Utils.Buffer
         /// Чтения значения bool (1 байт)
         /// </summary>
         /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool ReadBool() => ReadByte() == 1;
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public async Task<bool> ReadBoolAsync() => await ReadByteAsync() == 1;
 
         /// <summary>
@@ -455,6 +506,7 @@ namespace NSL.SocketCore.Utils.Buffer
         /// </summary>
         /// <param name="buffer">буффер</param>
         /// <param name="off">позиция начала копирования</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void AppendBody(byte[] buffer, int off)
         {
             int tempPos = DataPosition;
@@ -466,6 +518,7 @@ namespace NSL.SocketCore.Utils.Buffer
             DataPosition = tempPos;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public byte[] GetBody()
         {
             byte[] buf = new byte[DataLength];

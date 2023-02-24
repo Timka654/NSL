@@ -40,7 +40,7 @@ namespace NSL.WebSockets.Server.AspNetPoint
 
         public override IPEndPoint GetRemotePoint()
         {
-            if (context.Connection.RemoteIpAddress == default)
+            if (context.Connection?.RemoteIpAddress == default)
                 return default;
 
             return new IPEndPoint(context.Connection.RemoteIpAddress, context.Connection.RemotePort);
