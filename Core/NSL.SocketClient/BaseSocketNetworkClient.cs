@@ -94,7 +94,7 @@ namespace NSL.SocketClient
             {
                 RequestPing();
 
-                await Task.Delay(AliveCheckTimeOut, token);
+                await Task.Delay(AliveCheckTimeOut / 2, token);
             }
             while (!token.IsCancellationRequested && pingPongEnabled && Network?.GetState() == true);
         }

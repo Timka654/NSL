@@ -31,8 +31,5 @@ namespace NSL.UDP.Channels
         {
             base.Send(channel, data);
         }
-
-        internal override uint CreatePID()
-            => (parent as ReliableChannel<TClient, TParent>)?.CreatePID() ?? 0;
     }
 }

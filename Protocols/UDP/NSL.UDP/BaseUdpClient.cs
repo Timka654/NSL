@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
+using System.Threading;
 
 namespace NSL.UDP
 {
@@ -21,16 +22,20 @@ namespace NSL.UDP
         public event ReceivePacketDebugInfo<TParent> OnReceivePacket;
         public event SendPacketDebugInfo<TParent> OnSendPacket;
 
+        private CancellationTokenSource LiveStateTokenSource { get; } = new CancellationTokenSource();
+
+        public CancellationToken LiveStateToken => LiveStateTokenSource.Token;
+
         #region Channels
 
         protected BaseChannel<TClient, TParent> reliableChannel;
-		protected BaseChannel<TClient, TParent> unreliableChannel;
+        protected BaseChannel<TClient, TParent> unreliableChannel;
 
-		#endregion
+        #endregion
 
-		#region Network
+        #region Network
 
-		public const int PHeadLenght = 5;
+        public const int PHeadLenght = 5;
 
         #region Cipher
 
@@ -78,8 +83,8 @@ namespace NSL.UDP
 
         protected virtual void Initialize()
         {
-			reliableChannel = new ReliableChannel<TClient, TParent>(this);
-			unreliableChannel = new UnreliableChannel<TClient, TParent>(this);
+            reliableChannel = new ReliableChannel<TClient, TParent>(this);
+            unreliableChannel = new UnreliableChannel<TClient, TParent>(this);
         }
 
 
@@ -103,11 +108,17 @@ namespace NSL.UDP
 
         public void Disconnect()
         {
-            if (disconnected == true)
-                return;
+            lock (this)
+            {
 
+                if (disconnected == true)
+                    return;
 
-            disconnected = true;
+                disconnected = true;
+            }
+
+            LiveStateTokenSource.Cancel();
+
             RunDisconnect();
 
             if (inputCipher != null)
@@ -122,9 +133,7 @@ namespace NSL.UDP
         public Socket GetSocket() => null;
 
         public bool GetState()
-        {
-            throw new NotImplementedException();
-        }
+            => Data.AliveState;
 
         public virtual void Receive(byte[] result)
         {
@@ -181,7 +190,11 @@ namespace NSL.UDP
         public void Send(OutputPacketBuffer packet, bool disposeOnSend = true)
         {
             if (!(packet is DgramPacket dpkg))
-                throw new ArgumentException(nameof(packet));
+            {
+                dpkg = new DgramPacket() { Channel = UDPChannelEnum.ReliableOrdered, PacketId = packet.PacketId };
+                packet.DataPosition = 0;
+                packet.CopyTo(dpkg);
+            }
 
             Send(dpkg, disposeOnSend);
         }
@@ -210,6 +223,13 @@ namespace NSL.UDP
                     return;
 
                 listenerSocket.SendTo(sndBuffer, SocketFlags.None, endPoint);
+            }
+            catch (ObjectDisposedException)
+            {
+                AddWaitPacket(sndBuffer, 0, sndBuffer.Length);
+
+                //отключаем клиента, лишним не будет
+                Disconnect();
             }
             catch (Exception ex)
             {

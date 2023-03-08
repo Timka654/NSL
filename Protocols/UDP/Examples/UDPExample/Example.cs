@@ -126,6 +126,8 @@ namespace UDPExample
 
             options.AddPacket(1, new TestPacket());
 
+            options.OnClientConnectEvent += c => { c.PingPongEnabled = true; };
+
 
             Run();
         }
@@ -136,8 +138,10 @@ namespace UDPExample
             client = new UDPNetworkClient<NetworkClient>(options);
             client.OnReceivePacket += Client_OnReceivePacket;
             client.OnSendPacket += Client_OnSendPacket;
+
             Thread.Sleep(2_500);
             client.Connect();
+
 
             for (int i = 0; i < 10; i++)
             {

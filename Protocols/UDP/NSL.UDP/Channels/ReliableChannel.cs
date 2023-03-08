@@ -85,6 +85,8 @@ namespace NSL.UDP.Channels
         {
             var locker = new CancellationTokenSource();
 
+            udpClient.LiveStateToken.Register(locker.Cancel);
+
             Action<uint> action = (pid) => { if (temp.PID == pid) locker.Cancel(); };
 
             ActReceived += action;
@@ -109,15 +111,5 @@ namespace NSL.UDP.Channels
 
 
 
-
-        uint currentPID = 0;
-
-        internal override uint CreatePID()
-        {
-            lock (this)
-            {
-                return currentPID++;
-            }
-        }
     }
 }

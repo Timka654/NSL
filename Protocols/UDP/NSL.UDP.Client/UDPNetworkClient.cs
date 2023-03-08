@@ -24,12 +24,13 @@ namespace NSL.UDP.Client
         {
             if (!IPAddress.TryParse(options.IpAddress, out var ip))
                 throw new ArgumentException($"invalid connection ip {options.IpAddress}", nameof(options.IpAddress));
-
             StartReceive(() => {
                 client = new UDPClient<TClient>(options.GetIPEndPoint(), listener, options);
 
                 client.OnReceivePacket += OnReceivePacket;
                 client.OnSendPacket += OnSendPacket;
+
+                options.InitializeClient(client.Data);
             });
         }
 

@@ -176,7 +176,16 @@ namespace NSL.UDP.Channels
             }
         }
 
-        internal virtual uint CreatePID() => 0;
+
+        uint currentPID = 0;
+
+        private uint CreatePID()
+        {
+            lock (this)
+            {
+                return currentPID++;
+            }
+        }
 
         public struct PacketWaitTemp
         {

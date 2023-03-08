@@ -6,6 +6,7 @@ using TCPExample.Client;
 ClientOptions<NetworkClient> options = new ClientOptions<NetworkClient>();
 
 options.ReceiveBufferSize = 1024;
+options.OnClientConnectEvent += (client) => client.PingPongEnabled = true;
 
 options.AddHandle(1, (c, p) =>
 {
@@ -13,6 +14,9 @@ options.AddHandle(1, (c, p) =>
 });
 
 var t = new TCPNetworkClient<NetworkClient, ClientOptions<NetworkClient>>(options);
+
+t.OnReceivePacket += (c, pid, len) => { Console.WriteLine($"received {pid}"); };
+t.OnSendPacket += (c, pid, len, stackTrace) => { Console.WriteLine($"sended {pid}"); };
 
 Console.WriteLine($"Current State {t.GetState()}, Try connect");
 
