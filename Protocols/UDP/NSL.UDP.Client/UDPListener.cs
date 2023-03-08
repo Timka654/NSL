@@ -151,7 +151,7 @@ namespace NSL.UDP.Client
 
             try
             {
-                var recv = await listener.ReceiveFromAsync(poolMem, _blankEndpoint);
+                var recv = await listener.ReceiveFromAsync(poolMem, SocketFlags.None, _blankEndpoint);
 
                 Args_Completed(poolMem[..recv.ReceivedBytes], recv);
             }
