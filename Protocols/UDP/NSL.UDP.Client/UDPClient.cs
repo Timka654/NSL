@@ -61,12 +61,12 @@ namespace NSL.UDP.Client
 
         public void Receive(Span<byte> result)
         {
-                var channel = DgramPacket.ReadChannel(result);
+            var channel = DgramPacket.ReadChannel(result);
 
-                if (channel.HasFlag(UDPChannelEnum.Reliable))
-                    reliableChannel.Receive(channel, result);
-				else if(channel.HasFlag(UDPChannelEnum.Unreliable))
-                    unreliableChannel.Receive(channel, result);
+            if (channel.HasFlag(UDPChannelEnum.Reliable))
+                reliableChannel.Receive(channel, result);
+            else if (channel.HasFlag(UDPChannelEnum.Unreliable))
+                unreliableChannel.Receive(channel, result);
         }
 
         protected override void OnReceive(ushort pid, int len)

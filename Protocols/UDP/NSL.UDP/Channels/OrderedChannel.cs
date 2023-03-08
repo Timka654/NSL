@@ -12,7 +12,7 @@ namespace NSL.UDP.Channels
 
         public override UDPChannelEnum Channel => UDPChannelEnum.Ordered;
 
-        public Action<uint> OnSend = pid => { };
+        public Action<PacketWaitTemp> OnSend = pid => { };
 
         public OrderedChannel(BaseUDPClient<TClient, TParent> udpClient) : base(udpClient) { }
         public OrderedChannel(BaseUDPClient<TClient, TParent> udpClient, BaseChannel<TClient, TParent> parent) : this(udpClient)
@@ -27,7 +27,7 @@ namespace NSL.UDP.Channels
 
         protected override void AfterBuild(BaseChannel<TClient, TParent> fromChannel, PacketWaitTemp packet)
         {
-            OnSend(packet.PID);
+            OnSend(packet);
             base.AfterBuild(fromChannel, packet);
         }
 

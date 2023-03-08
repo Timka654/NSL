@@ -22,11 +22,15 @@ namespace NSL.UDP.Channels
 
         public abstract UDPChannelEnum Channel { get; }
 
+        public Action<uint> OnReceive;
+
         public BaseChannel(BaseUDPClient<TClient, TParent> udpClient)
         {
             this.udpClient = udpClient;
 
             UDPOptions = udpClient.Options as IUDPOptions;
+
+            receivePidBuffer.Enqueue(uint.MaxValue);
         }
 
         protected virtual void AfterBuild(BaseChannel<TClient, TParent> fromChannel, PacketWaitTemp packet) { }
@@ -81,6 +85,8 @@ namespace NSL.UDP.Channels
 
         protected ConcurrentDictionary<uint, PacketReciveTemp> packetReceiveBuffer = new ConcurrentDictionary<uint, PacketReciveTemp>();
 
+        private ConcurrentQueue<uint> receivePidBuffer = new ConcurrentQueue<uint>();
+
         public virtual void Receive(UDPChannelEnum channel, Span<byte> data)
         {
             var checksum = UDPPacket.ReadChecksum(data);
@@ -92,6 +98,9 @@ namespace NSL.UDP.Channels
             }
 
             var pid = UDPPacket.ReadPID(data);
+
+            if (receivePidBuffer.Contains(pid))
+                return;
 
             var packet = packetReceiveBuffer.GetOrAdd(
                 pid,
@@ -116,20 +125,60 @@ namespace NSL.UDP.Channels
                 }
             }
 
+            ProcessPacket(channel, packet);
+        }
 
-            if (packet.Ready() &&
-                packetReceiveBuffer.TryRemove(packet.PID, out packet))
+        protected virtual void ProcessPacket(UDPChannelEnum channel, PacketReciveTemp packet)
+        {
+            lock (this)
             {
-                udpClient.Receive(packet.Parts
-                .OrderBy(x => PacketReciveTemp.ReadPartDataOffset(x))
-                .SelectMany(x => x[2..].ToArray())
-                .ToArray());
+                if (channel.HasFlag(UDPChannelEnum.Ordered | UDPChannelEnum.Reliable))
+                {
+                    if (!receivePidBuffer.Contains(packet.PID - 1))
+                    {
+                        Action<uint> rcvHandle = default;
+
+                        rcvHandle = (pid) =>
+                        {
+                            Console.WriteLine($"{nameof(rcvHandle)} - {pid}");
+                            if (pid - 1 == packet.PID)
+                                ProcessPacket(channel, packet);
+                            OnReceive -= rcvHandle;
+                        };
+
+                        OnReceive += rcvHandle;
+
+                        return;
+                    }
+                }
+
+                if (packet.Ready() &&
+                    packetReceiveBuffer.TryRemove(packet.PID, out packet))
+                {
+                    if (receivePidBuffer.Contains(packet.PID))
+                    {
+                        packetReceiveBuffer.TryRemove(packet.PID, out _);
+                        return;
+                    }
+
+                    receivePidBuffer.Enqueue(packet.PID);
+
+                    while (receivePidBuffer.Count > 100)
+                        receivePidBuffer.TryDequeue(out _);
+
+                    udpClient.Receive(packet.Parts
+                    .OrderBy(x => PacketReciveTemp.ReadPartDataOffset(x))
+                    .SelectMany(x => x[2..].ToArray())
+                    .ToArray());
+
+                    OnReceive(packet.PID);
+                }
             }
         }
 
         internal virtual uint CreatePID() => 0;
 
-        protected struct PacketWaitTemp
+        public struct PacketWaitTemp
         {
             public uint PID;
 

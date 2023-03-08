@@ -4,6 +4,6 @@
     {
         LP,
         Data,
-        Comp
+        ACK
     }
 }

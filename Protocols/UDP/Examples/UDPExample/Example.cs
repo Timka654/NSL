@@ -88,9 +88,16 @@ namespace UDPExample
             options.OnClientConnectEvent += Options_OnClientConnectEvent;
             options.OnClientDisconnectEvent += Options_OnClientDisconnectEvent;
 
+            options.OnExceptionEvent += Options_OnExceptionEvent;
+
             options.InputCipher = new PacketNoneCipher();
 
             options.OutputCipher = new PacketNoneCipher();
+        }
+
+        private void Options_OnExceptionEvent(Exception ex, TClient client)
+        {
+            options.HelperLogger.Append(NSL.SocketCore.Utils.Logger.Enums.LoggerLevel.Error, ex.ToString());
         }
 
         private void Options_OnClientConnectEvent(TClient client)
@@ -129,12 +136,12 @@ namespace UDPExample
             client = new UDPNetworkClient<NetworkClient>(options);
             client.OnReceivePacket += Client_OnReceivePacket;
             client.OnSendPacket += Client_OnSendPacket;
-            Thread.Sleep(1_500);
+            Thread.Sleep(2_500);
             client.Connect();
 
             for (int i = 0; i < 10; i++)
             {
-                using (var packet = new NSL.UDP.DgramPacket() { PacketId = 1 })
+                using (var packet = new NSL.UDP.DgramPacket() { PacketId = 1, Channel = NSL.UDP.Enums.UDPChannelEnum.ReliableUnordered })
                 {
                     packet.WriteInt32((i * 3) + 1);
                     packet.WriteInt32((i * 3) + 2);
