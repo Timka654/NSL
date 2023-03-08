@@ -5,7 +5,6 @@ using NSL.UDP.Client.Interface;
 using STUN;
 using System;
 using System.Buffers;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -18,11 +17,16 @@ namespace NSL.UDP.Client
         where TClient : INetworkClient, new()
         where TOptions : CoreOptions<TClient>, IBindingUDPOptions
     {
+        private static readonly IPEndPoint _blankEndpoint = new IPEndPoint(IPAddress.Any, 0);
+
         protected readonly TOptions options;
 
         protected bool state = false;
 
         protected Socket listener;
+
+        public Socket GetSocket()
+            => listener;
 
         public STUNQueryResult StunInformation { get; private set; }
 
@@ -59,6 +63,9 @@ namespace NSL.UDP.Client
 
             listener = new Socket(options.AddressFamily, SocketType.Dgram, options.ProtocolType);
 
+            //         listener.ExclusiveAddressUse = false;
+            //listener.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
+
             listener.Bind(options.GetBindingIPEndPoint());
 
             options.BindingPort = listener.LocalEndPoint is IPEndPoint ipep ? ipep.Port : options.BindingPort;
@@ -84,7 +91,7 @@ namespace NSL.UDP.Client
 
                         var stunEndPoint = new IPEndPoint(stunIP, item.Port);
 
-                        StunInformation = STUNClient.Query(stunEndPoint, options.StunQueryType, false);
+                        StunInformation = STUNClient.Query(listener, stunEndPoint, options.StunQueryType);
 
                         if (StunInformation.QueryError != STUNQueryError.Success)
                             options.RunException(new StunExceptionInfo(item, StunInformation, StunExceptionInfo.ErrorTypeEnum.QueryResultError, stunEndPoint), default);
@@ -102,12 +109,13 @@ namespace NSL.UDP.Client
             if (afterBind != null)
                 afterBind();
 
+            state = true;
+
             for (int i = 0; i < 3; i++)
             {
-                RunReceiveAsync(ListenerCTS.Token);
+                RunReceiveAsync();
             }
 
-            state = true;
         }
 
         protected void StopReceive()
@@ -124,40 +132,46 @@ namespace NSL.UDP.Client
             listener = null;
         }
 
-        protected async void RunReceiveAsync(CancellationToken token) => await Task.Run(() => RunReceive(token), token);
+        protected async void RunReceiveAsync() => await RunReceive();
 
         protected CancellationTokenSource ListenerCTS;
 
-        protected void RunReceive(CancellationToken token)
+        protected async Task RunReceive()
         {
-            if (token.IsCancellationRequested)
+            if (ListenerCTS.Token.IsCancellationRequested)
                 return;
 
-            var poolMem = MemoryPool<byte>.Shared.Rent(options.ReceiveBufferSize);
+            var poolMem = ArrayPool<byte>.Shared.Rent(options.ReceiveBufferSize);
 
-            SocketAsyncEventArgs args = new SocketAsyncEventArgs();
+            //SocketAsyncEventArgs args = new SocketAsyncEventArgs();
 
-            args.SetBuffer(poolMem.Memory);
-            args.UserToken = poolMem;
-            args.RemoteEndPoint = new IPEndPoint(IPAddress.Any, 0);
-            args.Completed += Args_Completed;
+            //args.SetBuffer(poolMem);
+            //args.RemoteEndPoint = new IPEndPoint(IPAddress.Any, 0);
+            //args.Completed += Args_Completed;
 
             try
             {
-                if (!listener.ReceiveFromAsync(args))
-                    StopReceive();
+                var recv = await listener.ReceiveFromAsync(poolMem, _blankEndpoint);
+
+                Args_Completed(poolMem[..recv.ReceivedBytes], recv);
             }
             catch (SocketException sex)
             {
-                throw;
+                options.RunException(sex, null);
+                StopReceive();
             }
             catch (Exception ex)
             {
-                throw;
+                options.RunException(ex, null);
+                StopReceive();
+            }
+            finally
+            {
+                ArrayPool<byte>.Shared.Return(poolMem);
             }
         }
 
-        protected virtual void Args_Completed(object sender, SocketAsyncEventArgs e)
+        protected virtual void Args_Completed(Span<byte> buffer, SocketReceiveFromResult e)
         {
         }
     }

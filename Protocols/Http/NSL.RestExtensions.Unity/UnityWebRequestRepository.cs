@@ -46,48 +46,61 @@ namespace NSL.RestExtensions.Unity
             SafeInvoke(await base.SafeRequest<TData>(url, request), onResult);
         }
 
-        protected override async Task LogRequestResult(HttpResponseMessage result, string responseContent)
+        protected override Task LogRequestResult(HttpResponseMessage result, string responseContent)
         {
             if (!GetLogging())
-                return;
+                return Task.CompletedTask;
 
             var requestUriLine = $"RequestUri = {result.RequestMessage.RequestUri}\r\n";
-            var requestContentLine = result.RequestMessage.Content is StringContent sc ? $"RequestContent = {await sc.ReadAsStringAsync()}\r\n" : string.Empty;
+            var requestContentLine = responseContent ?? string.Empty;
             var resultStatusCodeLine = $"ResultCode = {((int)result.StatusCode)}{(Enum.IsDefined(typeof(HttpStatusCode), result.StatusCode) ? $"({result.StatusCode})" : "")}\r\n";
 
-            if (responseContent != null)
+            var stack = Environment.StackTrace;
+
+            ThreadHelper.InvokeOnMain(() =>
             {
-                if (responseContent.Length < 10_000)
+                if (responseContent != null)
                 {
-                    Debug.Log(requestUriLine + requestContentLine + resultStatusCodeLine +
-                              $"ResponseContent = {responseContent}\r\n" +
-                              $"================STACK TRACE================\r\n" +
-                              $"{Environment.StackTrace}");
+                    if (responseContent.Length < 10_000)
+                    {
+                        Debug.Log(requestUriLine + requestContentLine + resultStatusCodeLine +
+                                  $"ResponseContent = {responseContent}\r\n" +
+                                  $"================STACK TRACE================\r\n" +
+                                  $"{stack}");
+                    }
+                    else if (responseContent.Length > 20_000)
+                    {
+                        Debug.Log(requestUriLine + requestContentLine + resultStatusCodeLine +
+                                  $"ResponseContent = too large(20k more)\r\n" +
+                                  $"================STACK TRACE================\r\n" +
+                                  $"{stack}");
+                    }
+                    else
+                    {
+
+                        Debug.Log(requestUriLine + requestContentLine + resultStatusCodeLine +
+                                  $"ResponseContent = ");
+
+                        IEnumerable<char> charCollection = responseContent;
+
+                        do
+                        {
+                            Debug.Log(new string(charCollection.Take(10_000).ToArray()));
+
+                            charCollection = charCollection.Skip(10_000);
+                        } while (charCollection.Any());
+
+                        Debug.Log($"================STACK TRACE================\r\n" +
+                                  $"{stack}");
+                    }
                 }
                 else
-                {
-
                     Debug.Log(requestUriLine + requestContentLine + resultStatusCodeLine +
-                              $"ResponseContent = ");
+                              $"================STACK TRACE================\r\n" +
+                              $"{stack}");
+            });
 
-                    IEnumerable<char> charCollection = responseContent;
-
-                    do
-                    {
-                        Debug.Log(new string(charCollection.Take(10_000).ToArray()));
-
-                        charCollection = charCollection.Skip(10_000);
-                    } while (charCollection.Any());
-
-                    Debug.Log($"================STACK TRACE================\r\n" +
-                              $"{Environment.StackTrace}");
-                }
-            }
-            else
-                Debug.Log(requestUriLine + requestContentLine + resultStatusCodeLine +
-                          $"================STACK TRACE================\r\n" +
-                          $"{Environment.StackTrace}");
-
+            return Task.CompletedTask;
         }
 
         protected static void SafeInvoke(HttpRequestResult result, WebResponseDelegate onResult)

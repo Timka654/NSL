@@ -78,14 +78,11 @@ namespace NSL.ConfigurationEngine
         /// <param name="path"></param>
         /// <param name="existFlag">Оставить стандартным для получения значения без учета флага</param>
         /// <returns></returns>
-        public string GetValue(string path, string existFlag = "")
+        public string GetValue(string path)
         {
             var v = base.GetValue(path.ToLower());
 
             if (v == null)
-                return default;
-
-            if (!string.IsNullOrWhiteSpace(existFlag) && !v.ExistFlag(existFlag))
                 return default;
 
             return v.Value;
@@ -97,9 +94,9 @@ namespace NSL.ConfigurationEngine
         /// <param name="path"></param>
         /// <param name="existFlag">Оставить стандартным для получения значения без учета флага</param>
         /// <returns></returns>
-        public T GetValue<T>(string path, T defaultValue = default, string existFlag = "")
+        public T GetValue<T>(string path, T defaultValue = default)
         {
-            var val = GetValue(path, existFlag);
+            var val = GetValue(path);
 
             if (val == null)
                 return defaultValue;
@@ -113,10 +110,10 @@ namespace NSL.ConfigurationEngine
         /// <param name="path"></param>
         /// <param name="existFlag">Оставить стандартным для получения значения без учета флага</param>
         /// <returns></returns>
-        public TEnum GetEnumValue<TEnum>(string path, string existFlag = "", bool ignoreCase = false)
+        public TEnum GetEnumValue<TEnum>(string path, bool ignoreCase = false)
             where TEnum : struct
         {
-            var val = GetValue(path, existFlag);
+            var val = GetValue(path);
 
             if (val == null)
                 return default;

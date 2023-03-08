@@ -9,7 +9,11 @@
 
         public byte[] Decode(byte[] buffer, int offset, int lenght)
         {
-            return buffer;
+            byte[] dest = new byte[lenght];
+
+            System.Buffer.BlockCopy(buffer, offset, dest, 0, lenght);
+
+            return dest;
         }
 
         public void Dispose()

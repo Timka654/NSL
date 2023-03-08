@@ -1,18 +1,12 @@
-﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
-using NSL.Extensions.RPC.Generator.Declarations;
+﻿using NSL.Extensions.RPC.Generator.Declarations;
 using NSL.Extensions.RPC.Generator.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis;
-using NSL.SocketCore.Utils.Buffer;
 using NSL.Extensions.RPC.Generator.Models;
-using System.Diagnostics;
-using System.Reflection.Metadata;
 using NSL.Extensions.RPC.Generator.Generators.Handlers;
-using System.Data.Common;
-using System.Buffers;
 
 namespace NSL.Extensions.RPC.Generator.Generators
 {

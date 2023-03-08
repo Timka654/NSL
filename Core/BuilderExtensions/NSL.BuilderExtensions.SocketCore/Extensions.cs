@@ -40,6 +40,19 @@ namespace NSL.BuilderExtensions.SocketCore
             AddPacketHandle(builder, packetId.ToUInt16(null), packet);
         }
 
+        public static void AddAsyncPacketHandle<TClient>(this IOptionableEndPointBuilder<TClient> builder, ushort packetId, ClientOptions<TClient>.AsyncPacketHandle handle)
+            where TClient : INetworkClient, new()
+        {
+            builder.GetCoreOptions().AddAsyncHandle(packetId, handle);
+        }
+
+        public static void AddAsyncPacketHandle<TClient, TEnum>(this IOptionableEndPointBuilder<TClient> builder, TEnum packetId, ClientOptions<TClient>.AsyncPacketHandle packet)
+            where TEnum : struct, IConvertible
+            where TClient : INetworkClient, new()
+        {
+            AddAsyncPacketHandle(builder, packetId.ToUInt16(null), packet);
+        }
+
 
         public static void AddReceivePacketHandle<TClient>(this IOptionableEndPointBuilder<TClient> builder, ushort packetId, Func<TClient, PacketWaitBuffer> handler)
             where TClient : INetworkClient, new()
@@ -208,13 +221,27 @@ namespace NSL.BuilderExtensions.SocketCore
 
             if (handleOptions.HasFlag(DefaultEventHandlersEnum.Connect))
                 builder.AddConnectHandle(client
-                    => logger.Append(LoggerLevel.Info, $"{prefix}Success connected"
-                        + (handleOptions.HasFlag(DefaultEventHandlersEnum.DisplayEndPoint) ? $"({client.Network?.GetRemotePoint()})" : default)));
+                    =>
+                {
+                    try
+                    {
+                        logger.Append(LoggerLevel.Info, $"{prefix}Success connected"
+                        + (handleOptions.HasFlag(DefaultEventHandlersEnum.DisplayEndPoint) ? $"({client?.Network?.GetRemotePoint()})" : default));
+                    }
+                    catch { }
+                });
 
             if (handleOptions.HasFlag(DefaultEventHandlersEnum.Disconnect))
                 builder.AddDisconnectHandle(client
-                    => logger.Append(LoggerLevel.Info, $"{prefix}Success disconnected"
-                        + (handleOptions.HasFlag(DefaultEventHandlersEnum.DisplayEndPoint) ? $"({client.Network?.GetRemotePoint()})" : default)));
+                    =>
+                {
+                    try
+                    {
+                        logger.Append(LoggerLevel.Info, $"{prefix}Success disconnected"
+                        + (handleOptions.HasFlag(DefaultEventHandlersEnum.DisplayEndPoint) ? $"({client?.Network?.GetRemotePoint()})" : default));
+                    }
+                    catch { }
+                });
 
             if (handleOptions.HasFlag(DefaultEventHandlersEnum.Exception))
                 builder.AddExceptionHandle((ex, client)
@@ -228,10 +255,14 @@ namespace NSL.BuilderExtensions.SocketCore
                     if (name != default)
                         name = $"({name})";
 
-                    logger.Append(LoggerLevel.Info,
-                        $"{prefix}Send packet {name}{pid}"
-                        + (handleOptions.HasFlag(DefaultEventHandlersEnum.DisplayEndPoint) ? $" to {client.GetRemotePoint()}" : default)
-                        + (handleOptions.HasFlag(DefaultEventHandlersEnum.HasSendStackTrace) ? $" {stackTrace}" : default));
+                    try
+                    {
+                        logger.Append(LoggerLevel.Info,
+                            $"{prefix}Send packet {name}{pid}"
+                            + (handleOptions.HasFlag(DefaultEventHandlersEnum.DisplayEndPoint) ? $" to {client?.GetRemotePoint()}" : default)
+                            + (handleOptions.HasFlag(DefaultEventHandlersEnum.HasSendStackTrace) ? $" {stackTrace}" : default));
+                    }
+                    catch { }
                 });
 
 
@@ -243,9 +274,13 @@ namespace NSL.BuilderExtensions.SocketCore
                     if (name != default)
                         name = $"({name})";
 
-                    logger.Append(LoggerLevel.Info,
-                        $"{prefix}Receive packet {name}{pid}"
-                        + (handleOptions.HasFlag(DefaultEventHandlersEnum.DisplayEndPoint) ? $" from {client.GetRemotePoint()}" : default));
+                    try
+                    {
+                        logger.Append(LoggerLevel.Info,
+                            $"{prefix}Receive packet {name}{pid}"
+                            + (handleOptions.HasFlag(DefaultEventHandlersEnum.DisplayEndPoint) ? $" from {client?.GetRemotePoint()}" : default));
+                    }
+                    catch { }
                 });
         }
     }

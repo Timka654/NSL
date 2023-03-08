@@ -1,8 +1,8 @@
 ﻿using NSL.SocketCore;
 using NSL.SocketCore.Utils;
+using NSL.UDP.Enums;
 using System;
-using System.Collections.Concurrent;
-using System.Linq;
+using System.Buffers;
 using System.Net;
 using System.Net.Sockets;
 
@@ -11,29 +11,6 @@ namespace NSL.UDP.Client
     public class UDPClient<T> : BaseUDPClient<T, UDPClient<T>>
         where T : INetworkClient, new()
     {
-        private class PacketTemp
-        {
-            public ushort PID;
-
-            public ushort Lenght;
-
-            public ConcurrentBag<Memory<byte>> Parts;
-
-            public PacketTemp(ushort PID, ushort len) : this(PID)
-            {
-                this.Lenght = len;
-            }
-
-            public PacketTemp(ushort PID)
-            {
-                this.PID = PID;
-                this.Lenght = 0;
-                Parts = new ConcurrentBag<Memory<byte>>();
-            }
-
-            public bool Ready() => Lenght > 0 && Parts.Count == Lenght;
-        }
-
         private T data;
 
         public override T Data => data;
@@ -45,8 +22,10 @@ namespace NSL.UDP.Client
             Initialize();
         }
 
-        protected void Initialize()
+        protected override void Initialize()
         {
+            base.Initialize();
+
             PacketHandles = options.GetHandleMap();
 
             data = new T();
@@ -80,35 +59,14 @@ namespace NSL.UDP.Client
 
         protected override void AddWaitPacket(byte[] buffer, int offset, int length) => Data?.AddWaitPacket(buffer, offset, length);
 
-        ConcurrentDictionary<ushort, PacketTemp> packetBuffer = new ConcurrentDictionary<ushort, PacketTemp>();
-
-        private static ushort ReadPID(Memory<byte> buffer) => BitConverter.ToUInt16(buffer.Span[1..]);
-        private static bool ReadLP(Memory<byte> buffer) => buffer.Span[0] == 1;
-        private static ushort ReadLPLen(Memory<byte> buffer) => BitConverter.ToUInt16(buffer.Span[3..]);
-        private static ushort ReadPOffset(Memory<byte> buffer) => BitConverter.ToUInt16(buffer.Span);
-
-        public void Receive(SocketAsyncEventArgs result)
+        public void Receive(Span<byte> result)
         {
-            using (result)
-            {
-                var packet = packetBuffer.GetOrAdd(
-                    ReadPID(result.MemoryBuffer),
-                    id => new PacketTemp(id));
+            var channel = DgramPacket.ReadChannel(result);
 
-                if (ReadLP(result.MemoryBuffer))
-                    packet.Lenght = ReadLPLen(result.MemoryBuffer);
-                else
-                    packet.Parts.Add(result.MemoryBuffer[3..result.BytesTransferred]);
-
-                if (packet.Ready() &&
-                    packetBuffer.TryRemove(packet.PID, out packet))
-                {
-                    base.Receive(packet.Parts
-                    .OrderBy(x => ReadPOffset(x))
-                    .SelectMany(x => x.Slice(2).ToArray())
-                    .ToArray());
-                }
-            }
+            if (channel.HasFlag(UDPChannelEnum.Reliable))
+                reliableChannel.Receive(channel, result);
+            else if (channel.HasFlag(UDPChannelEnum.Unreliable))
+                unreliableChannel.Receive(channel, result);
         }
 
         protected override void OnReceive(ushort pid, int len)

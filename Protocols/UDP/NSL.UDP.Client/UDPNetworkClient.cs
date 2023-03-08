@@ -1,8 +1,8 @@
-﻿using NSL.SocketCore;
-using System.Net;
+﻿using System.Net;
 using System;
 using System.Net.Sockets;
 using NSL.SocketClient;
+using NSL.SocketCore;
 
 namespace NSL.UDP.Client
 {
@@ -24,12 +24,13 @@ namespace NSL.UDP.Client
         {
             if (!IPAddress.TryParse(options.IpAddress, out var ip))
                 throw new ArgumentException($"invalid connection ip {options.IpAddress}", nameof(options.IpAddress));
-
             StartReceive(() => {
                 client = new UDPClient<TClient>(options.GetIPEndPoint(), listener, options);
 
                 client.OnReceivePacket += OnReceivePacket;
                 client.OnSendPacket += OnSendPacket;
+
+                options.InitializeClient(client.Data);
             });
         }
 
@@ -38,17 +39,15 @@ namespace NSL.UDP.Client
             StopReceive();
         }
 
-        protected override void Args_Completed(object sender, SocketAsyncEventArgs e)
+        protected override void Args_Completed(Span<byte> data, SocketReceiveFromResult e)
         {
             if (!state)
                 return;
 
-            RunReceiveAsync(ListenerCTS.Token);
+            RunReceiveAsync();
 
             if (e.RemoteEndPoint.Equals(options.GetIPEndPoint()))
-                client.Receive(e);
-            else
-                e.Dispose();
+                client.Receive(data);
         }
     }
 }

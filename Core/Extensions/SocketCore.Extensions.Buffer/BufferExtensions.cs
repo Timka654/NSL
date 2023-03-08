@@ -1,7 +1,6 @@
 ﻿using Newtonsoft.Json;
 using NSL.SocketCore.Utils.Buffer;
 using System;
-using System.Net.Sockets;
 
 namespace NSL.SocketCore.Extensions.Buffer
 {
@@ -220,7 +219,7 @@ namespace NSL.SocketCore.Extensions.Buffer
 
             rbuff.WriteDouble(value);
 
-            client.Send(rbuff.CompilePacket(), 0, rbuff.PacketLenght);
+            client.Send(rbuff);
         }
 
         public static void Send<TClient, TPacket>(this TClient client, TPacket packetId, DateTime value)

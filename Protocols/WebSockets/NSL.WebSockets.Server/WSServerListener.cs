@@ -1,8 +1,8 @@
-﻿using NSL.SocketCore;
-using NSL.SocketServer.Utils;
+﻿using NSL.SocketServer.Utils;
 using NSL.SocketServer;
 using System;
 using System.Net;
+using NSL.SocketCore;
 
 namespace NSL.WebSockets.Server
 {

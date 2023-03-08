@@ -124,6 +124,9 @@ namespace NSL.SocketCore
             return false;
         }
 
+        public bool AddAsyncHandle(ushort packetId, AsyncPacketHandle handle)
+            => AddHandle(packetId, (client, input) => handle(client, input).Wait());
+
         public IPacket<TClient> GetPacket(ushort packetId)
         {
             Packets.TryGetValue(packetId, out var result);
@@ -166,6 +169,7 @@ namespace NSL.SocketCore
         /// <param name="data">Входящий буффер с данными</param>
         /// <param name="output">Исходящий буффер с данными(не обязательно)</param>
         public delegate void PacketHandle(TClient client, InputPacketBuffer data);
+        public delegate Task AsyncPacketHandle(TClient client, InputPacketBuffer data);
 
         /// <summary>
         /// События вызываемое при получении ошибки

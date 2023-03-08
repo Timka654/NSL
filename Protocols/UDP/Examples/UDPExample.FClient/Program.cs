@@ -1,6 +1,9 @@
-﻿using UDPExample;
+﻿using NSL.Logger;
+using UDPExample;
 
-new SenderExample();
+ConsoleLogger logger = new ConsoleLogger();
+
+new SenderExample(logger);
 
 while (true)
 {

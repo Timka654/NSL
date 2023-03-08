@@ -1,11 +1,11 @@
 ﻿using NSL.BuilderExtensions.TCP;
-using NSL.EndPointBuilder;
-using NSL.SocketCore;
 using System;
 using System.Net;
 using NSL.TCP.Server;
-using NSL.SocketServer;
 using NSL.SocketServer.Utils;
+using NSL.SocketServer;
+using NSL.SocketCore;
+using NSL.EndPointBuilder;
 
 namespace NSL.BuilderExtensions.TCPServer
 {
