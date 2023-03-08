@@ -13,7 +13,7 @@ namespace NSL.UDP
         public UDPChannelEnum Channel { get; set; } = UDPChannelEnum.ReliableOrdered;
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static UDPChannelEnum ReadChannel(Memory<byte> buffer) => UDPPacket.ReadChannel(buffer);
+		public static UDPChannelEnum ReadChannel(Span<byte> buffer) => UDPPacket.ReadChannel(buffer);
 
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]

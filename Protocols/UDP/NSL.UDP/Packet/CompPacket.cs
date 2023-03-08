@@ -7,6 +7,6 @@ namespace NSL.UDP.Packet
     internal class CompPacket
 	{
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static bool ReadISComp(Memory<byte> buffer) => (DgramHeadTypeEnum)buffer.Span[0] == DgramHeadTypeEnum.Comp; // end offset 1
+		public static bool ReadISComp(Span<byte> buffer) => (DgramHeadTypeEnum)buffer[0] == DgramHeadTypeEnum.Comp; // end offset 1
 	}
 }

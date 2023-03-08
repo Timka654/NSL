@@ -12,10 +12,10 @@ namespace NSL.UDP.Packet
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static ushort GetChecksum(byte[] buffer)
-			=> GetChecksum(buffer.AsMemory());
+			=> GetChecksum((Span<byte>)buffer);
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static ushort GetChecksum(Memory<byte> buffer)
+		public static ushort GetChecksum(Span<byte> buffer)
 		{
 			emptySumBytes.CopyTo(buffer[3..]);
 
@@ -30,12 +30,12 @@ namespace NSL.UDP.Packet
 		// 0 byte - head
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static ushort ReadPID(Memory<byte> buffer) => BitConverter.ToUInt16(buffer.Span[1..]); // end offset = 3
+		public static ushort ReadPID(Span<byte> buffer) => BitConverter.ToUInt16(buffer[1..]); // end offset = 3
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static UDPChannelEnum ReadChannel(Memory<byte> buffer) => (UDPChannelEnum)buffer.Span[5]; // end offset = 6
+		public static UDPChannelEnum ReadChannel(Span<byte> buffer) => (UDPChannelEnum)buffer[5]; // end offset = 6
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static ushort ReadChecksum(Memory<byte> buffer) => BitConverter.ToUInt16(buffer.Span[3..]); // end offset = 10
+		public static ushort ReadChecksum(Span<byte> buffer) => BitConverter.ToUInt16(buffer[3..]); // end offset = 10
 	}
 }

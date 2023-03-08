@@ -134,6 +134,8 @@ namespace NSL.UDP
                 //дешефруем и засовываем это все в спец буффер в котором реализованы методы чтения типов, своего рода поток
                 InputPacketBuffer pbuff = new InputPacketBuffer(inputCipher.Decode(result, 0, result.Length), true);
 
+                OnReceive(pbuff.PacketId, pbuff.Lenght);
+
                 //предотвращение ошибок в пакете
                 try
                 {

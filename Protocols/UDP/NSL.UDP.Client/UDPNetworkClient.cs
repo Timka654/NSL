@@ -38,17 +38,15 @@ namespace NSL.UDP.Client
             StopReceive();
         }
 
-        protected override void Args_Completed(object sender, SocketAsyncEventArgs e)
+        protected override void Args_Completed(Span<byte> data, SocketReceiveFromResult e)
         {
             if (!state)
                 return;
 
-            RunReceiveAsync(ListenerCTS.Token);
+            RunReceiveAsync();
 
             if (e.RemoteEndPoint.Equals(options.GetIPEndPoint()))
-                client.Receive(e);
-            else
-                e.Dispose();
+                client.Receive(data);
         }
     }
 }

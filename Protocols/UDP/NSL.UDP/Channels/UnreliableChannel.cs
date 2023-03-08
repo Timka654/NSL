@@ -1,5 +1,6 @@
 ﻿using NSL.SocketCore.Utils;
 using NSL.UDP.Enums;
+using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
 
@@ -30,12 +31,12 @@ namespace NSL.UDP.Channels
 				throw new KeyNotFoundException(channel.ToString());
 		}
 
-		public override void Receive(UDPChannelEnum channel, SocketAsyncEventArgs result)
+		public override void Receive(UDPChannelEnum channel, Span<byte> data)
 		{
 			if (channel.HasFlag(UDPChannelEnum.Ordered))
-				orderedChannel.Receive(channel, result);
+				orderedChannel.Receive(channel, data);
 			else if (channel.HasFlag(UDPChannelEnum.Unordered))
-				unorderedChannel.Receive(channel, result);
+				unorderedChannel.Receive(channel, data);
 			else
 				throw new KeyNotFoundException(channel.ToString());
 		}

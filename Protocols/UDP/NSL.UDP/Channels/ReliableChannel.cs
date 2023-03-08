@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using NSL.UDP.Enums;
 using System.Net.Sockets;
+using System;
+using NSL.UDP.Packet;
 
 namespace NSL.UDP.Channels
 {
@@ -14,10 +16,10 @@ namespace NSL.UDP.Channels
         BaseChannel<TClient, TParent> orderedChannel;
         BaseChannel<TClient, TParent> unorderedChannel;
 
-		public ReliableChannel(BaseUDPClient<TClient, TParent> udpClient) : base(udpClient)
+        public ReliableChannel(BaseUDPClient<TClient, TParent> udpClient) : base(udpClient)
         {
-			orderedChannel = new OrderedChannel<TClient, TParent>(udpClient, this);
-			unorderedChannel = new UnorderedChannel<TClient, TParent>(udpClient, this);
+            orderedChannel = new OrderedChannel<TClient, TParent>(udpClient, this);
+            unorderedChannel = new UnorderedChannel<TClient, TParent>(udpClient, this);
         }
 
         public override void Send(UDPChannelEnum channel, byte[] data)
@@ -30,14 +32,27 @@ namespace NSL.UDP.Channels
                 throw new KeyNotFoundException(channel.ToString());
         }
 
-        public override void Receive(UDPChannelEnum channel, SocketAsyncEventArgs result)
-		{
-			if (channel.HasFlag(UDPChannelEnum.Ordered))
-				orderedChannel.Receive(channel, result);
-			else if (channel.HasFlag(UDPChannelEnum.Unordered))
-				unorderedChannel.Receive(channel, result);
-			else
-				throw new KeyNotFoundException(channel.ToString());
+        public override void Receive(UDPChannelEnum channel, Span<byte> data)
+        {
+            if (CompPacket.ReadISComp(data))
+                throw new NotImplementedException();
+            else if (channel.HasFlag(UDPChannelEnum.Ordered))
+                orderedChannel.Receive(channel, data);
+            else if (channel.HasFlag(UDPChannelEnum.Unordered))
+                unorderedChannel.Receive(channel, data);
+            else
+                throw new KeyNotFoundException(channel.ToString());
+        }
+
+
+        uint currentPID = 0;
+
+        internal override uint CreatePID()
+        {
+            lock (this)
+            {
+                return currentPID++;
+            }
         }
     }
 }

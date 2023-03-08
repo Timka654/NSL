@@ -9,11 +9,11 @@ namespace NSL.UDP.Packet
 		public static byte[] LPHeadBytes = new byte[] { 0 };
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static bool ReadISLP(Memory<byte> buffer) => (DgramHeadTypeEnum)buffer.Span[0] == DgramHeadTypeEnum.LP; // end offset 1
+		public static bool ReadISLP(Span<byte> buffer) => (DgramHeadTypeEnum)buffer[0] == DgramHeadTypeEnum.LP; // end offset 1
 
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static ushort ReadPacketLen(Memory<byte> buffer) => BitConverter.ToUInt16(buffer.Span[6..]); // end offset = 8
+		public static ushort ReadPacketLen(Span<byte> buffer) => BitConverter.ToUInt16(buffer[6..]); // end offset = 8
 
 		// 8..10 - is Checksum
 

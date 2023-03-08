@@ -1,5 +1,6 @@
 ﻿using NSL.SocketCore.Utils;
 using NSL.UDP.Enums;
+using System;
 
 namespace NSL.UDP.Channels
 {
@@ -10,6 +11,8 @@ namespace NSL.UDP.Channels
         private readonly BaseChannel<TClient, TParent> parent;
 
         public override UDPChannelEnum Channel => UDPChannelEnum.Ordered;
+
+        public Action<uint> OnSend = pid => { };
 
         public OrderedChannel(BaseUDPClient<TClient, TParent> udpClient) : base(udpClient) { }
         public OrderedChannel(BaseUDPClient<TClient, TParent> udpClient, BaseChannel<TClient, TParent> parent) : this(udpClient)
@@ -22,6 +25,14 @@ namespace NSL.UDP.Channels
             base.Send(channel, data);
         }
 
+        protected override void AfterBuild(BaseChannel<TClient, TParent> fromChannel, PacketWaitTemp packet)
+        {
+            OnSend(packet.PID);
+            base.AfterBuild(fromChannel, packet);
+        }
+
+        internal override uint CreatePID()
+            => (parent as ReliableChannel<TClient, TParent>)?.CreatePID() ?? 0;
 
     }
 }

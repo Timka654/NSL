@@ -3,6 +3,7 @@ using NSL.SocketCore;
 using NSL.SocketCore.Utils;
 using NSL.SocketCore.Utils.Buffer;
 using NSL.SocketCore.Utils.Cipher;
+using NSL.SocketCore.Utils.Logger;
 using NSL.SocketServer.Utils;
 using NSL.UDP.Client;
 using NSL.UDP.Client.Interface;
@@ -45,18 +46,21 @@ namespace UDPExample
 
     }
 
-    public class Example<TOptions>
-        where TOptions : CoreOptions, IBindingUDPOptions, new ()
+    public class Example<TOptions, TClient>
+        where TClient : INetworkClient
+        where TOptions : CoreOptions<TClient>, IBindingUDPOptions, new()
     {
         protected TOptions options;
 
-        protected void Initialize()
+        protected void Initialize(IBasicLogger logger)
         {
             options = new TOptions();
 
             options.BindingIP = "0.0.0.0";
 
             options.ReceiveBufferSize = 1024;
+
+            options.HelperLogger = logger;
 
             options.StunServers.Add(new NSL.UDP.Client.Info.StunServerInfo("stun.l.google.com:19302"));
             options.StunServers.Add(new NSL.UDP.Client.Info.StunServerInfo("stun1.l.google.com:19302"));
@@ -81,18 +85,31 @@ namespace UDPExample
             options.StunServers.Add(new NSL.UDP.Client.Info.StunServerInfo("stun.virtual-call.com"));
             options.StunServers.Add(new NSL.UDP.Client.Info.StunServerInfo("stun.voxgratia.org"));
 
+            options.OnClientConnectEvent += Options_OnClientConnectEvent;
+            options.OnClientDisconnectEvent += Options_OnClientDisconnectEvent;
+
             options.InputCipher = new PacketNoneCipher();
 
             options.OutputCipher = new PacketNoneCipher();
         }
+
+        private void Options_OnClientConnectEvent(TClient client)
+        {
+            options.HelperLogger.Append(NSL.SocketCore.Utils.Logger.Enums.LoggerLevel.Info, $"Client Connected");
+        }
+
+        private void Options_OnClientDisconnectEvent(TClient client)
+        {
+            options.HelperLogger.Append(NSL.SocketCore.Utils.Logger.Enums.LoggerLevel.Info, $"Client disconnected");
+        }
     }
 
-    public class SenderExample : Example<UDPClientOptions<NetworkClient>>
+    public class SenderExample : Example<UDPClientOptions<NetworkClient>, NetworkClient>
     {
         protected UDPNetworkClient<NetworkClient> client;
-        public SenderExample()
+        public SenderExample(IBasicLogger logger)
         {
-            base.Initialize();
+            base.Initialize(logger);
 
             options.IpAddress = "127.0.0.1";
 
@@ -110,29 +127,43 @@ namespace UDPExample
         private void Run()
         {
             client = new UDPNetworkClient<NetworkClient>(options);
+            client.OnReceivePacket += Client_OnReceivePacket;
+            client.OnSendPacket += Client_OnSendPacket;
             Thread.Sleep(1_500);
             client.Connect();
 
-
-            using (var packet = new NSL.UDP.DgramPacket() { PacketId = 1 })
+            for (int i = 0; i < 10; i++)
             {
-                packet.WriteInt32(1);
-                packet.WriteInt32(2);
-                packet.WriteInt32(3);
+                using (var packet = new NSL.UDP.DgramPacket() { PacketId = 1 })
+                {
+                    packet.WriteInt32((i * 3) + 1);
+                    packet.WriteInt32((i * 3) + 2);
+                    packet.WriteInt32((i * 3) + 3);
 
-                client.GetClient().Send(packet);
+                    client.GetClient().Send(packet);
+                }
             }
 
         }
+
+        private void Client_OnSendPacket(UDPClient<NetworkClient> client, ushort pid, int len, string stacktrace)
+        {
+            options.HelperLogger.Append(NSL.SocketCore.Utils.Logger.Enums.LoggerLevel.Debug, $"Send {pid}----{len}bytes to {client.GetRemotePoint()}");
+        }
+
+        private void Client_OnReceivePacket(UDPClient<NetworkClient> client, ushort pid, int len)
+        {
+            options.HelperLogger.Append(NSL.SocketCore.Utils.Logger.Enums.LoggerLevel.Debug, $"Receive {pid}----{len}bytes from {client.GetRemotePoint()}");
+        }
     }
 
-    public class ReceiverExample : Example<UDPServerOptions<NetworkClientForServer>>
+    public class ReceiverExample : Example<UDPServerOptions<NetworkClientForServer>, NetworkClientForServer>
     {
         protected UDPServer<NetworkClientForServer> listener;
 
-        public ReceiverExample()
+        public ReceiverExample(IBasicLogger logger)
         {
-            base.Initialize();
+            base.Initialize(logger);
 
             options.BindingPort = 5553;
 
@@ -145,7 +176,20 @@ namespace UDPExample
         {
             listener = new UDPServer<NetworkClientForServer>(options);
 
+            listener.OnReceivePacket += Listener_OnReceivePacket;
+            listener.OnSendPacket += Listener_OnSendPacket;
+
             listener.Start();
+        }
+
+        private void Listener_OnSendPacket(UDPClient<NetworkClientForServer> client, ushort pid, int len, string stacktrace)
+        {
+            options.HelperLogger.Append(NSL.SocketCore.Utils.Logger.Enums.LoggerLevel.Debug, $"Send {pid}----{len}bytes to {client.GetRemotePoint()}");
+        }
+
+        private void Listener_OnReceivePacket(UDPClient<NetworkClientForServer> client, ushort pid, int len)
+        {
+            options.HelperLogger.Append(NSL.SocketCore.Utils.Logger.Enums.LoggerLevel.Debug, $"Receive {pid}----{len}bytes from {client.GetRemotePoint()}");
         }
     }
 }

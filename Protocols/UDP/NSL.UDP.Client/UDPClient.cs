@@ -59,19 +59,14 @@ namespace NSL.UDP.Client
 
         protected override void AddWaitPacket(byte[] buffer, int offset, int length) => Data?.AddWaitPacket(buffer, offset, length);
 
-        public void Receive(SocketAsyncEventArgs result)
+        public void Receive(Span<byte> result)
         {
-            using (result)
-            {
-                var channel = DgramPacket.ReadChannel(result.MemoryBuffer);
+                var channel = DgramPacket.ReadChannel(result);
 
                 if (channel.HasFlag(UDPChannelEnum.Reliable))
                     reliableChannel.Receive(channel, result);
 				else if(channel.HasFlag(UDPChannelEnum.Unreliable))
                     unreliableChannel.Receive(channel, result);
-
-                ArrayPool<byte>.Shared.Return(result.MemoryBuffer.ToArray());
-            }
         }
 
         protected override void OnReceive(ushort pid, int len)
