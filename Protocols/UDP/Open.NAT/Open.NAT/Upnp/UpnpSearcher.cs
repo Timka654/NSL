@@ -32,14 +32,13 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Net;
-using System.Diagnostics;
 using System.Net.Sockets;
 using System.Threading;
 using System.Xml;
 
 namespace Open.Nat
 {
-	internal class UpnpSearcher : Searcher
+    internal class UpnpSearcher : Searcher
 	{
 		private readonly IIPAddressesProvider _ipprovider;
 		private readonly IDictionary<Uri, NatDevice> _devices;

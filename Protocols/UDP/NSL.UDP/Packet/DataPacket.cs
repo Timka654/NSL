@@ -1,14 +1,11 @@
 ﻿using NSL.UDP.Interface;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace NSL.UDP.Packet
 {
-	internal class DataPacket
+    internal class DataPacket
 	{
 		public static byte[] DataHeadBytes = new byte[] { 1 };
 

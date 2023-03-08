@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace NSL.SocketCore.Utils.Cipher
+﻿namespace NSL.SocketCore.Utils.Cipher
 {
     public class PacketNoneCipher : IPacketCipher
     {

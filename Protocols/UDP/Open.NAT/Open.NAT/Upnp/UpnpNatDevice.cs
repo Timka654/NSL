@@ -29,14 +29,13 @@
 //
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 
 namespace Open.Nat
 {
-	internal sealed class UpnpNatDevice : NatDevice
+    internal sealed class UpnpNatDevice : NatDevice
 	{
 		public override IPEndPoint HostEndPoint
 		{

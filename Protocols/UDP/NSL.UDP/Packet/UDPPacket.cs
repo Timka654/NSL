@@ -1,15 +1,12 @@
 ﻿using NSL.UDP.Enums;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace NSL.UDP.Packet
 {
-	internal class UDPPacket
+    internal class UDPPacket
 	{
 		protected static byte[] emptySumBytes = new byte[] { 0, 0 };
 
