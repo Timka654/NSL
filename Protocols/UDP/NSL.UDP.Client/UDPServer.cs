@@ -1,4 +1,5 @@
-﻿using NSL.SocketCore;
+﻿using NSL.SocketClient;
+using NSL.SocketCore;
 using NSL.SocketServer;
 using NSL.SocketServer.Utils;
 using System;
@@ -12,27 +13,14 @@ using System.Threading.Tasks;
 
 namespace NSL.UDP.Client
 {
-    public class IPEPEQComparer : IEqualityComparer<IPEndPoint>
-    {
-        public bool Equals(IPEndPoint x, IPEndPoint y)
-        {
-            return x.Equals(y);
-        }
-
-        public int GetHashCode([DisallowNull] IPEndPoint obj)
-        {
-            return obj.GetHashCode();
-        }
-    }
-
-    public class UDPServer<TClient> : UDPListener<TClient, UDPServerOptions<TClient>>, INetworkListener
+    public class UDPServer<TClient> : UDPListener<TClient, UDPClientOptions<TClient>>, INetworkListener
         where TClient : IServerNetworkClient, new()
     {
         public event ReceivePacketDebugInfo<UDPClient<TClient>> OnReceivePacket;
 
         public event SendPacketDebugInfo<UDPClient<TClient>> OnSendPacket;
 
-        public UDPServer(UDPServerOptions<TClient> options) : base(options)
+        public UDPServer(UDPClientOptions<TClient> options) : base(options)
         {
         }
 
@@ -46,7 +34,7 @@ namespace NSL.UDP.Client
             StopReceive();
         }
 
-        private ConcurrentDictionary<IPEndPoint, Lazy<UDPClient<TClient>>> clients = new ConcurrentDictionary<IPEndPoint, Lazy<UDPClient<TClient>>>(new IPEPEQComparer());
+        private ConcurrentDictionary<IPEndPoint, Lazy<UDPClient<TClient>>> clients = new ConcurrentDictionary<IPEndPoint, Lazy<UDPClient<TClient>>>();
 
         protected override void Options_OnClientDisconnectEvent(TClient client)
         {
@@ -61,7 +49,13 @@ namespace NSL.UDP.Client
 
             RunReceiveAsync();
 
-            var c = clients.GetOrAdd(e.RemoteEndPoint as IPEndPoint, ipep =>
+            GetClient(e.RemoteEndPoint as IPEndPoint)
+                .Receive(buffer[..e.ReceivedBytes]);
+        }
+
+        private UDPClient<TClient> GetClient(IPEndPoint endPoint)
+        {
+            var c = clients.GetOrAdd(endPoint, ipep =>
             {
                 return new Lazy<UDPClient<TClient>>(() =>
                 {
@@ -72,8 +66,11 @@ namespace NSL.UDP.Client
                 });
             });
 
-            c.Value.Receive(buffer[..e.ReceivedBytes]);
+            return c.Value;
         }
+
+        private UDPClient<TClient> CreateClientConnection(IPEndPoint endPoint)
+            => GetClient(endPoint);
 
         public int GetListenerPort() => options.BindingPort;
 

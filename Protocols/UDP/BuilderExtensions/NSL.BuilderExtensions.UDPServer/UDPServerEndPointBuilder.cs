@@ -6,6 +6,8 @@ using System.Net;
 using NSL.SocketServer;
 using NSL.SocketServer.Utils;
 using NSL.UDP.Client;
+using NSL.SocketClient;
+using NSL.SocketClient.Utils;
 
 namespace NSL.BuilderExtensions.UDPServer
 {
@@ -36,7 +38,7 @@ namespace NSL.BuilderExtensions.UDPServer
         }
 
         public UDPServerEndPointBuilder<TClient, TOptions> WithOptions<TOptions>()
-            where TOptions : UDPServerOptions<TClient>, new()
+            where TOptions : UDPClientOptions<TClient>, new()
         {
             return UDPServerEndPointBuilder<TClient, TOptions>.Create();
         }
@@ -44,7 +46,7 @@ namespace NSL.BuilderExtensions.UDPServer
 
     public class UDPServerEndPointBuilder<TClient, TOptions> : UDPEndPointBuilder, IOptionableEndPointServerBuilder<TClient>, IHandleIOBuilder<UDPClient<TClient>>
         where TClient : IServerNetworkClient, new()
-        where TOptions : UDPServerOptions<TClient>, new()
+        where TOptions : UDPClientOptions<TClient>, new()
     {
         TOptions options = new TOptions();
 
@@ -83,13 +85,6 @@ namespace NSL.BuilderExtensions.UDPServer
         {
             options.BindingIP = ip;
             options.BindingPort = port;
-
-            return this;
-        }
-
-        public UDPServerEndPointBuilder<TClient, TOptions> WithBacklog(int maxWaitConnectionCount)
-        {
-            options.Backlog = maxWaitConnectionCount;
 
             return this;
         }

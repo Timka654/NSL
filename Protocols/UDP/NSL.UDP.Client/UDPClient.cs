@@ -79,5 +79,6 @@ namespace NSL.UDP.Client
         protected override void RunDisconnect() => base.options.RunClientDisconnect(Data);
 
         protected override void RunException(Exception ex) => base.options.RunException(ex, Data);
+
     }
 }

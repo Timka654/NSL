@@ -1,5 +1,7 @@
-﻿using NSL.SocketCore;
+﻿using NSL.SocketClient;
+using NSL.SocketCore;
 using NSL.SocketCore.Utils;
+using NSL.SocketServer.Utils;
 using NSL.UDP.Client.Info;
 using NSL.UDP.Client.Interface;
 using STUN;
@@ -13,9 +15,9 @@ using System.Threading.Tasks;
 
 namespace NSL.UDP.Client
 {
-    public class UDPListener<TClient, TOptions>
-        where TClient : INetworkClient, new()
-        where TOptions : CoreOptions<TClient>, IBindingUDPOptions
+    public abstract class UDPListener<TClient, TOptions>
+        where TClient : IServerNetworkClient, new()
+        where TOptions : UDPClientOptions<TClient>, IBindingUDPOptions
     {
         private static readonly IPEndPoint _blankEndpoint = new IPEndPoint(IPAddress.Any, 0);
 
@@ -143,12 +145,6 @@ namespace NSL.UDP.Client
 
             var poolMem = ArrayPool<byte>.Shared.Rent(options.ReceiveBufferSize);
 
-            //SocketAsyncEventArgs args = new SocketAsyncEventArgs();
-
-            //args.SetBuffer(poolMem);
-            //args.RemoteEndPoint = new IPEndPoint(IPAddress.Any, 0);
-            //args.Completed += Args_Completed;
-
             try
             {
                 var recv = await listener.ReceiveFromAsync(poolMem, SocketFlags.None, _blankEndpoint);
@@ -171,10 +167,6 @@ namespace NSL.UDP.Client
             }
         }
 
-        protected virtual void Args_Completed(Span<byte> buffer, SocketReceiveFromResult e)
-        {
-        }
+        protected abstract void Args_Completed(Span<byte> buffer, SocketReceiveFromResult e);
     }
-
-
 }

@@ -27,13 +27,16 @@ namespace NSL.SocketServer
 
         public ServerOptions()
         {
+            LoadOptions();
+        }
+
+        protected virtual void LoadOptions()
+        { 
             AddPacket(AliveConnectionPacket.PacketId, new ServerAliveConnectionPacket<TClient>());
             AddPacket(RecoverySessionPacket<TClient>.PacketId, new RecoverySessionPacket<TClient>());
             AddPacket(VersionPacket<TClient>.PacketId, new VersionPacket<TClient>());
             AddPacket(SystemTime<TClient>.PacketId, new SystemTime<TClient>());
         }
-
-
 
         /// <summary>
         /// Ип адресс - используется для инициализации слушателя на определенном адаптере (0.0.0.0 - для всех)

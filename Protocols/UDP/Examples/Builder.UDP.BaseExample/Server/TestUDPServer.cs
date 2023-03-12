@@ -11,9 +11,8 @@ namespace Builder.UDP.BaseExample.Server
             var server = UDPServerEndPointBuilder
                 .Create()
                 .WithClientProcessor<UDPServerNetworkClient>()
-                .WithOptions<UDPServerOptions<UDPServerNetworkClient>>()
+                .WithOptions<UDPClientOptions<UDPServerNetworkClient>>()
                 .WithBindingPoint("0.0.0.0", 20006)
-                .WithBacklog(1)
                 .WithCode(builder =>
                 {
                     // builder.WithAddressFamily(System.Net.Sockets.AddressFamily.InterNetwork); //optional(setted on initialize to valid)

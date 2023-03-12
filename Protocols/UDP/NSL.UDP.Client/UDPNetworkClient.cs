@@ -3,11 +3,12 @@ using System;
 using System.Net.Sockets;
 using NSL.SocketClient;
 using NSL.SocketCore;
+using NSL.SocketServer.Utils;
 
 namespace NSL.UDP.Client
 {
     public class UDPNetworkClient<TClient> : UDPListener<TClient, UDPClientOptions<TClient>>
-        where TClient : BaseSocketNetworkClient, new()
+        where TClient : IServerNetworkClient, new()
     {
         public event ReceivePacketDebugInfo<UDPClient<TClient>> OnReceivePacket;
         public event SendPacketDebugInfo<UDPClient<TClient>> OnSendPacket;
@@ -29,8 +30,6 @@ namespace NSL.UDP.Client
 
                 client.OnReceivePacket += OnReceivePacket;
                 client.OnSendPacket += OnSendPacket;
-
-                options.InitializeClient(client.Data);
             });
         }
 

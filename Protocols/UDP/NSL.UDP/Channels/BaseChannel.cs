@@ -106,8 +106,6 @@ namespace NSL.UDP.Channels
                 pid,
                 id => new PacketReciveTemp(id));
 
-            Console.WriteLine($"{channel} received {pid} lp:{LPacket.ReadISLP(data)}");
-
             if (LPacket.ReadISLP(data))
             {
                 packet.Lenght = LPacket.ReadPacketLen(data);
@@ -140,7 +138,6 @@ namespace NSL.UDP.Channels
 
                         rcvHandle = (pid) =>
                         {
-                            Console.WriteLine($"{nameof(rcvHandle)} - {pid}");
                             if (pid - 1 == packet.PID)
                                 ProcessPacket(channel, packet);
                             OnReceive -= rcvHandle;

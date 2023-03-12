@@ -63,7 +63,7 @@ namespace NSL.SocketClient
         /// </summary>
         public int Ping { get; protected set; }
 
-        public bool PingPongEnabled
+        public virtual bool PingPongEnabled
         {
             get => pingPongEnabled; set
             {
