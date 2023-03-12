@@ -1,15 +1,10 @@
-﻿using NSL.SocketClient;
-using NSL.SocketCore;
+﻿using NSL.SocketCore;
 using NSL.SocketServer;
 using NSL.SocketServer.Utils;
 using System;
-using System.Collections;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Net.Sockets;
-using System.Threading.Tasks;
 
 namespace NSL.UDP.Client
 {
@@ -69,7 +64,7 @@ namespace NSL.UDP.Client
             return c.Value;
         }
 
-        private UDPClient<TClient> CreateClientConnection(IPEndPoint endPoint)
+        public UDPClient<TClient> CreateClientConnection(IPEndPoint endPoint)
             => GetClient(endPoint);
 
         public int GetListenerPort() => options.BindingPort;

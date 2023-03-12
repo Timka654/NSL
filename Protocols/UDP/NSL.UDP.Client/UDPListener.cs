@@ -1,7 +1,4 @@
-﻿using NSL.SocketClient;
-using NSL.SocketCore;
-using NSL.SocketCore.Utils;
-using NSL.SocketServer.Utils;
+﻿using NSL.SocketServer.Utils;
 using NSL.UDP.Client.Info;
 using NSL.UDP.Client.Interface;
 using STUN;

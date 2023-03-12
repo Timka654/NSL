@@ -1,7 +1,6 @@
 ﻿using System.Net;
 using System;
 using System.Net.Sockets;
-using NSL.SocketClient;
 using NSL.SocketCore;
 using NSL.SocketServer.Utils;
 

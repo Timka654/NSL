@@ -1,7 +1,5 @@
 ﻿using NSL.BuilderExtensions.UDP;
 using NSL.EndPointBuilder;
-using NSL.SocketClient;
-using NSL.SocketClient.Utils;
 using NSL.SocketCore;
 using NSL.SocketServer;
 using NSL.SocketServer.Utils;

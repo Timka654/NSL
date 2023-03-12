@@ -1,5 +1,4 @@
-﻿using NSL.SocketClient;
-using NSL.SocketCore;
+﻿using NSL.SocketCore;
 using NSL.SocketCore.Utils;
 using NSL.SocketCore.Utils.Buffer;
 using NSL.SocketCore.Utils.Cipher;
