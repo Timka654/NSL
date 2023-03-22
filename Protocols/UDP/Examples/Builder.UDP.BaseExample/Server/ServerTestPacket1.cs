@@ -12,7 +12,7 @@ namespace Builder.UDP.BaseExample.Server
 
             Console.WriteLine($"[Server]receive from {nameof(ServerTestPacket1)} - {str}");
 
-            var pkt = new DgramPacket();
+            var pkt = new NSL.UDP.DgramOutputPacketBuffer();
 
             pkt.PacketId = 1;
 
@@ -20,7 +20,7 @@ namespace Builder.UDP.BaseExample.Server
 
             client.Send(pkt);
 
-            pkt = new DgramPacket();
+            pkt = new NSL.UDP.DgramOutputPacketBuffer();
 
             pkt.PacketId = 2;
 
@@ -28,7 +28,7 @@ namespace Builder.UDP.BaseExample.Server
 
             client.Send(pkt);
 
-            pkt = new DgramPacket();
+            pkt = new NSL.UDP.DgramOutputPacketBuffer();
 
             pkt.PacketId = 3;
 

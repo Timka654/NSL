@@ -62,6 +62,8 @@ namespace NSL.UDP.Client
 
             listener = new Socket(options.AddressFamily, SocketType.Dgram, options.ProtocolType);
 
+            listener.Blocking = false;
+
             //         listener.ExclusiveAddressUse = false;
             //listener.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
 

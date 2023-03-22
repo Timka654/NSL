@@ -26,7 +26,7 @@ namespace UDPExample
 
 
 
-            using (var packet = new NSL.UDP.DgramPacket() { PacketId = 1 })
+            using (var packet = new NSL.UDP.DgramOutputPacketBuffer() { PacketId = 1 })
             {
                 packet.WriteInt32(1);
                 packet.WriteInt32(2);
@@ -140,7 +140,7 @@ namespace UDPExample
 
             for (int i = 0; i < 10; i++)
             {
-                using (var packet = new NSL.UDP.DgramPacket() { PacketId = 1, Channel = NSL.UDP.Enums.UDPChannelEnum.ReliableUnordered })
+                using (var packet = new NSL.UDP.DgramOutputPacketBuffer() { PacketId = 1, Channel = NSL.UDP.Enums.UDPChannelEnum.ReliableUnordered })
                 {
                     packet.WriteInt32((i * 3) + 1);
                     packet.WriteInt32((i * 3) + 2);

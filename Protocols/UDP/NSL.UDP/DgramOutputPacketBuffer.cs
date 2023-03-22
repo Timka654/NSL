@@ -8,15 +8,15 @@ using System.Runtime.CompilerServices;
 
 namespace NSL.UDP
 {
-    public class DgramPacket : OutputPacketBuffer
+    public class DgramOutputPacketBuffer : OutputPacketBuffer
     {
         public UDPChannelEnum Channel { get; set; } = UDPChannelEnum.ReliableOrdered;
 
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static UDPChannelEnum ReadChannel(Span<byte> buffer) => UDPPacket.ReadChannel(buffer);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static UDPChannelEnum ReadChannel(Span<byte> buffer) => UDPPacket.ReadChannel(buffer);
 
 
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override void Send(IClient client, bool disposeOnSend)
         {
             if (client is IUDPClient c)
@@ -29,8 +29,11 @@ namespace NSL.UDP
 
                 return;
             }
-            
-            throw new Exception($"{nameof(DgramPacket)} cannot be send with no {nameof(IClient<DgramPacket>)}");
+
+            base.Send(client, disposeOnSend);
         }
     }
+
+    [Obsolete("Replace to DgramOutputPacketBuffer", true)]
+    public class DgramPacket : DgramOutputPacketBuffer { }
 }

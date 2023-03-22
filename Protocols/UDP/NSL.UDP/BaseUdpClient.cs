@@ -13,7 +13,7 @@ using System.Threading;
 
 namespace NSL.UDP
 {
-    public abstract class BaseUDPClient<TClient, TParent> : IClient<DgramPacket>, IUDPClient
+    public abstract class BaseUDPClient<TClient, TParent> : IClient<DgramOutputPacketBuffer>, IUDPClient
         where TClient : INetworkClient
         where TParent : BaseUDPClient<TClient, TParent>
     {
@@ -176,7 +176,7 @@ namespace NSL.UDP
             }
         }
 
-        public void Send(DgramPacket packet, bool disposeOnSend = true)
+        public void Send(DgramOutputPacketBuffer packet, bool disposeOnSend = true)
         {
 #if DEBUG
             OnSend(packet, Environment.StackTrace);
@@ -189,9 +189,9 @@ namespace NSL.UDP
 
         public void Send(OutputPacketBuffer packet, bool disposeOnSend = true)
         {
-            if (!(packet is DgramPacket dpkg))
+            if (!(packet is DgramOutputPacketBuffer dpkg))
             {
-                dpkg = new DgramPacket() { Channel = UDPChannelEnum.ReliableOrdered, PacketId = packet.PacketId };
+                dpkg = new DgramOutputPacketBuffer() { Channel = UDPChannelEnum.ReliableOrdered, PacketId = packet.PacketId };
                 packet.DataPosition = 0;
                 packet.CopyTo(dpkg);
             }
@@ -243,7 +243,7 @@ namespace NSL.UDP
 
         public void SendEmpty(ushort packetId)
         {
-            DgramPacket rbuff = new DgramPacket
+            DgramOutputPacketBuffer rbuff = new DgramOutputPacketBuffer
             {
                 PacketId = packetId
             };
@@ -264,7 +264,7 @@ namespace NSL.UDP
 
         public short GetTtl() => listenerSocket.Ttl;
 
-        protected virtual void OnSend(DgramPacket rbuff, string stackTrace = "")
+        protected virtual void OnSend(DgramOutputPacketBuffer rbuff, string stackTrace = "")
         {
             OnSendPacket?.Invoke(parent, rbuff.PacketId, rbuff.PacketLenght, stackTrace);
         }

@@ -55,17 +55,17 @@ namespace NSL.SocketCore.Extensions.Buffer
         public async Task SendWaitRequest(WaitablePacketBuffer buffer, Func<InputPacketBuffer, Task> onResult, bool disposeOnSend = true)
         {
             InputPacketBuffer data = default;
+            Guid rid;
 
             using (ManualResetEvent locker = new ManualResetEvent(false))
             {
-                Guid rid;
 
                 do
                 {
                     rid = Guid.NewGuid();
-                } while (!requests.TryAdd(rid, (input) => 
-                { 
-                    data = input; 
+                } while (!requests.TryAdd(rid, (input) =>
+                {
+                    data = input;
                     locker.Set();
                     requests.TryRemove(rid, out _);
                 }));
@@ -82,6 +82,48 @@ namespace NSL.SocketCore.Extensions.Buffer
             await onResult(data);
 
             data?.Dispose();
+        }
+
+        public async Task SendWaitRequest(WaitablePacketBuffer buffer, Func<InputPacketBuffer, Task> onResult, CancellationToken cancellationToken, bool disposeOnSend = true)
+        {
+            InputPacketBuffer data = default;
+            Guid rid;
+            try
+            {
+                using (ManualResetEvent locker = new ManualResetEvent(false))
+                {
+                    do
+                    {
+                        rid = Guid.NewGuid();
+                    } while (!requests.TryAdd(rid, (input) =>
+                    {
+                        data = input;
+                        locker.Set();
+                        requests.TryRemove(rid, out _);
+                    }));
+
+                    buffer.WithRecvIdentity(rid);
+
+                    client.Network.Send(buffer, disposeOnSend);
+
+                    while (requests.ContainsKey(rid) && !await Task.Run(() => locker.WaitOne(client.AliveState ? client.AliveCheckTimeOut / 2 : 1000), cancellationToken)) { cancellationToken.ThrowIfCancellationRequested(); }
+                }
+
+                await onResult(data);
+            }
+            catch (TaskCanceledException) { }
+            catch (OperationCanceledException) { }
+            catch (Exception)
+            {
+                throw;
+            }
+            finally
+            {
+                if (rid == default)
+                    requests.TryRemove(rid, out _);
+
+                data?.Dispose();
+            }
         }
 
         public void ProcessWaitResponse(InputPacketBuffer data)

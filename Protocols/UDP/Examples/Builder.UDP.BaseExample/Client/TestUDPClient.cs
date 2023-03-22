@@ -80,7 +80,7 @@ namespace Builder.UDP.BaseExample.Client
 
             Console.WriteLine("write any text and press <Enter>:");
 
-            var forpacket1 = new DgramPacket();
+            var forpacket1 = new NSL.UDP.DgramOutputPacketBuffer();
 
             forpacket1.PacketId = 1;
 

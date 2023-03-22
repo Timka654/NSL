@@ -60,7 +60,7 @@ namespace NSL.UDP.Client
 
         public void Receive(Span<byte> result)
         {
-            var channel = DgramPacket.ReadChannel(result);
+            var channel = DgramOutputPacketBuffer.ReadChannel(result);
 
             if (channel.HasFlag(UDPChannelEnum.Reliable))
                 reliableChannel.Receive(channel, result);

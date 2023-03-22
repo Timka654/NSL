@@ -253,7 +253,7 @@ namespace NSL.SocketCore.Utils.Buffer
             if (len == 0)
                 return String.Empty;
 
-            return ReadString16(len);
+            return ReadString(len);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -267,7 +267,7 @@ namespace NSL.SocketCore.Utils.Buffer
             if (len == 0)
                 return String.Empty;
 
-            return await ReadString16Async(len);
+            return await ReadStringAsync(len);
         }
 
         /// <summary>
@@ -275,19 +275,19 @@ namespace NSL.SocketCore.Utils.Buffer
         /// </summary>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public string ReadString16(ushort len)
+        public string ReadString(uint len)
         {
             if (len < 1)
                 throw new ArgumentOutOfRangeException(nameof(len));
-            return coding.GetString(Read(len));
+            return coding.GetString(Read((int)len));
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public async Task<string> ReadString16Async(ushort len)
+        public async Task<string> ReadStringAsync(uint len)
         {
             if (len < 1)
                 throw new ArgumentOutOfRangeException(nameof(len));
-            return await Task.FromResult(coding.GetString(Read(len)));
+            return await Task.FromResult(coding.GetString(Read((int)len)));
         }
 
         /// <summary>
@@ -305,7 +305,7 @@ namespace NSL.SocketCore.Utils.Buffer
             if (len == 0)
                 return String.Empty;
 
-            return ReadString32(len);
+            return ReadString(len);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -319,27 +319,7 @@ namespace NSL.SocketCore.Utils.Buffer
             if (len == 0)
                 return String.Empty;
 
-            return await ReadString32Async(len);
-        }
-
-        /// <summary>
-        /// Чтения значения string
-        /// </summary>
-        /// <returns></returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public string ReadString32(uint len)
-        {
-            if (len < 1)
-                throw new ArgumentOutOfRangeException(nameof(len));
-            return coding.GetString(Read((int)len));
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public async Task<string> ReadString32Async(uint len)
-        {
-            if (len < 1)
-                throw new ArgumentOutOfRangeException(nameof(len));
-            return await Task.FromResult(coding.GetString(Read((int)len)));
+            return await ReadStringAsync(len);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
