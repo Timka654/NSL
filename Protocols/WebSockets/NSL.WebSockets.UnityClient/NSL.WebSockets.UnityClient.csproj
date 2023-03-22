@@ -29,6 +29,12 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <Content Include="Content\WGLWSWrapper.jslib">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
+	</ItemGroup>
+
+	<ItemGroup>
 		<ProjectReference Include="..\..\..\Core\NSL.SocketClient\NSL.SocketClient.csproj" />
 		<ProjectReference Include="..\..\..\Core\NSL.SocketCore\NSL.SocketCore.csproj" />
 		<ProjectReference Include="..\..\..\Core\Utils\NSL.Utils.Unity\NSL.Utils.Unity.csproj" />
@@ -40,12 +46,6 @@
 	  <Reference Include="UnityEngine">
 	    <HintPath>..\..\..\Reference\UnityEngine.dll</HintPath>
 	  </Reference>
-	</ItemGroup>
-
-	<ItemGroup>
-	  <None Update="Content\WGLWSWrapper.jslib">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </None>
 	</ItemGroup>
 
 </Project>
