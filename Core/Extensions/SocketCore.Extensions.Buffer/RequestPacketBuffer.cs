@@ -3,7 +3,7 @@ using System;
 
 namespace NSL.SocketCore.Extensions.Buffer
 {
-    public class WaitablePacketBuffer : OutputPacketBuffer
+    public class RequestPacketBuffer : OutputPacketBuffer
     {
         /// <summary>
         /// Размер шапки пакета
@@ -21,7 +21,7 @@ namespace NSL.SocketCore.Extensions.Buffer
 
         public override int DataLenght => PacketLenght - DefaultHeaderLenght;
 
-        public WaitablePacketBuffer(Guid rid, int len = 48) : base(len)
+        public RequestPacketBuffer(Guid rid, int len = 48) : base(len)
         {
             WithRecvIdentity(rid);
         }
@@ -40,12 +40,20 @@ namespace NSL.SocketCore.Extensions.Buffer
                 DataPosition = 0;
         }
 
-        public new static WaitablePacketBuffer Create<TEnum>(TEnum packetId, int len = 48)
+        public new static RequestPacketBuffer Create<TEnum>(TEnum packetId, int len = 48)
             where TEnum : struct, Enum, IConvertible
             => Create(packetId, Guid.Empty, len);
 
-        public static WaitablePacketBuffer Create<TEnum>(TEnum packetId, Guid rid, int len = 48)
+        public static RequestPacketBuffer Create<TEnum>(TEnum packetId, Guid rid, int len = 48)
             where TEnum : struct, Enum, IConvertible
-            => new WaitablePacketBuffer(rid, len).WithPid(packetId);
+            => new RequestPacketBuffer(rid, len).WithPid(packetId);
+    }
+
+    [Obsolete("Replace to RequestPacketBuffer", true)]
+    public class WaitablePacketBuffer : RequestPacketBuffer
+    {
+        public WaitablePacketBuffer(Guid rid, int len = 48) : base(rid, len)
+        {
+        }
     }
 }

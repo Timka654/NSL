@@ -288,12 +288,12 @@ namespace NSL.SocketCore.Extensions.Buffer
 
             buffer.WriteGuid(data.ReadGuid());
 
-            if (boffset > WaitablePacketBuffer.DefaultHeaderLenght)
+            if (boffset > RequestPacketBuffer.DefaultHeaderLenght)
                 buffer.Position = boffset;
             else
                 buffer.DataPosition = 16;
 
-            if (doffset > WaitablePacketBuffer.DefaultHeaderLenght)
+            if (doffset > RequestPacketBuffer.DefaultHeaderLenght)
                 data.Position = doffset;
             else
                 data.DataPosition = 16;

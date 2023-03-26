@@ -2,6 +2,7 @@
 using NSL.SocketClient;
 using NSL.SocketCore;
 using NSL.SocketCore.Extensions.Buffer;
+using NSL.SocketCore.Extensions.Buffer.Interface;
 using NSL.SocketCore.Extensions.Packet;
 using NSL.SocketCore.Utils;
 using NSL.SocketCore.Utils.Logger;
@@ -54,13 +55,13 @@ namespace NSL.BuilderExtensions.SocketCore
         }
 
 
-        public static void AddReceivePacketHandle<TClient>(this IOptionableEndPointBuilder<TClient> builder, ushort packetId, Func<TClient, PacketWaitBuffer> handler)
+        public static void AddReceivePacketHandle<TClient>(this IOptionableEndPointBuilder<TClient> builder, ushort packetId, Func<TClient, IResponsibleProcessor> handler)
             where TClient : INetworkClient, new()
         {
             builder.GetCoreOptions().AddReceivePacketHandle(packetId, handler);
         }
 
-        public static void AddReceivePacketHandle<TClient, TEnum>(this IOptionableEndPointBuilder<TClient> builder, TEnum packetId, Func<TClient, PacketWaitBuffer> handler)
+        public static void AddReceivePacketHandle<TClient, TEnum>(this IOptionableEndPointBuilder<TClient> builder, TEnum packetId, Func<TClient, IResponsibleProcessor> handler)
             where TEnum : struct, IConvertible
             where TClient : INetworkClient, new()
         {

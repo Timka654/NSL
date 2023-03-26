@@ -1,0 +1,41 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<Configurations>Debug;Release;Unity;UnityDebug;DebugExamples</Configurations>
+
+		<PublishRepositoryUrl>true</PublishRepositoryUrl>
+		<EmbedUntrackedSources>true</EmbedUntrackedSources>
+		<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+		<GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
+
+		<Description>Библиотека для расширения функций буффера</Description>
+		<Authors>Relife87</Authors>
+		<Version>$(VersionSuffix)</Version>
+
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)'=='Debug'">
+		<PackageId>$(MSBuildProjectName)_Debug</PackageId>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)'=='DebugExamples'">
+		<PackageId>$(MSBuildProjectName)_Debug</PackageId>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)'=='UnityDebug'">
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<DefineConstants>DEBUG;TRACE</DefineConstants>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)'=='Unity'">
+		<TargetFramework>netstandard2.0</TargetFramework>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\NSL.SocketCore\NSL.SocketCore.csproj" />
+		<ProjectReference Include="..\..\Utils\NSL.Utils\NSL.Utils.csproj" />
+		<ProjectReference Include="..\SocketCore.Extensions.Buffer\NSL.SocketCore.Extensions.Buffer.csproj" />
+	</ItemGroup>
+</Project>

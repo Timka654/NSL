@@ -11,6 +11,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Transactions;
 using UnityEngine;
+using UnityEngine.AI;
 
 namespace NSL.WebSockets.UnityClient
 {
@@ -45,7 +46,8 @@ namespace NSL.WebSockets.UnityClient
         {
             CloseAsync(WebSocketCloseStatus.NormalClosure, String.Empty, CancellationToken.None);
 
-            lockedSegment = null;
+            lastReceivedSegment = null;
+            openedCTS.Cancel();
         }
 
         public override Task CloseAsync(WebSocketCloseStatus closeStatus, string statusDescription, CancellationToken cancellationToken)
@@ -70,60 +72,59 @@ namespace NSL.WebSockets.UnityClient
             instances.Remove(index);
         }
 
-        ArraySegment<byte>? lockedSegment = null;
+        byte[] lastReceivedSegment = null;
+
+        private int TryWriteSegment(ArraySegment<byte> buf, int offset)
+        {
+            var copyLen = buf.Count - offset;
+
+            if (copyLen > lastReceivedSegment.Length)
+                copyLen = lastReceivedSegment.Length;
+
+            Buffer.BlockCopy(lastReceivedSegment, 0, buf.Array, buf.Offset + offset, copyLen);
+
+            if (copyLen < lastReceivedSegment.Length)
+            {
+                var latestRecvSegment = new byte[lastReceivedSegment.Length - copyLen];
+
+                Buffer.BlockCopy(lastReceivedSegment, copyLen, latestRecvSegment, 0, latestRecvSegment.Length);
+
+                lastReceivedSegment = latestRecvSegment;
+            }
+            else
+                lastReceivedSegment = null;
+
+            return copyLen;
+        }
 
         public override async Task<WebSocketReceiveResult> ReceiveAsync(ArraySegment<byte> buffer, CancellationToken cancellationToken)
         {
             if (state != WebSocketState.Open)
                 throw new Exception("Socket first must be opened for receive");
 
-            List<ArraySegment<byte>> array = new List<ArraySegment<byte>>();
+            var offset = 0;
 
-            if (lockedSegment.HasValue)
-                array.Add(lockedSegment.Value);
+            if (lastReceivedSegment != null)
+            {
+                offset += TryWriteSegment(buffer, offset);
+            }
 
-
-            var rcount = buffer.Count;
-
-            int totalCount = 0;
-
-            while ((totalCount = array.Sum(x => x.Count)) < rcount && !cancellationToken.IsCancellationRequested && !openedCTS.IsCancellationRequested)
+            while (offset < buffer.Count && !cancellationToken.IsCancellationRequested && !openedCTS.IsCancellationRequested)
             {
                 if (!receiveQueue.TryDequeue(out var newSegment))
                     await Task.Yield();
                 else
-                    array.Add(newSegment);
+                {
+                    lastReceivedSegment = newSegment;
+
+                    offset += TryWriteSegment(buffer, offset);
+                }
             }
 
             if (cancellationToken.IsCancellationRequested || openedCTS.IsCancellationRequested)
                 return new WebSocketReceiveResult(0, WebSocketMessageType.Binary, true, CloseStatus, CloseStatusDescription);
 
-            var cloneOffset = buffer.Offset;
-
-            foreach (var item in array)
-            {
-                var needCount = rcount - cloneOffset < item.Count ? buffer.Count - cloneOffset : item.Count;
-
-                Buffer.BlockCopy(item.Array, item.Offset, buffer.Array, cloneOffset, needCount);
-
-                cloneOffset += needCount;
-            }
-
-
-            if (totalCount > rcount)
-            {
-                var latest = array.Last();
-                var offset = rcount - array.Take(array.Count - 1).Sum(x => x.Count);
-
-                if (latest.Count == offset)
-                    lockedSegment = latest;
-                else
-                    lockedSegment = new ArraySegment<byte>(latest.Array, offset, latest.Count - offset);
-            }
-            else
-                lockedSegment = null;
-
-            return new WebSocketReceiveResult(rcount, WebSocketMessageType.Binary, true, CloseStatus, CloseStatusDescription);
+            return new WebSocketReceiveResult(buffer.Count, WebSocketMessageType.Binary, true, CloseStatus, CloseStatusDescription);
         }
 
         public override Task SendAsync(ArraySegment<byte> buffer, WebSocketMessageType messageType, bool endOfMessage, CancellationToken cancellationToken)
@@ -167,7 +168,7 @@ namespace NSL.WebSockets.UnityClient
             }
         }
 
-        private ConcurrentQueue<ArraySegment<byte>> receiveQueue = new ConcurrentQueue<ArraySegment<byte>>();
+        private ConcurrentQueue<byte[]> receiveQueue = new ConcurrentQueue<byte[]>();
 
         void onMessage(IntPtr bufferPtr, int count)
         {
@@ -177,7 +178,7 @@ namespace NSL.WebSockets.UnityClient
 
                 Marshal.Copy(bufferPtr, data, 0, count);
 
-                receiveQueue.Enqueue(new ArraySegment<byte>(data));
+                receiveQueue.Enqueue(data);
             }
             catch (Exception e)
             {

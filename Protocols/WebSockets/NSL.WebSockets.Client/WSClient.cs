@@ -37,10 +37,12 @@ namespace NSL.WebSockets.Client
         {
             if (!IPAddress.TryParse(endPoint.Host, out var ip))
             {
-                var dns = Dns.GetHostEntry(endPoint.Host);
+                IPHostEntry dns = default;
 
-                if (dns.AddressList.Any())
-                    ip = dns.AddressList.FirstOrDefault(x=>x.AddressFamily == AddressFamily.InterNetwork) ?? dns.AddressList.FirstOrDefault() ;
+                try { dns = Dns.GetHostEntry(endPoint.Host); } catch { }
+
+                if (dns?.AddressList?.Any() == true)
+                    ip = dns.AddressList.FirstOrDefault(x => x.AddressFamily == AddressFamily.InterNetwork) ?? dns.AddressList.FirstOrDefault();
                 else
                     ip = IPAddress.None;
             }
