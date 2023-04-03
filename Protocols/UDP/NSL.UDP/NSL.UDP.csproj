@@ -11,6 +11,7 @@
 		
 		<Authors>Relife87</Authors>
 		<Version>$(VersionSuffix)</Version>
+		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)'=='Debug'">
@@ -31,6 +32,10 @@
 		<TargetFramework>netstandard2.1</TargetFramework>
 		<AssemblyName>Unity.$(MSBuildProjectName)</AssemblyName>
 	</PropertyGroup>
+
+	<ItemGroup Condition="'$(Configuration)'=='Unity' Or '$(Configuration)'=='UnityDebug'">
+	  <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.0.0" />
+	</ItemGroup>
 
 	<ItemGroup>
 	  <PackageReference Include="STUN" Version="0.5.0" />
