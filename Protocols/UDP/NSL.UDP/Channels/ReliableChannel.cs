@@ -20,17 +20,17 @@ namespace NSL.UDP.Channels
         /// <summary>
         /// Min ping with latest multiple requests
         /// </summary>
-        public int MINPing => pings.Min();
+        public int MINPing => pings.Any() ? pings.Min() : 0;
 
         /// <summary>
         /// Average ping with latest multiple requests
         /// </summary>
-        public int AVGPing => (int)pings.Average();
+        public int AVGPing => pings.Any() ? (int)pings.Average() : 0;
 
         /// <summary>
         /// Max ping with latest multiple requests
         /// </summary>
-        public int MAXPing => pings.Max();
+        public int MAXPing => pings.Any() ? pings.Max() : 0;
 
         BaseChannel<TClient, TParent> orderedChannel;
         BaseChannel<TClient, TParent> unorderedChannel;
