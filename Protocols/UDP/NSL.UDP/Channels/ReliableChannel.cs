@@ -6,14 +6,33 @@ using NSL.UDP.Packet;
 using System.Threading.Tasks;
 using System.Threading;
 using System.Buffers;
+using NSL.SocketServer.Utils;
+using NSL.UDP.Client;
+using System.Collections.Concurrent;
+using System.Linq;
 
 namespace NSL.UDP.Channels
 {
     public class ReliableChannel<TClient, TParent> : BaseChannel<TClient, TParent>
-        where TClient : INetworkClient
+        where TClient : IServerNetworkClient
         where TParent : BaseUDPClient<TClient, TParent>
     {
         public override UDPChannelEnum Channel => UDPChannelEnum.Reliable;
+
+        /// <summary>
+        /// Min ping with latest multiple requests
+        /// </summary>
+        public int MINPing => pings.Min();
+
+        /// <summary>
+        /// Average ping with latest multiple requests
+        /// </summary>
+        public int AVGPing => (int)pings.Average();
+
+        /// <summary>
+        /// Max ping with latest multiple requests
+        /// </summary>
+        public int MAXPing => pings.Max();
 
         BaseChannel<TClient, TParent> orderedChannel;
         BaseChannel<TClient, TParent> unorderedChannel;
@@ -62,6 +81,8 @@ namespace NSL.UDP.Channels
         {
             var pid = ACKPacket.ReadPID(arr);
 
+            //Debug.Log($"ack received {pid}"); // ok
+
             ActReceived(pid);
         }
 
@@ -71,30 +92,46 @@ namespace NSL.UDP.Channels
 
             packet[0] = (byte)DgramHeadTypeEnum.ACK;
 
-            BitConverter.GetBytes(pid).CopyTo(packet, 1);
+            packet[1] = (byte)channel;
 
-            packet[5] = (byte)channel;
+            BitConverter.GetBytes(pid).CopyTo(packet, 4);
 
             udpClient.SocketSend(packet);
 
             ArrayPool<byte>.Shared.Return(packet);
         }
 
-        private async void SendHandle(PacketWaitTemp temp)
+        private async void SendHandle(BaseChannel<TClient, TParent> dummy, PacketWaitTemp temp)
         {
-            var locker = new CancellationTokenSource();
+            DateTime reqTime = default;
+            using var locker = new CancellationTokenSource();
 
-            udpClient.LiveStateToken.Register(locker.Cancel);
+            using CancellationTokenSource linkedCts =
+                    CancellationTokenSource.CreateLinkedTokenSource(locker.Token, udpClient.LiveStateToken);
 
-            Action<uint> action = (pid) => { if (temp.PID == pid) locker.Cancel(); };
+            int delay = UDPOptions.ReliableSendRepeatDelay;
+
+            Action<uint> action = (pid) =>
+            {
+                if (temp.PID == pid)
+                {
+                    var edt = DateTime.UtcNow;
+
+                    locker.Cancel();
+
+                    PingProcess(reqTime, edt);
+                }
+            };
 
             ActReceived += action;
 
             try
             {
+                reqTime = DateTime.UtcNow;
+
                 do
                 {
-                    await Task.Delay(30, locker.Token);
+                    await Task.Delay(delay, linkedCts.Token);
 
                     base.SendFull(temp);
                 }
@@ -103,12 +140,27 @@ namespace NSL.UDP.Channels
             catch (TaskCanceledException) { }
             finally
             {
+
+                //Debug.Log($"ack success cancel {temp.PID}"); // ok
                 ActReceived -= action;
-                locker.Dispose();
+                //Debug.Log($"ack success cancel2 {temp.PID}"); // ok
             }
         }
 
+        private async void PingProcess(DateTime s, DateTime e)
+        {
+            await Task.Run(() =>
+            {
+                pings.Enqueue((int)(e - s).TotalMilliseconds);
 
+                if (pings.Count > 3)
+                {
+                    while (pings.Count > 3)
+                        pings.TryDequeue(out _);
+                }
+            });
+        }
 
+        private ConcurrentQueue<int> pings = new ConcurrentQueue<int>();
     }
 }

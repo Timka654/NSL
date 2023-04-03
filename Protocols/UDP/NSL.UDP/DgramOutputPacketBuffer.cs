@@ -5,6 +5,7 @@ using NSL.UDP.Interface;
 using NSL.UDP.Packet;
 using System;
 using System.Runtime.CompilerServices;
+using UnityEngine;
 
 namespace NSL.UDP
 {

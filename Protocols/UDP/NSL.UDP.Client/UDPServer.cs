@@ -5,6 +5,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Net;
 using System.Net.Sockets;
+using System.Threading;
 
 namespace NSL.UDP.Client
 {
@@ -37,15 +38,15 @@ namespace NSL.UDP.Client
                 clients.TryRemove((client.Network as UDPClient<TClient>).GetRemotePoint(), out var _);
         }
 
-        protected override void Args_Completed(Span<byte> buffer, SocketReceiveFromResult e)
+        protected override void Args_Completed(Span<byte> buffer, SocketReceiveFromResult e, CancellationToken token)
         {
             if (!state || ListenerCTS.IsCancellationRequested)
                 return;
 
-            RunReceiveAsync();
+            RunReceiveIntern(token);
 
             GetClient(e.RemoteEndPoint as IPEndPoint)
-                .Receive(buffer[..e.ReceivedBytes]);
+                .Receive(buffer);
         }
 
         private UDPClient<TClient> GetClient(IPEndPoint endPoint)

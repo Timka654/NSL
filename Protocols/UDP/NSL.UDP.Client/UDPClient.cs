@@ -1,5 +1,6 @@
 ﻿using NSL.SocketCore;
 using NSL.SocketCore.Utils;
+using NSL.SocketServer.Utils;
 using NSL.UDP.Enums;
 using System;
 using System.Net;
@@ -8,13 +9,13 @@ using System.Net.Sockets;
 namespace NSL.UDP.Client
 {
     public class UDPClient<T> : BaseUDPClient<T, UDPClient<T>>
-        where T : INetworkClient, new()
+        where T : IServerNetworkClient, new()
     {
         private T data;
 
         public override T Data => data;
 
-        public UDPClient(IPEndPoint receivePoint, Socket listenerSocket, CoreOptions<T> options) : base(receivePoint, listenerSocket)
+        public UDPClient(IPEndPoint receivePoint, Socket listenerSocket, UDPClientOptions<T> options) : base(receivePoint, listenerSocket)
         {
             this.options = options;
 
@@ -57,16 +58,6 @@ namespace NSL.UDP.Client
         protected override UDPClient<T> GetParent() => this;
 
         protected override void AddWaitPacket(byte[] buffer, int offset, int length) => Data?.AddWaitPacket(buffer, offset, length);
-
-        public void Receive(Span<byte> result)
-        {
-            var channel = DgramOutputPacketBuffer.ReadChannel(result);
-
-            if (channel.HasFlag(UDPChannelEnum.Reliable))
-                reliableChannel.Receive(channel, result);
-            else if (channel.HasFlag(UDPChannelEnum.Unreliable))
-                unreliableChannel.Receive(channel, result);
-        }
 
         protected override void OnReceive(ushort pid, int len)
         {

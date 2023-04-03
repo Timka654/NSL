@@ -8,37 +8,48 @@ using NSL.UDP.Interface;
 using System.Collections.Concurrent;
 using System.Runtime.CompilerServices;
 using NSL.UDP.Packet;
+using System.Threading;
+using NSL.SocketServer.Utils;
+using NSL.UDP.Client;
 
 namespace NSL.UDP.Channels
 {
+    public delegate void OnSendDelegate<TClient, TParent>(BaseChannel<TClient, TParent> fromChannel, BaseChannel<TClient, TParent>.PacketWaitTemp packet)
+        where TClient : IServerNetworkClient
+        where TParent : BaseUDPClient<TClient, TParent>;
+
     public abstract class BaseChannel<TClient, TParent>
-        where TClient : INetworkClient
+        where TClient : IServerNetworkClient
         where TParent : BaseUDPClient<TClient, TParent>
     {
         protected readonly BaseUDPClient<TClient, TParent> udpClient;
 
-        protected readonly IUDPOptions UDPOptions;
+        protected readonly UDPClientOptions<TClient> UDPOptions;
 
         public abstract UDPChannelEnum Channel { get; }
 
         public Action<uint> OnReceive;
 
+        public OnSendDelegate<TClient, TParent> OnSend = (channel, packet) => { };
+
         public BaseChannel(BaseUDPClient<TClient, TParent> udpClient)
         {
             this.udpClient = udpClient;
 
-            UDPOptions = udpClient.Options as IUDPOptions;
-
-            receivePidBuffer.Enqueue(uint.MaxValue);
+            UDPOptions = udpClient.Options as UDPClientOptions<TClient>;
         }
-
-        protected virtual void AfterBuild(BaseChannel<TClient, TParent> fromChannel, PacketWaitTemp packet) { }
 
         protected virtual void InvalidRecvChecksum(BaseChannel<TClient, TParent> fromChannel, Span<byte> data) { }
 
         public virtual void Send(UDPChannelEnum channel, byte[] data)
         {
-            var count = (int)Math.Ceiling((double)data.Length / UDPOptions.SendFragmentSize);
+            var count = UDPOptions.SendFragmentSize - data.Length;
+
+            // full packet
+            if (count >= UDPPacket.BaseHeadLen + 2)
+                count = 0;
+            else
+                count = (int)Math.Ceiling((double)data.Length / UDPOptions.SendFragmentSize);
 
             var ppid = CreatePID();
 
@@ -47,11 +58,16 @@ namespace NSL.UDP.Channels
             var packet = new PacketWaitTemp()
             {
                 PID = ppid,
-                Head = LPacket.CreateHeader(pidBytes, (byte)channel, (ushort)count),
-                Parts = DataPacket.CreateParts(pidBytes, (byte)channel, data, UDPOptions)
+                Head = count > 0 ? LPacket.CreateHeader(pidBytes, (byte)channel, (ushort)count) : UDPPacket.CreateFull(pidBytes, (byte)channel, data),
+                Parts = count > 0 ? DataPacket.CreateParts(pidBytes, (byte)channel, data, UDPOptions) : default
             };
 
-            AfterBuild(this, packet);
+            //if (packet.PID == uint.MaxValue || packet.PID == uint.MinValue)
+            //{
+            //    Debug.Log($"send {packet.PID} - prev {packet.PID - 1} - next {packet.PID + 1}");
+            //} //ok
+
+            OnSend(this, packet);
 
             SendFull(packet);
         }
@@ -73,18 +89,22 @@ namespace NSL.UDP.Channels
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         protected void SendParts(PacketWaitTemp packet)
         {
+            if (packet.Parts == null)
+                return;
+
             Parallel.ForEach(packet.Parts, data => udpClient.SocketSend(data.ToArray()));
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         protected void SendParts(PacketWaitTemp packet, int fromPartInc, int toPartExc)
         {
+            if (packet.Parts == null)
+                return;
+
             Parallel.For(fromPartInc, toPartExc, idx => udpClient.SocketSend(packet.Parts.ElementAt(idx).ToArray()));
         }
 
         protected ConcurrentDictionary<uint, PacketReciveTemp> packetReceiveBuffer = new ConcurrentDictionary<uint, PacketReciveTemp>();
-
-        private ConcurrentQueue<uint> receivePidBuffer = new ConcurrentQueue<uint>();
 
         public virtual void Receive(UDPChannelEnum channel, Span<byte> data)
         {
@@ -98,27 +118,30 @@ namespace NSL.UDP.Channels
 
             var pid = UDPPacket.ReadPID(data);
 
-            if (receivePidBuffer.Contains(pid))
-                return;
-
             var packet = packetReceiveBuffer.GetOrAdd(
                 pid,
                 id => new PacketReciveTemp(id));
 
-            if (LPacket.ReadISLP(data))
+            if (UDPPacket.ReadISFull(data))
+            {
+                packet.Lenght = 1;
+                packet.Parts.Add(data[UDPPacket.BaseHeadLen..].ToArray());
+            }
+            else if (LPacket.ReadISLP(data))
             {
                 packet.Lenght = LPacket.ReadPacketLen(data);
             }
-            else
+            else // data part
             {
+                var poffset = DataPacket.ReadPOffset(data);
                 lock (packet.ContainsParts)
                 {
-                    if (packet.ContainsParts.Contains(pid))
+                    if (packet.ContainsParts.Contains(poffset))
                         return;
 
-                    packet.ContainsParts.Add(pid);
+                    packet.ContainsParts.Add(poffset);
 
-                    packet.Parts.Add(data[6..].ToArray());
+                    packet.Parts.Add(data[UDPPacket.BaseHeadLen..].ToArray());
                 }
             }
 
@@ -127,60 +150,23 @@ namespace NSL.UDP.Channels
 
         protected virtual void ProcessPacket(UDPChannelEnum channel, PacketReciveTemp packet)
         {
-            lock (this)
+            if (packetReceiveBuffer.TryRemove(packet.PID, out packet))
             {
-                if (channel.HasFlag(UDPChannelEnum.Ordered | UDPChannelEnum.Reliable))
-                {
-                    if (!receivePidBuffer.Contains(packet.PID - 1))
-                    {
-                        Action<uint> rcvHandle = default;
+                udpClient.Receive(packet.Parts
+                .OrderBy(x => PacketReciveTemp.ReadPartDataOffset(x))
+                .SelectMany(x => x[2..].ToArray())
+                .ToArray(), channel);
 
-                        rcvHandle = (pid) =>
-                        {
-                            if (pid - 1 == packet.PID)
-                                ProcessPacket(channel, packet);
-                            OnReceive -= rcvHandle;
-                        };
-
-                        OnReceive += rcvHandle;
-
-                        return;
-                    }
-                }
-
-                if (packet.Ready() &&
-                    packetReceiveBuffer.TryRemove(packet.PID, out packet))
-                {
-                    if (receivePidBuffer.Contains(packet.PID))
-                    {
-                        packetReceiveBuffer.TryRemove(packet.PID, out _);
-                        return;
-                    }
-
-                    receivePidBuffer.Enqueue(packet.PID);
-
-                    while (receivePidBuffer.Count > 100)
-                        receivePidBuffer.TryDequeue(out _);
-
-                    udpClient.Receive(packet.Parts
-                    .OrderBy(x => PacketReciveTemp.ReadPartDataOffset(x))
-                    .SelectMany(x => x[2..].ToArray())
-                    .ToArray());
-
-                    OnReceive(packet.PID);
-                }
+                OnReceive(packet.PID);
             }
         }
 
-
-        uint currentPID = 0;
+        uint currentPID = uint.MaxValue;
 
         private uint CreatePID()
         {
-            lock (this)
-            {
-                return currentPID++;
-            }
+            int incrementedSigned = Interlocked.Increment(ref Unsafe.As<uint, int>(ref currentPID));
+            return Unsafe.As<int, uint>(ref incrementedSigned);
         }
 
         public struct PacketWaitTemp

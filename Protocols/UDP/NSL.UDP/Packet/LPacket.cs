@@ -1,44 +1,56 @@
 ﻿using NSL.UDP.Enums;
 using System;
+using System.Net.Sockets;
 using System.Runtime.CompilerServices;
 
 namespace NSL.UDP.Packet
 {
     internal class LPacket
 	{
-		public static byte[] LPHeadBytes = new byte[] { 0 };
+		public static byte LPHeadByte = (byte)DgramHeadTypeEnum.LP;
 
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public const byte LPLen = UDPPacket.BaseHeadLen + 2;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static bool ReadISLP(Span<byte> buffer) => (DgramHeadTypeEnum)buffer[0] == DgramHeadTypeEnum.LP; // end offset 1
 
+		// 1 - channel
+
+		// 2..4 - is Checksum
+
+		// 4..8 - pid
+
+		// 8..10 - part count
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static ushort ReadPacketLen(Span<byte> buffer) => BitConverter.ToUInt16(buffer[6..]); // end offset = 8
+		public static ushort ReadPacketLen(Span<byte> buffer) => BitConverter.ToUInt16(buffer[8..]); // end offset = 10
 
-		// 8..10 - is Checksum
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static Memory<byte> CreateHeader(byte[] pidBytes, byte channelBytes, ushort count)
+		public static Memory<byte> CreateHeader(byte[] pidBytes, byte channelByte, ushort count)
 		{
-			var lpBuf = (Memory<byte>)new byte[8];
+			var lpBuf = (Memory<byte>)new byte[LPLen];
 
-			LPHeadBytes
-				.CopyTo(lpBuf);
+			lpBuf.Span[0] = LPHeadByte;
+
+			lpBuf.Span[1] = channelByte;
+
+			// 2..4 checksum
 
 			pidBytes
-				.CopyTo(lpBuf[1..]);
+				.CopyTo(lpBuf[4..]);
 
-			lpBuf.Span[5] = channelBytes;
 
 			BitConverter.GetBytes(count)
-				.CopyTo(lpBuf[6..]);
+				.CopyTo(lpBuf[8..]);
+
 
 			var lpBufRes = lpBuf.ToArray();
 
 			var cs = UDPPacket.GetChecksum(lpBufRes);
 
 			BitConverter.GetBytes(cs)
-				.CopyTo(lpBuf[3..]);
+				.CopyTo(lpBuf[2..]);
 
 			return lpBuf;
 		}

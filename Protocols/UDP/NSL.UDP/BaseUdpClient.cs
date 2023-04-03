@@ -1,20 +1,26 @@
-﻿using NSL.SocketCore;
+﻿using Assets.Scripts.Network.UDP.NSL.UDP;
+using NSL.SocketCore;
 using NSL.SocketCore.Utils;
 using NSL.SocketCore.Utils.Buffer;
 using NSL.SocketCore.Utils.Exceptions;
+using NSL.SocketServer.Utils;
 using NSL.UDP.Channels;
+using NSL.UDP.Client;
 using NSL.UDP.Enums;
 using NSL.UDP.Interface;
+using NSL.UDP.Packet;
+using NSL.UDP.Utils;
 using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace NSL.UDP
 {
     public abstract class BaseUDPClient<TClient, TParent> : IClient<DgramOutputPacketBuffer>, IUDPClient
-        where TClient : INetworkClient
+        where TClient : IServerNetworkClient
         where TParent : BaseUDPClient<TClient, TParent>
     {
         public abstract TClient Data { get; }
@@ -28,8 +34,13 @@ namespace NSL.UDP
 
         #region Channels
 
-        protected BaseChannel<TClient, TParent> reliableChannel;
-        protected BaseChannel<TClient, TParent> unreliableChannel;
+        protected ReliableChannel<TClient, TParent> reliableChannel;
+        protected UnreliableChannel<TClient, TParent> unreliableChannel;
+
+
+        public ReliableChannel<TClient, TParent> ReliableChannel => reliableChannel;
+
+        public UnreliableChannel<TClient, TParent> UnreliableChannel => unreliableChannel;
 
         #endregion
 
@@ -85,12 +96,34 @@ namespace NSL.UDP
         {
             reliableChannel = new ReliableChannel<TClient, TParent>(this);
             unreliableChannel = new UnreliableChannel<TClient, TParent>(this);
+
+            LiveStateToken.Register(() => SyncNetworkClientTimer.OnSync -= Sync);
+
+            Data.LastReceiveMessage = DateTime.UtcNow;
+
+            SyncNetworkClientTimer.OnSync += Sync;
         }
 
+        private async void Sync()
+        {
+            await Task.Run(() =>
+            {
+                latestSendRate = currentSendRate;
+
+                currentSendRate = 0;
+
+                latestReceiveRate = currentReceiveRate;
+
+                currentReceiveRate = 0;
+
+                if (!Data.AliveState)
+                    Disconnect();
+            });
+        }
 
         protected abstract TParent GetParent();
 
-        protected CoreOptions<TClient> options;
+        protected UDPClientOptions<TClient> options;
 
         protected Dictionary<ushort, CoreOptions<TClient>.PacketHandle> PacketHandles;
 
@@ -135,13 +168,25 @@ namespace NSL.UDP
         public bool GetState()
             => Data.AliveState;
 
-        public virtual void Receive(byte[] result)
+        public void Receive(Span<byte> receivedBytes)
+        {
+            Interlocked.Add(ref currentReceiveRate, receivedBytes.Length);
+
+            var channel = DgramOutputPacketBuffer.ReadChannel(receivedBytes);
+
+            if (channel.HasFlag(UDPChannelEnum.Reliable))
+                reliableChannel.Receive(channel, receivedBytes);
+            else if (channel.HasFlag(UDPChannelEnum.Unreliable))
+                unreliableChannel.Receive(channel, receivedBytes);
+        }
+
+        public virtual void Receive(byte[] result, UDPChannelEnum channel)
         {
             //замыкаем это все в блок try, если клиент отключился то EndReceive может вернуть ошибку
             try
             {
                 //дешефруем и засовываем это все в спец буффер в котором реализованы методы чтения типов, своего рода поток
-                InputPacketBuffer pbuff = new InputPacketBuffer(inputCipher.Decode(result, 0, result.Length), true);
+                DgramInputPacketBuffer pbuff = new DgramInputPacketBuffer(inputCipher.Decode(result, 0, result.Length), channel, true);
 
                 OnReceive(pbuff.PacketId, pbuff.Lenght);
 
@@ -222,6 +267,11 @@ namespace NSL.UDP
                 if (listenerSocket == null)
                     return;
 
+                if (currentSendRate + sndBuffer.Length > options.ClientLimitSendRate)
+                    return;
+
+                Interlocked.Add(ref currentSendRate, sndBuffer.Length);
+
                 listenerSocket.SendTo(sndBuffer, SocketFlags.None, endPoint);
             }
             catch (ObjectDisposedException)
@@ -268,5 +318,18 @@ namespace NSL.UDP
         {
             OnSendPacket?.Invoke(parent, rbuff.PacketId, rbuff.PacketLenght, stackTrace);
         }
+
+        private int currentSendRate;
+        private int currentReceiveRate;
+
+        /// <summary>
+        /// Send bytes per latest second
+        /// </summary>
+        public int SendBytesRate => latestSendRate;
+
+        public int ReceiveBytesRate => latestReceiveRate;
+
+        private int latestSendRate;
+        private int latestReceiveRate;
     }
 }

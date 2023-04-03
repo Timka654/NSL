@@ -10,7 +10,7 @@ namespace NSL.UDP.Packet
         public static bool ReadISACK(Span<byte> buffer) => (DgramHeadTypeEnum)buffer[0] == DgramHeadTypeEnum.ACK; // end offset 1
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static uint ReadPID(Span<byte> buffer) => BitConverter.ToUInt32(buffer[1..]); // end offset 5
+        public static uint ReadPID(Span<byte> buffer) => BitConverter.ToUInt32(buffer[4..]); // end offset 8
 
     }
 }

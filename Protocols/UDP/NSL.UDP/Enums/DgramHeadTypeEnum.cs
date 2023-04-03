@@ -4,6 +4,7 @@
     {
         LP,
         Data,
-        ACK
+        ACK,
+        Full
     }
 }

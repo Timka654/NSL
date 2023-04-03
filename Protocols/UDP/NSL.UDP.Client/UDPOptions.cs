@@ -16,6 +16,12 @@ namespace NSL.UDP.Client
 
         public int BindingPort { get; set; }
 
+        /// <summary>
+        /// Receive messages cycles on initialize
+        /// default: 3
+        /// </summary>
+        public int ReceiveChannelCount { get; set; } = 3;
+
         public List<StunServerInfo> StunServers { get; } = new List<StunServerInfo>();
 
         public STUNQueryType StunQueryType { get; set; } = STUNQueryType.ExactNAT;
@@ -29,6 +35,18 @@ namespace NSL.UDP.Client
         /// default: 1024
         /// </summary>
         public int SendFragmentSize { get; set; } = 1024;
+
+        /// <summary>
+        /// Max send per second bytes rate
+        /// default: 1 MBps
+        /// </summary>
+        public int ClientLimitSendRate { get; set; } = 1 * 1024 * 1024; // 1MB
+
+        /// <summary>
+        /// Try repeat send in reliable channel delay
+        /// default: 30ms
+        /// </summary>
+        public int ReliableSendRepeatDelay { get; set; } = 30;
 
         /// <summary>
         /// Connection IpAddress (0.0.0.0 - all)

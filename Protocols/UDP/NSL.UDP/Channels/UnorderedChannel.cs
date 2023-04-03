@@ -1,35 +1,28 @@
 ﻿using NSL.SocketCore.Utils;
+using NSL.SocketServer.Utils;
 using NSL.UDP.Enums;
 using System;
 
 namespace NSL.UDP.Channels
 {
-    internal class UnorderedChannel<TClient, TParent> : BaseChannel<TClient, TParent>
-        where TClient : INetworkClient
+    public class UnorderedChannel<TClient, TParent> : BaseChannel<TClient, TParent>
+        where TClient : IServerNetworkClient
         where TParent : BaseUDPClient<TClient, TParent>
     {
-        private readonly BaseChannel<TClient, TParent> parent;
-
         public override UDPChannelEnum Channel => UDPChannelEnum.Unordered;
-
-        public Action<PacketWaitTemp> OnSend = pid => { };
 
         public UnorderedChannel(BaseUDPClient<TClient, TParent> udpClient) : base(udpClient) { }
 
         public UnorderedChannel(BaseUDPClient<TClient, TParent> udpClient, BaseChannel<TClient, TParent> parent) : this(udpClient)
         {
-            this.parent = parent;
         }
 
-        protected override void AfterBuild(BaseChannel<TClient, TParent> fromChannel, PacketWaitTemp packet)
+        protected override void ProcessPacket(UDPChannelEnum channel, PacketReciveTemp packet)
         {
-            OnSend(packet);
-            base.AfterBuild(fromChannel, packet);
-        }
+            if (!packet.Ready())
+                return;
 
-        public override void Send(UDPChannelEnum channel, byte[] data)
-        {
-            base.Send(channel, data);
+            base.ProcessPacket(channel, packet);
         }
     }
 }

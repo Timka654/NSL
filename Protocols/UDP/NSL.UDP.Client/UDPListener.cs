@@ -62,7 +62,6 @@ namespace NSL.UDP.Client
 
             listener = new Socket(options.AddressFamily, SocketType.Dgram, options.ProtocolType);
 
-            listener.Blocking = false;
 
             //         listener.ExclusiveAddressUse = false;
             //listener.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
@@ -112,7 +111,7 @@ namespace NSL.UDP.Client
 
             state = true;
 
-            for (int i = 0; i < 3; i++)
+            for (int i = 0; i < options.ReceiveChannelCount; i++)
             {
                 RunReceiveAsync();
             }
@@ -133,13 +132,30 @@ namespace NSL.UDP.Client
             listener = null;
         }
 
-        protected async void RunReceiveAsync() => await RunReceive();
+        /// <summary>
+        /// Run new receive cycle
+        /// </summary>
+        public async void RunReceiveAsync() => await RunReceive(ListenerCTS.Token);
+        /// <summary>
+        /// Run new receive cycle
+        /// </summary>
+        public async void RunReceiveAsync(CancellationToken cancellationToken)
+        {
+            var source = CancellationTokenSource.CreateLinkedTokenSource(ListenerCTS.Token, cancellationToken);
+
+            await RunReceive(source.Token);
+        }
+
+        protected async void RunReceiveIntern(CancellationToken cancellationToken)
+        {
+            await RunReceive(cancellationToken);
+        }
 
         protected CancellationTokenSource ListenerCTS;
 
-        protected async Task RunReceive()
+        protected async Task RunReceive(CancellationToken token)
         {
-            if (ListenerCTS.Token.IsCancellationRequested)
+            if (token.IsCancellationRequested)
                 return;
 
             var poolMem = ArrayPool<byte>.Shared.Rent(options.ReceiveBufferSize);
@@ -148,7 +164,7 @@ namespace NSL.UDP.Client
             {
                 var recv = await listener.ReceiveFromAsync(poolMem, SocketFlags.None, _blankEndpoint);
 
-                Args_Completed(poolMem[..recv.ReceivedBytes], recv);
+                Args_Completed(poolMem[..recv.ReceivedBytes], recv, token);
             }
             catch (SocketException sex)
             {
@@ -166,6 +182,6 @@ namespace NSL.UDP.Client
             }
         }
 
-        protected abstract void Args_Completed(Span<byte> buffer, SocketReceiveFromResult e);
+        protected abstract void Args_Completed(Span<byte> buffer, SocketReceiveFromResult e, CancellationToken token);
     }
 }

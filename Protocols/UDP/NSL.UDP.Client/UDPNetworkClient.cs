@@ -3,6 +3,7 @@ using System;
 using System.Net.Sockets;
 using NSL.SocketCore;
 using NSL.SocketServer.Utils;
+using System.Threading;
 
 namespace NSL.UDP.Client
 {
@@ -37,12 +38,12 @@ namespace NSL.UDP.Client
             StopReceive();
         }
 
-        protected override void Args_Completed(Span<byte> data, SocketReceiveFromResult e)
+        protected override void Args_Completed(Span<byte> data, SocketReceiveFromResult e, CancellationToken token)
         {
             if (!state)
                 return;
 
-            RunReceiveAsync();
+            RunReceiveIntern(token);
 
             if (e.RemoteEndPoint.Equals(options.GetIPEndPoint()))
                 client.Receive(data);

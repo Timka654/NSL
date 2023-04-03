@@ -7,6 +7,8 @@ namespace NSL.UDP.Client.Interface
         string BindingIP { get; set; }
         int BindingPort { get; set; }
 
+        int ReceiveChannelCount { get; set; }
+
         IPAddress GetBindingIPAddress();
         IPEndPoint GetBindingIPEndPoint();
     }
