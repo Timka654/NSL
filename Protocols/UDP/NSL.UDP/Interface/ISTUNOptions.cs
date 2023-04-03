@@ -1,8 +1,8 @@
-﻿using NSL.UDP.Client.Info;
+﻿using NSL.UDP.Info;
 using STUN;
 using System.Collections.Generic;
 
-namespace NSL.UDP.Client.Interface
+namespace NSL.UDP.Interface
 {
     public interface ISTUNOptions
     {

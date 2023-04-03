@@ -1,6 +1,5 @@
 ﻿using NSL.UDP.Enums;
 using System;
-using System.Net.Sockets;
 using System.Runtime.CompilerServices;
 
 namespace NSL.UDP.Packet

@@ -1,16 +1,13 @@
-﻿using NSL.SocketCore.Utils;
-using NSL.UDP.Enums;
+﻿using NSL.UDP.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using NSL.UDP.Interface;
 using System.Collections.Concurrent;
 using System.Runtime.CompilerServices;
 using NSL.UDP.Packet;
 using System.Threading;
 using NSL.SocketServer.Utils;
-using NSL.UDP.Client;
 
 namespace NSL.UDP.Channels
 {
@@ -124,8 +121,19 @@ namespace NSL.UDP.Channels
 
             if (UDPPacket.ReadISFull(data))
             {
-                packet.Lenght = 1;
-                packet.Parts.Add(data[UDPPacket.BaseHeadLen..].ToArray());
+                var poffset = DataPacket.ReadPOffset(data);
+
+                lock (packet.ContainsParts)
+                {
+                    if (packet.ContainsParts.Contains(poffset))
+                        return;
+
+                    packet.Lenght = 1;
+
+                    packet.Parts.Add(data[UDPPacket.BaseHeadLen..].ToArray());
+
+                    packet.ContainsParts.Add(poffset);
+                }
             }
             else if (LPacket.ReadISLP(data))
             {

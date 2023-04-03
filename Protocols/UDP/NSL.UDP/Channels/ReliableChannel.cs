@@ -1,5 +1,4 @@
-﻿using NSL.SocketCore.Utils;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using NSL.UDP.Enums;
 using System;
 using NSL.UDP.Packet;
@@ -7,7 +6,6 @@ using System.Threading.Tasks;
 using System.Threading;
 using System.Buffers;
 using NSL.SocketServer.Utils;
-using NSL.UDP.Client;
 using System.Collections.Concurrent;
 using System.Linq;
 
@@ -117,7 +115,7 @@ namespace NSL.UDP.Channels
                 {
                     var edt = DateTime.UtcNow;
 
-                    locker.Cancel();
+                    locker.Cancel(false);
 
                     PingProcess(reqTime, edt);
                 }

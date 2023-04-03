@@ -2,7 +2,7 @@
 using System;
 using System.Net;
 
-namespace NSL.UDP.Client.Info
+namespace NSL.UDP.Info
 {
     public class StunExceptionInfo : Exception
     {

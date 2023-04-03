@@ -1,6 +1,6 @@
 ﻿using System.Net;
 
-namespace NSL.UDP.Client.Interface
+namespace NSL.UDP.Interface
 {
     public interface IBindingUDPOptions : ISTUNOptions
     {

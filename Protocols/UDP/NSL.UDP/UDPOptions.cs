@@ -1,13 +1,12 @@
 ﻿using NSL.SocketServer;
 using NSL.SocketServer.Utils;
-using NSL.UDP.Client.Info;
-using NSL.UDP.Client.Interface;
+using NSL.UDP.Info;
 using NSL.UDP.Interface;
 using STUN;
 using System.Collections.Generic;
 using System.Net;
 
-namespace NSL.UDP.Client
+namespace NSL.UDP
 {
     public class UDPClientOptions<TClient> : ServerOptions<TClient>, IBindingUDPOptions, IUDPOptions
         where TClient : IServerNetworkClient

@@ -33,7 +33,12 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <PackageReference Include="STUN" Version="0.5.0" />
+	</ItemGroup>
+
+	<ItemGroup>
 	  <ProjectReference Include="..\..\..\Core\NSL.SocketCore\NSL.SocketCore.csproj" />
+	  <ProjectReference Include="..\..\..\Core\NSL.SocketServer\NSL.SocketServer.csproj" />
 	</ItemGroup>
 
 </Project>

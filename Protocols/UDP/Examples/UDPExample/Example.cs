@@ -3,9 +3,13 @@ using NSL.SocketCore.Utils;
 using NSL.SocketCore.Utils.Buffer;
 using NSL.SocketCore.Utils.Cipher;
 using NSL.SocketCore.Utils.Logger;
+using NSL.SocketServer;
 using NSL.SocketServer.Utils;
+using NSL.UDP;
 using NSL.UDP.Client;
-using NSL.UDP.Client.Interface;
+using NSL.UDP.Info;
+using NSL.UDP.Interface;
+using NSL.UDP.Packet;
 using System;
 using System.Threading;
 
@@ -36,14 +40,24 @@ namespace UDPExample
             }
         }
     }
-    public class NetworkClient : IServerNetworkClient
+    public class NetworkClient : IServerNetworkClient, IUDPClientWithPing<NetworkClient>
     {
+        public UDPPingPacket<NetworkClient> PingPacket { get; }
 
+        public NetworkClient()
+        {
+            PingPacket = new UDPPingPacket<NetworkClient>(this);
+        }
+
+        public override void Dispose()
+        {
+            base.Dispose();
+            PingPacket.Dispose();
+        }
     }
 
-    public class Example<TOptions, TClient>
-        where TClient : INetworkClient
-        where TOptions : CoreOptions<TClient>, IBindingUDPOptions, new()
+    public class Example<TOptions>
+        where TOptions : UDPClientOptions<NetworkClient>, IBindingUDPOptions, new()
     {
         protected TOptions options;
 
@@ -57,28 +71,30 @@ namespace UDPExample
 
             options.HelperLogger = logger;
 
-            options.StunServers.Add(new NSL.UDP.Client.Info.StunServerInfo("stun.l.google.com:19302"));
-            options.StunServers.Add(new NSL.UDP.Client.Info.StunServerInfo("stun1.l.google.com:19302"));
-            options.StunServers.Add(new NSL.UDP.Client.Info.StunServerInfo("stun2.l.google.com:19302"));
-            options.StunServers.Add(new NSL.UDP.Client.Info.StunServerInfo("stun3.l.google.com:19302"));
-            options.StunServers.Add(new NSL.UDP.Client.Info.StunServerInfo("stun4.l.google.com:19302"));
-            options.StunServers.Add(new NSL.UDP.Client.Info.StunServerInfo("stun.node4.co.uk"));
-            options.StunServers.Add(new NSL.UDP.Client.Info.StunServerInfo("stun.nventure.com"));
-            options.StunServers.Add(new NSL.UDP.Client.Info.StunServerInfo("stun.patlive.com"));
-            options.StunServers.Add(new NSL.UDP.Client.Info.StunServerInfo("stun.petcube.com"));
-            options.StunServers.Add(new NSL.UDP.Client.Info.StunServerInfo("stun.phoneserve.com"));
-            options.StunServers.Add(new NSL.UDP.Client.Info.StunServerInfo("stun.prizee.com"));
-            options.StunServers.Add(new NSL.UDP.Client.Info.StunServerInfo("stun.qvod.com"));
-            options.StunServers.Add(new NSL.UDP.Client.Info.StunServerInfo("stun.refint.net"));
-            options.StunServers.Add(new NSL.UDP.Client.Info.StunServerInfo("stun.remote-learner.net"));
-            options.StunServers.Add(new NSL.UDP.Client.Info.StunServerInfo("stun.rounds.com"));
-            options.StunServers.Add(new NSL.UDP.Client.Info.StunServerInfo("stun.samsungsmartcam.com"));
-            options.StunServers.Add(new NSL.UDP.Client.Info.StunServerInfo("stun.sysadminman.net"));
-            options.StunServers.Add(new NSL.UDP.Client.Info.StunServerInfo("stun.tatneft.ru"));
-            options.StunServers.Add(new NSL.UDP.Client.Info.StunServerInfo("stun.telefacil.com"));
-            options.StunServers.Add(new NSL.UDP.Client.Info.StunServerInfo("stun.ucallweconn.net"));
-            options.StunServers.Add(new NSL.UDP.Client.Info.StunServerInfo("stun.virtual-call.com"));
-            options.StunServers.Add(new NSL.UDP.Client.Info.StunServerInfo("stun.voxgratia.org"));
+            options.StunServers.Add(new StunServerInfo("stun.l.google.com:19302"));
+            options.StunServers.Add(new StunServerInfo("stun1.l.google.com:19302"));
+            options.StunServers.Add(new StunServerInfo("stun2.l.google.com:19302"));
+            options.StunServers.Add(new StunServerInfo("stun3.l.google.com:19302"));
+            options.StunServers.Add(new StunServerInfo("stun4.l.google.com:19302"));
+            options.StunServers.Add(new StunServerInfo("stun.node4.co.uk"));
+            options.StunServers.Add(new StunServerInfo("stun.nventure.com"));
+            options.StunServers.Add(new StunServerInfo("stun.patlive.com"));
+            options.StunServers.Add(new StunServerInfo("stun.petcube.com"));
+            options.StunServers.Add(new StunServerInfo("stun.phoneserve.com"));
+            options.StunServers.Add(new StunServerInfo("stun.prizee.com"));
+            options.StunServers.Add(new StunServerInfo("stun.qvod.com"));
+            options.StunServers.Add(new StunServerInfo("stun.refint.net"));
+            options.StunServers.Add(new StunServerInfo("stun.remote-learner.net"));
+            options.StunServers.Add(new StunServerInfo("stun.rounds.com"));
+            options.StunServers.Add(new StunServerInfo("stun.samsungsmartcam.com"));
+            options.StunServers.Add(new StunServerInfo("stun.sysadminman.net"));
+            options.StunServers.Add(new StunServerInfo("stun.tatneft.ru"));
+            options.StunServers.Add(new StunServerInfo("stun.telefacil.com"));
+            options.StunServers.Add(new StunServerInfo("stun.ucallweconn.net"));
+            options.StunServers.Add(new StunServerInfo("stun.virtual-call.com"));
+            options.StunServers.Add(new StunServerInfo("stun.voxgratia.org"));
+
+            options.RegisterUDPPingHandle();
 
             options.OnClientConnectEvent += Options_OnClientConnectEvent;
             options.OnClientDisconnectEvent += Options_OnClientDisconnectEvent;
@@ -90,23 +106,23 @@ namespace UDPExample
             options.OutputCipher = new PacketNoneCipher();
         }
 
-        private void Options_OnExceptionEvent(Exception ex, TClient client)
+        private void Options_OnExceptionEvent(Exception ex, NetworkClient client)
         {
             options.HelperLogger.Append(NSL.SocketCore.Utils.Logger.Enums.LoggerLevel.Error, ex.ToString());
         }
 
-        private void Options_OnClientConnectEvent(TClient client)
+        private void Options_OnClientConnectEvent(NetworkClient client)
         {
             options.HelperLogger.Append(NSL.SocketCore.Utils.Logger.Enums.LoggerLevel.Info, $"Client Connected");
         }
 
-        private void Options_OnClientDisconnectEvent(TClient client)
+        private void Options_OnClientDisconnectEvent(NetworkClient client)
         {
             options.HelperLogger.Append(NSL.SocketCore.Utils.Logger.Enums.LoggerLevel.Info, $"Client disconnected");
         }
     }
 
-    public class SenderExample : Example<UDPClientOptions<NetworkClient>, NetworkClient>
+    public class SenderExample : Example<UDPClientOptions<NetworkClient>>
     {
         protected UDPNetworkClient<NetworkClient> client;
         public SenderExample(IBasicLogger logger)
@@ -121,7 +137,9 @@ namespace UDPExample
 
             options.AddPacket(1, new TestPacket());
 
-            options.OnClientConnectEvent += c => {  };
+            options.OnClientConnectEvent += c => {
+                c.PingPacket.PingPongEnabled = true;
+            };
 
 
             Run();
@@ -134,7 +152,6 @@ namespace UDPExample
             client.OnReceivePacket += Client_OnReceivePacket;
             client.OnSendPacket += Client_OnSendPacket;
 
-            Thread.Sleep(2_500);
             client.Connect();
 
 
@@ -163,7 +180,7 @@ namespace UDPExample
         }
     }
 
-    public class ReceiverExample : Example<UDPClientOptions<NetworkClient>, NetworkClient>
+    public class ReceiverExample : Example<UDPClientOptions<NetworkClient>>
     {
         protected UDPServer<NetworkClient> listener;
 

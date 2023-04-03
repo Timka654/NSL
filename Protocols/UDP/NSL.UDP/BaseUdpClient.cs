@@ -5,10 +5,8 @@ using NSL.SocketCore.Utils.Buffer;
 using NSL.SocketCore.Utils.Exceptions;
 using NSL.SocketServer.Utils;
 using NSL.UDP.Channels;
-using NSL.UDP.Client;
 using NSL.UDP.Enums;
 using NSL.UDP.Interface;
-using NSL.UDP.Packet;
 using NSL.UDP.Utils;
 using System;
 using System.Collections.Generic;
@@ -99,8 +97,6 @@ namespace NSL.UDP
 
             LiveStateToken.Register(() => SyncNetworkClientTimer.OnSync -= Sync);
 
-            Data.LastReceiveMessage = DateTime.UtcNow;
-
             SyncNetworkClientTimer.OnSync += Sync;
         }
 
@@ -116,7 +112,7 @@ namespace NSL.UDP
 
                 currentReceiveRate = 0;
 
-                if (!Data.AliveState)
+                if (Data != null && Data.AliveState == false)
                     Disconnect();
             });
         }

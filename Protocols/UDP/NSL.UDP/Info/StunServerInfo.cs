@@ -1,6 +1,6 @@
 ﻿using System.Linq;
 
-namespace NSL.UDP.Client.Info
+namespace NSL.UDP.Info
 {
     public class StunServerInfo
     {

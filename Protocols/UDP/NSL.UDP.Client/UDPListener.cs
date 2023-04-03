@@ -1,6 +1,6 @@
 ﻿using NSL.SocketServer.Utils;
-using NSL.UDP.Client.Info;
-using NSL.UDP.Client.Interface;
+using NSL.UDP.Info;
+using NSL.UDP.Interface;
 using STUN;
 using System;
 using System.Buffers;

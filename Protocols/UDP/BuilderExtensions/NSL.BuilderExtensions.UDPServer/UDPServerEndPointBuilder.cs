@@ -6,6 +6,7 @@ using System.Net;
 using NSL.SocketServer;
 using NSL.SocketServer.Utils;
 using NSL.UDP.Client;
+using NSL.UDP;
 
 namespace NSL.BuilderExtensions.UDPServer
 {

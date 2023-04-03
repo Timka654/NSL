@@ -1,5 +1,6 @@
 ﻿using NSL.BuilderExtensions.SocketCore;
 using NSL.BuilderExtensions.UDPServer;
+using NSL.UDP;
 using NSL.UDP.Client;
 
 namespace Builder.UDP.BaseExample.Server
