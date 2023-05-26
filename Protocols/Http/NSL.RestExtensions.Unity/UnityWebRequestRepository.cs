@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
@@ -30,6 +31,11 @@ namespace NSL.RestExtensions.Unity
     {
         #region Utils
 
+        /// <summary>
+        /// Allow show large response/request content(2k+ chars) and split to small(10k chars) log messages, if need. In default LogRequestResult implementation
+        /// </summary>
+        protected virtual bool DisplayLargeLog { get; set; } = false;
+
         public void ClearAuth()
         {
             SetDefaultHeader("Authorization", null);
@@ -46,61 +52,90 @@ namespace NSL.RestExtensions.Unity
             SafeInvoke(await base.SafeRequest<TData>(url, request), onResult);
         }
 
-        protected override Task LogRequestResult(HttpResponseMessage result, string responseContent)
+        protected override async Task LogRequestResult(HttpResponseMessage result, string responseContent)
         {
             if (!GetLogging())
-                return Task.CompletedTask;
+                return;
 
-            var requestUriLine = $"RequestUri = {result.RequestMessage.RequestUri}\r\n";
-            var requestContentLine = responseContent ?? string.Empty;
-            var resultStatusCodeLine = $"ResultCode = {((int)result.StatusCode)}{(Enum.IsDefined(typeof(HttpStatusCode), result.StatusCode) ? $"({result.StatusCode})" : "")}\r\n";
+            bool showLarge = DisplayLargeLog;
+
+            StringBuilder sb = new StringBuilder();
+
+            sb.AppendLine($"RequestUri = {result.RequestMessage.RequestUri}");
+
+            string requestContentLine = string.Empty;
+
+            if (result.RequestMessage.Content is StringContent rsc)
+                requestContentLine = await rsc.ReadAsStringAsync();
+
+            if (requestContentLine.Length > 2_000)
+                sb.AppendLine($"RequestContent = too large(2k more),{nameof(DisplayLargeLog)} = {showLarge}");
+            else
+                sb.AppendLine($"RequestContent = {requestContentLine}");
+
+            var resultStatusCodeLine = $"ResultCode = {(int)result.StatusCode}";
+
+            if (Enum.IsDefined(typeof(HttpStatusCode), result.StatusCode))
+                resultStatusCodeLine += $"({result.StatusCode})";
+
+            sb.AppendLine(resultStatusCodeLine);
+
+            var responseContentLine = responseContent ?? string.Empty;
 
             var stack = Environment.StackTrace;
 
+
+            if (responseContentLine.Length > 2_000)
+                sb.AppendLine($"ResponseContent = too large(2k more),{nameof(DisplayLargeLog)} = {showLarge}");
+            else
+                sb.AppendLine($"ResponseContent = {responseContentLine}");
+
+            sb.AppendLine($"================STACK TRACE================");
+            sb.AppendLine(stack);
+
+            var message = sb.ToString();
+
             ThreadHelper.InvokeOnMain(() =>
             {
-                if (responseContent != null)
+                Debug.Log(message);
+
+                if(requestContentLine.Length > 2_000 && showLarge)
                 {
-                    if (responseContent.Length < 10_000)
+                    int idx = 0;
+
+                    IEnumerable<char> charCollection = requestContentLine;
+
+                    do
                     {
-                        Debug.Log(requestUriLine + requestContentLine + resultStatusCodeLine +
-                                  $"ResponseContent = {responseContent}\r\n" +
-                                  $"================STACK TRACE================\r\n" +
-                                  $"{stack}");
-                    }
-                    else if (responseContent.Length > 20_000)
-                    {
-                        Debug.Log(requestUriLine + requestContentLine + resultStatusCodeLine +
-                                  $"ResponseContent = too large(20k more)\r\n" +
-                                  $"================STACK TRACE================\r\n" +
-                                  $"{stack}");
-                    }
-                    else
-                    {
+                        var line = new string(charCollection.Take(10_000).ToArray());
 
-                        Debug.Log(requestUriLine + requestContentLine + resultStatusCodeLine +
-                                  $"ResponseContent = ");
+                        Debug.Log($"request content pt.{idx} - {Environment.NewLine}{line}");
 
-                        IEnumerable<char> charCollection = responseContent;
+                        charCollection = charCollection.Skip(10_000);
 
-                        do
-                        {
-                            Debug.Log(new string(charCollection.Take(10_000).ToArray()));
-
-                            charCollection = charCollection.Skip(10_000);
-                        } while (charCollection.Any());
-
-                        Debug.Log($"================STACK TRACE================\r\n" +
-                                  $"{stack}");
-                    }
+                        ++idx;
+                    } while (charCollection.Any());
                 }
-                else
-                    Debug.Log(requestUriLine + requestContentLine + resultStatusCodeLine +
-                              $"================STACK TRACE================\r\n" +
-                              $"{stack}");
-            });
 
-            return Task.CompletedTask;
+                if(responseContentLine.Length > 2_000 && showLarge)
+                {
+                    int idx = 0;
+
+                    IEnumerable<char> charCollection = responseContentLine;
+
+                    do
+                    {
+
+                        var line = new string(charCollection.Take(10_000).ToArray());
+
+                        Debug.Log($"response content pt.{idx} - {Environment.NewLine}{line}");
+
+                        charCollection = charCollection.Skip(10_000);
+
+                        ++idx;
+                    } while (charCollection.Any());
+                }
+            });
         }
 
         protected static void SafeInvoke(HttpRequestResult result, WebResponseDelegate onResult)

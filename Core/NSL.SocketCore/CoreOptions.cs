@@ -221,9 +221,7 @@ namespace NSL.SocketCore
             OnClientDisconnectEvent?.Invoke(client);
             if (OnClientDisconnectAsyncEvent != null)
             {
-                var r = OnClientDisconnectAsyncEvent.BeginInvoke(client, (s) => { }, this);
-
-                r.AsyncWaitHandle.WaitOne();
+                Task.Run(()=> OnClientDisconnectAsyncEvent(client)).Wait();
             }
         }
     }
