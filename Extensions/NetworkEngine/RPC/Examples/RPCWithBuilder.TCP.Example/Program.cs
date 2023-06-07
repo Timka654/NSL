@@ -74,7 +74,7 @@ internal class Program
 
         Console.WriteLine($"[Client] Try call {nameof(TestRPCClientContainerRPCRepository<NetworkClient>.abc1)}");
 
-        var repo = client.ConnectionOptions.ClientData.RPCRepository;
+        var repo = client.Data.RPCRepository;
 
         var rpcCallResult = repo.abc1(1, null, "abc", null, new TestDataModel() { tdValue = 10 }, new TestStructModel() { tsValue = 1010 });
         Console.WriteLine($"[Client] has result {rpcCallResult}");

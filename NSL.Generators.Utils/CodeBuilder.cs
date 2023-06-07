@@ -2,9 +2,9 @@
 using System.Linq;
 using System.Text;
 
-namespace NSL.Extensions.RPC.Generator.Utils
+namespace NSL.Generators.Utils
 {
-    internal class CodeBuilder
+    public class CodeBuilder
     {
         private StringBuilder sb = new StringBuilder();
 

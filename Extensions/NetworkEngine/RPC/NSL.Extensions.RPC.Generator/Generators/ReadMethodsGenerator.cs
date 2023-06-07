@@ -5,9 +5,9 @@ using System.Collections.Generic;
 using Microsoft.CodeAnalysis;
 using System.Linq;
 using NSL.Extensions.RPC.Generator.Declarations;
-using NSL.Extensions.RPC.Generator.Utils;
 using NSL.Extensions.RPC.Generator.Models;
 using NSL.Extensions.RPC.Generator.Generators.Handlers;
+using NSL.Generators.Utils;
 using System.Reflection;
 
 namespace NSL.Extensions.RPC.Generator.Generators

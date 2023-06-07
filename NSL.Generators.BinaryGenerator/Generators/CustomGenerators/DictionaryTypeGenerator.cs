@@ -1,28 +1,28 @@
 ﻿using Microsoft.CodeAnalysis;
-using NSL.Extensions.RPC.Generator.Models;
 using NSL.Generators.Utils;
 using NSL.SocketCore.Utils.Buffer;
 using System.Linq;
 
-namespace NSL.Extensions.RPC.Generator.Generators.Handlers.CustomHandlers
+namespace NSL.Generators.BinaryGenerator.Generators.CustomGenerators
 {
     internal class DictionaryTypeGenerator
     {
-        public static string GetReadLine(INamedTypeSymbol type, MethodContextModel methodContext, string path)
+        public static string GetReadLine(INamedTypeSymbol type, string path)
         {
             var farg = type.TypeArguments.First();
             var sarg = type.TypeArguments.Last();
+
 
             var cb = new CodeBuilder();
 
             cb.AppendLine($"dataPacket.{nameof(InputPacketBuffer.ReadCollection)}(()=>{{");
             cb.NextTab();
 
-            cb.AppendLine($"var key = {ReadMethodsGenerator.GetValueReadSegment(farg, methodContext, "key")};");
+            cb.AppendLine($"var key = {ReadMethodsGenerator.GetValueReadSegment(farg, "key")};");
 
             cb.AppendLine();
 
-            cb.AppendLine($"var value = {ReadMethodsGenerator.GetValueReadSegment(sarg, methodContext, "value")};");
+            cb.AppendLine($"var value = {ReadMethodsGenerator.GetValueReadSegment(sarg, "value")};");
 
             cb.AppendLine();
 
@@ -36,7 +36,7 @@ namespace NSL.Extensions.RPC.Generator.Generators.Handlers.CustomHandlers
         }
 
 
-        public static string GetWriteLine(INamedTypeSymbol type, MethodContextModel methodContext, string path)
+        public static string GetWriteLine(INamedTypeSymbol type, string path)
         {
             //if (!Debugger.IsAttached)
             //    Debugger.Launch();
@@ -50,9 +50,9 @@ namespace NSL.Extensions.RPC.Generator.Generators.Handlers.CustomHandlers
 
             cb.NextTab();
 
-            cb.AppendLine(WriteMethodsGenerator.BuildParameterWriter(farg, methodContext, "i.Key", null));
+            cb.AppendLine(WriteMethodsGenerator.BuildParameterWriter(farg, "i.Key", null));
             cb.AppendLine();
-            cb.AppendLine(WriteMethodsGenerator.BuildParameterWriter(sarg, methodContext, "i.Value", null));
+            cb.AppendLine(WriteMethodsGenerator.BuildParameterWriter(sarg, "i.Value", null));
 
             cb.PrevTab();
 

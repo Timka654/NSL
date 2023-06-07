@@ -1,8 +1,8 @@
 ﻿using Microsoft.CodeAnalysis;
 
-namespace NSL.Extensions.RPC.Generator.Utils
+namespace NSL.Generators.Utils
 {
-    internal static class SymbolExtensions
+    public static class SymbolExtensions
     {
         public static string GetName(this ISymbol symbol, string path)
         {

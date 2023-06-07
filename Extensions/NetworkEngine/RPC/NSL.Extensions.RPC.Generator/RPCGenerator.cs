@@ -1,4 +1,6 @@
-﻿using Microsoft.CodeAnalysis;
+﻿#define DEVELOP
+
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using NSL.Extensions.RPC.Generator.Attributes;
@@ -6,7 +8,7 @@ using NSL.Extensions.RPC.Generator.Comparers;
 using NSL.Extensions.RPC.Generator.Declarations;
 using NSL.Extensions.RPC.Generator.Generators;
 using NSL.Extensions.RPC.Generator.Models;
-using NSL.Extensions.RPC.Generator.Utils;
+using NSL.Generators.Utils;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -182,7 +184,7 @@ namespace NSL.Extensions.RPC.Generator
             }
             // Visual studio have lag(or ...) cannot show changes any time
 #if DEVELOP
-            System.IO.File.WriteAllText($@"D:\Temp\gen\{classIdentityName}.rpcgen.cs", outputValue);
+            System.IO.File.WriteAllText($@"C:\Work\temp\{classIdentityName}.rpcgen.cs", outputValue);
 #endif
 
             //if (!Debugger.IsAttached)

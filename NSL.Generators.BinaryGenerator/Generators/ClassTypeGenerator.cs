@@ -1,16 +1,15 @@
 ﻿using Microsoft.CodeAnalysis;
-using NSL.Extensions.RPC.Generator.Models;
 using NSL.Generators.Utils;
 using NSL.SocketCore.Utils.Buffer;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace NSL.Extensions.RPC.Generator.Generators.Handlers
+namespace NSL.Generators.BinaryGenerator.Generators
 {
     internal class ClassTypeGenerator
     {
-        public static string GetReadLine(ISymbol parameter, MethodContextModel methodContext, string path, IEnumerable<string> ignoreMembers)
+        public static string GetReadLine(ISymbol parameter, string path, IEnumerable<string> ignoreMembers)
         {
             var type = parameter.GetTypeSymbol();
 
@@ -43,7 +42,7 @@ namespace NSL.Extensions.RPC.Generator.Generators.Handlers
                 if (ignoreMembers != null && ignoreMembers.Any(x => x.Equals(member.Name, StringComparison.InvariantCultureIgnoreCase)))
                     continue;
 
-                ReadMethodsGenerator.AddTypeMemberReadLine(member, rb, string.Join(".", path, member.Name), methodContext);
+                ReadMethodsGenerator.AddTypeMemberReadLine(member, rb, string.Join(".", path, member.Name));
             }
 
             rb.AppendLine("return data;");
@@ -55,7 +54,7 @@ namespace NSL.Extensions.RPC.Generator.Generators.Handlers
             return rb.ToString();// test only
         }
 
-        public static string GetWriteLine(ISymbol item, MethodContextModel mcm, string path, IEnumerable<string> ignoreMembers)
+        public static string GetWriteLine(ISymbol item, string path, IEnumerable<string> ignoreMembers)
         {
             var type = item.GetTypeSymbol();
 
@@ -79,7 +78,7 @@ namespace NSL.Extensions.RPC.Generator.Generators.Handlers
                 if (ignoreMembers != null && ignoreMembers.Any(x => x.Equals(member.Name, StringComparison.InvariantCultureIgnoreCase)))
                     continue;
 
-                WriteMethodsGenerator.AddTypeMemberWriteLine(member, mcm, cb, string.Join(".", path, member.Name));
+                WriteMethodsGenerator.AddTypeMemberWriteLine(member, cb, string.Join(".", path, member.Name));
             }
 
             cb.PrevTab();

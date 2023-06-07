@@ -1,15 +1,14 @@
 ﻿using Microsoft.CodeAnalysis;
-using NSL.Extensions.RPC.Generator.Models;
 using NSL.Generators.Utils;
 using NSL.SocketCore.Utils.Buffer;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace NSL.Extensions.RPC.Generator.Generators.Handlers
+namespace NSL.Generators.BinaryGenerator.Generators
 {
     internal class NullableTypeGenerator
     {
-        public static string GetReadLine(ISymbol parameter, MethodContextModel methodContext, string path, IEnumerable<string> ignoreMembers)
+        public static string GetReadLine(ISymbol parameter, string path, IEnumerable<string> ignoreMembers)
         {
             CodeBuilder rb = new CodeBuilder();
 
@@ -26,10 +25,10 @@ namespace NSL.Extensions.RPC.Generator.Generators.Handlers
             if (!genericType.IsValueType)
                 return default;
 
-            return $"dataPacket.{nameof(InputPacketBuffer.ReadNullable)}(()=>{{ return {ReadMethodsGenerator.GetValueReadSegment(genericType, methodContext, path)}; }})";
+            return $"dataPacket.{nameof(InputPacketBuffer.ReadNullable)}(()=>{{ return {ReadMethodsGenerator.GetValueReadSegment(genericType, path)}; }})";
         }
 
-        public static string GetWriteLine(ISymbol parameter, MethodContextModel mcm, string path, IEnumerable<string> ignoreMembers)
+        public static string GetWriteLine(ISymbol parameter, string path, IEnumerable<string> ignoreMembers)
         {
             var type = parameter.GetTypeSymbol();
 
@@ -41,7 +40,7 @@ namespace NSL.Extensions.RPC.Generator.Generators.Handlers
             if (!genericType.IsValueType)
                 return default;
 
-            return $"__packet.{nameof(OutputPacketBuffer.WriteNullable)}({path},()=>{{ {WriteMethodsGenerator.BuildParameterWriter(genericType, mcm, $"{path}.Value", null)} }});";
+            return $"__packet.{nameof(OutputPacketBuffer.WriteNullable)}({path},()=>{{ {WriteMethodsGenerator.BuildParameterWriter(genericType, $"{path}.Value", null)} }});";
         }
     }
 }

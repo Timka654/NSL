@@ -45,6 +45,7 @@
 
 	<ItemGroup>
 	  <ProjectReference Include="..\..\..\..\Core\NSL.SocketCore\NSL.SocketCore.csproj" />
+	  <ProjectReference Include="..\..\..\..\NSL.Generators.Utils\NSL.Generators.Utils.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>		

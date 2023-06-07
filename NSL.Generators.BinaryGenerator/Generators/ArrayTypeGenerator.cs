@@ -1,14 +1,13 @@
 ﻿using Microsoft.CodeAnalysis;
-using NSL.Extensions.RPC.Generator.Models;
+using NSL.Generators.Utils;
 using NSL.SocketCore.Utils.Buffer;
 using System.Collections.Generic;
-using NSL.Generators.Utils;
 
-namespace NSL.Extensions.RPC.Generator.Generators.Handlers
+namespace NSL.Generators.BinaryGenerator.Generators
 {
     internal class ArrayTypeGenerator
     {
-        public static string GetReadLine(ISymbol parameter, MethodContextModel methodContext, string path, IEnumerable<string> ignoreMembers)
+        public static string GetReadLine(ISymbol parameter, string path, IEnumerable<string> ignoreMembers)
         {
             if (parameter is IArrayTypeSymbol array)
             {
@@ -20,7 +19,7 @@ namespace NSL.Extensions.RPC.Generator.Generators.Handlers
 
                 cb.NextTab();
 
-                cb.AppendLine($"var value = {ReadMethodsGenerator.GetValueReadSegment(farg, methodContext, "value")};");
+                cb.AppendLine($"var value = {ReadMethodsGenerator.GetValueReadSegment(farg, "value")};");
 
                 cb.AppendLine();
 
@@ -37,7 +36,7 @@ namespace NSL.Extensions.RPC.Generator.Generators.Handlers
         }
 
 
-        public static string GetWriteLine(ISymbol parameter, MethodContextModel methodContext, string path, IEnumerable<string> ignoreMembers)
+        public static string GetWriteLine(ISymbol parameter, string path, IEnumerable<string> ignoreMembers)
         {
             if (parameter is IArrayTypeSymbol array)
             {
@@ -49,7 +48,7 @@ namespace NSL.Extensions.RPC.Generator.Generators.Handlers
 
                 cb.NextTab();
 
-                cb.AppendLine(WriteMethodsGenerator.BuildParameterWriter(farg, methodContext, "i", null));
+                cb.AppendLine(WriteMethodsGenerator.BuildParameterWriter(farg, "i", null));
 
                 cb.PrevTab();
 

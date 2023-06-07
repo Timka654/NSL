@@ -5,7 +5,6 @@ using RPCWithBuilder.TCP.Example.Models;
 
 namespace RPCWithBuilder.TCP.Example
 {
-
     internal class TestRPCClientContainer<TClient> : RPCHandleContainer<TClient>
         where TClient : INetworkClient
     {

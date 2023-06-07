@@ -1,5 +1,5 @@
 ﻿using NSL.Extensions.RPC.Generator.Declarations;
-using NSL.Extensions.RPC.Generator.Utils;
+using NSL.Generators.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;

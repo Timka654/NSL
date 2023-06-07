@@ -1,14 +1,13 @@
 ﻿using Microsoft.CodeAnalysis;
-using NSL.Extensions.RPC.Generator.Models;
 using NSL.Generators.Utils;
 using NSL.SocketCore.Utils.Buffer;
 using System.Linq;
 
-namespace NSL.Extensions.RPC.Generator.Generators.Handlers.CustomHandlers
+namespace NSL.Generators.BinaryGenerator.Generators.CustomGenerators
 {
     internal class ListTypeGenerator
     {
-        public static string GetReadLine(INamedTypeSymbol type, MethodContextModel methodContext, string path)
+        public static string GetReadLine(INamedTypeSymbol type, string path)
         {
             var farg = type.TypeArguments.First();
 
@@ -18,7 +17,7 @@ namespace NSL.Extensions.RPC.Generator.Generators.Handlers.CustomHandlers
 
             cb.NextTab();
 
-            cb.AppendLine($"var value = {ReadMethodsGenerator.GetValueReadSegment(farg, methodContext, "value")};");
+            cb.AppendLine($"var value = {ReadMethodsGenerator.GetValueReadSegment(farg, "value")};");
 
             cb.AppendLine();
 
@@ -31,7 +30,7 @@ namespace NSL.Extensions.RPC.Generator.Generators.Handlers.CustomHandlers
             return cb.ToString();
         }
 
-        public static string GetWriteLine(INamedTypeSymbol type, MethodContextModel methodContext, string path)
+        public static string GetWriteLine(INamedTypeSymbol type, string path)
         {
             var farg = type.TypeArguments.First();
 
@@ -41,7 +40,7 @@ namespace NSL.Extensions.RPC.Generator.Generators.Handlers.CustomHandlers
 
             cb.NextTab();
 
-            cb.AppendLine(WriteMethodsGenerator.BuildParameterWriter(farg, methodContext, "i", null));
+            cb.AppendLine(WriteMethodsGenerator.BuildParameterWriter(farg, "i", null));
 
             cb.PrevTab();
 
