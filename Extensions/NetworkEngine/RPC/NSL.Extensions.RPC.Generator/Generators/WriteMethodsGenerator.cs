@@ -6,26 +6,12 @@ using System.Linq;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis;
 using NSL.Extensions.RPC.Generator.Models;
-using NSL.Extensions.RPC.Generator.Generators.Handlers;
+using NSL.Generators.BinaryGenerator;
 
 namespace NSL.Extensions.RPC.Generator.Generators
 {
     internal class WriteMethodsGenerator
     {
-
-        private static List<GenerateHandle> generators = new List<GenerateHandle>();
-
-        static WriteMethodsGenerator()
-        {
-            generators.Add(CustomTypeGenerator.GetWriteLine);
-            generators.Add(ArrayTypeGenerator.GetWriteLine);
-            generators.Add(BaseTypeGenerator.GetWriteLine);
-            generators.Add(NullableTypeGenerator.GetWriteLine);
-            generators.Add(ClassTypeGenerator.GetWriteLine);
-            generators.Add(StructTypeGenerator.GetWriteLine);
-        }
-
-
         internal static string BuildWriteMethods(MethodDeclModel methodDecl)
         {
             CodeBuilder cb = new CodeBuilder();
@@ -116,7 +102,7 @@ namespace NSL.Extensions.RPC.Generator.Generators
 
                 trun = true;
 
-                cb.AppendLine($"{(mcm.IsAsync ? ((rType != null ? "return " :String.Empty) + "await") : "return")} System.Threading.Tasks.Task.Run(() => {{");
+                cb.AppendLine($"{(mcm.IsAsync ? ((rType != null ? "return " : String.Empty) + "await") : "return")} System.Threading.Tasks.Task.Run(() => {{");
                 cb.NextTab();
             }
 
@@ -158,22 +144,7 @@ namespace NSL.Extensions.RPC.Generator.Generators
         }
 
         public static string BuildParameterWriter(ISymbol item, MethodContextModel mcm, string path, IEnumerable<string> ignoreMembers)
-        {
-            string writerLine = default;
-
-            if (ignoreMembers == null || !ignoreMembers.Any(x => x.Equals("*")))
-            {
-                foreach (var gen in generators)
-                {
-                    writerLine = gen(item, mcm, path, ignoreMembers);
-
-                    if (writerLine != default)
-                        break;
-                }
-            }
-
-            return writerLine ?? ""; //debug only
-        }
+            => BinaryWriteMethodsGenerator.BuildParameterWriter(item, binaryContext, path, ignoreMembers);
 
 
         public static void AddTypeMemberWriteLine(ISymbol member, MethodContextModel mcm, CodeBuilder cb, string path)
@@ -181,7 +152,7 @@ namespace NSL.Extensions.RPC.Generator.Generators
             if (member.DeclaredAccessibility.HasFlag(Accessibility.Public) == false || member.IsStatic)
                 return;
 
-            if (RPCGenerator.IsIgnoreMember(member, mcm))
+            if (RPCGenerator.IsIgnoreMember(member))
                 return;
 
             if (member is IPropertySymbol ps)
@@ -201,5 +172,7 @@ namespace NSL.Extensions.RPC.Generator.Generators
                 cb.AppendLine();
             }
         }
+
+        private static RPCBinaryGeneratorContext binaryContext = new RPCBinaryGeneratorContext();
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace RPCWithBuilder.TCP.Example.Models
+﻿//using NSL.Extensions.RPC.Generator.Attributes;
+
+namespace RPCWithBuilder.TCP.Example.Models
 {
     public class TestDataModel
     {

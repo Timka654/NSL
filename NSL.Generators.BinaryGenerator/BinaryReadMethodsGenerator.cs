@@ -10,14 +10,14 @@ using NSL.Generators.BinaryGenerator.Generators;
 
 namespace NSL.Generators.BinaryGenerator
 {
-    internal delegate string CustomTypeHandle(INamedTypeSymbol type, string path);
-    internal delegate string GenerateHandle(ISymbol type, string path, IEnumerable<string> ignoreMembers);
+    internal delegate string CustomTypeHandle(INamedTypeSymbol type, BinaryGeneratorContext context, string path);
+    internal delegate string GenerateHandle(ISymbol type, BinaryGeneratorContext context, string path, IEnumerable<string> ignoreMembers);
 
-    internal class ReadMethodsGenerator
+    public class BinaryReadMethodsGenerator
     {
         private static List<GenerateHandle> generators = new List<GenerateHandle>();
 
-        static ReadMethodsGenerator()
+        static BinaryReadMethodsGenerator()
         {
             //generators.Add(TaskTypeGenerator.GetReadLine);
             generators.Add(CustomTypeGenerator.GetReadLine);
@@ -28,7 +28,7 @@ namespace NSL.Generators.BinaryGenerator
             generators.Add(StructTypeGenerator.GetReadLine);
         }
 
-        public static string GetValueReadSegment(ISymbol parameter, string path, IEnumerable<string> ignoreMembers = null)
+        public static string GetValueReadSegment(ISymbol parameter, BinaryGeneratorContext context, string path, IEnumerable<string> ignoreMembers = null)
         {
             string valueReader = default;
 
@@ -36,7 +36,7 @@ namespace NSL.Generators.BinaryGenerator
             {
                 foreach (var gen in generators)
                 {
-                    valueReader = gen(parameter, path, ignoreMembers);
+                    valueReader = gen(parameter, context, path, ignoreMembers);
 
                     if (valueReader != default)
                         break;
@@ -72,14 +72,13 @@ namespace NSL.Generators.BinaryGenerator
             return $"{genericType.Name}?";
         }
 
-        public static void AddTypeMemberReadLine(ISymbol member, CodeBuilder rb, string path)
+        public static void AddTypeMemberReadLine(ISymbol member, BinaryGeneratorContext context, CodeBuilder rb, string path)
         {
             if (member.DeclaredAccessibility.HasFlag(Accessibility.Public) == false || member.IsStatic)
                 return;
 
-            //if (RPCGenerator.IsIgnoreMember(member, methodContext))
-            throw new NotImplementedException();
-            return;
+            if (context.IsIgnore(member))
+                return;
 
             if (member is IPropertySymbol ps)
             {
@@ -87,7 +86,7 @@ namespace NSL.Generators.BinaryGenerator
                 {
                     var ptype = ps.GetTypeSymbol();
 
-                    rb.AppendLine($"{path} = {GetValueReadSegment(ptype, path)};");
+                    rb.AppendLine($"{path} = {GetValueReadSegment(ptype, context, path)};");
 
                     rb.AppendLine();
                 }
@@ -96,7 +95,7 @@ namespace NSL.Generators.BinaryGenerator
             {
                 var ftype = fs.GetTypeSymbol();
 
-                rb.AppendLine($"{path} = {GetValueReadSegment(ftype, path)};");
+                rb.AppendLine($"{path} = {GetValueReadSegment(ftype, context, path)};");
 
                 rb.AppendLine();
             }

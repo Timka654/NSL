@@ -9,7 +9,7 @@ namespace NSL.Generators.BinaryGenerator.Generators
 {
     internal class ClassTypeGenerator
     {
-        public static string GetReadLine(ISymbol parameter, string path, IEnumerable<string> ignoreMembers)
+        public static string GetReadLine(ISymbol parameter, BinaryGeneratorContext context, string path, IEnumerable<string> ignoreMembers)
         {
             var type = parameter.GetTypeSymbol();
 
@@ -42,7 +42,7 @@ namespace NSL.Generators.BinaryGenerator.Generators
                 if (ignoreMembers != null && ignoreMembers.Any(x => x.Equals(member.Name, StringComparison.InvariantCultureIgnoreCase)))
                     continue;
 
-                ReadMethodsGenerator.AddTypeMemberReadLine(member, rb, string.Join(".", path, member.Name));
+                BinaryReadMethodsGenerator.AddTypeMemberReadLine(member, context, rb, string.Join(".", path, member.Name));
             }
 
             rb.AppendLine("return data;");
@@ -54,7 +54,7 @@ namespace NSL.Generators.BinaryGenerator.Generators
             return rb.ToString();// test only
         }
 
-        public static string GetWriteLine(ISymbol item, string path, IEnumerable<string> ignoreMembers)
+        public static string GetWriteLine(ISymbol item, BinaryGeneratorContext context, string path, IEnumerable<string> ignoreMembers)
         {
             var type = item.GetTypeSymbol();
 
@@ -78,7 +78,7 @@ namespace NSL.Generators.BinaryGenerator.Generators
                 if (ignoreMembers != null && ignoreMembers.Any(x => x.Equals(member.Name, StringComparison.InvariantCultureIgnoreCase)))
                     continue;
 
-                WriteMethodsGenerator.AddTypeMemberWriteLine(member, cb, string.Join(".", path, member.Name));
+                BinaryWriteMethodsGenerator.AddTypeMemberWriteLine(member, context, cb, string.Join(".", path, member.Name));
             }
 
             cb.PrevTab();

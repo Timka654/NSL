@@ -8,7 +8,7 @@ namespace NSL.Generators.BinaryGenerator.Generators
 {
     internal class StructTypeGenerator
     {
-        public static string GetReadLine(ISymbol parameter, string path, IEnumerable<string> ignoreMembers)
+        public static string GetReadLine(ISymbol parameter, BinaryGeneratorContext context, string path, IEnumerable<string> ignoreMembers)
         {
             var type = parameter.GetTypeSymbol();
 
@@ -24,7 +24,7 @@ namespace NSL.Generators.BinaryGenerator.Generators
 
                 var nts = type as INamedTypeSymbol;
 
-                rb.AppendLine($@"new {type.Name}<{string.Join(", ", nts.TupleElements.Select(x => ReadMethodsGenerator.BuildNullableTypeDef(x)))}>();");
+                rb.AppendLine($@"new {type.Name}<{string.Join(", ", nts.TupleElements.Select(x => BinaryReadMethodsGenerator.BuildNullableTypeDef(x)))}>();");
             }
             else
                 rb.AppendLine($"new {type.Name}();");
@@ -41,13 +41,13 @@ namespace NSL.Generators.BinaryGenerator.Generators
                 if (ignoreMembers != null && ignoreMembers.Any(x => x.Equals(member.Name, StringComparison.InvariantCultureIgnoreCase)))
                     continue;
 
-                ReadMethodsGenerator.AddTypeMemberReadLine(member, rb, string.Join(".", path, member.Name));
+                BinaryReadMethodsGenerator.AddTypeMemberReadLine(member, context, rb, string.Join(".", path, member.Name));
             }
 
             return rb.ToString();// test only
         }
 
-        public static string GetWriteLine(ISymbol item, string path, IEnumerable<string> ignoreMembers)
+        public static string GetWriteLine(ISymbol item, BinaryGeneratorContext context, string path, IEnumerable<string> ignoreMembers)
         {
             var type = item.GetTypeSymbol();
 
@@ -63,7 +63,7 @@ namespace NSL.Generators.BinaryGenerator.Generators
                 if (ignoreMembers != null && ignoreMembers.Any(x => x.Equals(member.Name, StringComparison.InvariantCultureIgnoreCase)))
                     continue;
 
-                WriteMethodsGenerator.AddTypeMemberWriteLine(member, cb, string.Join(".", path, member.Name));
+                BinaryWriteMethodsGenerator.AddTypeMemberWriteLine(member, context, cb, string.Join(".", path, member.Name));
             }
 
             return cb.ToString();

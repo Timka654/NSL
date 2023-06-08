@@ -7,7 +7,7 @@ namespace NSL.Generators.BinaryGenerator.Generators.CustomGenerators
 {
     internal class DictionaryTypeGenerator
     {
-        public static string GetReadLine(INamedTypeSymbol type, string path)
+        public static string GetReadLine(INamedTypeSymbol type, BinaryGeneratorContext context, string path)
         {
             var farg = type.TypeArguments.First();
             var sarg = type.TypeArguments.Last();
@@ -18,11 +18,11 @@ namespace NSL.Generators.BinaryGenerator.Generators.CustomGenerators
             cb.AppendLine($"dataPacket.{nameof(InputPacketBuffer.ReadCollection)}(()=>{{");
             cb.NextTab();
 
-            cb.AppendLine($"var key = {ReadMethodsGenerator.GetValueReadSegment(farg, "key")};");
+            cb.AppendLine($"var key = {BinaryReadMethodsGenerator.GetValueReadSegment(farg, context, "key")};");
 
             cb.AppendLine();
 
-            cb.AppendLine($"var value = {ReadMethodsGenerator.GetValueReadSegment(sarg, "value")};");
+            cb.AppendLine($"var value = {BinaryReadMethodsGenerator.GetValueReadSegment(sarg, context, "value")};");
 
             cb.AppendLine();
 
@@ -36,7 +36,7 @@ namespace NSL.Generators.BinaryGenerator.Generators.CustomGenerators
         }
 
 
-        public static string GetWriteLine(INamedTypeSymbol type, string path)
+        public static string GetWriteLine(INamedTypeSymbol type, BinaryGeneratorContext context, string path)
         {
             //if (!Debugger.IsAttached)
             //    Debugger.Launch();
@@ -50,9 +50,9 @@ namespace NSL.Generators.BinaryGenerator.Generators.CustomGenerators
 
             cb.NextTab();
 
-            cb.AppendLine(WriteMethodsGenerator.BuildParameterWriter(farg, "i.Key", null));
+            cb.AppendLine(BinaryWriteMethodsGenerator.BuildParameterWriter(farg, context, "i.Key", null));
             cb.AppendLine();
-            cb.AppendLine(WriteMethodsGenerator.BuildParameterWriter(sarg, "i.Value", null));
+            cb.AppendLine(BinaryWriteMethodsGenerator.BuildParameterWriter(sarg, context, "i.Value", null));
 
             cb.PrevTab();
 

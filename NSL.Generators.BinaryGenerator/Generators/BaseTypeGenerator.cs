@@ -9,7 +9,7 @@ namespace NSL.Generators.BinaryGenerator.Generators
     internal class BaseTypeGenerator
     {
 
-        public static string GetReadLine(ISymbol parameter, string path, IEnumerable<string> ignoreMembers)
+        public static string GetReadLine(ISymbol parameter, BinaryGeneratorContext context, string path, IEnumerable<string> ignoreMembers)
         {
             var type = parameter.GetTypeSymbol();
 
@@ -19,7 +19,7 @@ namespace NSL.Generators.BinaryGenerator.Generators
             return $"dataPacket.{tReadLine}()";
         }
 
-        public static string GetWriteLine(ISymbol item, string path, IEnumerable<string> ignoreMembers)
+        public static string GetWriteLine(ISymbol item, BinaryGeneratorContext context, string path, IEnumerable<string> ignoreMembers)
         {
             var type = item.GetTypeSymbol();
 

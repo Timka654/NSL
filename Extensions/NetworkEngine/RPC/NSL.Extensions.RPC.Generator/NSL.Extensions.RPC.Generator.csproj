@@ -44,8 +44,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\..\..\..\Core\NSL.SocketCore\NSL.SocketCore.csproj" />
-	  <ProjectReference Include="..\..\..\..\NSL.Generators.Utils\NSL.Generators.Utils.csproj" />
+	  <ProjectReference Include="..\..\..\..\Core\NSL.SocketCore\NSL.SocketCore.csproj" GeneratePathProperty="true" PrivateAssets="all" />
+	  <ProjectReference Include="..\..\..\..\NSL.Generators.BinaryGenerator\NSL.Generators.BinaryGenerator.csproj" GeneratePathProperty="true" PrivateAssets="all" OutputItemType="Analyzer" />
+	  <ProjectReference Include="..\..\..\..\NSL.Generators.Utils\NSL.Generators.Utils.csproj" GeneratePathProperty="true" PrivateAssets="all" OutputItemType="Analyzer" />
 	</ItemGroup>
 
 	<ItemGroup>		

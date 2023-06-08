@@ -8,8 +8,10 @@ using NSL.Extensions.RPC.Generator.Comparers;
 using NSL.Extensions.RPC.Generator.Declarations;
 using NSL.Extensions.RPC.Generator.Generators;
 using NSL.Extensions.RPC.Generator.Models;
+using NSL.Generators.BinaryGenerator;
 using NSL.Generators.Utils;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace NSL.Extensions.RPC.Generator
@@ -210,16 +212,13 @@ namespace NSL.Extensions.RPC.Generator
         }
 
 
-        static INamedTypeSymbol IgnoreAttributeOriginType;
+        static string IgnoreAttributeMetadataName = typeof(RPCMemberIgnoreAttribute).Name;
 
-        public static bool IsIgnoreMember(ISymbol member, MethodContextModel methodContext)
+        public static bool IsIgnoreMember(ISymbol member)
         {
             var attr = member.GetAttributes();
 
-            if (IgnoreAttributeOriginType == default)
-                IgnoreAttributeOriginType = methodContext.Compilation.GetTypeByMetadataName(typeof(RPCMemberIgnoreAttribute).FullName);
-
-            return attr.Any(x => x.AttributeClass.Equals(IgnoreAttributeOriginType));
+            return attr.Any(x => x.AttributeClass.MetadataName.Equals(IgnoreAttributeMetadataName));
         }
 
         static INamedTypeSymbol CustomMemberIgnoreOriginType;

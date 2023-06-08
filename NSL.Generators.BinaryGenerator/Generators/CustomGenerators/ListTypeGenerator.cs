@@ -7,7 +7,7 @@ namespace NSL.Generators.BinaryGenerator.Generators.CustomGenerators
 {
     internal class ListTypeGenerator
     {
-        public static string GetReadLine(INamedTypeSymbol type, string path)
+        public static string GetReadLine(INamedTypeSymbol type, BinaryGeneratorContext context, string path)
         {
             var farg = type.TypeArguments.First();
 
@@ -17,7 +17,7 @@ namespace NSL.Generators.BinaryGenerator.Generators.CustomGenerators
 
             cb.NextTab();
 
-            cb.AppendLine($"var value = {ReadMethodsGenerator.GetValueReadSegment(farg, "value")};");
+            cb.AppendLine($"var value = {BinaryReadMethodsGenerator.GetValueReadSegment(farg, context, "value")};");
 
             cb.AppendLine();
 
@@ -30,7 +30,7 @@ namespace NSL.Generators.BinaryGenerator.Generators.CustomGenerators
             return cb.ToString();
         }
 
-        public static string GetWriteLine(INamedTypeSymbol type, string path)
+        public static string GetWriteLine(INamedTypeSymbol type, BinaryGeneratorContext context, string path)
         {
             var farg = type.TypeArguments.First();
 
@@ -40,7 +40,7 @@ namespace NSL.Generators.BinaryGenerator.Generators.CustomGenerators
 
             cb.NextTab();
 
-            cb.AppendLine(WriteMethodsGenerator.BuildParameterWriter(farg, "i", null));
+            cb.AppendLine(BinaryWriteMethodsGenerator.BuildParameterWriter(farg, context, "i", null));
 
             cb.PrevTab();
 

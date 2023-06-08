@@ -7,7 +7,7 @@ namespace NSL.Generators.BinaryGenerator.Generators
 {
     internal class ArrayTypeGenerator
     {
-        public static string GetReadLine(ISymbol parameter, string path, IEnumerable<string> ignoreMembers)
+        public static string GetReadLine(ISymbol parameter, BinaryGeneratorContext context, string path, IEnumerable<string> ignoreMembers)
         {
             if (parameter is IArrayTypeSymbol array)
             {
@@ -19,7 +19,7 @@ namespace NSL.Generators.BinaryGenerator.Generators
 
                 cb.NextTab();
 
-                cb.AppendLine($"var value = {ReadMethodsGenerator.GetValueReadSegment(farg, "value")};");
+                cb.AppendLine($"var value = {BinaryReadMethodsGenerator.GetValueReadSegment(farg, context, "value")};");
 
                 cb.AppendLine();
 
@@ -36,7 +36,7 @@ namespace NSL.Generators.BinaryGenerator.Generators
         }
 
 
-        public static string GetWriteLine(ISymbol parameter, string path, IEnumerable<string> ignoreMembers)
+        public static string GetWriteLine(ISymbol parameter, BinaryGeneratorContext context, string path, IEnumerable<string> ignoreMembers)
         {
             if (parameter is IArrayTypeSymbol array)
             {
@@ -48,7 +48,7 @@ namespace NSL.Generators.BinaryGenerator.Generators
 
                 cb.NextTab();
 
-                cb.AppendLine(WriteMethodsGenerator.BuildParameterWriter(farg, "i", null));
+                cb.AppendLine(BinaryWriteMethodsGenerator.BuildParameterWriter(farg, context, "i", null));
 
                 cb.PrevTab();
 

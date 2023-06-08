@@ -8,11 +8,11 @@ using NSL.Generators.BinaryGenerator.Generators;
 
 namespace NSL.Generators.BinaryGenerator
 {
-    internal class WriteMethodsGenerator
+    public class BinaryWriteMethodsGenerator
     {
         private static List<GenerateHandle> generators = new List<GenerateHandle>();
 
-        static WriteMethodsGenerator()
+        static BinaryWriteMethodsGenerator()
         {
             generators.Add(CustomTypeGenerator.GetWriteLine);
             generators.Add(ArrayTypeGenerator.GetWriteLine);
@@ -22,7 +22,7 @@ namespace NSL.Generators.BinaryGenerator
             generators.Add(StructTypeGenerator.GetWriteLine);
         }
 
-        public static string BuildParameterWriter(ISymbol item, string path, IEnumerable<string> ignoreMembers)
+        public static string BuildParameterWriter(ISymbol item, BinaryGeneratorContext context, string path, IEnumerable<string> ignoreMembers)
         {
             string writerLine = default;
 
@@ -30,7 +30,7 @@ namespace NSL.Generators.BinaryGenerator
             {
                 foreach (var gen in generators)
                 {
-                    writerLine = gen(item, path, ignoreMembers);
+                    writerLine = gen(item, context, path, ignoreMembers);
 
                     if (writerLine != default)
                         break;
@@ -41,21 +41,20 @@ namespace NSL.Generators.BinaryGenerator
         }
 
 
-        public static void AddTypeMemberWriteLine(ISymbol member, CodeBuilder cb, string path)
+        public static void AddTypeMemberWriteLine(ISymbol member, BinaryGeneratorContext context, CodeBuilder cb, string path)
         {
             if (member.DeclaredAccessibility.HasFlag(Accessibility.Public) == false || member.IsStatic)
                 return;
 
-            //if (RPCGenerator.IsIgnoreMember(member, mcm))
-            throw new NotImplementedException();
-            return;
+            if (context.IsIgnore(member))
+                return;
 
             if (member is IPropertySymbol ps)
             {
                 if (ps.SetMethod != null)
                 {
                     var ptype = ps.GetTypeSymbol();
-                    cb.AppendLine(BuildParameterWriter(ptype, path, null));
+                    cb.AppendLine(BuildParameterWriter(ptype, context, path, null));
 
                     cb.AppendLine();
                 }
@@ -63,7 +62,7 @@ namespace NSL.Generators.BinaryGenerator
             else if (member is IFieldSymbol fs)
             {
                 var ftype = fs.GetTypeSymbol();
-                cb.AppendLine(BuildParameterWriter(ftype, path, null));
+                cb.AppendLine(BuildParameterWriter(ftype, context, path, null));
                 cb.AppendLine();
             }
         }
