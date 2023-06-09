@@ -5,30 +5,15 @@ using System.Collections.Generic;
 using Microsoft.CodeAnalysis;
 using System.Linq;
 using NSL.Extensions.RPC.Generator.Declarations;
-using NSL.Extensions.RPC.Generator.Utils;
 using NSL.Extensions.RPC.Generator.Models;
-using NSL.Extensions.RPC.Generator.Generators.Handlers;
+using NSL.Generators.Utils;
 using System.Reflection;
+using NSL.Generators.BinaryGenerator;
 
 namespace NSL.Extensions.RPC.Generator.Generators
 {
-    internal delegate string CustomTypeHandle(INamedTypeSymbol type, MethodContextModel methodContext, string path);
-    internal delegate string GenerateHandle(ISymbol type, MethodContextModel methodContext, string path, IEnumerable<string> ignoreMembers);
-
     internal class ReadMethodsGenerator
     {
-        private static List<GenerateHandle> generators = new List<GenerateHandle>();
-
-        static ReadMethodsGenerator()
-        {
-            //generators.Add(TaskTypeGenerator.GetReadLine);
-            generators.Add(CustomTypeGenerator.GetReadLine);
-            generators.Add(ArrayTypeGenerator.GetReadLine);
-            generators.Add(BaseTypeGenerator.GetReadLine);
-            generators.Add(NullableTypeGenerator.GetReadLine);
-            generators.Add(ClassTypeGenerator.GetReadLine);
-            generators.Add(StructTypeGenerator.GetReadLine);
-        }
 
         public static string BuildParameterReader(ParameterSyntax parameterSyntax, MethodContextModel mcm)
         {
@@ -50,32 +35,7 @@ namespace NSL.Extensions.RPC.Generator.Generators
         }
 
         public static string GetValueReadSegment(ISymbol parameter, MethodContextModel methodContext, string path, IEnumerable<string> ignoreMembers = null)
-        {
-            string valueReader = default;
-
-            if (ignoreMembers == null || !ignoreMembers.Any(v => v.Equals("*")))
-            {
-                foreach (var gen in generators)
-                {
-                    valueReader = gen(parameter, methodContext, path, ignoreMembers);
-
-                    if (valueReader != default)
-                        break;
-                }
-            }
-            //else if (!Debugger.IsAttached)
-            //    Debugger.Launch();
-
-            if (valueReader == default)
-                valueReader = $"({parameter.GetTypeSymbol().Name})default;";
-
-            var linePrefix = GetLinePrefix(parameter, path);
-
-            if (linePrefix == default)
-                return valueReader;
-
-            return $"{linePrefix}{valueReader}{(valueReader.EndsWith(";") ? string.Empty : ";")}";
-        }
+            => BinaryReadMethodsGenerator.GetValueReadSegment(parameter, binaryContext, path, ignoreMembers);
 
         public static string BuildNullableTypeDef(IFieldSymbol field)
         {
@@ -98,7 +58,7 @@ namespace NSL.Extensions.RPC.Generator.Generators
             if (member.DeclaredAccessibility.HasFlag(Accessibility.Public) == false || member.IsStatic)
                 return;
 
-            if (RPCGenerator.IsIgnoreMember(member, methodContext))
+            if (RPCGenerator.IsIgnoreMember(member))
                 return;
 
             if (member is IPropertySymbol ps)
@@ -280,7 +240,7 @@ namespace NSL.Extensions.RPC.Generator.Generators
 
                     BuildTrySegment(mb, b =>
                     {
-                        mb.AppendLine($"var result = {(trun? "await" : string.Empty)} base.{methodDecl.Name}({string.Join(", ", parameters)});");
+                        mb.AppendLine($"var result = {(trun ? "await" : string.Empty)} base.{methodDecl.Name}({string.Join(", ", parameters)});");
 
                         mb.AppendLine();
 
@@ -365,6 +325,8 @@ namespace NSL.Extensions.RPC.Generator.Generators
 
             return cb.ToString();
         }
+
+        private static RPCBinaryGeneratorContext binaryContext = new RPCBinaryGeneratorContext();
 
     }
 }

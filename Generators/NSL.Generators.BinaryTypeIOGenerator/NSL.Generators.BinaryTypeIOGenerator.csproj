@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<TargetFramework>netstandard2.0</TargetFramework>
@@ -9,12 +9,13 @@
 		<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
 		<GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
 
-		<Description>Библиотека генератор классов перегрузок для быстрых вызовов(RPC)</Description>
+		<Description>-</Description>
 		<Authors>Relife87</Authors>
 		<Version>$(VersionSuffix)</Version>
 
-		<AllowUnsafeBlocks>true</AllowUnsafeBlocks><NoPackageAnalysis>true</NoPackageAnalysis>
-		
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<NoPackageAnalysis>true</NoPackageAnalysis>
+
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)'=='Debug'">
@@ -22,7 +23,7 @@
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)'=='DebugExamples'">
-	  <PackageId>$(MSBuildProjectName)_Debug</PackageId>
+		<PackageId>$(MSBuildProjectName)_Debug</PackageId>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)'=='UnityDebug'">
@@ -44,12 +45,13 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\..\..\..\Core\NSL.SocketCore\NSL.SocketCore.csproj" GeneratePathProperty="true" PrivateAssets="all" />
-	  <ProjectReference Include="..\..\..\..\Generators\NSL.Generators.BinaryGenerator\NSL.Generators.BinaryGenerator.csproj"  GeneratePathProperty="true" PrivateAssets="all" OutputItemType="Analyzer"/>
-	  <ProjectReference Include="..\..\..\..\Generators\NSL.Generators.Utils\NSL.Generators.Utils.csproj"  GeneratePathProperty="true" PrivateAssets="all" OutputItemType="Analyzer"/>
+    <ProjectReference Include="..\NSL.Generators.BinaryGenerator\NSL.Generators.BinaryGenerator.csproj" GeneratePathProperty="true" PrivateAssets="all" OutputItemType="Analyzer" />
+    <ProjectReference Include="..\NSL.Generators.Utils\NSL.Generators.Utils.csproj" GeneratePathProperty="true" PrivateAssets="all" OutputItemType="Analyzer" />		<ProjectReference Include="..\NSL.Generators.BinaryGenerator\NSL.Generators.BinaryGenerator.csproj" GeneratePathProperty="true" PrivateAssets="all" OutputItemType="Analyzer" />
+		
+		<ProjectReference Include="..\..\Core\NSL.SocketCore\NSL.SocketCore.csproj" GeneratePathProperty="true" PrivateAssets="all" OutputItemType="Analyzer"  />
 	</ItemGroup>
 
-	<ItemGroup>		
+	<ItemGroup>
 		<None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
 	</ItemGroup>
 </Project>

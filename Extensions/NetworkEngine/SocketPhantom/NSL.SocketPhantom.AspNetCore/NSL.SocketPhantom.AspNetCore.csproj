@@ -29,7 +29,6 @@
 	  <ProjectReference Include="..\..\..\..\ConfigurationEngine\NSL.ConfigurationEngine\NSL.ConfigurationEngine.csproj" />
 	  <ProjectReference Include="..\..\..\..\ConfigurationEngine\Providers\NSL.ConfigurationEngine.Providers.IConfiguration\NSL.ConfigurationEngine.Providers.IConfiguration.csproj" />
 	  <ProjectReference Include="..\..\..\..\Core\Extensions\SocketCore.Extensions.Buffer\NSL.SocketCore.Extensions.Buffer.csproj" />
-	  <ProjectReference Include="..\..\..\..\Core\Extensions\SocketCore.Extensions.TCPServer\NSL.SocketCore.Extensions.TCPServer.csproj" />
 	  <ProjectReference Include="..\..\..\..\Core\NSL.SocketServer\NSL.SocketServer.csproj" />
 	  <ProjectReference Include="..\..\..\..\Protocols\WebSockets\BuilderExtensions\NSL.BuilderExtensions.WebSocketsServer.AspNet\NSL.BuilderExtensions.WebSocketsServer.AspNet.csproj" />
 	  <ProjectReference Include="..\..\..\..\Protocols\WebSockets\BuilderExtensions\NSL.BuilderExtensions.WebSocketsServer\NSL.BuilderExtensions.WebSocketsServer.csproj" />
