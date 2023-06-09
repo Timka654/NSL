@@ -24,6 +24,9 @@ namespace NSL.Generators.Utils
         public override string ToString()
             => sb.ToString().TrimEnd('\r', '\n');
 
+        public string GetText()
+            => ToString();
+
         public void AppendLine()
         {
             AppendLine($"{string.Concat(Enumerable.Range(0, Tabs).Select(i => $"\t"))}");
@@ -57,5 +60,17 @@ namespace NSL.Generators.Utils
         {
             AppendLine(span, string.Format(format, args));
         }
+
+        public void AppendComment(Action<CodeBuilder> commentAction)
+        {
+            AppendLine("/*");
+
+            commentAction(this);
+
+            AppendLine("*/");
+        }
+
+        public void AppendComment(Action commentAction)
+            => AppendComment(builder => commentAction());
     }
 }

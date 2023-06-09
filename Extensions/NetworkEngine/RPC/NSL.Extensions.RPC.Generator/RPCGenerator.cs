@@ -22,23 +22,14 @@ namespace NSL.Extensions.RPC.Generator
         internal static ClassDeclComparer classDeclComparer = new ClassDeclComparer();
         internal static MethodDeclarationSyntaxComparer methodDeclarationSyntaxComparer = new MethodDeclarationSyntaxComparer();
 
-        internal static string GetClassFullModifier(ClassDeclarationSyntax classDecl)
-            => string.Join(" ", classDecl.Modifiers.Select(x => x.Text));
-
-        internal static string GetClassName(ClassDeclarationSyntax classDecl)
-            => @classDecl.Identifier.Text;
-
-        internal static string GetClassRPCHandleName(ClassDeclarationSyntax classDecl)
-            => $"{GetClassName(classDecl)}RPCRepository";
-
-        internal static string GetMethodName(MethodDeclarationSyntax methodDecl)
-            => methodDecl.Identifier.Text;
-
         internal static string GetMethodRPCHandleName(MethodDeclarationSyntax methodDecl)
-            => GetMethodRPCHandleName(GetMethodName(methodDecl));
+            => GetMethodRPCHandleName(methodDecl.GetMethodName());
 
         internal static string GetMethodRPCHandleName(string methodName)
             => $"__{methodName}RPCRecvHandle";
+
+        public static string GetClassRPCHandleName( ClassDeclarationSyntax classDecl)
+            => $"{classDecl.GetClassName()}RPCRepository";
 
         private void ProcessRPCMethods(GeneratorExecutionContext context, RPCMethodAttributeSyntaxReceiver syntaxReceiver)
         {
@@ -98,7 +89,7 @@ namespace NSL.Extensions.RPC.Generator
         {
             var ns = classDecl.Class.Parent as NamespaceDeclarationSyntax;
 
-            var classIdentityName = GetClassName(classDecl.Class);
+            var classIdentityName = classDecl.Class.GetClassName();
 
             CodeBuilder classBuilder = new CodeBuilder();
 
@@ -130,7 +121,7 @@ namespace NSL.Extensions.RPC.Generator
             var generic = classDecl.Class.TypeParameterList?.Parameters.Any() == true ? $"<{string.Join(",", classDecl.Class.TypeParameterList.Parameters.Select(x => x.Identifier.Text))}>" : string.Empty;
 
 
-            classBuilder.AppendLine($"{GetClassFullModifier(classDecl.Class)} class {GetClassRPCHandleName(classDecl.Class)}{generic} : {classIdentityName}{generic}");
+            classBuilder.AppendLine($"{classDecl.Class.GetClassFullModifier()} class {GetClassRPCHandleName(classDecl.Class)}{generic} : {classIdentityName}{generic}");
 
             classBuilder.NextTab();
 
