@@ -202,7 +202,7 @@ namespace NSL.Generators.BinaryTypeIOGenerator
 
             var tSym = context.Compilation.GetSemanticModel(classDecl.SyntaxTree);
 
-            var bgContext = new BinaryGeneratorContext();
+            var bgContext = new BinaryTypeIOGeneratorContext() { For = methodInfo.ForGroup };
 
             methodBuilder.AppendLine($"return {BinaryReadMethodsGenerator.GetValueReadSegment(tSym.GetDeclaredSymbol(classDecl), bgContext, default, Enumerable.Empty<string>())};");
 
@@ -250,7 +250,7 @@ namespace NSL.Generators.BinaryTypeIOGenerator
 
             var tSym = context.Compilation.GetSemanticModel(method.SyntaxTree);
 
-            var bgContext = new BinaryGeneratorContext();
+            var bgContext = new BinaryTypeIOGeneratorContext() { For = methodInfo.ForGroup };
 
             methodBuilder.AppendLine(BinaryWriteMethodsGenerator.BuildParameterWriter(tSym.GetDeclaredSymbol(classDecl), bgContext, typeParamName, Enumerable.Empty<string>()));
 
