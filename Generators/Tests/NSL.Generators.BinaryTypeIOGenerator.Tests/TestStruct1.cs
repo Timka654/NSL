@@ -15,12 +15,10 @@ namespace NSL.Generators.BinaryTypeIOGenerator.Tests
 
         public int n1 { get; set; }
 
-        [CLSCompliant(true)]
         [BinaryIOWriteMethod(For = "abc")]
-        static partial void BinaryWriteFull(TestStruct1 data, OutputPacketBuffer packet);
+        public partial void BinaryWriteFull(OutputPacketBuffer packet);
 
-        [CLSCompliant(true)]
         [BinaryIOReadMethod]
-        static partial void BinaryReadFull(InputPacketBuffer data);
+        public static partial TestStruct1 BinaryReadFull(InputPacketBuffer data);
     }
 }

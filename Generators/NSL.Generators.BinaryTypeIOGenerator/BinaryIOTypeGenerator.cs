@@ -1,8 +1,11 @@
 ﻿using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using NSL.Generators.BinaryGenerator;
 using NSL.Generators.BinaryTypeIOGenerator.Attributes;
 using NSL.Generators.BinaryTypeIOGenerator.Models;
 using NSL.Generators.Utils;
+using NSL.SocketCore.Utils.Buffer;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -16,8 +19,8 @@ namespace NSL.Generators.BinaryTypeIOGenerator
     {
         private void ProcessBinaryIOTypes(GeneratorExecutionContext context, BinaryIOAttributeSyntaxReceiver methodSyntaxReceiver)
         {
-            if (!Debugger.IsAttached)
-                Debugger.Launch();
+            //if (!Debugger.IsAttached)
+            //    Debugger.Launch();
 
             foreach (var type in methodSyntaxReceiver.BinaryIOTypes)
             {
@@ -49,7 +52,6 @@ namespace NSL.Generators.BinaryTypeIOGenerator
 
             classBuilder.AppendLine($"using NSL.SocketCore;");
             classBuilder.AppendLine($"using NSL.SocketCore.Utils.Buffer;");
-            classBuilder.AppendLine($"using NSL.Extensions.RPC;");
 
             var usings = UpdateUsingDirectives(type.SyntaxTree);
 
@@ -100,11 +102,11 @@ namespace NSL.Generators.BinaryTypeIOGenerator
 
                 string forGroup = null;
 
-                var args = methodWriteAttribute.ArgumentList?.Arguments;
+                var args = (methodWriteAttribute ?? methodReadAttribute).ArgumentList?.Arguments;
 
                 var argsMap = args?
                     .Select(x => (x.NameEquals?.Name.ToString(), x.Expression.NormalizeWhitespace().ToString()))
-                    .Where(x=>x.Item1 != null)
+                    .Where(x => x.Item1 != null)
                     .ToDictionary(x => x.Item1, x => x.Item2);
 
                 argsMap?.TryGetValue("For", out forGroup);
@@ -114,7 +116,12 @@ namespace NSL.Generators.BinaryTypeIOGenerator
                     MethodDeclarationSyntax = method,
                     IOType = methodReadAttribute == null ? IOTypeEnum.Write : IOTypeEnum.Read,
                     ForGroup = forGroup?.Trim('\"') ?? "*",
-                    parameters = method.ParameterList.Parameters.ToDictionary(x=>x.Identifier.ValueText, x=>((IdentifierNameSyntax)x.Type).Identifier.Text)
+                    Parameters = method.ParameterList.Parameters.Select(x => new parametermodel
+                    {
+                        name = x.Identifier.ValueText,
+                        parameter = x
+                    }).ToList(),
+                    ClassDeclarationSyntax = classDecl
                 };
 
                 CodeBuilder methodBuilder = new CodeBuilder();
@@ -122,15 +129,10 @@ namespace NSL.Generators.BinaryTypeIOGenerator
                 switch (methodInfo.IOType)
                 {
                     case IOTypeEnum.Read:
+                        ProcessReadMethod(methodBuilder, methodInfo, context);
                         break;
                     case IOTypeEnum.Write:
-
-                        methodBuilder.AppendLine($"public static partial void {method.GetMethodName()}({string.Join(", ", methodInfo.parameters.Select(x=>$"{x.Value} {x.Key}"))})");
-                        methodBuilder.AppendLine("{");
-                        methodBuilder.NextTab();
-
-                        methodBuilder.PrevTab();
-                        methodBuilder.AppendLine("}");
+                        ProcessWriteMethod(methodBuilder, methodInfo, context);
                         break;
                     default:
                         break;
@@ -171,7 +173,90 @@ namespace NSL.Generators.BinaryTypeIOGenerator
             //if (!Debugger.IsAttached)
             //    Debugger.Launch();
 
-            //context.AddSource($"{classIdentityName}.binaryio.cs", outputValue);
+            context.AddSource($"{classIdentityName}.binaryio.cs", outputValue);
+        }
+
+
+        private void ProcessReadMethod(CodeBuilder methodBuilder, MethodInfoModel methodInfo, GeneratorExecutionContext context)
+        {
+            var method = methodInfo.MethodDeclarationSyntax;
+            var classDecl = methodInfo.ClassDeclarationSyntax;
+
+            methodBuilder.AppendLine($"public static partial {classDecl.GetClassName()} {method.GetMethodName()}({string.Join(", ", methodInfo.Parameters.Select(x => $"{((IdentifierNameSyntax)x.parameter.Type).Identifier.Text} {x.name}"))})");
+            methodBuilder.AppendLine("{");
+            methodBuilder.NextTab();
+
+            var bufferParam = methodInfo.Parameters.FirstOrDefault(x => ((IdentifierNameSyntax)x.parameter.Type).Identifier.Text.Equals(typeof(InputPacketBuffer).Name));
+
+            if (bufferParam == null)
+            {
+                methodBuilder.AppendLine($"throw new NotImplementedException(\"Required parameter with type \\\"{typeof(InputPacketBuffer).Name}\\\" not found\");");
+                return;
+            }
+
+            if (bufferParam.name != "__packet")
+            {
+                methodBuilder.AppendLine($"var dataPacket = {bufferParam.name};");
+                methodBuilder.AppendLine();
+            }
+
+            var tSym = context.Compilation.GetSemanticModel(classDecl.SyntaxTree);
+
+            var bgContext = new BinaryGeneratorContext();
+
+            methodBuilder.AppendLine($"return {BinaryReadMethodsGenerator.GetValueReadSegment(tSym.GetDeclaredSymbol(classDecl), bgContext, default, Enumerable.Empty<string>())};");
+
+            methodBuilder.PrevTab();
+            methodBuilder.AppendLine("}");
+        }
+
+        private void ProcessWriteMethod(CodeBuilder methodBuilder, MethodInfoModel methodInfo, GeneratorExecutionContext context)
+        {
+            var method = methodInfo.MethodDeclarationSyntax;
+            var classDecl = methodInfo.ClassDeclarationSyntax;
+
+            methodBuilder.AppendLine($"{string.Join(" ", method.Modifiers.Select(x => x.Text))} void {method.GetMethodName()}({string.Join(", ", methodInfo.Parameters.Select(x => $"{((IdentifierNameSyntax)x.parameter.Type).Identifier.Text} {x.name}"))})");
+            methodBuilder.AppendLine("{");
+            methodBuilder.NextTab();
+
+            var typeParam = methodInfo.Parameters.FirstOrDefault(x => ((IdentifierNameSyntax)x.parameter.Type).Identifier.Text.Equals(classDecl.GetClassName()));
+
+            var needObject = method.Modifiers.Any(x => x.Text.Equals("static"));
+
+            var existsObject = typeParam != null;
+
+            if (!existsObject && needObject)
+            {
+                methodBuilder.AppendLine($"throw new NotImplementedException(\"Required parameter with type \\\"{classDecl.GetClassName()}\\\" not found\");");
+                return;
+            }
+
+
+            var bufferParam = methodInfo.Parameters.FirstOrDefault(x => ((IdentifierNameSyntax)x.parameter.Type).Identifier.Text.Equals(typeof(OutputPacketBuffer).Name));
+
+            if (bufferParam == null)
+            {
+                methodBuilder.AppendLine($"throw new NotImplementedException(\"Required parameter with type \\\"{typeof(OutputPacketBuffer).Name}\\\" not found\");");
+                return;
+            }
+
+            var typeParamName = existsObject ? typeParam.name : "this";
+
+            if (bufferParam.name != "__packet")
+            {
+                methodBuilder.AppendLine($"var __packet = {bufferParam.name};");
+                methodBuilder.AppendLine();
+            }
+
+            var tSym = context.Compilation.GetSemanticModel(method.SyntaxTree);
+
+            var bgContext = new BinaryGeneratorContext();
+
+            methodBuilder.AppendLine(BinaryWriteMethodsGenerator.BuildParameterWriter(tSym.GetDeclaredSymbol(classDecl), bgContext, typeParamName, Enumerable.Empty<string>()));
+
+
+            methodBuilder.PrevTab();
+            methodBuilder.AppendLine("}");
         }
 
         private SyntaxList<UsingDirectiveSyntax> UpdateUsingDirectives(SyntaxTree originalTree)
