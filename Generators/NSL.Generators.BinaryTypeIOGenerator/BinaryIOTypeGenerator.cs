@@ -19,8 +19,8 @@ namespace NSL.Generators.BinaryTypeIOGenerator
     {
         private void ProcessBinaryIOTypes(GeneratorExecutionContext context, BinaryIOAttributeSyntaxReceiver methodSyntaxReceiver)
         {
-            //if (!Debugger.IsAttached)
-            //    Debugger.Launch();
+            if (!Debugger.IsAttached)
+                Debugger.Launch();
 
             foreach (var type in methodSyntaxReceiver.BinaryIOTypes)
             {

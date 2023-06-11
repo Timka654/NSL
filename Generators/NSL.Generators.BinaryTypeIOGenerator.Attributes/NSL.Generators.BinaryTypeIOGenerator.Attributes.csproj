@@ -6,8 +6,6 @@
 		<Description>-</Description>
 		<Authors>Relife87</Authors>
 		<Version>$(VersionSuffix)</Version>
-
-		<EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)'=='Debug'">

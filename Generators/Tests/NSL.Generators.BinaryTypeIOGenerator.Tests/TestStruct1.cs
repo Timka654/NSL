@@ -8,9 +8,19 @@ using System.Threading.Tasks;
 
 namespace NSL.Generators.BinaryTypeIOGenerator.Tests
 {
+    public enum abcEn
+    {
+        abc1,
+        abc2
+    }
+
     [BinaryIOType]
     public partial class TestStruct1
     {
+
+        [BinaryIOData(For = "en")]
+        public abcEn en1 { get; set; }
+
         [BinaryIOData(For = "abc")]
         public string s1 { get; set; }
 
@@ -27,5 +37,8 @@ namespace NSL.Generators.BinaryTypeIOGenerator.Tests
 
         //[BinaryIOReadMethod(For = "abc")]
         //public static partial TestStruct1 BinaryReadABC(InputPacketBuffer data);
+
+        [BinaryIOReadMethod(For = "en")]
+        public static partial TestStruct1 BinaryReaden(InputPacketBuffer data);
     }
 }

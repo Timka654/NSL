@@ -1,14 +1,12 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<TargetFramework>netstandard2.0</TargetFramework>
 		<Configurations>Debug;Release;Unity;UnityDebug;DebugExamples</Configurations>
-		
+
 		<Description>-</Description>
 		<Authors>Relife87</Authors>
 		<Version>$(VersionSuffix)</Version>
-
-		<EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)'=='Debug'">
@@ -27,18 +25,4 @@
 	<PropertyGroup Condition="'$(Configuration)'=='Unity'">
 		<AssemblyName>Unity.$(MSBuildProjectName)</AssemblyName>
 	</PropertyGroup>
-	
-	<ItemGroup Condition="'$(Configuration)'=='Debug' Or '$(Configuration)'=='Release'">
-		<PackageReference Include="Microsoft.CodeAnalysis.Common" Version="4.5.0"  PrivateAssets="all" />
-	</ItemGroup>
-
-	<ItemGroup Condition="'$(Configuration)'=='UnityDebug' Or '$(Configuration)'=='Unity'">
-		<PackageReference Include="Microsoft.CodeAnalysis.Common" Version="3.8.0"  PrivateAssets="all" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<ProjectReference Include="..\..\Core\NSL.SocketCore\NSL.SocketCore.csproj" />
-		<ProjectReference Include="..\NSL.Generators.Utils\NSL.Generators.Utils.csproj" />
-	</ItemGroup>
-
 </Project>
