@@ -6,20 +6,43 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NSL.Generators.BinaryTypeIOGenerator.Tests
+namespace NSL.Generators.BinaryTypeIOGenerator.Tests.abserb.erge.ergeg.erg
 {
     public enum abcEn
     {
         abc1,
         abc2
     }
+}
+
+
+
+namespace NSL.Generators.BinaryTypeIOGenerator.Tests
+{
+
+    public struct abcfff{
+        public int abc1;
+    }
+
 
     [BinaryIOType]
     public partial class TestStruct1
     {
 
         [BinaryIOData(For = "en")]
-        public abcEn en1 { get; set; }
+        public NSL.Generators.BinaryTypeIOGenerator.Tests.abserb.erge.ergeg.erg.abcEn en1 { get; set; }
+
+        [BinaryIOData(For = "en")]
+        public TestStruct2 en2 { get; set; }
+
+        [BinaryIOData(For = "en")]
+        public NSL.Generators.BinaryTypeIOGenerator.Tests.abserb.erge.ergeg.erg.abcEn? en3 { get; set; }
+
+        [BinaryIOData(For = "en")]
+        public abcfff en4 { get; set; }
+
+        [BinaryIOData(For = "en")]
+        public abcfff? en5 { get; set; }
 
         [BinaryIOData(For = "abc")]
         public string s1 { get; set; }
@@ -40,5 +63,8 @@ namespace NSL.Generators.BinaryTypeIOGenerator.Tests
 
         [BinaryIOReadMethod(For = "en")]
         public static partial TestStruct1 BinaryReaden(InputPacketBuffer data);
+
+        [BinaryIOWriteMethod(For = "en")]
+        public partial void BinaryWriteen(OutputPacketBuffer data);
     }
 }

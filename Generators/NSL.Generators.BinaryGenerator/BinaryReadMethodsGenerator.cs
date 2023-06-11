@@ -20,6 +20,7 @@ namespace NSL.Generators.BinaryGenerator
             //generators.Add(TaskTypeGenerator.GetReadLine);
             generators.Add(CustomTypeGenerator.GetReadLine);
             generators.Add(ArrayTypeGenerator.GetReadLine);
+            generators.Add(EnumTypeGenerator.GetReadLine);
             generators.Add(BaseTypeGenerator.GetReadLine);
             generators.Add(NullableTypeGenerator.GetReadLine);
             generators.Add(ClassTypeGenerator.GetReadLine);

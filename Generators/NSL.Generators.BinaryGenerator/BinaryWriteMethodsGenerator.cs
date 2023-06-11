@@ -15,6 +15,7 @@ namespace NSL.Generators.BinaryGenerator
         {
             generators.Add(CustomTypeGenerator.GetWriteLine);
             generators.Add(ArrayTypeGenerator.GetWriteLine);
+            generators.Add(EnumTypeGenerator.GetWriteLine);
             generators.Add(BaseTypeGenerator.GetWriteLine);
             generators.Add(NullableTypeGenerator.GetWriteLine);
             generators.Add(ClassTypeGenerator.GetWriteLine);
