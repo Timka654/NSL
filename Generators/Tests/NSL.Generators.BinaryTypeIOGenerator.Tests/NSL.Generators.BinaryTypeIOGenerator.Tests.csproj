@@ -23,11 +23,5 @@
 		<ProjectReference Include="..\..\NSL.Generators.BinaryTypeIOGenerator\NSL.Generators.BinaryTypeIOGenerator.csproj" OutputItemType="Analyzer" />
 		<ProjectReference Include="..\..\NSL.Generators.Utils\NSL.Generators.Utils.csproj" />
 	</ItemGroup>
-	<ItemGroup>
-		<Compile Include="D:\Projects\work\arrible\RektSkullsWebApi\RektSkullsWebApi\RektSkullsWebApi.Shared\**\*.cs" />
-	</ItemGroup>
-	<ItemGroup>
-	  <Compile Remove="D:\Projects\work\arrible\RektSkullsWebApi\RektSkullsWebApi\RektSkullsWebApi.Shared\obj\**" />
-	</ItemGroup>
 
 </Project>

@@ -1,8 +1,4 @@
-﻿//#if DEBUG
-//#define DEVELOP
-//#endif
-
-using Microsoft.CodeAnalysis;
+﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using NSL.Generators.BinaryGenerator;
@@ -23,10 +19,8 @@ namespace NSL.Generators.BinaryTypeIOGenerator
     {
         private void ProcessBinaryIOTypes(GeneratorExecutionContext context, BinaryIOAttributeSyntaxReceiver methodSyntaxReceiver)
         {
-#if DEBUG
-            if (!Debugger.IsAttached)
-                Debugger.Launch();
-#endif
+            //if (!Debugger.IsAttached)
+            //    Debugger.Launch();
 
             foreach (var type in methodSyntaxReceiver.BinaryIOTypes)
             {

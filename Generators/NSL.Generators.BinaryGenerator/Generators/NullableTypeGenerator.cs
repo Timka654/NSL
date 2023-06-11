@@ -35,9 +35,11 @@ namespace NSL.Generators.BinaryGenerator.Generators
             if (!type.NullableAnnotation.Equals(NullableAnnotation.Annotated))
                 return default;
 
-            var genericType = ((INamedTypeSymbol)type).TypeArguments.First();
+            var typedArgs = ((INamedTypeSymbol)type).TypeArguments;
 
-            if (!genericType.IsValueType)
+            var genericType = typedArgs.FirstOrDefault();
+
+            if (genericType == null || !genericType.IsValueType)
                 return default;
 
             return $"__packet.{nameof(OutputPacketBuffer.WriteNullable)}({path},()=>{{ {BinaryWriteMethodsGenerator.BuildParameterWriter(genericType, context, $"{path}.Value", null)} }});";
