@@ -16,16 +16,16 @@ namespace NSL.Generators.BinaryTypeIOGenerator.Tests
 
         public int n1 { get; set; }
 
-        [BinaryIOWriteMethod]
-        public partial void BinaryWriteFull(OutputPacketBuffer packet);
+        //[BinaryIOWriteMethod]
+        //public partial void BinaryWriteFull(OutputPacketBuffer packet);
 
-        [BinaryIOReadMethod]
-        public static partial TestStruct1 BinaryReadFull(InputPacketBuffer data);
+        //[BinaryIOReadMethod]
+        //public static partial TestStruct1 BinaryReadFull(InputPacketBuffer data);
 
-        [BinaryIOWriteMethod(For = "abc")]
-        public partial void BinaryWriteABC(OutputPacketBuffer packet);
+        //[BinaryIOWriteMethod(For = "abc")]
+        //public partial void BinaryWriteABC(OutputPacketBuffer packet);
 
-        [BinaryIOReadMethod(For = "abc")]
-        public static partial TestStruct1 BinaryReadABC(InputPacketBuffer data);
+        //[BinaryIOReadMethod(For = "abc")]
+        //public static partial TestStruct1 BinaryReadABC(InputPacketBuffer data);
     }
 }

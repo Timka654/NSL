@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
@@ -16,8 +17,14 @@ namespace NSL.Generators.Utils
         public void PrevTab()
         {
             if (Tabs == 0)
-                throw new Exception();
+            {
+                if (!Debugger.IsAttached)
+                    Debugger.Launch();
+                else
+                    Debugger.Break();
 
+                throw new Exception();
+            }
             --Tabs;
         }
 
@@ -36,7 +43,9 @@ namespace NSL.Generators.Utils
         {
             string tabs = string.Concat(Enumerable.Range(0, Tabs).Select(i => $"\t"));
 
+#pragma warning disable RS1035 // Do not use APIs banned for analyzers
             text = text.Replace(Environment.NewLine, $"{Environment.NewLine}{tabs}");
+#pragma warning restore RS1035 // Do not use APIs banned for analyzers
 
             sb.AppendLine($"{tabs}{text}");
         }

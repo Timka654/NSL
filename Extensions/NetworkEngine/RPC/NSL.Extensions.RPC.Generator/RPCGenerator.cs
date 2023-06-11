@@ -1,4 +1,6 @@
-﻿#define DEVELOP
+﻿#if DEBUG
+#define DEVELOP
+#endif
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -177,7 +179,9 @@ namespace NSL.Extensions.RPC.Generator
             }
             // Visual studio have lag(or ...) cannot show changes any time
 #if DEVELOP
+#pragma warning disable RS1035 // Do not use APIs banned for analyzers
             System.IO.File.WriteAllText($@"C:\Work\temp\{classIdentityName}.rpcgen.cs", outputValue);
+#pragma warning restore RS1035 // Do not use APIs banned for analyzers
 #endif
 
             //if (!Debugger.IsAttached)
