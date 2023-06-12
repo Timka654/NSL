@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using Microsoft.CodeAnalysis;
 using System.Linq;
-using System.Reflection;
 using NSL.Generators.Utils;
 using NSL.Generators.BinaryGenerator.Generators;
 

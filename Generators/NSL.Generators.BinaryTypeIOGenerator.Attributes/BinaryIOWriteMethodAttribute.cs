@@ -1,7 +1,5 @@
 ﻿using NSL.Generators.BinaryTypeIOGenerator.Attributes.Interface;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace NSL.Generators.BinaryTypeIOGenerator.Attributes
 {

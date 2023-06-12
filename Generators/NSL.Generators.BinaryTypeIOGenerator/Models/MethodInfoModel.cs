@@ -1,7 +1,5 @@
 ﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
-using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace NSL.Generators.BinaryTypeIOGenerator.Models
 {
@@ -9,11 +7,15 @@ namespace NSL.Generators.BinaryTypeIOGenerator.Models
     {
         public ClassDeclarationSyntax ClassDeclarationSyntax { get; internal set; }
 
-        public MethodDeclarationSyntax MethodDeclarationSyntax { get; set; }
-
         public IOTypeEnum IOType { get; set; }
 
         public string ForGroup { get; set; }
+
+        public string MethodModifier { get; set; }
+
+        public string MethodName { get; set; }
+
+        public string ReadType { get; set; }
 
         public List<parametermodel> Parameters { get; set; }
     }
@@ -22,7 +24,10 @@ namespace NSL.Generators.BinaryTypeIOGenerator.Models
     public class parametermodel
     {
         public string name;
-        public ParameterSyntax parameter;
+        //public ParameterSyntax parameter;
+
+        //public IdentifierNameSyntax type;
+        public string typeName;
     }
     internal enum IOTypeEnum
     {

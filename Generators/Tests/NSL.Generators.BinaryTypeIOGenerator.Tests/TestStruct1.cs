@@ -26,6 +26,8 @@ namespace NSL.Generators.BinaryTypeIOGenerator.Tests
 
 
     [BinaryIOType]
+    [BinaryIOMethodsFor("en", "abc")]
+    [BinaryIOMethodsFor]
     public partial class TestStruct1 :TestStruct2
     {
 
@@ -38,11 +40,11 @@ namespace NSL.Generators.BinaryTypeIOGenerator.Tests
         [BinaryIOData(For = "en")]
         public NSL.Generators.BinaryTypeIOGenerator.Tests.abserb.erge.ergeg.erg.abcEn? en3 { get; set; }
 
-        [BinaryIOData(For = "en")]
-        public abcfff en4 { get; set; }
+        //[BinaryIOData(For = "en")]
+        //public abcfff en4 { get; set; }
 
-        [BinaryIOData(For = "en")]
-        public abcfff? en5 { get; set; }
+        //[BinaryIOData(For = "en")]
+        //public abcfff? en5 { get; set; }
 
         [BinaryIOData(For = "abc")]
         public string s1 { get; set; }
@@ -61,10 +63,10 @@ namespace NSL.Generators.BinaryTypeIOGenerator.Tests
         //[BinaryIOReadMethod(For = "abc")]
         //public static partial TestStruct1 BinaryReadABC(InputPacketBuffer data);
 
-        [BinaryIOReadMethod(For = "en")]
-        public static partial TestStruct1 BinaryReaden(InputPacketBuffer data);
+        //[BinaryIOReadMethod(For = "en")]
+        //public static partial TestStruct1 BinaryReaden(InputPacketBuffer data);
 
-        [BinaryIOWriteMethod(For = "en")]
-        public partial void BinaryWriteen(OutputPacketBuffer data);
+        //[BinaryIOWriteMethod(For = "en")]
+        //public partial void BinaryWriteen(OutputPacketBuffer data);
     }
 }
