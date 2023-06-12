@@ -20,9 +20,11 @@ namespace NSL.Generators.BinaryGenerator.Generators
             //if (!Debugger.IsAttached)
             //    Debugger.Launch();
 
-            var genericType = ((INamedTypeSymbol)type).TypeArguments.First();
+            var typedArgs = ((INamedTypeSymbol)type).TypeArguments;
 
-            if (!genericType.IsValueType)
+            var genericType = typedArgs.FirstOrDefault();
+
+            if (genericType == null || !genericType.IsValueType)
                 return default;
 
             return $"dataPacket.{nameof(InputPacketBuffer.ReadNullable)}(()=>{{ return {BinaryReadMethodsGenerator.GetValueReadSegment(genericType, context, path)}; }})";
