@@ -26,7 +26,7 @@ namespace NSL.Generators.BinaryTypeIOGenerator.Tests
 
 
     [BinaryIOType]
-    public partial class TestStruct1
+    public partial class TestStruct1 :TestStruct2
     {
 
         [BinaryIOData(For = "en")]

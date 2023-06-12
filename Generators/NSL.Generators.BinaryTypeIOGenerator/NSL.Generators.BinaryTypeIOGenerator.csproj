@@ -48,9 +48,10 @@
 		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.8.0"  PrivateAssets="all" />
 	</ItemGroup>
 	<ItemGroup>
-		<ProjectReference Include="..\NSL.Generators.BinaryTypeIOGenerator.Attributes\NSL.Generators.BinaryTypeIOGenerator.Attributes.csproj" />
-		<ProjectReference Include="..\NSL.Generators.BinaryGenerator\NSL.Generators.BinaryGenerator.csproj" />
-		<ProjectReference Include="..\NSL.Generators.Utils\NSL.Generators.Utils.csproj" />
+		<ProjectReference Include="..\..\Core\NSL.SocketCore\NSL.SocketCore.csproj" PrivateAssets="all" OutputItemType="Analyzer" />
+		<ProjectReference Include="..\NSL.Generators.BinaryTypeIOGenerator.Attributes\NSL.Generators.BinaryTypeIOGenerator.Attributes.csproj" PrivateAssets="all" OutputItemType="Analyzer" />
+		<ProjectReference Include="..\NSL.Generators.BinaryGenerator\NSL.Generators.BinaryGenerator.csproj" PrivateAssets="all" OutputItemType="Analyzer" />
+		<ProjectReference Include="..\NSL.Generators.Utils\NSL.Generators.Utils.csproj" PrivateAssets="all" OutputItemType="Analyzer" />
 	</ItemGroup>
 
 	<ItemGroup>

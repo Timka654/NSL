@@ -37,8 +37,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\Core\NSL.SocketCore\NSL.SocketCore.csproj" />
-		<ProjectReference Include="..\NSL.Generators.Utils\NSL.Generators.Utils.csproj" />
+		<ProjectReference Include="..\..\Core\NSL.SocketCore\NSL.SocketCore.csproj" PrivateAssets="all" OutputItemType="Analyzer" />
+		<ProjectReference Include="..\NSL.Generators.Utils\NSL.Generators.Utils.csproj" PrivateAssets="all" OutputItemType="Analyzer" />
 	</ItemGroup>
 
 </Project>

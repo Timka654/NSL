@@ -18,7 +18,6 @@ namespace NSL.Generators.BinaryGenerator.Generators
 
             CodeBuilder rb = new CodeBuilder();
 
-
             rb.AppendLine($"dataPacket.{nameof(InputPacketBuffer.ReadNullableClass)}(() => {{");
 
             rb.NextTab();
@@ -29,21 +28,28 @@ namespace NSL.Generators.BinaryGenerator.Generators
 
             rb.AppendLine();
 
-            var members = type.GetMembers();
-
-
             path = "data";
 
-            //if (!Debugger.IsAttached && ignoreMembers.Any())
-            //    Debugger.Launch();
-
-            foreach (var member in members)
+            do
             {
-                if (ignoreMembers != null && ignoreMembers.Any(x => x.Equals(member.Name, StringComparison.InvariantCultureIgnoreCase)))
-                    continue;
 
-                BinaryReadMethodsGenerator.AddTypeMemberReadLine(member, context, rb, string.Join(".", path, member.Name));
-            }
+                var members = type.GetMembers();
+
+
+                //if (!Debugger.IsAttached && ignoreMembers.Any())
+                //    Debugger.Launch();
+
+                foreach (var member in members)
+                {
+                    if (ignoreMembers != null && ignoreMembers.Any(x => x.Equals(member.Name, StringComparison.InvariantCultureIgnoreCase)))
+                        continue;
+
+                    BinaryReadMethodsGenerator.AddTypeMemberReadLine(member, context, rb, string.Join(".", path, member.Name));
+                }
+
+                type = type.BaseType;
+
+            } while (type != null);
 
             rb.AppendLine("return data;");
 
@@ -70,16 +76,23 @@ namespace NSL.Generators.BinaryGenerator.Generators
 
             cb.AppendLine();
 
-            var members = type.GetMembers();
-
-
-            foreach (var member in members)
+            do
             {
-                if (ignoreMembers != null && ignoreMembers.Any(x => x.Equals(member.Name, StringComparison.InvariantCultureIgnoreCase)))
-                    continue;
 
-                BinaryWriteMethodsGenerator.AddTypeMemberWriteLine(member, context, cb, string.Join(".", path, member.Name));
-            }
+                var members = type.GetMembers();
+
+
+                foreach (var member in members)
+                {
+                    if (ignoreMembers != null && ignoreMembers.Any(x => x.Equals(member.Name, StringComparison.InvariantCultureIgnoreCase)))
+                        continue;
+
+                    BinaryWriteMethodsGenerator.AddTypeMemberWriteLine(member, context, cb, string.Join(".", path, member.Name));
+                }
+
+                type = type.BaseType;
+
+            } while (type != null);
 
             cb.PrevTab();
 
