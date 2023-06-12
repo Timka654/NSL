@@ -17,16 +17,22 @@ namespace NSL.Generators.BinaryTypeIOGenerator
     {
         private void ProcessBinaryIOTypes(GeneratorExecutionContext context, BinaryIOAttributeSyntaxReceiver methodSyntaxReceiver)
         {
-//#if DEBUG
-//            if (!Debugger.IsAttached)
-//                Debugger.Launch();
-//#endif
+            //#if DEBUG
+            //            if (!Debugger.IsAttached)
+            //                Debugger.Launch();
+            //#endif
 
             foreach (var type in methodSyntaxReceiver.BinaryIOTypes)
             {
                 ProcessBinaryIOType(context, type);
             }
         }
+
+        private static string[] requiredUsings = new string[] {
+            "using NSL.SocketCore;",
+            "using NSL.SocketCore.Utils.Buffer;",
+            "using System.Linq;"
+        };
 
         private void ProcessBinaryIOType(GeneratorExecutionContext context, TypeDeclarationSyntax type)
         {
@@ -50,14 +56,17 @@ namespace NSL.Generators.BinaryTypeIOGenerator
                 classBuilder.AppendLine($"Project must have reference \"NSL.SocketCore\" library for normal working");
             });
 
-            classBuilder.AppendLine($"using NSL.SocketCore;");
-            classBuilder.AppendLine($"using NSL.SocketCore.Utils.Buffer;");
-
             var usings = UpdateUsingDirectives(type.SyntaxTree);
 
             foreach (var u in usings)
             {
                 classBuilder.AppendLine(u.ToString());
+            }
+
+            foreach (var u in requiredUsings)
+            {
+                if (!usings.Any(eu => eu.ToString().Equals(u)))
+                    classBuilder.AppendLine(u);
             }
 
             classBuilder.AppendLine();
@@ -196,8 +205,8 @@ namespace NSL.Generators.BinaryTypeIOGenerator
                 methodInfo.Parameters = new List<parametermodel>()
                 {
                     new parametermodel(){  name = "data", typeName = typeof(InputPacketBuffer).Name }
-                }; 
-                
+                };
+
                 methodBuilder = new CodeBuilder();
                 ProcessReadMethod(methodBuilder, methodInfo, context);
                 classBuilder.AppendLine(methodBuilder.ToString());

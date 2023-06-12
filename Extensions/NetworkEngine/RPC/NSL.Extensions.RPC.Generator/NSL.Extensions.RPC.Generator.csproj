@@ -54,9 +54,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\..\..\..\Generators\NSL.Generators.BinaryGenerator\NSL.Generators.BinaryGenerator.csproj" />
-	  <ProjectReference Include="..\..\..\..\Generators\NSL.Generators.Utils\NSL.Generators.Utils.csproj" />
-	  <ProjectReference Include="..\NSL.Extensions.RPC\NSL.Extensions.RPC.csproj" />
+	  <ProjectReference Include="..\..\..\..\Generators\NSL.Generators.BinaryGenerator\NSL.Generators.BinaryGenerator.csproj" PrivateAssets="all" OutputItemType="Analyzer"  />
+	  <ProjectReference Include="..\..\..\..\Generators\NSL.Generators.Utils\NSL.Generators.Utils.csproj" PrivateAssets="all" OutputItemType="Analyzer"  />
+	  <ProjectReference Include="..\NSL.Extensions.RPC\NSL.Extensions.RPC.csproj" PrivateAssets="all" OutputItemType="Analyzer"  />
 	</ItemGroup>
 
 	<ItemGroup>
