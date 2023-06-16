@@ -1,11 +1,13 @@
 ﻿using Microsoft.CodeAnalysis;
 using NSL.Generators.Utils;
 using NSL.SocketCore.Utils.Buffer;
+using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace NSL.Generators.BinaryGenerator.Generators.CustomGenerators
 {
-    internal class ListTypeGenerator
+    internal class IListTypeGenerator
     {
         public static string GetReadLine(INamedTypeSymbol type, BinaryGeneratorContext context, string path)
         {
@@ -16,7 +18,21 @@ namespace NSL.Generators.BinaryGenerator.Generators.CustomGenerators
             //var b = new InputPacketBuffer();
             //b.ReadNullableClass(()=> b.ReadCollection<int>(()=>b.ReadInt32()))
 
-            cb.AppendLine($"dataPacket.{nameof(InputPacketBuffer.ReadNullableClass)}(() => dataPacket.{nameof(InputPacketBuffer.ReadCollection)}(()=>{{");
+            var cParamType = context.SemanticModel.Compilation.GetTypeByMetadataName(typeof(IEnumerable<>).FullName).Construct(farg);
+
+            var constructor = type.Constructors.FirstOrDefault(x => x.Parameters.FirstOrDefault()?.Type.Equals(cParamType) == true);
+
+            if (constructor == null)
+            {
+                cParamType = context.SemanticModel.Compilation.GetTypeByMetadataName(typeof(IEnumerable<>).FullName);
+
+                constructor = type.Constructors.FirstOrDefault(x => x.Parameters.FirstOrDefault()?.Type.Equals(cParamType) == true);
+            }
+
+            if (constructor == default)
+                return default;
+
+            cb.AppendLine($"dataPacket.{nameof(InputPacketBuffer.ReadNullableClass)}(() => new {type.ToDisplayString()}(dataPacket.{nameof(InputPacketBuffer.ReadCollection)}(()=>{{");
 
             cb.NextTab();
 
@@ -28,7 +44,7 @@ namespace NSL.Generators.BinaryGenerator.Generators.CustomGenerators
 
             cb.PrevTab();
 
-            cb.AppendLine($"}}).ToList());"); 
+            cb.AppendLine($"}}).ToList()));");
 
             return cb.ToString();
         }

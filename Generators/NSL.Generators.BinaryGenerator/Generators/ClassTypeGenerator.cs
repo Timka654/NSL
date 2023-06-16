@@ -33,7 +33,7 @@ namespace NSL.Generators.BinaryGenerator.Generators
             do
             {
 
-                var members = type.GetMembers();
+                var members = type.GetMembers().OrderBy(x=>x.MetadataName);
 
 
                 //if (!Debugger.IsAttached && ignoreMembers.Any())
@@ -79,7 +79,7 @@ namespace NSL.Generators.BinaryGenerator.Generators
             do
             {
 
-                var members = type.GetMembers();
+                var members = type.GetMembers().OrderBy(x=>x.MetadataName);
 
 
                 foreach (var member in members)

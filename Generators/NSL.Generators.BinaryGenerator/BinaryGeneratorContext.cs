@@ -7,6 +7,8 @@ namespace NSL.Generators.BinaryGenerator
 {
     public class BinaryGeneratorContext
     {
+        public SemanticModel SemanticModel;
+
         public virtual bool IsIgnore(ISymbol symbol) => false;
     }
 }

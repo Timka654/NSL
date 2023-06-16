@@ -33,7 +33,7 @@ namespace NSL.Generators.BinaryGenerator.Generators
 
             path = parameter.GetName(path) ?? default;
 
-            var members = type.GetMembers();
+            var members = type.GetMembers().OrderBy(x => x.MetadataName);
 
 
             foreach (var member in members)
@@ -56,7 +56,7 @@ namespace NSL.Generators.BinaryGenerator.Generators
 
             CodeBuilder cb = new CodeBuilder();
 
-            var members = type.GetMembers();
+            var members = type.GetMembers().OrderBy(x=>x.MetadataName);
 
             foreach (var member in members)
             {

@@ -48,6 +48,8 @@ namespace NSL.Extensions.RPC.Generator.Generators
         {
             CodeBuilder cb = new CodeBuilder();
 
+            binaryContext.SemanticModel = mcm.SemanticModel;
+
             //if (!Debugger.IsAttached)
             //    Debugger.Launch();
 

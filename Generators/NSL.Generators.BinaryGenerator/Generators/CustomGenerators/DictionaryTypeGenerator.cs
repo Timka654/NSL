@@ -15,7 +15,7 @@ namespace NSL.Generators.BinaryGenerator.Generators.CustomGenerators
 
             var cb = new CodeBuilder();
 
-            cb.AppendLine($"dataPacket.{nameof(InputPacketBuffer.ReadCollection)}(()=>{{");
+            cb.AppendLine($"dataPacket.{nameof(InputPacketBuffer.ReadNullableClass)}(() => dataPacket.{nameof(InputPacketBuffer.ReadCollection)}(()=>{{");
             cb.NextTab();
 
             cb.AppendLine($"var key = {BinaryReadMethodsGenerator.GetValueReadSegment(farg, context, "key")};");
@@ -30,7 +30,7 @@ namespace NSL.Generators.BinaryGenerator.Generators.CustomGenerators
 
             cb.PrevTab();
 
-            cb.AppendLine($"}}).ToDictionary(x=>x.key, x=>x.value);");
+            cb.AppendLine($"}}).ToDictionary(x=>x.key, x=>x.value));");
 
             return cb.ToString();
         }
@@ -46,7 +46,7 @@ namespace NSL.Generators.BinaryGenerator.Generators.CustomGenerators
 
             var cb = new CodeBuilder();
 
-            cb.AppendLine($"__packet.{nameof(OutputPacketBuffer.WriteCollection)}({path},(i)=>{{");
+            cb.AppendLine($"__packet.{nameof(OutputPacketBuffer.WriteNullableClass)}({path},() => __packet.{nameof(OutputPacketBuffer.WriteCollection)}({path},(i)=>{{");
 
             cb.NextTab();
 
@@ -56,7 +56,7 @@ namespace NSL.Generators.BinaryGenerator.Generators.CustomGenerators
 
             cb.PrevTab();
 
-            cb.AppendLine($"}});");
+            cb.AppendLine($"}}));");
 
             return cb.ToString();
         }

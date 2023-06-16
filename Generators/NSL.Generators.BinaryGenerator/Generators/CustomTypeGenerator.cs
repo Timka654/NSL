@@ -32,6 +32,12 @@ namespace NSL.Generators.BinaryGenerator.Generators
 
             if (GetHandlers(type, out var handlers))
                 return handlers.readHandle(type, context, path);
+            else
+                foreach (var item in type.AllInterfaces)
+                {
+                    if (GetHandlers(item, out handlers))
+                        return handlers.readHandle(type, context, path);
+                }
 
             return default;
         }
@@ -45,6 +51,12 @@ namespace NSL.Generators.BinaryGenerator.Generators
 
             if (GetHandlers(type, out var handlers))
                 return handlers.writeHandle(type, context, path);
+            else
+                foreach (var item in type.AllInterfaces)
+                {
+                    if (GetHandlers(item, out handlers))
+                        return handlers.writeHandle(type, context, path);
+                }
 
             return default;
         }
@@ -58,6 +70,10 @@ namespace NSL.Generators.BinaryGenerator.Generators
             customTypeReadHandlers.Add(
                 typeof(List<>).Name,
                 (ListTypeGenerator.GetReadLine, ListTypeGenerator.GetWriteLine));
+
+            customTypeReadHandlers.Add(
+                typeof(IList<>).Name,
+                (IListTypeGenerator.GetReadLine, IListTypeGenerator.GetWriteLine));
         }
     }
 }

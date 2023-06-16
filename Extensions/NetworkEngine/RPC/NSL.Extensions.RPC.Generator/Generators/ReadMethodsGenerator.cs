@@ -27,6 +27,8 @@ namespace NSL.Extensions.RPC.Generator.Generators
 
             mcm.CurrentParameterSymbol = parameterSymbol;
 
+            binaryContext.SemanticModel = mcm.SemanticModel;
+
             string valueReader = GetValueReadSegment(parameterSymbol, mcm, null, RPCGenerator.GetParameterIgnoreMembers(parameterSymbol, mcm));
 
             pb.AppendLine(valueReader);

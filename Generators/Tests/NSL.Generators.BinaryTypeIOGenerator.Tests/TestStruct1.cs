@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ZergRush.ReactiveCore;
 
 namespace NSL.Generators.BinaryTypeIOGenerator.Tests.abserb.erge.ergeg.erg
 {
@@ -30,6 +31,8 @@ namespace NSL.Generators.BinaryTypeIOGenerator.Tests
     [BinaryIOMethodsFor]
     public partial class TestStruct1 :TestStruct2
     {
+        [BinaryIOData(For = "en")]
+        public ReactiveCollection<byte> data { get; set; }
 
         [BinaryIOData(For = "en")]
         public NSL.Generators.BinaryTypeIOGenerator.Tests.abserb.erge.ergeg.erg.abcEn en1 { get; set; }

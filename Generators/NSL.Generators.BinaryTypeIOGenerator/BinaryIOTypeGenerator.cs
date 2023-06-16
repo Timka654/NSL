@@ -17,10 +17,10 @@ namespace NSL.Generators.BinaryTypeIOGenerator
     {
         private void ProcessBinaryIOTypes(GeneratorExecutionContext context, BinaryIOAttributeSyntaxReceiver methodSyntaxReceiver)
         {
-            //#if DEBUG
-            //            if (!Debugger.IsAttached)
-            //                Debugger.Launch();
-            //#endif
+#if DEBUG
+            if (!Debugger.IsAttached)
+                Debugger.Launch();
+#endif
 
             foreach (var type in methodSyntaxReceiver.BinaryIOTypes)
             {
@@ -275,7 +275,7 @@ namespace NSL.Generators.BinaryTypeIOGenerator
 
             var tSym = context.Compilation.GetSemanticModel(classDecl.SyntaxTree);
 
-            var bgContext = new BinaryTypeIOGeneratorContext() { For = methodInfo.ForGroup };
+            var bgContext = new BinaryTypeIOGeneratorContext() { For = methodInfo.ForGroup, SemanticModel = tSym };
 
             methodBuilder.AppendLine($"return {BinaryReadMethodsGenerator.GetValueReadSegment(tSym.GetDeclaredSymbol(classDecl), bgContext, default, Enumerable.Empty<string>())};");
 
@@ -323,7 +323,7 @@ namespace NSL.Generators.BinaryTypeIOGenerator
 
             var tSym = context.Compilation.GetSemanticModel(methodInfo.ClassDeclarationSyntax.SyntaxTree);
 
-            var bgContext = new BinaryTypeIOGeneratorContext() { For = methodInfo.ForGroup };
+            var bgContext = new BinaryTypeIOGeneratorContext() { For = methodInfo.ForGroup, SemanticModel = tSym };
 
             methodBuilder.AppendLine(BinaryWriteMethodsGenerator.BuildParameterWriter(tSym.GetDeclaredSymbol(methodInfo.ClassDeclarationSyntax), bgContext, typeParamName, Enumerable.Empty<string>()));
 
