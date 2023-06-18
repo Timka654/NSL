@@ -23,9 +23,9 @@ namespace NSL.SocketServer.Utils.SystemPackets
 
         public override void Receive(T client, InputPacketBuffer data)
         {
-            string session = data.ReadString16();
+            string session = data.ReadString();
 
-            var keys = data.ReadCollection(data.ReadString16).ToArray();
+            var keys = data.ReadCollection(data.ReadString).ToArray();
 
             if (session == default && keys == default)
                 return;
@@ -44,12 +44,12 @@ namespace NSL.SocketServer.Utils.SystemPackets
 
             if (result == RecoverySessionResultEnum.Ok)
             {
-                packet.WriteString16(session);
+                packet.WriteString(session);
                 packet.WriteInt32(newKeys.Length);
 
                 for (int i = 0; i < newKeys.Length; i++)
                 {
-                    packet.WriteString16(newKeys[i]);
+                    packet.WriteString(newKeys[i]);
                 }
             }
 

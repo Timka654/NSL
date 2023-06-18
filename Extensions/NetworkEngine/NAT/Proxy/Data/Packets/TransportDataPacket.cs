@@ -13,12 +13,12 @@ namespace NSL.Extensions.NAT.Proxy.Data.Packets
 
         protected override void Receive(InputPacketBuffer data)
         {
-            InvokeEvent((data.ReadString16(), new InputPacketBuffer(data.Read(data.ReadInt32()))));
+            InvokeEvent((data.ReadString(), new InputPacketBuffer(data.Read(data.ReadInt32()))));
         }
 
         public void Send(byte[] data)
         {
-            OutputPacketBuffer packet = new OutputPacketBuffer(data.Length + OutputPacketBuffer.DefaultHeaderLenght)
+            OutputPacketBuffer packet = new OutputPacketBuffer(data.Length + OutputPacketBuffer.DefaultHeaderLength)
             {
                 PacketId = (ushort)ServerPacketsEnum.Transport
             };

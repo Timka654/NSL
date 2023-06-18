@@ -5,6 +5,7 @@ using NSL.SocketCore.Extensions.Buffer;
 using NSL.SocketCore.Extensions.Buffer.Interface;
 using NSL.SocketCore.Extensions.Packet;
 using NSL.SocketCore.Utils;
+using NSL.SocketCore.Utils.Buffer;
 using NSL.SocketCore.Utils.Logger;
 using NSL.SocketCore.Utils.Logger.Enums;
 using System;
@@ -251,6 +252,9 @@ namespace NSL.BuilderExtensions.SocketCore
             if (handleOptions.HasFlag(DefaultEventHandlersEnum.Send))
                 builder.AddBaseSendHandle((client, pid, len, stackTrace) =>
                 {
+                    if (handleOptions.HasFlag(DefaultEventHandlersEnum.ExcludeSystemPid) && OutputPacketBuffer.IsSystemPID(pid))
+                        return;
+
                     var name = getNameSendPacket(pid);
 
                     if (name != default)
@@ -270,6 +274,9 @@ namespace NSL.BuilderExtensions.SocketCore
             if (handleOptions.HasFlag(DefaultEventHandlersEnum.Receive))
                 builder.AddBaseReceiveHandle((client, pid, len) =>
                 {
+                    if (handleOptions.HasFlag(DefaultEventHandlersEnum.ExcludeSystemPid) && InputPacketBuffer.IsSystemPID(pid))
+                        return;
+
                     var name = getNameReceivePacket(pid);
 
                     if (name != default)
@@ -296,6 +303,7 @@ namespace NSL.BuilderExtensions.SocketCore
         Receive = 16,
         Exception = 32,
         DisplayEndPoint = 64,
+        ExcludeSystemPid = 128,
         All = int.MaxValue
     }
 }

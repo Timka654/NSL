@@ -14,8 +14,6 @@ namespace NSL.Extensions.DBEngine
 
         private TimeSpan DelayCommandTime = TimeSpan.FromSeconds(20);
 
-        private long CurrentIndex = 1;
-
         public Action<Exception> OnException { protected get; set; } = (e) => { };
 
         protected ConcurrentQueue<Action<DBCommand>> WaitList = new ConcurrentQueue<Action<DBCommand>>();

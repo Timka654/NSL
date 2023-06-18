@@ -8,7 +8,7 @@ namespace NSL.Generators.BinaryTypeIOGenerator.Tests
         {
             var o = new OutputPacketBuffer();
 
-            var ouData = new TestStruct1() { s1 = " abbbbcc", n1 = 75656, data = new ZergRush.ReactiveCore.ReactiveCollection<byte>() };
+            var ouData = new TestStruct1() { s1 = " abbbbcc", n1 = 75656/*, data = new ZergRush.ReactiveCore.ReactiveCollection<byte>()*/ };
 
             ouData.WriteabcTo(o);
 
@@ -22,7 +22,7 @@ namespace NSL.Generators.BinaryTypeIOGenerator.Tests
 
             var o1 = new OutputPacketBuffer();
 
-            ouData = new TestStruct1() { s1 = "rwegrewgwrg", n1 = 6347, data = new ZergRush.ReactiveCore.ReactiveCollection<byte>(new byte[] { 45, 67, 85 }) };
+            ouData = new TestStruct1() { s1 = "rwegrewgwrg", n1 = 6347/*, data = new ZergRush.ReactiveCore.ReactiveCollection<byte>(new byte[] { 45, 67, 85 })*/ };
             ouData.WriteenTo(o1);
 
             var i1 = new InputPacketBuffer(o1.CompilePacket());

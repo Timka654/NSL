@@ -63,7 +63,7 @@ namespace NSL.BuilderExtensions.TCPClient
             return new TCPClientEndPointBuilder<TClient, TOptions>();
         }
 
-        public new TCPClientEndPointBuilder<TClient, TOptions> WithCode(Action<TCPClientEndPointBuilder<TClient, TOptions>> code)
+        public TCPClientEndPointBuilder<TClient, TOptions> WithCode(Action<TCPClientEndPointBuilder<TClient, TOptions>> code)
         {
             code(this);
             return this;

@@ -42,8 +42,8 @@
 		<ProjectReference Include="..\..\NSL.Generators.Utils\NSL.Generators.Utils.csproj" />
 	</ItemGroup>
 
-	<ItemGroup>
+	<!--<ItemGroup>
 		<Compile Include="D:\Projects\work\arrible\ZergRush\Assets\ZergRush\PureCSharp\**\*.cs" />
-	</ItemGroup>
+	</ItemGroup>-->
 
 </Project>

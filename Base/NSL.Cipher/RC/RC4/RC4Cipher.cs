@@ -131,7 +131,7 @@ namespace NSL.Cipher.RC.RC4
         public byte[] Peek(byte[] buffer)
         {
             byte[] dest = new byte[7];
-            codeBlock(ref buffer, 0, ref dest, InputPacketBuffer.DefaultHeaderLenght);
+            codeBlock(ref buffer, 0, ref dest, InputPacketBuffer.DefaultHeaderLength);
 
             return dest;
         }

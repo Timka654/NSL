@@ -46,8 +46,8 @@ namespace NSL.Cipher.RSA
 
         public byte[] Peek(byte[] buffer)
         {
-            byte[] buf = new byte[InputPacketBuffer.DefaultHeaderLenght];
-            Array.Copy(buffer, 0, buf, 0, InputPacketBuffer.DefaultHeaderLenght);
+            byte[] buf = new byte[InputPacketBuffer.DefaultHeaderLength];
+            Array.Copy(buffer, 0, buf, 0, InputPacketBuffer.DefaultHeaderLength);
             return rsa.Encrypt(buf,true);
         }
 

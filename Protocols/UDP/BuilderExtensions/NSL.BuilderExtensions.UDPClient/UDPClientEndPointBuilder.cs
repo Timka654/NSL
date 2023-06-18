@@ -81,7 +81,7 @@ namespace NSL.BuilderExtensions.UDPClient
             return this;
         }
 
-        public new UDPClientEndPointBuilder<TClient, TOptions> WithCode(Action<UDPClientEndPointBuilder<TClient, TOptions>> code)
+        public UDPClientEndPointBuilder<TClient, TOptions> WithCode(Action<UDPClientEndPointBuilder<TClient, TOptions>> code)
         {
             code(this);
             return this;

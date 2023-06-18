@@ -27,9 +27,9 @@ namespace NSL.SocketClient.Utils.SystemPackets
                 PacketId = PacketId
             };
 
-            packet.WriteString16(client.Session);
+            packet.WriteString(client.Session);
 
-            packet.WriteCollection(client.RecoverySessionKeyArray, packet.WriteString16);
+            packet.WriteCollection(client.RecoverySessionKeyArray, packet.WriteString);
 
             client.Network.Send(packet);
         }
@@ -49,9 +49,9 @@ namespace NSL.SocketClient.Utils.SystemPackets
 
             if (result == RecoverySessionResultEnum.Ok)
             {
-                string session = data.ReadString16();
+                string session = data.ReadString();
 
-                var recoverySessionKeyArray = data.ReadCollection(data.ReadString16).ToArray();
+                var recoverySessionKeyArray = data.ReadCollection(data.ReadString).ToArray();
 
                 Client.SetRecoveryData(session, recoverySessionKeyArray);
             }

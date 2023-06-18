@@ -183,7 +183,7 @@ namespace NSL.UDP
                 //дешефруем и засовываем это все в спец буффер в котором реализованы методы чтения типов, своего рода поток
                 DgramInputPacketBuffer pbuff = new DgramInputPacketBuffer(inputCipher.Decode(result, 0, result.Length), channel, true);
 
-                OnReceive(pbuff.PacketId, pbuff.Lenght);
+                OnReceive(pbuff.PacketId, pbuff.PacketLength);
 
                 //предотвращение ошибок в пакете
                 try
@@ -311,7 +311,7 @@ namespace NSL.UDP
 
         protected virtual void OnSend(DgramOutputPacketBuffer rbuff, string stackTrace = "")
         {
-            OnSendPacket?.Invoke(parent, rbuff.PacketId, rbuff.PacketLenght, stackTrace);
+            OnSendPacket?.Invoke(parent, rbuff.PacketId, rbuff.PacketLength, stackTrace);
         }
 
         private int currentSendRate;

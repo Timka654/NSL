@@ -14,12 +14,12 @@ namespace NSL.SocketCore.Extensions.Buffer
         /// <returns></returns>
         public static T ReadJson16<T>(this InputPacketBuffer packet)
         {
-            return JsonConvert.DeserializeObject<T>(packet.ReadString16());
+            return JsonConvert.DeserializeObject<T>(packet.ReadString());
         }
 
         public static object ReadJson16(this InputPacketBuffer packet, Type type)
         {
-            return JsonConvert.DeserializeObject(packet.ReadString16(), type);
+            return JsonConvert.DeserializeObject(packet.ReadString(), type);
         }
 
         /// <summary>
@@ -30,12 +30,12 @@ namespace NSL.SocketCore.Extensions.Buffer
         /// <returns></returns>
         public static T ReadJson32<T>(this InputPacketBuffer packet)
         {
-            return JsonConvert.DeserializeObject<T>(packet.ReadString32());
+            return JsonConvert.DeserializeObject<T>(packet.ReadString());
         }
 
         public static object ReadJson32(this InputPacketBuffer packet, Type type)
         {
-            return JsonConvert.DeserializeObject(packet.ReadString32(), type);
+            return JsonConvert.DeserializeObject(packet.ReadString(), type);
         }
 
         /// <summary>
@@ -46,7 +46,7 @@ namespace NSL.SocketCore.Extensions.Buffer
         /// <param name="value"></param>
         public static void WriteJson16<T>(this OutputPacketBuffer buffer, T value)
         {
-            buffer.WriteString16(JsonConvert.SerializeObject(value));
+            buffer.WriteString(JsonConvert.SerializeObject(value));
         }
 
         /// <summary>
@@ -57,7 +57,7 @@ namespace NSL.SocketCore.Extensions.Buffer
         /// <param name="value"></param>
         public static void WriteJson32<T>(this OutputPacketBuffer buffer, T value)
         {
-            buffer.WriteString32(JsonConvert.SerializeObject(value));
+            buffer.WriteString(JsonConvert.SerializeObject(value));
         }
 
         public static void SendJson16<TClient, TObject>(this TClient client, ushort packetId, TObject o)
@@ -239,7 +239,7 @@ namespace NSL.SocketCore.Extensions.Buffer
         {
             var rbuff = OutputPacketBuffer.Create(packetId);
 
-            rbuff.WriteString16(value);
+            rbuff.WriteString(value);
 
             client.Send(rbuff);
         }
@@ -288,12 +288,12 @@ namespace NSL.SocketCore.Extensions.Buffer
 
             buffer.WriteGuid(data.ReadGuid());
 
-            if (boffset > RequestPacketBuffer.DefaultHeaderLenght)
+            if (boffset > RequestPacketBuffer.DefaultHeaderLength)
                 buffer.Position = boffset;
             else
                 buffer.DataPosition = 16;
 
-            if (doffset > RequestPacketBuffer.DefaultHeaderLenght)
+            if (doffset > RequestPacketBuffer.DefaultHeaderLength)
                 data.Position = doffset;
             else
                 data.DataPosition = 16;

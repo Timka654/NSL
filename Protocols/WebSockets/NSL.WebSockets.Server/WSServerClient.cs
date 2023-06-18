@@ -10,9 +10,9 @@ namespace NSL.WebSockets.Server
     public class WSServerClient<T> : BaseWSClient<T, WSServerClient<T>>
         where T : IServerNetworkClient, new()
     {
-        private T data;
+        private T clientData;
 
-        public override T Data => data;
+        public override T Data => clientData;
 
         /// <summary>
         /// Общие настройки сервера
@@ -42,7 +42,7 @@ namespace NSL.WebSockets.Server
 
         protected void Initialize(ServerOptions<T> options)
         {
-            data = new T();
+            clientData = new T();
 
             //установка переменной с общими настройками сервера
             base.options = options;
@@ -83,7 +83,7 @@ namespace NSL.WebSockets.Server
         {
             if (setClient is T valid)
             {
-                data = valid;
+                clientData = valid;
                 Data.Network = this;
                 Data.ServerOptions = options;
             }
