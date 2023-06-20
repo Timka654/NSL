@@ -21,15 +21,16 @@ namespace NSL.Generators.BinaryGenerator
             generators.Add(StructTypeGenerator.GetWriteLine);
         }
 
-        public static string BuildParameterWriter(ISymbol item, BinaryGeneratorContext context, string path, IEnumerable<string> ignoreMembers)
+        //public static string BuildParameterWriter(ISymbol item, BinaryGeneratorContext context, string path, IEnumerable<string> ignoreMembers)
+        public static string BuildParameterWriter(ISymbol item, BinaryGeneratorContext context, string path)
         {
-            string writerLine = default;
+            string writerLine = context.GetExistsWriteHandleCode(item, path);
 
-            if (ignoreMembers == null || !ignoreMembers.Any(x => x.Equals("*")))
+            if (writerLine == default)
             {
                 foreach (var gen in generators)
                 {
-                    writerLine = gen(item, context, path, ignoreMembers);
+                    writerLine = gen(item, context, path);
 
                     if (writerLine != default)
                         break;
@@ -45,7 +46,7 @@ namespace NSL.Generators.BinaryGenerator
             if (member.DeclaredAccessibility.HasFlag(Accessibility.Public) == false || member.IsStatic)
                 return;
 
-            if (context.IsIgnore(member))
+            if (context.IsIgnore(member, path))
                 return;
 
             if (member is IPropertySymbol ps)
@@ -53,7 +54,7 @@ namespace NSL.Generators.BinaryGenerator
                 if (ps.SetMethod != null)
                 {
                     var ptype = ps.GetTypeSymbol();
-                    cb.AppendLine(BuildParameterWriter(ptype, context, path, null));
+                    cb.AppendLine(BuildParameterWriter(ptype, context, path));
 
                     cb.AppendLine();
                 }
@@ -61,7 +62,7 @@ namespace NSL.Generators.BinaryGenerator
             else if (member is IFieldSymbol fs)
             {
                 var ftype = fs.GetTypeSymbol();
-                cb.AppendLine(BuildParameterWriter(ftype, context, path, null));
+                cb.AppendLine(BuildParameterWriter(ftype, context, path));
                 cb.AppendLine();
             }
         }

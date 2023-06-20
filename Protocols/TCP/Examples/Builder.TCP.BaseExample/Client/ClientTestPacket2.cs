@@ -8,7 +8,7 @@ namespace Builder.TCP.BaseExample.Client
     {
         public override void Receive(TCPNetworkClient client, InputPacketBuffer data)
         {
-            Console.WriteLine($"[Client]receive from {nameof(ClientTestPacket2)} - {data.ReadString16()}");
+            Console.WriteLine($"[Client]receive from {nameof(ClientTestPacket2)} - {data.ReadString()}");
         }
     }
 }

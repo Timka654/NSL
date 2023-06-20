@@ -8,7 +8,7 @@ namespace NSL.Generators.BinaryGenerator.Generators
 {
     internal class StructTypeGenerator
     {
-        public static string GetReadLine(ISymbol parameter, BinaryGeneratorContext context, string path, IEnumerable<string> ignoreMembers)
+        public static string GetReadLine(ISymbol parameter, BinaryGeneratorContext context, string path)
         {
             var type = parameter.GetTypeSymbol();
 
@@ -33,21 +33,25 @@ namespace NSL.Generators.BinaryGenerator.Generators
 
             path = parameter.GetName(path) ?? default;
 
-            var members = type.GetMembers().OrderBy(x => x.MetadataName);
+            var members = type.GetMembers()
+                .Where(x => x is IFieldSymbol || x is IPropertySymbol)
+                .OrderBy(x => x.MetadataName);
 
 
             foreach (var member in members)
             {
-                if (ignoreMembers != null && ignoreMembers.Any(x => x.Equals(member.Name, StringComparison.InvariantCultureIgnoreCase)))
+                var fpath = string.Join(".", path, member.Name);
+
+                if (context.IsIgnore(member, fpath))
                     continue;
 
-                BinaryReadMethodsGenerator.AddTypeMemberReadLine(member, context, rb, string.Join(".", path, member.Name));
+                BinaryReadMethodsGenerator.AddTypeMemberReadLine(member, context, rb, fpath);
             }
 
             return rb.ToString();// test only
         }
 
-        public static string GetWriteLine(ISymbol item, BinaryGeneratorContext context, string path, IEnumerable<string> ignoreMembers)
+        public static string GetWriteLine(ISymbol item, BinaryGeneratorContext context, string path)
         {
             var type = item.GetTypeSymbol();
 
@@ -56,14 +60,18 @@ namespace NSL.Generators.BinaryGenerator.Generators
 
             CodeBuilder cb = new CodeBuilder();
 
-            var members = type.GetMembers().OrderBy(x=>x.MetadataName);
+            var members = type.GetMembers()
+                .Where(x=>x is IFieldSymbol || x is IPropertySymbol)
+                .OrderBy(x=>x.MetadataName);
 
             foreach (var member in members)
             {
-                if (ignoreMembers != null && ignoreMembers.Any(x => x.Equals(member.Name, StringComparison.InvariantCultureIgnoreCase)))
+                var fpath = string.Join(".", path, member.Name);
+
+                if (context.IsIgnore(member, fpath))
                     continue;
 
-                BinaryWriteMethodsGenerator.AddTypeMemberWriteLine(member, context, cb, string.Join(".", path, member.Name));
+                BinaryWriteMethodsGenerator.AddTypeMemberWriteLine(member, context, cb, fpath);
             }
 
             return cb.ToString();

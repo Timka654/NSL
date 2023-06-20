@@ -5,7 +5,7 @@ namespace NSL.Extensions.DataEngine.Interface
 {
     public interface ICacheDataProvider
     {
-        Type GetCacheProviderType();
+        Type[] GetCacheProviderType();
     }
 
     public interface ICacheDataLoader : ICacheDataProvider

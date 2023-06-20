@@ -18,12 +18,7 @@ namespace NSL.Generators.Utils
         {
             if (Tabs == 0)
             {
-                if (!Debugger.IsAttached)
-                    Debugger.Launch();
-                else
-                    Debugger.Break();
-
-                throw new Exception();
+                return;
             }
             --Tabs;
         }

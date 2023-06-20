@@ -7,6 +7,8 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis;
 using NSL.Extensions.RPC.Generator.Models;
 using NSL.Generators.BinaryGenerator;
+using NSL.Extensions.RPC.Generator.Attributes;
+using System.Diagnostics;
 
 namespace NSL.Extensions.RPC.Generator.Generators
 {
@@ -60,11 +62,17 @@ namespace NSL.Extensions.RPC.Generator.Generators
 
             cb.NextTab();
 
-
-            cb.AppendLine($"var __packet = Processor.CreateCall(GetContainerName(), \"{mcm.methodSyntax.Identifier.Text}\", {mcm.methodSyntax.ParameterList.Parameters.Count});");
+            cb.AppendLine($"var __packet = Processor.CreateCall(GetContainerName(), {HasherUtils.GetInt32HashCode(mcm.methodSyntax.Identifier.Text)}, {HasherUtils.GetInt32HashCode(mcm.methodSyntax.ParameterList.Parameters.Select(x=>x.ToFullString()).ToArray())});");
 
             foreach (var parameter in mcm.methodSyntax.ParameterList.Parameters)
             {
+                var attributes = parameter.AttributeLists
+                    .SelectMany(n => n.Attributes)
+                    .Where(x => x.GetAttributeFullName().Equals(RPCCustomMemberIgnoreAttributeFullName)).ToArray();
+
+                if (attributes.Any(x => x.ArgumentList == null || x.ArgumentList.Arguments.Any(b => b.GetAttributeParameterValue<string>(mcm.SemanticModel).Equals("*"))))
+                    continue;
+
                 var parameterSymbol = mcm.SemanticModel.GetDeclaredSymbol(parameter);
 
                 mcm.CurrentParameter = parameter;
@@ -75,7 +83,9 @@ namespace NSL.Extensions.RPC.Generator.Generators
 
                 cb.AppendLine();
 
-                cb.AppendLine(BuildParameterWriter(parameterSymbol, mcm, path, RPCGenerator.GetParameterIgnoreMembers(parameterSymbol, mcm)));
+                binaryContext.IgnorePaths = RPCGenerator.GetParameterIgnoreMembers(parameterSymbol, mcm).ToArray();
+
+                cb.AppendLine(BuildParameterWriter(parameterSymbol, mcm, path));
             }
 
             cb.AppendLine();
@@ -145,36 +155,11 @@ namespace NSL.Extensions.RPC.Generator.Generators
             return cb.ToString();
         }
 
-        public static string BuildParameterWriter(ISymbol item, MethodContextModel mcm, string path, IEnumerable<string> ignoreMembers)
-            => BinaryWriteMethodsGenerator.BuildParameterWriter(item, binaryContext, path, ignoreMembers);
-
-
-        public static void AddTypeMemberWriteLine(ISymbol member, MethodContextModel mcm, CodeBuilder cb, string path)
-        {
-            if (member.DeclaredAccessibility.HasFlag(Accessibility.Public) == false || member.IsStatic)
-                return;
-
-            if (RPCGenerator.IsIgnoreMember(member))
-                return;
-
-            if (member is IPropertySymbol ps)
-            {
-                if (ps.SetMethod != null)
-                {
-                    var ptype = ps.GetTypeSymbol();
-                    cb.AppendLine(BuildParameterWriter(ptype, mcm, path, null));
-
-                    cb.AppendLine();
-                }
-            }
-            else if (member is IFieldSymbol fs)
-            {
-                var ftype = fs.GetTypeSymbol();
-                cb.AppendLine(BuildParameterWriter(ftype, mcm, path, null));
-                cb.AppendLine();
-            }
-        }
+        public static string BuildParameterWriter(ISymbol item, MethodContextModel mcm, string path)
+            => BinaryWriteMethodsGenerator.BuildParameterWriter(item, binaryContext, path);
 
         private static RPCBinaryGeneratorContext binaryContext = new RPCBinaryGeneratorContext();
+
+        private static readonly string RPCCustomMemberIgnoreAttributeFullName = typeof(RPCCustomMemberIgnoreAttribute).Name;
     }
 }

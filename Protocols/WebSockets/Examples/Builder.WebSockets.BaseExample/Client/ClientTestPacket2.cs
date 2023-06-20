@@ -8,7 +8,7 @@ namespace Builder.WebSockets.BaseExample.Client
     {
         public override void Receive(WebSocketsNetworkClient client, InputPacketBuffer data)
         {
-            Console.WriteLine($"[Client]receive from {nameof(ClientTestPacket2)} - {data.ReadString16()}");
+            Console.WriteLine($"[Client]receive from {nameof(ClientTestPacket2)} - {data.ReadString()}");
         }
     }
 }

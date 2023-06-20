@@ -31,6 +31,8 @@ namespace NSL.Generators.BinaryTypeIOGenerator.Tests
     [BinaryIOMethodsFor]
     public partial class TestStruct1 :TestStruct2
     {
+        [BinaryIOData(For = "en")]
+        public byte[] testArr { get; set; }
         //[BinaryIOData(For = "en")]
         //public ReactiveCollection<byte> data { get; set; }
 

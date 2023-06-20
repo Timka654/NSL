@@ -8,7 +8,7 @@ namespace NSL.Generators.BinaryGenerator.Generators
 {
     internal class NullableTypeGenerator
     {
-        public static string GetReadLine(ISymbol parameter, BinaryGeneratorContext context, string path, IEnumerable<string> ignoreMembers)
+        public static string GetReadLine(ISymbol parameter, BinaryGeneratorContext context, string path)
         {
             CodeBuilder rb = new CodeBuilder();
 
@@ -30,7 +30,7 @@ namespace NSL.Generators.BinaryGenerator.Generators
             return $"dataPacket.{nameof(InputPacketBuffer.ReadNullable)}(()=>{{ return {BinaryReadMethodsGenerator.GetValueReadSegment(genericType, context, path)}; }})";
         }
 
-        public static string GetWriteLine(ISymbol parameter, BinaryGeneratorContext context, string path, IEnumerable<string> ignoreMembers)
+        public static string GetWriteLine(ISymbol parameter, BinaryGeneratorContext context, string path)
         {
             var type = parameter.GetTypeSymbol();
 
@@ -44,7 +44,7 @@ namespace NSL.Generators.BinaryGenerator.Generators
             if (genericType == null || !genericType.IsValueType)
                 return default;
 
-            return $"__packet.{nameof(OutputPacketBuffer.WriteNullable)}({path},()=>{{ {BinaryWriteMethodsGenerator.BuildParameterWriter(genericType, context, $"{path}.Value", null)} }});";
+            return $"__packet.{nameof(OutputPacketBuffer.WriteNullable)}({path},()=>{{ {BinaryWriteMethodsGenerator.BuildParameterWriter(genericType, context, $"{path}.Value")} }});";
         }
     }
 }

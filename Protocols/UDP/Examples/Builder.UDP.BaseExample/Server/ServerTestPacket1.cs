@@ -7,7 +7,7 @@ namespace Builder.UDP.BaseExample.Server
     {
         public override void Receive(UDPServerNetworkClient client, InputPacketBuffer data)
         {
-            var str = data.ReadString16();
+            var str = data.ReadString();
 
             Console.WriteLine($"[Server]receive from {nameof(ServerTestPacket1)} - {str}");
 
@@ -15,7 +15,7 @@ namespace Builder.UDP.BaseExample.Server
 
             pkt.PacketId = 1;
 
-            pkt.WriteString16(str);
+            pkt.WriteString(str);
 
             client.Send(pkt);
 
@@ -23,7 +23,7 @@ namespace Builder.UDP.BaseExample.Server
 
             pkt.PacketId = 2;
 
-            pkt.WriteString16(str);
+            pkt.WriteString(str);
 
             client.Send(pkt);
 
@@ -31,7 +31,7 @@ namespace Builder.UDP.BaseExample.Server
 
             pkt.PacketId = 3;
 
-            pkt.WriteString16(str);
+            pkt.WriteString(str);
 
             client.Send(pkt);
         }

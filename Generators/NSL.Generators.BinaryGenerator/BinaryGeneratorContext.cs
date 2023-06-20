@@ -9,6 +9,10 @@ namespace NSL.Generators.BinaryGenerator
     {
         public SemanticModel SemanticModel;
 
-        public virtual bool IsIgnore(ISymbol symbol) => false;
+        public virtual bool IsIgnore(ISymbol symbol, string path) => false;
+
+        public virtual string GetExistsReadHandleCode(ISymbol symbol, string path) => default;
+
+        public virtual string GetExistsWriteHandleCode(ISymbol symbol, string path) => default;
     }
 }

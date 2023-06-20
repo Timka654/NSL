@@ -425,16 +425,16 @@ namespace NSL.SocketCore.Utils.Buffer
         {
             Write(buf, 0, buf.Length);
         }
-        
+
 
         /// <summary>
-        /// Write byte array with header(Int32, 4 bytes)
+        /// Write byte array, with 1-4 bytes len header, max - 4.294kkk len
         /// </summary>
         /// <param name="buf"></param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void WriteByteArray(byte[] buf)
         {
-            WriteInt32(buf.Length);
+            Write7BitEncodedUInt32((uint)buf.Length);
             Write(buf, 0, buf.Length);
         }
 

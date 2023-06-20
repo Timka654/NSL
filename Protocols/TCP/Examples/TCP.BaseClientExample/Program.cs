@@ -10,7 +10,7 @@ options.OnClientConnectEvent += (client) => client.PingPongEnabled = true;
 
 options.AddHandle(1, (c, p) =>
 {
-    Console.WriteLine($"received from server {p.PacketId} - {p.ReadString16()}");
+    Console.WriteLine($"received from server {p.PacketId} - {p.ReadString()}");
 });
 
 var t = new TCPNetworkClient<NetworkClient, ClientOptions<NetworkClient>>(options);

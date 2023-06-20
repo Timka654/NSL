@@ -13,9 +13,9 @@ namespace NSL.Generators.BinaryGenerator.Generators
         private static Dictionary<string, (CustomTypeHandle readHandle, CustomTypeHandle writeHandle)> customTypeReadHandlers
             = new Dictionary<string, (CustomTypeHandle readHandle, CustomTypeHandle writeHandle)>();
 
-        private static bool GetHandlers(INamedTypeSymbol type, out (CustomTypeHandle readHandle, CustomTypeHandle writeHandle) handlers)
+        private static bool GetHandlers(string typeName, out (CustomTypeHandle readHandle, CustomTypeHandle writeHandle) handlers)
         {
-            if (customTypeReadHandlers.TryGetValue(type.MetadataName, out handlers))
+            if (customTypeReadHandlers.TryGetValue(typeName, out handlers))
                 return true;
 
             handlers = default;
@@ -23,38 +23,63 @@ namespace NSL.Generators.BinaryGenerator.Generators
             return false;
         }
 
-        public static string GetReadLine(ISymbol parameter, BinaryGeneratorContext context, string path, IEnumerable<string> ignoreMembers)
+        public static string GetReadLine(ISymbol parameter, BinaryGeneratorContext context, string path)
         {
+            string typeName = default;
+
             INamedTypeSymbol type = parameter.GetTypeSymbol() as INamedTypeSymbol;
 
-            if (type == null)
+            if (type != null)
+                typeName = type.MetadataName;
+            else
+            {
+                var arrType = parameter as IArrayTypeSymbol;
+
+                typeName = $"{arrType.ElementType.Name}[]";
+            }
+
+            if (typeName == default)
                 return default;
 
-            if (GetHandlers(type, out var handlers))
+            if (GetHandlers(typeName, out var handlers))
                 return handlers.readHandle(type, context, path);
             else
                 foreach (var item in type.AllInterfaces)
                 {
-                    if (GetHandlers(item, out handlers))
+                    typeName = item.MetadataName;
+                    if (GetHandlers(typeName, out handlers))
                         return handlers.readHandle(type, context, path);
                 }
 
             return default;
         }
 
-        public static string GetWriteLine(ISymbol parameter, BinaryGeneratorContext context, string path, IEnumerable<string> ignoreMembers)
+        public static string GetWriteLine(ISymbol parameter, BinaryGeneratorContext context, string path)
         {
+
+            string typeName = default;
+
             INamedTypeSymbol type = parameter.GetTypeSymbol() as INamedTypeSymbol;
 
-            if (type == null)
+            if (type != null)
+                typeName = type.MetadataName;
+            else
+            {
+                var arrType = parameter as IArrayTypeSymbol;
+
+                typeName = $"{arrType.ElementType.Name}[]";
+            }
+
+            if (typeName == default)
                 return default;
 
-            if (GetHandlers(type, out var handlers))
+            if (GetHandlers(typeName, out var handlers))
                 return handlers.writeHandle(type, context, path);
             else
                 foreach (var item in type.AllInterfaces)
                 {
-                    if (GetHandlers(item, out handlers))
+                    typeName = item.MetadataName;
+                    if (GetHandlers(typeName, out handlers))
                         return handlers.writeHandle(type, context, path);
                 }
 
@@ -63,6 +88,10 @@ namespace NSL.Generators.BinaryGenerator.Generators
 
         static CustomTypeGenerator()
         {
+            customTypeReadHandlers.Add(
+                typeof(byte[]).Name,
+                (ByteArrayTypeGenerator.GetReadLine, ByteArrayTypeGenerator.GetWriteLine));
+
             customTypeReadHandlers.Add(
                 typeof(Dictionary<,>).Name,
                 (DictionaryTypeGenerator.GetReadLine, DictionaryTypeGenerator.GetWriteLine));

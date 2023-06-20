@@ -55,7 +55,7 @@ namespace Builder.WebSockets.BaseExample.Server
 
                     //builder.AddPacketHandle(2, (client, data) =>
                     //{
-                    //    Console.WriteLine($"[Client] receive from packet handle(2) - {data.ReadString16()}");
+                    //    Console.WriteLine($"[Client] receive from packet handle(2) - {data.ReadString()}");
 
                     //    cts.Cancel();
                     //});

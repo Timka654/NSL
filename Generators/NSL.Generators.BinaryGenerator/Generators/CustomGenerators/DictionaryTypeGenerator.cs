@@ -50,9 +50,9 @@ namespace NSL.Generators.BinaryGenerator.Generators.CustomGenerators
 
             cb.NextTab();
 
-            cb.AppendLine(BinaryWriteMethodsGenerator.BuildParameterWriter(farg, context, "i.Key", null));
+            cb.AppendLine(BinaryWriteMethodsGenerator.BuildParameterWriter(farg, context, "i.Key"));
             cb.AppendLine();
-            cb.AppendLine(BinaryWriteMethodsGenerator.BuildParameterWriter(sarg, context, "i.Value", null));
+            cb.AppendLine(BinaryWriteMethodsGenerator.BuildParameterWriter(sarg, context, "i.Value"));
 
             cb.PrevTab();
 

@@ -7,7 +7,7 @@ namespace NSL.Generators.BinaryGenerator.Generators
     internal class EnumTypeGenerator
     {
 
-        public static string GetReadLine(ISymbol parameter, BinaryGeneratorContext context, string path, IEnumerable<string> ignoreMembers)
+        public static string GetReadLine(ISymbol parameter, BinaryGeneratorContext context, string path)
         {
             var type = parameter.GetTypeSymbol();
 
@@ -17,7 +17,7 @@ namespace NSL.Generators.BinaryGenerator.Generators
 
                 if (t != null)
                 {
-                   var line = BaseTypeGenerator.GetReadLine(t, context, path, ignoreMembers);
+                   var line = BaseTypeGenerator.GetReadLine(t, context, path);
 
                     if (line == default)
                         return "default";
@@ -29,7 +29,7 @@ namespace NSL.Generators.BinaryGenerator.Generators
             return default;
         }
 
-        public static string GetWriteLine(ISymbol item, BinaryGeneratorContext context, string path, IEnumerable<string> ignoreMembers)
+        public static string GetWriteLine(ISymbol item, BinaryGeneratorContext context, string path)
         {
             var type = item.GetTypeSymbol();
 
@@ -39,7 +39,7 @@ namespace NSL.Generators.BinaryGenerator.Generators
 
                 if (t != null)
                 {
-                    var line = BaseTypeGenerator.GetWriteLine(t, context, $"({t.Name}){path}", ignoreMembers);
+                    var line = BaseTypeGenerator.GetWriteLine(t, context, $"({t.Name}){path}");
 
                     return line;
                 }

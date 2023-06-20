@@ -141,15 +141,15 @@ namespace NSL.Extensions.RPC
 
         }
 
-        public OutputPacketBuffer CreateCall(string containerName, string methodName, byte argCount)
+        public OutputPacketBuffer CreateCall(string containerName, int methodName, int paramHash)
         {
             var packet = new RPCOutputPacketBuffer();
 
             packet.WriteString(containerName);
 
-            packet.WriteString(methodName);
+            packet.WriteInt32(methodName);
 
-            packet.WriteByte(argCount);
+            packet.WriteInt32(paramHash);
 
             packet.GuidOffset = (int)packet.Position;
 

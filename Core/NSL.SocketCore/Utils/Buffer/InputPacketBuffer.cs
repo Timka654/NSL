@@ -350,15 +350,15 @@ namespace NSL.SocketCore.Utils.Buffer
         }
 
         /// <summary>
-        /// Read byte array with header(Int32, 4 bytes)
+        /// Read byte array, with 1-4 bytes header, max - 4.294kkk len
         /// </summary>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public byte[] ReadByteArray()
         {
-            int len = ReadInt32();
+            var len = Read7BitEncodedUInt();
 
-            return Read(len);
+            return Read((int)len);
         }
 
         /// <summary>

@@ -4,6 +4,7 @@ using NSL.BuilderExtensions.SocketCore;
 using NSL.BuilderExtensions.WebSocketsClient;
 using NSL.BuilderExtensions.WebSocketsServer.AspNet;
 using NSL.Extensions.RPC.EndPointBuilder;
+using NSL.SocketCore.Utils.Buffer;
 using NSL.WebSockets.Client;
 using NSL.WebSockets.Server.AspNetPoint;
 
@@ -80,6 +81,8 @@ namespace Builder.WebSockets.AspNetCoreIntegrationExample
                     });
 
                     builder.AddReceiveHandle((client, pid, len) => {
+                        if (InputPacketBuffer.IsSystemPID(pid))
+                            return;
                         app.Logger.LogInformation($"[Client] Receive packet pid:{pid} with len: {len}");
                     });
 

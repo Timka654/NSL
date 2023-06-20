@@ -4,21 +4,16 @@
 		<TargetFramework>netstandard2.0</TargetFramework>
 		<Configurations>Debug;Release;Unity;UnityDebug;DebugExamples</Configurations>
 
-		<PublishRepositoryUrl>true</PublishRepositoryUrl>
-		<EmbedUntrackedSources>true</EmbedUntrackedSources>
-		<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-		<GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
-
 		<Description>-</Description>
 		<Authors>Relife87</Authors>
 		<Version>$(VersionSuffix)</Version>
 
-		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-		<NoPackageAnalysis>true</NoPackageAnalysis>
-
 		<EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
-		<IncludeBuildOutput>false</IncludeBuildOutput> <!-- Do not include the generator as a lib dependency -->
+
 		<IsRoslynComponent>true</IsRoslynComponent>
+		<!-- Do not include the generator as a lib dependency -->
+		<!--<IncludeBuildOutput>false</IncludeBuildOutput>-->
+		<!--<GeneratePackageOnBuild>true</GeneratePackageOnBuild>-->
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)'=='Debug'">

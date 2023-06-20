@@ -43,7 +43,7 @@ namespace NSL.Generators.BinaryGenerator.Generators.CustomGenerators
 
             cb.NextTab();
 
-            cb.AppendLine(BinaryWriteMethodsGenerator.BuildParameterWriter(farg, context, "i", null));
+            cb.AppendLine(BinaryWriteMethodsGenerator.BuildParameterWriter(farg, context, "i"));
 
             cb.PrevTab();
 

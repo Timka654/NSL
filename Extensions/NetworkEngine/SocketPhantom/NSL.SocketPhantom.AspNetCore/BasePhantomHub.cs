@@ -132,7 +132,7 @@ namespace NSL.SocketPhantom.AspNetCore
 
                 ip.Position = 0;
 
-                var methodName = ip.ReadString16().ToLower();
+                var methodName = ip.ReadString().ToLower();
 
                 if (methodDelegates.TryGetValue($"{methodName}_{ip.ReadInt32()}", out var func))
                 {
