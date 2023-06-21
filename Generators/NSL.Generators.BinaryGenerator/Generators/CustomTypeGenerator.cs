@@ -1,10 +1,7 @@
 ﻿using Microsoft.CodeAnalysis;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using NSL.Generators.Utils;
 using NSL.Generators.BinaryGenerator.Generators.CustomGenerators;
-using System.Diagnostics;
 
 namespace NSL.Generators.BinaryGenerator.Generators
 {
@@ -43,7 +40,7 @@ namespace NSL.Generators.BinaryGenerator.Generators
 
             if (GetHandlers(typeName, out var handlers))
                 return handlers.readHandle(type, context, path);
-            else
+            else if (type != null)
                 foreach (var item in type.AllInterfaces)
                 {
                     typeName = item.MetadataName;
@@ -56,7 +53,6 @@ namespace NSL.Generators.BinaryGenerator.Generators
 
         public static string GetWriteLine(ISymbol parameter, BinaryGeneratorContext context, string path)
         {
-
             string typeName = default;
 
             INamedTypeSymbol type = parameter.GetTypeSymbol() as INamedTypeSymbol;
@@ -75,7 +71,7 @@ namespace NSL.Generators.BinaryGenerator.Generators
 
             if (GetHandlers(typeName, out var handlers))
                 return handlers.writeHandle(type, context, path);
-            else
+            else if (type != null)
                 foreach (var item in type.AllInterfaces)
                 {
                     typeName = item.MetadataName;
