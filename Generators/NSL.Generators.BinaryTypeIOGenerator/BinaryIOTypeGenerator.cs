@@ -18,8 +18,8 @@ namespace NSL.Generators.BinaryTypeIOGenerator
         private void ProcessBinaryIOTypes(GeneratorExecutionContext context, BinaryIOAttributeSyntaxReceiver methodSyntaxReceiver)
         {
 #if DEBUG
-            //if (!Debugger.IsAttached)
-            //    Debugger.Launch();
+            if (!Debugger.IsAttached)
+                Debugger.Launch();
 #endif
 
             foreach (var type in methodSyntaxReceiver.BinaryIOTypes)
@@ -163,7 +163,7 @@ namespace NSL.Generators.BinaryTypeIOGenerator
 
             var full = ioMethodsAttributes
                 .SelectMany(x =>
-                    x.ArgumentList?.Arguments.Select(n =>  n.GetAttributeParameterValue<string>(tSym)) ?? Enumerable.Repeat("*", 1))
+                    x.ArgumentList?.Arguments.Select(n => n.GetAttributeParameterValue<string>(tSym)) ?? Enumerable.Repeat("*", 1))
                 .ToArray();
 
 
@@ -274,7 +274,14 @@ namespace NSL.Generators.BinaryTypeIOGenerator
                 methodBuilder.AppendLine();
             }
 
-            var bgContext = new BinaryTypeIOGeneratorContext() { For = methodInfo.ForGroup, SemanticModel = tSym };
+            var bgContext = new BinaryTypeIOGeneratorContext()
+            {
+                For = methodInfo.ForGroup,
+                SemanticModel = tSym,
+                ProcessingType = classDecl.GetClassName(),
+                ReadCurrentTypeMethodName = methodInfo.MethodName,
+                IsStatic = methodInfo.MethodModifier.Contains("static")
+            };
 
             methodBuilder.AppendLine($"return {BinaryReadMethodsGenerator.GetValueReadSegment(tSym.GetDeclaredSymbol(classDecl), bgContext, default)};");
 
@@ -320,7 +327,14 @@ namespace NSL.Generators.BinaryTypeIOGenerator
                 methodBuilder.AppendLine();
             }
 
-            var bgContext = new BinaryTypeIOGeneratorContext() { For = methodInfo.ForGroup, SemanticModel = tSym };
+            var bgContext = new BinaryTypeIOGeneratorContext()
+            {
+                For = methodInfo.ForGroup,
+                SemanticModel = tSym,
+                ProcessingType = classDecl.GetClassName(),
+                WriteCurrentTypeMethodName = methodInfo.MethodName,
+                IsStatic = methodInfo.MethodModifier.Contains("static")
+            };
 
             methodBuilder.AppendLine(BinaryWriteMethodsGenerator.BuildParameterWriter(tSym.GetDeclaredSymbol(classDecl), bgContext, typeParamName));
 

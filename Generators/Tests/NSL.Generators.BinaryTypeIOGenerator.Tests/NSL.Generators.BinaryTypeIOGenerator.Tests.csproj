@@ -43,7 +43,8 @@
 	</ItemGroup>
 
 	<!--<ItemGroup>
-		<Compile Include="D:\Projects\work\arrible\ZergRush\Assets\ZergRush\PureCSharp\**\*.cs" />
+		<Compile Include="D:\Projects\work\arrible\RektSkullsWebApi\RektSkullsWebApi\RektSkullsWebApi.Shared\**\*.cs" />
+		<Compile Include="D:\Projects\work\arrible\RektSkullsWebApi\RektSkullsWebApi\ZergRush\Assets\ZergRush\PureCSharp\**\*.cs" />
 	</ItemGroup>-->
 
 </Project>

@@ -87,7 +87,7 @@ namespace NSL.Generators.BinaryGenerator
                 {
                     var ptype = ps.GetTypeSymbol();
 
-                    rb.AppendLine($"{path} = {GetValueReadSegment(ptype, context, path)};");
+                    rb.AppendLine($"{path} = {GetValueReadSegment(ptype, context, path).TrimEnd(';')};");
 
                     rb.AppendLine();
                 }
@@ -96,7 +96,7 @@ namespace NSL.Generators.BinaryGenerator
             {
                 var ftype = fs.GetTypeSymbol();
 
-                rb.AppendLine($"{path} = {GetValueReadSegment(ftype, context, path)};");
+                rb.AppendLine($"{path} = {GetValueReadSegment(ftype, context, path).TrimEnd(';')};");
 
                 rb.AppendLine();
             }
