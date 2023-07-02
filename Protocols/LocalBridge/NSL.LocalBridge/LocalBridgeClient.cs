@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.Sockets;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace NSL.LocalBridge
 {
@@ -109,12 +110,22 @@ namespace NSL.LocalBridge
 
         public void Send(byte[] buf)
         {
-            Send(buf, 0, buf.Length);
+            otherClient.Receive(buf);
         }
 
         public void Send(byte[] buf, int offset, int length)
         {
-            otherClient.Receive(buf[offset..length]);
+            if (buf.Length == length && offset == 0)
+            {
+                Send(buf);
+                return;
+            }
+
+            var buf2 = new byte[length];
+
+            Array.Copy(buf, offset, buf2, 0, length);
+
+            Send(buf2);
         }
 
         public void SendEmpty(ushort packetId)
