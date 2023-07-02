@@ -30,7 +30,7 @@ namespace NSL.Generators.BinaryGenerator.Generators.CustomGenerators
 
             cb.PrevTab();
 
-            cb.AppendLine($"}}).ToDictionary(x=>x.key, x=>x.value));");
+            cb.AppendLine($"}})?.ToDictionary(x=>x.key, x=>x.value));");
 
             return cb.ToString();
         }

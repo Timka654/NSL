@@ -27,7 +27,7 @@ namespace NSL.Generators.BinaryGenerator.Generators
 
                 cb.PrevTab();
 
-                cb.AppendLine($"}}).ToArray();");
+                cb.AppendLine($"}})?.ToArray();");
 
                 return cb.ToString();
             }
