@@ -13,7 +13,7 @@ options.ReceiveBufferSize = 1024;
 
 options.AddHandle(1, (client, p) =>
 {
-    Console.WriteLine($"received from client({client.ObjectBag["uid"]}) pid:{p.PacketId} - {p.ReadString16()}");
+    Console.WriteLine($"received from client({client.ObjectBag["uid"]}) pid:{p.PacketId} - {p.ReadString()}");
 });
 
 int counter = 0;

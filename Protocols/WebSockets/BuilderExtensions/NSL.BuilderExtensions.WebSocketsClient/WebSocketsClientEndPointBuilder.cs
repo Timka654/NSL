@@ -64,7 +64,7 @@ namespace NSL.BuilderExtensions.WebSocketsClient
             return new WebSocketsClientEndPointBuilder<TClient, TOptions>();
         }
 
-        public new WebSocketsClientEndPointBuilder<TClient, TOptions> WithCode(Action<WebSocketsClientEndPointBuilder<TClient, TOptions>> code)
+        public WebSocketsClientEndPointBuilder<TClient, TOptions> WithCode(Action<WebSocketsClientEndPointBuilder<TClient, TOptions>> code)
         {
             code(this);
             return this;

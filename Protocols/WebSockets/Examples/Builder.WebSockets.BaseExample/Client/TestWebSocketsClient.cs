@@ -60,7 +60,7 @@ namespace Builder.WebSockets.BaseExample.Client
 
                     builder.AddPacketHandle(3, (client, data) =>
                     {
-                        Console.WriteLine($"[Client] receive from packet handle(3) - {data.ReadString16()}");
+                        Console.WriteLine($"[Client] receive from packet handle(3) - {data.ReadString()}");
 
                         cts.Cancel();
                     });

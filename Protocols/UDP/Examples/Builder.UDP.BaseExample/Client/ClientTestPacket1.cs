@@ -7,7 +7,7 @@ namespace Builder.UDP.BaseExample.Client
     {
         public override void Receive(UDPTestNetworkClient client, InputPacketBuffer data)
         {
-            Console.WriteLine($"[Client]receive from {nameof(ClientTestPacket1)} - {data.ReadString16()}");
+            Console.WriteLine($"[Client]receive from {nameof(ClientTestPacket1)} - {data.ReadString()}");
         }
     }
 }

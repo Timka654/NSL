@@ -8,7 +8,7 @@ namespace NSL.SocketCore
 
         void Send(byte[] buf);
 
-        void Send(byte[] buf, int offset, int lenght);
+        void Send(byte[] buf, int offset, int length);
 
         void Send(OutputPacketBuffer packet, bool disposeOnSend = true);
 

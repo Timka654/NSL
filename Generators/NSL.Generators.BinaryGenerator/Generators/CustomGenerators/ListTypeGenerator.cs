@@ -13,7 +13,10 @@ namespace NSL.Generators.BinaryGenerator.Generators.CustomGenerators
 
             var cb = new CodeBuilder();
 
-            cb.AppendLine($"dataPacket.{nameof(InputPacketBuffer.ReadCollection)}(()=>{{");
+            //var b = new InputPacketBuffer();
+            //b.ReadNullableClass(()=> b.ReadCollection<int>(()=>b.ReadInt32()))
+
+            cb.AppendLine($"dataPacket.{nameof(InputPacketBuffer.ReadNullableClass)}(() => dataPacket.{nameof(InputPacketBuffer.ReadCollection)}(()=>{{");
 
             cb.NextTab();
 
@@ -25,7 +28,7 @@ namespace NSL.Generators.BinaryGenerator.Generators.CustomGenerators
 
             cb.PrevTab();
 
-            cb.AppendLine($"}}).ToList();");
+            cb.AppendLine($"}})?.ToList());"); 
 
             return cb.ToString();
         }
@@ -36,15 +39,15 @@ namespace NSL.Generators.BinaryGenerator.Generators.CustomGenerators
 
             var cb = new CodeBuilder();
 
-            cb.AppendLine($"__packet.{nameof(OutputPacketBuffer.WriteCollection)}({path},(i)=>{{");
+            cb.AppendLine($"__packet.{nameof(OutputPacketBuffer.WriteNullableClass)}({path},() => __packet.{nameof(OutputPacketBuffer.WriteCollection)}({path},(i)=>{{");
 
             cb.NextTab();
 
-            cb.AppendLine(BinaryWriteMethodsGenerator.BuildParameterWriter(farg, context, "i", null));
+            cb.AppendLine(BinaryWriteMethodsGenerator.BuildParameterWriter(farg, context, "i"));
 
             cb.PrevTab();
 
-            cb.AppendLine($"}});");
+            cb.AppendLine($"}}));");
 
 
             return cb.ToString();

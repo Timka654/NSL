@@ -14,9 +14,9 @@ namespace NSL.SocketPhantom.AspNetCore.Network.Packets
 
         public override void Receive(PhantomHubClientProxy client, InputPacketBuffer data)
         {
-            var path = data.ReadString16();
+            var path = data.ReadString();
 
-            client.Session = data.ReadString16();
+            client.Session = data.ReadString();
 
             var sessionResultPacket = OutputPacketBuffer.Create(PacketEnum.SignInResult);
 

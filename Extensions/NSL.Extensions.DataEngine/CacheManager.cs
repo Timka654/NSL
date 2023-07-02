@@ -1,6 +1,7 @@
 ﻿using NSL.Extensions.DataEngine.Interface;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace NSL.Extensions.DataEngine
 {
@@ -16,14 +17,12 @@ namespace NSL.Extensions.DataEngine
 
         }
 
-        public bool RegisterProvider(ICacheDataProvider provider)
-        {
-            return providers.TryAdd(provider.GetType(), provider);
-        }
+        public (Type, bool)[] RegisterProvider(ICacheDataProvider provider)
+            => provider.GetCacheProviderType().Select(t => (t, providers.TryAdd(t, provider))).ToArray();
 
-        public List<object> LoadData(Type type, DateTime? latestMidified)
+        public List<object> LoadData(Type type, DateTime? latestModified)
         {
-            if(!providers.TryGetValue(type, out var provider) )
+            if (!providers.TryGetValue(type, out var provider))
                 return null;
 
             return null;

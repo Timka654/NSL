@@ -16,7 +16,7 @@ namespace NSL.Extensions.NAT.Proxy.Data.Packets.PacketData
             result.Result = (ProxySignInResultEnum)data.ReadByte();
 
             if (result.Result == ProxySignInResultEnum.Ok)
-                result.ProxyIp = data.ReadString16();
+                result.ProxyIp = data.ReadString();
 
             return result;
         }

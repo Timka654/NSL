@@ -5,8 +5,8 @@ using System.Text;
 
 namespace NSL.Generators.BinaryTypeIOGenerator.Attributes
 {
-    [AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
-    public class BinaryIOWriteMethodAttribute : Attribute, IBinaryIOFor
+    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
+    public class BinaryIODataIgnoreAttribute : Attribute, IBinaryIOFor
     {
         public string For { get; set; } = "*";
     }

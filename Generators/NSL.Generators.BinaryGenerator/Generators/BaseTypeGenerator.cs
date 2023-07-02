@@ -9,7 +9,7 @@ namespace NSL.Generators.BinaryGenerator.Generators
     internal class BaseTypeGenerator
     {
 
-        public static string GetReadLine(ISymbol parameter, BinaryGeneratorContext context, string path, IEnumerable<string> ignoreMembers)
+        public static string GetReadLine(ISymbol parameter, BinaryGeneratorContext context, string path)
         {
             var type = parameter.GetTypeSymbol();
 
@@ -19,7 +19,7 @@ namespace NSL.Generators.BinaryGenerator.Generators
             return $"dataPacket.{tReadLine}()";
         }
 
-        public static string GetWriteLine(ISymbol item, BinaryGeneratorContext context, string path, IEnumerable<string> ignoreMembers)
+        public static string GetWriteLine(ISymbol item, BinaryGeneratorContext context, string path)
         {
             var type = item.GetTypeSymbol();
 
@@ -73,7 +73,7 @@ namespace NSL.Generators.BinaryGenerator.Generators
             },
             {
                 typeof(string).Name,
-                nameof(InputPacketBuffer.ReadString32)
+                nameof(InputPacketBuffer.ReadString)
             },
             {
                 typeof(DateTime).Name,
@@ -82,6 +82,10 @@ namespace NSL.Generators.BinaryGenerator.Generators
             {
                 typeof(TimeSpan).Name,
                 nameof(InputPacketBuffer.ReadTimeSpan)
+            },
+            {
+                typeof(Guid).Name,
+                nameof(InputPacketBuffer.ReadGuid)
             },
         };
 
@@ -129,7 +133,7 @@ namespace NSL.Generators.BinaryGenerator.Generators
             },
             {
                 typeof(string).Name,
-                nameof(OutputPacketBuffer.WriteString32)
+                nameof(OutputPacketBuffer.WriteString)
             },
             {
                 typeof(DateTime).Name,
@@ -138,6 +142,10 @@ namespace NSL.Generators.BinaryGenerator.Generators
             {
                 typeof(TimeSpan).Name,
                 nameof(OutputPacketBuffer.WriteTimeSpan)
+            },
+            {
+                typeof(Guid).Name,
+                nameof(OutputPacketBuffer.WriteGuid)
             },
         };
     }

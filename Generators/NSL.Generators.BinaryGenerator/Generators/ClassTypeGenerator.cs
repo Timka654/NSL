@@ -9,7 +9,7 @@ namespace NSL.Generators.BinaryGenerator.Generators
 {
     internal class ClassTypeGenerator
     {
-        public static string GetReadLine(ISymbol parameter, BinaryGeneratorContext context, string path, IEnumerable<string> ignoreMembers)
+        public static string GetReadLine(ISymbol parameter, BinaryGeneratorContext context, string path)
         {
             var type = parameter.GetTypeSymbol();
 
@@ -17,7 +17,6 @@ namespace NSL.Generators.BinaryGenerator.Generators
                 return default;
 
             CodeBuilder rb = new CodeBuilder();
-
 
             rb.AppendLine($"dataPacket.{nameof(InputPacketBuffer.ReadNullableClass)}(() => {{");
 
@@ -29,21 +28,31 @@ namespace NSL.Generators.BinaryGenerator.Generators
 
             rb.AppendLine();
 
-            var members = type.GetMembers();
-
-
             path = "data";
 
-            //if (!Debugger.IsAttached && ignoreMembers.Any())
-            //    Debugger.Launch();
-
-            foreach (var member in members)
+            do
             {
-                if (ignoreMembers != null && ignoreMembers.Any(x => x.Equals(member.Name, StringComparison.InvariantCultureIgnoreCase)))
-                    continue;
+                var members = type.GetMembers()
+                    .Where(x => x is IFieldSymbol || x is IPropertySymbol)
+                    .OrderBy(x => x.MetadataName);
 
-                BinaryReadMethodsGenerator.AddTypeMemberReadLine(member, context, rb, string.Join(".", path, member.Name));
-            }
+
+                //if (!Debugger.IsAttached && ignoreMembers.Any())
+                //    Debugger.Launch();
+
+                foreach (var member in members)
+                {
+                    var fpath = string.Join(".", path, member.Name);
+
+                    if (context.IsIgnore(member, fpath))
+                        continue;
+
+                    BinaryReadMethodsGenerator.AddTypeMemberReadLine(member, context, rb, fpath);
+                }
+
+                type = type.BaseType;
+
+            } while (type != null);
 
             rb.AppendLine("return data;");
 
@@ -54,7 +63,7 @@ namespace NSL.Generators.BinaryGenerator.Generators
             return rb.ToString();// test only
         }
 
-        public static string GetWriteLine(ISymbol item, BinaryGeneratorContext context, string path, IEnumerable<string> ignoreMembers)
+        public static string GetWriteLine(ISymbol item, BinaryGeneratorContext context, string path)
         {
             var type = item.GetTypeSymbol();
 
@@ -70,16 +79,25 @@ namespace NSL.Generators.BinaryGenerator.Generators
 
             cb.AppendLine();
 
-            var members = type.GetMembers();
-
-
-            foreach (var member in members)
+            do
             {
-                if (ignoreMembers != null && ignoreMembers.Any(x => x.Equals(member.Name, StringComparison.InvariantCultureIgnoreCase)))
-                    continue;
+                var members = type.GetMembers()
+                    .Where(x => x is IFieldSymbol || x is IPropertySymbol)
+                    .OrderBy(x => x.MetadataName);
 
-                BinaryWriteMethodsGenerator.AddTypeMemberWriteLine(member, context, cb, string.Join(".", path, member.Name));
-            }
+                foreach (var member in members)
+                {
+                    var fpath = string.Join(".", path, member.Name);
+
+                    if (context.IsIgnore(member, fpath))
+                        continue;
+
+                    BinaryWriteMethodsGenerator.AddTypeMemberWriteLine(member, context, cb, fpath);
+                }
+
+                type = type.BaseType;
+
+            } while (type != null);
 
             cb.PrevTab();
 

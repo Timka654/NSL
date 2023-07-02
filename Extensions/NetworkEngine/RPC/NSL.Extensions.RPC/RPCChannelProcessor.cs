@@ -107,7 +107,7 @@ namespace NSL.Extensions.RPC
                 new BinaryFormatter().Serialize(stream, exception);
                 var buf = stream.GetBuffer();
 
-                packet.WriteString16(exception.GetType().FullName);
+                packet.WriteString(exception.GetType().FullName);
 
                 packet.WriteInt32(buf.Length);
 
@@ -126,7 +126,7 @@ namespace NSL.Extensions.RPC
 
         private void ProcessException(InputPacketBuffer pin)
         {
-            string exTypeFullName = pin.ReadString16();
+            string exTypeFullName = pin.ReadString();
 
             var type = Type.GetType(exTypeFullName);
 
@@ -141,15 +141,15 @@ namespace NSL.Extensions.RPC
 
         }
 
-        public OutputPacketBuffer CreateCall(string containerName, string methodName, byte argCount)
+        public OutputPacketBuffer CreateCall(string containerName, int methodName, int paramHash)
         {
             var packet = new RPCOutputPacketBuffer();
 
-            packet.WriteString16(containerName);
+            packet.WriteString(containerName);
 
-            packet.WriteString16(methodName);
+            packet.WriteInt32(methodName);
 
-            packet.WriteByte(argCount);
+            packet.WriteInt32(paramHash);
 
             packet.GuidOffset = (int)packet.Position;
 
@@ -213,7 +213,7 @@ namespace NSL.Extensions.RPC
             // fix: lock if execute rpc from rpc method
             await Task.Run(() =>
             {
-                var containerName = input.ReadString16();
+                var containerName = input.ReadString();
 
                 if (containers.TryGetValue(containerName, out var container))
                     container.InvokeMethod(input);

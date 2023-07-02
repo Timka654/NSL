@@ -55,7 +55,7 @@ namespace NSL.TCP
         /// <summary>
         /// Размер читаемых данных при следующем вызове BeginReceive
         /// </summary>
-        protected int lenght = InputPacketBuffer.DefaultHeaderLenght;
+        protected int lenght = InputPacketBuffer.DefaultHeaderLength;
 
         protected bool data = false;
 
@@ -82,7 +82,7 @@ namespace NSL.TCP
         protected void ResetBuffer()
         {
             data = false;
-            lenght = InputPacketBuffer.DefaultHeaderLenght;
+            lenght = InputPacketBuffer.DefaultHeaderLength;
             offset = 0;
         }
 
@@ -325,7 +325,7 @@ namespace NSL.TCP
 
         protected virtual void OnSend(OutputPacketBuffer rbuff, string stackTrace = "")
         {
-            OnSendPacket?.Invoke(parent, rbuff.PacketId, rbuff.PacketLenght, stackTrace);
+            OnSendPacket?.Invoke(parent, rbuff.PacketId, rbuff.PacketLength, stackTrace);
         }
 
         protected virtual void OnReceive(ushort pid, int len)

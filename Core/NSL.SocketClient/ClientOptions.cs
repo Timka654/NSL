@@ -41,28 +41,13 @@ namespace NSL.SocketClient
 
         #endregion
 
-        #region Events
-
-        public event ReconnectDelegate OnReconnectEvent;
-
-        public event RecoverySessionPacket<TClient>.OnReceiveEventHandle OnRecoverySessionEvent;
-
-        #endregion
-
         public ClientOptions()
         {
-            var recoverySession = new RecoverySessionPacket<TClient>(this);
-
-            recoverySession.OnReceiveEvent += RunRecoverySession;
-
             AddPacket(ClientSystemTimePacket.PacketId,
                     new ClientSystemTimePacket<TClient>(this));
 
             AddPacket(AliveConnectionPacket.PacketId,
                 new ClientAliveConnectionPacket<TClient>(this));
-
-            AddPacket(RecoverySessionPacket.PacketId,
-                recoverySession);
         }
 
         /// <summary>
@@ -100,22 +85,6 @@ namespace NSL.SocketClient
         {
             RunClientDisconnect(ClientData);
         }
-
-        internal void RunRecoverySession(RecoverySessionResultEnum result)
-        {
-            OnRecoverySessionEvent?.Invoke(result);
-        }
-
-        #region Recovery
-
-        public bool EnableAutoRecovery { get; set; }
-
-        public int MaxRecoveryTryTime { get; set; } = 5;
-
-        public int RecoveryWaitTime { get; set; } = 1900;
-
-
-        #endregion
 
         #region ServerSettings
         //Данные для настройки сервера

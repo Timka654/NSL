@@ -6,11 +6,9 @@ using NSL.Generators.BinaryTypeIOGenerator.Attributes;
 using NSL.Generators.BinaryTypeIOGenerator.Models;
 using NSL.Generators.Utils;
 using NSL.SocketCore.Utils.Buffer;
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
 
 namespace NSL.Generators.BinaryTypeIOGenerator
 {
@@ -19,14 +17,22 @@ namespace NSL.Generators.BinaryTypeIOGenerator
     {
         private void ProcessBinaryIOTypes(GeneratorExecutionContext context, BinaryIOAttributeSyntaxReceiver methodSyntaxReceiver)
         {
+#if DEBUG
             //if (!Debugger.IsAttached)
             //    Debugger.Launch();
+#endif
 
             foreach (var type in methodSyntaxReceiver.BinaryIOTypes)
             {
                 ProcessBinaryIOType(context, type);
             }
         }
+
+        private static string[] requiredUsings = new string[] {
+            "using NSL.SocketCore;",
+            "using NSL.SocketCore.Utils.Buffer;",
+            "using System.Linq;"
+        };
 
         private void ProcessBinaryIOType(GeneratorExecutionContext context, TypeDeclarationSyntax type)
         {
@@ -50,14 +56,17 @@ namespace NSL.Generators.BinaryTypeIOGenerator
                 classBuilder.AppendLine($"Project must have reference \"NSL.SocketCore\" library for normal working");
             });
 
-            classBuilder.AppendLine($"using NSL.SocketCore;");
-            classBuilder.AppendLine($"using NSL.SocketCore.Utils.Buffer;");
-
             var usings = UpdateUsingDirectives(type.SyntaxTree);
 
             foreach (var u in usings)
             {
                 classBuilder.AppendLine(u.ToString());
+            }
+
+            foreach (var u in requiredUsings)
+            {
+                if (!usings.Any(eu => eu.ToString().Equals(u)))
+                    classBuilder.AppendLine(u);
             }
 
             classBuilder.AppendLine();
@@ -80,6 +89,7 @@ namespace NSL.Generators.BinaryTypeIOGenerator
 
             classBuilder.NextTab();
 
+            var tSym = context.Compilation.GetSemanticModel(classDecl.SyntaxTree);
 
             foreach (var method in methods)
             {
@@ -105,7 +115,7 @@ namespace NSL.Generators.BinaryTypeIOGenerator
                 var args = (methodWriteAttribute ?? methodReadAttribute).ArgumentList?.Arguments;
 
                 var argsMap = args?
-                    .Select(x => (x.NameEquals?.Name.ToString(), x.Expression.NormalizeWhitespace().ToString()))
+                    .Select(x => (x.NameEquals?.Name.ToString(), x.GetAttributeParameterValue<string>(tSym)))
                     .Where(x => x.Item1 != null)
                     .ToDictionary(x => x.Item1, x => x.Item2);
 
@@ -113,15 +123,18 @@ namespace NSL.Generators.BinaryTypeIOGenerator
 
                 var methodInfo = new MethodInfoModel()
                 {
-                    MethodDeclarationSyntax = method,
                     IOType = methodReadAttribute == null ? IOTypeEnum.Write : IOTypeEnum.Read,
                     ForGroup = forGroup?.Trim('\"') ?? "*",
                     Parameters = method.ParameterList.Parameters.Select(x => new parametermodel
                     {
                         name = x.Identifier.ValueText,
-                        parameter = x
+                        typeName = ((IdentifierNameSyntax)x.Type).Identifier.Text
+                        //type = ((IdentifierNameSyntax)x.Type)
                     }).ToList(),
-                    ClassDeclarationSyntax = classDecl
+                    ClassDeclarationSyntax = classDecl,
+                    MethodModifier = string.Join(" ", method.Modifiers.Select(x => x.Text)),
+                    MethodName = method.GetMethodName(),
+                    ReadType = classDecl.GetClassName()
                 };
 
                 CodeBuilder methodBuilder = new CodeBuilder();
@@ -129,10 +142,10 @@ namespace NSL.Generators.BinaryTypeIOGenerator
                 switch (methodInfo.IOType)
                 {
                     case IOTypeEnum.Read:
-                        ProcessReadMethod(methodBuilder, methodInfo, context);
+                        ProcessReadMethod(methodBuilder, methodInfo, tSym);
                         break;
                     case IOTypeEnum.Write:
-                        ProcessWriteMethod(methodBuilder, methodInfo, context);
+                        ProcessWriteMethod(methodBuilder, methodInfo, tSym);
                         break;
                     default:
                         break;
@@ -141,6 +154,66 @@ namespace NSL.Generators.BinaryTypeIOGenerator
 
                 classBuilder.AppendLine(methodBuilder.ToString());
             }
+
+
+
+            var ioMethodsAttributes = classDecl.AttributeLists
+                .SelectMany(x => x.Attributes)
+                .Where(x => x.GetAttributeFullName().Equals(IOMethodsForAttributeFullName)).ToArray();
+
+            var full = ioMethodsAttributes
+                .SelectMany(x =>
+                    x.ArgumentList?.Arguments.Select(n => n.GetAttributeParameterValue<string>(tSym)) ?? Enumerable.Repeat("*", 1))
+                .ToArray();
+
+
+
+            foreach (var attribute in full)
+            {
+                var methodInfo = new MethodInfoModel()
+                {
+                    IOType = IOTypeEnum.Write,
+                    ForGroup = attribute,
+                    Parameters = new List<parametermodel>() {
+                    new parametermodel(){  name = "packet", typeName = typeof(OutputPacketBuffer).Name }
+                    },
+                    ClassDeclarationSyntax = classDecl,
+                    MethodModifier = "public",
+                    ReadType = classDecl.GetClassName()
+                };
+
+                var name = attribute == "*" ? "Full" : attribute;
+
+                methodInfo.MethodName = $"Write{name}To";
+
+                CodeBuilder methodBuilder = new CodeBuilder();
+                ProcessWriteMethod(methodBuilder, methodInfo, tSym);
+                classBuilder.AppendLine(methodBuilder.ToString());
+
+                methodInfo.MethodModifier = "public static";
+                methodInfo.Parameters = new List<parametermodel>()
+                {
+                    new parametermodel(){ name = "value", typeName = methodInfo.ReadType },
+                    methodInfo.Parameters[0]
+                };
+
+                methodBuilder = new CodeBuilder();
+                ProcessWriteMethod(methodBuilder, methodInfo, tSym);
+                classBuilder.AppendLine(methodBuilder.ToString());
+
+                methodInfo.IOType = IOTypeEnum.Read;
+                methodInfo.MethodName = $"Read{name}From";
+                methodInfo.Parameters = new List<parametermodel>()
+                {
+                    new parametermodel(){  name = "data", typeName = typeof(InputPacketBuffer).Name }
+                };
+
+                methodBuilder = new CodeBuilder();
+                ProcessReadMethod(methodBuilder, methodInfo, tSym);
+                classBuilder.AppendLine(methodBuilder.ToString());
+            }
+
+
 
             classBuilder.PrevTab();
 
@@ -166,9 +239,11 @@ namespace NSL.Generators.BinaryTypeIOGenerator
                 outputValue = nsBuilder.ToString();
             }
             // Visual studio have lag(or ...) cannot show changes any time
-#if !DEVELOP
-            System.IO.File.WriteAllText($@"C:\Work\temp\{classIdentityName}.binaryio.cs", outputValue);
-#endif
+            //#if DEVELOP
+            //#pragma warning disable RS1035 // Do not use APIs banned for analyzers
+            //            System.IO.File.WriteAllText($@"C:\Work\temp\{classIdentityName}.binaryio.cs", outputValue);
+            //#pragma warning restore RS1035 // Do not use APIs banned for analyzers
+            //#endif
 
             //if (!Debugger.IsAttached)
             //    Debugger.Launch();
@@ -177,16 +252,15 @@ namespace NSL.Generators.BinaryTypeIOGenerator
         }
 
 
-        private void ProcessReadMethod(CodeBuilder methodBuilder, MethodInfoModel methodInfo, GeneratorExecutionContext context)
+        private void ProcessReadMethod(CodeBuilder methodBuilder, MethodInfoModel methodInfo, SemanticModel tSym)
         {
-            var method = methodInfo.MethodDeclarationSyntax;
             var classDecl = methodInfo.ClassDeclarationSyntax;
 
-            methodBuilder.AppendLine($"public static partial {classDecl.GetClassName()} {method.GetMethodName()}({string.Join(", ", methodInfo.Parameters.Select(x => $"{((IdentifierNameSyntax)x.parameter.Type).Identifier.Text} {x.name}"))})");
+            methodBuilder.AppendLine($"{methodInfo.MethodModifier} {methodInfo.ReadType} {methodInfo.MethodName}({string.Join(", ", methodInfo.Parameters.Select(x => $"{x.typeName} {x.name}"))})");
             methodBuilder.AppendLine("{");
             methodBuilder.NextTab();
 
-            var bufferParam = methodInfo.Parameters.FirstOrDefault(x => ((IdentifierNameSyntax)x.parameter.Type).Identifier.Text.Equals(typeof(InputPacketBuffer).Name));
+            var bufferParam = methodInfo.Parameters.FirstOrDefault(x => x.typeName.Equals(typeof(InputPacketBuffer).Name));
 
             if (bufferParam == null)
             {
@@ -200,39 +274,44 @@ namespace NSL.Generators.BinaryTypeIOGenerator
                 methodBuilder.AppendLine();
             }
 
-            var tSym = context.Compilation.GetSemanticModel(classDecl.SyntaxTree);
+            var bgContext = new BinaryTypeIOGeneratorContext()
+            {
+                For = methodInfo.ForGroup,
+                SemanticModel = tSym,
+                ProcessingType = classDecl.GetClassName(),
+                ReadCurrentTypeMethodName = methodInfo.MethodName,
+                IsStatic = methodInfo.MethodModifier.Contains("static")
+            };
 
-            var bgContext = new BinaryTypeIOGeneratorContext() { For = methodInfo.ForGroup };
-
-            methodBuilder.AppendLine($"return {BinaryReadMethodsGenerator.GetValueReadSegment(tSym.GetDeclaredSymbol(classDecl), bgContext, default, Enumerable.Empty<string>())};");
+            methodBuilder.AppendLine($"return {BinaryReadMethodsGenerator.GetValueReadSegment(tSym.GetDeclaredSymbol(classDecl), bgContext, default)};");
 
             methodBuilder.PrevTab();
             methodBuilder.AppendLine("}");
         }
 
-        private void ProcessWriteMethod(CodeBuilder methodBuilder, MethodInfoModel methodInfo, GeneratorExecutionContext context)
+        private void ProcessWriteMethod(CodeBuilder methodBuilder, MethodInfoModel methodInfo, SemanticModel tSym)
         {
-            var method = methodInfo.MethodDeclarationSyntax;
+            //var method = methodInfo.MethodDeclarationSyntax;
             var classDecl = methodInfo.ClassDeclarationSyntax;
 
-            methodBuilder.AppendLine($"{string.Join(" ", method.Modifiers.Select(x => x.Text))} void {method.GetMethodName()}({string.Join(", ", methodInfo.Parameters.Select(x => $"{((IdentifierNameSyntax)x.parameter.Type).Identifier.Text} {x.name}"))})");
+            methodBuilder.AppendLine($"{methodInfo.MethodModifier} void {methodInfo.MethodName}({string.Join(", ", methodInfo.Parameters.Select(x => $"{x.typeName} {x.name}"))})");
             methodBuilder.AppendLine("{");
             methodBuilder.NextTab();
 
-            var typeParam = methodInfo.Parameters.FirstOrDefault(x => ((IdentifierNameSyntax)x.parameter.Type).Identifier.Text.Equals(classDecl.GetClassName()));
+            var typeParam = methodInfo.Parameters.FirstOrDefault(x => x.typeName.Equals(methodInfo.ReadType));
 
-            var needObject = method.Modifiers.Any(x => x.Text.Equals("static"));
+            var needObject = methodInfo.MethodModifier.Contains("static");
 
             var existsObject = typeParam != null;
 
             if (!existsObject && needObject)
             {
-                methodBuilder.AppendLine($"throw new NotImplementedException(\"Required parameter with type \\\"{classDecl.GetClassName()}\\\" not found\");");
+                methodBuilder.AppendLine($"throw new NotImplementedException(\"Required parameter with type \\\"{methodInfo.ReadType}\\\" not found\");");
                 return;
             }
 
 
-            var bufferParam = methodInfo.Parameters.FirstOrDefault(x => ((IdentifierNameSyntax)x.parameter.Type).Identifier.Text.Equals(typeof(OutputPacketBuffer).Name));
+            var bufferParam = methodInfo.Parameters.FirstOrDefault(x => x.typeName.Equals(typeof(OutputPacketBuffer).Name));
 
             if (bufferParam == null)
             {
@@ -248,11 +327,16 @@ namespace NSL.Generators.BinaryTypeIOGenerator
                 methodBuilder.AppendLine();
             }
 
-            var tSym = context.Compilation.GetSemanticModel(method.SyntaxTree);
+            var bgContext = new BinaryTypeIOGeneratorContext()
+            {
+                For = methodInfo.ForGroup,
+                SemanticModel = tSym,
+                ProcessingType = classDecl.GetClassName(),
+                WriteCurrentTypeMethodName = methodInfo.MethodName,
+                IsStatic = methodInfo.MethodModifier.Contains("static")
+            };
 
-            var bgContext = new BinaryTypeIOGeneratorContext() { For = methodInfo.ForGroup };
-
-            methodBuilder.AppendLine(BinaryWriteMethodsGenerator.BuildParameterWriter(tSym.GetDeclaredSymbol(classDecl), bgContext, typeParamName, Enumerable.Empty<string>()));
+            methodBuilder.AppendLine(BinaryWriteMethodsGenerator.BuildParameterWriter(tSym.GetDeclaredSymbol(classDecl), bgContext, typeParamName));
 
 
             methodBuilder.PrevTab();
@@ -269,8 +353,47 @@ namespace NSL.Generators.BinaryTypeIOGenerator
 
         public void Execute(GeneratorExecutionContext context)
         {
+            //if (!context.Compilation.ReferencedAssemblyNames.Any(ai => ai.Name.Equals("NSL.Generators.BinaryGenerator", StringComparison.OrdinalIgnoreCase)))
+            //{
+            //    context.ReportDiagnostic(Diagnostic.Create(
+            //    new DiagnosticDescriptor(
+            //        "SG0001",
+            //        "Not found reference",
+            //        $"Cannot find reference \"NSL.Generators.BinaryGenerator\"",
+            //        "none",
+            //        DiagnosticSeverity.Error,
+            //        true,
+            //        $"Cannot find reference \"NSL.Generators.BinaryGenerator\""), Location.None));
+            //}
+            //if (!context.Compilation.ReferencedAssemblyNames.Any(ai => ai.Name.Equals("NSL.Generators.Utils", StringComparison.OrdinalIgnoreCase)))
+            //{
+            //    context.ReportDiagnostic(Diagnostic.Create(
+            //    new DiagnosticDescriptor(
+            //        "SG0001",
+            //        "Not found reference",
+            //        $"Cannot find reference \"NSL.Generators.Utils\"",
+            //        "none",
+            //        DiagnosticSeverity.Error,
+            //        true, 
+            //        $"Cannot find reference \"NSL.Generators.Utils\""), Location.None));
+            //}
+            //if (!context.Compilation.ReferencedAssemblyNames.Any(ai => ai.Name.Equals("NSL.Generators.BinaryTypeIOGenerator.Attributes", StringComparison.OrdinalIgnoreCase)))
+            //{
+            //    context.ReportDiagnostic(Diagnostic.Create(
+            //    new DiagnosticDescriptor(
+            //        "SG0001",
+            //        "Not found reference",
+            //        $"Cannot find reference \"NSL.Generators.BinaryTypeIOGenerator.Attributes\"",
+            //        "none",
+            //        DiagnosticSeverity.Error,
+            //        true,
+            //        $"Cannot find reference \"NSL.Generators.BinaryTypeIOGenerator.Attributes\""), Location.None));
+            //}
+
             if (context.SyntaxReceiver is BinaryIOAttributeSyntaxReceiver methodSyntaxReceiver)
+            {
                 ProcessBinaryIOTypes(context, methodSyntaxReceiver);
+            }
         }
 
         public void Initialize(GeneratorInitializationContext context)
@@ -284,5 +407,7 @@ namespace NSL.Generators.BinaryTypeIOGenerator
         private readonly string ReadMethodAttributeFullName = typeof(BinaryIOReadMethodAttribute).Name;
 
         private readonly string WriteMethodAttributeFullName = typeof(BinaryIOWriteMethodAttribute).Name;
+
+        private readonly string IOMethodsForAttributeFullName = typeof(BinaryIOMethodsForAttribute).Name;
     }
 }

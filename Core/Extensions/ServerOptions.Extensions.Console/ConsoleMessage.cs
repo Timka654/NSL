@@ -19,7 +19,7 @@ namespace NSL.ServerOptions.Extensions.Console
 
         public override void Receive(T client, InputPacketBuffer data)
         {
-            Send(client, manager.InvokeCommand(client, data.ReadString16()));
+            Send(client, manager.InvokeCommand(client, data.ReadString()));
         }
 
         public static void Send(IServerNetworkClient client, string result)
@@ -29,7 +29,7 @@ namespace NSL.ServerOptions.Extensions.Console
                 PacketId = ConsoleHelper.DefaultClientPacketId
             };
 
-            packet.WriteString16(result);
+            packet.WriteString(result);
 
             client.Send(packet);
         }

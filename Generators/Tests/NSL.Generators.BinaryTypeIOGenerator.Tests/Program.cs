@@ -2,17 +2,19 @@
 
 namespace NSL.Generators.BinaryTypeIOGenerator.Tests
 {
-	class Program
-	{
-		static void Main(string[] args)
-		{
-			var o = new OutputPacketBuffer();
+    internal class Program
+    {
+        private static void Main(string[] args)
+        {
+            var o = new OutputPacketBuffer();
 
-			 new TestStruct1() { s1 = " abbbbcc", n1 = 75656 }.BinaryWriteFull(o);
+            var ouData = new TestStruct1() { s1 = " abbbbcc", n1 = 75656/*, data = new ZergRush.ReactiveCore.ReactiveCollection<byte>()*/ };
 
-			var i = new InputPacketBuffer(o.CompilePacket());
+            ouData.WriteabcTo(o);
 
-			var s = TestStruct1.BinaryReadFull(i);
+            var i = new InputPacketBuffer(o.CompilePacket());
+
+            var s = TestStruct1.ReadabcFrom(i);
 
 
 
@@ -20,12 +22,13 @@ namespace NSL.Generators.BinaryTypeIOGenerator.Tests
 
             var o1 = new OutputPacketBuffer();
 
-            new TestStruct1() { s1 = "rwegrewgwrg", n1 = 6347 }.BinaryWriteABC(o1);
+            ouData = new TestStruct1() { s1 = "rwegrewgwrg", n1 = 6347/*, data = new ZergRush.ReactiveCore.ReactiveCollection<byte>(new byte[] { 45, 67, 85 })*/ };
+            ouData.WriteenTo(o1);
 
             var i1 = new InputPacketBuffer(o1.CompilePacket());
 
-            var s1 = TestStruct1.BinaryReadABC(i1);
+            var s1 = TestStruct1.ReadenFrom(i1);
 
         }
-	}
+    }
 }

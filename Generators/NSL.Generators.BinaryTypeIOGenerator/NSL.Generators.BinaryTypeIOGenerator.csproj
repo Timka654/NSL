@@ -4,18 +4,16 @@
 		<TargetFramework>netstandard2.0</TargetFramework>
 		<Configurations>Debug;Release;Unity;UnityDebug;DebugExamples</Configurations>
 
-		<PublishRepositoryUrl>true</PublishRepositoryUrl>
-		<EmbedUntrackedSources>true</EmbedUntrackedSources>
-		<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-		<GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
-
 		<Description>-</Description>
 		<Authors>Relife87</Authors>
 		<Version>$(VersionSuffix)</Version>
 
-		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-		<NoPackageAnalysis>true</NoPackageAnalysis>
+		<EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
 
+		<IsRoslynComponent>true</IsRoslynComponent>
+		<!-- Do not include the generator as a lib dependency -->
+		<!--<IncludeBuildOutput>false</IncludeBuildOutput>-->
+		<!--<GeneratePackageOnBuild>true</GeneratePackageOnBuild>-->
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)'=='Debug'">
@@ -40,18 +38,23 @@
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.5.0" />
-		<PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="4.5.0" />
+	</ItemGroup>
+
+	<ItemGroup Condition="'$(Configuration)'=='Debug' Or '$(Configuration)'=='Release'">
+		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.5.0"  PrivateAssets="all" />
+	</ItemGroup>
+
+	<ItemGroup Condition="'$(Configuration)'=='UnityDebug' Or '$(Configuration)'=='Unity'">
+		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.8.0"  PrivateAssets="all" />
+	</ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\..\Core\NSL.SocketCore\NSL.SocketCore.csproj" PrivateAssets="all" OutputItemType="Analyzer" />
+		<ProjectReference Include="..\NSL.Generators.BinaryTypeIOGenerator.Attributes\NSL.Generators.BinaryTypeIOGenerator.Attributes.csproj" PrivateAssets="all" OutputItemType="Analyzer" />
+		<ProjectReference Include="..\NSL.Generators.BinaryGenerator\NSL.Generators.BinaryGenerator.csproj" PrivateAssets="all" OutputItemType="Analyzer" />
+		<ProjectReference Include="..\NSL.Generators.Utils\NSL.Generators.Utils.csproj" PrivateAssets="all" OutputItemType="Analyzer" />
 	</ItemGroup>
 
 	<ItemGroup>
-    <ProjectReference Include="..\NSL.Generators.BinaryGenerator\NSL.Generators.BinaryGenerator.csproj" GeneratePathProperty="true" PrivateAssets="all" OutputItemType="Analyzer" />
-    <ProjectReference Include="..\NSL.Generators.Utils\NSL.Generators.Utils.csproj" GeneratePathProperty="true" PrivateAssets="all" OutputItemType="Analyzer" />		<ProjectReference Include="..\NSL.Generators.BinaryGenerator\NSL.Generators.BinaryGenerator.csproj" GeneratePathProperty="true" PrivateAssets="all" OutputItemType="Analyzer" />
-		
-		<ProjectReference Include="..\..\Core\NSL.SocketCore\NSL.SocketCore.csproj" GeneratePathProperty="true" PrivateAssets="all" OutputItemType="Analyzer"  />
-	</ItemGroup>
-
-	<ItemGroup>
-		<None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+		<None Include="$(OutputPath)\*NSL.*.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
 	</ItemGroup>
 </Project>

@@ -1,17 +1,14 @@
-﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.CodeAnalysis.CSharp;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Microsoft.CodeAnalysis;
 using System.Linq;
-using System.Reflection;
 using NSL.Generators.Utils;
 using NSL.Generators.BinaryGenerator.Generators;
 
 namespace NSL.Generators.BinaryGenerator
 {
     internal delegate string CustomTypeHandle(INamedTypeSymbol type, BinaryGeneratorContext context, string path);
-    internal delegate string GenerateHandle(ISymbol type, BinaryGeneratorContext context, string path, IEnumerable<string> ignoreMembers);
+    internal delegate string GenerateHandle(ISymbol type, BinaryGeneratorContext context, string path);
 
     public class BinaryReadMethodsGenerator
     {
@@ -22,21 +19,25 @@ namespace NSL.Generators.BinaryGenerator
             //generators.Add(TaskTypeGenerator.GetReadLine);
             generators.Add(CustomTypeGenerator.GetReadLine);
             generators.Add(ArrayTypeGenerator.GetReadLine);
+            generators.Add(EnumTypeGenerator.GetReadLine);
             generators.Add(BaseTypeGenerator.GetReadLine);
             generators.Add(NullableTypeGenerator.GetReadLine);
             generators.Add(ClassTypeGenerator.GetReadLine);
             generators.Add(StructTypeGenerator.GetReadLine);
         }
 
-        public static string GetValueReadSegment(ISymbol parameter, BinaryGeneratorContext context, string path, IEnumerable<string> ignoreMembers = null)
+        //public static string GetValueReadSegment(ISymbol parameter, BinaryGeneratorContext context, string path, IEnumerable<string> ignoreMembers = null)
+        public static string GetValueReadSegment(ISymbol parameter, BinaryGeneratorContext context, string path)
         {
             string valueReader = default;
 
-            if (ignoreMembers == null || !ignoreMembers.Any(v => v.Equals("*")))
+            valueReader = context.GetExistsReadHandleCode(parameter, path);
+
+            if (valueReader == default)
             {
                 foreach (var gen in generators)
                 {
-                    valueReader = gen(parameter, context, path, ignoreMembers);
+                    valueReader = gen(parameter, context, path);
 
                     if (valueReader != default)
                         break;
@@ -77,7 +78,7 @@ namespace NSL.Generators.BinaryGenerator
             if (member.DeclaredAccessibility.HasFlag(Accessibility.Public) == false || member.IsStatic)
                 return;
 
-            if (context.IsIgnore(member))
+            if (context.IsIgnore(member, path))
                 return;
 
             if (member is IPropertySymbol ps)
@@ -86,7 +87,7 @@ namespace NSL.Generators.BinaryGenerator
                 {
                     var ptype = ps.GetTypeSymbol();
 
-                    rb.AppendLine($"{path} = {GetValueReadSegment(ptype, context, path)};");
+                    rb.AppendLine($"{path} = {GetValueReadSegment(ptype, context, path).TrimEnd(';')};");
 
                     rb.AppendLine();
                 }
@@ -95,7 +96,7 @@ namespace NSL.Generators.BinaryGenerator
             {
                 var ftype = fs.GetTypeSymbol();
 
-                rb.AppendLine($"{path} = {GetValueReadSegment(ftype, context, path)};");
+                rb.AppendLine($"{path} = {GetValueReadSegment(ftype, context, path).TrimEnd(';')};");
 
                 rb.AppendLine();
             }

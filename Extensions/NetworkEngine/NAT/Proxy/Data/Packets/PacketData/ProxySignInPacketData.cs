@@ -12,9 +12,9 @@ namespace NSL.Extensions.NAT.Proxy.Data.Packets.PacketData
 
         public static void WritePacketData(OutputPacketBuffer packet, ProxySignInPacketData data)
         {
-            packet.WriteString16(data.UserId);
-            packet.WriteString16(data.GameId);
-            packet.WriteString16(data.Session);
+            packet.WriteString(data.UserId);
+            packet.WriteString(data.GameId);
+            packet.WriteString(data.Session);
         }
     }
 }

@@ -8,18 +8,18 @@ namespace NSL.SocketCore.Extensions.Buffer
         /// <summary>
         /// Размер шапки пакета
         /// </summary>
-        public new const int DefaultHeaderLenght = OutputPacketBuffer.DefaultHeaderLenght + 16;
+        public new const int DefaultHeaderLength = OutputPacketBuffer.DefaultHeaderLength + 16;
 
         /// <summary>
-        /// <see cref="System.IO.MemoryStream.Position"/> without <see cref="DefaultHeaderLenght"/> header offset
+        /// <see cref="System.IO.MemoryStream.Position"/> without <see cref="DefaultHeaderLength"/> header offset
         /// </summary>
         public override long DataPosition
         {
-            get => base.Position - DefaultHeaderLenght;
-            set => base.Position = value + DefaultHeaderLenght;
+            get => base.Position - DefaultHeaderLength;
+            set => base.Position = value + DefaultHeaderLength;
         }
 
-        public override int DataLenght => PacketLenght - DefaultHeaderLenght;
+        public override int DataLength => PacketLength - DefaultHeaderLength;
 
         public RequestPacketBuffer(Guid rid, int len = 48) : base(len)
         {
@@ -30,11 +30,11 @@ namespace NSL.SocketCore.Extensions.Buffer
         {
             var offset = Position;
 
-            Position = OutputPacketBuffer.DefaultHeaderLenght;
+            Position = OutputPacketBuffer.DefaultHeaderLength;
 
             WriteGuid(rid);
 
-            if (Position >= DefaultHeaderLenght)
+            if (Position >= DefaultHeaderLength)
                 Position = offset;
             else
                 DataPosition = 0;

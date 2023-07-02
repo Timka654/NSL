@@ -9,17 +9,21 @@ using NSL.Extensions.RPC.Generator.Models;
 using NSL.Generators.Utils;
 using System.Reflection;
 using NSL.Generators.BinaryGenerator;
+using NSL.SocketCore.Utils.Buffer;
+using NSL.Extensions.RPC.Generator.Attributes;
+using System.Diagnostics;
 
 namespace NSL.Extensions.RPC.Generator.Generators
 {
     internal class ReadMethodsGenerator
     {
-
         public static string BuildParameterReader(ParameterSyntax parameterSyntax, MethodContextModel mcm)
         {
             CodeBuilder pb = new CodeBuilder();
             //if (!Debugger.IsAttached)
             //    Debugger.Launch();
+
+
 
             var parameterSymbol = mcm.SemanticModel.GetDeclaredSymbol(parameterSyntax);
 
@@ -27,92 +31,29 @@ namespace NSL.Extensions.RPC.Generator.Generators
 
             mcm.CurrentParameterSymbol = parameterSymbol;
 
-            string valueReader = GetValueReadSegment(parameterSymbol, mcm, null, RPCGenerator.GetParameterIgnoreMembers(parameterSymbol, mcm));
+            binaryContext.SemanticModel = mcm.SemanticModel;
+            binaryContext.IgnorePaths = RPCGenerator.GetParameterIgnoreMembers(parameterSymbol, mcm).ToArray();
+
+            string valueReader = GetValueReadSegment(parameterSymbol, mcm, null);
 
             pb.AppendLine(valueReader);
 
             return pb.ToString();
         }
 
-        public static string GetValueReadSegment(ISymbol parameter, MethodContextModel methodContext, string path, IEnumerable<string> ignoreMembers = null)
-            => BinaryReadMethodsGenerator.GetValueReadSegment(parameter, binaryContext, path, ignoreMembers);
-
-        public static string BuildNullableTypeDef(IFieldSymbol field)
-        {
-            if (!field.NullableAnnotation.Equals(NullableAnnotation.Annotated))
-                return field.Type.Name;
-
-            if (!field.Type.IsValueType)
-                return field.Type.Name;
-
-            //if (!Debugger.IsAttached)
-            //    Debugger.Launch();
-
-            var genericType = ((INamedTypeSymbol)field.Type).TypeArguments.First();
-
-            return $"{genericType.Name}?";
-        }
-
-        public static void AddTypeMemberReadLine(ISymbol member, CodeBuilder rb, string path, MethodContextModel methodContext)
-        {
-            if (member.DeclaredAccessibility.HasFlag(Accessibility.Public) == false || member.IsStatic)
-                return;
-
-            if (RPCGenerator.IsIgnoreMember(member))
-                return;
-
-            if (member is IPropertySymbol ps)
-            {
-                if (ps.SetMethod != null)
-                {
-                    var ptype = ps.GetTypeSymbol();
-
-                    rb.AppendLine($"{path} = {GetValueReadSegment(ptype, methodContext, path)};");
-
-                    rb.AppendLine();
-                }
-            }
-            else if (member is IFieldSymbol fs)
-            {
-                var ftype = fs.GetTypeSymbol();
-
-                rb.AppendLine($"{path} = {GetValueReadSegment(ftype, methodContext, path)};");
-
-                rb.AppendLine();
-            }
-        }
-
-        private static string GetLinePrefix(ISymbol symbol, string path)
-        {
-            string name = default;
-
-            if (symbol is IParameterSymbol param)
-                name = param.Name;
-
-
-            if (name == null)
-                return default;
-
-            if (path != default)
-            {
-                return $"{path}.{name} = ";
-            }
-
-            return $"var {name} = ";
-        }
-
-
+        public static string GetValueReadSegment(ISymbol parameter, MethodContextModel methodContext, string path)
+            => BinaryReadMethodsGenerator.GetValueReadSegment(parameter, binaryContext, path);
 
         public static string BuildNameHandle(IEnumerable<MethodDeclModel> methodDecl)
         {
             var mb = new CodeBuilder();
 
-            mb.AppendLine("public override void InvokeMethod(InputPacketBuffer dataPacket)");
+            mb.AppendLine($"public override void InvokeMethod({nameof(InputPacketBuffer)} dataPacket)");
             mb.AppendLine("{");
 
             mb.NextTab(); // 1
 
-            mb.AppendLine($"string name = dataPacket.ReadString16();");
+            mb.AppendLine($"var name = dataPacket.{nameof(InputPacketBuffer.ReadInt32)}();");
             mb.AppendLine();
 
             mb.AppendLine($"switch (name)");
@@ -123,7 +64,7 @@ namespace NSL.Extensions.RPC.Generator.Generators
             mb.NextTab(); // 2
             foreach (var method in methodDecl)
             {
-                mb.AppendLine($"case \"{method.Name}\":");
+                mb.AppendLine($"case {HasherUtils.GetInt32HashCode(method.Name)}:");
                 mb.NextTab(); // 3
                 mb.AppendLine($"{RPCGenerator.GetMethodRPCHandleName(method.Name)}(dataPacket);");
                 mb.AppendLine($"break;");
@@ -155,17 +96,15 @@ namespace NSL.Extensions.RPC.Generator.Generators
             mb.AppendLine($"private void {RPCGenerator.GetMethodRPCHandleName(methodDecl.Name)}(InputPacketBuffer dataPacket)");
             mb.AppendLine("{");
 
+
             mb.NextTab(); // 1
-
-            mb.AppendLine("byte argCount = dataPacket.ReadByte();");
-
-            mb.AppendLine();
+            mb.AppendLine($"var paramHash = dataPacket.{nameof(InputPacketBuffer.ReadInt32)}();");
 
             mb.AppendLine($"Guid rid = dataPacket.ReadGuid();");
 
             mb.AppendLine();
 
-            mb.AppendLine("switch (argCount)");
+            mb.AppendLine("switch (paramHash)");
             mb.AppendLine("{");
 
             mb.NextTab(); // 2
@@ -174,9 +113,7 @@ namespace NSL.Extensions.RPC.Generator.Generators
 
             foreach (var mov in methodDecl.Overrides)
             {
-                mb.AppendLine($"case {mov.DeclSyntax.ParameterList.Parameters.Count}:");
-
-                mb.NextTab(); // 3
+                mb.AppendLine($"case {HasherUtils.GetInt32HashCode(mov.DeclSyntax.ParameterList.Parameters.Select(x => x.ToFullString()).ToArray())}:");
 
                 mb.AppendLine("{");
 
@@ -201,73 +138,95 @@ namespace NSL.Extensions.RPC.Generator.Generators
 
                 foreach (var item in mov.DeclSyntax.ParameterList.Parameters)
                 {
+                    var attributes = item.AttributeLists
+                        .SelectMany(n => n.Attributes)
+                        .Where(x => x.GetAttributeFullName().Equals(RPCCustomMemberIgnoreAttributeFullName)).ToArray();
 
-                    mb.AppendLine(BuildParameterReader(item, p));
-                    mb.AppendLine();
+                    if (attributes.Any(x => x.ArgumentList == null || x.ArgumentList.Arguments.Any(b => b.GetAttributeParameterValue<string>(semanticModel).Equals("*"))))
+                    {
+                        mb.AppendLine($"{item.Type} {item.Identifier} = default;");
+                    }
+                    else
+                    {
+                        mb.AppendLine(BuildParameterReader(item, p));
+                        mb.AppendLine();
+                    }
 
                     parameters.Add(item.Identifier.Text);
                 }
 
 
-                //if (!Debugger.IsAttached)
-                //    Debugger.Launch();
-
-
-                if (movSymbol.ReturnsVoid)
+                BuildTrySegment(mb, b =>
                 {
-                    BuildTrySegment(mb, b =>
+                    if (movSymbol.ReturnsVoid)
                     {
                         mb.AppendLine($"base.{methodDecl.Name}({string.Join(", ", parameters)});");
-                    });
-                }
-                else
-                {
-
-                    var rType = movSymbol.ReturnType;
-                    bool trun = false;
-                    if (p.IsTask && rType is INamedTypeSymbol nts && nts.TypeArguments.Any())
-                    {
-                        rType = nts.TypeArguments.First();
-
-                        //if (!Debugger.IsAttached)
-                        //    Debugger.Break();
-
-                        trun = true;
-
-                        mb.AppendLine("System.Threading.Tasks.Task.Run(async () => {");
-                        mb.NextTab();
                     }
-
-                    BuildTrySegment(mb, b =>
+                    else
                     {
-                        mb.AppendLine($"var result = {(trun ? "await" : string.Empty)} base.{methodDecl.Name}({string.Join(", ", parameters)});");
 
-                        mb.AppendLine();
+                        bool asyncClose = false;
 
-                        mb.AppendLine(WriteMethodsGenerator.BuildParameterWriter(rType, p, "result", null));
-                    });
+                        var rType = movSymbol.ReturnType as INamedTypeSymbol;
 
-                    if (trun)
-                    {
-                        mb.PrevTab();
-                        mb.AppendLine("});");
+                        if (p.IsTask)
+                        {
+                            asyncClose = true;
+
+                            mb.AppendLine("System.Threading.Tasks.Task.Run(async () => {");
+
+                            mb.NextTab(); // 5
+
+                            if (rType.TypeArguments.Any())
+                            {
+                                rType = rType.TypeArguments.First() as INamedTypeSymbol;
+
+                                mb.AppendLine($"var result = await base.{methodDecl.Name}({string.Join(", ", parameters)});");
+                            }
+                            else
+                            {
+                                rType = null;
+
+                                mb.AppendLine($"await base.{methodDecl.Name}({string.Join(", ", parameters)});");
+                            }
+                        }
+                        else
+                        {
+
+                            mb.NextTab(); // 5
+                            mb.AppendLine($"var result = base.{methodDecl.Name}({string.Join(", ", parameters)});");
+                        }
+
+                        if (rType != null)
+                        {
+                            mb.AppendLine();
+
+                            mb.AppendLine(WriteMethodsGenerator.BuildParameterWriter(rType, p, "result"));
+                        }
+
+                        if (asyncClose)
+                        {
+                            mb.PrevTab(); // 5
+
+                            mb.AppendLine("});");
+                        }
+
                     }
+                });
 
-                }
-
-                mb.PrevTab(); // 3
+                mb.PrevTab(); // 4
 
 
                 mb.AppendLine("}");
                 mb.AppendLine("break;");
 
-                mb.PrevTab(); // 2
+                mb.PrevTab(); // 3
             }
 
 
             mb.AppendLine($"default:");
             mb.NextTab(); // 3
-            mb.AppendLine($"throw new System.Exception($\"RPC method \\\"{methodDecl.Name}\\\" not have override with {{argCount}} args count on remote\");");
+            mb.AppendLine($"throw new System.Exception($\"RPC method \\\"{methodDecl.Name}\\\" not have override with {{paramHash}} parameter hash on remote\");");
             mb.AppendLine($"break;");
 
             mb.PrevTab(); // 2
@@ -285,6 +244,9 @@ namespace NSL.Extensions.RPC.Generator.Generators
 
             return mb.ToString();
         }
+
+
+
 
         private static string BuildTrySegment(CodeBuilder cb, Action<CodeBuilder> code)
         {
@@ -327,6 +289,8 @@ namespace NSL.Extensions.RPC.Generator.Generators
         }
 
         private static RPCBinaryGeneratorContext binaryContext = new RPCBinaryGeneratorContext();
+
+        private static readonly string RPCCustomMemberIgnoreAttributeFullName = typeof(RPCCustomMemberIgnoreAttribute).Name;
 
     }
 }
