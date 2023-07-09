@@ -1,5 +1,4 @@
-﻿using NSL.Extensions.Session.Server;
-using NSL.SocketCore.Utils.Buffer;
+﻿using NSL.SocketCore.Utils.Buffer;
 using NSL.SocketServer;
 using NSL.SocketServer.Utils;
 using NSL.TCP.Server;
@@ -12,19 +11,6 @@ options.Port = 20004;
 options.IpAddress = "0.0.0.0";
 
 options.ReceiveBufferSize = 1024;
-
-options.AddNSLSessions(options => {
-
-    options.OnExpiredSession = (client, sessionInfo) =>
-    {
-        Console.WriteLine($"Session expired {sessionInfo.Session}");
-    };
-
-    options.OnRecoverySession = (client, sessionInfo) =>
-    {
-        Console.WriteLine($"Session recovered {sessionInfo.Session}");
-    };
-});
 
 options.AddHandle(1, (client, p) =>
 {

@@ -1,6 +1,5 @@
 ﻿using NSL.SocketClient;
 using NSL.SocketCore.Utils.Buffer;
-using NSL.SocketCore.Extensions.Buffer;
 using NSL.TCP.Client;
 using TCPExample.Client;
 
@@ -8,8 +7,6 @@ ClientOptions<NetworkClient> options = new ClientOptions<NetworkClient>();
 
 options.ReceiveBufferSize = 1024;
 options.OnClientConnectEvent += (client) => client.PingPongEnabled = true;
-
-options.ConfigureRequestProcessor();
 
 options.AddHandle(1, (c, p) =>
 {
