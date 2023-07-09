@@ -11,7 +11,7 @@ namespace Builder.TCP.BaseExample.Server
             var server = TCPServerEndPointBuilder
                 .Create()
                 .WithClientProcessor<TCPServerNetworkClient>()
-                .WithOptions<ServerOptions<TCPServerNetworkClient>>()
+                .WithOptions()
                 .WithBindingPoint("0.0.0.0", 20006)
                 .WithBacklog(1)
                 .WithCode(builder =>

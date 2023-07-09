@@ -55,6 +55,10 @@ namespace NSL.BuilderExtensions.WebSocketsServer.AspNet
             });
         }
 
+        public static AspNetWebSocketsServerEndPointBuilder<TClient, WSServerOptions<TClient>> AspWithOptions<TClient>(this WebSocketsServerEndPointBuilder<TClient> builder)
+            where TClient : AspNetWSNetworkServerClient, new()
+            => builder.AspWithOptions<TClient, WSServerOptions<TClient>>();
+
         public static AspNetWebSocketsServerEndPointBuilder<TClient, TOptions> AspWithOptions<TClient, TOptions>(this WebSocketsServerEndPointBuilder<TClient> builder)
             where TOptions : WSServerOptions<TClient>, new()
             where TClient : AspNetWSNetworkServerClient, new()

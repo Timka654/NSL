@@ -271,14 +271,14 @@ namespace NSL.UDP
             }
             catch (ObjectDisposedException)
             {
-                AddWaitPacket(sndBuffer, 0, sndBuffer.Length);
+                Data?.OnPacketSendFail(sndBuffer, 0, sndBuffer.Length);
 
                 //отключаем клиента, лишним не будет
                 Disconnect();
             }
             catch (Exception ex)
             {
-                AddWaitPacket(sndBuffer, 0, sndBuffer.Length);
+                Data?.OnPacketSendFail(sndBuffer, 0, sndBuffer.Length);
                 RunException(ex);
 
                 //отключаем клиента, лишним не будет
@@ -304,8 +304,6 @@ namespace NSL.UDP
         protected abstract void RunDisconnect();
 
         protected abstract void RunException(Exception ex);
-
-        protected abstract void AddWaitPacket(byte[] buffer, int offset, int length);
 
         public short GetTtl() => listenerSocket.Ttl;
 

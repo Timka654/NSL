@@ -11,6 +11,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\Extensions\Session\NSL.Extensions.Session.Server\NSL.Extensions.Session.Server.csproj" />
     <ProjectReference Include="..\..\NSL.TCP.Server\NSL.TCP.Server.csproj" />
   </ItemGroup>
 

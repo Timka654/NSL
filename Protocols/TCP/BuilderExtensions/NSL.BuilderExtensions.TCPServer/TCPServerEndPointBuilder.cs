@@ -6,6 +6,7 @@ using NSL.SocketServer.Utils;
 using NSL.SocketServer;
 using NSL.SocketCore;
 using NSL.EndPointBuilder;
+using NSL.SocketClient;
 
 namespace NSL.BuilderExtensions.TCPServer
 {
@@ -34,6 +35,9 @@ namespace NSL.BuilderExtensions.TCPServer
         {
             return new TCPServerEndPointBuilder<TClient>();
         }
+
+        public TCPServerEndPointBuilder<TClient, ServerOptions<TClient>> WithOptions()
+            => WithOptions<ServerOptions<TClient>>();
 
         public TCPServerEndPointBuilder<TClient, TOptions> WithOptions<TOptions>()
             where TOptions : ServerOptions<TClient>, new()
@@ -78,6 +82,9 @@ namespace NSL.BuilderExtensions.TCPServer
         {
             return WithBindingPoint(ip.ToString(), port);
         }
+
+        public TCPServerEndPointBuilder<TClient, TOptions> WithBindingPoint(int port)
+            => WithBindingPoint(System.Net.IPAddress.Any.ToString(), port);
 
         public TCPServerEndPointBuilder<TClient, TOptions> WithBindingPoint(string ip, int port)
         {

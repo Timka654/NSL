@@ -224,7 +224,7 @@ namespace NSL.TCP
             }
             catch (Exception ex)
             {
-                AddWaitPacket(buf, offset, lenght);
+                Data?.OnPacketSendFail(buf, offset, lenght);
                 RunException(ex);
 
                 //отключаем клиента, лишним не будет
@@ -254,7 +254,7 @@ namespace NSL.TCP
             catch (Exception ex)
             {
                 var sas = ((SendAsyncState)r.AsyncState);
-                AddWaitPacket(sas.buf, sas.offset, sas.len);
+                Data?.OnPacketSendFail(sas.buf, sas.offset, sas.len);
                 RunException(ex);
                 Disconnect();
             }
@@ -332,8 +332,6 @@ namespace NSL.TCP
         {
             OnReceivePacket?.Invoke(parent, pid, len);
         }
-
-        protected abstract void AddWaitPacket(byte[] buffer, int offset, int length);
 
         protected abstract void RunDisconnect();
 

@@ -9,7 +9,8 @@ namespace NSL.SocketServer.Utils.SystemPackets
 
         public override void Receive(T client, InputPacketBuffer data)
         {
-            client.Version = data.ReadInt64();
+            //client.Version = data.ReadInt64();
+            // todo
         }
     }
 }

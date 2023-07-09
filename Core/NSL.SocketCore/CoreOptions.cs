@@ -88,6 +88,8 @@ namespace NSL.SocketCore
 
         protected Dictionary<ushort, PacketHandle> PacketHandles = new Dictionary<ushort, PacketHandle>();
 
+        public ObjectBag ObjectBag { get; } = new ObjectBag();
+
         public Dictionary<ushort, PacketHandle> GetHandleMap()
         {
             return new Dictionary<ushort, PacketHandle>(PacketHandles);
@@ -204,6 +206,7 @@ namespace NSL.SocketCore
         public void RunClientConnect(TClient client)
         {
             OnClientConnectEvent?.Invoke(client);
+
             if (OnClientConnectAsyncEvent != null)
             {
                 var r = OnClientConnectAsyncEvent.Invoke(client);
@@ -218,7 +221,13 @@ namespace NSL.SocketCore
         /// <param name="client"></param>
         public void RunClientDisconnect(TClient client)
         {
+            if (client == null)
+                return;
+
+            client.DisconnectTime = DateTime.UtcNow;
+
             OnClientDisconnectEvent?.Invoke(client);
+
             if (OnClientDisconnectAsyncEvent != null)
             {
                 Task.Run(()=> OnClientDisconnectAsyncEvent(client)).Wait();

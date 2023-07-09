@@ -5,6 +5,8 @@ using System;
 
 namespace NSL.SocketServer.Utils
 {
+    public class BaseServerNetworkClient : IServerNetworkClient { }
+
     public abstract class IServerNetworkClient : INetworkClient
     {
         public override bool AliveState
@@ -14,14 +16,9 @@ namespace NSL.SocketServer.Utils
 
         public CoreOptions ServerOptions { get; set; }
 
-        internal new void AddWaitPacket(byte[] packet_data, int offset, int lenght)
+        public virtual void Send(OutputPacketBuffer packet)
         {
-            base.AddWaitPacket(packet_data, offset, lenght);
-        }
-
-        public void Send(OutputPacketBuffer packet)
-        {
-            Network.Send(packet);
+            Network?.Send(packet);
         }
 
         /// <summary>

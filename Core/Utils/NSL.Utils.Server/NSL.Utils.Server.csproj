@@ -32,9 +32,4 @@
 		<TargetFramework>netstandard2.0</TargetFramework>
 	</PropertyGroup>
 
-	<ItemGroup>
-		<ProjectReference Include="..\..\NSL.SocketServer\NSL.SocketServer.csproj" />
-		<ProjectReference Include="..\NSL.Utils\NSL.Utils.csproj" />
-	</ItemGroup>
-
 </Project>

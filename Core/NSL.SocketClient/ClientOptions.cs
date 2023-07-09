@@ -129,13 +129,5 @@ namespace NSL.SocketClient
         {
             return AddPacket(packetId, (IPacket<TClient>)packet);
         }
-
-        public void ClearRecoveryData()
-        {
-            if (ClientData != null)
-            {
-                ClientData.SetRecoveryData(null, null);
-            }
-        }
     }
 }

@@ -249,7 +249,7 @@ namespace NSL.WebSockets
             }
             catch (Exception ex)
             {
-                AddWaitPacket(buf, offset, lenght);
+                Data?.OnPacketSendFail(buf, offset, lenght);
                 RunException(ex);
 
                 //отключаем клиента, лишним не будет
@@ -327,8 +327,6 @@ namespace NSL.WebSockets
         {
             OnReceivePacket?.Invoke(parent, pid, len);
         }
-
-        protected abstract void AddWaitPacket(byte[] buffer, int offset, int length);
 
         protected abstract void RunDisconnect();
 

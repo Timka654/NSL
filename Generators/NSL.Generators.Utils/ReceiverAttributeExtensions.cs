@@ -19,7 +19,10 @@ namespace NSL.Generators.Utils
         }
 
         public static string GetClassFullModifier(this ClassDeclarationSyntax classDecl)
-            => string.Join(" ", classDecl.Modifiers.Select(x => x.Text));
+            => string.Join(" ", classDecl.GetClassModifiers());
+
+        public static IEnumerable<string> GetClassModifiers(this ClassDeclarationSyntax classDecl)
+            => classDecl.Modifiers.Select(x => x.Text);
 
         public static string GetClassName(this ClassDeclarationSyntax classDecl)
             => @classDecl.Identifier.Text;

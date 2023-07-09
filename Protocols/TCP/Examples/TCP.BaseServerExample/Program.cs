@@ -1,15 +1,30 @@
-﻿using NSL.SocketCore.Utils.Buffer;
+﻿using NSL.Extensions.Session.Server;
+using NSL.SocketCore.Utils.Buffer;
 using NSL.SocketServer;
+using NSL.SocketServer.Utils;
 using NSL.TCP.Server;
 using TCP.BaseServerExample;
 
-ServerOptions<ServerNetworkClient> options = new ServerOptions<ServerNetworkClient>();
+ServerOptions<BaseServerNetworkClient> options = new ServerOptions<BaseServerNetworkClient>();
 
 options.Port = 20004;
 
 options.IpAddress = "0.0.0.0";
 
 options.ReceiveBufferSize = 1024;
+
+options.AddNSLSessions(options => {
+
+    options.OnExpiredSession = (client, sessionInfo) =>
+    {
+        Console.WriteLine($"Session expired {sessionInfo.Session}");
+    };
+
+    options.OnRecoverySession = (client, sessionInfo) =>
+    {
+        Console.WriteLine($"Session recovered {sessionInfo.Session}");
+    };
+});
 
 options.AddHandle(1, (client, p) =>
 {
@@ -28,7 +43,7 @@ options.OnClientConnectEvent += (client) =>
 
     outputPacketBuffer.PacketId = 1;
 
-    outputPacketBuffer.WriteString16("Hello! I'm server");
+    outputPacketBuffer.WriteString("Hello! I'm server");
 
     client.Send(outputPacketBuffer);
 };
@@ -38,7 +53,7 @@ options.OnClientDisconnectEvent += (client) =>
     Console.WriteLine($"Client({client.ObjectBag["uid"]}) disconnected!!");
 };
 
-var t = new TCPServerListener<ServerNetworkClient>(options);
+var t = new TCPServerListener<BaseServerNetworkClient>(options);
 
 t.Start();
 

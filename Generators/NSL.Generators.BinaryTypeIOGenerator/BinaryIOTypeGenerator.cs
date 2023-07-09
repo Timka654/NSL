@@ -29,26 +29,23 @@ namespace NSL.Generators.BinaryTypeIOGenerator
         }
 
         private static string[] requiredUsings = new string[] {
-            "using NSL.SocketCore;",
-            "using NSL.SocketCore.Utils.Buffer;",
-            "using System.Linq;"
+            "NSL.SocketCore",
+            "NSL.SocketCore.Utils.Buffer",
+            "System.Linq"
         };
 
         private void ProcessBinaryIOType(GeneratorExecutionContext context, TypeDeclarationSyntax type)
         {
-            var classDecl = type as ClassDeclarationSyntax;
-
-            if (!type.Modifiers.Any(x => x.ValueText.Equals("partial")))
+            if (!type.HasPartialModifier())
                 return;
 
+            var typeClass = type as ClassDeclarationSyntax;
 
-            var classIdentityName = type.Identifier.Text;
+            var typeSem = context.Compilation.GetSemanticModel(typeClass.SyntaxTree);
 
-            var ns = type.Parent as NamespaceDeclarationSyntax;
+            var classBuilder = new CodeBuilder();
 
             var methods = type.Members.Select(x => x as MethodDeclarationSyntax).Where(x => x != null).ToArray();
-
-            CodeBuilder classBuilder = new CodeBuilder();
 
             classBuilder.AppendComment(() =>
             {
@@ -56,188 +53,128 @@ namespace NSL.Generators.BinaryTypeIOGenerator
                 classBuilder.AppendLine($"Project must have reference \"NSL.SocketCore\" library for normal working");
             });
 
-            var usings = UpdateUsingDirectives(type.SyntaxTree);
-
-            foreach (var u in usings)
+            classBuilder.CreatePartialClass(typeClass, () =>
             {
-                classBuilder.AppendLine(u.ToString());
-            }
-
-            foreach (var u in requiredUsings)
-            {
-                if (!usings.Any(eu => eu.ToString().Equals(u)))
-                    classBuilder.AppendLine(u);
-            }
-
-            classBuilder.AppendLine();
-
-            var generic = classDecl.TypeParameterList?.Parameters.Any() == true ? $"<{string.Join(",", classDecl.TypeParameterList.Parameters.Select(x => x.Identifier.Text))}>" : string.Empty;
-
-
-            classBuilder.AppendLine($"{classDecl.GetClassFullModifier()} class {classDecl.GetClassName()}{generic}");
-
-            classBuilder.NextTab();
-
-            foreach (var c in classDecl.ConstraintClauses)
-            {
-                classBuilder.AppendLine(c.ToString());
-            }
-
-            classBuilder.PrevTab();
-
-            classBuilder.AppendLine("{");
-
-            classBuilder.NextTab();
-
-            var tSym = context.Compilation.GetSemanticModel(classDecl.SyntaxTree);
-
-            foreach (var method in methods)
-            {
-                if (!method.Modifiers.Any(x => x.ValueText.Equals("partial")))
-                    continue;
-
-                var attrList = method.AttributeLists.SelectMany(x => x.Attributes).ToArray();
-
-                var methodReadAttribute = attrList
-                    .FirstOrDefault(x => x.GetAttributeFullName().Equals(ReadMethodAttributeFullName));
-
-                var methodWriteAttribute = attrList
-                    .FirstOrDefault(x => x.GetAttributeFullName().Equals(WriteMethodAttributeFullName));
-
-                if (
-                    (methodReadAttribute != null && methodWriteAttribute != null) ||
-                    (methodReadAttribute == null && methodWriteAttribute == null)
-                   )
-                    continue;
-
-                string forGroup = null;
-
-                var args = (methodWriteAttribute ?? methodReadAttribute).ArgumentList?.Arguments;
-
-                var argsMap = args?
-                    .Select(x => (x.NameEquals?.Name.ToString(), x.GetAttributeParameterValue<string>(tSym)))
-                    .Where(x => x.Item1 != null)
-                    .ToDictionary(x => x.Item1, x => x.Item2);
-
-                argsMap?.TryGetValue("For", out forGroup);
-
-                var methodInfo = new MethodInfoModel()
+                foreach (var method in methods)
                 {
-                    IOType = methodReadAttribute == null ? IOTypeEnum.Write : IOTypeEnum.Read,
-                    ForGroup = forGroup?.Trim('\"') ?? "*",
-                    Parameters = method.ParameterList.Parameters.Select(x => new parametermodel
+                    if (!method.Modifiers.Any(x => x.ValueText.Equals("partial")))
+                        continue;
+
+                    var attrList = method.AttributeLists.SelectMany(x => x.Attributes).ToArray();
+
+                    var methodReadAttribute = attrList
+                        .FirstOrDefault(x => x.GetAttributeFullName().Equals(ReadMethodAttributeFullName));
+
+                    var methodWriteAttribute = attrList
+                        .FirstOrDefault(x => x.GetAttributeFullName().Equals(WriteMethodAttributeFullName));
+
+                    if (
+                        (methodReadAttribute != null && methodWriteAttribute != null) ||
+                        (methodReadAttribute == null && methodWriteAttribute == null)
+                       )
+                        continue;
+
+                    string forGroup = null;
+
+                    var args = (methodWriteAttribute ?? methodReadAttribute).ArgumentList?.Arguments;
+
+                    var argsMap = args?
+                        .Select(x => (x.NameEquals?.Name.ToString(), x.GetAttributeParameterValue<string>(typeSem)))
+                        .Where(x => x.Item1 != null)
+                        .ToDictionary(x => x.Item1, x => x.Item2);
+
+                    argsMap?.TryGetValue("For", out forGroup);
+
+                    var methodInfo = new MethodInfoModel()
                     {
-                        name = x.Identifier.ValueText,
-                        typeName = ((IdentifierNameSyntax)x.Type).Identifier.Text
-                        //type = ((IdentifierNameSyntax)x.Type)
-                    }).ToList(),
-                    ClassDeclarationSyntax = classDecl,
-                    MethodModifier = string.Join(" ", method.Modifiers.Select(x => x.Text)),
-                    MethodName = method.GetMethodName(),
-                    ReadType = classDecl.GetClassName()
-                };
+                        IOType = methodReadAttribute == null ? IOTypeEnum.Write : IOTypeEnum.Read,
+                        ForGroup = forGroup?.Trim('\"') ?? "*",
+                        Parameters = method.ParameterList.Parameters.Select(x => new parametermodel
+                        {
+                            name = x.Identifier.ValueText,
+                            typeName = ((IdentifierNameSyntax)x.Type).Identifier.Text
+                            //type = ((IdentifierNameSyntax)x.Type)
+                        }).ToList(),
+                        ClassDeclarationSyntax = typeClass,
+                        MethodModifier = string.Join(" ", method.Modifiers.Select(x => x.Text)),
+                        MethodName = method.GetMethodName(),
+                        ReadType = typeClass.GetClassName()
+                    };
 
-                CodeBuilder methodBuilder = new CodeBuilder();
+                    CodeBuilder methodBuilder = new CodeBuilder();
 
-                switch (methodInfo.IOType)
-                {
-                    case IOTypeEnum.Read:
-                        ProcessReadMethod(methodBuilder, methodInfo, tSym);
-                        break;
-                    case IOTypeEnum.Write:
-                        ProcessWriteMethod(methodBuilder, methodInfo, tSym);
-                        break;
-                    default:
-                        break;
+                    switch (methodInfo.IOType)
+                    {
+                        case IOTypeEnum.Read:
+                            ProcessReadMethod(methodBuilder, methodInfo, typeSem);
+                            break;
+                        case IOTypeEnum.Write:
+                            ProcessWriteMethod(methodBuilder, methodInfo, typeSem);
+                            break;
+                        default:
+                            break;
+                    }
+
+
+                    classBuilder.AppendLine(methodBuilder.ToString());
                 }
 
+                var ioMethodsAttributes = typeClass.AttributeLists
+                    .SelectMany(x => x.Attributes)
+                    .Where(x => x.GetAttributeFullName().Equals(IOMethodsForAttributeFullName)).ToArray();
 
-                classBuilder.AppendLine(methodBuilder.ToString());
-            }
+                var full = ioMethodsAttributes
+                    .SelectMany(x =>
+                        x.ArgumentList?.Arguments.Select(n => n.GetAttributeParameterValue<string>(typeSem)) ?? Enumerable.Repeat("*", 1))
+                    .ToArray();
 
-
-
-            var ioMethodsAttributes = classDecl.AttributeLists
-                .SelectMany(x => x.Attributes)
-                .Where(x => x.GetAttributeFullName().Equals(IOMethodsForAttributeFullName)).ToArray();
-
-            var full = ioMethodsAttributes
-                .SelectMany(x =>
-                    x.ArgumentList?.Arguments.Select(n => n.GetAttributeParameterValue<string>(tSym)) ?? Enumerable.Repeat("*", 1))
-                .ToArray();
-
-
-
-            foreach (var attribute in full)
-            {
-                var methodInfo = new MethodInfoModel()
+                foreach (var attribute in full)
                 {
-                    IOType = IOTypeEnum.Write,
-                    ForGroup = attribute,
-                    Parameters = new List<parametermodel>() {
+                    var methodInfo = new MethodInfoModel()
+                    {
+                        IOType = IOTypeEnum.Write,
+                        ForGroup = attribute,
+                        Parameters = new List<parametermodel>() {
                     new parametermodel(){  name = "packet", typeName = typeof(OutputPacketBuffer).Name }
                     },
-                    ClassDeclarationSyntax = classDecl,
-                    MethodModifier = "public",
-                    ReadType = classDecl.GetClassName()
-                };
+                        ClassDeclarationSyntax = typeClass,
+                        MethodModifier = "public",
+                        ReadType = typeClass.GetClassName()
+                    };
 
-                var name = attribute == "*" ? "Full" : attribute;
+                    var name = attribute == "*" ? "Full" : attribute;
 
-                methodInfo.MethodName = $"Write{name}To";
+                    methodInfo.MethodName = $"Write{name}To";
 
-                CodeBuilder methodBuilder = new CodeBuilder();
-                ProcessWriteMethod(methodBuilder, methodInfo, tSym);
-                classBuilder.AppendLine(methodBuilder.ToString());
+                    CodeBuilder methodBuilder = new CodeBuilder();
+                    ProcessWriteMethod(methodBuilder, methodInfo, typeSem);
+                    classBuilder.AppendLine(methodBuilder.ToString());
 
-                methodInfo.MethodModifier = "public static";
-                methodInfo.Parameters = new List<parametermodel>()
+                    methodInfo.MethodModifier = "public static";
+                    methodInfo.Parameters = new List<parametermodel>()
                 {
                     new parametermodel(){ name = "value", typeName = methodInfo.ReadType },
                     methodInfo.Parameters[0]
                 };
 
-                methodBuilder = new CodeBuilder();
-                ProcessWriteMethod(methodBuilder, methodInfo, tSym);
-                classBuilder.AppendLine(methodBuilder.ToString());
+                    methodBuilder = new CodeBuilder();
+                    ProcessWriteMethod(methodBuilder, methodInfo, typeSem);
+                    classBuilder.AppendLine(methodBuilder.ToString());
 
-                methodInfo.IOType = IOTypeEnum.Read;
-                methodInfo.MethodName = $"Read{name}From";
-                methodInfo.Parameters = new List<parametermodel>()
+                    methodInfo.IOType = IOTypeEnum.Read;
+                    methodInfo.MethodName = $"Read{name}From";
+                    methodInfo.Parameters = new List<parametermodel>()
                 {
                     new parametermodel(){  name = "data", typeName = typeof(InputPacketBuffer).Name }
                 };
 
-                methodBuilder = new CodeBuilder();
-                ProcessReadMethod(methodBuilder, methodInfo, tSym);
-                classBuilder.AppendLine(methodBuilder.ToString());
-            }
+                    methodBuilder = new CodeBuilder();
+                    ProcessReadMethod(methodBuilder, methodInfo, typeSem);
+                    classBuilder.AppendLine(methodBuilder.ToString());
+                }
 
+            }, requiredUsings);
 
-
-            classBuilder.PrevTab();
-
-            classBuilder.AppendLine("}");
-
-            string outputValue = classBuilder.ToString();
-
-            if (ns != null)
-            {
-                var nsBuilder = new CodeBuilder();
-
-                nsBuilder.AppendLine($"namespace {ns.Name.ToString()}");
-                nsBuilder.AppendLine("{");
-
-                nsBuilder.NextTab();
-
-                nsBuilder.AppendLine(outputValue);
-
-                nsBuilder.PrevTab();
-
-                nsBuilder.AppendLine("}");
-
-                outputValue = nsBuilder.ToString();
-            }
             // Visual studio have lag(or ...) cannot show changes any time
             //#if DEVELOP
             //#pragma warning disable RS1035 // Do not use APIs banned for analyzers
@@ -245,10 +182,7 @@ namespace NSL.Generators.BinaryTypeIOGenerator
             //#pragma warning restore RS1035 // Do not use APIs banned for analyzers
             //#endif
 
-            //if (!Debugger.IsAttached)
-            //    Debugger.Launch();
-
-            context.AddSource($"{classIdentityName}.binaryio.cs", outputValue);
+            context.AddSource($"{typeClass.GetTypeClassName()}.binaryio.cs", classBuilder.ToString());
         }
 
 
