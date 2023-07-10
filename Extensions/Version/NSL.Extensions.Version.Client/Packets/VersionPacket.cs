@@ -1,6 +1,6 @@
 ﻿using NSL.SocketCore.Utils.Buffer;
 
-namespace NSL.SocketClient.Utils.SystemPackets
+namespace NSL.Extensions.Version.Client.Packets
 {
     public class VersionPacket
     {

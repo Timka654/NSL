@@ -23,16 +23,6 @@ namespace NSL.SocketCore
         /// </summary>
         public virtual ProtocolType ProtocolType { get; set; } = ProtocolType.Unspecified;
 
-        ///// <summary>
-        ///// Ип адресс - используется для инициализации сервера на определенном адаптере (0.0.0.0 - для всех), или для подключения к серверу
-        ///// </summary>
-        //public string IpAddress { get; set; }
-
-        ///// <summary>
-        ///// Порт - используется для инициализации сервера или 
-        ///// </summary>
-        //public int Port { get; set; }
-
         /// <summary>
         /// Размер буффера приходящих данных, если пакет больше этого значения то данные по реализованному алгоритму принять не получиться, значение по умолчанию - 1024
         /// </summary>

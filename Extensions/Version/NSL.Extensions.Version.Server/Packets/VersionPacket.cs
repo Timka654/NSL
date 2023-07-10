@@ -1,7 +1,9 @@
-﻿using NSL.SocketCore.Utils;
+﻿using NSL.SocketCore.Extensions.Buffer;
+using NSL.SocketCore.Utils;
 using NSL.SocketCore.Utils.Buffer;
+using NSL.SocketServer.Utils;
 
-namespace NSL.SocketServer.Utils.SystemPackets
+namespace NSL.Extensions.Version.Server.Packets
 {
     public class VersionPacket<T> : IPacket<T> where T : IServerNetworkClient
     {
@@ -9,6 +11,8 @@ namespace NSL.SocketServer.Utils.SystemPackets
 
         public override void Receive(T client, InputPacketBuffer data)
         {
+            var response = data.CreateResponse();
+
             //client.Version = data.ReadInt64();
             // todo
         }

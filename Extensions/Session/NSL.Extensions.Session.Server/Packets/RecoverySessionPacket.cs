@@ -10,11 +10,9 @@ namespace NSL.Extensions.Session.Server.Packets
 {
     public class RecoverySessionPacket<T> : IPacket<T> where T : IServerNetworkClient
     {
-        public const ushort PacketId = ushort.MaxValue - 2;
-
         public override void Receive(T client, InputPacketBuffer data)
         {
-            var response = data.CreateResponse(PacketId);
+            var response = data.CreateResponse(client.ServerOptions.);
 
             var request = NSLSessionInfo.ReadFullFrom(data);
 

@@ -6,13 +6,6 @@ namespace NSL.Extensions.ConsoleEngine
     public class ConsoleManager<T> : ConsoleStorage<T>
         where T : INetworkClient
     {
-        public static ConsoleManager<T> Instance { get; private set; }
-
-        public ConsoleManager()
-        {
-            Instance = this;
-        }
-
         public string InvokeCommand(T client, string text)
         {
             var cmd = ParseMultiSpacedArguments(text);

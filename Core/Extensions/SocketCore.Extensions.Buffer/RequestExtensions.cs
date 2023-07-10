@@ -86,6 +86,12 @@ namespace NSL.SocketCore.Extensions.Buffer
             options.AddResponsePacketHandle(responsePacketId, c => c.GetRequestProcessor(objectKey));
         }
 
+        public static void SetDefaultResponsePID<TClient>(this CoreOptions<TClient> options, ushort responsePacketId = RequestProcessor.DefaultResponsePacketId)
+            where TClient : INetworkClient, new()
+        {
+            options.ObjectBag["NSL__DEFAULT__RESPONSE_PID"] = responsePacketId;
+        }
+
         public static OutputPacketBuffer CreateResponse<TEnum>(this InputPacketBuffer data, TEnum packetId)
             where TEnum : struct, Enum, IConvertible
             => data.CreateWaitBufferResponse().WithPid(packetId);
