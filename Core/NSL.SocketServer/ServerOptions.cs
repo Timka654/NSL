@@ -28,7 +28,6 @@ namespace NSL.SocketServer
         protected virtual void LoadOptions()
         { 
             AddPacket(AliveConnectionPacket.PacketId, new ServerAliveConnectionPacket<TClient>());
-            AddPacket(VersionPacket<TClient>.PacketId, new VersionPacket<TClient>());
             AddPacket(SystemTime<TClient>.PacketId, new SystemTime<TClient>());
         }
 

@@ -1,13 +1,15 @@
-﻿using NSL.Generators.BinaryTypeIOGenerator.Attributes.Interface;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace NSL.Generators.BinaryTypeIOGenerator.Attributes
 {
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
-    public class BinaryIODataIgnoreAttribute : Attribute, IBinaryIOFor
+    public class BinaryIODataIgnoreAttribute : Attribute
     {
-        public string For { get; set; } = "*";
+        public BinaryIODataIgnoreAttribute(params string[] @for)
+        {
+
+        }
     }
 }

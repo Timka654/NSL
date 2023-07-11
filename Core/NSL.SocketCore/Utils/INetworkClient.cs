@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NSL.SocketCore.Utils.Buffer;
+using System;
 using System.Collections.Generic;
 
 namespace NSL.SocketCore.Utils
@@ -65,6 +66,27 @@ namespace NSL.SocketCore.Utils
         public virtual void OnPacketSendFail(byte[] packet_data, int offset, int length)
         {
 
+        }
+
+        public virtual void Send(OutputPacketBuffer packet)
+        {
+            Network?.Send(packet);
+
+            if (Network == null)
+            {
+                var buf = packet.CompilePacket();
+                OnPacketSendFail(buf, 0, buf.Length);
+            }
+        }
+
+        public virtual void Send(byte[] buf, int offset, int len)
+        {
+            Network?.Send(buf, offset, len);
+
+            if (Network == null)
+            {
+                OnPacketSendFail(buf, offset, len);
+            }
         }
 
         /// <summary>

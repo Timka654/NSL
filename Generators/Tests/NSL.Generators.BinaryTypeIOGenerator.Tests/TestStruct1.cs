@@ -31,29 +31,30 @@ namespace NSL.Generators.BinaryTypeIOGenerator.Tests
     [BinaryIOMethodsFor]
     public partial class TestStruct1 :TestStruct2
     {
-        [BinaryIOData(For = "en")]
+        [BinaryIOData("en")]
         public TestStruct1 testArr { get; set; }
         //[BinaryIOData(For = "en")]
         //public ReactiveCollection<byte> data { get; set; }
 
-        [BinaryIOData(For = "en")]
+        [BinaryIOData("en")]
         public NSL.Generators.BinaryTypeIOGenerator.Tests.abserb.erge.ergeg.erg.abcEn en1 { get; set; }
 
-        [BinaryIOData(For = "en")]
+        [BinaryIOData("en")]
         public TestStruct2 en2 { get; set; }
 
-        [BinaryIOData(For = "en")]
+        [BinaryIOData("en")]
         public NSL.Generators.BinaryTypeIOGenerator.Tests.abserb.erge.ergeg.erg.abcEn? en3 { get; set; }
 
-        //[BinaryIOData(For = "en")]
+        //[BinaryIOData("en")]
         //public abcfff en4 { get; set; }
 
-        //[BinaryIOData(For = "en")]
+        //[BinaryIOData("en")]
         //public abcfff? en5 { get; set; }
 
-        [BinaryIOData(For = "abc")]
+        [BinaryIOData("abc")]
         public string s1 { get; set; }
 
+        [BinaryIOData]
         public int n1 { get; set; }
 
         //[BinaryIOWriteMethod]

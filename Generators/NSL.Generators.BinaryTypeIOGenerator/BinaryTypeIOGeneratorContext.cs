@@ -24,16 +24,19 @@ namespace NSL.Generators.BinaryTypeIOGenerator
             if (For.Equals("*"))
                 return false;
 
+            //var attr = symbol.GetAttributes()
+            //    .Where(x => x.AttributeClass.Name == nameof(BinaryIODataAttribute)).FirstOrDefault();
+
             return symbol.GetAttributes()
                 .Where(x => x.AttributeClass.Name == nameof(BinaryIODataAttribute))
-                .Where(x => x.NamedArguments.Any(b => b.Key == "For" && For.Equals((string)b.Value.Value)))
+                .Where(x => x.ConstructorArguments.Any(b => b.Values.Any(n => For.Equals(n.Value))))
                 .Any() == false;
         }
 
         private bool HasIgnore(ISymbol symbol)
             => symbol.GetAttributes()
                     .Where(x => x.AttributeClass.Name == nameof(BinaryIODataIgnoreAttribute))
-                    .Where(x => x.NamedArguments.Any() || x.NamedArguments.Any(b => b.Key == "For" && For.Equals((string)b.Value.Value)))
+                    .Where(x => x.ConstructorArguments.Any(b=>b.Values.Length == 0) || x.ConstructorArguments.Any(b => b.Values.Any(n => For.Equals(n.Value))))
                     .Any();
 
         public override string GetExistsReadHandleCode(ISymbol symbol, string path)
@@ -44,7 +47,7 @@ namespace NSL.Generators.BinaryTypeIOGenerator
             {
                 if (symbol is INamedTypeSymbol nts)
                 {
-                    if (nts.MetadataName.Equals(ProcessingType)) 
+                    if (nts.MetadataName.Equals(ProcessingType))
                         isThis = true;
                 }
                 if (symbol is IArrayTypeSymbol ats)
@@ -77,8 +80,8 @@ namespace NSL.Generators.BinaryTypeIOGenerator
                         isThis = true;
                 }
             }
-            
-            if(isThis)
+
+            if (isThis)
                 return $"{WriteCurrentTypeMethodName}({path},__packet);";
 
             return base.GetExistsReadHandleCode(symbol, path);

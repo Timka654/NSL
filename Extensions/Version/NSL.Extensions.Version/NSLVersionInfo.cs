@@ -12,6 +12,6 @@ namespace NSL.Extensions.Version
     {
         public const string ObjectBagKey = "NSL__VERSION";
 
-        public string? Version { get; set; }
+        public string Version { get; set; }
     }
 }

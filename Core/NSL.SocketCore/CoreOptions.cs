@@ -11,6 +11,8 @@ namespace NSL.SocketCore
 {
     public class CoreOptions
     {
+        public ObjectBag ObjectBag { get; } = new ObjectBag();
+
         public IBasicLogger HelperLogger { get; set; }
 
         /// <summary>
@@ -77,8 +79,6 @@ namespace NSL.SocketCore
         protected Dictionary<ushort, IPacket<TClient>> Packets = new Dictionary<ushort, IPacket<TClient>>();
 
         protected Dictionary<ushort, PacketHandle> PacketHandles = new Dictionary<ushort, PacketHandle>();
-
-        public ObjectBag ObjectBag { get; } = new ObjectBag();
 
         public Dictionary<ushort, PacketHandle> GetHandleMap()
         {

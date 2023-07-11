@@ -8,20 +8,28 @@
 
         public bool ValidateMinVersion(string version)
         {
-            if (long.TryParse(version, out var clientVer))
-                if (long.TryParse(MinVersion, out var serverMinVer))
+            if (long.TryParse(MinVersion, out var serverMinVer))
+                if (long.TryParse(version, out var clientVer))
+                {
                     if (clientVer < serverMinVer)
                         return false;
+                }
+                else
+                    return false;
 
             return true;
         }
 
         public bool ValidateRequireVersion(string version)
         {
-            if (long.TryParse(version, out var clientVer))
-                if (long.TryParse(RequireVersion, out var serverReqVer))
+            if (long.TryParse(RequireVersion, out var serverReqVer))
+                if (long.TryParse(version, out var clientVer))
+                {
                     if (clientVer != serverReqVer)
                         return false;
+                }
+                else
+                    return false;
 
             return true;
         }

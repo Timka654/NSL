@@ -4,7 +4,7 @@ using System;
 namespace NSL.Extensions.Session
 {
     [BinaryIOType, BinaryIOMethodsFor]
-    public partial class RecoverySessionResult
+    public partial class NSLRecoverySessionResult
     {
         public NSLRecoverySessionResultEnum Result { get; set; }
 

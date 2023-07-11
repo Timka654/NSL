@@ -8,11 +8,15 @@ using System.Linq;
 
 namespace NSL.Extensions.Session.Server.Packets
 {
-    public class RecoverySessionPacket<T> : IPacket<T> where T : IServerNetworkClient
+    public class NSLRecoverySessionPacket<T> : IPacket<T> where T : IServerNetworkClient
     {
+        public const ushort PacketId = ushort.MaxValue - 2;
+
         public override void Receive(T client, InputPacketBuffer data)
         {
-            var response = data.CreateResponse(client.ServerOptions.);
+            var pid = client.ServerOptions.ObjectBag.Get<ushort>(RequestProcessor.DefaultResponsePIDObjectBagKey, true);
+
+            var response = data.CreateResponse(pid);
 
             var request = NSLSessionInfo.ReadFullFrom(data);
 
@@ -21,7 +25,7 @@ namespace NSL.Extensions.Session.Server.Packets
 
             client.ThrowIfObjectBagNull();
 
-            var serverOptions = client.ServerOptions as ServerOptions<T>;
+            var serverOptions = client.ServerOptions;
 
             var sessionManager = serverOptions.ObjectBag.Get<NSLSessionManager<T>>(NSLSessionManager<T>.ObjectBagKey);
 

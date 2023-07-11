@@ -16,11 +16,6 @@ namespace NSL.SocketServer.Utils
 
         public CoreOptions ServerOptions { get; set; }
 
-        public virtual void Send(OutputPacketBuffer packet)
-        {
-            Network?.Send(packet);
-        }
-
         /// <summary>
         /// 
         /// </summary>

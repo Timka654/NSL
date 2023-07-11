@@ -70,8 +70,6 @@ namespace NSL.WebSockets.Client
 
             RunReceiveAsync();
 
-            VersionPacket.Send(ConnectionOptions.ClientData, Version);
-
             ConnectionOptions.RunClientConnect();
         }
 

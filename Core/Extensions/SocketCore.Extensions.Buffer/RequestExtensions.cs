@@ -89,7 +89,7 @@ namespace NSL.SocketCore.Extensions.Buffer
         public static void SetDefaultResponsePID<TClient>(this CoreOptions<TClient> options, ushort responsePacketId = RequestProcessor.DefaultResponsePacketId)
             where TClient : INetworkClient, new()
         {
-            options.ObjectBag["NSL__DEFAULT__RESPONSE_PID"] = responsePacketId;
+            options.ObjectBag[RequestProcessor.DefaultResponsePIDObjectBagKey] = responsePacketId;
         }
 
         public static OutputPacketBuffer CreateResponse<TEnum>(this InputPacketBuffer data, TEnum packetId)

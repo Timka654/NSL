@@ -74,13 +74,13 @@ namespace NSL.Extensions.Session.Server
             waitCloseQueue.Enqueue(session);
         }
 
-        public RecoverySessionResult TryRecovery(TClient client, string session, string[] keys)
+        public NSLRecoverySessionResult TryRecovery(TClient client, string session, string[] keys)
         {
             if (!sessionStorage.TryGetValue(session, out var oldSession)
                 || oldSession.RestoreKeys.Length != keys.Length
                 || !keys.SequenceEqual(oldSession.RestoreKeys))
             {
-                return new RecoverySessionResult() { Result = NSLRecoverySessionResultEnum.NotFound };
+                return new NSLRecoverySessionResult() { Result = NSLRecoverySessionResultEnum.NotFound };
             }
 
             sessionStorage.TryRemove(session, out _);
@@ -100,16 +100,16 @@ namespace NSL.Extensions.Session.Server
 
             client.ObjectBag[options.ClientSessionBagKey] = sessionInfo;
 
-            var result = new RecoverySessionResult() { Result = NSLRecoverySessionResultEnum.Ok, SessionInfo = sessionInfo };
+            var result = new NSLRecoverySessionResult() { Result = NSLRecoverySessionResultEnum.Ok, SessionInfo = sessionInfo };
 
             options.OnRecoverySession(client, sessionInfo);
 
             return result;
         }
 
-        public void RegisterServer(ServerOptions<TClient> server)
+        internal void RegisterServer(ServerOptions<TClient> server)
         {
-            server.AddPacket(RecoverySessionPacket<TClient>.PacketId, new RecoverySessionPacket<TClient>());
+            server.AddPacket(NSLRecoverySessionPacket<TClient>.PacketId, new NSLRecoverySessionPacket<TClient>());
 
             server.OnClientDisconnectEvent += Server_OnClientDisconnectEvent;
         }

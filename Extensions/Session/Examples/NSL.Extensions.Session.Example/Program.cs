@@ -53,13 +53,15 @@ namespace NSL.Extensions.Session.Example
                             };
                         });
 
-                    b.AddPacketHandle(1, (c, d) =>
+                    b.GetOptions().SetDefaultResponsePID();
+
+                    b.AddPacketHandle(2, (c, d) =>
                     {
                         var session = serverSessionManager.CreateSession(c);
 
                         sl.AppendLog($"Client connected session {session.Session}");
 
-                        var result = OutputPacketBuffer.Create(1);
+                        var result = OutputPacketBuffer.Create(2);
 
                         session.WriteFullTo(result);
 
@@ -84,15 +86,19 @@ namespace NSL.Extensions.Session.Example
                     b.AddConnectHandle(c =>
                     {
                         c.InitializeObjectBag();
-                        c.CreateRequestProcessor();
                     });
+
+                    b.GetOptions().ConfigureRequestProcessor();
 
                     b.AddDefaultEventHandlers<TCPClientEndPointBuilder<BasicNetworkClient, ClientOptions<BasicNetworkClient>>, BasicNetworkClient>(handleOptions: DefaultEventHandlersEnum.All & ~DefaultEventHandlersEnum.HasSendStackTrace);
 
-                    b.AddPacketHandle(1, (c, d) =>
+                    b.AddPacketHandle(2, (c, d) =>
                     {
                         clientSession = NSLSessionInfo.ReadFullFrom(d);
                     });
+
+                    b.GetOptions()
+                    .SetDefaultResponsePID();
 
                     b.GetOptions()
                     .AddNSLSessions();
@@ -104,7 +110,7 @@ namespace NSL.Extensions.Session.Example
 
             //sigin
 
-            client.SendEmpty(1);
+            client.SendEmpty(2);
 
             await Task.Delay(2_000);
 
@@ -117,7 +123,7 @@ namespace NSL.Extensions.Session.Example
 
             client.SetNSLSessionInfo<BasicNetworkClient>(clientSession);
 
-            var recovery = await RecoverySessionPacket<BasicNetworkClient>.SendRequestAsync(client.Data);
+            var recovery = await NSLRecoverySessionPacket<BasicNetworkClient>.SendRequestAsync(client.Data);
 
             var validInfo = recovery.SessionInfo;
 
@@ -137,7 +143,7 @@ namespace NSL.Extensions.Session.Example
 
             client.SetNSLSessionInfo<BasicNetworkClient>(clientSession); // invalid info
 
-            recovery = await RecoverySessionPacket<BasicNetworkClient>.SendRequestAsync(client.Data);
+            recovery = await NSLRecoverySessionPacket<BasicNetworkClient>.SendRequestAsync(client.Data);
 
             cl.AppendInfo($"{JsonConvert.SerializeObject(recovery)}");
 
@@ -158,7 +164,7 @@ namespace NSL.Extensions.Session.Example
 
             client.SetNSLSessionInfo<BasicNetworkClient>(clientSession);
 
-            recovery = await RecoverySessionPacket<BasicNetworkClient>.SendRequestAsync(client.Data);
+            recovery = await NSLRecoverySessionPacket<BasicNetworkClient>.SendRequestAsync(client.Data);
 
             cl.AppendInfo($"{JsonConvert.SerializeObject(recovery)}");
 
@@ -181,7 +187,7 @@ namespace NSL.Extensions.Session.Example
 
             client.SetNSLSessionInfo<BasicNetworkClient>(clientSession);
 
-            recovery = await RecoverySessionPacket<BasicNetworkClient>.SendRequestAsync(client.Data);
+            recovery = await NSLRecoverySessionPacket<BasicNetworkClient>.SendRequestAsync(client.Data);
 
             cl.AppendInfo($"{JsonConvert.SerializeObject(recovery)}");
 

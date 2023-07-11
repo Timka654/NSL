@@ -23,7 +23,7 @@ namespace NSL.Extensions.Session.Client
 
             options.ObjectBag[SOObjectKey] = o;
 
-            options.AddResponsePacketHandle(RecoverySessionPacket<TClient>.PacketId, client => client.GetRequestProcessor(RPObjectKey));
+            options.AddResponsePacketHandle(NSLRecoverySessionPacket<TClient>.PacketId, client => client.GetRequestProcessor(RPObjectKey));
         }
 
         public static void SetNSLSessionInfo<TClient>(this IClient client, NSLSessionInfo info)

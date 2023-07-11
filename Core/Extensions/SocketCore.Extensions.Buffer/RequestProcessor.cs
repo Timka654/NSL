@@ -12,6 +12,7 @@ namespace NSL.SocketCore.Extensions.Buffer
     public class RequestProcessor : IResponsibleProcessor, IDisposable
     {
         public const string DefaultObjectBagKey = "NSL__DEFAULT__REQUEST__PROCESSOR";
+        public const string DefaultResponsePIDObjectBagKey = "NSL__DEFAULT__RESPONSE_PID";
 
         public const ushort DefaultResponsePacketId = 1;
 

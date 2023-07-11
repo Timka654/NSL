@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace NSL.Extensions.Session.Client.Packets
 {
-    public class RecoverySessionPacket<T>
+    public class NSLRecoverySessionPacket<T>
         where T : BaseSocketNetworkClient
     {
         public const ushort PacketId = ushort.MaxValue - 2;
@@ -59,52 +59,52 @@ namespace NSL.Extensions.Session.Client.Packets
             return packet;
         }
 
-        public static void SendRequest(T client, Action<RecoverySessionResult> onResponse, string RPObjectKey = RequestProcessor.DefaultObjectBagKey)
+        public static void SendRequest(T client, Action<NSLRecoverySessionResult> onResponse, string RPObjectKey = RequestProcessor.DefaultObjectBagKey)
         {
             client.ThrowIfObjectBagNull();
 
             SendRequest(client, GetClientSessionInfo(client), onResponse, RPObjectKey);
         }
 
-        public static void SendRequest(T client, NSLSessionInfo sessionInfo, Action<RecoverySessionResult> onResponse, string RPObjectKey = RequestProcessor.DefaultObjectBagKey)
+        public static void SendRequest(T client, NSLSessionInfo sessionInfo, Action<NSLRecoverySessionResult> onResponse, string RPObjectKey = RequestProcessor.DefaultObjectBagKey)
         {
             client.ThrowIfObjectBagNull();
 
             SendRequest(client.GetRequestProcessor(RPObjectKey), sessionInfo, onResponse);
         }
 
-        public static void SendRequest(RequestProcessor processor, NSLSessionInfo sessionInfo, Action<RecoverySessionResult> onResponse)
+        public static void SendRequest(RequestProcessor processor, NSLSessionInfo sessionInfo, Action<NSLRecoverySessionResult> onResponse)
         {
             var request = RequestPacketBuffer.Create();
 
             FillPacket(request, sessionInfo);
 
-            processor.SendRequest(request, data => { onResponse(RecoverySessionResult.ReadFullFrom(data)); return true; });
+            processor.SendRequest(request, data => { onResponse(NSLRecoverySessionResult.ReadFullFrom(data)); return true; });
         }
 
-        public static async Task<RecoverySessionResult> SendRequestAsync(T client, string RPObjectKey = RequestProcessor.DefaultObjectBagKey)
+        public static async Task<NSLRecoverySessionResult> SendRequestAsync(T client, string RPObjectKey = RequestProcessor.DefaultObjectBagKey)
         {
             client.ThrowIfObjectBagNull();
 
             return await SendRequestAsync(client, GetClientSessionInfo(client), RPObjectKey);
         }
 
-        public static async Task<RecoverySessionResult> SendRequestAsync(T client, NSLSessionInfo sessionInfo, string RPObjectKey = RequestProcessor.DefaultObjectBagKey)
+        public static async Task<NSLRecoverySessionResult> SendRequestAsync(T client, NSLSessionInfo sessionInfo, string RPObjectKey = RequestProcessor.DefaultObjectBagKey)
         {
             client.ThrowIfObjectBagNull();
 
             return await SendRequestAsync(client.GetRequestProcessor(RPObjectKey), sessionInfo);
         }
 
-        public static async Task<RecoverySessionResult> SendRequestAsync(RequestProcessor processor, NSLSessionInfo sessionInfo)
+        public static async Task<NSLRecoverySessionResult> SendRequestAsync(RequestProcessor processor, NSLSessionInfo sessionInfo)
         {
             var request = RequestPacketBuffer.Create();
 
             FillPacket(request, sessionInfo);
 
-            RecoverySessionResult result = default;
+            NSLRecoverySessionResult result = default;
 
-            await processor.SendRequestAsync(request, data => { result = RecoverySessionResult.ReadFullFrom(data); return Task.CompletedTask; });
+            await processor.SendRequestAsync(request, data => { result = NSLRecoverySessionResult.ReadFullFrom(data); return Task.CompletedTask; });
 
             return result;
         }
