@@ -21,6 +21,9 @@ namespace NSLLibProjectFileFormatter
         [GeneratedRegex(@"\s*<Description>([\S\s]*)</Description>")]
         public partial Regex GetProjectDescriptionRegex();
 
+        [GeneratedRegex(@"\s*<OutputType>([\S\s]*)</OutputType>")]
+        public partial Regex GetProjectOutputTypeRegex();
+
         [GeneratedRegex(@"\s*<Authors>([\S\s]*)</Authors>")]
         public partial Regex GetProjectAuthorsRegex();
 
@@ -63,6 +66,11 @@ namespace NSLLibProjectFileFormatter
 
         void BuildNewProjectFile(string path, string[] currentContent)
         {
+            var outputType = GetGroupValue(FindGroupsByRegex(currentContent, GetProjectOutputTypeRegex()));
+            
+            if (Equals(outputType, "Exe"))
+                return;
+
             TemplateBuilder tb = new TemplateBuilder();
 
             var sdk = GetGroupValue(FindGroupsByRegex(currentContent, GetProjectSdkRegex()));
@@ -87,11 +95,11 @@ namespace NSLLibProjectFileFormatter
                     if (!isOnlyUnityProject(path))
                     {
                         configurations.AddRange(new[] { "Unity", "UnityDebug" });
-                        tf = "netstandard2.0";
                     }
                     else if (!isOnlyAspNetProject(path, sdk))
                     {
                         configurations = new List<string>(new[] { "Unity", "UnityDebug" });
+                        tf = "netstandard2.0";
                     }
 
 
@@ -192,6 +200,8 @@ namespace NSLLibProjectFileFormatter
             });
 
             string v = tb.ToString();
+
+            File.WriteAllText(path, v);
 
             return;
 
