@@ -15,7 +15,10 @@ namespace NSLLibProjectFileFormatter
         [GeneratedRegex(@"<ItemGroup>(\s*<ProjectReference(\s*(\S+)\s*=\s*""([\s\S]+?)"")\s*/>)+\s*</ItemGroup>")]
         public partial Regex GetProjectReferenceRegex();
 
-        [GeneratedRegex(@"<ItemGroup(\s*(\S*)\s*=\s*""([\S\s]+?)"")+>([\S\s]+?)</ItemGroup>")]
+        [GeneratedRegex(@"(<ItemGroup(\s*(\S*)\s*=\s*""([\S\s]+?)"")*>(\s*<PackageReference(\s*([\S]+?)\s*=\s*""([\s\S]+?)""\s*)+)(/>\s*|>(\s*<([\S]+?)>\s*([\S\s]+?)</([\S]+)>)+\s*</PackageReference>\s*)*</ItemGroup>)+")]
+        public partial Regex GetPackageReferenceRegex();
+
+        [GeneratedRegex(@"<ItemGroup(\s*(\S*)\s*=\s*""([\S\s]+?)"")*>([\S\s]+?)</ItemGroup>")]
         public partial Regex GetItemGroupWithConditionRegex();
 
         [GeneratedRegex(@"\s*<Description>([\S\s]*)</Description>")]
@@ -26,6 +29,9 @@ namespace NSLLibProjectFileFormatter
 
         [GeneratedRegex(@"\s*<Authors>([\S\s]*)</Authors>")]
         public partial Regex GetProjectAuthorsRegex();
+
+        [GeneratedRegex(@"\s*<NSLProjectTypes>(([\S\s]+?)(;|\b))+</NSLProjectTypes>")]
+        public partial Regex GetProjectNSLTypes();
 
         [GeneratedRegex(@"\s*<IsRoslynComponent>\s*([\s\S]*)\s*</IsRoslynComponent>")]
         public partial Regex GetProjectIsRoslynRegex();
@@ -66,7 +72,6 @@ namespace NSLLibProjectFileFormatter
 
                 BuildNewProjectFile(item.FullName, File.ReadAllLines(item.FullName).Where(x => !string.IsNullOrWhiteSpace(x)).ToArray());
             }
-
         }
 
 
@@ -74,7 +79,11 @@ namespace NSLLibProjectFileFormatter
         {
             var outputType = GetGroupValue(FindGroupsByRegex(currentContent, GetProjectOutputTypeRegex()));
 
-            if (Equals(outputType, "Exe"))
+            var NSLTypes = FindAllLinesByRegex(currentContent, GetProjectNSLTypes()).FirstOrDefault();
+
+            List<string> NSLProjectTypes = NSLTypes == null ? new List<string>() : NSLTypes[2].Captures.Select(x => x.Value).ToList();
+
+            if (Equals(outputType, "Exe") || NSLProjectTypes.Any(x=> x.Equals("Test", StringComparison.OrdinalIgnoreCase)))
                 return;
 
             bool unityOnly = isOnlyUnityProject(path);
@@ -84,6 +93,7 @@ namespace NSLLibProjectFileFormatter
             var sdk = GetGroupValue(FindGroupsByRegex(currentContent, GetProjectSdkRegex()));
 
             var description = GetGroupValue(FindGroupsByRegex(currentContent, GetProjectDescriptionRegex()));
+
             var authors = GetGroupValue(FindGroupsByRegex(currentContent, GetProjectAuthorsRegex()));
 
             var isRoslyn = bool.TryParse(GetGroupValue(FindGroupsByRegex(currentContent, GetProjectIsRoslynRegex())), out var rv) && rv;
@@ -92,16 +102,43 @@ namespace NSLLibProjectFileFormatter
 
             var projectRefs = FindAllByRegex(fileContent, GetProjectReferenceRegex());
 
-            var projectRefsWithConditions = FindAllByRegex(fileContent, GetItemGroupWithConditionRegex());
+            //var projectRefsWithConditions = FindAllByRegex(fileContent, GetItemGroupWithConditionRegex());
 
             var unityRef = FindAllByRegex(fileContent, GetProjectUnityRefRegex()).FirstOrDefault();
 
             var contentItems = FindAllByRegex(fileContent, GetProjectContentItemGroupRegex());
 
+            var packagesRefs = FindAllByRegex(fileContent, GetPackageReferenceRegex());
+
             tb.WriteProjectRoot(sdk, () =>
             {
                 tb.WritePropertyGroup(() =>
                 {
+
+                    if (!NSLProjectTypes.Any())
+                    {
+                        if (unityOnly)
+                        {
+                            NSLProjectTypes.Add("UnityTarget");
+                            NSLProjectTypes.Add("UnitySupport");
+                            NSLProjectTypes.Add("UnityReference");
+                        }
+                        else if (isOnlyAspNetProject(path, sdk))
+                        {
+                            NSLProjectTypes.Add("ASPTarget");
+                        }
+                        else
+                        {
+                            NSLProjectTypes.Add("UnitySupport");
+                        }
+
+                        if (isRoslyn)
+                        {
+                            NSLProjectTypes.Add("Analyzer");
+                        }
+                    }
+
+
                     List<string> configurations = new List<string> { "Debug", "Release", "DebugExamples" };
 
                     var tf = "net7.0";
@@ -119,6 +156,10 @@ namespace NSLLibProjectFileFormatter
 
                     if (isRoslyn)
                         tf = "netstandard2.0";
+
+                    tb.AppendLine($"<NSLProjectTypes></NSLProjectTypes>")
+                    .AppendLine();
+
 
                     tb.AppendLine($"<TargetFramework>{tf}</TargetFramework>")
                       .AppendLine($"<Configurations>{string.Join(';', configurations)}</Configurations>")
@@ -181,13 +222,42 @@ namespace NSLLibProjectFileFormatter
                             tb.AppendLine("<TargetFramework>netstandard2.0</TargetFramework>");
                     });
 
-                if (projectRefsWithConditions.Any())
-                    foreach (Match item in projectRefsWithConditions)
+                //if (projectRefsWithConditions.Any())
+                //    foreach (Match item in projectRefsWithConditions)
+                //    {
+                //        tb.AppendLine()
+                //        .WriteItemGroup(item.Groups[3].Value, () =>
+                //        {
+                //            tb.AppendLine(item.Groups[4].Value.Trim());
+                //        });
+                //    }
+
+                if(packagesRefs.Any())
+                    foreach (Match item in packagesRefs)
                     {
-                        tb.AppendLine()
-                        .WriteItemGroup(item.Groups[3].Value, () =>
+                        var igroups = item.Groups;
+
+                        tb.WriteItemGroup(GetGroupValue(item.Groups, 2).Trim(),() =>
                         {
-                            tb.AppendLine(item.Groups[4].Value);
+                            var packageProps = igroups[6].Captures;
+
+                            var packageBodyProps = igroups[10].Captures;
+
+                            tb.AppendLine($"<PackageReference {string.Join(" ", packageProps.Select(x => x.Value.Trim()).ToArray())} {(packageBodyProps.Any() ? ">" : "/>")}");
+
+                            if (packageBodyProps.Any())
+                            {
+                                tb.NextTab();
+
+                                foreach (Capture bodyProp in packageBodyProps)
+                                {
+                                    tb.AppendLine(bodyProp.Value.Trim());
+                                }
+
+                                tb.PrevTab()
+                                .AppendLine("</PackageReference>");
+                            }
+
                         });
                     }
 
@@ -237,7 +307,8 @@ namespace NSLLibProjectFileFormatter
 
                 if (contentItems.Any())
                     tb.AppendLine()
-                    .WriteItemGroup(() => {
+                    .WriteItemGroup(() =>
+                    {
                         foreach (Match item in contentItems)
                         {
                             Group pathGroup = item.Groups[2];

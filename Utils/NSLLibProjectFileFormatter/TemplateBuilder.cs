@@ -73,6 +73,11 @@ namespace NSLLibProjectFileFormatter
 
         public TemplateBuilder WriteItemGroup(string condition, Action body)
         {
+            if (string.IsNullOrWhiteSpace(condition))
+            { 
+                return WriteItemGroup(body);
+            }
+
             AppendLine($"<ItemGroup Condition=\"{condition}\">")
                 .NextTab();
 
