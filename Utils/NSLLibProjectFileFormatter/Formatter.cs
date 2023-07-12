@@ -67,9 +67,11 @@ namespace NSLLibProjectFileFormatter
         void BuildNewProjectFile(string path, string[] currentContent)
         {
             var outputType = GetGroupValue(FindGroupsByRegex(currentContent, GetProjectOutputTypeRegex()));
-            
+
             if (Equals(outputType, "Exe"))
                 return;
+
+            bool unityOnly = isOnlyUnityProject(path);
 
             TemplateBuilder tb = new TemplateBuilder();
 
@@ -92,7 +94,7 @@ namespace NSLLibProjectFileFormatter
 
                     var tf = "net7.0";
 
-                    if (!isOnlyUnityProject(path))
+                    if (!unityOnly)
                     {
                         configurations.AddRange(new[] { "Unity", "UnityDebug" });
                     }
@@ -145,16 +147,23 @@ namespace NSLLibProjectFileFormatter
 
                 tb.AppendLine()
                 .WritePropertyGroup("'$(Configuration)'=='UnityDebug'", () =>
-                    tb.AppendLine("<AssemblyName>Unity.$(MSBuildProjectName)</AssemblyName>")
-                      .AppendLine("<TargetFramework>netstandard2.0</TargetFramework>")
-                      .AppendLine("<DefineConstants>DEBUG;TRACE</DefineConstants>")
-                );
+                {
+                    if (!unityOnly)
+                        tb.AppendLine("<AssemblyName>Unity.$(MSBuildProjectName)</AssemblyName>");
+                    if (!isRoslyn)
+                        tb.AppendLine("<TargetFramework>netstandard2.0</TargetFramework>");
+                    tb.AppendLine("<DefineConstants>DEBUG;TRACE</DefineConstants>");
+                });
 
-                tb.AppendLine()
-                .WritePropertyGroup("'$(Configuration)'=='Unity'", () =>
-                    tb.AppendLine("<AssemblyName>Unity.$(MSBuildProjectName)</AssemblyName>")
-                      .AppendLine("<TargetFramework>netstandard2.0</TargetFramework>")
-                );
+                if (!unityOnly && !isRoslyn)
+                    tb.AppendLine()
+                    .WritePropertyGroup("'$(Configuration)'=='Unity'", () =>
+                    {
+                        if (!unityOnly)
+                            tb.AppendLine("<AssemblyName>Unity.$(MSBuildProjectName)</AssemblyName>");
+                        if (!isRoslyn)
+                            tb.AppendLine("<TargetFramework>netstandard2.0</TargetFramework>");
+                    });
 
                 if (projectRefsWithConditions.Any())
                     foreach (Match item in projectRefsWithConditions)
