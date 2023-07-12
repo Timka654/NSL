@@ -88,7 +88,7 @@ namespace NSLLibProjectFileFormatter
             if (Equals(outputType, "Exe") || HasTest(NSLProjectTypes) || HasExternal(NSLProjectTypes))
                 return;
 
-            bool unityOnly = isOnlyUnityProject(path);
+            bool unityOnly = hasUnityInProjectName(path);
 
             TemplateBuilder tb = new TemplateBuilder();
 
@@ -154,7 +154,7 @@ namespace NSLLibProjectFileFormatter
                     else if (!isOnlyAspNetProject(path, sdk))
                     {
                         configurations = new List<string>(new[] { "Unity", "UnityDebug" });
-                        tf = "netstandard2.0";
+                        tf = "netstandard2.1";
                     }
 
 
@@ -220,7 +220,7 @@ namespace NSLLibProjectFileFormatter
                         tb.AppendLine("<DefineConstants>DEBUG;TRACE</DefineConstants>");
                     });
 
-                    if (!HasUnityTarget(NSLProjectTypes) && !HasAnalyzerUtils(NSLProjectTypes))
+                    if (!HasUnityTarget(NSLProjectTypes) || !HasAnalyzerUtils(NSLProjectTypes))
                         tb.AppendLine()
                         .WritePropertyGroup("'$(Configuration)'=='Unity'", () =>
                         {
@@ -375,7 +375,7 @@ namespace NSLLibProjectFileFormatter
             return types.Contains("UnityTarget");
         }
 
-        private bool isOnlyUnityProject(string path)
+        private bool hasUnityInProjectName(string path)
         {
             var name = new FileInfo(path).Name;
 
