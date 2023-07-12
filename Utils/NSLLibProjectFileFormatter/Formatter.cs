@@ -44,6 +44,8 @@ namespace NSLLibProjectFileFormatter
 
         private readonly string path;
 
+        private readonly string UnityRefPath;
+
         public Formatter(string path)
         {
             this.path = path;
@@ -83,7 +85,7 @@ namespace NSLLibProjectFileFormatter
 
             List<string> NSLProjectTypes = NSLTypes == null ? new List<string>() : NSLTypes[2].Captures.Select(x => x.Value).ToList();
 
-            if (Equals(outputType, "Exe") || NSLProjectTypes.Any(x=> x.Equals("Test", StringComparison.OrdinalIgnoreCase)))
+            if (Equals(outputType, "Exe") || HasTest(NSLProjectTypes) || HasExternal(NSLProjectTypes))
                 return;
 
             bool unityOnly = isOnlyUnityProject(path);
@@ -121,7 +123,6 @@ namespace NSLLibProjectFileFormatter
                         {
                             NSLProjectTypes.Add("UnityTarget");
                             NSLProjectTypes.Add("UnitySupport");
-                            NSLProjectTypes.Add("UnityReference");
                         }
                         else if (isOnlyAspNetProject(path, sdk))
                         {
@@ -136,6 +137,9 @@ namespace NSLLibProjectFileFormatter
                         {
                             NSLProjectTypes.Add("Analyzer");
                         }
+
+                        if (unityRef != null)
+                            NSLProjectTypes.Add("UnityReference");
                     }
 
 
@@ -154,10 +158,10 @@ namespace NSLLibProjectFileFormatter
                     }
 
 
-                    if (isRoslyn)
+                    if (HasAnalyzer(NSLProjectTypes) || HasAnalyzerUtils(NSLProjectTypes))
                         tf = "netstandard2.0";
 
-                    tb.AppendLine($"<NSLProjectTypes></NSLProjectTypes>")
+                    tb.AppendLine($"<NSLProjectTypes>{string.Join(';', NSLProjectTypes)}</NSLProjectTypes>")
                     .AppendLine();
 
 
@@ -202,25 +206,32 @@ namespace NSLLibProjectFileFormatter
                     tb.AppendLine("<PackageId>$(MSBuildProjectName)_Debug</PackageId>")
                 );
 
-                tb.AppendLine()
-                .WritePropertyGroup("'$(Configuration)'=='UnityDebug'", () =>
+                if (HasUnitySupport(NSLProjectTypes))
                 {
-                    if (!unityOnly)
-                        tb.AppendLine("<AssemblyName>Unity.$(MSBuildProjectName)</AssemblyName>");
-                    if (!isRoslyn)
-                        tb.AppendLine("<TargetFramework>netstandard2.0</TargetFramework>");
-                    tb.AppendLine("<DefineConstants>DEBUG;TRACE</DefineConstants>");
-                });
-
-                if (!unityOnly && !isRoslyn)
                     tb.AppendLine()
-                    .WritePropertyGroup("'$(Configuration)'=='Unity'", () =>
+                    .WritePropertyGroup("'$(Configuration)'=='UnityDebug'", () =>
                     {
-                        if (!unityOnly)
+                        if (!HasUnityTarget(NSLProjectTypes))
                             tb.AppendLine("<AssemblyName>Unity.$(MSBuildProjectName)</AssemblyName>");
-                        if (!isRoslyn)
-                            tb.AppendLine("<TargetFramework>netstandard2.0</TargetFramework>");
+
+                        if (!HasAnalyzerUtils(NSLProjectTypes))
+                            tb.AppendLine("<TargetFramework>netstandard2.1</TargetFramework>");
+
+                        tb.AppendLine("<DefineConstants>DEBUG;TRACE</DefineConstants>");
                     });
+
+                    if (!HasUnityTarget(NSLProjectTypes) && !HasAnalyzerUtils(NSLProjectTypes))
+                        tb.AppendLine()
+                        .WritePropertyGroup("'$(Configuration)'=='Unity'", () =>
+                        {
+                            if (!HasUnityTarget(NSLProjectTypes))
+                                tb.AppendLine("<AssemblyName>Unity.$(MSBuildProjectName)</AssemblyName>");
+
+                            if (!HasAnalyzerUtils(NSLProjectTypes))
+                                tb.AppendLine("<TargetFramework>netstandard2.1</TargetFramework>");
+                        });
+
+                }
 
                 //if (projectRefsWithConditions.Any())
                 //    foreach (Match item in projectRefsWithConditions)
@@ -232,12 +243,12 @@ namespace NSLLibProjectFileFormatter
                 //        });
                 //    }
 
-                if(packagesRefs.Any())
+                if (packagesRefs.Any())
                     foreach (Match item in packagesRefs)
                     {
                         var igroups = item.Groups;
 
-                        tb.WriteItemGroup(GetGroupValue(item.Groups, 2).Trim(),() =>
+                        tb.WriteItemGroup(item.Groups[2].Captures.Select(x => x.Value.Trim()), () =>
                         {
                             var packageProps = igroups[6].Captures;
 
@@ -332,6 +343,36 @@ namespace NSLLibProjectFileFormatter
 
 
             // todo write
+        }
+
+        public bool HasUnitySupport(List<string> types)
+        {
+            if (!types.Contains("UnitySupport"))
+                return HasUnityTarget(types);
+
+            return true;
+        }
+
+        public bool HasExternal(List<string> types)
+            => types.Contains("External");
+
+        public bool HasTest(List<string> types)
+            => types.Contains("Test");
+
+        public bool HasAnalyzer(List<string> types)
+            => types.Contains("Analyzer");
+
+        public bool HasAnalyzerUtils(List<string> types)
+            => HasAnalyzer(types) || types.Contains("AnalyzerUtils");
+
+        public bool HasUnityTarget(List<string> types)
+        {
+            return types.Contains("UnityTarget");
+        }
+
+        public bool HasASPTarget(List<string> types)
+        {
+            return types.Contains("UnityTarget");
         }
 
         private bool isOnlyUnityProject(string path)

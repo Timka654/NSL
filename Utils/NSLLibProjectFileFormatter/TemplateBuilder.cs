@@ -70,6 +70,21 @@ namespace NSLLibProjectFileFormatter
 
             return this;
         }
+        public TemplateBuilder WriteItemGroup(IEnumerable<string> props, Action body)
+        {
+            if (props?.Any() != true)
+                return WriteItemGroup(body);
+
+            AppendLine($"<ItemGroup {string.Join(" ", props)}>")
+                .NextTab();
+
+            body();
+
+            PrevTab()
+                .AppendLine("</ItemGroup>");
+
+            return this;
+        }
 
         public TemplateBuilder WriteItemGroup(string condition, Action body)
         {
