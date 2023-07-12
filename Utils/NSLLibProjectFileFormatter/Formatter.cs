@@ -85,11 +85,13 @@ namespace NSLLibProjectFileFormatter
 
             var isRoslyn = bool.TryParse(GetGroupValue(FindGroupsByRegex(currentContent, GetProjectIsRoslynRegex())), out var rv) && rv;
 
-            var projectRefs = FindAllByRegex(string.Join(Environment.NewLine, currentContent), GetProjectReferenceRegex());
+            var fileContent = string.Join(Environment.NewLine, currentContent);
 
-            var projectRefsWithConditions = FindAllByRegex(string.Join(Environment.NewLine, currentContent), GetItemGroupWithConditionRegex());
+            var projectRefs = FindAllByRegex(fileContent, GetProjectReferenceRegex());
 
-            var unityRef = FindAllLinesByRegex(currentContent, GetProjectUnityRefRegex()).FirstOrDefault();
+            var projectRefsWithConditions = FindAllByRegex(fileContent, GetItemGroupWithConditionRegex());
+
+            var unityRef = FindAllByRegex(fileContent, GetProjectUnityRefRegex()).FirstOrDefault();
 
             tb.WriteProjectRoot(sdk, () =>
             {
