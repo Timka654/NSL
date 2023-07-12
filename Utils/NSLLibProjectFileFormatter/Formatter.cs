@@ -33,6 +33,9 @@ namespace NSLLibProjectFileFormatter
         [GeneratedRegex(@"<ItemGroup>\s*<Reference\s*Include\s*=\s*""UnityEngine""\s*>\s*<HintPath>([\s\S]+?)</HintPath>\s*</Reference>\s*</ItemGroup>")]
         public partial Regex GetProjectUnityRefRegex();
 
+        [GeneratedRegex(@"\s*<ItemGroup>(\s*<Content Include=""([\S]+)"">\s*<CopyToOutputDirectory>([\S]+)</CopyToOutputDirectory>\s*</Content>\s*)+</ItemGroup>\s*")]
+        public partial Regex GetProjectContentItemGroupRegex();
+
         private readonly string path;
 
         public Formatter(string path)
@@ -93,6 +96,8 @@ namespace NSLLibProjectFileFormatter
 
             var unityRef = FindAllByRegex(fileContent, GetProjectUnityRefRegex()).FirstOrDefault();
 
+            var contentItems = FindAllByRegex(fileContent, GetProjectContentItemGroupRegex());
+
             tb.WriteProjectRoot(sdk, () =>
             {
                 tb.WritePropertyGroup(() =>
@@ -119,6 +124,10 @@ namespace NSLLibProjectFileFormatter
                       .AppendLine($"<Configurations>{string.Join(';', configurations)}</Configurations>")
                       .AppendLine("<AllowUnsafeBlocks>true</AllowUnsafeBlocks>")
                       .AppendLine("<Nullable>disable</Nullable>");
+
+                    if (isOnlyAspNetProject(path, sdk))
+                        tb.AppendLine("<IsPackable>true</IsPackable>")
+                        .AppendLine("<OutputType>Library</OutputType>");
 
                     tb.AppendLine();
 
@@ -225,6 +234,22 @@ namespace NSLLibProjectFileFormatter
                             tb.AppendLine("</Reference>");
                         });
                 }
+
+                if (contentItems.Any())
+                    tb.AppendLine()
+                    .WriteItemGroup(() => {
+                        foreach (Match item in contentItems)
+                        {
+                            Group pathGroup = item.Groups[2];
+                            Group typeGroup = item.Groups[3];
+
+
+                            tb.AppendLine($"<Content Include=\"{pathGroup.Value}\">").NextTab();
+                            tb.AppendLine($"<CopyToOutputDirectory>{typeGroup.Value}</CopyToOutputDirectory>");
+                            tb.PrevTab().AppendLine($"</Content>");
+
+                        }
+                    });
 
             });
 
