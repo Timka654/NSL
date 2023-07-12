@@ -30,6 +30,9 @@ namespace NSLLibProjectFileFormatter
         [GeneratedRegex(@"\s*<IsRoslynComponent>\s*([\s\S]*)\s*</IsRoslynComponent>")]
         public partial Regex GetProjectIsRoslynRegex();
 
+        [GeneratedRegex(@"<ItemGroup>\s*<Reference\s*Include\s*=\s*""UnityEngine""\s*>\s*<HintPath>([\s\S]+?)</HintPath>\s*</Reference>\s*</ItemGroup>")]
+        public partial Regex GetProjectUnityRefRegex();
+
         private readonly string path;
 
         public Formatter(string path)
@@ -85,6 +88,8 @@ namespace NSLLibProjectFileFormatter
             var projectRefs = FindAllByRegex(string.Join(Environment.NewLine, currentContent), GetProjectReferenceRegex());
 
             var projectRefsWithConditions = FindAllByRegex(string.Join(Environment.NewLine, currentContent), GetItemGroupWithConditionRegex());
+
+            var unityRef = FindAllLinesByRegex(currentContent, GetProjectUnityRefRegex()).FirstOrDefault();
 
             tb.WriteProjectRoot(sdk, () =>
             {
@@ -205,6 +210,18 @@ namespace NSLLibProjectFileFormatter
                     tb.AppendLine().WriteItemGroup(() =>
                         tb.AppendLine("<None Include=\"$(OutputPath)\\*NSL.*.dll\" Pack=\"true\" PackagePath=\"analyzers/dotnet/cs\" Visible=\"false\" />")
                     );
+
+                if (unityRef != null)
+                {
+                    tb.AppendLine()
+                        .WriteItemGroup(() =>
+                        {
+                            tb.AppendLine("<Reference Include=\"UnityEngine\">");
+                            tb.NextTab();
+                            tb.AppendLine($"<HintPath>{GetGroupValue(unityRef)}</HintPath>");
+                            tb.PrevTab();
+                        });
+                }
 
             });
 
