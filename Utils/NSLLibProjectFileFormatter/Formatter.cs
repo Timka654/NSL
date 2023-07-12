@@ -220,8 +220,9 @@ namespace NSLLibProjectFileFormatter
                         {
                             tb.AppendLine("<Reference Include=\"UnityEngine\">");
                             tb.NextTab();
-                            tb.AppendLine($"<HintPath>{GetGroupValue(unityRef)}</HintPath>");
+                            tb.AppendLine($"<HintPath>{GetGroupValue(unityRef.Groups)}</HintPath>");
                             tb.PrevTab();
+                            tb.AppendLine("</Reference>");
                         });
                 }
 
