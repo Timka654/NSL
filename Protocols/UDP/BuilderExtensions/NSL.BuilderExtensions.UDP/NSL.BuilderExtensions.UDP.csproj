@@ -1,25 +1,24 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
+		<NSLProjectTypes>UnitySupport</NSLProjectTypes>
+
 		<TargetFramework>net7.0</TargetFramework>
-		<Configurations>Debug;Release;Unity;UnityDebug;DebugExamples</Configurations>
+		<Configurations>Debug;Release;DebugExamples;Unity;UnityDebug</Configurations>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<Nullable>disable</Nullable>
 
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
 		<EmbedUntrackedSources>true</EmbedUntrackedSources>
 		<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
 		<GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
 
-		<Authors>Relife87</Authors>
 		<Version>$(VersionSuffix)</Version>
-		<Nullable>disable</Nullable>
+		<Authors>Relife87</Authors>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)'=='Debug'">
 		<PackageId>$(MSBuildProjectName)_Debug</PackageId>
-	</PropertyGroup>
-
-	<PropertyGroup Condition="'$(Configuration)'=='DebugExamples'">
-	  <PackageId>$(MSBuildProjectName)_Debug</PackageId>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)'=='UnityDebug'">

@@ -1,8 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
+		<NSLProjectTypes>UnitySupport;AnalyzerUtils</NSLProjectTypes>
+
 		<TargetFramework>netstandard2.0</TargetFramework>
-		<Configurations>Debug;Release;Unity;UnityDebug;DebugExamples</Configurations>
+		<Configurations>Debug;Release;DebugExamples;Unity;UnityDebug</Configurations>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<Nullable>disable</Nullable>
 
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
 		<EmbedUntrackedSources>true</EmbedUntrackedSources>
@@ -11,17 +15,10 @@
 
 		<Version>$(VersionSuffix)</Version>
 		<Authors>Relife87</Authors>
-		<Nullable>disable</Nullable>
-
-		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)'=='Debug'">
 		<PackageId>$(MSBuildProjectName)_Debug</PackageId>
-	</PropertyGroup>
-
-	<PropertyGroup Condition="'$(Configuration)'=='DebugExamples'">
-	  <PackageId>$(MSBuildProjectName)_Debug</PackageId>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)'=='UnityDebug'">
@@ -34,9 +31,9 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\..\Extensions\SocketCore.Extensions.Buffer\NSL.SocketCore.Extensions.Buffer.csproj" />
-	  <ProjectReference Include="..\..\Extensions\SocketCore.Extensions.Packet\NSL.SocketCore.Extensions.Packet.csproj" />
-	  <ProjectReference Include="..\..\NSL.SocketClient\NSL.SocketClient.csproj" />
+		<ProjectReference Include="..\..\Extensions\SocketCore.Extensions.Buffer\NSL.SocketCore.Extensions.Buffer.csproj" />
+		<ProjectReference Include="..\..\Extensions\SocketCore.Extensions.Packet\NSL.SocketCore.Extensions.Packet.csproj" />
+		<ProjectReference Include="..\..\NSL.SocketClient\NSL.SocketClient.csproj" />
 	</ItemGroup>
 
 </Project>

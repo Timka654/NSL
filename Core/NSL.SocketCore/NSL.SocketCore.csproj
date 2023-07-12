@@ -1,28 +1,25 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
+		<NSLProjectTypes>UnitySupport;AnalyzerUtils</NSLProjectTypes>
+
 		<TargetFramework>netstandard2.0</TargetFramework>
-		<Configurations>Debug;Release;Unity;UnityDebug;DebugExamples</Configurations>
+		<Configurations>Debug;Release;DebugExamples;Unity;UnityDebug</Configurations>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<Nullable>disable</Nullable>
 
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
 		<EmbedUntrackedSources>true</EmbedUntrackedSources>
 		<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
 		<GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
 
-		<Description>Библиотека содержащая базовые классы для взаимодействия по сетевому протоколу TCP</Description>
-		<Authors>Relife87</Authors>
 		<Version>$(VersionSuffix)</Version>
-		<Nullable>disable</Nullable>
-
-		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<Authors>Relife87</Authors>
+		<Description>Библиотека содержащая базовые классы для взаимодействия по сетевому протоколу TCP</Description>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)'=='Debug'">
 		<PackageId>$(MSBuildProjectName)_Debug</PackageId>
-	</PropertyGroup>
-
-	<PropertyGroup Condition="'$(Configuration)'=='DebugExamples'">
-	  <PackageId>$(MSBuildProjectName)_Debug</PackageId>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)'=='UnityDebug'">
@@ -33,4 +30,5 @@
 	<PropertyGroup Condition="'$(Configuration)'=='Unity'">
 		<AssemblyName>Unity.$(MSBuildProjectName)</AssemblyName>
 	</PropertyGroup>
+
 </Project>

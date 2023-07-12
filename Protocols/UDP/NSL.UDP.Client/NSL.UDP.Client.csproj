@@ -1,17 +1,35 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
+		<NSLProjectTypes>UnitySupport</NSLProjectTypes>
+
 		<TargetFramework>net7.0</TargetFramework>
-		<Configurations>Debug;Release;Unity;UnityDebug;DebugExamples</Configurations>
+		<Configurations>Debug;Release;DebugExamples;Unity;UnityDebug</Configurations>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<Nullable>disable</Nullable>
 
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
 		<EmbedUntrackedSources>true</EmbedUntrackedSources>
 		<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
 		<GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
-		
-		<Authors>Relife87</Authors>
+
 		<Version>$(VersionSuffix)</Version>
-		<Nullable>disable</Nullable>
+		<Authors>Relife87</Authors>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)'=='Debug'">
+		<PackageId>$(MSBuildProjectName)_Debug</PackageId>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)'=='UnityDebug'">
+		<AssemblyName>Unity.$(MSBuildProjectName)</AssemblyName>
+		<TargetFramework>netstandard2.1</TargetFramework>
+		<DefineConstants>DEBUG;TRACE</DefineConstants>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)'=='Unity'">
+		<AssemblyName>Unity.$(MSBuildProjectName)</AssemblyName>
+		<TargetFramework>netstandard2.1</TargetFramework>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -19,24 +37,5 @@
 		<ProjectReference Include="..\..\..\Core\NSL.SocketServer\NSL.SocketServer.csproj" />
 		<ProjectReference Include="..\NSL.UDP\NSL.UDP.csproj" />
 	</ItemGroup>
-
-	<PropertyGroup Condition="'$(Configuration)'=='Debug'">
-		<PackageId>$(MSBuildProjectName)_Debug</PackageId>
-	</PropertyGroup>
-
-	<PropertyGroup Condition="'$(Configuration)'=='DebugExamples'">
-	  <PackageId>$(MSBuildProjectName)_Debug</PackageId>
-	</PropertyGroup>
-
-	<PropertyGroup Condition="'$(Configuration)'=='UnityDebug'">
-		<TargetFramework>netstandard2.1</TargetFramework>
-		<DefineConstants>DEBUG;TRACE</DefineConstants>
-		<AssemblyName>Unity.$(MSBuildProjectName)</AssemblyName>
-	</PropertyGroup>
-
-	<PropertyGroup Condition="'$(Configuration)'=='Unity'">
-		<TargetFramework>netstandard2.1</TargetFramework>
-		<AssemblyName>Unity.$(MSBuildProjectName)</AssemblyName>
-	</PropertyGroup>
 
 </Project>

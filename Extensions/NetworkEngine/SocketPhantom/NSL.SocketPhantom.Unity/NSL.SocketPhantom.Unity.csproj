@@ -1,40 +1,52 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>net7.0</TargetFramework>
-		<Configurations>Debug;Release;Unity;UnityDebug</Configurations>
-		
-		<Authors>Relife87</Authors>
-		<Version>$(VersionSuffix)</Version>
+		<NSLProjectTypes>UnityTarget;UnitySupport;UnityReference</NSLProjectTypes>
+
+		<TargetFramework>netstandard2.1</TargetFramework>
+		<Configurations>Unity;UnityDebug</Configurations>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<Nullable>disable</Nullable>
+
+		<PublishRepositoryUrl>true</PublishRepositoryUrl>
+		<EmbedUntrackedSources>true</EmbedUntrackedSources>
+		<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+		<GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
+
+		<Version>$(VersionSuffix)</Version>
+		<Authors>Relife87</Authors>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)'=='Debug'">
+		<PackageId>$(MSBuildProjectName)_Debug</PackageId>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)'=='UnityDebug'">
-		<TargetFramework>netstandard2.0</TargetFramework>
+		<TargetFramework>netstandard2.1</TargetFramework>
 		<DefineConstants>DEBUG;TRACE</DefineConstants>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)'=='Unity'">
-		<TargetFramework>netstandard2.0</TargetFramework>
+		<TargetFramework>netstandard2.1</TargetFramework>
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\..\..\..\Core\BuilderExtensions\NSL.BuilderExtensions.SocketCore.Unity\NSL.BuilderExtensions.SocketCore.Unity.csproj" />
-	  <ProjectReference Include="..\..\..\..\Core\BuilderExtensions\NSL.BuilderExtensions.SocketCore\NSL.BuilderExtensions.SocketCore.csproj" />
-	  <ProjectReference Include="..\..\..\..\Core\Extensions\SocketCore.Extensions.Buffer\NSL.SocketCore.Extensions.Buffer.csproj" />
-	  <ProjectReference Include="..\..\..\..\Core\Utils\NSL.Utils.Unity\NSL.Utils.Unity.csproj" />
-	  <ProjectReference Include="..\..\..\..\Core\Utils\NSL.Utils\NSL.Utils.csproj" />
-	  <ProjectReference Include="..\..\..\..\Protocols\Http\NSL.RestExtensions.Unity\NSL.RestExtensions.Unity.csproj" />
-	  <ProjectReference Include="..\..\..\..\Protocols\WebSockets\BuilderExtensions\NSL.BuilderExtensions.WebSocketsClient.Unity\NSL.BuilderExtensions.WebSocketsClient.Unity.csproj" />
-	  <ProjectReference Include="..\..\..\..\Protocols\WebSockets\NSL.WebSockets.Client\NSL.WebSockets.Client.csproj" />
-	  <ProjectReference Include="..\..\..\..\Protocols\WebSockets\NSL.WebSockets.UnityClient\NSL.WebSockets.UnityClient.csproj" />
-	  <ProjectReference Include="..\NSL.SocketPhantom\NSL.SocketPhantom.csproj" />
+		<ProjectReference Include="..\..\..\..\Core\BuilderExtensions\NSL.BuilderExtensions.SocketCore.Unity\NSL.BuilderExtensions.SocketCore.Unity.csproj" />
+		<ProjectReference Include="..\..\..\..\Core\BuilderExtensions\NSL.BuilderExtensions.SocketCore\NSL.BuilderExtensions.SocketCore.csproj" />
+		<ProjectReference Include="..\..\..\..\Core\Extensions\SocketCore.Extensions.Buffer\NSL.SocketCore.Extensions.Buffer.csproj" />
+		<ProjectReference Include="..\..\..\..\Core\Utils\NSL.Utils.Unity\NSL.Utils.Unity.csproj" />
+		<ProjectReference Include="..\..\..\..\Core\Utils\NSL.Utils\NSL.Utils.csproj" />
+		<ProjectReference Include="..\..\..\..\Protocols\Http\NSL.RestExtensions.Unity\NSL.RestExtensions.Unity.csproj" />
+		<ProjectReference Include="..\..\..\..\Protocols\WebSockets\BuilderExtensions\NSL.BuilderExtensions.WebSocketsClient.Unity\NSL.BuilderExtensions.WebSocketsClient.Unity.csproj" />
+		<ProjectReference Include="..\..\..\..\Protocols\WebSockets\NSL.WebSockets.Client\NSL.WebSockets.Client.csproj" />
+		<ProjectReference Include="..\..\..\..\Protocols\WebSockets\NSL.WebSockets.UnityClient\NSL.WebSockets.UnityClient.csproj" />
+		<ProjectReference Include="..\NSL.SocketPhantom\NSL.SocketPhantom.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Reference Include="UnityEngine">
-	    <HintPath>..\..\..\..\Reference\UnityEngine.dll</HintPath>
-	  </Reference>
+		<Reference Include="UnityEngine">
+			<HintPath>..\..\..\..\Reference\UnityEngine.dll</HintPath>
+		</Reference>
 	</ItemGroup>
 
 </Project>

@@ -1,5 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
+		<NSLProjectTypes>External</NSLProjectTypes>
 		<TargetFrameworks>netstandard2.1</TargetFrameworks>
 		<Platforms>AnyCPU;x64;x86</Platforms>
 		<PackageId>Open.Nat</PackageId>
