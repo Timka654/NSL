@@ -11,6 +11,7 @@
 
 		<Version>$(VersionSuffix)</Version>
 		<Authors>Relife87</Authors>
+		<Nullable>disable</Nullable>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)'=='Debug'">

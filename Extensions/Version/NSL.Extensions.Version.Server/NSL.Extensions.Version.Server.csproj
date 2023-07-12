@@ -4,6 +4,7 @@
 		<TargetFramework>net7.0</TargetFramework>
 		<Configurations>Debug;Release;Unity;UnityDebug;DebugExamples</Configurations>
 		<Version>$(VersionSuffix)</Version>
+		<Nullable>disable</Nullable>
 
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
 		<EmbedUntrackedSources>true</EmbedUntrackedSources>

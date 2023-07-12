@@ -16,7 +16,7 @@ namespace NSL.Extensions.DataEngine.Interface
     public interface ICacheDataLoader<TEntity> : ICacheDataLoader
         where TEntity : ICacheDataEntry
     {
-        IEnumerable<TEntity> LoadCacheData(DateTime? latestUpdate);
+        new IEnumerable<TEntity> LoadCacheData(DateTime? latestUpdate);
     }
 
     public interface ICacheDataReceiver<TEntity> : ICacheDataProvider

@@ -6,11 +6,12 @@ using NSL.Utils;
 using System;
 using System.Collections.Concurrent;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace NSL.Extensions.Session.Server
 {
-    public class NSLSessionManager<TClient>
+    public class NSLSessionManager<TClient> : IDisposable
         where TClient : IServerNetworkClient
     {
         public const string ObjectBagKey = "NSL__SESSION__MANAGER";
@@ -19,9 +20,13 @@ namespace NSL.Extensions.Session.Server
 
         private ConcurrentQueue<NSLServerSessionInfo<TClient>> waitCloseQueue { get; } = new ConcurrentQueue<NSLServerSessionInfo<TClient>>();
 
+        private CancellationTokenSource removeSessionCycleCTS;
+
         public NSLSessionManager(NSLSessionServerOptions<TClient> options)
         {
             this.options = options;
+
+            removeSessionCycleCTS = new CancellationTokenSource();
 
             RunRemoveSessionCycle();
         }
@@ -34,7 +39,10 @@ namespace NSL.Extensions.Session.Server
                 {
                     if (!waitCloseQueue.TryDequeue(out var waitClose))
                     {
-                        await Task.Delay(options.CloseSessionDelay / 4);
+                        var delay = options.CloseSessionDelay.TotalMilliseconds / 4;
+
+                        await Task.Delay((int)delay, removeSessionCycleCTS.Token);
+
                         continue;
                     }
 
@@ -46,7 +54,7 @@ namespace NSL.Extensions.Session.Server
                     if (!waitTime.HasValue)
                         continue;
 
-                    await Task.Delay(waitTime.Value);
+                    await Task.Delay(waitTime.Value, removeSessionCycleCTS.Token);
 
                     if (!waitClose.DisconnectTime.HasValue)
                         continue;
@@ -55,6 +63,7 @@ namespace NSL.Extensions.Session.Server
 
                     options.OnExpiredSession(waitClose.Client, waitClose);
                 }
+                catch (TaskCanceledException) { return; }
                 catch { }
             } while (true);
         }
@@ -182,6 +191,11 @@ namespace NSL.Extensions.Session.Server
             }
 
             return result;
+        }
+
+        public void Dispose()
+        {
+            removeSessionCycleCTS.Cancel();
         }
 
         private static Random rnd = new Random();

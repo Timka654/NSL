@@ -12,6 +12,7 @@
 		<Authors>Relife87</Authors>
 		<Version>$(VersionSuffix)</Version>
 		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+		<Nullable>disable</Nullable>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)'=='Debug'">

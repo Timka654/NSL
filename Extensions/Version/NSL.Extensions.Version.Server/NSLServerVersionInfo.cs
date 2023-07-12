@@ -2,9 +2,9 @@
 {
     public class NSLServerVersionInfo : NSLVersionInfo
     {
-        public string? MinVersion { get; set; }
+        public string MinVersion { get; set; }
 
-        public string? RequireVersion { get; set; }
+        public string RequireVersion { get; set; }
 
         public bool ValidateMinVersion(string version)
         {

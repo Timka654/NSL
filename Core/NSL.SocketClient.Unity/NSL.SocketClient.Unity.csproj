@@ -15,6 +15,7 @@
 		</Description>
 		<Authors>Relife87</Authors>
 		<Version>$(VersionSuffix)</Version>
+		<Nullable>disable</Nullable>
 
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 	</PropertyGroup>

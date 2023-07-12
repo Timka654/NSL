@@ -74,7 +74,6 @@ namespace NSL.Extensions.RPC.Generator.Generators
             mb.AppendLine($"default:");
             mb.NextTab(); // 3
             mb.AppendLine($"throw new System.Exception($\"RPC method \\\"{{name}}\\\" not exists on remote\");");
-            mb.AppendLine($"break;");
 
             mb.PrevTab(); // 2
 

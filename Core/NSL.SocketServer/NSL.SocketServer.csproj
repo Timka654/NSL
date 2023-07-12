@@ -12,6 +12,7 @@
 		<Description>Базовая библиотека содержащая классы для реализации TCP сервера</Description>
 		<Authors>Relife87</Authors>
 		<Version>$(VersionSuffix)</Version>
+		<Nullable>disable</Nullable>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)'=='Debug'">

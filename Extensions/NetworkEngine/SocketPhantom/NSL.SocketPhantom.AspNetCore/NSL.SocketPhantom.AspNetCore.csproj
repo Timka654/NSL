@@ -14,6 +14,7 @@
 		
 		<IsPackable>true</IsPackable>
 		<OutputType>Library</OutputType>
+		<Nullable>disable</Nullable>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)'=='Debug'">

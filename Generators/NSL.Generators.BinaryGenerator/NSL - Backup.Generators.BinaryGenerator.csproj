@@ -12,6 +12,7 @@
 
 		<Authors>Relife87</Authors>
 		<Version>$(VersionSuffix)</Version>
+		<Nullable>disable</Nullable>
 	</PropertyGroup>
 
 	<ItemGroup>

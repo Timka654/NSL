@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "NSLLibProjectFileFormatter": {
+      "commandName": "Project",
+      "commandLineArgs": "\"../../../../../\""
+    }
+  }
+}

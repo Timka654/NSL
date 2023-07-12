@@ -12,6 +12,7 @@
 		<Description>Базовая библиотека для создания клиента с логикой взаимодействия совместимой с сервером созданным при помощи пакета SocketServer</Description>
 		<Version>$(VersionSuffix)</Version>
 		<Authors>Relife87</Authors>
+		<Nullable>disable</Nullable>
 		
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 	</PropertyGroup>
