@@ -31,7 +31,8 @@ namespace NSL.Generators.BinaryTypeIOGenerator
         private static string[] requiredUsings = new string[] {
             "NSL.SocketCore",
             "NSL.SocketCore.Utils.Buffer",
-            "System.Linq"
+            "System.Linq",
+            "System"
         };
 
         private void ProcessBinaryIOType(GeneratorExecutionContext context, TypeDeclarationSyntax type)
