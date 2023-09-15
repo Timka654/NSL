@@ -36,19 +36,10 @@ namespace NSL.TCP.Client
         public void Reconnect(Socket client)
         {
             disconnected = false;
-            string[] keys = ConnectionOptions.ClientData?.RecoverySessionKeyArray;
-            IEnumerable<byte[]> waitBuffer = ConnectionOptions.ClientData?.GetWaitPackets();
 
             ConnectionOptions.InitializeClient(new T());
 
-            ConnectionOptions.ClientData.SetRecoveryData(ConnectionOptions.ClientData.Session, keys);
             ConnectionOptions.ClientData.Network = this;
-
-            if (waitBuffer != null)
-                foreach (var item in waitBuffer)
-                {
-                    ConnectionOptions.ClientData.AddWaitPacket(item, 0, item.Length);
-                }
 
             //установка переменной содержащую поток клиента
             this.sclient = client;
@@ -69,10 +60,6 @@ namespace NSL.TCP.Client
 
             RunReceive();
 
-            VersionPacket.Send(ConnectionOptions.ClientData, Version);
-
-            RecoverySessionPacket.Send(ConnectionOptions.ClientData);
-
             ConnectionOptions.RunClientConnect();
         }
 
@@ -86,11 +73,6 @@ namespace NSL.TCP.Client
         {
             ConnectionOptions.ClientData.LastReceiveMessage = DateTime.UtcNow;
             base.OnReceive(pid, len);
-        }
-
-        protected override void AddWaitPacket(byte[] buffer, int offset, int length)
-        {
-            ConnectionOptions.ClientData?.AddWaitPacket(buffer, offset, length);
         }
 
         protected override TCPClient<T> GetParent() => this;

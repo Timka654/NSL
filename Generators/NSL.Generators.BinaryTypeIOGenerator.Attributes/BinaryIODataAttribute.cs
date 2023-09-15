@@ -1,11 +1,13 @@
-﻿using NSL.Generators.BinaryTypeIOGenerator.Attributes.Interface;
-using System;
+﻿using System;
 
 namespace NSL.Generators.BinaryTypeIOGenerator.Attributes
 {
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
-    public class BinaryIODataAttribute : Attribute, IBinaryIOFor
+    public class BinaryIODataAttribute : Attribute
     {
-        public string For { get; set; } = "*";
+        public BinaryIODataAttribute(params string[] @for)
+        {
+
+        }
     }
 }

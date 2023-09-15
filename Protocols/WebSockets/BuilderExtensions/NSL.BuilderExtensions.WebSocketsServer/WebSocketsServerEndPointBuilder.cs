@@ -34,6 +34,9 @@ namespace NSL.BuilderExtensions.WebSocketsServer
             return new WebSocketsServerEndPointBuilder<TClient>();
         }
 
+        public WebSocketsServerEndPointBuilder<TClient, WSServerOptions<TClient>> WithOptions()
+            => WithOptions<WSServerOptions<TClient>>();
+
         public WebSocketsServerEndPointBuilder<TClient, TOptions> WithOptions<TOptions>()
             where TOptions : WSServerOptions<TClient>, new()
         {

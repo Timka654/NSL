@@ -13,7 +13,7 @@ options.AddHandle(1, (c, p) =>
     Console.WriteLine($"received from server {p.PacketId} - {p.ReadString()}");
 });
 
-var t = new TCPNetworkClient<NetworkClient, ClientOptions<NetworkClient>>(options);
+var t = new TCPNetworkClient<NetworkClient>(options);
 
 t.OnReceivePacket += (c, pid, len) => { if (InputPacketBuffer.IsSystemPID(pid)) return; Console.WriteLine($"received {pid}"); };
 t.OnSendPacket += (c, pid, len, stackTrace) => { Console.WriteLine($"sended {pid}"); };
@@ -28,11 +28,13 @@ else
     {
         Console.WriteLine($"Write any text:");
 
+        var line = Console.ReadLine();
+
         var outputPacketBuffer = new OutputPacketBuffer();
 
         outputPacketBuffer.PacketId = 1;
 
-        outputPacketBuffer.WriteString16(Console.ReadLine());
+        outputPacketBuffer.WriteString(line);
 
         t.Send(outputPacketBuffer);
 

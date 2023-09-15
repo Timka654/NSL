@@ -119,7 +119,7 @@ namespace NSL.Extensions.RPC
 
             //exception.GetObjectData(serializationInfo, context);
 
-            //packet.WriteString32(serializationInfo.get());
+            //packet.WriteString(serializationInfo.get());
 
             return packet;
         }

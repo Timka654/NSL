@@ -55,18 +55,28 @@ namespace NSL.BuilderExtensions.SocketCore
             AddAsyncPacketHandle(builder, packetId.ToUInt16(null), packet);
         }
 
-
+        [Obsolete("Renamed to AddResponsePacketHandle", true)]
         public static void AddReceivePacketHandle<TClient>(this IOptionableEndPointBuilder<TClient> builder, ushort packetId, Func<TClient, IResponsibleProcessor> handler)
             where TClient : INetworkClient, new()
+            => AddResponsePacketHandle(builder, packetId, handler);
+
+        public static void AddResponsePacketHandle<TClient>(this IOptionableEndPointBuilder<TClient> builder, ushort packetId, Func<TClient, IResponsibleProcessor> handler)
+            where TClient : INetworkClient, new()
         {
-            builder.GetCoreOptions().AddReceivePacketHandle(packetId, handler);
+            builder.GetCoreOptions().AddResponsePacketHandle(packetId, handler);
         }
 
+        [Obsolete("Renamed to AddResponsePacketHandle", true)]
         public static void AddReceivePacketHandle<TClient, TEnum>(this IOptionableEndPointBuilder<TClient> builder, TEnum packetId, Func<TClient, IResponsibleProcessor> handler)
             where TEnum : struct, IConvertible
             where TClient : INetworkClient, new()
+            => AddResponsePacketHandle(builder, packetId, handler);
+
+        public static void AddResponsePacketHandle<TClient, TEnum>(this IOptionableEndPointBuilder<TClient> builder, TEnum packetId, Func<TClient, IResponsibleProcessor> handler)
+            where TEnum : struct, IConvertible
+            where TClient : INetworkClient, new()
         {
-            AddReceivePacketHandle(builder, packetId.ToUInt16(null), handler);
+            AddResponsePacketHandle(builder, packetId.ToUInt16(null), handler);
         }
 
         /// <summary>
@@ -198,8 +208,8 @@ namespace NSL.BuilderExtensions.SocketCore
             DefaultEventHandlersEnum handleOptions = DefaultEventHandlersEnum.All,
             Func<ushort, string> getNameSendPacket = default,
             Func<ushort, string> getNameReceivePacket = default)
-            where TBuilder : IOptionableEndPointBuilder<TClient>, IHandleIOBuilder
             where TClient : INetworkClient, new()
+            where TBuilder : IOptionableEndPointBuilder<TClient>, IHandleIOBuilder
         {
             if (prefix != null)
                 prefix = $"{prefix} ";

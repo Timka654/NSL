@@ -6,49 +6,23 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using NSL.SocketCore;
 
 namespace NSL.SocketClient
 {
+    public class BasicNetworkClient : BaseSocketNetworkClient { }
+
     public abstract class BaseSocketNetworkClient : INetworkClient
     {
         /// <summary>
         /// Буффер для хранения отправленных пакетов во время разрыва соединения
         /// </summary>
-        private Queue<byte[]> WaitPacketBuffer { get; set; }
-
-        public ClientOptions<BaseSocketNetworkClient> ClientOptions => Network.Options as ClientOptions<BaseSocketNetworkClient>;
+        /// 
+        public CoreOptions ClientOptions => Network.Options;
 
         public void Send(OutputPacketBuffer packet)
         {
             Network.Send(packet);
-        }
-
-        /// <summary>
-        /// Получить все пакеты из списка ожидания и уберает их с очереди
-        /// </summary>
-        /// <returns></returns>
-        public IEnumerable<byte[]> GetWaitPackets()
-        {
-            IEnumerable<byte[]> result = WaitPacketBuffer?.ToArray() ?? new byte[0][];
-
-            ClearWaitPacketBuffer();
-
-            return result;
-        }
-
-        /// <summary>
-        /// Копировать пакеты в буффер с новым подключением
-        /// </summary>
-        /// <param name="other_client"></param>
-        public void CopyWaitPacketBuffer(BaseSocketNetworkClient other_client)
-        {
-            other_client.WaitPacketBuffer = WaitPacketBuffer;
-        }
-
-        public void ClearWaitPacketBuffer()
-        {
-            if (WaitPacketBuffer != null)
-                WaitPacketBuffer.Clear();
         }
 
         #region PingPong
@@ -154,36 +128,6 @@ namespace NSL.SocketClient
         }
 
         #endregion
-
-        public async void RunRecovery()
-        {
-            await Task.CompletedTask;
-            //if (ClientOptions.OldSessionClientData == null)
-            //{
-            //    ClientOptions.RunRecoverySession OnReconnectEvent?.Invoke(MaxRecoveryTryTime, false);
-            //    return;
-            //}
-
-            //for (int currentTry = 0; currentTry < MaxRecoveryTryTime && NetworkClient != null; currentTry++)
-            //{
-            //    var result = await NetworkClient.ConnectAsync();
-
-            //    OnReconnectEvent?.Invoke(currentTry + 1, result);
-
-            //    if (result)
-            //        break;
-
-            //    await Task.Delay(RecoveryWaitTime);
-            //}
-
-            //byte[] buffer;
-
-            //if (ClientData != null)
-            //    while ((buffer = ClientData.GetWaitPacket()) != null)
-            //    {
-            //        NetworkClient.Send(buffer, 0, buffer.Length);
-            //    }
-        }
 
         public override void Dispose()
         {

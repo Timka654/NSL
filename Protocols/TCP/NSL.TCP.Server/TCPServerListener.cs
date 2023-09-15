@@ -7,8 +7,16 @@ using System.Net.Sockets;
 
 namespace NSL.TCP.Server
 {
-    public class TCPServerListener<T> : INetworkListener<T>
+    public class TCPServerListener<T> : TCPServerListener<T, ServerOptions<T>>
         where T : IServerNetworkClient, new()
+    {
+        public TCPServerListener(ServerOptions<T> options) : base(options)
+        {
+        }
+    }
+    public class TCPServerListener<T, TOptions> : INetworkListener<T>
+        where T : IServerNetworkClient, new()
+        where TOptions : ServerOptions<T>
     {
         public event ReceivePacketDebugInfo<TCPServerClient<T>> OnReceivePacket;
         public event SendPacketDebugInfo<TCPServerClient<T>> OnSendPacket;
@@ -27,13 +35,13 @@ namespace NSL.TCP.Server
         /// <summary>
         /// Настройки сервера
         /// </summary>
-        private ServerOptions<T> serverOptions;
+        private TOptions serverOptions;
 
         /// <summary>
         /// Инициализация сервера
         /// </summary>
         /// <param name="options">Настройки</param>
-        public TCPServerListener(ServerOptions<T> options)
+        public TCPServerListener(TOptions options)
         {
             serverOptions = options;
         }

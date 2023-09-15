@@ -1,4 +1,7 @@
-﻿using System;
+﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -76,5 +79,85 @@ namespace NSL.Generators.Utils
 
         public void AppendComment(Action commentAction)
             => AppendComment(builder => commentAction());
+
+
+        public void CreatePartialClass(ClassDeclarationSyntax classDecl, Action bodyBuild, IEnumerable<string> requiredDirectives = null)
+        {
+            var @namespace = classDecl.Parent as NamespaceDeclarationSyntax;
+
+            var usings = classDecl.GetTypeClassUsingDirectives();
+
+            AddUsings(usings);
+
+            if (requiredDirectives != null)
+            {
+                requiredDirectives = requiredDirectives.Except(usings);
+
+                AddUsings(requiredDirectives);
+            }
+
+            AppendLine();
+
+            var genericParams = classDecl.GetTypeGenericParameters();
+
+            var declTypeLine = "";
+
+            if (genericParams?.Any() == true)
+                declTypeLine = $"<{string.Join(",", genericParams)}>";
+
+            declTypeLine = $"{classDecl.GetClassFullModifier()} class {classDecl.GetClassName()}{declTypeLine}";
+
+
+            if (@namespace != null)
+            {
+                AppendLine($"namespace {@namespace.Name.ToString()}");
+                AppendLine("{");
+
+                NextTab();
+            }
+
+            AppendLine(declTypeLine);
+
+            NextTab();
+
+            foreach (var c in classDecl.ConstraintClauses)
+            {
+                AppendLine(c.ToString());
+            }
+
+            PrevTab();
+
+            AppendLine("{");
+
+            NextTab();
+
+            bodyBuild();
+
+            PrevTab();
+
+            AppendLine("}");
+
+            PrevTab();
+
+            if (@namespace != null)
+            {
+                PrevTab();
+
+                AppendLine("}");
+            }
+        }
+
+
+        public void AddUsings(IEnumerable<string> usings)
+        {
+            foreach (var item in usings)
+            {
+                AddUsing(item);
+            }
+        }
+
+        public void AddUsing(string @using)
+            =>AppendLine($"using {@using};");
+
     }
 }

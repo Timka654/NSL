@@ -6,6 +6,7 @@
 	  <IsPackable>false</IsPackable>
 	  <Version>$(VersionSuffix)</Version>
 	  <Configurations>Debug;Release;DebugExamples</Configurations>
+		<Nullable>disable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>

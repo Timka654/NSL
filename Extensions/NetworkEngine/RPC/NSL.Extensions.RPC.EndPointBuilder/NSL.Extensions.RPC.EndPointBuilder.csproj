@@ -1,29 +1,24 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
+		<NSLProjectTypes>UnitySupport;AnalyzerUtils</NSLProjectTypes>
+
 		<TargetFramework>netstandard2.0</TargetFramework>
-		<Configurations>Debug;Release;Unity;UnityDebug;DebugExamples</Configurations>
+		<Configurations>Debug;Release;DebugExamples;Unity;UnityDebug</Configurations>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<Nullable>disable</Nullable>
 
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
 		<EmbedUntrackedSources>true</EmbedUntrackedSources>
 		<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
 		<GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
 
-		<Description>-</Description>
-		<Authors>Relife87</Authors>
 		<Version>$(VersionSuffix)</Version>
-
-		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-		<NoPackageAnalysis>true</NoPackageAnalysis>
-
-		<EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+		<Authors>Relife87</Authors>
+		<Description>-</Description>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)'=='Debug'">
-		<PackageId>$(MSBuildProjectName)_Debug</PackageId>
-	</PropertyGroup>
-
-	<PropertyGroup Condition="'$(Configuration)'=='DebugExamples'">
 		<PackageId>$(MSBuildProjectName)_Debug</PackageId>
 	</PropertyGroup>
 
@@ -35,7 +30,7 @@
 	<PropertyGroup Condition="'$(Configuration)'=='Unity'">
 		<AssemblyName>Unity.$(MSBuildProjectName)</AssemblyName>
 	</PropertyGroup>
-	
+
 	<ItemGroup>
 		<ProjectReference Include="..\..\..\..\Core\BuilderExtensions\NSL.BuilderExtensions.SocketCore\NSL.BuilderExtensions.SocketCore.csproj" />
 		<ProjectReference Include="..\..\..\..\Core\NSL.EndPointBuilder\NSL.EndPointBuilder.csproj" />

@@ -85,8 +85,6 @@ namespace NSL.TCP.Server
 
         protected override TCPServerClient<T> GetParent() => this;
 
-        protected override void AddWaitPacket(byte[] buffer, int offset, int length) => Data.AddWaitPacket(buffer, offset, length);
-
         protected override void OnReceive(ushort pid, int len)
         {
             Data.LastReceiveMessage = DateTime.UtcNow;

@@ -21,6 +21,8 @@ namespace NSL.SocketCore.Extensions.Buffer
 
         public override int DataLength => PacketLength - DefaultHeaderLength;
 
+        public RequestPacketBuffer(int len = 48) : this(Guid.Empty, len) { }
+
         public RequestPacketBuffer(Guid rid, int len = 48) : base(len)
         {
             WithRecvIdentity(rid);
@@ -47,6 +49,9 @@ namespace NSL.SocketCore.Extensions.Buffer
         public static RequestPacketBuffer Create<TEnum>(TEnum packetId, Guid rid, int len = 48)
             where TEnum : struct, Enum, IConvertible
             => new RequestPacketBuffer(rid, len).WithPid(packetId);
+
+        public static RequestPacketBuffer Create(int len = 48)
+            => new RequestPacketBuffer(len);
     }
 
     [Obsolete("Replace to RequestPacketBuffer", true)]

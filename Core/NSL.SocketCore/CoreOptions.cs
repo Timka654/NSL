@@ -11,6 +11,8 @@ namespace NSL.SocketCore
 {
     public class CoreOptions
     {
+        public ObjectBag ObjectBag { get; } = new ObjectBag();
+
         public IBasicLogger HelperLogger { get; set; }
 
         /// <summary>
@@ -22,16 +24,6 @@ namespace NSL.SocketCore
         /// Протокол для передачи данных, по умолчанию ProtocolType.Unspecified - определяется автоматически
         /// </summary>
         public virtual ProtocolType ProtocolType { get; set; } = ProtocolType.Unspecified;
-
-        ///// <summary>
-        ///// Ип адресс - используется для инициализации сервера на определенном адаптере (0.0.0.0 - для всех), или для подключения к серверу
-        ///// </summary>
-        //public string IpAddress { get; set; }
-
-        ///// <summary>
-        ///// Порт - используется для инициализации сервера или 
-        ///// </summary>
-        //public int Port { get; set; }
 
         /// <summary>
         /// Размер буффера приходящих данных, если пакет больше этого значения то данные по реализованному алгоритму принять не получиться, значение по умолчанию - 1024
@@ -204,6 +196,7 @@ namespace NSL.SocketCore
         public void RunClientConnect(TClient client)
         {
             OnClientConnectEvent?.Invoke(client);
+
             if (OnClientConnectAsyncEvent != null)
             {
                 var r = OnClientConnectAsyncEvent.Invoke(client);
@@ -218,7 +211,13 @@ namespace NSL.SocketCore
         /// <param name="client"></param>
         public void RunClientDisconnect(TClient client)
         {
+            if (client == null)
+                return;
+
+            client.DisconnectTime = DateTime.UtcNow;
+
             OnClientDisconnectEvent?.Invoke(client);
+
             if (OnClientDisconnectAsyncEvent != null)
             {
                 Task.Run(()=> OnClientDisconnectAsyncEvent(client)).Wait();

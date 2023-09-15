@@ -78,7 +78,7 @@ namespace NSL.ConfigurationEngine
         /// <param name="path"></param>
         /// <param name="existFlag">Оставить стандартным для получения значения без учета флага</param>
         /// <returns></returns>
-        public string GetValue(string path)
+        public new string GetValue(string path)
         {
             var v = base.GetValue(path.ToLower());
 

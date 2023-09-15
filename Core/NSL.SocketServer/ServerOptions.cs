@@ -3,6 +3,7 @@ using NSL.SocketCore;
 using NSL.SocketServer.Utils;
 using NSL.SocketServer.Utils.SystemPackets;
 using System.Net;
+using NSL.SocketCore.Utils;
 
 namespace NSL.SocketServer
 {
@@ -19,12 +20,6 @@ namespace NSL.SocketServer
 
         #endregion
 
-        public event OnRecoverySessionReceiveDelegate<TClient> OnRecoverySessionReceiveEvent
-        {
-            add { GetPacket<RecoverySessionPacket<TClient>>(RecoverySessionPacket<TClient>.PacketId).OnRecoverySessionReceiveEvent += value; }
-            remove { GetPacket<RecoverySessionPacket<TClient>>(RecoverySessionPacket<TClient>.PacketId).OnRecoverySessionReceiveEvent -= value; }
-        }
-
         public ServerOptions()
         {
             LoadOptions();
@@ -33,8 +28,6 @@ namespace NSL.SocketServer
         protected virtual void LoadOptions()
         { 
             AddPacket(AliveConnectionPacket.PacketId, new ServerAliveConnectionPacket<TClient>());
-            AddPacket(RecoverySessionPacket<TClient>.PacketId, new RecoverySessionPacket<TClient>());
-            AddPacket(VersionPacket<TClient>.PacketId, new VersionPacket<TClient>());
             AddPacket(SystemTime<TClient>.PacketId, new SystemTime<TClient>());
         }
 

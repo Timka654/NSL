@@ -35,6 +35,9 @@ namespace NSL.BuilderExtensions.UDPClient
             return new UDPClientEndPointBuilder<TClient>();
         }
 
+        public UDPClientEndPointBuilder<TClient, UDPClientOptions<TClient>> WithOptions()
+            => WithOptions<UDPClientOptions<TClient>>();
+
         public UDPClientEndPointBuilder<TClient, TOptions> WithOptions<TOptions>()
             where TOptions : UDPClientOptions<TClient>, new()
         {

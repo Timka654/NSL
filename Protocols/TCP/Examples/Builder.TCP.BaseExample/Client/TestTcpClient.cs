@@ -17,7 +17,7 @@ namespace Builder.TCP.BaseExample.Client
             client = TCPClientEndPointBuilder
                 .Create()
                 .WithClientProcessor<TCPNetworkClient>()
-                .WithOptions<ClientOptions<TCPNetworkClient>>()
+                .WithOptions()
                 .WithEndPoint("127.0.0.1", 20006)
                 .WithCode(builder =>
                 {
@@ -83,7 +83,7 @@ namespace Builder.TCP.BaseExample.Client
 
             forpacket1.PacketId = 1;
 
-            forpacket1.WriteString16(Console.ReadLine());
+            forpacket1.WriteString(Console.ReadLine());
 
             client.Send(forpacket1);
 

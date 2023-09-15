@@ -16,6 +16,8 @@ namespace NSL.Generators.BinaryGenerator.Generators
             if (type.IsValueType)
                 return default;
 
+            path = $"data{++context.ProcessingLevel}";
+
             CodeBuilder rb = new CodeBuilder();
 
             rb.AppendLine($"dataPacket.{nameof(InputPacketBuffer.ReadNullableClass)}(() => {{");
@@ -24,11 +26,9 @@ namespace NSL.Generators.BinaryGenerator.Generators
 
             rb.AppendLine();
 
-            rb.AppendLine($"var data = new {type.Name}();");
+            rb.AppendLine($"var {path} = new {type.Name}();");
 
             rb.AppendLine();
-
-            path = "data";
 
             do
             {
@@ -54,11 +54,13 @@ namespace NSL.Generators.BinaryGenerator.Generators
 
             } while (type != null);
 
-            rb.AppendLine("return data;");
+            rb.AppendLine($"return {path};");
 
             rb.PrevTab();
 
             rb.AppendLine("})");
+
+            --context.ProcessingLevel;
 
             return rb.ToString();// test only
         }

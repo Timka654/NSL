@@ -50,19 +50,9 @@ namespace NSL.WebSockets.Client
             remoteEndPoint = new IPEndPoint(ip, endPoint.Port);
 
             disconnected = false;
-            string[] keys = ConnectionOptions.ClientData?.RecoverySessionKeyArray;
-            IEnumerable<byte[]> waitBuffer = ConnectionOptions.ClientData?.GetWaitPackets();
 
             ConnectionOptions.InitializeClient(new T());
-
-            ConnectionOptions.ClientData.SetRecoveryData(ConnectionOptions.ClientData.Session, keys);
             ConnectionOptions.ClientData.Network = this;
-
-            if (waitBuffer != null)
-                foreach (var item in waitBuffer)
-                {
-                    ConnectionOptions.ClientData.AddWaitPacket(item, 0, item.Length);
-                }
 
             //установка переменной содержащую поток клиента
             this.sclient = client;
@@ -80,9 +70,6 @@ namespace NSL.WebSockets.Client
 
             RunReceiveAsync();
 
-            VersionPacket.Send(ConnectionOptions.ClientData, Version);
-            RecoverySessionPacket.Send(ConnectionOptions.ClientData);
-
             ConnectionOptions.RunClientConnect();
         }
 
@@ -96,11 +83,6 @@ namespace NSL.WebSockets.Client
         {
             ConnectionOptions.ClientData.LastReceiveMessage = DateTime.UtcNow;
             base.OnReceive(pid, len);
-        }
-
-        protected override void AddWaitPacket(byte[] buffer, int offset, int length)
-        {
-            ConnectionOptions.ClientData?.AddWaitPacket(buffer, offset, length);
         }
 
         protected override WSClient<T> GetParent() => this;

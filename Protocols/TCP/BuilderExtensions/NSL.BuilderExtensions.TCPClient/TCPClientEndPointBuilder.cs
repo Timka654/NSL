@@ -35,6 +35,9 @@ namespace NSL.BuilderExtensions.TCPClient
             return new TCPClientEndPointBuilder<TClient>();
         }
 
+        public TCPClientEndPointBuilder<TClient, ClientOptions<TClient>> WithOptions()
+            => WithOptions<ClientOptions<TClient>>();
+
         public TCPClientEndPointBuilder<TClient, TOptions> WithOptions<TOptions>()
             where TOptions : ClientOptions<TClient>, new()
         {

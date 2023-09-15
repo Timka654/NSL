@@ -3,7 +3,9 @@ using System.Collections.Concurrent;
 
 namespace NSL.SocketCore.Utils
 {
-    public class ClientObjectBag : IDisposable
+    public class ClientObjectBag : ObjectBag { }
+
+    public class ObjectBag : IDisposable
     {
         private ConcurrentDictionary<string, object> store = new ConcurrentDictionary<string, object>();
 
@@ -23,7 +25,15 @@ namespace NSL.SocketCore.Utils
 
         public object Get(string key) => this[key];
 
-        public TObject Get<TObject>(string key) => (TObject)this[key];
+        public TObject Get<TObject>(string key, bool throwIfNotExists = false)
+        {
+            var item = this[key];
+
+            if (throwIfNotExists && item == default)
+                throw new Exception($"Object bag not contains object with key equals \"{key}\"");
+
+            return (TObject)item;
+        }
 
         public void Set(string key, object value) => this[key] = value;
 
@@ -35,6 +45,12 @@ namespace NSL.SocketCore.Utils
 
         public void Dispose()
         {
+            foreach (var item in store)
+            {
+                if (item.Value is IDisposable d)
+                    d.Dispose();
+            }
+
             store.Clear();
         }
     }

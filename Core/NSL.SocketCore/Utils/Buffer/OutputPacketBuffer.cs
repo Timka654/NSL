@@ -79,6 +79,11 @@ namespace NSL.SocketCore.Utils.Buffer
         /// </summary>
         public const int DefaultHeaderLength = 7;
 
+        public static OutputPacketBuffer Create(ushort packetId, int len = 32)
+        {
+            return new OutputPacketBuffer(len) { PacketId = packetId};
+        }
+
         public static OutputPacketBuffer Create<TEnum>(TEnum packetId, int len = 32)
             where TEnum : struct, Enum, IConvertible
         {

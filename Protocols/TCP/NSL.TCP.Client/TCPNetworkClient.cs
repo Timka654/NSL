@@ -7,6 +7,14 @@ using System.Threading.Tasks;
 
 namespace NSL.TCP.Client
 {
+    public class TCPNetworkClient<T> : TCPNetworkClient<T, ClientOptions<T>>
+        where T : BaseSocketNetworkClient, new()
+    {
+        public TCPNetworkClient(ClientOptions<T> options) : base(options)
+        {
+        }
+    }
+
     public class TCPNetworkClient<T, TOptions> : TCPClient<T>
         where T : BaseSocketNetworkClient, new()
         where TOptions : ClientOptions<T>

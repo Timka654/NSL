@@ -2,8 +2,6 @@
 {
     public class NoProviderLoadingProvider : BaseConfigurationProvider
     {
-        public BaseConfigurationManager Manager { get; set; }
-
         public override bool LoadData()
         {
             return true;

@@ -1,32 +1,45 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>netstandard2.0</TargetFramework>
-		<Configurations>Debug;Release;Unity;UnityDebug</Configurations>
-		
+		<NSLProjectTypes>UnityTarget;UnitySupport;UnityReference</NSLProjectTypes>
+
+		<TargetFramework>netstandard2.1</TargetFramework>
+		<Configurations>Unity;UnityDebug</Configurations>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<Nullable>disable</Nullable>
+
+		<PublishRepositoryUrl>true</PublishRepositoryUrl>
+		<EmbedUntrackedSources>true</EmbedUntrackedSources>
+		<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+		<GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
+
 		<Version>$(VersionSuffix)</Version>
 		<Authors>Relife87</Authors>
 	</PropertyGroup>
 
+	<PropertyGroup Condition="'$(Configuration)'=='Debug'">
+		<PackageId>$(MSBuildProjectName)_Debug</PackageId>
+	</PropertyGroup>
+
 	<PropertyGroup Condition="'$(Configuration)'=='UnityDebug'">
-		<TargetFramework>netstandard2.0</TargetFramework>
+		<TargetFramework>netstandard2.1</TargetFramework>
 		<DefineConstants>DEBUG;TRACE</DefineConstants>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)'=='Unity'">
-		<TargetFramework>netstandard2.0</TargetFramework>
+		<TargetFramework>netstandard2.1</TargetFramework>
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\..\..\Core\Utils\NSL.Utils.Unity\NSL.Utils.Unity.csproj" />
-	  <ProjectReference Include="..\..\..\Core\Utils\NSL.Utils\NSL.Utils.csproj" />
-	  <ProjectReference Include="..\NSL.RestExtensions\NSL.RestExtensions.csproj" />
+		<ProjectReference Include="..\..\..\Core\Utils\NSL.Utils.Unity\NSL.Utils.Unity.csproj" />
+		<ProjectReference Include="..\..\..\Core\Utils\NSL.Utils\NSL.Utils.csproj" />
+		<ProjectReference Include="..\NSL.RestExtensions\NSL.RestExtensions.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Reference Include="UnityEngine">
-	    <HintPath>..\..\..\Reference\UnityEngine.dll</HintPath>
-	  </Reference>
+		<Reference Include="UnityEngine">
+			<HintPath>..\..\..\Reference\UnityEngine.dll</HintPath>
+		</Reference>
 	</ItemGroup>
 
 </Project>
