@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+	<PropertyGroup>
+		<NSLProjectTypes>ASPTarget</NSLProjectTypes>
+
+		<TargetFramework>net7.0</TargetFramework>
+		<Configurations>Debug;Release;DebugExamples;Unity;UnityDebug</Configurations>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<Nullable>disable</Nullable>
+		<IsPackable>true</IsPackable>
+		<OutputType>Library</OutputType>
+
+		<PublishRepositoryUrl>true</PublishRepositoryUrl>
+		<EmbedUntrackedSources>true</EmbedUntrackedSources>
+		<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+		<GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
+
+		<Version>$(VersionSuffix)</Version>
+		<Authors>Relife87</Authors>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)'=='Debug'">
+		<PackageId>$(MSBuildProjectName)_Debug</PackageId>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\..\Core\NSL.SocketClient\NSL.SocketClient.csproj" />
+		<ProjectReference Include="..\NSL.WebSockets.Client\NSL.WebSockets.Client.csproj" />
+		<ProjectReference Include="..\NSL.WebSockets\NSL.WebSockets.csproj" />
+	</ItemGroup>
+
+</Project>
