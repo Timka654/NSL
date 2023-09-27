@@ -55,6 +55,10 @@ namespace NSL.SocketCore.Extensions.Buffer
             {
                 if (onResponse(input))
                     input?.Dispose();
+                lock (this)
+                {
+                    requests.Remove(rid);
+                }
             }));
 
             buffer.WithRecvIdentity(rid);
@@ -65,10 +69,10 @@ namespace NSL.SocketCore.Extensions.Buffer
         }
 
 
-        public Task SendRequestAsync(RequestPacketBuffer buffer, Func<InputPacketBuffer, Task> onResponse, bool disposeOnSend = true)
+        public Task SendRequestAsync(RequestPacketBuffer buffer, Func<InputPacketBuffer, Task<bool>> onResponse, bool disposeOnSend = true)
             => SendRequestAsync(buffer, onResponse, CancellationToken.None, disposeOnSend);
 
-        public async Task SendRequestAsync(RequestPacketBuffer buffer, Func<InputPacketBuffer, Task> onResult, CancellationToken cancellationToken, bool disposeOnSend = true)
+        public async Task SendRequestAsync(RequestPacketBuffer buffer, Func<InputPacketBuffer, Task<bool>> onResult, CancellationToken cancellationToken, bool disposeOnSend = true)
         {
             InputPacketBuffer data = default;
             Guid rid = default;
@@ -86,7 +90,8 @@ namespace NSL.SocketCore.Extensions.Buffer
                     while (requests.ContainsKey(rid) && !await Task.Run(() => locker.WaitOne(100), cancellationToken)) { cancellationToken.ThrowIfCancellationRequested(); }
                 }
 
-                await onResult(data);
+                if(await onResult(data))
+                    data?.Dispose();
             }
             catch (TaskCanceledException) { }
             catch (OperationCanceledException) { }
