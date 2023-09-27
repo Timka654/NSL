@@ -104,7 +104,7 @@ namespace NSL.Extensions.Session.Client.Packets
 
             NSLRecoverySessionResult result = default;
 
-            await processor.SendRequestAsync(request, data => { result = NSLRecoverySessionResult.ReadFullFrom(data); return Task.CompletedTask; });
+            await processor.SendRequestAsync(request, data => { result = NSLRecoverySessionResult.ReadFullFrom(data); return Task.FromResult(true); });
 
             return result;
         }

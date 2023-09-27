@@ -75,7 +75,7 @@ namespace NSL.Extensions.Version.Client.Packets
 
             NSLVersionResult result = default;
 
-            await processor.SendRequestAsync(request, data => { result = NSLVersionResult.ReadFullFrom(data); return Task.CompletedTask; });
+            await processor.SendRequestAsync(request, data => { result = NSLVersionResult.ReadFullFrom(data); return Task.FromResult(true); });
 
             return result;
         }
