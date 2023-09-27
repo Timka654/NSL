@@ -79,6 +79,7 @@ namespace NSL.SocketCore.Extensions.Buffer
                     rid = SendRequest(buffer, input =>
                     {
                         data = input;
+                        locker.Set();
                         return false;
                     }, disposeOnSend);
 
