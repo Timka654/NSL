@@ -243,9 +243,7 @@ namespace NSL.WebSockets
 
                 //начинаем отправку данных
                 if (sclient != null)
-                     sclient.SendAsync(new ArraySegment<byte>(sndBuffer, offset, lenght), WebSocketMessageType.Binary, true, CancellationToken.None).ContinueWith(t => {
-                         _sendLocker.Set();
-                     });
+                    sclient.SendAsync(new ArraySegment<byte>(sndBuffer, offset, lenght), WebSocketMessageType.Binary, true, CancellationToken.None);
             }
             catch (Exception ex)
             {
@@ -254,6 +252,9 @@ namespace NSL.WebSockets
 
                 //отключаем клиента, лишним не будет
                 Disconnect();
+            }
+            finally
+            {
                 _sendLocker.Set();
             }
 
