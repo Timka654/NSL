@@ -29,18 +29,16 @@ namespace NSL.BuilderExtensions.SocketCore.Unity
             builder.GetCoreOptions().OnExceptionEvent += (ex, client) => ThreadHelper.InvokeOnMain(() => handle(ex, client));
         }
 
-        public static void AddReceiveHandleForUnity<TClient>(this IHandleIOBuilder<TClient> builder, ReceivePacketDebugInfo<TClient> handle)
-            where TClient : IClient
+        public static void AddReceiveHandleForUnity<TClient>(this IHandleIOBuilder<TClient> builder, CoreOptions<TClient>.ReceivePacketHandle handle)
+            where TClient : INetworkClient, new()
         {
             builder.AddReceiveHandle((client, pid, len) => ThreadHelper.InvokeOnMain(() => handle(client, pid, len)));
         }
 
-        public static void AddSendHandleForUnity<TClient>(this IHandleIOBuilder<TClient> builder, SendPacketDebugInfo<TClient> handle)
-            where TClient : IClient
+        public static void AddSendHandleForUnity<TClient>(this IHandleIOBuilder<TClient> builder, CoreOptions<TClient>.SendPacketHandle handle)
+            where TClient : INetworkClient, new()
         {
-            {
-                builder.AddSendHandle((client, pid, len, stackTrace) => ThreadHelper.InvokeOnMain(() => handle(client, pid, len, stackTrace)));
-            }
+            builder.AddSendHandle((client, pid, len, stackTrace) => ThreadHelper.InvokeOnMain(() => handle(client, pid, len, stackTrace)));
         }
     }
 }
