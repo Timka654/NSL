@@ -63,8 +63,13 @@ namespace NSL.TCP
 
         #endregion
 
-        public BaseTcpClient()
+        public BaseTcpClient(CoreOptions<TClient> options)
         {
+            this.options = options;
+
+            OnReceivePacket += (client, pid, len) => options.CallReceivePacketEvent(client.Data, pid, len);
+            OnSendPacket += (client, pid, len, st) => options.CallSendPacketEvent(client.Data, pid, len, st);
+
             this.parent = GetParent();
         }
 
@@ -167,18 +172,11 @@ namespace NSL.TCP
             }
             catch (ConnectionLostException clex)
             {
-                RunException(clex);
-                Disconnect();
+                Disconnect(clex);
             }
             catch (Exception ex)
             {
-                if (!disconnected)
-                {
-                    RunException(ex);
-
-                    //отключаем клиента, в случае ошибки не в транспортном потоке а где-то в пакете, что-бы клиент не завис 
-                    Disconnect();
-                }
+                Disconnect(ex);
             }
         }
 
@@ -225,10 +223,7 @@ namespace NSL.TCP
             catch (Exception ex)
             {
                 Data?.OnPacketSendFail(buf, offset, lenght);
-                RunException(ex);
-
-                //отключаем клиента, лишним не будет
-                Disconnect();
+                Disconnect(ex);
             }
             finally
             {
@@ -255,8 +250,7 @@ namespace NSL.TCP
             {
                 var sas = ((SendAsyncState)r.AsyncState);
                 Data?.OnPacketSendFail(sas.buf, sas.offset, sas.len);
-                RunException(ex);
-                Disconnect();
+                Disconnect(ex);
             }
             catch
             {
@@ -285,6 +279,13 @@ namespace NSL.TCP
         }
 
         protected bool disconnected = true;
+
+        public void Disconnect(Exception ex)
+        {
+            RunException(ex);
+
+            Disconnect();
+        }
 
         public void Disconnect()
         {

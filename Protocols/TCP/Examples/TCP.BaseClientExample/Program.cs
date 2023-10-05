@@ -3,6 +3,8 @@ using NSL.SocketCore.Utils.Buffer;
 using NSL.TCP.Client;
 using TCPExample.Client;
 
+Console.WriteLine("TCP.Client");
+
 ClientOptions<NetworkClient> options = new ClientOptions<NetworkClient>();
 
 options.ReceiveBufferSize = 1024;

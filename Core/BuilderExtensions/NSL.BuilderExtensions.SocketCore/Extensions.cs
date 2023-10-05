@@ -1,4 +1,5 @@
 ﻿using NSL.EndPointBuilder;
+using NSL.Logger;
 using NSL.SocketClient;
 using NSL.SocketCore;
 using NSL.SocketCore.Extensions.Buffer;
@@ -6,9 +7,11 @@ using NSL.SocketCore.Extensions.Buffer.Interface;
 using NSL.SocketCore.Extensions.Packet;
 using NSL.SocketCore.Utils;
 using NSL.SocketCore.Utils.Buffer;
+using NSL.SocketCore.Utils.Exceptions;
 using NSL.SocketCore.Utils.Logger;
 using NSL.SocketCore.Utils.Logger.Enums;
 using System;
+using System.Diagnostics;
 using System.Net.Sockets;
 using System.Reflection;
 
@@ -190,6 +193,18 @@ namespace NSL.BuilderExtensions.SocketCore
             builder.GetCoreOptions().OnClientDisconnectAsyncEvent += handle;
         }
 
+        public static void AddSendHandle<TClient>(this IOptionableEndPointBuilder<TClient> builder, CoreOptions<TClient>.SendPacketHandle handle)
+            where TClient : INetworkClient, new()
+        {
+            builder.GetCoreOptions().OnSendPacket += handle;
+        }
+
+        public static void AddReceiveHandle<TClient>(this IOptionableEndPointBuilder<TClient> builder, CoreOptions<TClient>.ReceivePacketHandle handle)
+            where TClient : INetworkClient, new()
+        {
+            builder.GetCoreOptions().OnReceivePacket += handle;
+        }
+
         public static void SetLogger<TClient>(this IOptionableEndPointBuilder<TClient> builder, IBasicLogger logger)
             where TClient : INetworkClient, new()
         {
@@ -203,26 +218,32 @@ namespace NSL.BuilderExtensions.SocketCore
 
         #endregion
 
-        public static void AddDefaultEventHandlers<TBuilder, TClient>(this TBuilder builder,
+        public static void AddDefaultEventHandlers<TClient>(this IOptionableEndPointBuilder<TClient> builder,
             string prefix = default,
             DefaultEventHandlersEnum handleOptions = DefaultEventHandlersEnum.All,
             Func<ushort, string> getNameSendPacket = default,
             Func<ushort, string> getNameReceivePacket = default)
             where TClient : INetworkClient, new()
-            where TBuilder : IOptionableEndPointBuilder<TClient>, IHandleIOBuilder
         {
-            if (prefix != null)
-                prefix = $"{prefix} ";
-
-            var options = builder
-               .GetCoreOptions();
-
             var logger = builder
                .GetCoreOptions()
                .HelperLogger;
 
+            if (!string.IsNullOrWhiteSpace(prefix))
+                logger = new PrefixableLoggerProxy(logger, prefix);
+
+            builder.AddDefaultEventHandlers(logger, handleOptions, getNameSendPacket, getNameReceivePacket);
+        }
+
+        public static void AddDefaultEventHandlers<TClient>(this IOptionableEndPointBuilder<TClient> builder,
+            IBasicLogger logger,
+            DefaultEventHandlersEnum handleOptions = DefaultEventHandlersEnum.All,
+            Func<ushort, string> getNameSendPacket = default,
+            Func<ushort, string> getNameReceivePacket = default)
+            where TClient : INetworkClient, new()
+        {
             if (logger == default)
-                throw new InvalidOperationException($"{nameof(CoreOptions.HelperLogger)} has not setted in options");
+                throw new InvalidOperationException($"{nameof(CoreOptions.HelperLogger)} must be installed before invoke this method");
 
             if (getNameSendPacket == default)
                 getNameSendPacket = defaultGetNamePacketHandle;
@@ -232,71 +253,90 @@ namespace NSL.BuilderExtensions.SocketCore
 
 
             if (handleOptions.HasFlag(DefaultEventHandlersEnum.Connect))
-                builder.AddConnectHandle(client
-                    =>
+                builder.AddConnectHandle(client =>
                 {
                     try
                     {
-                        logger.Append(LoggerLevel.Info, $"{prefix}Success connected"
-                        + (handleOptions.HasFlag(DefaultEventHandlersEnum.DisplayEndPoint) ? $"({client?.Network?.GetRemotePoint()})" : default));
+                        string msg = $"Success connected";
+
+                        if (handleOptions.HasFlag(DefaultEventHandlersEnum.DisplayEndPoint) && client?.Network != null)
+                            msg += $"({client.Network.GetRemotePoint()})";
+
+                        logger.Append(LoggerLevel.Info, msg);
                     }
                     catch { }
                 });
 
             if (handleOptions.HasFlag(DefaultEventHandlersEnum.Disconnect))
-                builder.AddDisconnectHandle(client
-                    =>
+                builder.AddDisconnectHandle(client =>
                 {
                     try
                     {
-                        logger.Append(LoggerLevel.Info, $"{prefix}Success disconnected"
-                        + (handleOptions.HasFlag(DefaultEventHandlersEnum.DisplayEndPoint) ? $"({client?.Network?.GetRemotePoint()})" : default));
+                        string msg = $"Success disconnected";
+
+                        if (handleOptions.HasFlag(DefaultEventHandlersEnum.DisplayEndPoint) && client?.Network != null)
+                            msg += $"({client.Network.GetRemotePoint()})";
+
+                        logger.Append(LoggerLevel.Info, msg);
                     }
                     catch { }
                 });
 
             if (handleOptions.HasFlag(DefaultEventHandlersEnum.Exception))
-                builder.AddExceptionHandle((ex, client)
-                    => logger.Append(LoggerLevel.Info, $"{prefix}Exception error handle - {ex}"));
+                builder.AddExceptionHandle((ex, client) =>
+                {
+                    if (ex is ConnectionLostException)
+                        return;
+
+                    logger.Append(LoggerLevel.Info, $"Exception error handle - {ex}");
+                });
 
             if (handleOptions.HasFlag(DefaultEventHandlersEnum.Send))
-                builder.AddBaseSendHandle((client, pid, len, stackTrace) =>
+                builder.AddSendHandle((client, pid, len, stackTrace) =>
                 {
                     if (handleOptions.HasFlag(DefaultEventHandlersEnum.ExcludeSystemPid) && OutputPacketBuffer.IsSystemPID(pid))
                         return;
 
-                    var name = getNameSendPacket(pid);
+                    var msg = getNameSendPacket(pid);
 
-                    if (name != default)
-                        name = $"({name})";
+                    if (msg != default)
+                        msg = $"({msg})";
+
+                    msg = $"Send packet {pid}{msg}";
 
                     try
                     {
-                        logger.Append(LoggerLevel.Info,
-                            $"{prefix}Send packet {name}{pid}"
-                            + (handleOptions.HasFlag(DefaultEventHandlersEnum.DisplayEndPoint) ? $" to {client?.GetRemotePoint()}" : default)
-                            + (handleOptions.HasFlag(DefaultEventHandlersEnum.HasSendStackTrace) ? $" {stackTrace}" : default));
+                        if (handleOptions.HasFlag(DefaultEventHandlersEnum.DisplayEndPoint) && client?.Network != null)
+                            msg += $" to {client?.Network?.GetRemotePoint()}";
+
+                        if (handleOptions.HasFlag(DefaultEventHandlersEnum.HasSendStackTrace))
+                            msg += $" {stackTrace}";
+
+                        logger.Append(LoggerLevel.Info, msg);
                     }
                     catch { }
                 });
 
 
             if (handleOptions.HasFlag(DefaultEventHandlersEnum.Receive))
-                builder.AddBaseReceiveHandle((client, pid, len) =>
+                builder.AddReceiveHandle((client, pid, len) =>
                 {
                     if (handleOptions.HasFlag(DefaultEventHandlersEnum.ExcludeSystemPid) && InputPacketBuffer.IsSystemPID(pid))
                         return;
 
-                    var name = getNameReceivePacket(pid);
+                    var msg = getNameReceivePacket(pid);
 
-                    if (name != default)
-                        name = $"({name})";
+                    if (msg != default)
+                        msg = $"({msg})";
+
+                    msg = $"Receive packet {pid}{msg}";
 
                     try
                     {
-                        logger.Append(LoggerLevel.Info,
-                            $"{prefix}Receive packet {name}{pid}"
-                            + (handleOptions.HasFlag(DefaultEventHandlersEnum.DisplayEndPoint) ? $" from {client?.GetRemotePoint()}" : default));
+                        if (handleOptions.HasFlag(DefaultEventHandlersEnum.DisplayEndPoint) && client?.Network != null)
+                            msg += $" from {client?.Network?.GetRemotePoint()}";
+
+                        logger.Append(LoggerLevel.Info, msg);
                     }
                     catch { }
                 });

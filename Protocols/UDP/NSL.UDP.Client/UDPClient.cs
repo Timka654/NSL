@@ -13,10 +13,8 @@ namespace NSL.UDP.Client
 
         public override T Data => data;
 
-        public UDPClient(IPEndPoint receivePoint, Socket listenerSocket, UDPClientOptions<T> options) : base(receivePoint, listenerSocket)
+        public UDPClient(IPEndPoint receivePoint, Socket listenerSocket, UDPClientOptions<T> options) : base(receivePoint, listenerSocket, options)
         {
-            this.options = options;
-
             Initialize();
         }
 
@@ -39,7 +37,7 @@ namespace NSL.UDP.Client
 
             disconnected = false;
             //Начало приема пакетов от клиента
-            options.RunClientConnect(Data);
+            options.CallClientConnectEvent(Data);
         }
 
         public override void ChangeUserData(INetworkClient old_client_data)
@@ -62,9 +60,9 @@ namespace NSL.UDP.Client
             base.OnReceive(pid, len);
         }
 
-        protected override void RunDisconnect() => base.options.RunClientDisconnect(Data);
+        protected override void RunDisconnect() => base.options.CallClientDisconnectEvent(Data);
 
-        protected override void RunException(Exception ex) => base.options.RunException(ex, Data);
+        protected override void RunException(Exception ex) => base.options.CallExceptionEvent(ex, Data);
 
     }
 }

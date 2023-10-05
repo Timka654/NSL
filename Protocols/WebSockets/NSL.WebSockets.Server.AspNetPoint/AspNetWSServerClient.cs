@@ -11,11 +11,9 @@ namespace NSL.WebSockets.Server.AspNetPoint
     {
         private new readonly HttpContext context;
 
-        public AspNetWSServerClient(HttpContext context, ServerOptions<T> options) : base()
+        public AspNetWSServerClient(HttpContext context, ServerOptions<T> options) : base(options)
         {
             this.context = context;
-
-            Initialize(options);
 
             Data.SetContext(context);
         }
@@ -27,7 +25,7 @@ namespace NSL.WebSockets.Server.AspNetPoint
                 sclient = await context.WebSockets.AcceptWebSocketAsync();
 
                 //Начало приема пакетов от клиента
-                options.RunClientConnect(Data);
+                options.CallClientConnectEvent(Data);
 
                 await base.ReceiveLoop();
 

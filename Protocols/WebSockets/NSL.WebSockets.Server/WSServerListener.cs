@@ -9,8 +9,6 @@ namespace NSL.WebSockets.Server
     public class WSServerListener<T> : INetworkListener<T>
         where T : IServerNetworkClient, new()
     {
-        public event ReceivePacketDebugInfo<WSServerClient<T>> OnReceivePacket;
-        public event SendPacketDebugInfo<WSServerClient<T>> OnSendPacket;
         /// <summary>
         /// Слушатель порта (сервер)
         /// </summary>
@@ -84,7 +82,7 @@ namespace NSL.WebSockets.Server
             }
             catch (Exception ex)
             {
-                serverOptions.RunException(ex, null);
+                serverOptions.CallExceptionEvent(ex, null);
             }
             listener = null;
         }
@@ -107,18 +105,12 @@ namespace NSL.WebSockets.Server
                 //получения ожидающего подключения
                 client = listener.EndGetContext(result);
                 //инициализация слушателя клиента клиента
-                //#if DEBUG
-                var c = new WSServerClient<T>(client, serverOptions);
-                c.OnReceivePacket += OnReceivePacket;
-                c.OnSendPacket += OnSendPacket;
-                await c.RunPacketReceiver();
-                //#else
-                //                new ServerClient<T>(client, serverOptions).RunPacketReceiver();
-                //#endif
+
+                await new WSServerClient<T>(client, serverOptions).RunPacketReceiver();
             }
             catch (Exception ex)
             {
-                serverOptions.RunException(ex, null);
+                serverOptions.CallExceptionEvent(ex, null);
             }
             //продолжаем принимать запросы
             listener.BeginGetContext(Accept, listener);

@@ -14,6 +14,8 @@ namespace NSL.WebSockets.Client
 
         public const int DefaultConnectionTimeout = 8_000;
 
+        public WSClientOptions<T> Options => base.options as WSClientOptions<T>;
+
         public WSNetworkClient(TOptions options) : base(options)
         {
         }
@@ -58,11 +60,9 @@ namespace NSL.WebSockets.Client
             if (base.disconnected == false)
                 throw new InvalidOperationException("Client must be disconnected before reconnecting");
 
-
-            var options = (WSClientOptions<T>)base.options;
             try
             {
-                return await ConnectProcess(options, connectionTimeOut);
+                return await ConnectProcess(connectionTimeOut);
             }
             catch (Exception ex)
             {
@@ -74,7 +74,7 @@ namespace NSL.WebSockets.Client
             return false;
         }
 
-        protected virtual async Task<bool> ConnectProcess(WSClientOptions<T> options, int connectionTimeOut)
+        protected virtual async Task<bool> ConnectProcess(int connectionTimeOut)
         {
             client = CreateWS();
 
@@ -82,10 +82,9 @@ namespace NSL.WebSockets.Client
 
             cts.CancelAfter(connectionTimeOut);
 
-            await ConnectAsync(options.EndPoint, cts.Token);
-            //await client.ConnectAsync(ConnectionOptions.IpAddress, ConnectionOptions.Port);
+            await ConnectAsync(ConnectionOptions.EndPoint, cts.Token);
 
-            return ProcessState(options, client.State);
+            return ProcessState(client.State);
         }
 
         protected virtual WebSocket CreateWS()
@@ -98,11 +97,11 @@ namespace NSL.WebSockets.Client
             await ((ClientWebSocket)client).ConnectAsync(endPoint, cts);
         }
 
-        protected bool ProcessState(WSClientOptions<T> options, WebSocketState state)
+        protected bool ProcessState(WebSocketState state)
         {
             if (state == WebSocketState.Open)
             {
-                Reconnect(client, options.EndPoint);
+                Reconnect(client, Options.EndPoint);
                 return true;
             }
 

@@ -1,5 +1,4 @@
-﻿using NSL.BuilderExtensions.WebSockets;
-using NSL.EndPointBuilder;
+﻿using NSL.EndPointBuilder;
 using NSL.SocketCore;
 using NSL.SocketServer.Utils;
 using NSL.SocketServer;
@@ -10,15 +9,11 @@ using NSL.WebSockets.Server.AspNetPoint;
 
 namespace NSL.BuilderExtensions.WebSocketsServer.AspNet
 {
-    public class AspNetWebSocketsServerEndPointBuilder<TClient, TOptions> : WebSocketsEndPointBuilder, IOptionableEndPointServerBuilder<TClient>, IHandleIOBuilder<WSServerClient<TClient>>
+    public class AspNetWebSocketsServerEndPointBuilder<TClient, TOptions> : IOptionableEndPointServerBuilder<TClient>, IHandleIOBuilder<TClient>
             where TClient : AspNetWSNetworkServerClient, new()
             where TOptions : WSServerOptions<TClient>, new()
     {
         TOptions options = new TOptions();
-
-        event ReceivePacketDebugInfo<WSServerClient<TClient>> OnReceiveHandles;
-
-        event SendPacketDebugInfo<WSServerClient<TClient>> OnSendHandles;
 
         public ServerOptions<TClient> GetOptions() => options;
 
@@ -46,47 +41,21 @@ namespace NSL.BuilderExtensions.WebSocketsServer.AspNet
             return this;
         }
 
-        public void AddReceiveHandle(ReceivePacketDebugInfo<WSServerClient<TClient>> handle)
+        public void AddReceiveHandle(CoreOptions<TClient>.ReceivePacketHandle handle)
         {
-            OnReceiveHandles += handle;
+            options.OnReceivePacket += handle;
         }
 
-        public void AddSendHandle(SendPacketDebugInfo<WSServerClient<TClient>> handle)
+        public void AddSendHandle(CoreOptions<TClient>.SendPacketHandle handle)
         {
-            OnSendHandles += handle;
-        }
-
-        public void AddBaseReceiveHandle(ReceivePacketDebugInfo<IClient> handle)
-        {
-            OnReceiveHandles += (client, pid, len) => handle(client, pid, len);
-        }
-
-        public void AddBaseSendHandle(SendPacketDebugInfo<IClient> handle)
-        {
-            OnSendHandles += (client, pid, len, stack) => handle(client, pid, len, stack);
+            options.OnSendPacket += handle;
         }
 
         public AspNetWebSocketsServer<TClient> Build(IEndpointRouteBuilder router)
-        {
-            var result = new AspNetWebSocketsServer<TClient>(router, options);
-
-            result.OnReceivePacket += OnReceiveHandles;
-
-            result.OnSendPacket += OnSendHandles;
-
-            return result;
-        }
+            => new AspNetWebSocketsServer<TClient>(router, options);
 
         public AspNetWebSocketsServer<TClient> BuildWithoutRoute()
-        {
-            var result = new AspNetWebSocketsServer<TClient>(options);
-
-            result.OnReceivePacket += OnReceiveHandles;
-
-            result.OnSendPacket += OnSendHandles;
-
-            return result;
-        }
+            => new AspNetWebSocketsServer<TClient>(options);
     }
 }
 

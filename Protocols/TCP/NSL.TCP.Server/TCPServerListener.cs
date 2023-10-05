@@ -102,7 +102,7 @@ namespace NSL.TCP.Server
             }
             catch (Exception ex)
             {
-                serverOptions.RunException(ex, null);
+                serverOptions.CallExceptionEvent(ex, null);
             }
             listener = null;
         }
@@ -136,7 +136,7 @@ namespace NSL.TCP.Server
             }
             catch (Exception ex)
             {
-                serverOptions.RunException(ex, null);
+                serverOptions.CallExceptionEvent(ex, null);
             }
             //продолжаем принимать запросы
             listener.BeginAccept(Accept, listener);

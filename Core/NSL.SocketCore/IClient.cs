@@ -6,7 +6,7 @@ namespace NSL.SocketCore
 {
     public delegate void ReceivePacketDebugInfo<T>(T client, ushort pid, int len) where T : IClient;
 
-    public delegate void SendPacketDebugInfo<T>(T client, ushort pid, int len, string stacktrace) where T : IClient;
+    public delegate void SendPacketDebugInfo<T>(T client, ushort pid, int len, string stackTrace) where T : IClient;
 
     public interface IClient : INetworkNode
     {

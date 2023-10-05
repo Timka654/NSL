@@ -1,4 +1,5 @@
 ﻿using NSL.Extensions.Session.Server.Packets;
+using NSL.SocketCore;
 using NSL.SocketServer;
 using NSL.SocketServer.Utils;
 using System;
@@ -14,8 +15,7 @@ namespace NSL.Extensions.Session.Server
 
             if (configure != null)
                 configure(sOptions);
-
-            var manager = new NSLSessionManager<TClient>(sOptions);
+            var manager = new NSLSessionManager<TClient>(sOptions, options);
 
             options.ObjectBag.Set(NSLSessionServerOptions.ObjectBagKey, sOptions);
             options.ObjectBag.Set(NSLSessionManager<TClient>.ObjectBagKey, manager);

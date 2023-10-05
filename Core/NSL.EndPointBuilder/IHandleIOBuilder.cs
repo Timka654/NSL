@@ -1,18 +1,13 @@
 ﻿using NSL.SocketCore;
+using NSL.SocketCore.Utils;
 
 namespace NSL.EndPointBuilder
 {
-    public interface IHandleIOBuilder {
-        void AddBaseReceiveHandle(ReceivePacketDebugInfo<IClient> handle);
-
-        void AddBaseSendHandle(SendPacketDebugInfo<IClient> handle);
-    }
-
-    public interface IHandleIOBuilder<TClient> : IHandleIOBuilder
-        where TClient : IClient
+    public interface IHandleIOBuilder<TClient>
+        where TClient : INetworkClient
     {
-        void AddReceiveHandle(SocketCore.ReceivePacketDebugInfo<TClient> handle);
+        void AddReceiveHandle(CoreOptions<TClient>.ReceivePacketHandle handle);
 
-        void AddSendHandle(SocketCore.SendPacketDebugInfo<TClient> handle);
+        void AddSendHandle(CoreOptions<TClient>.SendPacketHandle handle);
     }
 }

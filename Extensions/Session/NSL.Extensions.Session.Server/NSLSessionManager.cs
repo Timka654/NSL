@@ -1,5 +1,6 @@
 ﻿using NSL.Extensions.Session;
 using NSL.Extensions.Session.Server.Packets;
+using NSL.SocketCore;
 using NSL.SocketServer;
 using NSL.SocketServer.Utils;
 using NSL.Utils;
@@ -22,10 +23,10 @@ namespace NSL.Extensions.Session.Server
 
         private CancellationTokenSource removeSessionCycleCTS;
 
-        public NSLSessionManager(NSLSessionServerOptions<TClient> options)
+        public NSLSessionManager(NSLSessionServerOptions<TClient> options, CoreOptions networkOptions)
         {
             this.options = options;
-
+            this.networkOptions = networkOptions;
             removeSessionCycleCTS = new CancellationTokenSource();
 
             RunRemoveSessionCycle();
@@ -33,13 +34,13 @@ namespace NSL.Extensions.Session.Server
 
         private async void RunRemoveSessionCycle()
         {
-            do
+            while (true)
             {
                 try
                 {
                     if (!waitCloseQueue.TryDequeue(out var waitClose))
                     {
-                        var delay = options.CloseSessionDelay.TotalMilliseconds / 4;
+                        var delay = options.CloseSessionDelay.TotalMilliseconds * 0.9;
 
                         await Task.Delay((int)delay, removeSessionCycleCTS.Token);
 
@@ -54,18 +55,19 @@ namespace NSL.Extensions.Session.Server
                     if (!waitTime.HasValue)
                         continue;
 
-                    await Task.Delay(waitTime.Value, removeSessionCycleCTS.Token);
+                    if (waitTime.Value > TimeSpan.Zero)
+                        await Task.Delay(waitTime.Value, removeSessionCycleCTS.Token);
 
                     if (!waitClose.DisconnectTime.HasValue)
                         continue;
 
-                    RemoveSession(waitClose.Session);
+                    RemoveSession(waitClose.Session, true);
 
                     options.OnExpiredSession(waitClose.Client, waitClose);
                 }
                 catch (TaskCanceledException) { return; }
-                catch { }
-            } while (true);
+                catch (Exception ex) { networkOptions.HelperLogger?.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Error, ex.ToString()); }
+            }
         }
 
         private void Server_OnClientDisconnectEvent(TClient client)
@@ -171,9 +173,18 @@ namespace NSL.Extensions.Session.Server
             return RemoveSession(session.Session);
         }
 
-        public bool RemoveSession(string session)
+        public bool RemoveSession(string session, bool expired = false)
         {
-            return sessionStorage.TryRemove(session, out _);
+            if (sessionStorage.TryRemove(session, out var s))
+            {
+                if (expired && !s.DisconnectTime.HasValue)
+                {
+                    sessionStorage.TryAdd(session, s);
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         public NSLServerSessionInfo<TClient> GetSession(string session)
@@ -200,5 +211,6 @@ namespace NSL.Extensions.Session.Server
 
         private static Random rnd = new Random();
         private readonly NSLSessionServerOptions<TClient> options;
+        private readonly CoreOptions networkOptions;
     }
 }

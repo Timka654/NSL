@@ -15,7 +15,13 @@ namespace NSL.Extensions.Version.Server
             if (configure != null)
                 configure(sOptions);
 
-            options.ObjectBag.Set(NSLServerVersionInfo.ObjectBagKey, sOptions);
+            return AddNSLVersion(options, sOptions);
+        }
+
+        public static ServerOptions<TClient> AddNSLVersion<TClient>(this ServerOptions<TClient> options, NSLServerVersionInfo versionInfo)
+            where TClient : IServerNetworkClient
+        {
+            options.ObjectBag.Set(NSLServerVersionInfo.ObjectBagKey, versionInfo);
 
             options.AddPacket(NSLVersionPacket<TClient>.PacketId, new NSLVersionPacket<TClient>());
 

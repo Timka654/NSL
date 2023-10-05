@@ -1,5 +1,4 @@
-﻿using NSL.BuilderExtensions.TCP;
-using System;
+﻿using System;
 using System.Net;
 using NSL.TCP.Server;
 using NSL.SocketServer.Utils;
@@ -10,7 +9,7 @@ using NSL.SocketClient;
 
 namespace NSL.BuilderExtensions.TCPServer
 {
-    public class TCPServerEndPointBuilder : TCPEndPointBuilder
+    public class TCPServerEndPointBuilder
     {
         private TCPServerEndPointBuilder() { }
 
@@ -26,7 +25,7 @@ namespace NSL.BuilderExtensions.TCPServer
         }
     }
 
-    public class TCPServerEndPointBuilder<TClient> : TCPEndPointBuilder
+    public class TCPServerEndPointBuilder<TClient>
         where TClient : IServerNetworkClient, new()
     {
         private TCPServerEndPointBuilder() { }
@@ -46,15 +45,11 @@ namespace NSL.BuilderExtensions.TCPServer
         }
     }
 
-    public class TCPServerEndPointBuilder<TClient, TOptions> : TCPEndPointBuilder, IOptionableEndPointServerBuilder<TClient>, IHandleIOBuilder<TCPServerClient<TClient>>
+    public class TCPServerEndPointBuilder<TClient, TOptions> : IOptionableEndPointServerBuilder<TClient>, IHandleIOBuilder<TClient>
         where TClient : IServerNetworkClient, new()
         where TOptions : ServerOptions<TClient>, new()
     {
         TOptions options = new TOptions();
-
-        event ReceivePacketDebugInfo<TCPServerClient<TClient>> OnReceiveHandles;
-
-        event SendPacketDebugInfo<TCPServerClient<TClient>> OnSendHandles;
 
         public ServerOptions<TClient> GetOptions() => options;
 
@@ -101,35 +96,17 @@ namespace NSL.BuilderExtensions.TCPServer
             return this;
         }
 
-        public void AddReceiveHandle(ReceivePacketDebugInfo<TCPServerClient<TClient>> handle)
+        public void AddReceiveHandle(CoreOptions<TClient>.ReceivePacketHandle handle)
         {
-            OnReceiveHandles += handle;
+            options.OnReceivePacket += handle;
         }
 
-        public void AddSendHandle(SendPacketDebugInfo<TCPServerClient<TClient>> handle)
+        public void AddSendHandle(CoreOptions<TClient>.SendPacketHandle handle)
         {
-            OnSendHandles += handle;
-        }
-
-        public void AddBaseReceiveHandle(ReceivePacketDebugInfo<IClient> handle)
-        {
-            OnReceiveHandles += (client, pid, len) => handle(client, pid, len);
-        }
-
-        public void AddBaseSendHandle(SendPacketDebugInfo<IClient> handle)
-        {
-            OnSendHandles += (client, pid, len, stack) => handle(client, pid, len, stack);
+            options.OnSendPacket += handle;
         }
 
         public TCPServerListener<TClient> Build()
-        {
-            var result = new TCPServerListener<TClient>(options);
-
-            result.OnReceivePacket += OnReceiveHandles;
-
-            result.OnSendPacket += OnSendHandles;
-
-            return result;
-        }
+            => new TCPServerListener<TClient>(options);
     }
 }

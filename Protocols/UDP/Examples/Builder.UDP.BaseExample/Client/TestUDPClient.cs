@@ -47,12 +47,12 @@ namespace Builder.UDP.BaseExample.Client
                     builder.AddSendHandle((client, pid, packet, stackTrace) =>
                     {
                         //Console.WriteLine($"[Client] Send packet({pid}) to {client.GetRemotePoint()} from\r\n{stackTrace}");
-                        Console.WriteLine($"[Client] Send packet({pid}) to {client.GetRemotePoint()}");
+                        Console.WriteLine($"[Client] Send packet({pid}) to {client?.Network?.GetRemotePoint()}");
                     });
 
                     builder.AddReceiveHandle((client, pid, packet) =>
                     {
-                        Console.WriteLine($"[Client] Receive packet({pid}) from {client.GetRemotePoint()}");
+                        Console.WriteLine($"[Client] Receive packet({pid}) from {client?.Network?.GetRemotePoint()}");
                     });
                 })
                 .WithCode(builder =>

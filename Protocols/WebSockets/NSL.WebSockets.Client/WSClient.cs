@@ -17,16 +17,14 @@ namespace NSL.WebSockets.Client
 
         public long Version { get; set; }
 
-        public ClientOptions<T> ConnectionOptions => (ClientOptions<T>)base.options;
+       public WSClientOptions<T> ConnectionOptions => (WSClientOptions<T>)base.options;
 
         /// <summary>
         /// Инициализация прослушивания клиента
         /// </summary>
         /// <param name="options">общие настройки сервера</param>
-        public WSClient(ClientOptions<T> options) : base()
+        public WSClient(ClientOptions<T> options) : base(options)
         {
-            //установка переменной с общими настройками сервера
-            this.options = options;
         }
 
         /// <summary>

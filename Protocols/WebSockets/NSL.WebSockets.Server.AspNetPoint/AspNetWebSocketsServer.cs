@@ -12,9 +12,6 @@ namespace NSL.WebSockets.Server.AspNetPoint
     public class AspNetWebSocketsServer<T> : INetworkListener<T>
         where T : AspNetWSNetworkServerClient, new()
     {
-        public event ReceivePacketDebugInfo<WSServerClient<T>> OnReceivePacket;
-        public event SendPacketDebugInfo<WSServerClient<T>> OnSendPacket;
-
         public delegate Task AcceptDelegate(HttpContext context);
 
         /// <summary>
@@ -70,18 +67,11 @@ namespace NSL.WebSockets.Server.AspNetPoint
             try
             {
                 //инициализация слушателя клиента клиента
-                //#if DEBUG
-                var c = new AspNetWSServerClient<T>(context, serverOptions);
-                c.OnReceivePacket += OnReceivePacket;
-                c.OnSendPacket += OnSendPacket;
-                await c.RunPacketReceiver();
-                //#else
-                //                new ServerClient<T>(client, serverOptions).RunPacketReceiver();
-                //#endif
+                await new AspNetWSServerClient<T>(context, serverOptions).RunPacketReceiver();
             }
             catch (Exception ex)
             {
-                serverOptions.RunException(ex, null);
+                serverOptions.CallExceptionEvent(ex, null);
             }
         }
 

@@ -81,7 +81,7 @@ namespace NSL.UDP.Client
                         var dnsIPs = Dns.GetHostAddresses(item.Address).OrderByDescending(x => x.AddressFamily == options.AddressFamily);
 
                         if (!dnsIPs.Any())
-                            options.RunException(new StunExceptionInfo(
+                            options.CallExceptionEvent(new StunExceptionInfo(
                                 item,
                                 null,
                                 StunExceptionInfo.ErrorTypeEnum.DNSIPAddressParseError,
@@ -94,7 +94,7 @@ namespace NSL.UDP.Client
                         StunInformation = STUNClient.Query(listener, stunEndPoint, options.StunQueryType);
 
                         if (StunInformation.QueryError != STUNQueryError.Success)
-                            options.RunException(new StunExceptionInfo(item, StunInformation, StunExceptionInfo.ErrorTypeEnum.QueryResultError, stunEndPoint), default);
+                            options.CallExceptionEvent(new StunExceptionInfo(item, StunInformation, StunExceptionInfo.ErrorTypeEnum.QueryResultError, stunEndPoint), default);
                         else
                             break;
                     }
@@ -168,12 +168,12 @@ namespace NSL.UDP.Client
             }
             catch (SocketException sex)
             {
-                options.RunException(sex, null);
+                options.CallExceptionEvent(sex, null);
                 StopReceive();
             }
             catch (Exception ex)
             {
-                options.RunException(ex, null);
+                options.CallExceptionEvent(ex, null);
                 StopReceive();
             }
             finally

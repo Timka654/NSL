@@ -4,6 +4,8 @@ using NSL.SocketServer.Utils;
 using NSL.TCP.Server;
 using TCP.BaseServerExample;
 
+Console.WriteLine("TCP.Server");
+
 ServerOptions<BaseServerNetworkClient> options = new ServerOptions<BaseServerNetworkClient>();
 
 options.Port = 20004;

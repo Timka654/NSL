@@ -55,12 +55,12 @@ namespace NSL.SocketClient
         /// </summary>
         public virtual void RunException(Exception ex)
         {
-            base.RunException(ex, ClientData);
+            base.CallExceptionEvent(ex, ClientData);
         }
 
         public virtual void RunClientConnect()
         {
-            base.RunClientConnect(ClientData);
+            base.CallClientConnectEvent(ClientData);
         }
 
         /// <summary>
@@ -83,7 +83,7 @@ namespace NSL.SocketClient
 
         protected virtual void OnRunClientDisconnect()
         {
-            RunClientDisconnect(ClientData);
+            CallClientDisconnectEvent(ClientData);
         }
 
         #region ServerSettings

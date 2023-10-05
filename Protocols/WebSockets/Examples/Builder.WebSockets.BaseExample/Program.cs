@@ -18,6 +18,7 @@ namespace Builder.WebSockets.BaseExample
 
             await TestWebSocketsClient.RunTest();
 
+            Console.WriteLine("Disconnecting");
             TestWebSocketsClient.Disconnect();
 
             Console.WriteLine("Press any key for exit");

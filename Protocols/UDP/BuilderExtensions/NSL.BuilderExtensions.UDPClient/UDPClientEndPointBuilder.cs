@@ -1,5 +1,4 @@
-﻿using NSL.BuilderExtensions.UDP;
-using NSL.EndPointBuilder;
+﻿using NSL.EndPointBuilder;
 using NSL.SocketCore;
 using NSL.SocketServer;
 using NSL.SocketServer.Utils;
@@ -9,7 +8,7 @@ using System;
 
 namespace NSL.BuilderExtensions.UDPClient
 {
-    public class UDPClientEndPointBuilder : UDPEndPointBuilder
+    public class UDPClientEndPointBuilder
     {
         private UDPClientEndPointBuilder() { }
 
@@ -25,7 +24,7 @@ namespace NSL.BuilderExtensions.UDPClient
         }
     }
 
-    public class UDPClientEndPointBuilder<TClient> : UDPEndPointBuilder
+    public class UDPClientEndPointBuilder<TClient>
         where TClient : IServerNetworkClient, new()
     {
         private UDPClientEndPointBuilder() { }
@@ -45,17 +44,11 @@ namespace NSL.BuilderExtensions.UDPClient
         }
     }
 
-    public class UDPClientEndPointBuilder<TClient, TOptions> : UDPEndPointBuilder, IOptionableEndPointServerBuilder<TClient>, IHandleIOBuilder<UDPClient<TClient>>
+    public class UDPClientEndPointBuilder<TClient, TOptions> : IOptionableEndPointServerBuilder<TClient>, IHandleIOBuilder<TClient>
         where TClient : IServerNetworkClient, new()
         where TOptions : UDPClientOptions<TClient>, new()
     {
         TOptions options = new TOptions();
-
-        event ReceivePacketDebugInfo<UDPClient<TClient>> OnReceiveHandles;
-
-        event SendPacketDebugInfo<UDPClient<TClient>> OnSendHandles;
-
-        //public ClientOptions<TClient> GetOptions() => options;
 
         public ServerOptions<TClient> GetOptions() => options;
 
@@ -90,35 +83,17 @@ namespace NSL.BuilderExtensions.UDPClient
             return this;
         }
 
-        public void AddReceiveHandle(ReceivePacketDebugInfo<UDPClient<TClient>> handle)
+        public void AddReceiveHandle(CoreOptions<TClient>.ReceivePacketHandle handle)
         {
-            OnReceiveHandles += handle;
+            options.OnReceivePacket += handle;
         }
 
-        public void AddSendHandle(SendPacketDebugInfo<UDPClient<TClient>> handle)
+        public void AddSendHandle(CoreOptions<TClient>.SendPacketHandle handle)
         {
-            OnSendHandles += handle;
-        }
-
-        public void AddBaseReceiveHandle(ReceivePacketDebugInfo<IClient> handle)
-        {
-            OnReceiveHandles += (client, pid, len) => handle(client, pid, len);
-        }
-
-        public void AddBaseSendHandle(SendPacketDebugInfo<IClient> handle)
-        {
-            OnSendHandles += (client, pid, len, stack) => handle(client, pid, len, stack);
+            options.OnSendPacket += handle;
         }
 
         public UDPNetworkClient<TClient> Build()
-        {
-            var result = new UDPNetworkClient<TClient>(options);
-
-            result.OnReceivePacket += OnReceiveHandles;
-
-            result.OnSendPacket += OnSendHandles;
-
-            return result;
-        }
+            => new UDPNetworkClient<TClient>(options);
     }
 }

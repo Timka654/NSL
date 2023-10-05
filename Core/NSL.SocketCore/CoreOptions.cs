@@ -163,6 +163,12 @@ namespace NSL.SocketCore
         public delegate void PacketHandle(TClient client, InputPacketBuffer data);
         public delegate Task AsyncPacketHandle(TClient client, InputPacketBuffer data);
 
+
+
+        public delegate void ReceivePacketHandle(TClient client, ushort pid, int len);
+
+        public delegate void SendPacketHandle(TClient client, ushort pid, int len, string stackTrace);
+
         /// <summary>
         /// События вызываемое при получении ошибки
         /// </summary>
@@ -180,11 +186,23 @@ namespace NSL.SocketCore
         public event ClientDisconnect OnClientDisconnectEvent;
         public event ClientDisconnectAsync OnClientDisconnectAsyncEvent;
 
+        public event ReceivePacketHandle OnReceivePacket;
+        public event SendPacketHandle OnSendPacket;
+
+        public void CallReceivePacketEvent(TClient client, ushort pid, int len)
+        {
+            OnReceivePacket?.Invoke(client, pid, len);
+        }
+
+        public void CallSendPacketEvent(TClient client, ushort pid, int len, string stackTrace)
+        {
+            OnSendPacket?.Invoke(client, pid, len,stackTrace);
+        }
 
         /// <summary>
         /// Вызов события ошибка
         /// </summary>
-        public void RunException(Exception ex, TClient client)
+        public void CallExceptionEvent(Exception ex, TClient client)
         {
             OnExceptionEvent?.Invoke(ex, client);
         }
@@ -193,7 +211,7 @@ namespace NSL.SocketCore
         /// Вызов события подключения клиента
         /// </summary>
         /// <param name="client"></param>
-        public void RunClientConnect(TClient client)
+        public void CallClientConnectEvent(TClient client)
         {
             OnClientConnectEvent?.Invoke(client);
 
@@ -209,7 +227,7 @@ namespace NSL.SocketCore
         /// Вызов события отключения клиента
         /// </summary>
         /// <param name="client"></param>
-        public void RunClientDisconnect(TClient client)
+        public void CallClientDisconnectEvent(TClient client)
         {
             if (client == null)
                 return;
@@ -220,7 +238,7 @@ namespace NSL.SocketCore
 
             if (OnClientDisconnectAsyncEvent != null)
             {
-                Task.Run(()=> OnClientDisconnectAsyncEvent(client)).Wait();
+                Task.Run(() => OnClientDisconnectAsyncEvent(client)).Wait();
             }
         }
     }

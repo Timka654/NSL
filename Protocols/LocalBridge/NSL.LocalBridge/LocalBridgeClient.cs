@@ -13,15 +13,18 @@ namespace NSL.LocalBridge
         where TClient : INetworkClient, new()
         where TOClient : INetworkClient, new()
     {
-        public LocalBridgeClient(CoreOptions options) : this(options, null, null)
+        public LocalBridgeClient(CoreOptions<TClient> options) : this(options, null, null)
         { }
 
-        public LocalBridgeClient(CoreOptions options, IPEndPoint connectionEndPoint) : this(options, connectionEndPoint, null)
+        public LocalBridgeClient(CoreOptions<TClient> options, IPEndPoint connectionEndPoint) : this(options, connectionEndPoint, null)
         { }
 
-        public LocalBridgeClient(CoreOptions options, IPEndPoint connectionEndPoint, LocalBridgeClient<TOClient, TClient> otherClient)
+        public LocalBridgeClient(CoreOptions<TClient> options, IPEndPoint connectionEndPoint, LocalBridgeClient<TOClient, TClient> otherClient)
         {
-            normalOptions = options as CoreOptions<TClient>;
+            normalOptions = options;
+
+            OnReceivePacket += (client, pid, len) => options.CallReceivePacketEvent(clientData, pid, len);
+            OnSendPacket += (client, pid, len, st) => options.CallSendPacketEvent(clientData, pid, len, st);
 
             clientData = new TClient();
 
@@ -35,6 +38,9 @@ namespace NSL.LocalBridge
                 SetOtherClient(otherClient);
         }
 
+        public event ReceivePacketDebugInfo<LocalBridgeClient<TClient, TOClient>> OnReceivePacket;
+        public event SendPacketDebugInfo<LocalBridgeClient<TClient, TOClient>> OnSendPacket;
+
         public void SetOtherClient(LocalBridgeClient<TOClient, TClient> otherClient)
         {
             if (this.otherClient == otherClient)
@@ -47,7 +53,7 @@ namespace NSL.LocalBridge
 
             otherClient.SetOtherClient(this);
 
-            normalOptions.RunClientConnect(clientData);
+            normalOptions.CallClientConnectEvent(clientData);
         }
 
         public CoreOptions Options => normalOptions;
@@ -80,7 +86,7 @@ namespace NSL.LocalBridge
 
             otherClient = null;
 
-            normalOptions.RunClientDisconnect(clientData);
+            normalOptions.CallClientDisconnectEvent(clientData);
 
             c.Disconnect();
         }
@@ -102,6 +108,12 @@ namespace NSL.LocalBridge
 
         public void Send(OutputPacketBuffer packet, bool disposeOnSend = true)
         {
+#if DEBUG
+            OnSend(packet, Environment.StackTrace);
+#else
+            OnSend(packet, "");
+#endif
+
             Send(packet.CompilePacket());
 
             if (disposeOnSend)
@@ -141,6 +153,8 @@ namespace NSL.LocalBridge
         {
             var pbuff = new InputPacketBuffer(buf);
 
+            OnReceive(pbuff.PacketId, pbuff.PacketLength);
+
             //предотвращение ошибок в пакете
             try
             {
@@ -149,11 +163,21 @@ namespace NSL.LocalBridge
             }
             catch (Exception ex)
             {
-                normalOptions.RunException(ex, clientData);
+                normalOptions.CallExceptionEvent(ex, clientData);
             }
 
             if (!pbuff.ManualDisposing)
                 pbuff.Dispose();
+        }
+
+        protected virtual void OnSend(OutputPacketBuffer rbuff, string stackTrace = "")
+        {
+            OnSendPacket?.Invoke(this, rbuff.PacketId, rbuff.PacketLength, stackTrace);
+        }
+
+        protected virtual void OnReceive(ushort pid, int len)
+        {
+            OnReceivePacket?.Invoke(this, pid, len);
         }
 
     }

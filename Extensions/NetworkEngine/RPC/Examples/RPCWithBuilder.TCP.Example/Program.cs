@@ -29,7 +29,7 @@ internal class Program
                 builder.RegisterRPCProcessor();
                 builder.AddRPCContainer(_client => _client.RPCRepository);
 
-                builder.AddDefaultEventHandlers<TCPServerEndPointBuilder<NetworkServerClient, ServerOptions<NetworkServerClient>>, NetworkServerClient>(
+                builder.AddDefaultEventHandlers(
                     "[Server]",
                      DefaultEventHandlersEnum.All & ~DefaultEventHandlersEnum.HasSendStackTrace,
                      GetRPCPacketType,
@@ -57,7 +57,7 @@ internal class Program
                 builder.RegisterRPCProcessor();
                 builder.AddRPCContainer(_client => _client.RPCRepository);
 
-                builder.AddDefaultEventHandlers<TCPClientEndPointBuilder<NetworkClient, ClientOptions<NetworkClient>>, NetworkClient>(
+                builder.AddDefaultEventHandlers(
                     "[Client]",
                      DefaultEventHandlersEnum.All & ~(DefaultEventHandlersEnum.DisplayEndPoint | DefaultEventHandlersEnum.HasSendStackTrace),
                     GetRPCPacketType,

@@ -17,17 +17,13 @@ namespace NSL.TCP.Client
 
         public override T Data => ConnectionOptions.ClientData;
 
-        public ClientOptions<T> ConnectionOptions => (ClientOptions<T>)base.options;
+        public ClientOptions<T> ConnectionOptions => base.options as ClientOptions<T>;
 
         /// <summary>
         /// Инициализация прослушивания клиента
         /// </summary>
         /// <param name="options">общие настройки сервера</param>
-        public TCPClient(ClientOptions<T> options) : base()
-        {
-            //установка переменной с общими настройками сервера
-            this.options = options;
-        }
+        public TCPClient(ClientOptions<T> options) : base(options) { }
 
         /// <summary>
         /// Запуск цикла приема пакетов

@@ -67,8 +67,13 @@ namespace NSL.WebSockets
 
         #endregion
 
-        public BaseWSClient()
+        public BaseWSClient(CoreOptions<TClient> options)
         {
+            this.options = options;
+
+            OnReceivePacket += (client, pid, len) => options.CallReceivePacketEvent(client.Data, pid, len);
+            OnSendPacket += (client, pid, len, st) => options.CallSendPacketEvent(client.Data, pid, len, st);
+
             this.parent = GetParent();
         }
 
@@ -187,20 +192,17 @@ namespace NSL.WebSockets
                     }
                 }
             }
+            catch (WebSocketException wsex)
+            {
+                Disconnect(new ConnectionLostException(GetRemotePoint(), true, wsex));
+            }
             catch (ConnectionLostException clex)
             {
-                RunException(clex);
-                Disconnect();
+                Disconnect(clex);
             }
             catch (Exception ex)
             {
-                if (!disconnected)
-                {
-                    RunException(ex);
-
-                    //отключаем клиента, в случае ошибки не в транспортном потоке а где-то в пакете, что-бы клиент не завис 
-                    Disconnect();
-                }
+                Disconnect(ex);
             }
         }
 
@@ -248,10 +250,7 @@ namespace NSL.WebSockets
             catch (Exception ex)
             {
                 Data?.OnPacketSendFail(buf, offset, lenght);
-                RunException(ex);
-
-                //отключаем клиента, лишним не будет
-                Disconnect();
+                Disconnect(ex);
             }
             finally
             {
@@ -281,6 +280,13 @@ namespace NSL.WebSockets
         }
 
         protected bool disconnected = true;
+
+        private void Disconnect(Exception ex)
+        {
+            RunException(ex);
+
+            Disconnect();
+        }
 
         public void Disconnect()
         {

@@ -82,8 +82,13 @@ namespace NSL.UDP
 
         #endregion
 
-        public BaseUDPClient(IPEndPoint endPoint, Socket listenerSocket)
+        public BaseUDPClient(IPEndPoint endPoint, Socket listenerSocket, UDPClientOptions<TClient> options)
         {
+            this.options = options;
+
+            OnReceivePacket += (client, pid, len) => options.CallReceivePacketEvent(client.Data, pid, len);
+            OnSendPacket += (client, pid, len, st) => options.CallSendPacketEvent(client.Data, pid, len, st);
+
             this.parent = GetParent();
             this.endPoint = endPoint;
             this.listenerSocket = listenerSocket;
@@ -134,11 +139,17 @@ namespace NSL.UDP
 
         public object GetUserData() => Data;
 
+        private void Disconnect(Exception ex)
+        {
+            RunException(ex);
+
+            Disconnect();
+        }
+
         public void Disconnect()
         {
             lock (this)
             {
-
                 if (disconnected == true)
                     return;
 
@@ -201,18 +212,11 @@ namespace NSL.UDP
             }
             catch (ConnectionLostException clex)
             {
-                RunException(clex);
-                Disconnect();
+                Disconnect(clex);
             }
             catch (Exception ex)
             {
-                if (!disconnected)
-                {
-                    RunException(ex);
-
-                    //отключаем клиента, в случае ошибки не в транспортном потоке а где-то в пакете, что-бы клиент не завис 
-                    Disconnect();
-                }
+                Disconnect(ex);
             }
         }
 
@@ -279,10 +283,7 @@ namespace NSL.UDP
             catch (Exception ex)
             {
                 Data?.OnPacketSendFail(sndBuffer, 0, sndBuffer.Length);
-                RunException(ex);
-
-                //отключаем клиента, лишним не будет
-                Disconnect();
+                Disconnect(ex);
             }
         }
 

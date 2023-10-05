@@ -31,7 +31,7 @@ namespace NSL.Extensions.Version.Example
                 {
                     b.SetLogger(sl);
 
-                    b.AddDefaultEventHandlers<TCPServerEndPointBuilder<BaseServerNetworkClient, ServerOptions<BaseServerNetworkClient>>, BaseServerNetworkClient>(handleOptions: DefaultEventHandlersEnum.All & ~DefaultEventHandlersEnum.HasSendStackTrace);
+                    b.AddDefaultEventHandlers(handleOptions: DefaultEventHandlersEnum.All & ~DefaultEventHandlersEnum.HasSendStackTrace);
 
                     b.AddConnectHandle(c => c.InitializeObjectBag());
 
@@ -41,7 +41,7 @@ namespace NSL.Extensions.Version.Example
                     b.GetOptions().AddNSLVersion(c =>
                     {
                         c.Version = "155";
-                        c.RequireVersion = "10";
+                        c.RequireVersion = "12";
                         c.MinVersion = "5";
 
                     });
@@ -72,7 +72,7 @@ namespace NSL.Extensions.Version.Example
                     b.GetOptions()
                     .AddNSLVersion(c => { c.Version = "10"; });
 
-                    b.AddDefaultEventHandlers<TCPClientEndPointBuilder<BasicNetworkClient, ClientOptions<BasicNetworkClient>>, BasicNetworkClient>(handleOptions: DefaultEventHandlersEnum.All & ~DefaultEventHandlersEnum.HasSendStackTrace);
+                    b.AddDefaultEventHandlers(handleOptions: DefaultEventHandlersEnum.All & ~DefaultEventHandlersEnum.HasSendStackTrace);
                 })
                 .Build();
 

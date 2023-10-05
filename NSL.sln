@@ -269,9 +269,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WaitBuffer", "WaitBuffer", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NSL.Extensions.WaitBuffer", "Extensions\WaitBuffer\NSL.Extensions.WaitBuffer\NSL.Extensions.WaitBuffer.csproj", "{55A5C966-C7EE-4166-9E69-72B75CA1C71F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NSL.WebSockets.Client.Blazor", "Protocols\WebSockets\NSL.WebSockets.Client.Blazor\NSL.WebSockets.Client.Blazor.csproj", "{A30B4EE6-C087-4E1E-B7F3-656087DEC016}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NSL.WebSockets.Client.Blazor", "Protocols\WebSockets\NSL.WebSockets.Client.Blazor\NSL.WebSockets.Client.Blazor.csproj", "{A30B4EE6-C087-4E1E-B7F3-656087DEC016}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NSL.BuilderExtensions.WebSocketsClient.Blazor", "Protocols\WebSockets\BuilderExtensions\NSL.BuilderExtensions.WebSocketsClient.Blazor\NSL.BuilderExtensions.WebSocketsClient.Blazor.csproj", "{561393B9-B96E-4171-B343-D1D97D8C16A1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NSL.BuilderExtensions.WebSocketsClient.Blazor", "Protocols\WebSockets\BuilderExtensions\NSL.BuilderExtensions.WebSocketsClient.Blazor\NSL.BuilderExtensions.WebSocketsClient.Blazor.csproj", "{561393B9-B96E-4171-B343-D1D97D8C16A1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

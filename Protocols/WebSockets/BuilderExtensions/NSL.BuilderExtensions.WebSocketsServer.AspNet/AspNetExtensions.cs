@@ -11,7 +11,6 @@ namespace NSL.BuilderExtensions.WebSocketsServer.AspNet
 {
     public static class AspNetExtensions
     {
-
         /// <summary>
         /// Previously call UseWebSockets method for normal work
         /// </summary>

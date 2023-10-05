@@ -21,28 +21,19 @@ namespace NSL.TCP.Server
         /// </summary>
         public ServerOptions<T> ServerOptions => (ServerOptions<T>)base.options;
 
-
-        protected TCPServerClient()
-        {
-
-        }
-
         /// <summary>
         /// Инициализация прослушивания клиента
         /// </summary>
         /// <param name="client">клиент</param>
         /// <param name="options">общие настройки сервера</param>
-        public TCPServerClient(Socket client, ServerOptions<T> options) : base()
+        public TCPServerClient(Socket client, ServerOptions<T> options) : base(options)
         {
-            Initialize(client, options);
+            Initialize(client);
         }
 
-        protected void Initialize(Socket client, ServerOptions<T> options)
+        protected void Initialize(Socket client)
         {
             clientData = new T();
-
-            //установка переменной с общими настройками сервера
-            base.options = options;
 
             //обзятельная переменная в NetworkClient, для отправки данных, можно использовать привидения типов (Client)NetworkClient но это никому не поможет
             Data.Network = this;
@@ -66,7 +57,7 @@ namespace NSL.TCP.Server
 
             disconnected = false;
             //Начало приема пакетов от клиента
-            options.RunClientConnect(Data);
+            options.CallClientConnectEvent(Data);
         }
 
         public void RunPacketReceiver() => RunReceive();
@@ -92,8 +83,8 @@ namespace NSL.TCP.Server
             base.OnReceive(pid, len);
         }
 
-        protected override void RunDisconnect() => ServerOptions.RunClientDisconnect(Data);
+        protected override void RunDisconnect() => ServerOptions.CallClientDisconnectEvent(Data);
 
-        protected override void RunException(Exception ex) => ServerOptions.RunException(ex, Data);
+        protected override void RunException(Exception ex) => ServerOptions.CallExceptionEvent(ex, Data);
     }
 }

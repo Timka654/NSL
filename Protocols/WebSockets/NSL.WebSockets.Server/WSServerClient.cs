@@ -20,7 +20,7 @@ namespace NSL.WebSockets.Server
         public ServerOptions<T> ServerOptions => (ServerOptions<T>)base.options;
 
 
-        protected WSServerClient()
+        protected WSServerClient(ServerOptions<T> options) : base(options)
         {
 
         }
@@ -30,22 +30,20 @@ namespace NSL.WebSockets.Server
         /// </summary>
         /// <param name="client">клиент</param>
         /// <param name="options">общие настройки сервера</param>
-        public WSServerClient(HttpListenerContext client, ServerOptions<T> options) : base()
+        public WSServerClient(HttpListenerContext client, ServerOptions<T> options) : this(options)
         {
             if (!client.Request.IsWebSocketRequest)
                 throw new Exception($"{client.Request.UserHostAddress} is not WebSocket request");
 
             base.context = client;
 
-            Initialize(options);
+            Initialize();
+
         }
 
-        protected void Initialize(ServerOptions<T> options)
+        protected void Initialize()
         {
             clientData = new T();
-
-            //установка переменной с общими настройками сервера
-            base.options = options;
 
             //обзятельная переменная в NetworkClient, для отправки данных, можно использовать привидения типов (Client)NetworkClient но это никому не поможет
             Data.Network = this;
@@ -70,7 +68,7 @@ namespace NSL.WebSockets.Server
                 sclient = (await context.AcceptWebSocketAsync(null))?.WebSocket;
 
                 //Начало приема пакетов от клиента
-                options.RunClientConnect(Data);
+                options.CallClientConnectEvent(Data);
 
                 RunReceiveAsync();
             }
@@ -100,8 +98,8 @@ namespace NSL.WebSockets.Server
             base.OnReceive(pid, len);
         }
 
-        protected override void RunDisconnect() => ServerOptions.RunClientDisconnect(Data);
+        protected override void RunDisconnect() => ServerOptions.CallClientDisconnectEvent(Data);
 
-        protected override void RunException(Exception ex) => ServerOptions.RunException(ex, Data);
+        protected override void RunException(Exception ex) => ServerOptions.CallExceptionEvent(ex, Data);
     }
 }

@@ -1,5 +1,4 @@
-﻿using NSL.BuilderExtensions.WebSockets;
-using NSL.EndPointBuilder;
+﻿using NSL.EndPointBuilder;
 using NSL.SocketClient;
 using NSL.SocketClient.Utils;
 using NSL.SocketCore;
@@ -8,7 +7,7 @@ using System;
 
 namespace NSL.BuilderExtensions.WebSocketsClient
 {
-    public class WebSocketsClientEndPointBuilder : WebSocketsEndPointBuilder
+    public class WebSocketsClientEndPointBuilder
     {
         private WebSocketsClientEndPointBuilder() { }
 
@@ -24,7 +23,7 @@ namespace NSL.BuilderExtensions.WebSocketsClient
         }
     }
 
-    public class WebSocketsClientEndPointBuilder<TClient> : WebSocketsEndPointBuilder
+    public class WebSocketsClientEndPointBuilder<TClient>
         where TClient : BaseSocketNetworkClient, new()
     {
         private WebSocketsClientEndPointBuilder() { }
@@ -44,15 +43,11 @@ namespace NSL.BuilderExtensions.WebSocketsClient
         }
     }
 
-    public class WebSocketsClientEndPointBuilder<TClient, TOptions> : WebSocketsEndPointBuilder, IOptionableEndPointClientBuilder<TClient>, IHandleIOBuilder<WSClient<TClient>>
+    public class WebSocketsClientEndPointBuilder<TClient, TOptions> : IOptionableEndPointClientBuilder<TClient>, IHandleIOBuilder<TClient>
         where TClient : BaseSocketNetworkClient, new()
         where TOptions : WSClientOptions<TClient>, new()
     {
         TOptions options = new TOptions();
-
-        event ReceivePacketDebugInfo<WSClient<TClient>> OnReceiveHandles;
-
-        event SendPacketDebugInfo<WSClient<TClient>> OnSendHandles;
 
         public ClientOptions<TClient> GetOptions() => options;
 
@@ -79,41 +74,17 @@ namespace NSL.BuilderExtensions.WebSocketsClient
             return this;
         }
 
-        public void AddReceiveHandle(ReceivePacketDebugInfo<WSClient<TClient>> handle)
+        public void AddReceiveHandle(CoreOptions<TClient>.ReceivePacketHandle handle)
         {
-            OnReceiveHandles += handle;
+            options.OnReceivePacket += handle;
         }
 
-        public void AddSendHandle(SendPacketDebugInfo<WSClient<TClient>> handle)
+        public void AddSendHandle(CoreOptions<TClient>.SendPacketHandle handle)
         {
-            OnSendHandles += handle;
-        }
-
-        public void AddBaseReceiveHandle(ReceivePacketDebugInfo<IClient> handle)
-        {
-            OnReceiveHandles += (client, pid, len) => handle(client, pid, len);
-        }
-
-        public void AddBaseSendHandle(SendPacketDebugInfo<IClient> handle)
-        {
-            OnSendHandles += (client, pid, len, stack) => handle(client, pid, len, stack);
+            options.OnSendPacket += handle;
         }
 
         public WSNetworkClient<TClient, TOptions> Build()
-        {
-            var result = new WSNetworkClient<TClient, TOptions>(options);
-
-            result.OnReceivePacket += OnReceiveHandles;
-
-            result.OnSendPacket += OnSendHandles;
-
-            return result;
-        }
-
-        public ReceivePacketDebugInfo<WSClient<TClient>> GetReceiveHandles()
-            => OnReceiveHandles;
-
-        public SendPacketDebugInfo<WSClient<TClient>> GetSendHandles()
-            => OnSendHandles;
+            => new WSNetworkClient<TClient, TOptions>(options);
     }
 }
