@@ -37,6 +37,8 @@ namespace NSL.WebSockets.Server
 
             base.context = client;
 
+            base.remoteEndPoint = context?.Request.RemoteEndPoint;
+
             Initialize();
 
         }

@@ -68,24 +68,49 @@ namespace NSL.Generators.MergeTypeGenerator
 
                 foreach (var attr in attrbs)
                 {
+                    //if (!Debugger.IsAttached)
+                    //    Debugger.Launch();
+
                     var typeSymb = typeSem.GetDeclaredSymbol(type) as ITypeSymbol;
 
-                    var forType = attr.ArgumentList.Arguments.First().GetAttributeTypeParameterValueSymbol(typeSem);
+                    var toType = attr.ArgumentList.Arguments.First().GetAttributeTypeParameterValueSymbol(typeSem) ;
 
-                    var declaration = forType.DeclaringSyntaxReferences.First().GetSyntax() as TypeDeclarationSyntax;
+                    var declaration = toType.DeclaringSyntaxReferences.First().GetSyntax() as TypeDeclarationSyntax;
 
-                    classBuilder.AppendLine($"{(declaration.HasInternalModifier() ? "internal" : "public")} void FillTo({forType.Name} toFill)");
+                    classBuilder.AppendLine($"{(declaration.HasInternalModifier() ? "internal" : "public")} void FillTo({toType.Name} toFill)");
 
                     classBuilder.AppendLine("{");
 
                     classBuilder.NextTab();
 
-                    var forMembers =
-                        forType.GetMembers();
 
-                    foreach (var item in typeSymb.GetMembers())
+                    var cType = toType;
+
+                    List<ISymbol> toMembers = new List<ISymbol>();
+
+                    do
                     {
-                        var fMember = forMembers.FirstOrDefault(x => x.Name.Equals(item.Name) && x.DeclaredAccessibility == Accessibility.Public);
+                        toMembers.AddRange(cType.GetMembers());
+
+                        cType = cType.BaseType;
+                    } while (cType != null);
+
+
+                    cType = typeSymb;
+
+                    List<ISymbol> members = new List<ISymbol>();
+
+                    do
+                    {
+                        members.AddRange(cType.GetMembers());
+
+                        cType = cType.BaseType;
+                    } while (cType != null);
+
+
+                    foreach (var item in members)
+                    {
+                        var fMember = toMembers.FirstOrDefault(x => x.Name.Equals(item.Name) && x.DeclaredAccessibility == Accessibility.Public);
 
                         if (fMember == default || (fMember is IPropertySymbol fps && fps.SetMethod == default))
                             continue;
@@ -94,7 +119,7 @@ namespace NSL.Generators.MergeTypeGenerator
                         {
                             var ignore = ps.GetAttributes()
                             .Where(x => x.AttributeClass.Name.Equals(MergeToTypeIgnoreAttributeFullName))
-                            .Any(q => q.ConstructorArguments.Any(x => (x.Value as INamedTypeSymbol).MetadataName.Equals(forType.MetadataName)));
+                            .Any(q => q.ConstructorArguments.Any(x => (x.Value as INamedTypeSymbol).MetadataName.Equals(toType.MetadataName)));
 
                             if (ignore)
                                 continue;
@@ -106,7 +131,7 @@ namespace NSL.Generators.MergeTypeGenerator
                         {
                             var ignore = fs.GetAttributes()
                             .Where(x => x.AttributeClass.Name.Equals(MergeToTypeIgnoreAttributeFullName))
-                            .Any(q => q.ConstructorArguments.Any(x => (x.Value as INamedTypeSymbol).MetadataName.Equals(forType.MetadataName)));
+                            .Any(q => q.ConstructorArguments.Any(x => (x.Value as INamedTypeSymbol).MetadataName.Equals(toType.MetadataName)));
 
                             if (ignore)
                                 continue;

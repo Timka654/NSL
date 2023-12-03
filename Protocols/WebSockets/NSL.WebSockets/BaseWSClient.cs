@@ -30,6 +30,8 @@ namespace NSL.WebSockets
 
         protected HttpListenerContext context;
 
+        protected IPEndPoint remoteEndPoint;
+
         #region Cipher
 
         /// <summary>
@@ -85,7 +87,7 @@ namespace NSL.WebSockets
 
         public virtual IPEndPoint GetRemotePoint()
         {
-            return (IPEndPoint)context?.Request.RemoteEndPoint;
+            return remoteEndPoint;
         }
 
         protected void ResetBuffer()

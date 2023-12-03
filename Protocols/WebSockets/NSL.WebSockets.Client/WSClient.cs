@@ -85,8 +85,6 @@ namespace NSL.WebSockets.Client
 
         protected override WSClient<T> GetParent() => this;
 
-        private IPEndPoint remoteEndPoint;
-
         public override IPEndPoint GetRemotePoint()
         {
             return remoteEndPoint;
