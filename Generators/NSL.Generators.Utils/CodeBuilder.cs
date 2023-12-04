@@ -147,6 +147,71 @@ namespace NSL.Generators.Utils
             }
         }
 
+        public void CreateStaticClass(ClassDeclarationSyntax classDecl, string className, Action bodyBuild, IEnumerable<string> requiredDirectives = null)
+        {
+            var @namespace = classDecl.Parent as NamespaceDeclarationSyntax;
+
+            var usings = classDecl.GetTypeClassUsingDirectives();
+
+            AddUsings(usings);
+
+            if (requiredDirectives != null)
+            {
+                requiredDirectives = requiredDirectives.Except(usings);
+
+                AddUsings(requiredDirectives);
+            }
+
+            AppendLine();
+
+            var genericParams = classDecl.GetTypeGenericParameters();
+
+            var declTypeLine = "";
+
+            if (genericParams?.Any() == true)
+                declTypeLine = $"<{string.Join(",", genericParams)}>";
+
+            declTypeLine = $"{classDecl.GetClassFullModifier(new string[] { "static" }, new string[] { "partial" })} class {className}{declTypeLine}";
+
+            if (@namespace != null)
+            {
+                AppendLine($"namespace {@namespace.Name.ToString()}");
+                AppendLine("{");
+
+                NextTab();
+            }
+
+            AppendLine(declTypeLine);
+
+            NextTab();
+
+            foreach (var c in classDecl.ConstraintClauses)
+            {
+                AppendLine(c.ToString());
+            }
+
+            PrevTab();
+
+            AppendLine("{");
+
+            NextTab();
+
+            bodyBuild();
+
+            PrevTab();
+
+            AppendLine("}");
+
+            PrevTab();
+
+            if (@namespace != null)
+            {
+                PrevTab();
+
+                AppendLine("}");
+            }
+        }
+
 
         public void AddUsings(IEnumerable<string> usings)
         {
@@ -157,7 +222,7 @@ namespace NSL.Generators.Utils
         }
 
         public void AddUsing(string @using)
-            =>AppendLine($"using {@using};");
+            => AppendLine($"using {@using};");
 
     }
 }

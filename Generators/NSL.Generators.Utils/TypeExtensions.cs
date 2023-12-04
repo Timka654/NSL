@@ -1,4 +1,5 @@
-﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
+﻿using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,6 +27,22 @@ namespace NSL.Generators.Utils
 
         public static string[] GetTypeGenericParameters(this ClassDeclarationSyntax c)
             => c.TypeParameterList?.Parameters.Select(x => x.Identifier.Text).ToArray();
+
+        public static ISymbol[] GetAllMembers(this ITypeSymbol type)
+        {
+            var cType = type;
+
+            List<ISymbol> toMembers = new List<ISymbol>();
+
+            do
+            {
+                toMembers.AddRange(cType.GetMembers());
+
+                cType = cType.BaseType;
+            } while (cType != null);
+
+            return toMembers.ToArray();
+        }
 
     }
 }

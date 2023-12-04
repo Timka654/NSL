@@ -1,4 +1,6 @@
-﻿using NSL.Generators.MergeTypeGenerator.Attributes;
+﻿#if !DEVELOP
+
+using NSL.Generators.MergeTypeGenerator.Attributes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,3 +21,5 @@ namespace NSL.Generators.MergeTypeGenerator.Tests
         public string TestValue3 { get; set; }
     }
 }
+
+#endif

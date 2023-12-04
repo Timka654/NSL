@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<OutputType>Exe</OutputType>
+		<TargetFramework>net7.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>disable</Nullable>
+		<IsPackable>false</IsPackable>
+		<Version>$(VersionSuffix)</Version>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+	  <DefineConstants>$(DefineConstants);DEVELOP</DefineConstants>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+	  <DefineConstants>$(DefineConstants);DEVELOP</DefineConstants>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\NSL.Generators.SelectTypeGenerator.Attributes\NSL.Generators.SelectTypeGenerator.Attributes.csproj" />
+		<ProjectReference Include="..\..\NSL.Generators.SelectTypeGenerator\NSL.Generators.SelectTypeGenerator.csproj" OutputItemType="Analyzer" />
+	</ItemGroup>
+
+</Project>

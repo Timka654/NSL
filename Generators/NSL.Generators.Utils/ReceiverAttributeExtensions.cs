@@ -20,7 +20,25 @@ namespace NSL.Generators.Utils
 
         public static string GetClassFullModifier(this ClassDeclarationSyntax classDecl)
             => string.Join(" ", classDecl.GetClassModifiers());
+        public static string GetClassFullModifier(this ClassDeclarationSyntax classDecl, IEnumerable<string> include = null, IEnumerable<string> exclude = null)
+        {
+            var mods = new List<string>(classDecl.GetClassModifiers());
 
+            if (exclude != null)
+                foreach (var item in exclude)
+                {
+                    mods.Remove(item);
+                }
+
+            if (include != null)
+                foreach (var item in include)
+                {
+                    if (!mods.Contains(item))
+                        mods.Add(item);
+                }
+
+            return string.Join(" ", mods);
+        }
         public static IEnumerable<string> GetClassModifiers(this ClassDeclarationSyntax classDecl)
             => classDecl.Modifiers.Select(x => x.Text);
 

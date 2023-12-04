@@ -1,19 +1,19 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using NSL.Generators.MergeTypeGenerator.Attributes;
+using NSL.Generators.HttpEndPointGenerator.Attributes;
 using NSL.Generators.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace NSL.Generators.MergeTypeGenerator
+namespace NSL.Generators.HttpEndPointGenerator
 {
-    internal class MergeTypeAttributeSyntaxReceiver : ISyntaxReceiver
+    internal class HttpEndPointImplementAttributeSyntaxReceiver : ISyntaxReceiver
     {
-        public IList<TypeDeclarationSyntax> MergeToTypeTypes { get; } = new List<TypeDeclarationSyntax>();
+        public IList<TypeDeclarationSyntax> Types { get; } = new List<TypeDeclarationSyntax>();
 
-        string MergeToTypeAttributeName = typeof(MergeToTypeAttribute).Name;
+        string AttributeName = typeof(HttpEndPointImplementGenerateAttribute).Name;
 
         public void OnVisitSyntaxNode(SyntaxNode syntaxNode)
         {
@@ -23,9 +23,9 @@ namespace NSL.Generators.MergeTypeGenerator
                 {
                     if (typeDeclarationSyntax.AttributeLists
                         .Any(al => al.Attributes
-                            .Any(a => a.GetAttributeFullName().Equals(MergeToTypeAttributeName, StringComparison.InvariantCultureIgnoreCase))))
+                            .Any(a => a.GetAttributeFullName().Equals(AttributeName, StringComparison.InvariantCultureIgnoreCase))))
                     {
-                        MergeToTypeTypes.Add(typeDeclarationSyntax);
+                        Types.Add(typeDeclarationSyntax);
                     }
                 }
             }

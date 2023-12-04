@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace NSL.Generators.MergeTypeGenerator.Attributes
+namespace NSL.Generators.FillTypeGenerator.Attributes
 {
+    [Obsolete("Use FillTypeGenerateAttribute", true)]
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
     public class MergeToTypeAttribute : Attribute
     {
