@@ -4,7 +4,6 @@
     {
         static void Main(string[] args)
         {
-            new TestService().TestTestPostPostRequest();
             Console.WriteLine("Hello, World!");
         }
     }
