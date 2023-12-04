@@ -18,7 +18,7 @@ namespace NSL.Generators.HttpEndPointGenerator
         {
             if (context.SyntaxReceiver is HttpEndPointImplementAttributeSyntaxReceiver methodSyntaxReceiver)
             {
-                ProcessFillTypes(context, methodSyntaxReceiver);
+                ProcessHttpEndPoints(context, methodSyntaxReceiver);
             }
         }
 
@@ -30,18 +30,18 @@ namespace NSL.Generators.HttpEndPointGenerator
 
         #endregion
 
-        private void ProcessFillTypes(GeneratorExecutionContext context, HttpEndPointImplementAttributeSyntaxReceiver methodSyntaxReceiver)
+        private void ProcessHttpEndPoints(GeneratorExecutionContext context, HttpEndPointImplementAttributeSyntaxReceiver methodSyntaxReceiver)
         {
             //if (!Debugger.IsAttached)
             //    Debugger.Launch();
 
             foreach (var item in methodSyntaxReceiver.Types)
             {
-                ProcessFillToType(context, item);
+                ProcessHttpEndPoint(context, item);
             }
         }
 
-        private void ProcessFillToType(GeneratorExecutionContext context, TypeDeclarationSyntax type)
+        private void ProcessHttpEndPoint(GeneratorExecutionContext context, TypeDeclarationSyntax type)
         {
             if (!type.HasPartialModifier())
                 return;
@@ -61,6 +61,10 @@ namespace NSL.Generators.HttpEndPointGenerator
 
             classBuilder.CreatePartialClass(typeClass, () =>
             {
+                classBuilder.AppendLine($"protected partial HttpClient CreateEndPointClient(string url);");
+
+                classBuilder.AppendLine();
+
                 var attrbs = typeClass.AttributeLists
                 .SelectMany(x => x.Attributes)
                 .Where(x => x.GetAttributeFullName().Equals(ImplementGenerateAttributeFullName))
@@ -101,10 +105,6 @@ namespace NSL.Generators.HttpEndPointGenerator
                     prefixUrl = prefixUrl.Replace("[controller]", controllerName);
 
                     var prefixVarName = $"{controllerName}PrefixUrl";
-
-                    classBuilder.AppendLine($"protected partial HttpClient CreateEndPointClient(string url);");
-
-                    classBuilder.AppendLine();
 
                     classBuilder.AppendLine($"protected const string {prefixVarName} = \"{prefixUrl}\";");
 
@@ -160,10 +160,17 @@ namespace NSL.Generators.HttpEndPointGenerator
 
                                 urlDeclarations.Add($"protected const string {_vname}Url = $\"{{{prefixVarName}}}/{templ.val.Replace("[action]", ms.Name)}\";");
 
+                                List<string> _p = new List<string>();
+
+                                if (mparam != null)
+                                    _p.Add($"{mparam.Type} {mparam.Name}");
+
+                                _p.Add($"{BaseHttpRequestOptionsFullName} __options = null");
+
 
                                 CodeBuilder methodBuilder = new CodeBuilder();
 
-                                methodBuilder.AppendLine($"public async Task<{returnType}> {_vname}Request({(mparam == null ? "" : ($"{mparam.Type} {mparam.Name}"))})");
+                                methodBuilder.AppendLine($"public async Task<{returnType}> {_vname}Request({string.Join(", ", _p)})");
                                 methodBuilder.NextTab();
                                 methodBuilder.AppendLine($"=> await CreateEndPointClient({_vname}Url)");
                                 if (_t == "Post")
@@ -174,7 +181,7 @@ namespace NSL.Generators.HttpEndPointGenerator
                                         methodBuilder.AppendLine($".PostJsonAsync({_vname}Url, {mparam.Name})");
                                 }
 
-                                methodBuilder.AppendLine($".ProcessResponseAsync<{returnType}>();");
+                                methodBuilder.AppendLine($".ProcessResponseAsync<{returnType}>(__options);");
 
                                 methodDeclarations.Add(methodBuilder.ToString());
                             }
@@ -192,11 +199,11 @@ namespace NSL.Generators.HttpEndPointGenerator
             // Visual studio have lag(or ...) cannot show changes sometime
             //#if DEVELOP
 #pragma warning disable RS1035 // Do not use APIs banned for analyzers
-            //System.IO.File.WriteAllText($@"C:\Work\temp\{typeClass.GetTypeClassName()}.filltype.cs", classBuilder.ToString());
+            //System.IO.File.WriteAllText($@"C:\Work\temp\{typeClass.GetTypeClassName()}..httpendpoints.cs", classBuilder.ToString());
 #pragma warning restore RS1035 // Do not use APIs banned for analyzers
             //#endif
 
-            context.AddSource($"{typeClass.GetTypeClassName()}.filltype.cs", classBuilder.ToString());
+            context.AddSource($"{typeClass.GetTypeClassName()}.{typeClass.GetClassName()}.httpendpoints.cs", classBuilder.ToString());
         }
 
         private string GetControllerName(ITypeSymbol containerType)
@@ -236,5 +243,6 @@ namespace NSL.Generators.HttpEndPointGenerator
         private readonly string GenerateAttributeFullName = typeof(HttpEndPointGenerateAttribute).Name;
 
         private readonly string RouteAttributeFullName = "RouteAttribute";
+        private readonly string BaseHttpRequestOptionsFullName = "BaseHttpRequestOptions";
     }
 }
