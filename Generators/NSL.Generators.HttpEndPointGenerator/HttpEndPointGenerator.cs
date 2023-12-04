@@ -203,7 +203,7 @@ namespace NSL.Generators.HttpEndPointGenerator
 #pragma warning restore RS1035 // Do not use APIs banned for analyzers
             //#endif
 
-            context.AddSource($"{typeClass.GetTypeClassName()}.{typeClass.GetClassName()}.httpendpoints.cs", classBuilder.ToString());
+            context.AddSource($"{typeClass.GetTypeClassName()}.httpendpoints.cs", classBuilder.ToString());
         }
 
         private string GetControllerName(ITypeSymbol containerType)
