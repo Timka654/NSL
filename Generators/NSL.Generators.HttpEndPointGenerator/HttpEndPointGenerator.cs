@@ -65,6 +65,11 @@ namespace NSL.Generators.HttpEndPointGenerator
 
                 classBuilder.AppendLine();
 
+
+                var urlDeclarations = new List<string>();
+
+                var methodDeclarations = new List<string>();
+
                 var attrbs = typeClass.AttributeLists
                 .SelectMany(x => x.Attributes)
                 .Where(x => x.GetAttributeFullName().Equals(ImplementGenerateAttributeFullName))
@@ -111,10 +116,6 @@ namespace NSL.Generators.HttpEndPointGenerator
                     classBuilder.AppendLine();
 
                     var members = containerType.GetAllMembers();
-
-                    var urlDeclarations = new List<string>();
-
-                    var methodDeclarations = new List<string>();
 
                     foreach (var item in members)
                     {
@@ -188,12 +189,12 @@ namespace NSL.Generators.HttpEndPointGenerator
                         }
                     }
 
+                }
 #pragma warning disable RS1035 // Не использовать API, запрещенные для анализаторов
                     classBuilder.AppendLine(string.Join($"{Environment.NewLine}{Environment.NewLine}", urlDeclarations));
                     classBuilder.AppendLine();
                     classBuilder.AppendLine(string.Join($"{Environment.NewLine}{Environment.NewLine}", methodDeclarations));
 #pragma warning restore RS1035 // Не использовать API, запрещенные для анализаторов
-                }
             });
 
             // Visual studio have lag(or ...) cannot show changes sometime

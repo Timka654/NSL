@@ -84,7 +84,7 @@ namespace NSL.Generators.SelectTypeGenerator
                     }
 
 #pragma warning disable RS1035 // Do not use APIs banned for analyzers
-                        classBuilder.AppendLine(string.Join(Environment.NewLine + Environment.NewLine, methods));
+                    classBuilder.AppendLine(string.Join(Environment.NewLine + Environment.NewLine, methods));
 #pragma warning restore RS1035 // Do not use APIs banned for analyzers
                 }
             });
@@ -123,8 +123,8 @@ namespace NSL.Generators.SelectTypeGenerator
 
             ReadMembers(members, sMembers, model, "x");
 
-            methods.Add(CreateMethod(type, sMembers, model,"IEnumerable").ToString());
-            methods.Add(CreateMethod(type, sMembers, model,"IQueryable").ToString());
+            methods.Add(CreateMethod(type, sMembers, model, "IEnumerable").ToString());
+            methods.Add(CreateMethod(type, sMembers, model, "IQueryable").ToString());
 
         }
 
@@ -180,8 +180,36 @@ namespace NSL.Generators.SelectTypeGenerator
 #pragma warning restore RS1035 // Не использовать API, запрещенные для анализаторов
         }
 
+        private string GetProxyModel(ISymbol item, string model)
+        {
+            //if (!Debugger.IsAttached)
+            //    Debugger.Launch();
+
+            string proxyModel = default;
+
+            var attributes = item.GetAttributes();
+
+            var proxyAttribs = attributes.Where(x => x.AttributeClass.Name == SelectGenerateProxyAttributeFullName).ToArray();
+
+            var fromModel = proxyAttribs.FirstOrDefault(x => x.ConstructorArguments.Length == 2 && x.ConstructorArguments.First().Value == model);
+
+            if (fromModel != null)
+                proxyModel = (string)fromModel.ConstructorArguments[1].Value;
+            else
+            {
+                var toModel = proxyAttribs.FirstOrDefault(x => x.ConstructorArguments.Length == 1);
+
+                if (toModel != null)
+                    proxyModel = (string)toModel.ConstructorArguments.First().Value;
+            }
+
+            return proxyModel ?? model;
+        }
+
         private void ReadMembers(IEnumerable<ISymbol> members, List<string> sMembers, string model, string path)
         {
+            string itemModel;
+
             foreach (var item in members)
             {
                 ITypeSymbol memberType;
@@ -237,14 +265,18 @@ namespace NSL.Generators.SelectTypeGenerator
 
                     if (amembers.Any())
                     {
+                        itemModel = GetProxyModel(item, model);
+
                         int n = 0;
                         string p = string.Empty;
                         while (path.Contains(p = $"x{n++}")) { }
 
                         var amem = new List<string>();
 
-                        ReadMembers(amembers, amem, model, p);
+                        ReadMembers(amembers, amem, itemModel, p);
 
+                        if (!Equals(model, itemModel))
+                            sMembers.Add($"// Proxy model merge from \"{model}\" to \"{itemModel}\"");
 
 #pragma warning disable RS1035 // Не использовать API, запрещенные для анализаторов
                         sMembers.Add($"{item.Name} = {path}.{item.Name} == null ? null : {path}.{item.Name}.Select({p} => new {{{Environment.NewLine}{CombineMembers(amem.Select(x => $"\t{x}"))}{Environment.NewLine}}})");
@@ -266,14 +298,18 @@ namespace NSL.Generators.SelectTypeGenerator
 
                     if (amembers.Any())
                     {
+                        itemModel = GetProxyModel(item, model);
+
                         int n = 0;
                         string p = string.Empty;
                         while (path.Contains(p = $"x{n++}")) { }
 
                         var amem = new List<string>();
 
-                        ReadMembers(amembers, amem, model, p);
+                        ReadMembers(amembers, amem, itemModel, p);
 
+                        if (!Equals(model, itemModel))
+                            sMembers.Add($"// Proxy model merge from \"{model}\" to \"{itemModel}\"");
 
 #pragma warning disable RS1035 // Не использовать API, запрещенные для анализаторов
                         sMembers.Add($"{item.Name} = {path}.{item.Name} == null ? null : {path}.{item.Name}.Select({p} => new {{{Environment.NewLine}{CombineMembers(amem.Select(x => $"\t{x}"))}{Environment.NewLine}}})");
@@ -288,7 +324,10 @@ namespace NSL.Generators.SelectTypeGenerator
                     continue;
                 }
 
-                var memMembers = FilterSymbols(memberType.GetAllMembers(), model);
+
+                itemModel = GetProxyModel(item, model);
+
+                var memMembers = FilterSymbols(memberType.GetAllMembers(), itemModel);
 
                 //if (item.Name.StartsWith("AbcModel1"))
                 //{
@@ -302,7 +341,10 @@ namespace NSL.Generators.SelectTypeGenerator
                 {
                     var nMembers = new List<string>();
 
-                    ReadMembers(memMembers, nMembers, model, $"{path}.{item.Name}");
+                    ReadMembers(memMembers, nMembers, itemModel, $"{path}.{item.Name}");
+
+                    if (!Equals(model, itemModel))
+                        sMembers.Add($"// Proxy model merge from \"{model}\" to \"{itemModel}\"");
 
 #pragma warning disable RS1035 // Не использовать API, запрещенные для анализаторов
                     sMembers.Add($"{item.Name} = {path}.{item.Name} == null ? null : new {{{Environment.NewLine}{CombineMembers(nMembers.Select(x => $"\t{x}"))}{Environment.NewLine}}}");
@@ -315,5 +357,6 @@ namespace NSL.Generators.SelectTypeGenerator
 
         private readonly string SelectGenerateAttributeFullName = typeof(SelectGenerateAttribute).Name;
         private readonly string SelectGenerateIncludeAttributeFullName = typeof(SelectGenerateIncludeAttribute).Name;
+        private readonly string SelectGenerateProxyAttributeFullName = typeof(SelectGenerateProxyAttribute).Name;
     }
 }
