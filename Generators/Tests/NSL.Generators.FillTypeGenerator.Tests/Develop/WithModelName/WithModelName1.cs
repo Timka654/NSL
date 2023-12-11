@@ -7,17 +7,11 @@ using System.Threading.Tasks;
 
 namespace NSL.Generators.FillTypeGenerator.Tests.Develop.WithModelName
 {
-    [FillTypeGenerate(typeof(WithModelName2))]
     [FillTypeGenerate(typeof(WithModelName3))]
-    [FillTypeGenerate(typeof(WithModelName2), "abc1", "abc2")]
     public partial class WithModelName1
     {
-        [FillTypeGenerateInclude("abc1")] public int Abc1 { get; set; }
+        public Guid v0 { get; set; }
 
-        [FillTypeGenerateInclude("abc1", "abc2")] public int Abc2 { get; set; }
-
-        [FillTypeGenerateInclude("abc2")] public int Abc3 { get; set; }
-
-        [FillTypeGenerateInclude("abc2"), FillTypeGenerateIgnore(typeof(WithModelName2))] public int Abc4 { get; set; }
+        public List<WithModelName2> v1 { get; set; }
     }
 }

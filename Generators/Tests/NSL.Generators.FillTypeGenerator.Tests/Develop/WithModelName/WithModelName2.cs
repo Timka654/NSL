@@ -9,10 +9,6 @@ namespace NSL.Generators.FillTypeGenerator.Tests.Develop.WithModelName
 {
     public partial class WithModelName2
     {
-        public int Abc1 { get; set; }
-
-        public int Abc2 { get; set; }
-
-        public int Abc3 { get; set; }
+        public Guid v12 { get; set; }
     }
 }

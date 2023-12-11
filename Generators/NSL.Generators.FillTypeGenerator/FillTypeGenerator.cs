@@ -4,6 +4,7 @@ using NSL.Generators.FillTypeGenerator.Attributes;
 using NSL.Generators.Utils;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace NSL.Generators.FillTypeGenerator
@@ -96,18 +97,7 @@ namespace NSL.Generators.FillTypeGenerator
 
                         foreach (var item in models)
                         {
-                            methods.Add(CreateMethod(declaration, members.Where(x =>
-                            {
-                                var a = x.GetAttributes().FirstOrDefault(n => n.AttributeClass.Name == (FillTypeGenerateIncludeAttributeFullName));
-
-                                if (a == null)
-                                    return false;
-
-                                if (a.ConstructorArguments.SelectMany(n => n.Values).Any(n => (n.Value as string).Equals(item)))
-                                    return true;
-
-                                return false;
-                            }), toType, toMembers, item).ToString());
+                            methods.Add(CreateMethod(declaration, members, toType, toMembers, item).ToString());
                         }
 
 #pragma warning disable RS1035 // Do not use APIs banned for analyzers
@@ -123,6 +113,9 @@ namespace NSL.Generators.FillTypeGenerator
             //System.IO.File.WriteAllText($@"C:\Work\temp\{typeClass.GetTypeClassName()}.filltype.cs", classBuilder.ToString());
 #pragma warning restore RS1035 // Do not use APIs banned for analyzers
             //#endif
+
+            //if (!Debugger.IsAttached)
+            //    Debugger.Launch();
 
             context.AddSource($"{typeClass.GetTypeClassName()}.filltype.cs", classBuilder.ToString());
         }
@@ -151,6 +144,39 @@ namespace NSL.Generators.FillTypeGenerator
 
             methodBuilder.NextTab();
 
+            List<string> memberLines = new List<string>();
+
+            FillMembers(memberLines, members, model, toType, toMembers, "toFill", null, 0);
+
+            foreach (var ml in memberLines)
+            {
+                methodBuilder.AppendLine(ml);
+            }
+
+            methodBuilder.PrevTab();
+
+            methodBuilder.AppendLine("}");
+
+            return methodBuilder;
+        }
+
+        private void FillMembers(List<string> codeLines, IEnumerable<ISymbol> members, string model, ITypeSymbol toType, IEnumerable<ISymbol> toMembers, string fillPath, string readPath, int t)
+        {
+            if (model != default)
+                members = members.Where(x =>
+                {
+                    var a = x.GetAttributes().FirstOrDefault(n => n.AttributeClass.Name == (FillTypeGenerateIncludeAttributeFullName));
+
+                    if (a == null)
+                        return false;
+
+                    if (a.ConstructorArguments.SelectMany(n => n.Values).Any(n => (n.Value as string).Equals(model)))
+                        return true;
+
+                    return false;
+                });
+
+            var tabPrefix = string.Concat(Enumerable.Repeat("\t", t));
 
             foreach (var item in members)
             {
@@ -183,14 +209,8 @@ namespace NSL.Generators.FillTypeGenerator
                 else
                     continue;
 
-                methodBuilder.AppendLine($"toFill.{item.Name} = {item.Name};");
+                codeLines.Add($"{tabPrefix}{string.Join(".", fillPath, item.Name).TrimStart('.')} = {string.Join(".", readPath, item.Name).TrimStart('.')};");
             }
-
-            methodBuilder.PrevTab();
-
-            methodBuilder.AppendLine("}");
-
-            return methodBuilder;
         }
 
 

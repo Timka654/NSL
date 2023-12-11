@@ -9,7 +9,6 @@ namespace NSL.Generators.Utils
 {
     public static class TypeExtensions
     {
-
         public static bool HasPartialModifier(this TypeDeclarationSyntax type)
             => type.Modifiers.Any(x => x.ValueText.Equals("partial"));
 
