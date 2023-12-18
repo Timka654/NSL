@@ -43,6 +43,8 @@ namespace NSL.Generators.FillTypeGenerator
             }
         }
 
+        private static string[] requiredUsings = new string[] { "System.Linq" };
+
         private void ProcessFillToType(GeneratorExecutionContext context, TypeDeclarationSyntax type)
         {
             if (!type.HasPartialModifier())
@@ -102,7 +104,7 @@ namespace NSL.Generators.FillTypeGenerator
 #pragma warning restore RS1035 // Do not use APIs banned for analyzers
                     }
                 }
-            });
+            }, requiredUsings);
 
             // Visual studio have lag(or ...) cannot show changes sometime
             //#if DEVELOP
