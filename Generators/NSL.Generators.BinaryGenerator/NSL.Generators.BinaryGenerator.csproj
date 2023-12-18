@@ -30,11 +30,9 @@
 	<PropertyGroup Condition="'$(Configuration)'=='Unity'">
 		<AssemblyName>Unity.$(MSBuildProjectName)</AssemblyName>
 	</PropertyGroup>
-	
 	<ItemGroup Condition="'$(Configuration)'=='Debug' Or '$(Configuration)'=='Release'">
 		<PackageReference Include="Microsoft.CodeAnalysis.Common" Version="4.5.0" PrivateAssets="all" />
 	</ItemGroup>
-	
 	<ItemGroup Condition="'$(Configuration)'=='UnityDebug' Or '$(Configuration)'=='Unity'">
 		<PackageReference Include="Microsoft.CodeAnalysis.Common" Version="3.8.0" PrivateAssets="all" />
 	</ItemGroup>

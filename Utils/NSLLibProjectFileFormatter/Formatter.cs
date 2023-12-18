@@ -145,7 +145,7 @@ namespace NSLLibProjectFileFormatter
 
                     List<string> configurations = new List<string> { "Debug", "Release", "DebugExamples" };
 
-                    var tf = "net7.0";
+                    var tf = "net8.0";
 
                     if (!unityOnly)
                     {
@@ -386,7 +386,7 @@ namespace NSLLibProjectFileFormatter
         {
             var name = new FileInfo(path).Name;
 
-            return name.Contains("AspNet", StringComparison.OrdinalIgnoreCase) || sdk.Equals("Microsoft.NET.Sdk.Web", StringComparison.OrdinalIgnoreCase);
+            return name.Contains("AspNet", StringComparison.OrdinalIgnoreCase) || sdk.Equals("Microsoft.NET.Sdk.Web", StringComparison.OrdinalIgnoreCase) || sdk.Equals("Microsoft.NET.Sdk.Razor", StringComparison.OrdinalIgnoreCase);
         }
 
         private string GetGroupValue(GroupCollection collection, int idx = 1) // first group by default
