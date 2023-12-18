@@ -11,6 +11,10 @@ namespace NSL.Generators.FillTypeGenerator.Tests.Develop.WithModelName
     {
         public Guid v0 { get; set; }
 
-        public List<WithModelName2> v1 { get; set; }
+        public WithModelName4[] v1 { get; set; }
+
+        public string s1 { get; set; }
+
+        public string[] v2 { get; set; }
     }
 }

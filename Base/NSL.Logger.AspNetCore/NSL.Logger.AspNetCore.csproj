@@ -3,7 +3,7 @@
 	<PropertyGroup>
 		<NSLProjectTypes>ASPTarget</NSLProjectTypes>
 
-		<TargetFramework>net7.0</TargetFramework>
+		<TargetFramework>net8.0</TargetFramework>
 		<Configurations>Debug;Release;DebugExamples;Unity;UnityDebug</Configurations>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<Nullable>disable</Nullable>

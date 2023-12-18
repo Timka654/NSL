@@ -5,7 +5,9 @@ using NSL.Generators.Utils;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 
 namespace NSL.Generators.FillTypeGenerator
 {
@@ -82,22 +84,17 @@ namespace NSL.Generators.FillTypeGenerator
                         models = fillArgs.Skip(1).Select(x => x.GetAttributeParameterValue<string>(typeSem)).ToArray();
                     }
 
-                    var toMembers = toType.GetAllMembers();
-
-                    var members = typeSymb.GetAllMembers();
-
-
                     var declaration = toType.DeclaringSyntaxReferences.First().GetSyntax() as TypeDeclarationSyntax;
 
                     if (models == null)
-                        classBuilder.AppendLine(CreateMethod(declaration, members, toType, toMembers, null).ToString());
+                        classBuilder.AppendLine(CreateMethod(declaration, typeSymb, toType, null).ToString());
                     else
                     {
                         var methods = new List<string>();
 
                         foreach (var item in models)
                         {
-                            methods.Add(CreateMethod(declaration, members, toType, toMembers, item).ToString());
+                            methods.Add(CreateMethod(declaration, typeSymb, toType, item).ToString());
                         }
 
 #pragma warning disable RS1035 // Do not use APIs banned for analyzers
@@ -120,7 +117,7 @@ namespace NSL.Generators.FillTypeGenerator
             context.AddSource($"{typeClass.GetTypeClassName()}.filltype.cs", classBuilder.ToString());
         }
 
-        private CodeBuilder CreateMethod(TypeDeclarationSyntax declaration, IEnumerable<ISymbol> members, ITypeSymbol toType, IEnumerable<ISymbol> toMembers, string model)
+        private CodeBuilder CreateMethod(TypeDeclarationSyntax declaration, ITypeSymbol fromType, ITypeSymbol toType, string model)
         {
             CodeBuilder methodBuilder = new CodeBuilder();
 
@@ -146,11 +143,11 @@ namespace NSL.Generators.FillTypeGenerator
 
             List<string> memberLines = new List<string>();
 
-            FillMembers(memberLines, members, model, toType, toMembers, "toFill", null, 0);
+            FillMembers(memberLines, fromType, toType, model, "toFill", null, 0);
 
             foreach (var ml in memberLines)
             {
-                methodBuilder.AppendLine(ml);
+                methodBuilder.AppendLine($"{ml};");
             }
 
             methodBuilder.PrevTab();
@@ -160,56 +157,214 @@ namespace NSL.Generators.FillTypeGenerator
             return methodBuilder;
         }
 
-        private void FillMembers(List<string> codeLines, IEnumerable<ISymbol> members, string model, ITypeSymbol toType, IEnumerable<ISymbol> toMembers, string fillPath, string readPath, int t)
+        private IEnumerable<ISymbol> FilterSymbols(IEnumerable<ISymbol> symbols, string model)
         {
-            if (model != default)
-                members = members.Where(x =>
-                {
-                    var a = x.GetAttributes().FirstOrDefault(n => n.AttributeClass.Name == (FillTypeGenerateIncludeAttributeFullName));
+            if (model == default)
+                return symbols;
 
-                    if (a == null)
-                        return false;
+            return symbols.Where(x =>
+            {
+                var a = x.GetAttributes().FirstOrDefault(n => n.AttributeClass.Name == (FillTypeGenerateIncludeAttributeFullName));
 
-                    if (a.ConstructorArguments.SelectMany(n => n.Values).Any(n => (n.Value as string).Equals(model)))
-                        return true;
-
+                if (a == null)
                     return false;
-                });
+
+                if (a.ConstructorArguments.SelectMany(n => n.Values).Any(n => (n.Value as string).Equals(model)))
+                    return true;
+
+                return false;
+            });
+        }
+
+        private string GetProxyModel(ISymbol item, string model)
+        {
+            //if (!Debugger.IsAttached)
+            //    Debugger.Launch();
+
+            string proxyModel = default;
+
+            var attributes = item.GetAttributes();
+
+            var proxyAttribs = attributes.Where(x => x.AttributeClass.Name == FillTypeGenerateProxyAttributeFullName).ToArray();
+
+            var fromModel = proxyAttribs.FirstOrDefault(x => x.ConstructorArguments.Length == 2 && x.ConstructorArguments.First().Value == model);
+
+            if (fromModel != null)
+                proxyModel = (string)fromModel.ConstructorArguments[1].Value;
+            else
+            {
+                var toModel = proxyAttribs.FirstOrDefault(x => x.ConstructorArguments.Length == 1);
+
+                if (toModel != null)
+                    proxyModel = (string)toModel.ConstructorArguments.First().Value;
+            }
+
+            return proxyModel ?? model;
+        }
+
+        private ITypeSymbol GetFromTypeForFill(ISymbol fromItem, ITypeSymbol toType)
+        {
+            if (fromItem is IPropertySymbol ps)
+            {
+                var ignore = ps.GetAttributes()
+                .Where(x => x.AttributeClass.Name.Equals(FillTypeGenerateIgnoreAttributeFullName))
+                .Any(q => q.ConstructorArguments.Any(x => (x.Value as INamedTypeSymbol).MetadataName.Equals(toType.MetadataName)));
+
+                if (!ignore)
+                {
+                    if (ps.GetMethod != null)
+                        return ps.Type;
+                }
+            }
+            else if (fromItem is IFieldSymbol fs)
+            {
+                var ignore = fs.GetAttributes()
+                .Where(x => x.AttributeClass.Name.Equals(FillTypeGenerateIgnoreAttributeFullName))
+                .Any(q => q.ConstructorArguments.Any(x => (x.Value as INamedTypeSymbol).MetadataName.Equals(toType.MetadataName)));
+
+                if (!ignore)
+                    return fs.Type;
+            }
+
+            return default;
+        }
+
+        private ITypeSymbol GetToTypeForFill(ISymbol toItem)
+        {
+            if (toItem is IPropertySymbol ps)
+            {
+                if (ps.SetMethod != null)
+                    return ps.Type;
+            }
+            else if (toItem is IFieldSymbol fs)
+            {
+                return fs.Type;
+            }
+
+            return default;
+        }
+
+        private ITypeSymbol GetCollectionItemType(ITypeSymbol type)
+        {
+            if (type.Name == stringFullName)
+                return default;
+
+            if (type is IArrayTypeSymbol arrt)
+                return arrt.ElementType;
+
+            if ((type.MetadataName.Equals(typeof(List<>).Name)
+                || type.MetadataName.Equals(typeof(IList<>).Name)) && type is INamedTypeSymbol nt)
+                return nt.TypeArguments.First();
+
+            return default;
+        }
+
+        private string[] basicArrayTypes = new string[] {
+            typeof(byte).Name,
+            typeof(char).Name,
+            typeof(sbyte).Name,
+            typeof(ushort).Name,
+            typeof(short).Name,
+            typeof(uint).Name,
+            typeof(int).Name,
+            typeof(ulong).Name,
+            typeof(long).Name,
+            typeof(string).Name
+        };
+
+        private string GetCollectionLinqConvertMethod(ITypeSymbol type)
+        {
+            if (type is IArrayTypeSymbol arrt)
+                return "ToArray";
+
+            if ((type.MetadataName.Equals(typeof(List<>).Name)
+                || type.MetadataName.Equals(typeof(IList<>).Name)) && type is INamedTypeSymbol nt)
+                return "ToList";
+
+            return default;
+        }
+
+        private void FillMembers(List<string> codeLines, ITypeSymbol fromType, ITypeSymbol toType, string model, string fillPath, string readPath, int t)
+        {
+            var fromMembers = FilterSymbols(fromType.GetAllMembers(), model);
+            var toMembers = toType.GetAllMembers();
 
             var tabPrefix = string.Concat(Enumerable.Repeat("\t", t));
 
-            foreach (var item in members)
-            {
-                var fMember = toMembers.FirstOrDefault(x => x.Name.Equals(item.Name) && x.DeclaredAccessibility == Accessibility.Public);
+            string itemModel;
 
-                if (fMember == default || (fMember is IPropertySymbol fps && fps.SetMethod == default))
+            foreach (var fromItem in fromMembers)
+            {
+                var toItem = toMembers.FirstOrDefault(x => x.Name.Equals(fromItem.Name) && x.DeclaredAccessibility == Accessibility.Public);
+
+                if (toItem == default)
                     continue;
 
-                if (item is IPropertySymbol ps)
+                ITypeSymbol memberFromType = GetFromTypeForFill(fromItem, toType);
+
+                ITypeSymbol memberToType = GetToTypeForFill(toItem);
+
+                if (memberFromType == null || memberToType == null)
+                    continue;
+
+                string mFillPath = $"{tabPrefix}{string.Join(".", fillPath, fromItem.Name).TrimStart('.')} = ";
+
+                string codeFragment = default;
+
+                var arrayItemTypeFrom = GetCollectionItemType(memberFromType);
+                var arrayItemTypeTo = GetCollectionItemType(memberToType);
+
+                if (arrayItemTypeFrom != default)
                 {
-                    var ignore = ps.GetAttributes()
-                    .Where(x => x.AttributeClass.Name.Equals(FillTypeGenerateIgnoreAttributeFullName))
-                    .Any(q => q.ConstructorArguments.Any(x => (x.Value as INamedTypeSymbol).MetadataName.Equals(toType.MetadataName)));
-
-                    if (ignore)
+                    if (arrayItemTypeTo == null)
+                    {
+                        codeLines.Add($"Cannot convert {memberFromType} to {memberToType}");
                         continue;
+                    }
 
-                    if (ps.GetMethod == null)
-                        continue;
-                }
-                else if (item is IFieldSymbol fs)
-                {
-                    var ignore = fs.GetAttributes()
-                    .Where(x => x.AttributeClass.Name.Equals(FillTypeGenerateIgnoreAttributeFullName))
-                    .Any(q => q.ConstructorArguments.Any(x => (x.Value as INamedTypeSymbol).MetadataName.Equals(toType.MetadataName)));
+                    itemModel = GetProxyModel(fromItem, model);
 
-                    if (ignore)
-                        continue;
+                    int n = 0;
+
+                    string p = string.Empty;
+
+                    if (readPath == null)
+                        p = $"x{n}";
+                    else
+                        while (readPath.Contains(p = $"x{n++}")) { }
+
+                    if (basicArrayTypes.Contains(arrayItemTypeFrom.Name))
+                    {
+                        codeFragment = $"{string.Join(".", readPath, fromItem.Name).TrimStart('.')}.Select({p} => {p}).{GetCollectionLinqConvertMethod(memberToType)}()";
+                    }
+                    else
+                    {
+                        var amem = new List<string>();
+
+                        FillMembers(amem, arrayItemTypeFrom, arrayItemTypeTo, itemModel, null, p, 1);
+
+                        if (!Equals(model, itemModel))
+                            codeLines.Add($"// Proxy model merge from \"{model}\" to \"{itemModel}\"");
+
+                        //if (!Debugger.IsAttached)
+                        //    Debugger.Launch();
+
+#pragma warning disable RS1035 // Не использовать API, запрещенные для анализаторов
+
+                        codeFragment = $"{string.Join(".", readPath, fromItem.Name).TrimStart('.')}.Select({p} => new {arrayItemTypeTo} {{{Environment.NewLine}" +
+                            string.Join(",", amem) +
+                            $"{Environment.NewLine}}}).{GetCollectionLinqConvertMethod(memberToType)}()";
+
+#pragma warning restore RS1035 // Не использовать API, запрещенные для анализаторов
+
+                        //                        codeLines.Add($"{item.Name} = {path}.{item.Name} == null ? null : {path}.{item.Name}.Select({p} => new {{{Environment.NewLine}{CombineMembers(amem.Select(x => $"\t{x}"))}{Environment.NewLine}}})");
+
+                    }
                 }
                 else
-                    continue;
+                    codeFragment = string.Join(".", readPath, fromItem.Name).TrimStart('.');
 
-                codeLines.Add($"{tabPrefix}{string.Join(".", fillPath, item.Name).TrimStart('.')} = {string.Join(".", readPath, item.Name).TrimStart('.')};");
+                codeLines.Add($"{mFillPath}{codeFragment}");
             }
         }
 
@@ -217,5 +372,7 @@ namespace NSL.Generators.FillTypeGenerator
         private readonly string FillTypeGenerateAttributeFullName = typeof(FillTypeGenerateAttribute).Name;
         private readonly string FillTypeGenerateIgnoreAttributeFullName = typeof(FillTypeGenerateIgnoreAttribute).Name;
         private readonly string FillTypeGenerateIncludeAttributeFullName = typeof(FillTypeGenerateIncludeAttribute).Name;
+        private readonly string FillTypeGenerateProxyAttributeFullName = typeof(FillTypeGenerateProxyAttribute).Name;
+        private readonly string stringFullName = typeof(string).Name;
     }
 }

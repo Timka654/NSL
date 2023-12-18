@@ -3,7 +3,7 @@
 	<PropertyGroup>
 		<Configurations>Debug;Release;Unity;UnityDebug;DebugStable;DebugExamples</Configurations>
 		<OutputType>Library</OutputType>
-		<TargetFramework>net7.0</TargetFramework>
+		<TargetFramework>net8.0</TargetFramework>
 		<IsPackable>false</IsPackable>
 		<Version>$(VersionSuffix)</Version>
 		<Nullable>disable</Nullable>
