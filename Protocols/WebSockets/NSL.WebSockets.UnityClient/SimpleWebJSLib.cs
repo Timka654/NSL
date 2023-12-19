@@ -13,7 +13,7 @@ namespace NSL.WebSockets.UnityClient
 #pragma warning disable CA2101 // Specify marshaling for P/Invoke string arguments
         [DllImport("__Internal")]
 #pragma warning restore CA2101 // Specify marshaling for P/Invoke string arguments
-        internal static extern int Connect(string address, Action<int> openCallback, Action<int> closeCallBack, Action<int, IntPtr, int> messageCallback, Action<int> errorCallback);
+        internal static extern void Connect(string address, Action<int> openCallback, Action<int> closeCallBack, Action<int, IntPtr, int> messageCallback, Action<int> errorCallback, int index);
 
         [DllImport("__Internal")]
         internal static extern void Disconnect(int index);

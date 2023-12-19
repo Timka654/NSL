@@ -1,13 +1,10 @@
 // this will create a global object
 const SimpleWeb = {
     webSockets: [],
-    next: 1,
     GetWebSocket: function (index) {
         return SimpleWeb.webSockets[index]
     },
-    AddNextSocket: function (webSocket) {
-        var index = SimpleWeb.next;
-        SimpleWeb.next++;
+    AddNewSocket: function (webSocket, index) {
         SimpleWeb.webSockets[index] = webSocket;
         return index;
     },
@@ -26,19 +23,21 @@ function IsConnected(index) {
     }
 }
 
-function Connect(addressPtr, openCallbackPtr, closeCallBackPtr, messageCallbackPtr, errorCallbackPtr) {
+function Connect(addressPtr, openCallbackPtr, closeCallBackPtr, messageCallbackPtr, errorCallbackPtr, index) {
     const address = UTF8ToString(addressPtr);
     console.log("Connecting to " + address);
     // Create webSocket connection.
     webSocket = new WebSocket(address);
     webSocket.binaryType = 'arraybuffer';
-    const index = SimpleWeb.AddNextSocket(webSocket);
+
+    SimpleWeb.AddNewSocket(webSocket, index);
 
     // Connection opened
     webSocket.addEventListener('open', function (event) {
         console.log("Connected to " + address);
         Module.dynCall_vi(openCallbackPtr, index);
     });
+
     webSocket.addEventListener('close', function (event) {
         console.log("Disconnected from " + address);
         Module.dynCall_vi(closeCallBackPtr, index);
@@ -68,8 +67,6 @@ function Connect(addressPtr, openCallbackPtr, closeCallBackPtr, messageCallbackP
 
         Module.dynCall_vi(errorCallbackPtr, index);
     });
-
-    return index;
 }
 
 function Disconnect(index) {

@@ -69,6 +69,7 @@ namespace NSL.WebSockets.UnityClient
         public override void Dispose()
         {
             Abort();
+
             instances.Remove(index);
         }
 
@@ -150,7 +151,7 @@ namespace NSL.WebSockets.UnityClient
 
             openCTS = new CancellationTokenSource();
 
-            index = SimpleWebJSLib.Connect(endPoint.ToString(), OpenCallback, CloseCallBack, MessageCallback, ErrorCallback);
+            SimpleWebJSLib.Connect(endPoint.ToString(), OpenCallback, CloseCallBack, MessageCallback, ErrorCallback, index);
 
             state = WebSocketState.Connecting;
 
