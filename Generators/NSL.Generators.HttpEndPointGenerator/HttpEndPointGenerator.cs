@@ -131,6 +131,9 @@ namespace NSL.Generators.HttpEndPointGenerator
 
                         var genAttribute = mattrbs.FirstOrDefault(x => x.AttributeClass.Name.Equals(GenerateAttributeFullName));
 
+                        if (genAttribute == null)
+                            continue;
+
                         var returnType = genAttribute?.ConstructorArguments.FirstOrDefault().Value as ITypeSymbol;
 
                         var url = genAttribute?.ConstructorArguments.ElementAtOrDefault(1).Value as string;

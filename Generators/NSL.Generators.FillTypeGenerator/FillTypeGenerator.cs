@@ -337,7 +337,7 @@ namespace NSL.Generators.FillTypeGenerator
 
                     if (basicArrayTypes.Contains(arrayItemTypeFrom.Name))
                     {
-                        codeFragment = $"{string.Join(".", readPath, fromItem.Name).TrimStart('.')}.Select({p} => {p}).{GetCollectionLinqConvertMethod(memberToType)}()";
+                        codeFragment = $"{string.Join(".", readPath, fromItem.Name).TrimStart('.')}?.Select({p} => {p}).{GetCollectionLinqConvertMethod(memberToType)}()";
                     }
                     else
                     {
@@ -353,7 +353,7 @@ namespace NSL.Generators.FillTypeGenerator
 
 #pragma warning disable RS1035 // Не использовать API, запрещенные для анализаторов
 
-                        codeFragment = $"{string.Join(".", readPath, fromItem.Name).TrimStart('.')}.Select({p} => new {arrayItemTypeTo} {{{Environment.NewLine}" +
+                        codeFragment = $"{string.Join(".", readPath, fromItem.Name).TrimStart('.')}?.Select({p} => new {arrayItemTypeTo} {{{Environment.NewLine}" +
                             string.Join(",", amem) +
                             $"{Environment.NewLine}}}).{GetCollectionLinqConvertMethod(memberToType)}()";
 
