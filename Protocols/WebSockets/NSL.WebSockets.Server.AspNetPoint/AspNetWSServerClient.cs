@@ -15,6 +15,8 @@ namespace NSL.WebSockets.Server.AspNetPoint
         {
             this.context = context;
 
+            base.Initialize();
+
             Data.SetContext(context);
         }
 

@@ -66,7 +66,7 @@ namespace NSL.WebSockets.Server.AspNetPoint
 
             try
             {
-                //инициализация слушателя клиента клиента
+                //инициализация слушателя клиента
                 await new AspNetWSServerClient<T>(context, serverOptions).RunPacketReceiver();
             }
             catch (Exception ex)

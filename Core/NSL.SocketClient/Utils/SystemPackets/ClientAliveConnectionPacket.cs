@@ -6,7 +6,7 @@ namespace NSL.SocketClient.Utils.SystemPackets
     {
         protected override void Receive(InputPacketBuffer data)
         {
-            Client.PongProcess();
+            Client?.PongProcess();
         }
 
         public ClientAliveConnectionPacket(ClientOptions<T> options) : base(options)
