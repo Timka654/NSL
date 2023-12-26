@@ -258,14 +258,20 @@ namespace NSL.Generators.SelectTypeGenerator
                     typeName = $"{arrType.ElementType.Name}[]";
                 }
 
+//#if DEBUG
+
+//                if (!Debugger.IsAttached)
+//                    Debugger.Launch();
+//#endif
 
                 if (memberType is IArrayTypeSymbol arrt)
                 {
-                    var amembers = FilterSymbols(arrt.ElementType.GetAllMembers(), model);
+                    itemModel = GetProxyModel(item, model);
+
+                    var amembers = FilterSymbols(arrt.ElementType.GetAllMembers(), itemModel);
 
                     if (amembers.Any())
                     {
-                        itemModel = GetProxyModel(item, model);
 
                         int n = 0;
                         string p = string.Empty;
@@ -294,11 +300,12 @@ namespace NSL.Generators.SelectTypeGenerator
                 {
                     var pType = type.TypeArguments.First();
 
-                    var amembers = FilterSymbols(pType.GetAllMembers(), model);
+                    itemModel = GetProxyModel(item, model);
+
+                    var amembers = FilterSymbols(pType.GetAllMembers(), itemModel);
 
                     if (amembers.Any())
                     {
-                        itemModel = GetProxyModel(item, model);
 
                         int n = 0;
                         string p = string.Empty;

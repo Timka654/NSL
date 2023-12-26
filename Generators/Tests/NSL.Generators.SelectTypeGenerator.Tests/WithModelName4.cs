@@ -1,6 +1,7 @@
-﻿using NSL.Generators.SelectTypeGenerator.Attributes;
+﻿#if !DEVELOP
+using NSL.Generators.SelectTypeGenerator.Attributes;
 
-namespace NSL.Generators.FillTypeGenerator.Tests.Develop.WithModelName
+namespace NSL.Generators.FillTypeGenerator.Tests
 {
     [SelectGenerate("model1", "model2", "model3")]
     public partial class WithModelName4
@@ -12,3 +13,4 @@ namespace NSL.Generators.FillTypeGenerator.Tests.Develop.WithModelName
         public WithModelName5 Abc2 { get; set; }
     }
 }
+#endif

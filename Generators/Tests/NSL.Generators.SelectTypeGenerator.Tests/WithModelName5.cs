@@ -1,6 +1,7 @@
-﻿using NSL.Generators.SelectTypeGenerator.Attributes;
+﻿#if !DEVELOP
+using NSL.Generators.SelectTypeGenerator.Attributes;
 
-namespace NSL.Generators.FillTypeGenerator.Tests.Develop.WithModelName
+namespace NSL.Generators.FillTypeGenerator.Tests
 {
     public partial class WithModelName5
     {
@@ -11,3 +12,4 @@ namespace NSL.Generators.FillTypeGenerator.Tests.Develop.WithModelName
         public int Abc2 { get; set; }
     }
 }
+#endif
