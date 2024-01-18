@@ -18,7 +18,14 @@ All unity supported multithread function/handles have extension methods ends wit
 
 For correct working - you must have one or more ThreadHelper instance on you game scene
 
-Unity for WebGL not support Request-Response logic with async/await method as default - we use Response delegate handle logic on self projects for normal working
+Unity for WebGL 
+- not support Request-Response logic with async/await method as default - we use Response delegate handle logic on self projects for normal working
+- support only WebSockets protocol, all any another - not supported by browsers and WebAssembly platform
+- for correct working - Builder have "BuildForWGLPlatform" method 
+
+# NSL Blazor
+
+Library support only WebSockets protocol - Builder for websockets client have BuildForBlazorWASMPlatform method, all any another - not supported by browsers and WebAssembly platform
 
 # Documentation
 in process
