@@ -28,6 +28,7 @@ In main project(NSL.sln) - change configuration to DebugExamples for
 - ASP.NET
 - Application
 - for Unity have small project(/Examples/UnityExample/...)
+
 And select interested project for "run as default"
 
 # In library have implemented 
