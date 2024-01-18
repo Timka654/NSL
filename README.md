@@ -15,7 +15,7 @@ All unity supported multithread function/handles have extension methods ends wit
 
 For correct working - you must have one or more ThreadHelper instance on you game scene
 
-
+Unity for WebGL not support Request/Response logic with async/await method as default - we use Response delegate handle logic on self projects
 
 # Documentation
 in progress
