@@ -31,7 +31,7 @@ And select interested project for "run as default"
 - TCP network protocol
 - UDP network protocol
 - WebSockets network protocol(extensions and wrappers for inject to ASP.NET)
-- Local network wrapper
+- Local network wrapper(connect client-server logic without basic network connection in single app)
 - Request-Response client alghoritms
 - (Roslyn) RPC Generator
 - (Roslyn) Linq/Queryable Select Generator
