@@ -5,8 +5,11 @@ Platform - .NET 8/.NET Standard 2.0+
 
 It's library always in develop process, I'm use this for my projects and you can free use this library on MIT license for yourself projects
 
+For lite initialize - project have created on "Builder" logic with extensions
+
 # NSL Unity
 All unity supported projects has separate to solution NSL.Unity.sln
+
 For success build you must
 - extract "UnityEngine.dll" file from "/Reference/UnityEngine.zip" to "/Reference/UnityEngine.dll"
 - set "UnityDebug" or "Unity" configuration
