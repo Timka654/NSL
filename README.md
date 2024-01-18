@@ -3,7 +3,7 @@ Network Socket Library for development application with need network transfer da
 
 Platform - .NET 8/.NET Standard 2.0+
 
-It's library always in develop process, I'm use this for my projects and you can free use this library on MIT license for yoursalfe
+It's library always in develop process, I'm use this for my projects and you can free use this library on MIT license for yourself projects
 
 # NSL Unity
 All unity supported projects has separate to solution NSL.Unity.sln
