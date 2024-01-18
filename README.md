@@ -21,10 +21,11 @@ For correct working - you must have one or more ThreadHelper instance on you gam
 in progress
 
 # Samples
-in main project(NSL.sln) - change configuration to DebugExamples for
+In main project(NSL.sln) - change configuration to DebugExamples for
 - ASP.NET
 - Application
 - for Unity have small project(/Examples/UnityExample/...)
+And select interested project for "run as default"
 
 # In library have implemented 
 - TCP network protocol
@@ -32,7 +33,7 @@ in main project(NSL.sln) - change configuration to DebugExamples for
 - WebSockets network protocol(extensions and wrappers for inject to ASP.NET)
 - Local network wrapper
 - Request/Response alghoritms
-- Linq/Queryable Sellect Generator
+- Linq/Queryable Select Generator
 - Fill Type Generator
 - Binary IO Generator
 - Configuration Extensions(extensions and wrappers for inject to ASP.NET)
