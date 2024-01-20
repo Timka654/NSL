@@ -1,18 +1,58 @@
-# NSLLibrary
-Socket Library for development application with need network transfer data (support unity)
+# NSL Library
+Network Socket Library for development application with need network transfer data (support unity & blazor-client)
 
-It's library always in progress, I'm use this for my projects and you can free use this library on MIT license
+Platform - .NET 8/.NET Standard 2.0+
 
-#NSL Unity
-For success build you must extract "UnityEngine.dll" file from "/Reference/UnityEngine.zip" to "/Reference/UnityEngine.dll"
+It's library always in develop process, I'm use this for my projects and you can free use this library on MIT license for yourself projects
+
+For lite initialize - project have created on "Builder" logic with extensions
+
+# NSL Unity
+All unity supported projects has separate to solution NSL.Unity.sln
+
+For success build you must
+- extract "UnityEngine.dll" file from "/Reference/UnityEngine.zip" to "/Reference/UnityEngine.dll"
+- set "UnityDebug" or "Unity" configuration
+
+All unity supported multithread function/handles have extension methods ends with words "ForUnity"/"Unity" (as example - AddConnectHandleForUnity), if this methods does not exists - base function normal work in this platform
+
+For correct working - you must have one or more ThreadHelper instance on you game scene
+
+Unity for WebGL 
+- not support Request-Response logic with async/await method as default - we use Response delegate handle logic on self projects for normal working
+- support only WebSockets protocol, all any another - not supported by browsers and WebAssembly platform
+- for correct working - Builder have "BuildForWGLPlatform" method 
+
+# NSL Blazor
+
+Library support only WebSockets protocol - Builder for websockets client have BuildForBlazorWASMPlatform method, all any another - not supported by browsers and WebAssembly platform
 
 # Documentation
-in progress
+in process
 
 # Samples
-Unity - https://github.com/Twice-Price/NSLLibrary.Samples.Unity/tree/master
+In main project(NSL.sln) - change configuration to DebugExamples for
+- ASP.NET
+- Application
+- for Unity have small project(/Examples/UnityExample/...)
 
-ASP.NET - in progress
+And select interested project for "run as default"
 
-Console - in progress
+# In library have implemented 
+- TCP network protocol
+- UDP network protocol
+- WebSockets network protocol(extensions and wrappers for inject to ASP.NET)
+- Local network wrapper(connect client-server logic without basic network connection in single app)
+- Request-Response client alghoritms
+- (Roslyn) RPC Generator
+- (Roslyn) Linq/Queryable Select Generator
+- (Roslyn) Fill Type Generator
+- (Roslyn) Binary IO Generator
+- Configuration Extensions(extensions and wrappers for inject to ASP.NET)
+- Logger Extensions(extensions and wrappers for inject to ASP.NET)
+- Session Extensions
+- Version Extensions
+- .NET Scripts
 
+# Another projects based on NSL
+- https://github.com/Timka654/NSL.Node - implementation basic room logic with load balancing(in process)
