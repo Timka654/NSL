@@ -5,8 +5,17 @@ namespace NSL.Generators.FillTypeGenerator.Attributes
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = true)]
     public class FillTypeGenerateProxyAttribute : Attribute
     {
-        public FillTypeGenerateProxyAttribute(string to) { }
+        /// <summary>
+        /// From unconfigured models to child object model change on fill
+        /// </summary>
+        /// <param name="toModel"></param>
+        public FillTypeGenerateProxyAttribute(string toModel) { }
 
-        public FillTypeGenerateProxyAttribute(string from, string to) { }
+        /// <summary>
+        /// Configure model to child object model change on fill
+        /// </summary>
+        /// <param name="fromModel"></param>
+        /// <param name="toModel"></param>
+        public FillTypeGenerateProxyAttribute(string fromModel, string toModel) { }
     }
 }
