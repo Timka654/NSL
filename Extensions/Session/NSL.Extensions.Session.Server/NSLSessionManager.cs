@@ -63,14 +63,14 @@ namespace NSL.Extensions.Session.Server
 
                     RemoveSession(waitClose.Session, true);
 
-                    options.OnExpiredSession(waitClose.Client, waitClose);
+                    await options.OnExpiredSession(waitClose.Client, waitClose);
                 }
                 catch (TaskCanceledException) { return; }
                 catch (Exception ex) { networkOptions.HelperLogger?.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Error, ex.ToString()); }
             }
         }
 
-        private void Server_OnClientDisconnectEvent(TClient client)
+        private async Task Server_OnClientDisconnectAsyncEvent(TClient client)
         {
             if (client == null)
                 return;
@@ -80,16 +80,25 @@ namespace NSL.Extensions.Session.Server
             if (session == null)
                 return;
 
-            session.DisconnectTime = client.DisconnectTime + options.CloseSessionDelay;
-
-            waitCloseQueue.Enqueue(session);
+            if (await options.OnClientValidate(client))
+            {
+                session.DisconnectTime = client.DisconnectTime + options.CloseSessionDelay;
+                waitCloseQueue.Enqueue(session);
+            }
+            else
+            {
+                session.DisconnectTime = DateTime.UtcNow;
+                await options.OnExpiredSession(client, session);
+            }
         }
 
-        public NSLRecoverySessionResult TryRecovery(TClient client, string session, string[] keys)
+        public async Task<NSLRecoverySessionResult> TryRecovery(TClient client, string session, string[] keys)
         {
             if (!sessionStorage.TryGetValue(session, out var oldSession)
                 || oldSession.RestoreKeys.Length != keys.Length
-                || !keys.SequenceEqual(oldSession.RestoreKeys))
+                || !keys.SequenceEqual(oldSession.RestoreKeys)
+                || !oldSession.DisconnectTime.HasValue 
+                || (oldSession.DisconnectTime.HasValue && oldSession.DisconnectTime < DateTime.UtcNow))
             {
                 return new NSLRecoverySessionResult() { Result = NSLRecoverySessionResultEnum.NotFound };
             }
@@ -113,16 +122,16 @@ namespace NSL.Extensions.Session.Server
 
             var result = new NSLRecoverySessionResult() { Result = NSLRecoverySessionResultEnum.Ok, SessionInfo = sessionInfo };
 
-            options.OnRecoverySession(client, sessionInfo);
+            await options.OnRecoverySession(client, sessionInfo);
 
             return result;
         }
 
         internal void RegisterServer(ServerOptions<TClient> server)
         {
-            server.AddPacket(NSLRecoverySessionPacket<TClient>.PacketId, new NSLRecoverySessionPacket<TClient>());
+            server.AddAsyncPacket(NSLRecoverySessionPacket<TClient>.PacketId, new NSLRecoverySessionPacket<TClient>());
 
-            server.OnClientDisconnectEvent += Server_OnClientDisconnectEvent;
+            server.OnClientDisconnectAsyncEvent += Server_OnClientDisconnectAsyncEvent;
         }
 
         public NSLServerSessionInfo<TClient> CreateSession(TClient client)

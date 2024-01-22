@@ -20,10 +20,17 @@ namespace NSL.Extensions.Session.Server
     public class NSLSessionServerOptions<TClient> : NSLSessionServerOptions
         where TClient : IServerNetworkClient
     {
-        public delegate void ChangeSessionDelegate(TClient client, NSLSessionInfo sessionInfo);
+        public delegate Task<bool> ClientValidateDelegate(TClient client);
 
-        public ChangeSessionDelegate OnRecoverySession { get; set; } = (client, sessionInfo) => { };
+        public delegate Task ChangeSessionDelegate(TClient client, NSLSessionInfo sessionInfo);
 
-        public ChangeSessionDelegate OnExpiredSession { get; set; } = (client, sessionInfo) => { };
+        public ChangeSessionDelegate OnRecoverySession { get; set; } = (client, sessionInfo) => Task.CompletedTask;
+
+        public ChangeSessionDelegate OnExpiredSession { get; set; } = (client, sessionInfo) => Task.CompletedTask;
+
+        /// <summary>
+        /// Validate client on disconnect for wait reconnect
+        /// </summary>
+        public ClientValidateDelegate OnClientValidate { get; set; } = (client) => Task.FromResult(true);
     }
 }

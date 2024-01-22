@@ -147,9 +147,10 @@ namespace NSL.Generators.Utils
             }
         }
 
-        public void CreateStaticClass(ClassDeclarationSyntax classDecl, string className, Action bodyBuild, IEnumerable<string> requiredDirectives = null)
+        public void CreateStaticClass(ClassDeclarationSyntax classDecl, string className, Action bodyBuild, IEnumerable<string> requiredDirectives = null, string @namespace = null)
         {
-            var @namespace = classDecl.Parent as NamespaceDeclarationSyntax;
+            if (@namespace == null)
+                @namespace = (classDecl.Parent as NamespaceDeclarationSyntax)?.Name.ToString();
 
             var usings = classDecl.GetTypeClassUsingDirectives();
 
@@ -175,7 +176,7 @@ namespace NSL.Generators.Utils
 
             if (@namespace != null)
             {
-                AppendLine($"namespace {@namespace.Name.ToString()}");
+                AppendLine($"namespace {@namespace}");
                 AppendLine("{");
 
                 NextTab();

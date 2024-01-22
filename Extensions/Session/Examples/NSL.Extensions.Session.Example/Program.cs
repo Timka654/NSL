@@ -33,7 +33,7 @@ namespace NSL.Extensions.Session.Example
                 {
                     b.SetLogger(sl);
 
-                    b.AddDefaultEventHandlers<TCPServerEndPointBuilder<BaseServerNetworkClient, ServerOptions<BaseServerNetworkClient>>, BaseServerNetworkClient>(handleOptions: DefaultEventHandlersEnum.All & ~DefaultEventHandlersEnum.HasSendStackTrace);
+                    b.AddDefaultEventHandlers(handleOptions: DefaultEventHandlersEnum.All & ~DefaultEventHandlersEnum.HasSendStackTrace);
 
                     b.AddConnectHandle(c => c.InitializeObjectBag());
 
@@ -45,11 +45,14 @@ namespace NSL.Extensions.Session.Example
                             c.OnExpiredSession = (client, session) =>
                             {
                                 sl.AppendLog($"Expired session {session.Session}");
+
+                                return Task.CompletedTask;
                             };
 
                             c.OnRecoverySession = (client, session) =>
                             {
                                 sl.AppendLog($"Recovered session {session.Session}");
+                                return Task.CompletedTask;
                             };
                         });
 
@@ -90,7 +93,7 @@ namespace NSL.Extensions.Session.Example
 
                     b.GetOptions().ConfigureRequestProcessor();
 
-                    b.AddDefaultEventHandlers<TCPClientEndPointBuilder<BasicNetworkClient, ClientOptions<BasicNetworkClient>>, BasicNetworkClient>(handleOptions: DefaultEventHandlersEnum.All & ~DefaultEventHandlersEnum.HasSendStackTrace);
+                    b.AddDefaultEventHandlers(handleOptions: DefaultEventHandlersEnum.All & ~DefaultEventHandlersEnum.HasSendStackTrace);
 
                     b.AddPacketHandle(2, (c, d) =>
                     {

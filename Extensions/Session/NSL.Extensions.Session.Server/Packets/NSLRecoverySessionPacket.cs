@@ -5,14 +5,15 @@ using NSL.SocketCore.Utils.Buffer;
 using NSL.SocketServer;
 using NSL.SocketServer.Utils;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace NSL.Extensions.Session.Server.Packets
 {
-    public class NSLRecoverySessionPacket<T> : IPacket<T> where T : IServerNetworkClient
+    public class NSLRecoverySessionPacket<T> : IAsyncPacket<T> where T : IServerNetworkClient
     {
         public const ushort PacketId = ushort.MaxValue - 2;
 
-        public override void Receive(T client, InputPacketBuffer data)
+        public override async Task ReceiveAsync(T client, InputPacketBuffer data)
         {
             var pid = client.ServerOptions.ObjectBag.Get<ushort>(RequestProcessor.DefaultResponsePIDObjectBagKey, true);
 
@@ -29,7 +30,7 @@ namespace NSL.Extensions.Session.Server.Packets
 
             var sessionManager = serverOptions.ObjectBag.Get<NSLSessionManager<T>>(NSLSessionManager<T>.ObjectBagKey);
 
-            var result = sessionManager.TryRecovery(client, request.Session, request.RestoreKeys);
+            var result = await sessionManager.TryRecovery(client, request.Session, request.RestoreKeys);
 
             result.WriteFullTo(response);
 

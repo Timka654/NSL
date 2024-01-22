@@ -354,7 +354,7 @@ namespace NSL.Generators.FillTypeGenerator
 #pragma warning disable RS1035 // Не использовать API, запрещенные для анализаторов
 
                         codeFragment = $"{string.Join(".", readPath, fromItem.Name).TrimStart('.')}?.Select({p} => new {arrayItemTypeTo} {{{Environment.NewLine}" +
-                            string.Join(",", amem) +
+                            string.Join($",{Environment.NewLine}", amem) +
                             $"{Environment.NewLine}}}).{GetCollectionLinqConvertMethod(memberToType)}()";
 
 #pragma warning restore RS1035 // Не использовать API, запрещенные для анализаторов
@@ -366,7 +366,10 @@ namespace NSL.Generators.FillTypeGenerator
                 else
                     codeFragment = string.Join(".", readPath, fromItem.Name).TrimStart('.');
 
-                codeLines.Add($"{mFillPath}{codeFragment}");
+                var result = $"{mFillPath}{codeFragment}";
+
+                if (!codeLines.Contains(result))
+                    codeLines.Add(result);
             }
         }
 

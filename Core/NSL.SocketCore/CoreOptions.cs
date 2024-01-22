@@ -104,6 +104,9 @@ namespace NSL.SocketCore
             return false;
         }
 
+        public bool AddAsyncPacket(ushort packetId, IAsyncPacket<TClient> packet)
+            => AddPacket(packetId, packet);
+
         public bool AddHandle(ushort packetId, PacketHandle handle)
         {
             if (!PacketHandles.ContainsKey(packetId))
