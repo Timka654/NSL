@@ -13,7 +13,7 @@ namespace NSL.Extensions.Session.Client
 {
     public static class ClientExtensions
     {
-        public static void AddNSLSessions<TClient>(this CoreOptions<TClient> options, Action<NSLSessionClientOptions> configure = null, string SOObjectKey = NSLSessionClientOptions.ObjectBagKey, string RPObjectKey = RequestProcessor.DefaultObjectBagKey)
+        public static void AddNSLSessions<TClient>(this ClientOptions<TClient> options, Action<NSLSessionClientOptions> configure = null, string SOObjectKey = NSLSessionClientOptions.ObjectBagKey, string RPObjectKey = RequestProcessor.DefaultObjectBagKey)
             where TClient : BaseSocketNetworkClient
         {
             var o = new NSLSessionClientOptions();

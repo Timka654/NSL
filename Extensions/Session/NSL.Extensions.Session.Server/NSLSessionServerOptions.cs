@@ -30,6 +30,7 @@ namespace NSL.Extensions.Session.Server
 
         /// <summary>
         /// Validate client on disconnect for wait reconnect
+        /// Return <see cref="false"/> for expire session
         /// </summary>
         public ClientValidateDelegate OnClientValidate { get; set; } = (client) => Task.FromResult(true);
     }
