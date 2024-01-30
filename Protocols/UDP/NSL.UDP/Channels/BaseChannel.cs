@@ -11,7 +11,7 @@ using NSL.SocketServer.Utils;
 
 namespace NSL.UDP.Channels
 {
-    public delegate void OnSendDelegate<TClient, TParent>(BaseChannel<TClient, TParent> fromChannel, BaseChannel<TClient, TParent>.PacketWaitTemp packet)
+    public delegate void OnSendDelegate<TClient, TParent>(BaseChannel<TClient, TParent> fromChannel, PacketWaitTemp packet)
         where TClient : IServerNetworkClient
         where TParent : BaseUDPClient<TClient, TParent>;
 
@@ -80,7 +80,7 @@ namespace NSL.UDP.Channels
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         protected void SendHead(PacketWaitTemp packet)
         {
-            udpClient.SocketSend(packet.Head.ToArray());
+            udpClient.SocketSend(packet.Head.ToArray(), packet);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -89,7 +89,7 @@ namespace NSL.UDP.Channels
             if (packet.Parts == null)
                 return;
 
-            Parallel.ForEach(packet.Parts, data => udpClient.SocketSend(data.ToArray()));
+            Parallel.ForEach(packet.Parts, data => udpClient.SocketSend(data.ToArray(), packet));
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -98,7 +98,7 @@ namespace NSL.UDP.Channels
             if (packet.Parts == null)
                 return;
 
-            Parallel.For(fromPartInc, toPartExc, idx => udpClient.SocketSend(packet.Parts.ElementAt(idx).ToArray()));
+            Parallel.For(fromPartInc, toPartExc, idx => udpClient.SocketSend(packet.Parts.ElementAt(idx).ToArray(), packet));
         }
 
         protected ConcurrentDictionary<uint, PacketReciveTemp> packetReceiveBuffer = new ConcurrentDictionary<uint, PacketReciveTemp>();
@@ -177,15 +177,6 @@ namespace NSL.UDP.Channels
             return Unsafe.As<int, uint>(ref incrementedSigned);
         }
 
-        public struct PacketWaitTemp
-        {
-            public uint PID;
-
-            public Memory<byte> Head;
-
-            public IEnumerable<Memory<byte>> Parts;
-        }
-
         protected class PacketReciveTemp
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -215,5 +206,14 @@ namespace NSL.UDP.Channels
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public bool Ready() => Lenght > 0 && Parts.Count == Lenght;
         }
+    }
+
+    public struct PacketWaitTemp
+    {
+        public uint PID;
+
+        public Memory<byte> Head;
+
+        public IEnumerable<Memory<byte>> Parts;
     }
 }

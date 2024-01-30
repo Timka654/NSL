@@ -16,7 +16,7 @@ namespace NSL.SocketCore
 
         IPEndPoint GetRemotePoint();
 
-        void ChangeUserData(INetworkClient setClient);
+        void ChangeUserData(INetworkClient newClientData);
 
         object GetUserData();
 

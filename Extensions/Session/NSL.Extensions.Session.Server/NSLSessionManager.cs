@@ -109,6 +109,8 @@ namespace NSL.Extensions.Session.Server
 
             keys = GenerateKeys();
 
+            client.Network.ChangeUserData(oldSession.Client);
+
             client.ChangeOwner(oldSession.Client);
 
             var sessionInfo = new NSLServerSessionInfo<TClient>(client, keys)

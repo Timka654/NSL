@@ -211,6 +211,7 @@ namespace NSL.TCP
         public void Send(byte[] buf, int offset, int lenght)
         {
             _sendLocker.WaitOne();
+
             try
             {
                 //шифруем данные

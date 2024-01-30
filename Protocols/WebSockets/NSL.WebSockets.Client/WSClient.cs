@@ -71,7 +71,7 @@ namespace NSL.WebSockets.Client
             ConnectionOptions.RunClientConnect();
         }
 
-        public override void ChangeUserData(INetworkClient data) => ConnectionOptions.InitializeClient((T)data);
+        public override void ChangeUserData(INetworkClient newClientData) => ConnectionOptions.InitializeClient((T)newClientData);
 
         protected override void RunDisconnect() => ConnectionOptions.RunClientDisconnect();
 

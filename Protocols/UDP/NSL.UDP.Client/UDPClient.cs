@@ -40,15 +40,29 @@ namespace NSL.UDP.Client
             options.CallClientConnectEvent(Data);
         }
 
-        public override void ChangeUserData(INetworkClient old_client_data)
+        public override void ChangeUserData(INetworkClient newClientData)
         {
-            if (old_client_data == null)
+            if (newClientData == null)
             {
                 data = null;
                 return;
             }
 
-            old_client_data.ChangeOwner(Data);
+            if (newClientData is T td)
+            {
+                var oldData = data;
+
+                data = td;
+                data.Network = this;
+
+                oldData.Network = null;
+
+                newClientData.ChangeOwner(oldData);
+
+                return;
+            }
+
+            throw new Exception($"{nameof(newClientData)} must have type {typeof(T)}");
         }
 
         protected override UDPClient<T> GetParent() => this;

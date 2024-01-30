@@ -97,10 +97,23 @@ namespace NSL.SocketClient
 
         public IClient NetworkClient => ClientData.Network;
 
-        public void InitializeClient(TClient setClient)
+        public void InitializeClient(TClient newClientData)
         {
-            ClientData = setClient;
-            ClientData.Network = NetworkClient;
+            if (newClientData == null)
+            {
+                ClientData = null;
+                return;
+            }
+
+            var oldCD = ClientData;
+
+            ClientData = newClientData;
+
+            ClientData.Network = oldCD.Network;
+
+            oldCD.Network = null;
+
+            ClientData.ChangeOwner(oldCD);
         }
 
         /// <summary>

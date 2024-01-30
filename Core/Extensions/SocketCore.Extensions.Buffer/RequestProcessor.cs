@@ -63,7 +63,10 @@ namespace NSL.SocketCore.Extensions.Buffer
 
             buffer.WithRecvIdentity(rid);
 
-            client.Network.Send(buffer, disposeOnSend);
+            client.Network?.Send(buffer, disposeOnSend);
+
+            if (client.Network == null)
+                return default;
 
             return rid;
         }

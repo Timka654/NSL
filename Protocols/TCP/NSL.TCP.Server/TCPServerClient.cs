@@ -62,16 +62,29 @@ namespace NSL.TCP.Server
 
         public void RunPacketReceiver() => RunReceive();
 
-        public override void ChangeUserData(INetworkClient setClient)
+        public override void ChangeUserData(INetworkClient newClientData)
         {
-            if (setClient is T valid)
+            if (newClientData == null)
             {
-                clientData = valid;
-                Data.Network = this;
-                Data.ServerOptions = options;
+                clientData = null;
+                return;
             }
-            else
-                throw new ArgumentException("Invalid type", nameof(setClient));
+
+            if (newClientData is T td)
+            {
+                var oldData = clientData;
+
+                clientData = td;
+                clientData.Network = this;
+
+                oldData.Network = null;
+
+                newClientData.ChangeOwner(oldData);
+
+                return;
+            }
+
+            throw new Exception($"{nameof(newClientData)} must have type {typeof(T)}");
         }
 
         protected override TCPServerClient<T> GetParent() => this;

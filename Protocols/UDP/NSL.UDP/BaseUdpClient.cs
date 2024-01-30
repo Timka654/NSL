@@ -9,6 +9,7 @@ using NSL.UDP.Interface;
 using NSL.UDP.Utils;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
@@ -259,6 +260,34 @@ namespace NSL.UDP
         public void Send(byte[] buf, int offset, int lenght)
             => throw new NotImplementedException();
 
+        internal void SocketSend(byte[] sndBuffer, PacketWaitTemp packet)
+        {
+            try
+            {
+                if (listenerSocket == null)
+                    return;
+
+                if (currentSendRate + sndBuffer.Length > options.ClientLimitSendRate)
+                    return;
+
+                Interlocked.Add(ref currentSendRate, sndBuffer.Length);
+
+                listenerSocket.SendTo(sndBuffer, SocketFlags.None, endPoint);
+            }
+            catch (ObjectDisposedException)
+            {
+                PacketFailProd(packet);
+
+                Disconnect();
+            }
+            catch (Exception ex)
+            {
+                PacketFailProd(packet);
+
+                Disconnect(ex);
+            }
+        }
+
         internal void SocketSend(byte[] sndBuffer)
         {
             try
@@ -275,16 +304,28 @@ namespace NSL.UDP
             }
             catch (ObjectDisposedException)
             {
-                Data?.OnPacketSendFail(sndBuffer, 0, sndBuffer.Length);
-
-                //отключаем клиента, лишним не будет
                 Disconnect();
             }
             catch (Exception ex)
             {
-                Data?.OnPacketSendFail(sndBuffer, 0, sndBuffer.Length);
                 Disconnect(ex);
             }
+        }
+
+        private void PacketFailProd(PacketWaitTemp packet)
+        {
+            var dataArray = new byte[packet.Head.Length + packet.Parts.Sum(x => x.Length)];
+
+            Memory<byte> data = new Memory<byte>(dataArray);
+
+            packet.Head.CopyTo(data);
+
+            foreach (var item in packet.Parts)
+            {
+                item.CopyTo(data);
+            }
+
+            Data?.OnPacketSendFail(dataArray, 0, dataArray.Length);
         }
 
         public void SendEmpty(ushort packetId)

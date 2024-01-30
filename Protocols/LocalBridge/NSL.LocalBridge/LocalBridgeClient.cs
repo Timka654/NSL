@@ -67,14 +67,29 @@ namespace NSL.LocalBridge
 
         private Dictionary<ushort, CoreOptions<TClient>.PacketHandle> PacketHandles;
 
-        public void ChangeUserData(INetworkClient setClient)
+        public void ChangeUserData(INetworkClient newClientData)
         {
-            if (setClient is TClient valid)
+            if (newClientData == null)
             {
-                clientData = valid;
+                clientData = null;
+                return;
             }
-            else
-                throw new ArgumentException("Invalid type", nameof(setClient));
+
+            if (newClientData is TClient td)
+            {
+                var oldData = clientData;
+
+                clientData = td;
+                clientData.Network = this;
+
+                oldData.Network = null;
+
+                newClientData.ChangeOwner(oldData);
+
+                return;
+            }
+
+            throw new Exception($"{nameof(newClientData)} must have type {typeof(TClient)}");
         }
 
         public void Disconnect()

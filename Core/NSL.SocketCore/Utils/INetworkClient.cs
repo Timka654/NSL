@@ -95,7 +95,7 @@ namespace NSL.SocketCore.Utils
         /// <param name="from">copy from</param>
         public virtual void ChangeOwner(INetworkClient from)
         {
-            InitializeObjectBag(from);
+            //InitializeObjectBag(from);
         }
 
         public virtual void Dispose()
