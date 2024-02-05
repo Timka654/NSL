@@ -70,6 +70,19 @@ namespace NSL.Extensions.Session.Server
             }
         }
 
+        public bool IsValidSession(TClient client)
+        {
+            if (client == null)
+                return false;
+
+            var session = client.GetSessionInfo();
+
+            if (session == null)
+                return false;
+
+            return true;
+        }
+
         private async Task Server_OnClientDisconnectAsyncEvent(TClient client)
         {
             if (client == null)
@@ -78,7 +91,10 @@ namespace NSL.Extensions.Session.Server
             var session = client.GetSessionInfo();
 
             if (session == null)
+            {
+                await options.OnExpiredSession(client, session);
                 return;
+            }
 
             if (await options.OnClientValidate(client))
             {

@@ -109,11 +109,14 @@ namespace NSL.SocketClient
 
             ClientData = newClientData;
 
-            ClientData.Network = oldCD.Network;
+            if (oldCD != null)
+            {
+                ClientData.Network = oldCD.Network;
 
-            oldCD.Network = null;
+                oldCD.Network = null;
 
-            ClientData.ChangeOwner(oldCD);
+                ClientData.ChangeOwner(oldCD);
+            }
         }
 
         /// <summary>
