@@ -32,8 +32,7 @@ namespace NSL.Generators.HttpEndPointGenerator
 
         private void ProcessHttpEndPoints(GeneratorExecutionContext context, HttpEndPointImplementAttributeSyntaxReceiver methodSyntaxReceiver)
         {
-            //if (!Debugger.IsAttached)
-            //    Debugger.Launch();
+            //GenDebug.Break();
 
             foreach (var item in methodSyntaxReceiver.Types)
             {
@@ -77,8 +76,7 @@ namespace NSL.Generators.HttpEndPointGenerator
 
                 foreach (var attr in attrbs)
                 {
-                    //if (!Debugger.IsAttached)
-                    //    Debugger.Launch();
+                    //GenDebug.Break();
 
                     var typeSymb = typeSem.GetDeclaredSymbol(type) as ITypeSymbol;
 
@@ -119,8 +117,7 @@ namespace NSL.Generators.HttpEndPointGenerator
 
                     foreach (var item in members)
                     {
-                        //if (!Debugger.IsAttached)
-                        //    Debugger.Launch();
+                        //GenDebug.Break();
 
                         if (!(item is IMethodSymbol ms))
                             continue;
@@ -154,8 +151,8 @@ namespace NSL.Generators.HttpEndPointGenerator
                                 return (val, x.AttributeClass.Name);
                             }).Where(x => x != default).ToArray();
 
-                            if(!templates.Any())
-                                templates = new(string,string)[] { ("[action]", "Post") };
+                            if (!templates.Any())
+                                templates = new (string, string)[] { ("[action]", "Post") };
 
                             foreach (var templ in templates)
                             {
@@ -174,12 +171,21 @@ namespace NSL.Generators.HttpEndPointGenerator
 
                                 CodeBuilder methodBuilder = new CodeBuilder();
 
+                                methodBuilder.AppendSummary(b =>
+                                {
+                                    b.AppendSummaryLine($"Generate for <see cref=\"{containerType.Name}.{ms.Name}({string.Join(", ", ms.Parameters.Select(x => x.Type.ToString().Replace('<', '{').Replace('>', '}')))})\"/>");
+
+                                });
+#if DEBUG
+                                //GenDebug.Break();
+#endif
+
                                 methodBuilder.AppendLine($"public async Task<{returnType}> {_vname}Request({string.Join(", ", _p)})");
                                 methodBuilder.NextTab();
                                 methodBuilder.AppendLine($"=> await CreateEndPointClient({_vname}Url)");
                                 if (_t == "Post")
                                 {
-                                    if(mparam == null)
+                                    if (mparam == null)
                                         methodBuilder.AppendLine($".PostEmptyAsync({_vname}Url)");
                                     else
                                         methodBuilder.AppendLine($".PostJsonAsync({_vname}Url, {mparam.Name})");
@@ -194,9 +200,9 @@ namespace NSL.Generators.HttpEndPointGenerator
 
                 }
 #pragma warning disable RS1035 // Не использовать API, запрещенные для анализаторов
-                    classBuilder.AppendLine(string.Join($"{Environment.NewLine}{Environment.NewLine}", urlDeclarations));
-                    classBuilder.AppendLine();
-                    classBuilder.AppendLine(string.Join($"{Environment.NewLine}{Environment.NewLine}", methodDeclarations));
+                classBuilder.AppendLine(string.Join($"{Environment.NewLine}{Environment.NewLine}", urlDeclarations));
+                classBuilder.AppendLine();
+                classBuilder.AppendLine(string.Join($"{Environment.NewLine}{Environment.NewLine}", methodDeclarations));
 #pragma warning restore RS1035 // Не использовать API, запрещенные для анализаторов
             });
 

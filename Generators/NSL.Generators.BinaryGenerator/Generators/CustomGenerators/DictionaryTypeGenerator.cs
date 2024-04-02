@@ -38,8 +38,7 @@ namespace NSL.Generators.BinaryGenerator.Generators.CustomGenerators
 
         public static string GetWriteLine(INamedTypeSymbol type, BinaryGeneratorContext context, string path)
         {
-            //if (!Debugger.IsAttached)
-            //    Debugger.Launch();
+            //GenDebug.Break();
 
             var farg = type.TypeArguments.First();
             var sarg = type.TypeArguments.Last();

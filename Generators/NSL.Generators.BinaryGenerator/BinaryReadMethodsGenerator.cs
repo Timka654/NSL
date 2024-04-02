@@ -65,8 +65,7 @@ namespace NSL.Generators.BinaryGenerator
             if (!field.Type.IsValueType)
                 return field.Type.Name;
 
-            //if (!Debugger.IsAttached)
-            //    Debugger.Launch();
+            //GenDebug.Break();
 
             var genericType = ((INamedTypeSymbol)field.Type).TypeArguments.First();
 

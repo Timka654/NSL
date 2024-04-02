@@ -1,11 +1,12 @@
-﻿using NSL.Generators.SelectTypeGenerator.Attributes;
+﻿#if !DEVELOP
+using NSL.Generators.SelectTypeGenerator.Attributes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NSL.Generators.SelectTypeGenerator.Tests.Develop.Proxy
+namespace NSL.Generators.SelectTypeGenerator.Tests
 {
     [SelectGenerate("TestGet")]
     public partial class ProxyModel1
@@ -18,3 +19,4 @@ namespace NSL.Generators.SelectTypeGenerator.Tests.Develop.Proxy
         public virtual List<ProxyModel2> List { get; set; }
     }
 }
+#endif

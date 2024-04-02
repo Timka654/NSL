@@ -36,8 +36,7 @@ namespace NSL.Extensions.RPC.Generator
         private void ProcessRPCMethods(GeneratorExecutionContext context, RPCMethodAttributeSyntaxReceiver syntaxReceiver)
         {
 #if DEBUG
-            //if (!Debugger.IsAttached)
-            //    Debugger.Launch();
+            //GenDebug.Break();
 #endif
 
             var data = syntaxReceiver.RPCMethods
@@ -71,8 +70,7 @@ namespace NSL.Extensions.RPC.Generator
 
         public void Execute(GeneratorExecutionContext context)
         {
-            //if (!Debugger.IsAttached)
-            //    Debugger.Launch();
+            //GenDebug.Break();
 
             if (context.SyntaxReceiver is RPCMethodAttributeSyntaxReceiver methodSyntaxReceiver)
                 ProcessRPCMethods(context, methodSyntaxReceiver);

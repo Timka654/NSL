@@ -20,8 +20,7 @@ namespace NSL.Extensions.RPC.Generator.Generators
         public static string BuildParameterReader(ParameterSyntax parameterSyntax, MethodContextModel mcm)
         {
             CodeBuilder pb = new CodeBuilder();
-            //if (!Debugger.IsAttached)
-            //    Debugger.Launch();
+            //GenDebug.Break();
 
 
 

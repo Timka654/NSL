@@ -27,8 +27,7 @@ namespace NSL.Extensions.RPC.Generator.Generators
 
                 var returnTypeInfo = semanticModel.GetTypeInfo(mov.DeclSyntax.ReturnType);
 
-                //if (!Debugger.IsAttached)
-                //    Debugger.Launch();
+                //GenDebug.Break();
 
                 MethodContextModel mcm = new MethodContextModel()
                 {
@@ -52,8 +51,7 @@ namespace NSL.Extensions.RPC.Generator.Generators
 
             binaryContext.SemanticModel = mcm.SemanticModel;
 
-            //if (!Debugger.IsAttached)
-            //    Debugger.Launch();
+            //GenDebug.Break();
 
             var modText = mcm.methodSyntax.Modifiers.Remove(mcm.methodSyntax.Modifiers.First(x => x.Text.Equals("virtual"))).Add(SyntaxFactory.Token(SyntaxKind.OverrideKeyword)).ToString();
 
@@ -91,8 +89,7 @@ namespace NSL.Extensions.RPC.Generator.Generators
             cb.AppendLine();
 
 
-            //if (!Debugger.IsAttached)
-            //    Debugger.Launch();
+            //GenDebug.Break();
 
 
             var movSymbol = mcm.SemanticModel.GetDeclaredSymbol(mcm.methodSyntax);
@@ -109,8 +106,7 @@ namespace NSL.Extensions.RPC.Generator.Generators
                 else
                     rType = default;
 
-                //if (!Debugger.IsAttached)
-                //    Debugger.Launch();
+                //GenDebug.Break();
 
                 trun = true;
 

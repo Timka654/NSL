@@ -17,8 +17,7 @@ namespace NSL.Generators.BinaryGenerator.Generators
             if (!type.NullableAnnotation.Equals(NullableAnnotation.Annotated))
                 return default;
 
-            //if (!Debugger.IsAttached)
-            //    Debugger.Launch();
+            //GenDebug.Break();
 
             var typedArgs = ((INamedTypeSymbol)type).TypeArguments;
 

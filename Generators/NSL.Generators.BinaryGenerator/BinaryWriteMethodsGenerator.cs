@@ -51,7 +51,7 @@ namespace NSL.Generators.BinaryGenerator
 
             if (member is IPropertySymbol ps)
             {
-                if (ps.SetMethod != null)
+                if (ps.GetMethod != null)
                 {
                     var ptype = ps.GetTypeSymbol();
                     cb.AppendLine(BuildParameterWriter(ptype, context, path));

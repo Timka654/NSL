@@ -1,5 +1,6 @@
 ﻿
-using NSL.Generators.SelectTypeGenerator.Tests.Develop.Proxy;
+
+using NSL.Generators.SelectTypeGenerator.Tests.Develop;
 
 namespace NSL.Generators.FillTypeGenerator.Tests
 {
@@ -7,12 +8,15 @@ namespace NSL.Generators.FillTypeGenerator.Tests
     {
         static void Main(string[] args)
         {
+            List<JoiningModel1> jList = new List<JoiningModel1>();
+
+            jList.SelectGet2();
+
+#if !DEVELOP
 
             List<ProxyModel1> pItems = new List<ProxyModel1>();
 
             pItems.SelectTestGet();
-
-#if !DEVELOP
 
             List<WithModelName1> aa = new List<WithModelName1>();
 

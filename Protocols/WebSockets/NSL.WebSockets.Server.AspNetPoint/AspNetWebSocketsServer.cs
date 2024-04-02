@@ -27,7 +27,7 @@ namespace NSL.WebSockets.Server.AspNetPoint
         {
             foreach (var item in options.EndPoints)
             {
-                router.MapGet(item, Accept);
+                router.Map(item, Accept);
             }
         }
 

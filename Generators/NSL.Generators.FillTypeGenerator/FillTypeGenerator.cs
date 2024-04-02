@@ -34,8 +34,7 @@ namespace NSL.Generators.FillTypeGenerator
 
         private void ProcessFillTypes(GeneratorExecutionContext context, FillTypeAttributeSyntaxReceiver methodSyntaxReceiver)
         {
-            //if (!Debugger.IsAttached)
-            //    Debugger.Launch();
+            //GenDebug.Break();
 
             foreach (var item in methodSyntaxReceiver.FillTypeTypes)
             {
@@ -70,8 +69,7 @@ namespace NSL.Generators.FillTypeGenerator
 
                 foreach (var attr in attrbs)
                 {
-                    //if (!Debugger.IsAttached)
-                    //    Debugger.Launch();
+                    //GenDebug.Break();
 
                     var typeSymb = typeSem.GetDeclaredSymbol(type) as ITypeSymbol;
 
@@ -113,8 +111,7 @@ namespace NSL.Generators.FillTypeGenerator
 #pragma warning restore RS1035 // Do not use APIs banned for analyzers
             //#endif
 
-            //if (!Debugger.IsAttached)
-            //    Debugger.Launch();
+            //GenDebug.Break();
 
             context.AddSource($"{typeClass.GetTypeClassName()}.filltype.cs", classBuilder.ToString());
         }
@@ -180,8 +177,7 @@ namespace NSL.Generators.FillTypeGenerator
 
         private string GetProxyModel(ISymbol item, string model)
         {
-            //if (!Debugger.IsAttached)
-            //    Debugger.Launch();
+            //GenDebug.Break();
 
             string proxyModel = default;
 
@@ -348,8 +344,7 @@ namespace NSL.Generators.FillTypeGenerator
                         if (!Equals(model, itemModel))
                             codeLines.Add($"// Proxy model merge from \"{model}\" to \"{itemModel}\"");
 
-                        //if (!Debugger.IsAttached)
-                        //    Debugger.Launch();
+                        //GenDebug.Break();
 
 #pragma warning disable RS1035 // Не использовать API, запрещенные для анализаторов
 

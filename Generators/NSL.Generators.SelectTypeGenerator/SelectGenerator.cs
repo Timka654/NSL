@@ -34,8 +34,7 @@ namespace NSL.Generators.SelectTypeGenerator
 
         private void ProcessFillTypes(GeneratorExecutionContext context, SelectAttributeSyntaxReceiver methodSyntaxReceiver)
         {
-            //if (!Debugger.IsAttached)
-            //    Debugger.Launch();
+            //GenDebug.Break();
 
             foreach (var item in methodSyntaxReceiver.SelectTypes)
             {
@@ -65,11 +64,17 @@ namespace NSL.Generators.SelectTypeGenerator
                 .Where(x => x.GetAttributeFullName().Equals(SelectGenerateAttributeFullName))
                 .ToArray();
 
+                var joins = typeClass.AttributeLists
+                .SelectMany(x => x.Attributes)
+                .Where(x => x.GetAttributeFullName().Equals(SelectGenerateModelJoinAttributeFullName))
+                .Select(x => x.ArgumentList)
+                .ToArray();
+#if DEBUG
+                //GenDebug.Break();
+#endif
+
                 foreach (var attr in attrbs)
                 {
-                    //if (!Debugger.IsAttached)
-                    //    Debugger.Launch();
-
                     var typeSymb = typeSem.GetDeclaredSymbol(type) as ITypeSymbol;
 
                     var selectArgs = attr.ArgumentList.Arguments;
@@ -82,7 +87,12 @@ namespace NSL.Generators.SelectTypeGenerator
 
                     foreach (var item in models)
                     {
-                        CreateMethods(methods, typeSymb, FilterSymbols(members, item), item);
+                        var mjoins = joins
+                        .Where(x => x.Arguments.First().GetAttributeParameterValue<string>(typeSem).Equals(item))
+                        .SelectMany(x => x.Arguments.Skip(1).Select(n => n.GetAttributeParameterValue<string>(typeSem)))
+                        .ToArray();
+
+                        CreateMethods(methods, typeSymb, FilterSymbols(members, item, mjoins), item);
                     }
 
 #pragma warning disable RS1035 // Do not use APIs banned for analyzers
@@ -91,8 +101,7 @@ namespace NSL.Generators.SelectTypeGenerator
                 }
             }, originNamespace == null ? null : Enumerable.Repeat(originNamespace, 1), @namespace: "System.Linq");
 
-            //if (!Debugger.IsAttached)
-            //    Debugger.Launch();
+            //GenDebug.Break();
 
             // Visual studio have lag(or ...) cannot show changes sometime
             //#if DEVELOP
@@ -104,7 +113,7 @@ namespace NSL.Generators.SelectTypeGenerator
             context.AddSource($"{typeClass.GetTypeClassName()}.selectgen.cs", classBuilder.ToString());
         }
 
-        private IEnumerable<ISymbol> FilterSymbols(IEnumerable<ISymbol> symbols, string model)
+        private IEnumerable<ISymbol> FilterSymbols(IEnumerable<ISymbol> symbols, string model, IEnumerable<string> joinedArr)
             => symbols.Where(x =>
          {
              var a = x.GetAttributes().FirstOrDefault(n => n.AttributeClass.Name == SelectGenerateIncludeAttributeFullName);
@@ -112,7 +121,11 @@ namespace NSL.Generators.SelectTypeGenerator
              if (a == null)
                  return false;
 
-             if (a.ConstructorArguments.SelectMany(n => n.Values).Any(n => (n.Value as string).Equals(model)))
+             if (a.ConstructorArguments.SelectMany(n => n.Values).Any(n =>
+             {
+                 var m = (n.Value as string);
+                 return m.Equals(model) || joinedArr.Contains(m);
+             }))
                  return true;
 
              return false;
@@ -182,10 +195,21 @@ namespace NSL.Generators.SelectTypeGenerator
 #pragma warning restore RS1035 // Не использовать API, запрещенные для анализаторов
         }
 
+        private string[] GetJoinModels(ISymbol item, string model)
+        {
+            var attributes = item.GetAttributes();
+
+            var joined = attributes
+                        .Where(x => x.AttributeClass.Name == SelectGenerateModelJoinAttributeFullName)
+                        .Where(x => (x.ConstructorArguments.First().Value as string).Equals(model))
+                        .SelectMany(x => x.ConstructorArguments.ElementAt(1).Values.Select(q => q.Value as string))
+                        .ToArray();
+
+            return joined;
+        }
         private string GetProxyModel(ISymbol item, string model)
         {
-            //if (!Debugger.IsAttached)
-            //    Debugger.Launch();
+            //GenDebug.Break();
 
             string proxyModel = default;
 
@@ -206,6 +230,30 @@ namespace NSL.Generators.SelectTypeGenerator
             }
 
             return proxyModel ?? model;
+        }
+
+        private void ReadCollection(List<string> sMembers, ISymbol item, IEnumerable<ISymbol> amembers, string model, string itemModel, string path)
+        {
+            if (amembers.Any())
+            {
+
+                int n = 0;
+                string p = string.Empty;
+                while (path.Contains(p = $"x{n++}")) { }
+
+                var amem = new List<string>();
+
+                ReadMembers(amembers, amem, itemModel, p);
+
+                if (!Equals(model, itemModel))
+                    sMembers.Add($"// Proxy model merge from \"{model}\" to \"{itemModel}\"");
+
+#pragma warning disable RS1035 // Не использовать API, запрещенные для анализаторов
+                sMembers.Add($"{item.Name} = {path}.{item.Name} == null ? null : {path}.{item.Name}.Select({p} => new {{{Environment.NewLine}{CombineMembers(amem.Select(x => $"\t{x}"))}{Environment.NewLine}}})");
+#pragma warning restore RS1035 // Не использовать API, запрещенные для анализаторов
+            }
+            else
+                sMembers.Add($"{path}.{item.Name}");
         }
 
         private void ReadMembers(IEnumerable<ISymbol> members, List<string> sMembers, string model, string path)
@@ -249,6 +297,8 @@ namespace NSL.Generators.SelectTypeGenerator
 
                 string typeName = default;
 
+                IEnumerable<string> joined;
+
                 INamedTypeSymbol type = memberType as INamedTypeSymbol;
 
                 if (type != null)
@@ -261,40 +311,18 @@ namespace NSL.Generators.SelectTypeGenerator
                 }
 
                 //#if DEBUG
-
-                //                if (!Debugger.IsAttached)
-                //                    Debugger.Launch();
+                //   GenDebug.Break();
                 //#endif
 
                 if (memberType is IArrayTypeSymbol arrt)
                 {
                     itemModel = GetProxyModel(item, model);
 
-                    var amembers = FilterSymbols(arrt.ElementType.GetAllMembers(), itemModel);
+                    //joined = GetJoinModels(arrt.ElementType, itemModel);
 
-                    if (amembers.Any())
-                    {
+                    var amembers = FilterSymbols(arrt.ElementType.GetAllMembers(), itemModel, Enumerable.Empty<string>());
 
-                        int n = 0;
-                        string p = string.Empty;
-                        while (path.Contains(p = $"x{n++}")) { }
-
-                        var amem = new List<string>();
-
-                        ReadMembers(amembers, amem, itemModel, p);
-
-                        if (!Equals(model, itemModel))
-                            sMembers.Add($"// Proxy model merge from \"{model}\" to \"{itemModel}\"");
-
-#pragma warning disable RS1035 // Не использовать API, запрещенные для анализаторов
-                        sMembers.Add($"{item.Name} = {path}.{item.Name} == null ? null : {path}.{item.Name}.Select({p} => new {{{Environment.NewLine}{CombineMembers(amem.Select(x => $"\t{x}"))}{Environment.NewLine}}})");
-#pragma warning restore RS1035 // Не использовать API, запрещенные для анализаторов
-                    }
-                    else
-                    {
-                        sMembers.Add($"{path}.{item.Name}");
-                    }
-
+                    ReadCollection(sMembers, item, amembers, model, itemModel, path);
 
                     continue;
                 }
@@ -304,31 +332,11 @@ namespace NSL.Generators.SelectTypeGenerator
 
                     itemModel = GetProxyModel(item, model);
 
-                    var amembers = FilterSymbols(pType.GetAllMembers(), itemModel);
+                    //joined = GetJoinModels(pType, itemModel);
 
-                    if (amembers.Any())
-                    {
+                    var amembers = FilterSymbols(pType.GetAllMembers(), itemModel, Enumerable.Empty<string>());
 
-                        int n = 0;
-                        string p = string.Empty;
-                        while (path.Contains(p = $"x{n++}")) { }
-
-                        var amem = new List<string>();
-
-                        ReadMembers(amembers, amem, itemModel, p);
-
-                        if (!Equals(model, itemModel))
-                            sMembers.Add($"// Proxy model merge from \"{model}\" to \"{itemModel}\"");
-
-#pragma warning disable RS1035 // Не использовать API, запрещенные для анализаторов
-                        sMembers.Add($"{item.Name} = {path}.{item.Name} == null ? null : {path}.{item.Name}.Select({p} => new {{{Environment.NewLine}{CombineMembers(amem.Select(x => $"\t{x}"))}{Environment.NewLine}}})");
-#pragma warning restore RS1035 // Не использовать API, запрещенные для анализаторов
-                    }
-                    else
-                    {
-                        sMembers.Add($"{path}.{item.Name}");
-                    }
-
+                    ReadCollection(sMembers, item, amembers, model, itemModel, path);
 
                     continue;
                 }
@@ -336,14 +344,13 @@ namespace NSL.Generators.SelectTypeGenerator
 
                 itemModel = GetProxyModel(item, model);
 
-                var memMembers = FilterSymbols(memberType.GetAllMembers(), itemModel);
+                //joined = GetJoinModels(item.ContainingType, itemModel);
+
+                var memMembers = FilterSymbols(memberType.GetAllMembers(), itemModel, Enumerable.Empty<string>());
 
                 //if (item.Name.StartsWith("AbcModel1"))
                 //{
-                //    if (!Debugger.IsAttached)
-                //        Debugger.Launch();
-
-                //    Debugger.Break();
+                //    GenDebug.Break();
                 //}
 
                 if (memMembers.Any())
@@ -367,5 +374,6 @@ namespace NSL.Generators.SelectTypeGenerator
         private readonly string SelectGenerateAttributeFullName = typeof(SelectGenerateAttribute).Name;
         private readonly string SelectGenerateIncludeAttributeFullName = typeof(SelectGenerateIncludeAttribute).Name;
         private readonly string SelectGenerateProxyAttributeFullName = typeof(SelectGenerateProxyAttribute).Name;
+        private readonly string SelectGenerateModelJoinAttributeFullName = typeof(SelectGenerateModelJoinAttribute).Name;
     }
 }

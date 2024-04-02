@@ -19,8 +19,7 @@ namespace NSL.Generators.BinaryGenerator.Generators
 
             if (type.IsTupleType)
             {
-                //if (!Debugger.IsAttached)
-                //    Debugger.Launch();
+                //GenDebug.Break();
 
                 var nts = type as INamedTypeSymbol;
 

@@ -37,8 +37,8 @@ namespace NSL.Generators.BinaryGenerator.Generators
                     .OrderBy(x => x.MetadataName);
 
 
-                //if (!Debugger.IsAttached && ignoreMembers.Any())
-                //    Debugger.Launch();
+                //if ( ignoreMembers.Any())
+                //    GenDebug.Break();
 
                 foreach (var member in members)
                 {

@@ -77,8 +77,33 @@ namespace NSL.Generators.Utils
             AppendLine("*/");
         }
 
+        public void AppendSummary(Action<CodeBuilder> commentAction)
+        {
+            AppendSummaryLine("<summary>");
+
+            commentAction(this);
+
+            AppendSummaryLine("</summary>");
+        }
+
+        public void AppendSummaryLine(string line)
+        {
+            AppendLine($"/// {line}");
+        }
+
+        public void AppendSummaryLines(params string[] lines)
+        {
+            foreach (var item in lines)
+            {
+                AppendSummaryLine(item);
+            }
+        }
+
         public void AppendComment(Action commentAction)
             => AppendComment(builder => commentAction());
+
+        public void AppendSummary(Action commentAction)
+            => AppendSummary(builder => commentAction());
 
 
         public void CreatePartialClass(ClassDeclarationSyntax classDecl, Action bodyBuild, IEnumerable<string> requiredDirectives = null)

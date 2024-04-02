@@ -15,8 +15,6 @@ namespace Builder.WebSockets.BaseExample.Server
                 .WithBindingPoint("http://localhost:20006/")
                 .WithCode(builder =>
                 {
-                    // builder.WithAddressFamily(System.Net.Sockets.AddressFamily.InterNetwork); //optional(setted on initialize to valid)
-                    // builder.WithProtocolType(System.Net.Sockets.ProtocolType.WebSockets); //optional(setted on initialize to valid)
                     builder.WithBufferSize(8192); //optional
                 })
                 .WithCode(builder =>
@@ -50,17 +48,6 @@ namespace Builder.WebSockets.BaseExample.Server
                 .WithCode(builder =>
                 {
                     builder.AddPacket(1, new ServerTestPacket1());
-
-                    //builder.AddPacket(1, new testPacket1());
-
-                    //builder.AddPacketHandle(2, (client, data) =>
-                    //{
-                    //    Console.WriteLine($"[Client] receive from packet handle(2) - {data.ReadString()}");
-
-                    //    cts.Cancel();
-                    //});
-
-                    //builder.LoadPackets(typeof(PacketTestLoadAttribute));
                 })
                 .Build();
 

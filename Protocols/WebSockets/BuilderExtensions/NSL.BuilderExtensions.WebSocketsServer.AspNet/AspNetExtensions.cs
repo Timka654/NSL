@@ -44,7 +44,7 @@ namespace NSL.BuilderExtensions.WebSocketsServer.AspNet
 
             var acceptDelegate = server.GetAcceptDelegate();
 
-            return builder.MapGet(pattern, async context =>
+            return builder.Map(pattern, async (HttpContext context) =>
             {
                 if (requestHandle != null)
                     if (!await requestHandle(context))
