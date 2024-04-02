@@ -1,0 +1,1 @@
+dotnet outdated -r -u -inc "NSL"
