@@ -1,9 +1,9 @@
 ﻿using Microsoft.Extensions.Logging;
 using NSL.SocketCore.Utils.Logger.Enums;
 
-namespace NSL.Logger.AspNetCore
+namespace NSL.Logger.AspNet
 {
-    public class ILoggerWrapper : NSL.Logger.Interface.ILogger
+    public class ILoggerWrapper : Logger.Interface.ILogger
     {
         private readonly ILogger originLogger;
 

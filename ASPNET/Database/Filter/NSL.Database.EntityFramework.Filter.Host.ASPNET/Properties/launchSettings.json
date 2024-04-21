@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "NSL.Database.EntityFramework.Filter.Host.ASPNET": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:50061;http://localhost:50062"
+    }
+  }
+}

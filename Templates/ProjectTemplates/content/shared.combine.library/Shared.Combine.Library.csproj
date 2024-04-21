@@ -1,22 +1,25 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>{TargetFramework}</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
+		<TargetFramework>{TargetFramework}</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
   </PropertyGroup>
 
   <PropertyGroup>
-    <DefineConstants>$(DefineConstants);CLIENT</DefineConstants>
+		<DefineConstants>$(DefineConstants);CLIENT</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="artifacts\**" />
-    <EmbeddedResource Remove="artifacts\**" />
-    <None Remove="artifacts\**" />
-    <Compile Remove="Server\**" />
-    <EmbeddedResource Remove="Server\**" />
-    <None Remove="Server\**" />
+		<Compile Remove="artifacts\**" />
+		<Content Remove="artifacts\**" />
+		<EmbeddedResource Remove="artifacts\**" />
+		<None Remove="artifacts\**" />
+		
+		<Compile Remove="Server\**" />
+		<Content Remove="Server\**" />
+		<EmbeddedResource Remove="Server\**" />
+		<None Remove="Server\**" />
   </ItemGroup>
 
 </Project>

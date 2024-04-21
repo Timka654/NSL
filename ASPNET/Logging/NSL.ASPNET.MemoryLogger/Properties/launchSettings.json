@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "NSL.ASPNET.MemoryLogger": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:63587;http://localhost:63588"
+    }
+  }
+}

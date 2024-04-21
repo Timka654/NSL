@@ -2,6 +2,7 @@
 using NSL.SocketCore.Utils;
 using NSL.SocketCore.Utils.Buffer;
 using System;
+using System.Threading.Tasks;
 
 namespace NSL.SocketCore.Extensions.Buffer
 {
@@ -45,6 +46,72 @@ namespace NSL.SocketCore.Extensions.Buffer
             where TEnum : struct, IConvertible
         {
             options.AddResponsePacketHandle(packetId.ToUInt16(null), handler);
+        }
+
+
+
+        public delegate OutputPacketBuffer RequestPacketHandle<TClient>(TClient client, InputPacketBuffer data)
+             where TClient : INetworkClient;
+
+        public delegate bool RequestPacketHandle2<TClient>(TClient client, InputPacketBuffer data, OutputPacketBuffer response)
+             where TClient : INetworkClient;
+
+        public delegate Task<OutputPacketBuffer> RequestPacketAsyncHandle<TClient>(TClient client, InputPacketBuffer data)
+             where TClient : INetworkClient;
+
+        public delegate Task<bool> RequestPacketAsyncHandle2<TClient>(TClient client, InputPacketBuffer data, OutputPacketBuffer response)
+             where TClient : INetworkClient;
+
+        public static void AddRequestPacketHandle<TClient, TEnum>(this CoreOptions<TClient> builder, TEnum packetId, RequestPacketHandle<TClient> packet) where TClient : INetworkClient, new() where TEnum : struct, IConvertible
+        {
+            builder.AddHandle(packetId.ToUInt16(null), (client, data) => {
+
+                var result = packet.Invoke(client, data);
+
+                if (result != null)
+                    client.Network.Send(result);
+
+            });
+        }
+
+        public static void AddRequestPacketHandle<TClient, TEnum>(this CoreOptions<TClient> builder, TEnum packetId, RequestPacketHandle2<TClient> packet, ushort responsePacketId = 1) where TClient : INetworkClient, new() where TEnum : struct, IConvertible
+        {
+            builder.AddHandle(packetId.ToUInt16(null), (client, data) => {
+
+                using (var response = data.CreateResponse(responsePacketId))
+                {
+                    var result = packet.Invoke(client, data, response);
+
+                    if (result)
+                        client.Network.Send(response);
+                }
+            });
+        }
+
+        public static void AddAsyncRequestPacketHandle<TClient, TEnum>(this CoreOptions<TClient> builder, TEnum packetId, RequestPacketAsyncHandle<TClient> packet) where TClient : INetworkClient, new() where TEnum : struct, IConvertible
+        {
+            builder.AddAsyncHandle(packetId.ToUInt16(null), async (client, data) => {
+
+                var result = await packet.Invoke(client, data);
+
+                if (result != null)
+                    client.Network.Send(result);
+
+            });
+        }
+
+        public static void AddAsyncRequestPacketHandle<TClient, TEnum>(this CoreOptions<TClient> builder, TEnum packetId, RequestPacketAsyncHandle2<TClient> packet, ushort responsePacketId = 1) where TClient : INetworkClient, new() where TEnum : struct, IConvertible
+        {
+            builder.AddAsyncHandle(packetId.ToUInt16(null), async (client, data) => {
+
+                using (var response = data.CreateResponse(responsePacketId))
+                {
+                    var result = await packet.Invoke(client, data, response);
+
+                    if (result)
+                        client.Network.Send(response);
+                }
+            });
         }
 
         /// <summary>

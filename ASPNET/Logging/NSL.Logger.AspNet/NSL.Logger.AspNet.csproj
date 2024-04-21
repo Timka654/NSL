@@ -24,7 +24,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\NSL.Logger\NSL.Logger.csproj" />
+	  <ProjectReference Include="..\..\..\Base\NSL.Logger\NSL.Logger.csproj" />
 	</ItemGroup>
 
 </Project>

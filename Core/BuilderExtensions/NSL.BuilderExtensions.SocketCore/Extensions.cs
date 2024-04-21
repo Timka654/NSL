@@ -14,6 +14,7 @@ using System;
 using System.Diagnostics;
 using System.Net.Sockets;
 using System.Reflection;
+using static NSL.SocketCore.Extensions.Buffer.RequestExtensions;
 
 namespace NSL.BuilderExtensions.SocketCore
 {
@@ -81,6 +82,18 @@ namespace NSL.BuilderExtensions.SocketCore
         {
             AddResponsePacketHandle(builder, packetId.ToUInt16(null), handler);
         }
+
+        public static void AddRequestPacketHandle<TClient, TEnum>(this IOptionableEndPointBuilder<TClient> builder, TEnum packetId, RequestPacketHandle<TClient> packet) where TClient : INetworkClient, new() where TEnum : struct, IConvertible
+            => builder.GetCoreOptions().AddRequestPacketHandle(packetId, packet);
+
+        public static void AddRequestPacketHandle<TClient, TEnum>(this IOptionableEndPointBuilder<TClient> builder, TEnum packetId, RequestPacketHandle2<TClient> packet, ushort responsePacketId = 1) where TClient : INetworkClient, new() where TEnum : struct, IConvertible
+            => builder.GetCoreOptions().AddRequestPacketHandle(packetId, packet, responsePacketId);
+
+        public static void AddAsyncRequestPacketHandle<TClient, TEnum>(this IOptionableEndPointBuilder<TClient> builder, TEnum packetId, RequestPacketAsyncHandle<TClient> packet) where TClient : INetworkClient, new() where TEnum : struct, IConvertible
+            => builder.GetCoreOptions().AddAsyncRequestPacketHandle(packetId, packet);
+
+        public static void AddAsyncRequestPacketHandle<TClient, TEnum>(this IOptionableEndPointBuilder<TClient> builder, TEnum packetId, RequestPacketAsyncHandle2<TClient> packet, ushort responsePacketId = 1) where TClient : INetworkClient, new() where TEnum : struct, IConvertible
+            => builder.GetCoreOptions().AddAsyncRequestPacketHandle(packetId, packet, responsePacketId);
 
         /// <summary>
         /// 

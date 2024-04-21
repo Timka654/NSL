@@ -1,23 +1,26 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>{TargetFramework}</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-    <RootNamespace>Shared.Combine.Library</RootNamespace>
+		<TargetFramework>{TargetFramework}</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<RootNamespace>Shared.Combine.Library</RootNamespace>
   </PropertyGroup>
 
   <PropertyGroup>
-    <DefineConstants>$(DefineConstants);SERVER</DefineConstants>
+		<DefineConstants>$(DefineConstants);SERVER</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="artifacts\**" />
-    <EmbeddedResource Remove="artifacts\**" />
-    <None Remove="artifacts\**" />
-    <Compile Remove="Client\**" />
-    <EmbeddedResource Remove="Client\**" />
-    <None Remove="Client\**" />
+		<Compile Remove="artifacts\**" />
+		<Content Remove="artifacts\**" />
+		<EmbeddedResource Remove="artifacts\**" />
+		<None Remove="artifacts\**" />
+	
+		<Compile Remove="Client\**" />
+		<Content Remove="Client\**" />
+		<EmbeddedResource Remove="Client\**" />
+		<None Remove="Client\**" />
   </ItemGroup>
 
 </Project>
