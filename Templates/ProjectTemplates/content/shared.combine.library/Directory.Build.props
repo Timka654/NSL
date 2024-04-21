@@ -1,0 +1,7 @@
+<Project>
+	<!-- See https://aka.ms/dotnet/msbuild/customize for more details on customizing your build -->
+	<PropertyGroup>
+		<BaseIntermediateOutputPath>artifacts/$(MSBuildProjectName)/obj</BaseIntermediateOutputPath>
+    	<BaseOutputPath>artifacts/$(MSBuildProjectName)/bin</BaseOutputPath>
+	</PropertyGroup>
+</Project>
