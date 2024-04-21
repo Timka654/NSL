@@ -18,7 +18,7 @@ namespace NSL.SocketCore.Utils
             }
             set
             {
-                if(!store.TryAdd(key, value))
+                if (!store.TryAdd(key, value))
                     store[key] = value;
             }
         }
@@ -41,7 +41,27 @@ namespace NSL.SocketCore.Utils
 
         public void Remove(string key) => store.TryRemove(key, out object _);
 
-        public bool Exists(string key) => store.ContainsKey(key);
+        public bool Exists(string key) => Contains(key);
+
+        public bool Contains(string key) => store.ContainsKey(key);
+
+        public void CopyTo(ObjectBag another)
+        {
+            foreach (var item in store)
+            {
+                another[item.Key] = item.Value;
+            }
+        }
+
+        public void MoveTo(ObjectBag another)
+        {
+            foreach (var item in store)
+            {
+                another[item.Key] = item.Value;
+            }
+
+            store.Clear();
+        }
 
         public void Dispose()
         {

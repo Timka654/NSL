@@ -9,104 +9,113 @@ using System.Threading.Tasks;
 
 namespace NSL.Extensions.Session.Client.Packets
 {
-    public class NSLRecoverySessionPacket<T>
-        where T : BaseSocketNetworkClient
+    public static class NSLRecoverySessionPacketExtension
+    {
+        public static async Task<NSLRecoverySessionResult> NSLSessionSendRequestAsync<TClient>(this TClient client
+            , string SOObjectKey = NSLSessionClientOptions.ObjectBagKey
+            , string RPObjectKey = RequestProcessor.DefaultObjectBagKey)
+            where TClient : BaseSocketNetworkClient
+        {
+            client.ThrowIfObjectBagNull();
+
+            var options = client.GetNSLSessionOptions(SOObjectKey);
+
+            if (options == null)
+                throw new Exception($"ObjectBag not contains session options item {SOObjectKey}");
+
+            return await client.NSLSessionSendRequestAsync(options, RPObjectKey);
+        }
+
+        public static void NSLSessionSendRequest<TClient>(this TClient client
+            , Action<NSLRecoverySessionResult> onResponse
+            , string SOObjectKey = NSLSessionClientOptions.ObjectBagKey
+            , string RPObjectKey = RequestProcessor.DefaultObjectBagKey)
+            where TClient : BaseSocketNetworkClient
+        {
+            client.ThrowIfObjectBagNull();
+
+            var options = client.GetNSLSessionOptions(SOObjectKey);
+
+            if (options == null)
+                throw new Exception($"ObjectBag not contains session options item {SOObjectKey}");
+
+            client.NSLSessionSendRequest(onResponse, options, RPObjectKey);
+        }
+
+        public static async Task<NSLRecoverySessionResult> NSLSessionSendRequestAsync<TClient>(this TClient client, NSLSessionClientOptions sessionOptions, string RPObjectKey = RequestProcessor.DefaultObjectBagKey)
+            where TClient : BaseSocketNetworkClient
+        {
+            client.ThrowIfObjectBagNull();
+
+            var info = client.GetNSLSessionInfo(sessionOptions);
+
+            if (info == null)
+                throw new Exception($"ObjectBag not contains session info item {sessionOptions.ClientSessionBagKey}");
+
+            return await client.NSLSessionSendRequestAsync(info, RPObjectKey);
+
+        }
+
+        public static void NSLSessionSendRequest<TClient>(this TClient client, Action<NSLRecoverySessionResult> onResponse, NSLSessionClientOptions sessionOptions, string RPObjectKey = RequestProcessor.DefaultObjectBagKey)
+            where TClient : BaseSocketNetworkClient
+        {
+            client.ThrowIfObjectBagNull();
+
+            var info = client.GetNSLSessionInfo(sessionOptions);
+
+            if (info == null)
+                throw new Exception($"ObjectBag not contains session info item {sessionOptions.ClientSessionBagKey}");
+
+            client.NSLSessionSendRequest(onResponse, info, RPObjectKey);
+        }
+
+        public static async Task<NSLRecoverySessionResult> NSLSessionSendRequestAsync<TClient>(this TClient client, NSLSessionInfo sessionInfo, string RPObjectKey = RequestProcessor.DefaultObjectBagKey)
+            where TClient : BaseSocketNetworkClient
+        {
+            client.ThrowIfObjectBagNull();
+
+            NSLRecoverySessionResult result = null;
+
+            await client.GetRequestProcessor(RPObjectKey).SendRequestAsync(NSLRecoverySessionPacket.CreateRequest(sessionInfo), d =>
+            {
+                result = NSLRecoverySessionResult.ReadFullFrom(d);
+
+                return Task.FromResult(true);
+            });
+
+            return result;
+        }
+
+        public static void NSLSessionSendRequest<TClient>(this TClient client, Action<NSLRecoverySessionResult> onResponse, NSLSessionInfo sessionInfo, string RPObjectKey = RequestProcessor.DefaultObjectBagKey)
+            where TClient : BaseSocketNetworkClient
+        {
+            client.ThrowIfObjectBagNull();
+
+            NSLRecoverySessionResult result = null;
+
+            client.GetRequestProcessor(RPObjectKey).SendRequest(NSLRecoverySessionPacket.CreateRequest(sessionInfo), d =>
+            {
+                onResponse(NSLRecoverySessionResult.ReadFullFrom(d));
+
+                return true;
+            });
+        }
+
+    }
+
+    public class NSLRecoverySessionPacket
     {
         public const ushort PacketId = ushort.MaxValue - 2;
 
-        public static void Send(T client)
-        {
-            var session = GetClientSessionInfo(client);
-
-            var packet = FillPacket(new OutputPacketBuffer(), session);
-
-            client.Network.Send(packet);
-        }
-
-        public static OutputPacketBuffer BuildPacket(T client)
-        {
-            return FillPacket(new OutputPacketBuffer(), client);
-        }
-
-        private static NSLSessionInfo GetClientSessionInfo(T client)
-        {
-            client.ThrowIfObjectBagNull();
-
-            var options = (client.ClientOptions as ClientOptions<T>).ObjectBag.Get<NSLSessionClientOptions>(NSLSessionClientOptions.ObjectBagKey, true);
-
-            return client.ObjectBag.Get<NSLSessionInfo>(options.ClientSessionBagKey, true);
-        }
-
-        private static OutputPacketBuffer FillPacket(OutputPacketBuffer packet, T client)
-        {
-            return FillPacket(packet, GetClientSessionInfo(client));
-        }
-
-        public static OutputPacketBuffer BuildPacket(NSLSessionInfo sessionInfo)
-        {
-            return FillPacket(new OutputPacketBuffer(), sessionInfo);
-        }
-
-        private static OutputPacketBuffer FillPacket(OutputPacketBuffer packet, NSLSessionInfo sessionInfo)
-        {
-            packet.PacketId = PacketId;
-
-            if (!(packet is RequestPacketBuffer))
-                packet.WriteGuid(Guid.Empty);
-
-            sessionInfo.WriteFullTo(packet);
-
-            return packet;
-        }
-
-        public static void SendRequest(T client, Action<NSLRecoverySessionResult> onResponse, string RPObjectKey = RequestProcessor.DefaultObjectBagKey)
-        {
-            client.ThrowIfObjectBagNull();
-
-            SendRequest(client, GetClientSessionInfo(client), onResponse, RPObjectKey);
-        }
-
-        public static void SendRequest(T client, NSLSessionInfo sessionInfo, Action<NSLRecoverySessionResult> onResponse, string RPObjectKey = RequestProcessor.DefaultObjectBagKey)
-        {
-            client.ThrowIfObjectBagNull();
-
-            SendRequest(client.GetRequestProcessor(RPObjectKey), sessionInfo, onResponse);
-        }
-
-        public static void SendRequest(RequestProcessor processor, NSLSessionInfo sessionInfo, Action<NSLRecoverySessionResult> onResponse)
+        public static RequestPacketBuffer CreateRequest(NSLSessionInfo sessionInfo)
         {
             var request = RequestPacketBuffer.Create();
 
-            FillPacket(request, sessionInfo);
+            request.PacketId = PacketId;
 
-            processor.SendRequest(request, data => { onResponse(NSLRecoverySessionResult.ReadFullFrom(data)); return true; });
-        }
+            sessionInfo.WriteFullTo(request);
 
-        public static async Task<NSLRecoverySessionResult> SendRequestAsync(T client, string RPObjectKey = RequestProcessor.DefaultObjectBagKey)
-        {
-            client.ThrowIfObjectBagNull();
-
-            return await SendRequestAsync(client, GetClientSessionInfo(client), RPObjectKey);
-        }
-
-        public static async Task<NSLRecoverySessionResult> SendRequestAsync(T client, NSLSessionInfo sessionInfo, string RPObjectKey = RequestProcessor.DefaultObjectBagKey)
-        {
-            client.ThrowIfObjectBagNull();
-
-            return await SendRequestAsync(client.GetRequestProcessor(RPObjectKey), sessionInfo);
-        }
-
-        public static async Task<NSLRecoverySessionResult> SendRequestAsync(RequestProcessor processor, NSLSessionInfo sessionInfo)
-        {
-            var request = RequestPacketBuffer.Create();
-
-            FillPacket(request, sessionInfo);
-
-            NSLRecoverySessionResult result = default;
-
-            await processor.SendRequestAsync(request, data => { result = NSLRecoverySessionResult.ReadFullFrom(data); return Task.FromResult(true); });
-
-            return result;
+            return request;
         }
     }
 }

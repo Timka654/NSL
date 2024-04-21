@@ -77,9 +77,9 @@ namespace NSL.TCP.Server
                 clientData = td;
                 clientData.Network = this;
 
-                oldData.Network = null;
-
                 newClientData.ChangeOwner(oldData);
+
+                oldData.Network = null;
 
                 return;
             }

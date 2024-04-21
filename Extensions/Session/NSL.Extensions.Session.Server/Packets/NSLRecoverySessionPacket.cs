@@ -34,7 +34,9 @@ namespace NSL.Extensions.Session.Server.Packets
 
             result.WriteFullTo(response);
 
-            client.Network?.Send(response);
+            var nc = ((NSLServerSessionInfo<T>)result.SessionInfo)?.Client ?? client;
+
+            nc.Network?.Send(response);
         }
     }
 }

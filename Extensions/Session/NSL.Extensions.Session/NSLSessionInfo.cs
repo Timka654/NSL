@@ -12,6 +12,8 @@ namespace NSL.Extensions.Session
 
         public string[] RestoreKeys { get; set; }
 
+        public TimeSpan ExpiredSessionDelay { get; set; }
+
         public NSLSessionInfo() { }
 
         public NSLSessionInfo(string[] restoreKeys)

@@ -15,6 +15,7 @@ namespace NSL.Extensions.Session.Server
 
             if (configure != null)
                 configure(sOptions);
+
             var manager = new NSLSessionManager<TClient>(sOptions, options);
 
             options.ObjectBag.Set(NSLSessionServerOptions.ObjectBagKey, sOptions);

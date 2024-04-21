@@ -93,19 +93,36 @@ namespace NSL.Extensions.Session.Server
             if (session == null)
             {
                 await options.OnExpiredSession(client, session);
+
                 return;
             }
 
-            if (await options.OnClientValidate(client))
-            {
-                session.DisconnectTime = client.DisconnectTime + options.CloseSessionDelay;
-                waitCloseQueue.Enqueue(session);
-            }
-            else
+            if (!sessionStorage.TryGetValue(session.Session, out var ssession))
             {
                 session.DisconnectTime = DateTime.UtcNow;
                 await options.OnExpiredSession(client, session);
+
+                return;
             }
+
+            if (ssession != null && ssession != session)
+            {
+                session.DisconnectTime = DateTime.UtcNow;
+                await options.OnExpiredSession(client, session);
+
+                return;
+            }
+
+            if (!await options.OnClientValidate(client))
+            {
+                session.DisconnectTime = DateTime.UtcNow;
+                await options.OnExpiredSession(client, session);
+
+                return;
+            }
+
+            session.DisconnectTime = client.DisconnectTime + options.CloseSessionDelay;
+            waitCloseQueue.Enqueue(session);
         }
 
         public async Task<NSLRecoverySessionResult> TryRecovery(TClient client, string session, string[] keys)
@@ -113,7 +130,7 @@ namespace NSL.Extensions.Session.Server
             if (!sessionStorage.TryGetValue(session, out var oldSession)
                 || oldSession.RestoreKeys.Length != keys.Length
                 || !keys.SequenceEqual(oldSession.RestoreKeys)
-                || !oldSession.DisconnectTime.HasValue 
+                || !oldSession.DisconnectTime.HasValue
                 || (oldSession.DisconnectTime.HasValue && oldSession.DisconnectTime < DateTime.UtcNow))
             {
                 return new NSLRecoverySessionResult() { Result = NSLRecoverySessionResultEnum.NotFound };
@@ -129,18 +146,19 @@ namespace NSL.Extensions.Session.Server
 
             client.ChangeOwner(oldSession.Client);
 
-            var sessionInfo = new NSLServerSessionInfo<TClient>(client, keys)
+            var sessionInfo = new NSLServerSessionInfo<TClient>(oldSession.Client, keys)
             {
-                Session = session
+                Session = session,
+                ExpiredSessionDelay = options.CloseSessionDelay
             };
 
             sessionStorage.TryAdd(session, sessionInfo);
 
-            client.ObjectBag[options.ClientSessionBagKey] = sessionInfo;
+            oldSession.Client.ObjectBag[options.ClientSessionBagKey] = sessionInfo;
 
             var result = new NSLRecoverySessionResult() { Result = NSLRecoverySessionResultEnum.Ok, SessionInfo = sessionInfo };
 
-            await options.OnRecoverySession(client, sessionInfo);
+            await options.OnRecoverySession(oldSession.Client, sessionInfo);
 
             return result;
         }
@@ -156,7 +174,10 @@ namespace NSL.Extensions.Session.Server
         {
             client.ThrowIfObjectBagNull();
 
-            var sessionInfo = new NSLServerSessionInfo<TClient>(client, GenerateKeys());
+            var sessionInfo = new NSLServerSessionInfo<TClient>(client, GenerateKeys())
+            {
+                ExpiredSessionDelay = options.CloseSessionDelay
+            };
 
             string session;
 
@@ -169,14 +190,22 @@ namespace NSL.Extensions.Session.Server
             return sessionInfo;
         }
 
-        public NSLServerSessionInfo<TClient> CreateSession(TClient client, string session)
+        public NSLServerSessionInfo<TClient> CreateSession(TClient client, string session, bool replaceOnExists = true)
         {
             client.ThrowIfObjectBagNull();
 
-            var sessionInfo = new NSLServerSessionInfo<TClient>(client, GenerateKeys());
+            var sessionInfo = new NSLServerSessionInfo<TClient>(client, GenerateKeys())
+            {
+                ExpiredSessionDelay = options.CloseSessionDelay
+            };
 
             if (!sessionStorage.TryAdd(session, sessionInfo))
-                return null;
+            {
+                if (replaceOnExists)
+                    sessionStorage.TryRemove(session, out _);
+                else
+                    return null;
+            }
 
             sessionInfo.Session = session;
 

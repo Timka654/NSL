@@ -39,7 +39,8 @@ namespace NSL.SocketCore.Utils
         /// </summary>
         public void InitializeObjectBag()
         {
-            ObjectBag = new ClientObjectBag();
+            if (ObjectBag == default)
+                ObjectBag = new ClientObjectBag();
         }
 
         /// <summary>
@@ -100,7 +101,7 @@ namespace NSL.SocketCore.Utils
 
         public virtual void Dispose()
         {
-            ObjectBag?.Dispose(); 
+            ObjectBag?.Dispose();
             Network?.Disconnect();
         }
     }

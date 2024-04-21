@@ -18,23 +18,48 @@ namespace NSL.Extensions.Session.Client
         {
             var o = new NSLSessionClientOptions();
 
-            if(configure != null)
+            if (configure != null)
                 configure(o);
 
             options.ObjectBag[SOObjectKey] = o;
 
-            options.AddResponsePacketHandle(NSLRecoverySessionPacket<TClient>.PacketId, client => client.GetRequestProcessor(RPObjectKey));
+            options.AddResponsePacketHandle(NSLRecoverySessionPacket.PacketId, client => client.GetRequestProcessor(RPObjectKey));
         }
 
-        public static void SetNSLSessionInfo<TClient>(this IClient client, NSLSessionInfo info)
+        public static NSLSessionInfo GetNSLSessionInfo<TClient>(this TClient client, string optionsObjectKey = NSLSessionClientOptions.ObjectBagKey)
             where TClient : BaseSocketNetworkClient
         {
-            var co = client.Options as ClientOptions<TClient>;
+            var options = client.GetNSLSessionOptions(optionsObjectKey);
 
-            var options = co.ObjectBag.Get<NSLSessionClientOptions>(NSLSessionClientOptions.ObjectBagKey, true);
+            return client.GetNSLSessionInfo(options);
+        }
 
-            (client.GetUserData() as TClient).ObjectBag.Set(options.ClientSessionBagKey, info);
+        public static NSLSessionInfo GetNSLSessionInfo<TClient>(this TClient client, NSLSessionClientOptions options)
+            where TClient : BaseSocketNetworkClient
+        {
+            return client.ObjectBag.Get<NSLSessionInfo>(options.ClientSessionBagKey);
+        }
 
+        public static NSLSessionClientOptions GetNSLSessionOptions<TClient>(this TClient client, string optionsObjectKey = NSLSessionClientOptions.ObjectBagKey)
+            where TClient : BaseSocketNetworkClient
+        {
+            var co = client.ClientOptions as ClientOptions<TClient>;
+
+            return co.ObjectBag.Get<NSLSessionClientOptions>(optionsObjectKey, true);
+        }
+
+        public static void SetNSLSessionInfo<TClient>(this TClient client, NSLSessionInfo info, string optionsObjectKey = NSLSessionClientOptions.ObjectBagKey)
+            where TClient : BaseSocketNetworkClient
+        {
+            var options = client.GetNSLSessionOptions(optionsObjectKey);
+
+            client.SetNSLSessionInfo(info, options);
+        }
+
+        public static void SetNSLSessionInfo<TClient>(this TClient client, NSLSessionInfo info, NSLSessionClientOptions options)
+            where TClient : BaseSocketNetworkClient
+        {
+            client.ObjectBag.Set(options.ClientSessionBagKey, info);
         }
     }
 }

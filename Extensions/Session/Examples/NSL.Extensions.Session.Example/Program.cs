@@ -44,7 +44,14 @@ namespace NSL.Extensions.Session.Example
 
                             c.OnExpiredSession = (client, session) =>
                             {
-                                conLog.AppendLog($"Expired session {session.Session}");
+                                if (session == null)
+                                {
+                                    conLog.AppendLog($"Expired session - disconnect without session");
+                                    // expired without session
+                                    return Task.CompletedTask;
+                                }
+
+                                conLog.AppendLog($"Expired session {session?.Session}");
 
                                 return Task.CompletedTask;
                             };
@@ -154,9 +161,9 @@ namespace NSL.Extensions.Session.Example
 
             Console.WriteLine(testName);
 
-            client.SetNSLSessionInfo<BasicNetworkClient>(session);
+            client.Data.SetNSLSessionInfo(session);
 
-            var recovery = await NSLRecoverySessionPacket<BasicNetworkClient>.SendRequestAsync(client.Data);
+            var recovery = await client.Data.NSLSessionSendRequestAsync();
 
             var validInfo = recovery.SessionInfo;
 
