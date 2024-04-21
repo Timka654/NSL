@@ -1,46 +1,32 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <!-- The package metadata. Fill in the properties marked as TODO below -->
-    <!-- Follow the instructions on https://learn.microsoft.com/en-us/nuget/create-packages/package-authoring-best-practices -->
-    <PackageId>NSL.Template.Projects</PackageId>
-    <PackageVersion>1.0</PackageVersion>
-    <Title>TODO: fill the package name here</Title>
-    <Authors>TODO: fill the author name or organization here</Authors>
-    <Description>TODO: fill the package description here</Description>
-    <PackageTags>TODO: fill the tags here</PackageTags>
-    <PackageProjectUrl>TODO: include a link to an associated project, repository, or company website</PackageProjectUrl>
+	<PropertyGroup>
+		<NSLProjectTypes>Template;ProjectTemplate</NSLProjectTypes>
 
-    <!-- Keep package type as 'Template' to show the package as a template package on nuget.org and make your template available in dotnet new search.-->
-    <PackageType>Template</PackageType>
-    <TargetFramework>net8.0</TargetFramework>
-    <IncludeContentInPack>true</IncludeContentInPack>
-    <IncludeBuildOutput>false</IncludeBuildOutput>
-    <ContentTargetFolders>content</ContentTargetFolders>
-    <NoWarn>$(NoWarn);NU5128</NoWarn>
-    <NoDefaultExcludes>true</NoDefaultExcludes>
-    <PackageReadmeFile>README.md</PackageReadmeFile>
-  </PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<Configurations>Debug;Release;DebugExamples;Unity;UnityDebug</Configurations>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<Nullable>disable</Nullable>
 
-  <PropertyGroup>
-    <LocalizeTemplates>false</LocalizeTemplates>
-  </PropertyGroup>
+		<PublishRepositoryUrl>true</PublishRepositoryUrl>
+		<EmbedUntrackedSources>true</EmbedUntrackedSources>
+		<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+		<GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.TemplateEngine.Tasks" Version="*" PrivateAssets="all" IsImplicitlyDefined="true" />
-  </ItemGroup>
+		<Version>$(VersionSuffix)</Version>
+		<Authors>Relife87</Authors>
+    <LocalizeTemplates>false</LocalizeTemplates>		
+	</PropertyGroup>
 
-  <ItemGroup>
-    <Content Include="content\**\*" Exclude="content\**\bin\**;content\**\obj\**" />
-    <Compile Remove="**\*" />
-  </ItemGroup>
+	<PropertyGroup Condition="'$(Configuration)'=='Debug'">
+		<PackageId>$(MSBuildProjectName)_Debug</PackageId>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <None Include="README.md" Pack="true" PackagePath="" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="content\" />
-  </ItemGroup>
+	<ItemGroup>
+	  <Content Include="content\shared.combine.library\.template.config\template.json" />
+	</ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Microsoft.TemplateEngine.Tasks" Version="*" PrivateAssets="all" IsImplicitlyDefined="true" />
+	</ItemGroup>
 
 </Project>
