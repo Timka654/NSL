@@ -32,7 +32,7 @@
 		<TargetFramework>netstandard2.1</TargetFramework>
 	</PropertyGroup>
 	<ItemGroup Condition="'$(Configuration)'=='Debug' Or '$(Configuration)'=='Release'">
-		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.8.0" PrivateAssets="all" />
+		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.9.2" PrivateAssets="all" />
 	</ItemGroup>
 	<ItemGroup Condition="'$(Configuration)'=='UnityDebug' Or '$(Configuration)'=='Unity'">
 		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.8.0" PrivateAssets="all" />

@@ -5,7 +5,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DevExtensions.Blazor.Http.HttpContent
+namespace NSL.HttpClient.HttpContent
 {
     public class FormHttpContent : MultipartFormDataContent
     {

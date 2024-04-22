@@ -1,5 +1,4 @@
-﻿using DevExtensions.Blazor.Http.Models;
-using Microsoft.AspNetCore.Components.Forms;
+﻿using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components;
 using System;
 using System.Collections.Generic;
@@ -8,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using NSL.HttpClient.Validators;
+using NSL.HttpClient.Models;
 
 namespace NSL.HttpClient.Blazor.Validators
 {

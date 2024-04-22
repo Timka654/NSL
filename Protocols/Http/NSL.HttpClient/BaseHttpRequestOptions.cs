@@ -7,26 +7,26 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 
-namespace DevExtensions.Blazor.Http
+namespace NSL.HttpClient
 {
     public class BaseHttpRequestOptions
     {
         /// <summary>
         /// Validator ref for display errors
         /// </summary>
-        public IHttpResponseContentValidator? Validator { get; set; }
+        public IHttpResponseContentValidator Validator { get; set; }
 
         /// <summary>
         /// 
         /// </summary>
-        public string? ErrorPrefix { get; set; }
+        public string ErrorPrefix { get; set; }
 
-        public JsonSerializerOptions? JsonOptions { get; set; }
+        public JsonSerializerOptions JsonOptions { get; set; }
 
         public Func<string, Task<string>> ProcessMessage { get; set; } = v => Task.FromResult(v);
 
         public BaseHttpRequestOptions Clone()
-            => this.MemberwiseClone() as BaseHttpRequestOptions;
+            => MemberwiseClone() as BaseHttpRequestOptions;
 
         public static BaseHttpRequestOptions Create(IHttpResponseContentValidator validator) => new BaseHttpRequestOptions() { Validator = validator };
 
@@ -40,19 +40,19 @@ namespace DevExtensions.Blazor.Http
 
         public BaseHttpRequestOptions WithValidator(IHttpResponseContentValidator validator)
         {
-            this.Validator = validator;
+            Validator = validator;
             return this;
         }
 
         public BaseHttpRequestOptions WithErrorPrefix(string errorPrefix)
         {
-            this.ErrorPrefix = errorPrefix;
+            ErrorPrefix = errorPrefix;
             return this;
         }
 
         public BaseHttpRequestOptions WithJsonOptions(JsonSerializerOptions jsonOptions)
         {
-            this.JsonOptions = jsonOptions;
+            JsonOptions = jsonOptions;
             return this;
         }
 

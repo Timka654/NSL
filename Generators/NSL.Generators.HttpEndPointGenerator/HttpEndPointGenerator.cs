@@ -33,7 +33,8 @@ namespace NSL.Generators.HttpEndPointGenerator
         private void ProcessHttpEndPoints(GeneratorExecutionContext context, HttpEndPointImplementAttributeSyntaxReceiver methodSyntaxReceiver)
         {
 #if DEBUG
-            //GenDebug.Break();
+            GenDebug.Break();
+
 #endif
             foreach (var item in methodSyntaxReceiver.Types)
             {
@@ -52,7 +53,10 @@ namespace NSL.Generators.HttpEndPointGenerator
 
             var classBuilder = new CodeBuilder();
 
-            classBuilder.AddUsing("DevExtensions.Blazor.Http");
+            classBuilder.AddUsing("NSL.HttpClient");
+            classBuilder.AddUsing("NSL.HttpClient.HttpContent");
+            classBuilder.AddUsing("NSL.HttpClient.Models");
+            classBuilder.AddUsing("NSL.HttpClient.Validators");
 
             classBuilder.AppendComment(() =>
             {

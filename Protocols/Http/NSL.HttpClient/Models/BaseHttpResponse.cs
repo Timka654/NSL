@@ -2,7 +2,7 @@
 using System.Net;
 using System.Net.Http;
 
-namespace DevExtensions.Blazor.Http.Models
+namespace NSL.HttpClient.Models
 {
     public class BaseHttpResponse : IDisposable
     {
@@ -14,7 +14,7 @@ namespace DevExtensions.Blazor.Http.Models
 
         public HttpResponseMessage Response { get; set; }
 
-        public string? Content { get; set; }
+        public string Content { get; set; }
 
         /// <summary>
         /// Dispose <see cref="Response"/> prop

@@ -1,4 +1,4 @@
-﻿namespace NSL.Generators.HttpEndPointGenerator.Tests.Client
+﻿namespace Tests
 {
     internal class Program
     {

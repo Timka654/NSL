@@ -1,5 +1,5 @@
-﻿using DevExtensions.Blazor.Http.HttpContent;
-using DevExtensions.Blazor.Http.Models;
+﻿using NSL.HttpClient.HttpContent;
+using NSL.HttpClient.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,31 +8,31 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 
-namespace DevExtensions.Blazor.Http
+namespace NSL.HttpClient
 {
     public static class HttpResponseExtensions
     {
         public static async Task<BaseResponse> ProcessResponseAsync(
             this Task<HttpResponseMessage> request,
-            BaseHttpRequestOptions? options = null)
+            BaseHttpRequestOptions options = null)
             => await request.ProcessResponseAsync<BaseResponse>(options);
 
         public static Task<DataResponse<TData>> ProcessDataResponseAsync<TData>(
             this Task<HttpResponseMessage> request,
-            BaseHttpRequestOptions? options = null)
+            BaseHttpRequestOptions options = null)
             => request.ProcessResponseAsync<DataResponse<TData>>(options);
 
         public static Task<DataListResponse<TData>> ProcessDataListResponseAsync<TData>(
             this Task<HttpResponseMessage> request,
-            BaseHttpRequestOptions? options = null)
+            BaseHttpRequestOptions options = null)
             => request.ProcessResponseAsync<DataListResponse<TData>>(options);
 
         public static Task<IdResponse<TData>> ProcessIdResponseAsync<TData>(
             this Task<HttpResponseMessage> request,
-            BaseHttpRequestOptions? options = null)
+            BaseHttpRequestOptions options = null)
             => request.ProcessResponseAsync<IdResponse<TData>>(options);
 
-        public static async Task<TResult> ProcessResponseAsync<TResult>(this Task<HttpResponseMessage> request, BaseHttpRequestOptions? options = null)
+        public static async Task<TResult> ProcessResponseAsync<TResult>(this Task<HttpResponseMessage> request, BaseHttpRequestOptions options = null)
             where TResult : BaseResponse, new()
         {
             var response = await request;
@@ -89,9 +89,9 @@ namespace DevExtensions.Blazor.Http
             return result;
         }
 
-        public static async Task<Dictionary<string, List<string>>?> ReadErrorsAsync(
+        public static async Task<Dictionary<string, List<string>>> ReadErrorsAsync(
             this HttpResponseMessage response,
-            BaseHttpRequestOptions? options = null)
+            BaseHttpRequestOptions options = null)
         {
             //if (response.StatusCode != System.Net.HttpStatusCode.BadRequest)
             //    return default;
@@ -101,7 +101,7 @@ namespace DevExtensions.Blazor.Http
             if (string.IsNullOrEmpty(content))
                 return new Dictionary<string, List<string>>();
 
-            var result = JsonSerializer.Deserialize<Dictionary<string, List<string>>?>(content, options?.JsonOptions ?? JsonHttpContent.DefaultJsonOptions);
+            var result = JsonSerializer.Deserialize<Dictionary<string, List<string>>>(content, options?.JsonOptions ?? JsonHttpContent.DefaultJsonOptions);
 
             if (result == null)
                 return new Dictionary<string, List<string>>();

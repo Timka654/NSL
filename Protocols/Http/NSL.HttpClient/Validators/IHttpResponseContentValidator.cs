@@ -1,4 +1,4 @@
-﻿using DevExtensions.Blazor.Http.Models;
+﻿using NSL.HttpClient.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;

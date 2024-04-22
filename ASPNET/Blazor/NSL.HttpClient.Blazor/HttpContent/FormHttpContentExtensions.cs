@@ -1,5 +1,5 @@
-﻿using DevExtensions.Blazor.Http.HttpContent;
-using Microsoft.AspNetCore.Components.Forms;
+﻿using Microsoft.AspNetCore.Components.Forms;
+using NSL.HttpClient.HttpContent;
 using System;
 using System.Collections.Generic;
 using System.IO;

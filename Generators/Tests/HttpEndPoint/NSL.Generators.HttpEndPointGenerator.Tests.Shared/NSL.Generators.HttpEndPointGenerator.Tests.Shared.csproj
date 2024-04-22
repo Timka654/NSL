@@ -18,10 +18,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <PackageReference Include="ASPNET.DevExtensions.Blazor.Http" Version="2023.12.2.101" />
-	</ItemGroup>
-
-	<ItemGroup>
+	  <ProjectReference Include="..\..\..\..\Protocols\Http\NSL.HttpClient\NSL.HttpClient.csproj" />
 	  <ProjectReference Include="..\..\..\NSL.Generators.HttpEndPointGenerator.Shared\NSL.Generators.HttpEndPointGenerator.Shared.csproj" />
 	</ItemGroup>
 

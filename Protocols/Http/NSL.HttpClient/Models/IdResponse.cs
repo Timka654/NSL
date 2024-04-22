@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DevExtensions.Blazor.Http.Models
+namespace NSL.HttpClient.Models
 {
     public class IdResponse<TId> : BaseResponse
     {

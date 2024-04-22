@@ -1,4 +1,4 @@
-﻿namespace DevExtensions.Blazor.Http.Models
+﻿namespace NSL.HttpClient.Models
 {
     public class DataResponse<TData> : BaseResponse
     {

@@ -5,8 +5,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Net.Http;
+using NSL.HttpClient;
+using NSL.HttpClient.Models;
 
-namespace NSL.Generators.HttpEndPointGenerator.Tests.Client
+
+namespace Tests
 {
     [HttpEndPointImplementGenerate(typeof(ITestController))]
     public partial class TestService
