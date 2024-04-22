@@ -8,25 +8,37 @@
 
             ProcessDirectory(path);
 
-            Console.WriteLine("Hello, World!");
+            Console.WriteLine("finished");
         }
 
         static void ProcessDirectory(string path)
         {
-            var f =
-            Directory.GetFiles(path);
+            if (path.Contains("NSLLibMetaCleaner"))
+                return;
 
-            if (f.Any(x => x.EndsWith(".csproj")))
+            var f = Directory.GetFiles(path);
+
+            var fpath = f.FirstOrDefault(x => x.EndsWith(".csproj"));
+
+            if (fpath != null)
             {
-                var d = Path.Combine(path,"obj");
+                Console.WriteLine($"Clear - {Path.GetFullPath(fpath)}");
+
+                var d = Path.Combine(path, "obj");
 
                 if (Directory.Exists(d))
+                {
                     Directory.Delete(d, true);
-                
-                d = Path.Combine(path,"bin");
+                    Console.WriteLine($"- obj");
+
+                }
+                d = Path.Combine(path, "bin");
 
                 if (Directory.Exists(d))
+                {
                     Directory.Delete(d, true);
+                    Console.WriteLine($"- bin");
+                }
             }
 
             foreach (var item in Directory.GetDirectories(path))
