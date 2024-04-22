@@ -57,6 +57,14 @@ namespace NSL.Generators.SelectTypeGenerator
 
             var originNamespace = (typeClass.Parent as NamespaceDeclarationSyntax)?.Name.ToString();
 
+            List<string> namespaces = new List<string>();
+
+            if (originNamespace != null)
+            {
+                namespaces.Add(originNamespace);
+                namespaces.Add("System.Collections.Generic");
+            }
+
             classBuilder.CreateStaticClass(typeClass, $"{typeClass.GetClassName()}_Selection", () =>
             {
                 var attrbs = typeClass.AttributeLists
@@ -99,7 +107,7 @@ namespace NSL.Generators.SelectTypeGenerator
                     classBuilder.AppendLine(string.Join(Environment.NewLine + Environment.NewLine, methods));
 #pragma warning restore RS1035 // Do not use APIs banned for analyzers
                 }
-            }, originNamespace == null ? null : Enumerable.Repeat(originNamespace, 1), @namespace: "System.Linq");
+            }, namespaces, @namespace: "System.Linq");
 
             //GenDebug.Break();
 
@@ -161,7 +169,7 @@ namespace NSL.Generators.SelectTypeGenerator
 
             //methodBuilder.AppendLine();
 
-            methodBuilder.AppendLine($"public static {collectionType}<dynamic> Select{model}(this {collectionType}<{type.Name}> toSelect)");
+            methodBuilder.AppendLine($"public static {collectionType}<dynamic> Select{model}(this {collectionType}<{type.GetTypeFullName()}> toSelect)");
 
             methodBuilder.AppendLine("{");
 
