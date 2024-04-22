@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "NSLLibMetaCleaner": {
+      "commandName": "Project",
+      "commandLineArgs": "\"../../../../../\""
+    }
+  }
+}
