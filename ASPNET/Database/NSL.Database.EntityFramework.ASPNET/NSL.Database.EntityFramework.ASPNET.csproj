@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
 	<PropertyGroup>
 		<NSLProjectTypes>ASPTarget</NSLProjectTypes>
@@ -24,10 +24,11 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\..\ASPNET\NSL.ASPNET\NSL.ASPNET.csproj" />
-		<ProjectReference Include="..\..\..\Core\NSL.SocketServer\NSL.SocketServer.csproj" />
-		<ProjectReference Include="..\NSL.WebSockets.Server\NSL.WebSockets.Server.csproj" />
-		<ProjectReference Include="..\NSL.WebSockets\NSL.WebSockets.csproj" />
+	  <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.4" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\..\NSL.ASPNET\NSL.ASPNET.csproj" />
 	</ItemGroup>
 
 </Project>

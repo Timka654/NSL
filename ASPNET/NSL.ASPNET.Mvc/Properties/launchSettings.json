@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "NSL.ASPNET.Mvc": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:60057;http://localhost:60058"
+    }
+  }
+}
