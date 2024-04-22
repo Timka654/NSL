@@ -1,4 +1,6 @@
-﻿namespace NSL.Database.EntityFramework.Filter.Models
+﻿using System.Collections.Generic;
+
+namespace NSL.Database.EntityFramework.Filter.Models
 {
     public class BaseFilteredQueryModel
     {

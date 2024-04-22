@@ -1,5 +1,7 @@
 ﻿using NSL.Database.EntityFramework.Filter.Enums;
 using NSL.Database.EntityFramework.Filter.Models;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace NSL.Database.EntityFramework.Filter
 {
@@ -40,7 +42,7 @@ namespace NSL.Database.EntityFramework.Filter
                 block = value.OrderQuery.LastOrDefault();
             }
 
-            block.Propertyes.Add(new FilterPropertyOrderViewModel() { PropertyPath = propertyPath, ASC = asc });
+            block.Properties.Add(new FilterPropertyOrderViewModel() { PropertyPath = propertyPath, ASC = asc });
             return value;
 
         }

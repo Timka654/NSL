@@ -1,7 +1,9 @@
-﻿namespace NSL.Database.EntityFramework.Filter.Models
+﻿using System.Collections.Generic;
+
+namespace NSL.Database.EntityFramework.Filter.Models
 {
     public class FilterBlockOrderViewModel
     {
-        public List<FilterPropertyOrderViewModel> Propertyes { get; set; } = new List<FilterPropertyOrderViewModel>();
+        public List<FilterPropertyOrderViewModel> Properties { get; set; } = new List<FilterPropertyOrderViewModel>();
     }
 }

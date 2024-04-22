@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization.Infrastructure;
 using Microsoft.AspNetCore.Authorization;
 using NSL.ASPNET.Identity.ClientIdentity.Providers.Options;
+using System;
+using System.Threading.Tasks;
 
 namespace NSL.ASPNET.Identity.ClientIdentity.Providers
 {

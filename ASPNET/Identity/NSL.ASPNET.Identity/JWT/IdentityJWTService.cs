@@ -1,7 +1,11 @@
 ﻿using NSL.ASPNET.Identity.ClientIdentity;
 using NSL.ASPNET.Identity.ClientIdentity.Providers;
+using System;
+using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
+using System.Net.Http;
 using System.Security.Claims;
+using System.Threading.Tasks;
 
 namespace NSL.ASPNET.Identity.JWT
 {

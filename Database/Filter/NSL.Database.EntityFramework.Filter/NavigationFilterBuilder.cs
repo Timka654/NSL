@@ -64,7 +64,7 @@ namespace NSL.Database.EntityFramework.Filter
         {
             if (currentOrderBlock == null)
                 CreateOrderBlock();
-            currentOrderBlock.Propertyes.Add(new FilterPropertyOrderViewModel() { PropertyPath = propertyPath, ASC = asc });
+            currentOrderBlock.Properties.Add(new FilterPropertyOrderViewModel() { PropertyPath = propertyPath, ASC = asc });
             return this;
         }
 

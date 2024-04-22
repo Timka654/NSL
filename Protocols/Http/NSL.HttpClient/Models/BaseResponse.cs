@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.Collections.Generic;
+using System.Net;
 using System.Text.Json.Serialization;
 
 namespace DevExtensions.Blazor.Http.Models

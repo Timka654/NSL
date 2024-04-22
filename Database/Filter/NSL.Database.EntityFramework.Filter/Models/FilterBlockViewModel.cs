@@ -1,4 +1,5 @@
 ﻿using NSL.Database.EntityFramework.Filter.Enums;
+using System.Collections.Generic;
 
 namespace NSL.Database.EntityFramework.Filter.Models
 {

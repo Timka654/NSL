@@ -1,4 +1,6 @@
 ﻿using DevExtensions.Blazor.Http.HttpContent;
+using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace DevExtensions.Blazor.Http
 {

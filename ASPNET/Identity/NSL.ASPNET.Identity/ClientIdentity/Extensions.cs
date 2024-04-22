@@ -4,6 +4,9 @@ using Microsoft.Extensions.DependencyInjection;
 using NSL.ASPNET.Identity.ClientIdentity.MessageHandlers;
 using NSL.ASPNET.Identity.ClientIdentity.Providers;
 using NSL.ASPNET.Identity.ClientIdentity.Providers.Options;
+using System;
+using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace NSL.ASPNET.Identity.ClientIdentity
 {

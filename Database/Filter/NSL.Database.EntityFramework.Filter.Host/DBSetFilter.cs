@@ -46,7 +46,7 @@ namespace NSL.Database.EntityFramework.Filter.Host
                 foreach (var block in filterExt.OrderQuery)
                 {
                     bool first = true;
-                    foreach (var p in block.Propertyes)
+                    foreach (var p in block.Properties)
                     {
                         BuildPropertyOrder(li, p, ref query, first);
                         first = false;
