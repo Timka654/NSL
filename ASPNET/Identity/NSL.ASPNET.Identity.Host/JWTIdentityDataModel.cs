@@ -4,7 +4,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
-namespace DevExtensions.Authentification.JWT
+namespace NSL.ASPNET.Identity.Host
 {
     public class JWTIdentityDataModel
     {

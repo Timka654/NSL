@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using NSL.HttpClient.Validators;
 
-namespace NSL.HttpClient.Validators
+namespace NSL.HttpClient.Blazor.Validators
 {
     public class ServerModelValidator : ComponentBase, IHttpResponseContentValidator
     {

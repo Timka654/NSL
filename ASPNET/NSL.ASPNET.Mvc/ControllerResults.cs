@@ -5,7 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 
-namespace DevExtensions.Http
+namespace NSL.ASPNET.Mvc
 {
     public class ControllerResults
     {
@@ -64,7 +64,7 @@ namespace DevExtensions.Http
                 EnableRangeProcessing = rangeProcessing
             };
 
-        public static IActionResult PhysicalFile(string path, string contentType, string? fileName = null, bool rangeProcessing = false, DateTimeOffset? lastModified = null)
+        public static IActionResult PhysicalFile(string path, string contentType, string fileName = null, bool rangeProcessing = false, DateTimeOffset? lastModified = null)
             => new PhysicalFileResult(path, contentType)
             {
                 FileName = fileName ?? Path.GetFileName(path),
@@ -72,7 +72,7 @@ namespace DevExtensions.Http
                 EnableRangeProcessing = rangeProcessing
             };
 
-        public static IActionResult VirtualFile(string path, string contentType, string? fileName = null, bool rangeProcessing = false, DateTimeOffset? lastModified = null)
+        public static IActionResult VirtualFile(string path, string contentType, string fileName = null, bool rangeProcessing = false, DateTimeOffset? lastModified = null)
             => new VirtualFileResult(path, contentType)
             {
                 FileName = fileName ?? Path.GetFileName(path),
@@ -100,7 +100,7 @@ namespace DevExtensions.Http
 
 
         public static IActionResult IdResponse(object id)
-            => Ok(new { id = id });
+            => Ok(new { id });
 
         public static IActionResult DataResponse(object data)
             => Ok(new { Data = data });

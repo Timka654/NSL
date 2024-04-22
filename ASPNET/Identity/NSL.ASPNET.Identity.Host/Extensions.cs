@@ -15,7 +15,7 @@ using System.Security.Cryptography;
 using System.Security.Principal;
 using System.Text;
 
-namespace DevExtensions.Authentification.JWT
+namespace NSL.ASPNET.Identity.Host
 {
     public static class Extensions
     {
@@ -46,7 +46,7 @@ namespace DevExtensions.Authentification.JWT
         public static AuthenticationBuilder AddAPIBaseJWTBearer(this AuthenticationBuilder builder, JWTIdentityDataModel data, Action<JwtBearerOptions> configureBearer = null)
             => builder.AddJwtBearer(c =>
                 {
-                    c.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters()
+                    c.TokenValidationParameters = new TokenValidationParameters()
                     {
                         ValidIssuer = data.Issuer,
                         ValidAudience = data.Audience,
@@ -109,15 +109,15 @@ namespace DevExtensions.Authentification.JWT
             IConfiguration configuration,
             string path = BaseConfigurationPath)
              where TId : IEquatable<TId>
-            => GenerateClaims(user).GenerateJWT(configuration.GetAPIBaseJWTData(path));
+            => user.GenerateClaims().GenerateJWT(configuration.GetAPIBaseJWTData(path));
 
         public static string GenerateJWT<TId>(
             this IdentityUser<TId> user,
             JWTIdentityDataModel identityData)
              where TId : IEquatable<TId>
-            => GenerateClaims(user).GenerateJWT(identityData);
+            => user.GenerateClaims().GenerateJWT(identityData);
 
-        public static ClaimsIdentity GenerateClaims<TId>(this IdentityUser<TId> identity, Action<IdentityUser<TId>, List<Claim>>? build = null)
+        public static ClaimsIdentity GenerateClaims<TId>(this IdentityUser<TId> identity, Action<IdentityUser<TId>, List<Claim>> build = null)
              where TId : IEquatable<TId>
         {
             var claims = new List<Claim>
@@ -137,7 +137,7 @@ namespace DevExtensions.Authentification.JWT
             this ClaimsIdentity claims,
             IConfiguration configuration,
             string path = BaseConfigurationPath)
-            => GenerateJWT(claims, configuration.GetAPIBaseJWTData(path));
+            => claims.GenerateJWT(configuration.GetAPIBaseJWTData(path));
 
         public static string GenerateJWT(
             this ClaimsIdentity claims,

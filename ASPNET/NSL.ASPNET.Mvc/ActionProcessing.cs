@@ -2,11 +2,10 @@
 using System;
 using System.Threading.Tasks;
 
-namespace DevExtensions.Http
+namespace NSL.ASPNET.Mvc
 {
     public static class ActionProcessing
     {
-
         public static async Task<IActionResult> ProcessRequestAsync(this ControllerBase controller, Func<Task> action, Func<IActionResult> result)
         {
             if (!controller.ModelState.IsValid)
@@ -44,7 +43,7 @@ namespace DevExtensions.Http
         }
 
         public static IActionResult IdResponse(this ControllerBase controller, object id)
-            => controller.Ok(new { id = id });
+            => controller.Ok(new { id });
 
         public static IActionResult DataResponse(this ControllerBase controller, object data)
             => controller.Ok(new { Data = data });
