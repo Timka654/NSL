@@ -22,7 +22,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\..\NSL.Generators.HttpEndPointGenerator.Attributes\NSL.Generators.HttpEndPointGenerator.Attributes.csproj" />
+	  <ProjectReference Include="..\..\..\NSL.Generators.HttpEndPointGenerator.Shared\NSL.Generators.HttpEndPointGenerator.Shared.csproj" />
 	</ItemGroup>
 
 </Project>

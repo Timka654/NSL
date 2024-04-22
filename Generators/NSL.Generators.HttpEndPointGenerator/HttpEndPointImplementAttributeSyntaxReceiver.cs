@@ -1,6 +1,6 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using NSL.Generators.HttpEndPointGenerator.Attributes;
+using NSL.Generators.HttpEndPointGenerator.Shared.Attributes;
 using NSL.Generators.Utils;
 using System;
 using System.Collections.Generic;

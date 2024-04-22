@@ -1,4 +1,4 @@
-﻿using NSL.Generators.HttpEndPointGenerator.Attributes;
+﻿using NSL.Generators.HttpEndPointGenerator.Shared.Attributes;
 using NSL.Generators.HttpEndPointGenerator.Tests.Shared;
 using System;
 using System.Collections.Generic;

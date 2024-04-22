@@ -41,7 +41,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\NSL.Generators.HttpEndPointGenerator.Attributes\NSL.Generators.HttpEndPointGenerator.Attributes.csproj" PrivateAssets="all" OutputItemType="Analyzer" />
+		<ProjectReference Include="..\NSL.Generators.HttpEndPointGenerator.Shared\NSL.Generators.HttpEndPointGenerator.Shared.csproj" />
 		<ProjectReference Include="..\NSL.Generators.Utils\NSL.Generators.Utils.csproj" PrivateAssets="all" OutputItemType="Analyzer" />
 	</ItemGroup>
 

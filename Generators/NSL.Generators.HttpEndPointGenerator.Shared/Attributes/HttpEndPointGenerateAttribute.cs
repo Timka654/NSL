@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace NSL.Generators.HttpEndPointGenerator.Attributes
+namespace NSL.Generators.HttpEndPointGenerator.Shared.Attributes
 {
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
     public class HttpEndPointGenerateAttribute : Attribute

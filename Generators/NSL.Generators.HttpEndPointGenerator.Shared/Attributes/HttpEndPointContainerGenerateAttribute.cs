@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace NSL.Generators.HttpEndPointGenerator.Attributes
+namespace NSL.Generators.HttpEndPointGenerator.Shared.Attributes
 {
     [AttributeUsage(AttributeTargets.Interface, AllowMultiple = true)]
     public class HttpEndPointContainerGenerateAttribute : Attribute

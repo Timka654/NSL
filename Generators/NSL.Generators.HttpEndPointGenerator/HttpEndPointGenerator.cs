@@ -1,6 +1,6 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using NSL.Generators.HttpEndPointGenerator.Attributes;
+using NSL.Generators.HttpEndPointGenerator.Shared.Attributes;
 using NSL.Generators.Utils;
 using System;
 using System.Collections.Generic;
@@ -32,8 +32,9 @@ namespace NSL.Generators.HttpEndPointGenerator
 
         private void ProcessHttpEndPoints(GeneratorExecutionContext context, HttpEndPointImplementAttributeSyntaxReceiver methodSyntaxReceiver)
         {
+#if DEBUG
             //GenDebug.Break();
-
+#endif
             foreach (var item in methodSyntaxReceiver.Types)
             {
                 ProcessHttpEndPoint(context, item);
