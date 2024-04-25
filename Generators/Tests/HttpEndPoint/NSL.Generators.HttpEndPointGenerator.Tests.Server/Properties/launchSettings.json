@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "NSL.Generators.HttpEndPointGenerator.Tests.Server": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:60673;http://localhost:60674"
+    }
+  }
+}

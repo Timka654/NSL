@@ -1,4 +1,7 @@
 ﻿using Microsoft.CodeAnalysis;
+using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Linq;
 
 namespace NSL.Generators.Utils
 {
@@ -31,6 +34,16 @@ namespace NSL.Generators.Utils
                 return typedSymbol;
 
             return default;
+        }
+
+        public static object GetNamedArgumentValue(this AttributeData attr, string name)
+        {
+            var args = attr.NamedArguments;
+
+            if (args.IsDefaultOrEmpty || !args.Any(x=>x.Key.Equals(name)))
+                return default;
+
+            return args.First(x => x.Key.Equals(name)).Value;
         }
     }
 }

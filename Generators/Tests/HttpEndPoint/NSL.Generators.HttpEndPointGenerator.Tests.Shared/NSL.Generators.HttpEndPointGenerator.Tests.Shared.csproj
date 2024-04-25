@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
 	<PropertyGroup>
 		<OutputType>Library</OutputType>
@@ -7,6 +7,7 @@
 		<Nullable>disable</Nullable>
 		<IsPackable>false</IsPackable>
 		<Version>$(VersionSuffix)</Version>
+		
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -18,6 +19,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <ProjectReference Include="..\..\..\..\ASPNET\NSL.ASPNET\NSL.ASPNET.csproj" />
 	  <ProjectReference Include="..\..\..\..\Protocols\Http\NSL.HttpClient\NSL.HttpClient.csproj" />
 	  <ProjectReference Include="..\..\..\NSL.Generators.HttpEndPointGenerator.Shared\NSL.Generators.HttpEndPointGenerator.Shared.csproj" />
 	</ItemGroup>

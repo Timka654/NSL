@@ -106,6 +106,22 @@ namespace NSL.Generators.Utils
             => AppendSummary(builder => commentAction());
 
 
+        public void AppendTabContent(Action tabAction)
+        {
+            NextTab();
+
+            tabAction();
+
+            PrevTab();
+        }
+
+        public void AppendBodyTabContent(Action tabAction)
+        {
+            AppendLine("{");
+            AppendTabContent(tabAction);
+            AppendLine("}");
+        }
+
         public void CreatePartialClass(ClassDeclarationSyntax classDecl, Action bodyBuild, IEnumerable<string> requiredDirectives = null)
         {
             var @namespace = classDecl.Parent as NamespaceDeclarationSyntax;

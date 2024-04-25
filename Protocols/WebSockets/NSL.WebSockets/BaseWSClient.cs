@@ -152,6 +152,10 @@ namespace NSL.WebSockets
                     if (data == false)
                     {
                         var peeked = inputCipher.Peek(receiveBuffer);
+
+                        if (peeked == null)
+                            throw new ConnectionLostException(GetRemotePoint(), true);
+
                         //если все ок
                         //получаем размер пакета
                         lenght = BitConverter.ToInt32(peeked, 0);

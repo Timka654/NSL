@@ -15,5 +15,8 @@ namespace NSL.HttpClient.HttpContent
         {
 
         }
+
+        public static EmptyHttpContent Create()
+            => new EmptyHttpContent();
     }
 }

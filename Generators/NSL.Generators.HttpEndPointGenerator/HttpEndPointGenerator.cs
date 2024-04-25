@@ -1,9 +1,12 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using NSL.Generators.HttpEndPointGenerator.Shared.Attributes;
+using NSL.Generators.HttpEndPointGenerator.Shared.Fake.Attributes;
+using NSL.Generators.HttpEndPointGenerator.Shared.Fake.Interfaces;
 using NSL.Generators.Utils;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
 
@@ -33,7 +36,7 @@ namespace NSL.Generators.HttpEndPointGenerator
         private void ProcessHttpEndPoints(GeneratorExecutionContext context, HttpEndPointImplementAttributeSyntaxReceiver methodSyntaxReceiver)
         {
 #if DEBUG
-            GenDebug.Break();
+            //GenDebug.Break();
 
 #endif
             foreach (var item in methodSyntaxReceiver.Types)
@@ -65,7 +68,7 @@ namespace NSL.Generators.HttpEndPointGenerator
 
             classBuilder.CreatePartialClass(typeClass, () =>
             {
-                classBuilder.AppendLine($"protected partial HttpClient CreateEndPointClient(string url);");
+                classBuilder.AppendLine($"protected partial System.Net.Http.HttpClient CreateEndPointClient(string url);");
 
                 classBuilder.AppendLine();
 
@@ -127,7 +130,13 @@ namespace NSL.Generators.HttpEndPointGenerator
                         if (!(item is IMethodSymbol ms))
                             continue;
 
-                        var mparam = ms.Parameters.FirstOrDefault();
+
+                        var mparams = ms.Parameters.Where(x => x.GetAttributes().Any(a =>
+                        a.AttributeClass.Name.Equals(FromBodyAttributeFullName) ||
+                        a.AttributeClass.Name.Equals(FromFormAttributeFullName) || a.AttributeClass.Name.Equals(ParameterAttributeFullName))).ToImmutableArray();
+
+
+
 
                         var mattrbs = ms.GetAttributes();
 
@@ -168,8 +177,7 @@ namespace NSL.Generators.HttpEndPointGenerator
 
                                 List<string> _p = new List<string>();
 
-                                if (mparam != null)
-                                    _p.Add($"{mparam.Type} {mparam.Name}");
+                                _p.AddRange(GetParameter(mparams));
 
                                 _p.Add($"{BaseHttpRequestOptionsFullName} __options = null");
 
@@ -190,10 +198,23 @@ namespace NSL.Generators.HttpEndPointGenerator
                                 methodBuilder.AppendLine($"=> await CreateEndPointClient({_vname}Url)");
                                 if (_t == "Post")
                                 {
-                                    if (mparam == null)
+                                    if (!mparams.Any())
                                         methodBuilder.AppendLine($".PostEmptyAsync({_vname}Url)");
+                                    //if (mparams.Length == 1 && !mparams[0].GetAttributes().Any(x=>x.AttributeClass.Name.Equals(ParameterAttributeFullName) && (GenHttpParameterEnum)x.ConstructorArguments[0].Value != GenHttpParameterEnum.Particle))
+                                    //    methodBuilder.AppendLine($".PostJsonAsync({_vname}Url, {mparams[0].Name})");
                                     else
-                                        methodBuilder.AppendLine($".PostJsonAsync({_vname}Url, {mparam.Name})");
+                                    {
+                                        methodBuilder.AppendLine($".PostBuildAsync({_vname}Url, ()=>{{");
+                                        methodBuilder.NextTab();
+                                        methodBuilder.AppendLine("var ____content = ");
+
+                                        BuildContent(mparams.Cast<ISymbol>().ToImmutableArray(), methodBuilder);
+
+                                        methodBuilder.AppendLine("return ____content;");
+                                        methodBuilder.PrevTab();
+                                        //JsonHttpContent.Create(data)
+                                        methodBuilder.AppendLine("})");
+                                    }
                                 }
 
                                 methodBuilder.AppendLine($".ProcessResponseAsync<{returnType}>(__options);");
@@ -214,11 +235,146 @@ namespace NSL.Generators.HttpEndPointGenerator
             // Visual studio have lag(or ...) cannot show changes sometime
             //#if DEVELOP
 #pragma warning disable RS1035 // Do not use APIs banned for analyzers
-            //System.IO.File.WriteAllText($@"C:\Work\temp\{typeClass.GetTypeClassName()}..httpendpoints.cs", classBuilder.ToString());
+            //System.IO.File.WriteAllText($@"D:\Projects\work\my\NSL\NSL\Generators\Tests\HttpEndPoint\NSL.Generators.HttpEndPointGenerator.Tests.Client\{typeClass.GetTypeClassName()}.httpendpoints.cs", classBuilder.ToString());
 #pragma warning restore RS1035 // Do not use APIs banned for analyzers
             //#endif
 
             context.AddSource($"{typeClass.GetTypeClassName()}.httpendpoints.cs", classBuilder.ToString());
+        }
+
+        private List<string> GetParameter(IEnumerable<ISymbol> parameters, string path = null)
+        {
+            List<string> result = new List<string>();
+
+            foreach (var mparam in parameters)
+            {
+                var type = mparam.GetTypeSymbol();
+
+                var t = type.ToString();
+
+                var name = mparam.Name;
+
+                if (type.Name.Equals(IFormFileFullName))
+                {
+                    t = "NSL.HttpClient.HttpContent.StreamDataContent";
+                    name = string.Join("__", path, name).TrimStart('_');
+                }
+                else if (type.Name.Equals(IFormFileCollectionFullName))
+                {
+                    t = "IEnumerable<NSL.HttpClient.HttpContent.StreamDataContent>";
+                    name = string.Join("__", path, name).TrimStart('_');
+                }
+                else if (path != null)
+                {
+                    //unprocess - continue
+                    continue;
+                }
+
+                result.Add($"{t} {name}");
+
+                if (mparam.GetAttributes().Any(x => x.AttributeClass.Name.Equals(FromFormAttributeFullName)) && mparam.GetAttributes().Any(x => x.AttributeClass.Name.Equals(ParameterAttributeFullName) && ((GenHttpParameterEnum)x.ConstructorArguments[0].Value) == GenHttpParameterEnum.Particle))
+                {
+                    result.AddRange(GetParameter(type.GetAllMembers().Where(x => x is IPropertySymbol).ToImmutableArray(), name));
+                }
+            }
+
+            return result;
+        }
+
+        private void BuildContent(ImmutableArray<ISymbol> mparams, CodeBuilder methodBuilder)
+        {
+            var firstAttributes = mparams[0].GetAttributes();
+
+            if (!mparams.Any(x =>
+            x.GetAttributes().Any(a => a.AttributeClass.Name.Equals(FromFormAttributeFullName) || a.AttributeClass.Name.Equals(FromBodyAttributeFullName))))
+            {
+                methodBuilder.AppendLine($"EmptyHttpContent.Create();");
+
+                FillHeaders(mparams, methodBuilder);
+            }
+            else if (mparams.Length == 1 && firstAttributes.Any(x => x.AttributeClass.Name.Equals(FromBodyAttributeFullName)))
+            {
+                var _pa = firstAttributes.FirstOrDefault(x => x.AttributeClass.Name.Equals(ParameterAttributeFullName));
+
+                if (_pa == null || (GenHttpParameterEnum)_pa.ConstructorArguments[0].Value == GenHttpParameterEnum.Normal)
+                {
+                    methodBuilder.AppendLine($"JsonHttpContent.Create({mparams[0].Name});");
+
+                    FillHeaders(mparams, methodBuilder);
+                }
+            }
+            else if (mparams.Any(x => x.GetAttributes().Any(b => b.AttributeClass.Name.Equals(FromFormAttributeFullName))))
+            {
+                methodBuilder.AppendLine($"FormHttpContent.Create();");
+
+                FillHeaders(mparams, methodBuilder);
+
+                BuildForm(mparams, methodBuilder, null);
+            }
+            else
+            {
+
+            }
+        }
+
+        private void FillHeaders(ImmutableArray<ISymbol> mparams, CodeBuilder methodBuilder)
+        {
+            foreach (var item in mparams)
+            {
+                var itemAttrbs = item.GetAttributes();
+
+                var fromHeaderAttribute = itemAttrbs.FirstOrDefault(x => x.AttributeClass.Name.Equals(FromHeaderAttributeFullName));
+
+                if (fromHeaderAttribute == null)
+                    continue;
+
+                var formHeaderValue = fromHeaderAttribute?.GetNamedArgumentValue(nameof(FromHeaderAttribute.Name));
+
+                if (formHeaderValue is TypedConstant tc)
+                    formHeaderValue = tc.Value;
+
+                methodBuilder.AppendLine($"____content.Headers.Add(\"{formHeaderValue ?? item.Name}\", {item.Name});");
+            }
+        }
+
+        private void BuildForm(ImmutableArray<ISymbol> mparams, CodeBuilder methodBuilder, string path)
+        {
+            foreach (var item in mparams)
+            {
+                var endPath = string.Join(".", path, item.Name).TrimStart('.');
+
+                var itemAttrbs = item.GetAttributes();
+
+                var fromFormAttribute = itemAttrbs.FirstOrDefault(x => x.AttributeClass.Name.Equals(FromFormAttributeFullName));
+
+
+                var formNameValue = fromFormAttribute?.GetNamedArgumentValue(nameof(FromFormAttribute.Name));
+
+                if (itemAttrbs.Any(x => x.AttributeClass.Name.Equals(FromHeaderAttributeFullName)))
+                {
+                    continue;
+                }
+                else if (item.GetTypeSymbol().Name.Equals(IFormFileCollectionFullName))
+                {
+                    methodBuilder.AppendLine($"foreach(var ____item in {endPath.Replace(".","__")})");
+                    methodBuilder.AppendBodyTabContent(() =>
+                    {
+                        methodBuilder.AppendLine($"____content.Add(StreamHttpContent.Create(____item.Stream), \"{formNameValue ?? endPath}\", ____item.FileName);");
+                    });
+                }
+                else if (item.GetTypeSymbol().Name.Equals(IFormFileFullName))
+                {
+                    methodBuilder.AppendLine($"____content.Add(StreamHttpContent.Create({endPath.Replace(".", "__")}.Stream), \"{formNameValue ?? endPath}\", {endPath.Replace(".", "__")}.FileName);");
+                }
+                else if (itemAttrbs.Any(x => x.AttributeClass.Name.Equals(ParameterAttributeFullName)))
+                {
+                    BuildForm(item.GetTypeSymbol().GetAllMembers().Where(x => x is IPropertySymbol).ToImmutableArray(), methodBuilder, item.Name);
+                }
+                else
+                {
+                    methodBuilder.AppendLine($"____content.Add(JsonHttpContent.Create({endPath}), \"{formNameValue ?? endPath}\");");
+                }
+            }
         }
 
         private string GetControllerName(ITypeSymbol containerType)
@@ -256,6 +412,12 @@ namespace NSL.Generators.HttpEndPointGenerator
         private readonly string ImplementGenerateAttributeFullName = typeof(HttpEndPointImplementGenerateAttribute).Name;
         private readonly string ContainerGenerateAttributeFullName = typeof(HttpEndPointContainerGenerateAttribute).Name;
         private readonly string GenerateAttributeFullName = typeof(HttpEndPointGenerateAttribute).Name;
+        private readonly string ParameterAttributeFullName = typeof(HttpEndPointParameterAttribute).Name;
+        private readonly string IFormFileFullName = typeof(IFormFile).Name;
+        private readonly string IFormFileCollectionFullName = typeof(IFormFileCollection).Name;
+        private readonly string FromHeaderAttributeFullName = typeof(FromHeaderAttribute).Name;
+        private readonly string FromBodyAttributeFullName = typeof(FromBodyAttribute).Name;
+        private readonly string FromFormAttributeFullName = typeof(FromFormAttribute).Name;
 
         private readonly string RouteAttributeFullName = "RouteAttribute";
         private readonly string BaseHttpRequestOptionsFullName = "BaseHttpRequestOptions";
