@@ -18,6 +18,12 @@ namespace NSLLibProjectFileFormatter
         [GeneratedRegex(@"(<ItemGroup(\s*(\S*)\s*=\s*""([\S\s]+?)"")*>(\s*<PackageReference(\s*([\S]+?)\s*=\s*""([\s\S]+?)""\s*)+)(/>\s*|>(\s*<([\S]+?)>\s*([\S\s]+?)</([\S]+)>)+\s*</PackageReference>\s*)*</ItemGroup>)+")]
         public partial Regex GetPackageReferenceRegex();
 
+        [GeneratedRegex(@"(<ItemGroup(\s*(\S*)\s*=\s*""([\S\s]+?)"")*>(\s*<Compile(\s*([\S]+?)\s*=\s*""([\s\S]+?)""\s*)+)(/>\s*|>(\s*<([\S]+?)>\s*([\S\s]+?)</([\S]+)>)+\s*</Compile>\s*)*</ItemGroup>)+")]
+        public partial Regex GetCompileRegex();
+
+        [GeneratedRegex(@"(<ItemGroup(\s*(\S*)\s*=\s*""([\S\s]+?)"")*>(\s*<EmbeddedResource(\s*([\S]+?)\s*=\s*""([\s\S]+?)""\s*)+)(/>\s*|>(\s*<([\S]+?)>\s*([\S\s]+?)</([\S]+)>)+\s*</EmbeddedResource>\s*)*</ItemGroup>)+")]
+        public partial Regex GetEmbeddedResourceRegex();
+
         [GeneratedRegex(@"<ItemGroup(\s*(\S*)\s*=\s*""([\S\s]+?)"")*>([\S\s]+?)</ItemGroup>")]
         public partial Regex GetItemGroupWithConditionRegex();
 
@@ -29,6 +35,9 @@ namespace NSLLibProjectFileFormatter
 
         [GeneratedRegex(@"\s*<Authors>([\S\s]*)</Authors>")]
         public partial Regex GetProjectAuthorsRegex();
+
+        [GeneratedRegex(@"\s*<SuppressDependenciesWhenPacking>([\S\s]*)</SuppressDependenciesWhenPacking>")]
+        public partial Regex GetProjectSuppressDependenciesWhenPackingRegex();
 
         [GeneratedRegex(@"\s*<NSLProjectTypes>(([\S\s]+?)(;|\b))+</NSLProjectTypes>")]
         public partial Regex GetProjectNSLTypes();
@@ -102,6 +111,7 @@ namespace NSLLibProjectFileFormatter
             var description = GetGroupValue(FindGroupsByRegex(currentContent, GetProjectDescriptionRegex()));
 
             var authors = GetGroupValue(FindGroupsByRegex(currentContent, GetProjectAuthorsRegex()));
+            var suppressDependenciesWhenPacking = GetGroupValue(FindGroupsByRegex(currentContent, GetProjectSuppressDependenciesWhenPackingRegex()));
 
             var isRoslyn = bool.TryParse(GetGroupValue(FindGroupsByRegex(currentContent, GetProjectIsRoslynRegex())), out var rv) && rv;
 
@@ -118,6 +128,10 @@ namespace NSLLibProjectFileFormatter
             var contentItems = FindAllByRegex(fileContent, GetProjectContentItemGroupRegex());
 
             var packagesRefs = FindAllByRegex(fileContent, GetPackageReferenceRegex());
+
+            var compileItems = FindAllByRegex(fileContent, GetCompileRegex());
+
+            var embeddedResourceItems = FindAllByRegex(fileContent, GetEmbeddedResourceRegex());
 
             tb.WriteProjectRoot(sdk, () =>
             {
@@ -193,6 +207,11 @@ namespace NSLLibProjectFileFormatter
                         tb.AppendLine()
                           .AppendLine("<EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>")
                           .AppendLine("<IsRoslynComponent>true</IsRoslynComponent>");
+                    }
+
+                    if (suppressDependenciesWhenPacking != null)
+                    {
+                        tb.AppendLine($"<SuppressDependenciesWhenPacking>{suppressDependenciesWhenPacking}</SuppressDependenciesWhenPacking>");
                     }
 
                     if (isTemplate)
@@ -323,6 +342,65 @@ namespace NSLLibProjectFileFormatter
 
                         }
                     });
+
+
+                if (compileItems.Any())
+                    foreach (Match item in compileItems)
+                    {
+                        var igroups = item.Groups;
+
+                        tb.WriteItemGroup(item.Groups[2].Captures.Select(x => x.Value.Trim()), () =>
+                        {
+                            var packageProps = igroups[6].Captures;
+
+                            var packageBodyProps = igroups[10].Captures;
+
+                            tb.AppendLine($"<Compile {string.Join(" ", packageProps.Select(x => x.Value.Replace("\t", string.Empty).Trim()).ToArray())} {(packageBodyProps.Any() ? ">" : "/>")}");
+
+                            if (packageBodyProps.Any())
+                            {
+                                tb.NextTab();
+
+                                foreach (Capture bodyProp in packageBodyProps)
+                                {
+                                    tb.AppendLine(bodyProp.Value.Trim());
+                                }
+
+                                tb.PrevTab().AppendLine("</Compile>");
+                            }
+
+                        });
+                    }
+
+
+                if (embeddedResourceItems.Any())
+                    foreach (Match item in embeddedResourceItems)
+                    {
+                        var igroups = item.Groups;
+
+                        tb.WriteItemGroup(item.Groups[2].Captures.Select(x => x.Value.Trim()), () =>
+                        {
+                            var packageProps = igroups[6].Captures;
+
+                            var packageBodyProps = igroups[10].Captures;
+
+                            tb.AppendLine($"<EmbeddedResource {string.Join(" ", packageProps.Select(x => x.Value.Replace("\t", string.Empty).Trim()).ToArray())} {(packageBodyProps.Any() ? ">" : "/>")}");
+
+                            if (packageBodyProps.Any())
+                            {
+                                tb.NextTab();
+
+                                foreach (Capture bodyProp in packageBodyProps)
+                                {
+                                    tb.AppendLine(bodyProp.Value.Trim());
+                                }
+
+                                tb.PrevTab().AppendLine("</EmbeddedResource>");
+                            }
+
+                        });
+                    }
+
 
                 if (isRoslyn)
                     tb.AppendLine().WriteItemGroup(() =>
