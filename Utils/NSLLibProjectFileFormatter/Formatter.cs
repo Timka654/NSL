@@ -281,7 +281,7 @@ namespace NSLLibProjectFileFormatter
 
                             var packageBodyProps = igroups[10].Captures;
 
-                            tb.AppendLine($"<PackageReference {string.Join(" ", packageProps.Select(x => x.Value.Trim()).ToArray())} {(packageBodyProps.Any() ? ">" : "/>")}");
+                            tb.AppendLine($"<PackageReference {string.Join(" ", packageProps.Select(x => x.Value.Replace("\t", string.Empty).Trim()).ToArray())} {(packageBodyProps.Any() ? ">" : "/>")}");
 
                             if (packageBodyProps.Any())
                             {
@@ -292,8 +292,7 @@ namespace NSLLibProjectFileFormatter
                                     tb.AppendLine(bodyProp.Value.Trim());
                                 }
 
-                                tb.PrevTab()
-                                .AppendLine("</PackageReference>");
+                                tb.PrevTab().AppendLine("</PackageReference>");
                             }
 
                         });
