@@ -1,31 +1,48 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<NSLProjectTypes>UnitySupport;Analyzer</NSLProjectTypes>
+		<NSLProjectTypes>Analyzer</NSLProjectTypes>
+
 		<TargetFramework>netstandard2.0</TargetFramework>
-		<SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
+		<Configurations>Debug;Release;DebugExamples;Unity;UnityDebug</Configurations>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<Nullable>disable</Nullable>
+
+		<PublishRepositoryUrl>true</PublishRepositoryUrl>
+		<EmbedUntrackedSources>true</EmbedUntrackedSources>
+		<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+		<GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
+		<SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
+
+		<Version>$(VersionSuffix)</Version>
+		<Authors>Relife87</Authors>
 	</PropertyGroup>
 
-	<ItemGroup>
-	  <Compile Remove="Templates\Shared\ItemModel.Client.cs" />
-	  <Compile Remove="Templates\Shared\ItemModel.cs" />
-	  <Compile Remove="Templates\Shared\ItemModel.Server.cs" />
-	</ItemGroup>
+	<PropertyGroup Condition="'$(Configuration)'=='Debug'">
+		<PackageId>$(MSBuildProjectName)_Debug</PackageId>
+	</PropertyGroup>
 
+	<PropertyGroup Condition="'$(Configuration)'=='UnityDebug'">
+		<AssemblyName>Unity.$(MSBuildProjectName)</AssemblyName>
+		<DefineConstants>DEBUG;TRACE</DefineConstants>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)'=='Unity'">
+		<AssemblyName>Unity.$(MSBuildProjectName)</AssemblyName>
+	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="2.9.8" />
 		<PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="3.3.1" />
 	</ItemGroup>
-	
 	<ItemGroup>
-		<CompilerVisibleProperty Include="CodeRefactoring1_RelativeSharedPath" />
+		<Compile Remove="Templates\Shared\ItemModel.Client.cs" />
+		<Compile Remove="Templates\Shared\ItemModel.cs" />
+		<Compile Remove="Templates\Shared\ItemModel.Server.cs" />
 	</ItemGroup>
-	
 	<ItemGroup>
-	  <EmbeddedResource Include="Templates\Shared\ItemModel.Client.cs" />
-	  <EmbeddedResource Include="Templates\Shared\ItemModel.cs" />
-	  <EmbeddedResource Include="Templates\Shared\ItemModel.Server.cs" />
+		<EmbeddedResource Include="Templates\Shared\ItemModel.Client.cs" />
+		<EmbeddedResource Include="Templates\Shared\ItemModel.cs" />
+		<EmbeddedResource Include="Templates\Shared\ItemModel.Server.cs" />
 	</ItemGroup>
 
 </Project>
