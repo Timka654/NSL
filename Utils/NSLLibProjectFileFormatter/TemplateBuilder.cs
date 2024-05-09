@@ -21,7 +21,11 @@ namespace NSLLibProjectFileFormatter
 
         public TemplateBuilder AppendLine(string content)
         {
-            sb.AppendLine(string.Concat(Enumerable.Repeat('\t', tab).ToArray()) + content);
+            var pref = string.Concat(Enumerable.Repeat('\t', tab).ToArray());
+
+            var lines = content.Split(Environment.NewLine).Select(x => $"{pref}{x}").ToArray();
+
+            sb.AppendLine(string.Join(Environment.NewLine, lines));
             return this;
         }
 
@@ -89,7 +93,7 @@ namespace NSLLibProjectFileFormatter
         public TemplateBuilder WriteItemGroup(string condition, Action body)
         {
             if (string.IsNullOrWhiteSpace(condition))
-            { 
+            {
                 return WriteItemGroup(body);
             }
 

@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<NSLProjectTypes>UnitySupport;Analyzer</NSLProjectTypes>
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
+		<Nullable>disable</Nullable>
+	</PropertyGroup>
+
+	<ItemGroup>
+	  <Compile Remove="Templates\Shared\ItemModel.Client.cs" />
+	  <Compile Remove="Templates\Shared\ItemModel.cs" />
+	  <Compile Remove="Templates\Shared\ItemModel.Server.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="2.9.8" />
+		<PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="3.3.1" />
+	</ItemGroup>
+	
+	<ItemGroup>
+		<CompilerVisibleProperty Include="CodeRefactoring1_RelativeSharedPath" />
+	</ItemGroup>
+	
+	<ItemGroup>
+	  <EmbeddedResource Include="Templates\Shared\ItemModel.Client.cs" />
+	  <EmbeddedResource Include="Templates\Shared\ItemModel.cs" />
+	  <EmbeddedResource Include="Templates\Shared\ItemModel.Server.cs" />
+	</ItemGroup>
+
+</Project>

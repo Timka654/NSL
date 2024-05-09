@@ -69,7 +69,12 @@ namespace NSLLibProjectFileFormatter
         {
             foreach (var item in di.GetFiles("*.csproj", SearchOption.AllDirectories))
             {
-                if (item.Name.Contains(".Test") || item.Name.Contains("Example"))
+                var relPath = Path.GetRelativePath(di.FullName, item.FullName);
+
+                if (relPath.Contains(".Test") || relPath.Contains("Example"))
+                    continue;
+
+                if (relPath.Contains("Templates") && relPath.Contains("content"))
                     continue;
 
                 BuildNewProjectFile(item.FullName, File.ReadAllLines(item.FullName).Where(x => !string.IsNullOrWhiteSpace(x)).ToArray());
@@ -99,6 +104,8 @@ namespace NSLLibProjectFileFormatter
             var authors = GetGroupValue(FindGroupsByRegex(currentContent, GetProjectAuthorsRegex()));
 
             var isRoslyn = bool.TryParse(GetGroupValue(FindGroupsByRegex(currentContent, GetProjectIsRoslynRegex())), out var rv) && rv;
+
+            var isTemplate = HasTemplateType(NSLProjectTypes);
 
             var fileContent = string.Join(Environment.NewLine, currentContent);
 
@@ -188,6 +195,19 @@ namespace NSLLibProjectFileFormatter
                           .AppendLine("<IsRoslynComponent>true</IsRoslynComponent>");
                     }
 
+                    if (isTemplate)
+                    {
+                        tb.AppendLine("""
+                            <PackageType>Template</PackageType>
+                            <IncludeContentInPack>true</IncludeContentInPack>
+                            <IncludeBuildOutput>false</IncludeBuildOutput>
+                            <ContentTargetFolders>content</ContentTargetFolders>
+                            <NoWarn>$(NoWarn);NU5128</NoWarn>
+                            <NoDefaultExcludes>true</NoDefaultExcludes>
+                            <LocalizeTemplates>false</LocalizeTemplates>
+                            """);
+                    }
+
                     tb.AppendLine();
 
                     tb.AppendLine("<Version>$(VersionSuffix)</Version>");
@@ -200,6 +220,13 @@ namespace NSLLibProjectFileFormatter
                     if (description != null)
                         tb.AppendLine($"<Description>{description}</Description>");
                 });
+
+                if (isTemplate)
+                    tb.AppendLine("""
+                    <ItemGroup>
+                        <Content Include="**\*\.template.config\template.json" />
+                    </ItemGroup>
+                    """);
 
                 tb.AppendLine()
                 .WritePropertyGroup("'$(Configuration)'=='Debug'", () =>
@@ -373,6 +400,11 @@ namespace NSLLibProjectFileFormatter
         public bool HasASPTarget(List<string> types)
         {
             return types.Contains("UnityTarget");
+        }
+
+        public bool HasTemplateType(List<string> types)
+        {
+            return types.Contains("Template");
         }
 
         private bool hasUnityInProjectName(string path)

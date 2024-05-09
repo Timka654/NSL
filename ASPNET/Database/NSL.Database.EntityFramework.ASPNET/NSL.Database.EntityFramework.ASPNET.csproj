@@ -22,13 +22,13 @@
 	<PropertyGroup Condition="'$(Configuration)'=='Debug'">
 		<PackageId>$(MSBuildProjectName)_Debug</PackageId>
 	</PropertyGroup>
-
 	<ItemGroup>
-	  <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.4" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.4" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\..\NSL.ASPNET\NSL.ASPNET.csproj" />
+		<ProjectReference Include="..\..\..\Database\NSL.Database.EntityFramework\NSL.Database.EntityFramework.csproj" />
+		<ProjectReference Include="..\..\NSL.ASPNET\NSL.ASPNET.csproj" />
 	</ItemGroup>
 
 </Project>
