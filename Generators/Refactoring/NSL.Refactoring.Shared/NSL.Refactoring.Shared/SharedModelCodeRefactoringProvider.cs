@@ -15,7 +15,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 
-namespace CodeRefactoring1
+namespace NSL.Refactoring.Shared
 {
     [ExportCodeRefactoringProvider(LanguageNames.CSharp, Name = nameof(SharedModelCodeRefactoringProvider)), Shared]
     internal class SharedModelCodeRefactoringProvider : CodeRefactoringProvider
@@ -44,6 +44,7 @@ namespace CodeRefactoring1
                 return;
 
             //var opt = context.Document.Project.;
+            Dictionary<string, string> options = null;
 
             var sol = context.Document.Project.Solution;
 
@@ -51,11 +52,10 @@ namespace CodeRefactoring1
 
             var confPath = Path.Combine(sol_dir, "NSLGen.options");
 
-            if (!File.Exists(confPath))
-                return;
-
-            var options = File.ReadAllLines(confPath).Select(x => x.Split('=')).ToDictionary(x => x[0], x => string.Join("=", x.Skip(1)));
-
+            if (File.Exists(confPath))
+            {
+                options = File.ReadAllLines(confPath).Select(x => x.Split('=')).ToDictionary(x => x[0], x => string.Join("=", x.Skip(1)));
+            }
 
 
             var proj = context.Document.Project;
@@ -68,14 +68,21 @@ namespace CodeRefactoring1
             {
                 var poptions = File.ReadAllLines(confPath).Select(x => x.Split('=')).ToDictionary(x => x[0], x => string.Join("=", x.Skip(1)));
 
-                foreach (var item in poptions)
-                {
-                    options[item.Key] = item.Value;
-                }
+                if (options == null)
+                    options = poptions;
+                else
+                    foreach (var item in poptions)
+                    {
+                        options[item.Key] = item.Value;
+                    }
+            }
+            else if (options == null)
+            {
+                return;
             }
 
 
-                options.TryGetValue("shared_project_name", out var sharedProjName);
+            options.TryGetValue("shared_project_name", out var sharedProjName);
 
             var sharedProj = sol.Projects.FirstOrDefault(x => x.Name.Equals(sharedProjName));
 
@@ -133,13 +140,14 @@ namespace CodeRefactoring1
             //// Produce a new solution that has all references to that type renamed, including the declaration.
             //var originalSolution = document.Project.Solution;
             //var optionSet = originalSolution.Workspace.Options;
+            var assemblyName = this.GetType().Assembly.GetName().Name;
             var names =
     System
     .Reflection
     .Assembly
     .GetExecutingAssembly()
     .GetManifestResourceNames()
-    .Where(x => x.StartsWith("CodeRefactoring1.Templates.Shared."))
+    .Where(x => x.StartsWith($"{assemblyName}.Templates.Shared."))
     .ToArray();
 
             Solution s = sharedProj.Solution;
@@ -150,7 +158,7 @@ namespace CodeRefactoring1
                 .GetExecutingAssembly()
     .GetManifestResourceStream(item))
                 {
-                    var name = item.Substring("CodeRefactoring1.Templates.Shared.".Length);
+                    var name = item.Substring($"{assemblyName}.Templates.Shared.".Length);
 
                     name = string.Join(".", newName, string.Join(".", name.Split('.').Skip(1).ToArray()));
 
@@ -173,7 +181,7 @@ namespace CodeRefactoring1
 
             var srcProj = s.GetProject(sourceDoc.Project.Id);
 
-            if (!srcProj.ProjectReferences.Any(x => x.ProjectId == sharedProj.Id))
+            if (!srcProj.ProjectReferences.Any(x => x.ProjectId == sharedProj.Id) && !srcProj.Id.Equals(sharedProj.Id))
                 srcProj = srcProj.AddProjectReference(new ProjectReference(sharedProj.Id));
 
             sourceDoc = srcProj.GetDocument(sourceDoc.Id);
@@ -182,7 +190,12 @@ namespace CodeRefactoring1
 
             if (synRoot is CompilationUnitSyntax cus)
             {
-                if (!cus.Usings.Any(x => Equals(x.Name.ToString(), ns)))
+
+                if (cus.Members.FirstOrDefault() is NamespaceDeclarationSyntax cns && cns.Name.ToString() == ns)
+                {
+
+                }
+                else if (!cus.Usings.Any(x => Equals(x.Name.ToString(), ns)))
                 {
                     var us = SyntaxFactory.UsingDirective(SyntaxFactory.ParseName(ns));
 

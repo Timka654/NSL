@@ -1,26 +1,17 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<NSLProjectTypes>Analyzer</NSLProjectTypes>
-
 		<TargetFramework>netstandard2.0</TargetFramework>
 		<Configurations>Debug;Release;DebugExamples;Unity;UnityDebug</Configurations>
-		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-		<Nullable>disable</Nullable>
+		
+		<IsPackable>false</IsPackable>
 
-		<PublishRepositoryUrl>true</PublishRepositoryUrl>
-		<EmbedUntrackedSources>true</EmbedUntrackedSources>
-		<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-		<GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
-		<SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
-
+		<!-- Avoid ID conflicts with the package project. -->
+		<PackageId>*$(MSBuildProjectFile)*</PackageId>
 		<Version>$(VersionSuffix)</Version>
 		<Authors>Relife87</Authors>
 	</PropertyGroup>
-
-	<PropertyGroup Condition="'$(Configuration)'=='Debug'">
-		<PackageId>$(MSBuildProjectName)_Debug</PackageId>
-	</PropertyGroup>
+	
 	<ItemGroup>
 		<PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="2.9.8" />
 		<PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="3.3.1" />
