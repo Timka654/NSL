@@ -17,7 +17,7 @@
 		<Version>$(VersionSuffix)</Version>
 		<Authors>Relife87</Authors>
 		<Description>
-			Must contains "NSLGen.options" in solution directory(can override options from project directory NSLGen.options file)
+			Must contains "NSLGen.options" file in solution/project directory(can override solution options from project directory NSLGen.options file)<br/>
 			shared_project_name* - project name for store shared types
 			shared_request_models_rel_path? - request models path(has contains RequestModel in type name)
 			shared_response_models_rel_path? - response models path(has contains ResponseModel in type name)
