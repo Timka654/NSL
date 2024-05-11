@@ -1,19 +1,16 @@
 ﻿using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CodeActions;
 using Microsoft.CodeAnalysis.CodeRefactorings;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.CodeAnalysis.Rename;
-using Microsoft.CodeAnalysis.Text;
+using System;
 using System.Collections.Generic;
 using System.Composition;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Resources;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Xml.Linq;
 
 namespace NSL.Refactoring.Shared
 {
@@ -42,6 +39,10 @@ namespace NSL.Refactoring.Shared
 
             if (typeDecl == null)
                 return;
+#if DEBUGEXAMPLES
+            else
+                Debug.WriteLine($"type is not IdentifierNameSyntax - {node.GetType().Name}");
+#endif
 
             //var opt = context.Document.Project.;
             Dictionary<string, string> options = null;
@@ -81,7 +82,6 @@ namespace NSL.Refactoring.Shared
                 return;
             }
 
-
             options.TryGetValue("shared_project_name", out var sharedProjName);
 
             var sharedProj = sol.Projects.FirstOrDefault(x => x.Name.Equals(sharedProjName));
@@ -91,63 +91,71 @@ namespace NSL.Refactoring.Shared
 
             var sharedRootPath = Path.GetDirectoryName(sharedProj.FilePath);
 
-            var modelsFullPath = sharedRootPath;
-
             foreach (var item in models)
             {
                 if (!typeDecl.Identifier.Text.Contains(item.Key))
                     continue;
 
                 string key = item.Value.path;
+
+                var modelsFullPath = sharedRootPath;
+
                 if (options.TryGetValue(key, out var sharedModelsRelPath))
                     modelsFullPath = Path.Combine(modelsFullPath, sharedModelsRelPath);
 
-                context.RegisterRefactoring(CodeAction.Create(string.Format(item.Value.btn, typeDecl.Identifier.Text), c => CreateSharedModel(sharedProj, typeDecl, modelsFullPath, sharedRootPath, context.Document, c)));
+                context.RegisterRefactoring(PreviewedCodeAction.Create(string.Format(item.Value.btn, typeDecl.Identifier.Text), (c, preview) => CreateSharedModel(sharedProj, typeDecl, modelsFullPath, sharedRootPath, context.Document, c, preview)));
             }
-
-
-
-            //if (typeDecl == null)
-            //{
-            //    return;
-            //}
-
-            //// For any type declaration node, create a code action to reverse the identifier text.
-            //var action = CodeAction.Create("Reverse type name", c => ReverseTypeNameAsync(context.Document, typeDecl, c));
-
-            //// Register this code action.
-            //context.RegisterRefactoring(action);
         }
 
-        private async Task<Solution> CreateSharedModel(Project sharedProj, IdentifierNameSyntax typeDecl, string modelsFullPath, string sharedRootPath, Document sourceDoc, CancellationToken cancellationToken)
+        private async Task<Solution> CreateSharedModel(Project sharedProj, IdentifierNameSyntax typeDecl, string modelsFullPath, string sharedRootPath, Document sourceDoc, CancellationToken cancellationToken, bool preview)
         {
             // Produce a reversed version of the type declaration's identifier token.
             var identifierToken = typeDecl.Identifier;
             var newName = identifierToken.Text;
 
-            var relPath = modelsFullPath.Substring(sharedRootPath.Length);
+            var relPath = modelsFullPath.Substring(sharedRootPath.Length).Replace('\\','/').TrimStart('/');
+
+            //namespace
 
             var ns = relPath.Replace('\\', '.').Replace('/', '.');
 
             ns = string.Join(".", sharedProj.DefaultNamespace, ns).Trim('.');
-            //// Get the symbol representing the type to be renamed.
-            //var semanticModel = await sourceDoc.GetSemanticModelAsync(cancellationToken);
 
-            //semanticModel.SyntaxTree.TryGetRoot(out var root);
+            var ns_sp = ns.Split('.');
 
-            //var typeSymbol = semanticModel.GetDeclaredSymbol(typeDecl, cancellationToken);
-            //semanticModel.
-            //// Produce a new solution that has all references to that type renamed, including the declaration.
-            //var originalSolution = document.Project.Solution;
-            //var optionSet = originalSolution.Workspace.Options;
+            for (int i = 0; i < ns_sp.Length; i++)
+            {
+                if (char.IsDigit(ns_sp[i][0]))
+                    ns_sp[i] = $"_{ns_sp[i]}";
+
+                for (int ci = 0; ci < ns_sp[i].Length; ci++)
+                {
+                    if (ns_sp[i][ci] == '_')
+                        continue;
+
+                    if (!char.IsLetterOrDigit(ns_sp[i][ci]))
+                        ns_sp[i] = ns_sp[i].Replace(ns_sp[i][ci], '_');
+                }
+            }
+
+            ns = string.Join(".", ns_sp); // clear namespace
+
+            //templates
+
+            if (!Directory.Exists(modelsFullPath) && !preview)
+                Directory.CreateDirectory(modelsFullPath);
+
             var assemblyName = this.GetType().Assembly.GetName().Name;
+
+            var resPrefix = $"{assemblyName}.Templates.Shared.";
+
             var names =
     System
     .Reflection
     .Assembly
     .GetExecutingAssembly()
     .GetManifestResourceNames()
-    .Where(x => x.StartsWith($"{assemblyName}.Templates.Shared."))
+    .Where(x => x.StartsWith(resPrefix))
     .ToArray();
 
             Solution s = sharedProj.Solution;
@@ -158,7 +166,7 @@ namespace NSL.Refactoring.Shared
                 .GetExecutingAssembly()
     .GetManifestResourceStream(item))
                 {
-                    var name = item.Substring($"{assemblyName}.Templates.Shared.".Length);
+                    var name = item.Substring(resPrefix.Length);
 
                     name = string.Join(".", newName, string.Join(".", name.Split('.').Skip(1).ToArray()));
 
@@ -178,6 +186,8 @@ namespace NSL.Refactoring.Shared
                     s = sharedProj.Solution;
                 }
             }
+
+            //link
 
             var srcProj = s.GetProject(sourceDoc.Project.Id);
 
@@ -200,37 +210,15 @@ namespace NSL.Refactoring.Shared
                     var us = SyntaxFactory.UsingDirective(SyntaxFactory.ParseName(ns));
 
                     cus = cus.AddUsings(us);
+
                     srcProj = sourceDoc.WithSyntaxRoot(cus).Project;
-                    //semanticModel.sy semanticModel.SyntaxTree.WithRootAndOptions(cus, semanticModel.SyntaxTree.Options)
-                    //SyntaxFactory.UsingDirective(SyntaxFactory.ParseName(ns));
                 }
             }
 
             s = srcProj.Solution;
 
 
-
-            // Return the new solution with the now-uppercase type name.
             return s;
-        }
-
-        private async Task<Solution> ReverseTypeNameAsync(Document document, TypeDeclarationSyntax typeDecl, CancellationToken cancellationToken)
-        {
-            // Produce a reversed version of the type declaration's identifier token.
-            var identifierToken = typeDecl.Identifier;
-            var newName = new string(identifierToken.Text.ToCharArray().Reverse().ToArray());
-
-            // Get the symbol representing the type to be renamed.
-            var semanticModel = await document.GetSemanticModelAsync(cancellationToken);
-            var typeSymbol = semanticModel.GetDeclaredSymbol(typeDecl, cancellationToken);
-
-            // Produce a new solution that has all references to that type renamed, including the declaration.
-            var originalSolution = document.Project.Solution;
-            var optionSet = originalSolution.Workspace.Options;
-            var newSolution = await Renamer.RenameSymbolAsync(document.Project.Solution, typeSymbol, newName, optionSet, cancellationToken).ConfigureAwait(false);
-
-            // Return the new solution with the now-uppercase type name.
-            return newSolution;
         }
     }
 }
