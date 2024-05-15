@@ -1,9 +1,11 @@
 ﻿using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.CodeRefactorings;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Composition;
 using System.Diagnostics;
 using System.IO;
@@ -14,8 +16,8 @@ using System.Threading.Tasks;
 
 namespace NSL.Refactoring.Shared
 {
-    [ExportCodeRefactoringProvider(LanguageNames.CSharp, Name = nameof(SharedModelCodeRefactoringProvider)), Shared]
-    internal class SharedModelCodeRefactoringProvider : CodeRefactoringProvider
+    [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(SharedModelCodeRefactoringProvider)), Shared]
+    internal class SharedModelCodeRefactoringProvider : CodeFixProvider
     {
         static Dictionary<string, (string path, string btn)> models = new Dictionary<string, (string, string)>()
         {
@@ -25,7 +27,10 @@ namespace NSL.Refactoring.Shared
             { "Model", ("shared_models_rel_path", "Generate shared model \"{0}\"") }
         };
 
-        public sealed override async Task ComputeRefactoringsAsync(CodeRefactoringContext context)
+        public override ImmutableArray<string> FixableDiagnosticIds => ImmutableArray.Create(
+            "CS0246");
+
+        public override async Task RegisterCodeFixesAsync(CodeFixContext context)
         {
             // TODO: Replace the following code with your own analysis, generating a CodeAction for each refactoring to offer
 
@@ -87,23 +92,27 @@ namespace NSL.Refactoring.Shared
             var sharedProj = sol.Projects.FirstOrDefault(x => x.Name.Equals(sharedProjName));
 
             if (sharedProj == null)
-                return;
+            {
+                sharedProj = proj;
+            }
 
             var sharedRootPath = Path.GetDirectoryName(sharedProj.FilePath);
-
-            foreach (var item in models)
+            foreach (var diag in context.Diagnostics)
             {
-                if (!typeDecl.Identifier.Text.Contains(item.Key))
-                    continue;
+                foreach (var item in models)
+                {
+                    if (!typeDecl.Identifier.Text.Contains(item.Key))
+                        continue;
 
-                string key = item.Value.path;
+                    string key = item.Value.path;
 
-                var modelsFullPath = sharedRootPath;
+                    var modelsFullPath = sharedRootPath;
 
-                if (options.TryGetValue(key, out var sharedModelsRelPath))
-                    modelsFullPath = Path.Combine(modelsFullPath, sharedModelsRelPath);
+                    if (options.TryGetValue(key, out var sharedModelsRelPath))
+                        modelsFullPath = Path.Combine(modelsFullPath, sharedModelsRelPath);
 
-                context.RegisterRefactoring(PreviewedCodeAction.Create(string.Format(item.Value.btn, typeDecl.Identifier.Text), (c, preview) => CreateSharedModel(sharedProj, typeDecl, modelsFullPath, sharedRootPath, context.Document, c, preview)));
+                    context.RegisterCodeFix(PreviewedCodeAction.Create(string.Format(item.Value.btn, typeDecl.Identifier.Text), (c, preview) => CreateSharedModel(sharedProj, typeDecl, modelsFullPath, sharedRootPath, context.Document, c, preview)), diag);
+                }
             }
         }
 
