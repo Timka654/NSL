@@ -25,7 +25,6 @@ namespace NSL.Refactoring.Shared
         protected override async Task<IEnumerable<CodeActionOperation>> ComputePreviewOperationsAsync(
             CancellationToken cancellationToken)
         {
-            const bool isPreview = true;
             // Content copied from http://sourceroslyn.io/#Microsoft.CodeAnalysis.Workspaces/CodeActions/CodeAction.cs,81b0a0866b894b0e,references
             var changedSolution = await Action(cancellationToken, true);
             if (changedSolution == null)

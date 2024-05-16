@@ -18,11 +18,13 @@
 		<PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="3.3.1" />
 	</ItemGroup>
 	<ItemGroup>
+		<Compile Remove="Templates\Entity\EntityItemModel.cs" />
 		<Compile Remove="Templates\Shared\ItemModel.Client.cs" />
 		<Compile Remove="Templates\Shared\ItemModel.cs" />
 		<Compile Remove="Templates\Shared\ItemModel.Server.cs" />
 	</ItemGroup>
 	<ItemGroup>
+		<EmbeddedResource Include="Templates\Entity\EntityItemModel.cs" />
 		<EmbeddedResource Include="Templates\Shared\ItemModel.Client.cs" />
 		<EmbeddedResource Include="Templates\Shared\ItemModel.cs" />
 		<EmbeddedResource Include="Templates\Shared\ItemModel.Server.cs" />

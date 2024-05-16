@@ -23,6 +23,7 @@
 			shared_request_models_rel_path? - request models path(has contains RequestModel in type name)
 			shared_response_models_rel_path? - response models path(has contains ResponseModel in type name)
 			shared_data_models_rel_path? - data models path(has contains DataModel in type name)
+			shared_entity_models_rel_path? - entity models path(has contains EntityModel in type name)
 			shared_models_rel_path? - models path(has contains Model in type name)
 		</Description>
 	</PropertyGroup>
