@@ -144,11 +144,56 @@ namespace NSL.Generators.SelectTypeGenerator
 
             var sMembers = new List<string>();
 
-            ReadMembers(members, sMembers, model, "x");
+            ReadMembers(members, sMembers, model, "___x");
 
             methods.Add(CreateMethod(type, sMembers, model, "IEnumerable").ToString());
             methods.Add(CreateMethod(type, sMembers, model, "IQueryable").ToString());
+            methods.Add(CreateMethod(type, sMembers, model).ToString());
 
+        }
+
+        private CodeBuilder CreateMethod(ITypeSymbol type, IEnumerable<string> sMembers, string model)
+        {
+            CodeBuilder methodBuilder = new CodeBuilder();
+
+            //methodBuilder.AppendLine($"{(declaration.HasInternalModifier() ? "internal" : "public")} {toType.Name} Select{model}Create()");
+
+            //methodBuilder.AppendLine("{");
+
+            //methodBuilder.NextTab();
+
+
+
+            //methodBuilder.PrevTab();
+
+            //methodBuilder.AppendLine("}");
+
+            //methodBuilder.AppendLine();
+
+            methodBuilder.AppendLine($"public static dynamic To{model}(this {type.GetTypeFullName()} ___x)");
+
+            methodBuilder.AppendLine("{");
+
+            methodBuilder.NextTab();
+
+            methodBuilder.AppendLine("return new {");
+
+            methodBuilder.NextTab();
+
+
+#pragma warning disable RS1035 // Не использовать API, запрещенные для анализаторов
+            methodBuilder.AppendLine(CombineMembers(sMembers));
+#pragma warning restore RS1035 // Не использовать API, запрещенные для анализаторов
+
+            methodBuilder.PrevTab();
+
+            methodBuilder.AppendLine("};");
+
+            methodBuilder.PrevTab();
+
+            methodBuilder.AppendLine("}");
+
+            return methodBuilder;
         }
 
         private CodeBuilder CreateMethod(ITypeSymbol type, IEnumerable<string> sMembers, string model, string collectionType)
@@ -169,13 +214,13 @@ namespace NSL.Generators.SelectTypeGenerator
 
             //methodBuilder.AppendLine();
 
-            methodBuilder.AppendLine($"public static {collectionType}<dynamic> Select{model}(this {collectionType}<{type.GetTypeFullName()}> toSelect)");
+            methodBuilder.AppendLine($"public static {collectionType}<dynamic> Select{model}(this {collectionType}<{type.GetTypeFullName()}> ___toSelect)");
 
             methodBuilder.AppendLine("{");
 
             methodBuilder.NextTab();
 
-            methodBuilder.AppendLine("return toSelect.Select(x=> new {");
+            methodBuilder.AppendLine("return ___toSelect.Select(___x=> new {");
 
             methodBuilder.NextTab();
 

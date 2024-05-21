@@ -1,26 +1,32 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
+	<PropertyGroup>
 		<TargetFramework>{TargetFramework}</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<RootNamespace>Shared.Combine.Library</RootNamespace>
-  </PropertyGroup>
+	</PropertyGroup>
 
-  <PropertyGroup>
+	<PropertyGroup>
 		<DefineConstants>$(DefineConstants);SERVER</DefineConstants>
-  </PropertyGroup>
+	</PropertyGroup>
 
-  <ItemGroup>
+	<ItemGroup>
 		<Compile Remove="artifacts\**" />
 		<Content Remove="artifacts\**" />
 		<EmbeddedResource Remove="artifacts\**" />
 		<None Remove="artifacts\**" />
-	
+
 		<Compile Remove="Client\**" />
 		<Content Remove="Client\**" />
 		<EmbeddedResource Remove="Client\**" />
 		<None Remove="Client\**" />
-  </ItemGroup>
+	</ItemGroup>
+	<!--Uncomment this for link appsettings in asp.net project-->
+	<!--<ItemGroup>
+		<Content Include="..\$BaseProject$\appsettings.Development.json" Link="appsettings.Development.json" Condition="'$(Configuration)'=='Debug'">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>-->
 
 </Project>

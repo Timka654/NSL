@@ -8,11 +8,15 @@ namespace NSL.Generators.FillTypeGenerator.Tests
     {
         static void Main(string[] args)
         {
+#if DEVELOP
             List<JoiningModel1> jList = new List<JoiningModel1>();
 
-            jList.SelectGet2();
+            var selectTest = jList.SelectGet2();
 
-#if !DEVELOP
+            JoiningModel1 n = new JoiningModel1();
+
+            var convertTest = n.ToGet2();
+#else
 
             List<ProxyModel1> pItems = new List<ProxyModel1>();
 
