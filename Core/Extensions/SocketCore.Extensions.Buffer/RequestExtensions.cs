@@ -69,7 +69,7 @@ namespace NSL.SocketCore.Extensions.Buffer
                 var result = packet.Invoke(client, data);
 
                 if (result != null)
-                    client.Network.Send(result);
+                    client.Send(result);
 
             });
         }
@@ -83,7 +83,7 @@ namespace NSL.SocketCore.Extensions.Buffer
                     var result = packet.Invoke(client, data, response);
 
                     if (result)
-                        client.Network.Send(response);
+                        client.Send(response);
                 }
             });
         }
@@ -95,7 +95,7 @@ namespace NSL.SocketCore.Extensions.Buffer
                 var result = await packet.Invoke(client, data);
 
                 if (result != null)
-                    client.Network.Send(result);
+                    client.Send(result);
 
             });
         }
@@ -109,7 +109,7 @@ namespace NSL.SocketCore.Extensions.Buffer
                     var result = await packet.Invoke(client, data, response);
 
                     if (result)
-                        client.Network.Send(response);
+                        client.Send(response);
                 }
             });
         }

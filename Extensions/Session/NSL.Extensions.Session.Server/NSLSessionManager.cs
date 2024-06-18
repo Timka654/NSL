@@ -202,7 +202,7 @@ namespace NSL.Extensions.Session.Server
             if (!sessionStorage.TryAdd(session, sessionInfo))
             {
                 if (replaceOnExists)
-                    sessionStorage.TryRemove(session, out _);
+                    sessionStorage[session] = sessionInfo;
                 else
                     return null;
             }
