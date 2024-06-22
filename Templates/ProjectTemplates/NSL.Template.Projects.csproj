@@ -23,7 +23,9 @@
 		<Version>$(VersionSuffix)</Version>
 		<Authors>Relife87</Authors>
 	</PropertyGroup>
+	
 	<ItemGroup>
+		<Compile Remove="content\**\*" />
 		<Content Include="content\**\*" />
 	</ItemGroup>
 
