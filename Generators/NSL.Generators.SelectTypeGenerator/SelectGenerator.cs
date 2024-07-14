@@ -48,6 +48,10 @@ namespace NSL.Generators.SelectTypeGenerator
 
             var typeSem = context.Compilation.GetSemanticModel(typeClass.SyntaxTree);
 
+            var typeSymb = typeSem.GetDeclaredSymbol(type) as ITypeSymbol;
+
+            var members = typeSymb.GetAllMembers();
+
             var classBuilder = new CodeBuilder();
 
             classBuilder.AppendComment(() =>
@@ -72,6 +76,12 @@ namespace NSL.Generators.SelectTypeGenerator
                 .Where(x => x.GetAttributeFullName().Equals(SelectGenerateAttributeFullName))
                 .ToArray();
 
+                var typeSelectModels = attrbs
+                .SelectMany(x => x.ArgumentList.Arguments.Select(n => n.GetAttributeParameterValue<string>(typeSem)))
+                .GroupBy(x => x)
+                .Select(x => x.Key)
+                .ToArray();
+
                 var joins = typeClass.AttributeLists
                 .SelectMany(x => x.Attributes)
                 .Where(x => x.GetAttributeFullName().Equals(SelectGenerateModelJoinAttributeFullName))
@@ -81,32 +91,25 @@ namespace NSL.Generators.SelectTypeGenerator
                 //GenDebug.Break();
 #endif
 
-                foreach (var attr in attrbs)
+                var methods = new List<string>();
+
+                foreach (var item in typeSelectModels)
                 {
-                    var typeSymb = typeSem.GetDeclaredSymbol(type) as ITypeSymbol;
+                    var mjoins = joins
+                    .Where(x => x.Arguments.First().GetAttributeParameterValue<string>(typeSem).Equals(item))
+                    .SelectMany(x => x.Arguments.Skip(1).Select(n => n.GetAttributeParameterValue<string>(typeSem)))
+                    .GroupBy(x => x)
+                    .Select(x => x.Key)
+                    .Append(item)
+                    .ToArray();
 
-                    var selectArgs = attr.ArgumentList.Arguments;
-
-                    string[] models = selectArgs.Select(x => x.GetAttributeParameterValue<string>(typeSem)).ToArray();
-
-                    var members = typeSymb.GetAllMembers();
-
-                    var methods = new List<string>();
-
-                    foreach (var item in models)
-                    {
-                        var mjoins = joins
-                        .Where(x => x.Arguments.First().GetAttributeParameterValue<string>(typeSem).Equals(item))
-                        .SelectMany(x => x.Arguments.Skip(1).Select(n => n.GetAttributeParameterValue<string>(typeSem)))
-                        .ToArray();
-
-                        CreateMethods(methods, typeSymb, FilterSymbols(members, item, mjoins), item);
-                    }
+                    CreateMethods(methods, typeSymb, FilterSymbols(members, mjoins), item);
+                }
 
 #pragma warning disable RS1035 // Do not use APIs banned for analyzers
-                    classBuilder.AppendLine(string.Join(Environment.NewLine + Environment.NewLine, methods));
+                classBuilder.AppendLine(string.Join(Environment.NewLine + Environment.NewLine, methods));
 #pragma warning restore RS1035 // Do not use APIs banned for analyzers
-                }
+
             }, namespaces, @namespace: "System.Linq");
 
             //GenDebug.Break();
@@ -121,19 +124,17 @@ namespace NSL.Generators.SelectTypeGenerator
             context.AddSource($"{typeClass.GetTypeClassName()}.selectgen.cs", classBuilder.ToString());
         }
 
-        private IEnumerable<ISymbol> FilterSymbols(IEnumerable<ISymbol> symbols, string model, IEnumerable<string> joinedArr)
+        private IEnumerable<ISymbol> FilterSymbols(IEnumerable<ISymbol> symbols, IEnumerable<string> joinedArr)
             => symbols.Where(x =>
          {
-             var a = x.GetAttributes().FirstOrDefault(n => n.AttributeClass.Name == SelectGenerateIncludeAttributeFullName);
+             var a = x
+             .GetAttributes()
+             .Where(n => n.AttributeClass.Name == SelectGenerateIncludeAttributeFullName)
+             .SelectMany(b => b.ConstructorArguments)
+             .SelectMany(b => b.Values)
+             .ToArray();
 
-             if (a == null)
-                 return false;
-
-             if (a.ConstructorArguments.SelectMany(n => n.Values).Any(n =>
-             {
-                 var m = (n.Value as string);
-                 return m.Equals(model) || joinedArr.Contains(m);
-             }))
+             if (a.Any(n => joinedArr.Contains(n.Value as string)))
                  return true;
 
              return false;
@@ -373,7 +374,7 @@ namespace NSL.Generators.SelectTypeGenerator
 
                     //joined = GetJoinModels(arrt.ElementType, itemModel);
 
-                    var amembers = FilterSymbols(arrt.ElementType.GetAllMembers(), itemModel, Enumerable.Empty<string>());
+                    var amembers = FilterSymbols(arrt.ElementType.GetAllMembers(), Enumerable.Repeat( itemModel,1));
 
                     ReadCollection(sMembers, item, amembers, model, itemModel, path);
 
@@ -387,7 +388,7 @@ namespace NSL.Generators.SelectTypeGenerator
 
                     //joined = GetJoinModels(pType, itemModel);
 
-                    var amembers = FilterSymbols(pType.GetAllMembers(), itemModel, Enumerable.Empty<string>());
+                    var amembers = FilterSymbols(pType.GetAllMembers(), Enumerable.Repeat(itemModel,1));
 
                     ReadCollection(sMembers, item, amembers, model, itemModel, path);
 
@@ -399,7 +400,7 @@ namespace NSL.Generators.SelectTypeGenerator
 
                 //joined = GetJoinModels(item.ContainingType, itemModel);
 
-                var memMembers = FilterSymbols(memberType.GetAllMembers(), itemModel, Enumerable.Empty<string>());
+                var memMembers = FilterSymbols(memberType.GetAllMembers(), Enumerable.Repeat(itemModel, 1));
 
                 //if (item.Name.StartsWith("AbcModel1"))
                 //{

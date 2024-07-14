@@ -11,6 +11,7 @@ using System.Reflection;
 
 namespace NSL.Generators.FillTypeGenerator
 {
+
     [Generator]
     internal class FillTypeGenerator : ISourceGenerator
     {
@@ -53,6 +54,8 @@ namespace NSL.Generators.FillTypeGenerator
 
             var typeSem = context.Compilation.GetSemanticModel(typeClass.SyntaxTree);
 
+            var typeSymb = typeSem.GetDeclaredSymbol(type) as ITypeSymbol;
+
             var classBuilder = new CodeBuilder();
 
             classBuilder.AppendComment(() =>
@@ -67,28 +70,31 @@ namespace NSL.Generators.FillTypeGenerator
                 .Where(x => x.GetAttributeFullName().Equals(FillTypeGenerateAttributeFullName))
                 .ToArray();
 
-                foreach (var attr in attrbs)
+                var attrbsGrouped = attrbs.GroupBy(x => x.ArgumentList.Arguments.First().GetAttributeTypeParameterValueSymbol(typeSem), TypeSymbolEqualityComparer.Instance);
+
+
+                foreach (var attr in attrbsGrouped)
                 {
-                    //GenDebug.Break();
+                    var haveAll = attr.Any(x => x.ArgumentList.Arguments.Count() == 1);
 
-                    var typeSymb = typeSem.GetDeclaredSymbol(type) as ITypeSymbol;
+                    var models = attr.SelectMany(x => x.ArgumentList.Arguments
+                        .Skip(1)
+                        .Select(n=>n.GetAttributeParameterValue<string>(typeSem)))
+                    .GroupBy(x => x)
+                    .Select(x => x.Key)
+                    .ToArray();
 
-                    var fillArgs = attr.ArgumentList.Arguments;
+                    if (models.Contains(null))
+                        haveAll = false;
 
-                    var toType = fillArgs.First().GetAttributeTypeParameterValueSymbol(typeSem);
-
-                    string[] models = null;
-
-                    if (fillArgs.Count > 1)
-                    {
-                        models = fillArgs.Skip(1).Select(x => x.GetAttributeParameterValue<string>(typeSem)).ToArray();
-                    }
+                    var toType = attr.Key;
 
                     var declaration = toType.DeclaringSyntaxReferences.First().GetSyntax() as TypeDeclarationSyntax;
 
-                    if (models == null)
+                    if (haveAll)
                         classBuilder.AppendLine(CreateMethod(declaration, typeSymb, toType, null).ToString());
-                    else
+
+                    if (models.Any())
                     {
                         var methods = new List<string>();
 

@@ -356,15 +356,27 @@ namespace NSL.Generators.HttpEndPointGenerator
                 }
                 else if (item.GetTypeSymbol().Name.Equals(IFormFileCollectionFullName))
                 {
-                    methodBuilder.AppendLine($"foreach(var ____item in {endPath.Replace(".","__")})");
+                    var fakePath = endPath.Replace(".", "__");
+
+                    methodBuilder.AppendLine($"if ({fakePath} != null)");
                     methodBuilder.AppendBodyTabContent(() =>
                     {
-                        methodBuilder.AppendLine($"____content.Add(StreamHttpContent.Create(____item.Stream), \"{formNameValue ?? endPath}\", ____item.FileName);");
+                        methodBuilder.AppendLine($"foreach(var ____item in {fakePath})");
+                        methodBuilder.AppendBodyTabContent(() =>
+                        {
+                            methodBuilder.AppendLine($"____content.Add(StreamHttpContent.Create(____item.Stream), \"{formNameValue ?? endPath}\", ____item.FileName);");
+                        });
                     });
                 }
                 else if (item.GetTypeSymbol().Name.Equals(IFormFileFullName))
                 {
-                    methodBuilder.AppendLine($"____content.Add(StreamHttpContent.Create({endPath.Replace(".", "__")}.Stream), \"{formNameValue ?? endPath}\", {endPath.Replace(".", "__")}.FileName);");
+                    var fakePath = endPath.Replace(".", "__");
+
+                    methodBuilder.AppendLine($"if ({fakePath} != null)");
+                    methodBuilder.AppendBodyTabContent(() =>
+                    {
+                        methodBuilder.AppendLine($"____content.Add(StreamHttpContent.Create({fakePath}.Stream), \"{formNameValue ?? endPath}\", {fakePath}.FileName);");
+                    });
                 }
                 else if (itemAttrbs.Any(x => x.AttributeClass.Name.Equals(ParameterAttributeFullName)))
                 {

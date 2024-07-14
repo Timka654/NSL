@@ -11,6 +11,13 @@
 
             tmodel1.FillTo(tmodel2);
 #endif
+
+            Test6Model model5 = new Test6Model();
+            Test6Model model6 = new Test6Model();
+            Test7Model model7 = new Test7Model();
+
+            model7.Filla1To(model6);
+            model7.FillTo(model6);
         }
     }
 }
