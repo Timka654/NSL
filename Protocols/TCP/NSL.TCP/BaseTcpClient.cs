@@ -170,6 +170,7 @@ namespace NSL.TCP
                 }
                 sclient.BeginReceive(receiveBuffer, offset, lenght - offset, SocketFlags.None, Receive, sclient);
             }
+            catch (NullReferenceException) { } // on disconnected client
             catch (ConnectionLostException clex)
             {
                 Disconnect(clex);

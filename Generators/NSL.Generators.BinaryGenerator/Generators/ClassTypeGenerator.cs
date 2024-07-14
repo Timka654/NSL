@@ -26,7 +26,7 @@ namespace NSL.Generators.BinaryGenerator.Generators
 
             rb.AppendLine();
 
-            rb.AppendLine($"var {path} = new {type.Name}();");
+            rb.AppendLine($"var {path} = new {type.GetTypeFullName(false)}();");
 
             rb.AppendLine();
 

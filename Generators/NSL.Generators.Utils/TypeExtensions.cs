@@ -27,8 +27,15 @@ namespace NSL.Generators.Utils
         public static string[] GetTypeGenericParameters(this ClassDeclarationSyntax c)
             => c.TypeParameterList?.Parameters.Select(x => x.Identifier.Text).ToArray();
 
-        public static string GetTypeFullName(this ITypeSymbol type)
-            => type.ToString();
+        public static string GetTypeFullName(this ITypeSymbol type, bool canNullable = true)
+        {
+            var t = type.ToString();
+
+            if (!canNullable)
+                t = t.TrimEnd('?');
+
+            return t;
+        }
 
         public static ISymbol[] GetAllMembers(this ITypeSymbol type)
         {
