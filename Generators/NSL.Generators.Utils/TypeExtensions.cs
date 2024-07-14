@@ -54,4 +54,17 @@ namespace NSL.Generators.Utils
         }
 
     }
+    public class TypeSymbolEqualityComparer : IEqualityComparer<ITypeSymbol>
+    {
+        public static TypeSymbolEqualityComparer Instance { get; } = new TypeSymbolEqualityComparer();
+        public bool Equals(ITypeSymbol x, ITypeSymbol y)
+        {
+            return x.Equals(y);
+        }
+
+        public int GetHashCode(ITypeSymbol obj)
+        {
+            return obj.GetHashCode();
+        }
+    }
 }

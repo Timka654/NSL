@@ -54,7 +54,7 @@ namespace NSL.HttpClient
                 var content = await response.Content.ReadAsStringAsync();
 
                 if (!string.IsNullOrWhiteSpace(content))
-                    result = JsonSerializer.Deserialize<TResult>(content, JsonHttpContent.BuildJsonOptions(options?.JsonOptions));
+                    result = JsonSerializer.Deserialize<TResult>(content, options?.JsonOptions ?? JsonHttpContent.BuildJsonOptions(null));
                 else
                     result = new TResult();
 
