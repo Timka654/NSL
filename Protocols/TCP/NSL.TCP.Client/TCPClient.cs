@@ -4,6 +4,7 @@ using NSL.SocketCore.Utils;
 using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
+using System.Threading;
 
 namespace NSL.TCP.Client
 {
@@ -46,6 +47,8 @@ namespace NSL.TCP.Client
             this.inputCipher = ConnectionOptions.InputCipher.CreateEntry();
             //установка криптографии для шифровки исходящих данных, указана в общих настройках сервера
             this.outputCipher = ConnectionOptions.OutputCipher.CreateEntry();
+
+            _sendLocker = outputCipher.Sync() ? new AutoResetEvent(true) : null;
 
             //Bug fix, в системе Windows это значение берется из реестра, мы не сможем принять больше за раз чем прописанно в нем, если данных будет больше, то цикл зависнет
             sclient.ReceiveBufferSize = ConnectionOptions.ReceiveBufferSize;

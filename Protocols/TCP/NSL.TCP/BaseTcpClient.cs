@@ -201,7 +201,7 @@ namespace NSL.TCP
         public void Send(byte[] buffer)
             => Send(buffer, 0, buffer.Length);
 
-        protected AutoResetEvent _sendLocker = new AutoResetEvent(true);
+        protected AutoResetEvent _sendLocker;
 
         /// <summary>
         /// Отправка массива байт
@@ -211,16 +211,24 @@ namespace NSL.TCP
         /// <param name="lenght">размер передаваемых данных</param>
         public void Send(byte[] buf, int offset, int lenght)
         {
-            _sendLocker.WaitOne();
 
             try
             {
+                _sendLocker?.WaitOne();
                 //шифруем данные
                 byte[] sndBuffer = outputCipher.Encode(buf, offset, lenght);
 
                 //начинаем отправку данных
                 if (sclient != null)
                     sclient.BeginSend(sndBuffer, 0, lenght, SocketFlags.None, EndSend, new SendAsyncState { buf = buf, offset = offset, len = lenght });
+            }
+            catch (NullReferenceException ex)
+            {
+                Data?.OnPacketSendFail(buf, offset, lenght);
+            }
+            catch (ObjectDisposedException ex)
+            {
+                Data?.OnPacketSendFail(buf, offset, lenght);
             }
             catch (Exception ex)
             {
@@ -229,7 +237,7 @@ namespace NSL.TCP
             }
             finally
             {
-                _sendLocker.Set();
+                _sendLocker?.Set();
             }
         }
 
@@ -302,6 +310,12 @@ namespace NSL.TCP
 
             if (outputCipher != null)
                 outputCipher.Dispose();
+
+            var sl = _sendLocker;
+            
+            _sendLocker = default;
+            
+            sl?.Dispose();
 
             //проверяем возможно клиент и не был инициализирован, в случае дос атак, такое возможно
             if (sclient != null)

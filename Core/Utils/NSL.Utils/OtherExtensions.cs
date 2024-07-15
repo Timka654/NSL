@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reflection;
+using System.Threading.Tasks;
 
 namespace NSL.Utils
 {
@@ -12,5 +13,8 @@ namespace NSL.Utils
                 .AddDays(version.Build).AddSeconds(version.Revision * 2);
             return $"{version} ({buildDate})";
         }
+
+        public static async void RunAsync(this Task task)
+            => await task;
     }
 }
