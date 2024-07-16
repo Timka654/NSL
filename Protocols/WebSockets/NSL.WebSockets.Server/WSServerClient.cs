@@ -3,6 +3,7 @@ using NSL.SocketServer;
 using NSL.SocketServer.Utils;
 using System;
 using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace NSL.WebSockets.Server
@@ -57,6 +58,8 @@ namespace NSL.WebSockets.Server
             inputCipher = options.InputCipher.CreateEntry();
             //установка криптографии для шифровки исходящих данных, указана в общих настройках сервера
             outputCipher = options.OutputCipher.CreateEntry();
+
+            _sendLocker = outputCipher.Sync() ? new AutoResetEvent(true) : null;
 
             disconnected = false;
 

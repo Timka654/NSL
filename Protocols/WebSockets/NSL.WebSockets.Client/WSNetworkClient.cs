@@ -78,11 +78,20 @@ namespace NSL.WebSockets.Client
         {
             client = CreateWS();
 
-            CancellationTokenSource cts = new CancellationTokenSource();
+            try
+            {
+                CancellationTokenSource cts = new CancellationTokenSource();
 
-            cts.CancelAfter(connectionTimeOut);
+                cts.CancelAfter(connectionTimeOut);
 
-            await ConnectAsync(ConnectionOptions.EndPoint, cts.Token);
+                await ConnectAsync(ConnectionOptions.EndPoint, cts.Token);
+            }
+            catch (TaskCanceledException)
+            {
+                Release();
+                ConnectionOptions.RunClientDisconnect();
+                return false;
+            }
 
             return ProcessState(client.State);
         }
@@ -104,6 +113,8 @@ namespace NSL.WebSockets.Client
                 Reconnect(client, Options.EndPoint);
                 return true;
             }
+
+            Release();
 
             ConnectionOptions.RunClientDisconnect();
 

@@ -211,10 +211,10 @@ namespace NSL.TCP
         /// <param name="lenght">размер передаваемых данных</param>
         public void Send(byte[] buf, int offset, int lenght)
         {
-
+            var sl = _sendLocker;
             try
             {
-                _sendLocker?.WaitOne();
+                sl?.WaitOne();
                 //шифруем данные
                 byte[] sndBuffer = outputCipher.Encode(buf, offset, lenght);
 
@@ -222,13 +222,20 @@ namespace NSL.TCP
                 if (sclient != null)
                     sclient.BeginSend(sndBuffer, 0, lenght, SocketFlags.None, EndSend, new SendAsyncState { buf = buf, offset = offset, len = lenght });
             }
+            catch (SocketException ex)
+            {
+                Data?.OnPacketSendFail(buf, offset, lenght);
+                Disconnect();
+            }
             catch (NullReferenceException ex)
             {
                 Data?.OnPacketSendFail(buf, offset, lenght);
+                Disconnect();
             }
             catch (ObjectDisposedException ex)
             {
                 Data?.OnPacketSendFail(buf, offset, lenght);
+                Disconnect();
             }
             catch (Exception ex)
             {
@@ -237,7 +244,7 @@ namespace NSL.TCP
             }
             finally
             {
-                _sendLocker?.Set();
+                sl?.Set();
             }
         }
 

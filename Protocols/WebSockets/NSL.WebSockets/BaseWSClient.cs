@@ -232,7 +232,7 @@ namespace NSL.WebSockets
         public void Send(byte[] buffer)
             => Send(buffer, 0, buffer.Length);
 
-        protected AutoResetEvent _sendLocker = new AutoResetEvent(true);
+        protected AutoResetEvent _sendLocker;
 
         /// <summary>
         /// Отправка массива байт
@@ -242,10 +242,11 @@ namespace NSL.WebSockets
         /// <param name="lenght">размер передаваемых данных</param>
         public void Send(byte[] buf, int offset, int lenght)
         {
-            _sendLocker.WaitOne();
-
+            var sl = _sendLocker;
             try
             {
+                sl?.WaitOne();
+
                 //шифруем данные
                 byte[] sndBuffer = outputCipher.Encode(buf, offset, lenght);
 
@@ -260,7 +261,7 @@ namespace NSL.WebSockets
             }
             finally
             {
-                _sendLocker.Set();
+                sl?.Set();
             }
 
         }

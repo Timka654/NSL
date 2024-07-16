@@ -50,12 +50,11 @@ namespace NSL.TCP.Client
 
             _sendLocker = outputCipher.Sync() ? new AutoResetEvent(true) : null;
 
-            //Bug fix, в системе Windows это значение берется из реестра, мы не сможем принять больше за раз чем прописанно в нем, если данных будет больше, то цикл зависнет
             sclient.ReceiveBufferSize = ConnectionOptions.ReceiveBufferSize;
 
-            //Bug fix, отключение буфферизации пакетов для уменьшения трафика, если не отключить то получим фризы, в случае с игровым соединением эту опцию обычно нужно отключать
             sclient.NoDelay = true;
-            _sendLocker.Set();
+
+            _sendLocker?.Set();
 
             RunReceive();
 
