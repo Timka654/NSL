@@ -252,7 +252,46 @@ namespace NSL.WebSockets
 
                 //начинаем отправку данных
                 if (sclient != null)
-                    sclient.SendAsync(new ArraySegment<byte>(sndBuffer, offset, lenght), WebSocketMessageType.Binary, true, CancellationToken.None);
+                    sclient.SendAsync(new ArraySegment<byte>(sndBuffer, offset, lenght), WebSocketMessageType.Binary, true, CancellationToken.None).ContinueWith(t =>
+                    {
+                        if (t.Exception == null && !t.IsFaulted)
+                            return;
+
+                        Exception ex = null;
+
+                        if (t.Exception != null)
+                        {
+                            if (t.Exception.InnerException is WebSocketException
+                            || t.Exception.InnerException is TaskCanceledException
+                            || t.Exception.InnerException is OperationCanceledException)
+                            {
+
+                            }
+                            else
+                            {
+                                ex = t.Exception.InnerException ?? t.Exception; // dev collect exceptions
+                            }
+                        }
+
+                        Data?.OnPacketSendFail(buf, offset, lenght);
+
+                        if(ex != null)
+                            RunException(ex);
+
+                        Disconnect();
+                    });
+                else
+                    Data?.OnPacketSendFail(buf, offset, lenght);
+            }
+            catch (NullReferenceException ex)
+            {
+                Data?.OnPacketSendFail(buf, offset, lenght);
+                Disconnect();
+            }
+            catch (ObjectDisposedException ex)
+            {
+                Data?.OnPacketSendFail(buf, offset, lenght);
+                Disconnect();
             }
             catch (Exception ex)
             {

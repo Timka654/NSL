@@ -221,6 +221,8 @@ namespace NSL.TCP
                 //начинаем отправку данных
                 if (sclient != null)
                     sclient.BeginSend(sndBuffer, 0, lenght, SocketFlags.None, EndSend, new SendAsyncState { buf = buf, offset = offset, len = lenght });
+                else
+                    Data?.OnPacketSendFail(buf, offset, lenght);
             }
             catch (SocketException ex)
             {
@@ -271,6 +273,8 @@ namespace NSL.TCP
             }
             catch
             {
+                var sas = ((SendAsyncState)r.AsyncState);
+                Data?.OnPacketSendFail(sas.buf, sas.offset, sas.len);
                 Disconnect();
             }
         }
