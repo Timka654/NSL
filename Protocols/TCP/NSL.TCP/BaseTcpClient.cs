@@ -5,8 +5,10 @@ using NSL.SocketCore.Utils.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Net;
+using System.Net.Http.Headers;
 using System.Net.Sockets;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace NSL.TCP
 {
@@ -171,6 +173,10 @@ namespace NSL.TCP
                 sclient.BeginReceive(receiveBuffer, offset, lenght - offset, SocketFlags.None, Receive, sclient);
             }
             catch (NullReferenceException) { } // on disconnected client
+            catch (SocketException ex)
+            {
+                Disconnect();
+            }
             catch (ConnectionLostException clex)
             {
                 Disconnect(clex);
@@ -198,8 +204,8 @@ namespace NSL.TCP
             packet.Send(this, disposeOnSend);
         }
 
-        public void Send(byte[] buffer)
-            => Send(buffer, 0, buffer.Length);
+        public async void Send(byte[] buffer)
+            => await send(buffer, 0, buffer.Length);
 
         protected AutoResetEvent _sendLocker;
 
@@ -209,8 +215,17 @@ namespace NSL.TCP
         /// <param name="buf">массив байт</param>
         /// <param name="offset">смещение с которого начинается передача</param>
         /// <param name="lenght">размер передаваемых данных</param>
-        public void Send(byte[] buf, int offset, int lenght)
+        public async void Send(byte[] buf, int offset, int lenght)
         {
+            await send(buf, offset, lenght);
+        }
+
+        private async Task send(byte[] buf, int offset, int lenght)
+        {
+            CancellationTokenSource cts = new CancellationTokenSource();
+
+            cts.CancelAfter(8_000);
+
             var sl = _sendLocker;
             try
             {
@@ -220,9 +235,30 @@ namespace NSL.TCP
 
                 //начинаем отправку данных
                 if (sclient != null)
-                    sclient.BeginSend(sndBuffer, 0, lenght, SocketFlags.None, EndSend, new SendAsyncState { buf = buf, offset = offset, len = lenght });
+                {
+                    var offs = 0;
+
+                    do
+                    {
+                        var len = await sclient.SendAsync(sndBuffer[offs..], SocketFlags.None, cts.Token);
+                        if (len < 0)
+                        {
+                            Data?.OnPacketSendFail(buf, offset, lenght);
+                            Disconnect();
+                            return;
+                        }
+                        
+                        offs += len;
+
+                    } while (offs < sndBuffer.Length);
+                }
                 else
                     Data?.OnPacketSendFail(buf, offset, lenght);
+            }
+            catch (OperationCanceledException ex)
+            {
+                Data?.OnPacketSendFail(buf, offset, lenght);
+                Disconnect();
             }
             catch (SocketException ex)
             {
@@ -250,34 +286,59 @@ namespace NSL.TCP
             }
         }
 
-        /// <summary>
-        /// Завершение отправки данных
-        /// </summary>
-        /// <param name="r"></param>
-        private void EndSend(IAsyncResult r)
-        {
-            //замыкаем это все в блок try, если клиент отключился то EndSend может вернуть ошибку
-            try
-            {
-                //получаем размер переданных данных
-                int len = sclient?.EndSend(r) ?? 0;
-                //при некоторых ошибках размер возвращает 0 или -1, проверяем
-                if (len < 1)
-                    throw new ConnectionLostException(GetRemotePoint(), false);
-            }
-            catch (Exception ex)
-            {
-                var sas = ((SendAsyncState)r.AsyncState);
-                Data?.OnPacketSendFail(sas.buf, sas.offset, sas.len);
-                Disconnect(ex);
-            }
-            catch
-            {
-                var sas = ((SendAsyncState)r.AsyncState);
-                Data?.OnPacketSendFail(sas.buf, sas.offset, sas.len);
-                Disconnect();
-            }
-        }
+        ///// <summary>
+        ///// Завершение отправки данных
+        ///// </summary>
+        ///// <param name="r"></param>
+        //private void EndSend(IAsyncResult r)
+        //{
+        //    //замыкаем это все в блок try, если клиент отключился то EndSend может вернуть ошибку
+        //    try
+        //    {
+        //        //получаем размер переданных данных
+        //        int len = sclient?.EndSend(r) ?? 0;
+        //        //при некоторых ошибках размер возвращает 0 или -1, проверяем
+        //        if (len < 1)
+        //        {
+        //            var sas = ((SendAsyncState)r.AsyncState);
+        //            Data?.OnPacketSendFail(sas.buf, sas.offset, sas.len);
+        //            Disconnect();
+        //        }
+        //    }
+        //    catch (SocketException ex)
+        //    {
+
+        //        var sas = ((SendAsyncState)r.AsyncState);
+        //        Data?.OnPacketSendFail(sas.buf, sas.offset, sas.len);
+        //        Disconnect();
+        //    }
+        //    catch (NullReferenceException ex)
+        //    {
+
+        //        var sas = ((SendAsyncState)r.AsyncState);
+        //        Data?.OnPacketSendFail(sas.buf, sas.offset, sas.len);
+        //        Disconnect();
+        //    }
+        //    catch (ObjectDisposedException ex)
+        //    {
+
+        //        var sas = ((SendAsyncState)r.AsyncState);
+        //        Data?.OnPacketSendFail(sas.buf, sas.offset, sas.len);
+        //        Disconnect();
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        var sas = ((SendAsyncState)r.AsyncState);
+        //        Data?.OnPacketSendFail(sas.buf, sas.offset, sas.len);
+        //        Disconnect(ex);
+        //    }
+        //    catch
+        //    {
+        //        var sas = ((SendAsyncState)r.AsyncState);
+        //        Data?.OnPacketSendFail(sas.buf, sas.offset, sas.len);
+        //        Disconnect();
+        //    }
+        //}
 
         public void SendEmpty(ushort packetId)
         {
@@ -323,9 +384,9 @@ namespace NSL.TCP
                 outputCipher.Dispose();
 
             var sl = _sendLocker;
-            
+
             _sendLocker = default;
-            
+
             sl?.Dispose();
 
             //проверяем возможно клиент и не был инициализирован, в случае дос атак, такое возможно

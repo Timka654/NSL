@@ -69,22 +69,29 @@ namespace NSL.SocketCore.Utils
 
         }
 
-        public virtual void Send(OutputPacketBuffer packet)
+        public virtual void Send(OutputPacketBuffer packet, bool disposeOnSend = true)
         {
-            Network?.Send(packet);
+            var _network = Network;
 
-            if (Network == null)
+            _network?.Send(packet, disposeOnSend);
+
+            if (_network == null)
             {
                 var buf = packet.CompilePacket();
+
+                if (disposeOnSend) packet.Dispose();
+
                 OnPacketSendFail(buf, 0, buf.Length);
             }
         }
 
         public virtual void Send(byte[] buf, int offset, int len)
         {
-            Network?.Send(buf, offset, len);
+            var _network = Network;
 
-            if (Network == null)
+            _network?.Send(buf, offset, len);
+
+            if (_network == null)
             {
                 OnPacketSendFail(buf, offset, len);
             }

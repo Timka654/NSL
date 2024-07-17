@@ -3,6 +3,7 @@ using NSL.SocketCore.Utils;
 using NSL.SocketCore.Utils.Buffer;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -48,25 +49,25 @@ namespace NSL.SocketCore.Extensions.Buffer
         {
             Guid rid = default;
 
-            do
-            {
-                rid = Guid.NewGuid();
-            } while (!TryAdd(rid, (input) =>
+            Action<InputPacketBuffer> action = (input) =>
             {
                 if (onResponse(input))
                     input?.Dispose();
+
                 lock (this)
                 {
                     requests.Remove(rid);
                 }
-            }));
+            };
+
+            do
+            {
+                rid = Guid.NewGuid();
+            } while (!TryAdd(rid, action));
 
             buffer.WithRecvIdentity(rid);
 
-            client.Network?.Send(buffer, disposeOnSend);
-
-            if (client.Network == null)
-                return default;
+            client.Send(buffer, disposeOnSend);
 
             return rid;
         }
@@ -81,7 +82,9 @@ namespace NSL.SocketCore.Extensions.Buffer
             Guid rid = default;
             try
             {
-                using (ManualResetEvent locker = new ManualResetEvent(false))
+                //var now = DateTime.UtcNow;
+
+                using (ManualResetEventSlim locker = new ManualResetEventSlim(false))
                 {
                     rid = SendRequest(buffer, input =>
                     {
@@ -90,10 +93,12 @@ namespace NSL.SocketCore.Extensions.Buffer
                         return false;
                     }, disposeOnSend);
 
-                    while (requests.ContainsKey(rid) && !await Task.Run(() => locker.WaitOne(100), cancellationToken)) { cancellationToken.ThrowIfCancellationRequested(); }
+                    await Task.Run(() => locker.Wait());
+
+                    //Debug.LogError($"Request time - {(DateTime.UtcNow - now).TotalMilliseconds}ms");
                 }
 
-                if(await onResult(data))
+                if (await onResult(data))
                     data?.Dispose();
             }
             catch (TaskCanceledException) { }
@@ -159,7 +164,6 @@ namespace NSL.SocketCore.Extensions.Buffer
             {
             }
         }
-
     }
 
 }
