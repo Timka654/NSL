@@ -49,6 +49,8 @@ namespace NSL.Generators.BinaryGenerator
             if (context.IsIgnore(member, path))
                 return;
 
+            context.OpenTypeEntry(member, path);
+
             if (member is IPropertySymbol ps)
             {
                 if (ps.GetMethod != null)
@@ -65,6 +67,8 @@ namespace NSL.Generators.BinaryGenerator
                 cb.AppendLine(BuildParameterWriter(ftype, context, path));
                 cb.AppendLine();
             }
+
+            context.CloseTypeEntry(member, path);
         }
     }
 }

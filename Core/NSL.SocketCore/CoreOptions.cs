@@ -2,6 +2,7 @@
 using NSL.SocketCore.Utils.Buffer;
 using NSL.SocketCore.Utils.Cipher;
 using NSL.SocketCore.Utils.Logger;
+using NSL.Utils;
 using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
@@ -120,7 +121,24 @@ namespace NSL.SocketCore
         }
 
         public bool AddAsyncHandle(ushort packetId, AsyncPacketHandle handle)
-            => AddHandle(packetId, (client, input) => handle(client, input).Wait());
+            => AddHandle(packetId, (client, input) =>
+            {
+                input.ManualDisposing = true;
+                Task.Run(async () =>
+                    {
+                        try
+                        {
+                            await handle(client, input);
+                        }
+                        catch (Exception ex)
+                        {
+                            CallExceptionEvent(ex, client);
+                        }
+
+                        if (input.AsyncDisposing)
+                            input.Dispose();
+                    });
+            });
 
         public IPacket<TClient> GetPacket(ushort packetId)
         {
@@ -175,31 +193,31 @@ namespace NSL.SocketCore
         /// <summary>
         /// События вызываемое при получении ошибки
         /// </summary>
-        public event ExceptionHandle OnExceptionEvent;
+        public event ExceptionHandle OnExceptionEvent = (ex, client) => { };
 
         /// <summary>
         /// Событие вызываемое при подключении клиента
         /// </summary>
-        public event ClientConnect OnClientConnectEvent;
-        public event ClientConnectAsync OnClientConnectAsyncEvent;
+        public event ClientConnect OnClientConnectEvent = (client) => { };
+        public event ClientConnectAsync OnClientConnectAsyncEvent = client => Task.CompletedTask;
 
         /// <summary>
         /// Событие вызываемое при отключении клиента
         /// </summary>
-        public event ClientDisconnect OnClientDisconnectEvent;
-        public event ClientDisconnectAsync OnClientDisconnectAsyncEvent;
+        public event ClientDisconnect OnClientDisconnectEvent = (client) => { };
+        public event ClientDisconnectAsync OnClientDisconnectAsyncEvent = client => Task.CompletedTask;
 
-        public event ReceivePacketHandle OnReceivePacket;
-        public event SendPacketHandle OnSendPacket;
+        public event ReceivePacketHandle OnReceivePacket = (c, p, i) => { };
+        public event SendPacketHandle OnSendPacket = (c, p, i, stack) => { };
 
         public void CallReceivePacketEvent(TClient client, ushort pid, int len)
         {
-            OnReceivePacket?.Invoke(client, pid, len);
+            OnReceivePacket(client, pid, len);
         }
 
         public void CallSendPacketEvent(TClient client, ushort pid, int len, string stackTrace)
         {
-            OnSendPacket?.Invoke(client, pid, len,stackTrace);
+            OnSendPacket(client, pid, len, stackTrace);
         }
 
         /// <summary>
@@ -207,7 +225,7 @@ namespace NSL.SocketCore
         /// </summary>
         public void CallExceptionEvent(Exception ex, TClient client)
         {
-            OnExceptionEvent?.Invoke(ex, client);
+            OnExceptionEvent(ex, client);
         }
 
         /// <summary>
@@ -216,14 +234,9 @@ namespace NSL.SocketCore
         /// <param name="client"></param>
         public void CallClientConnectEvent(TClient client)
         {
-            OnClientConnectEvent?.Invoke(client);
+            OnClientConnectEvent(client);
 
-            if (OnClientConnectAsyncEvent != null)
-            {
-                var r = OnClientConnectAsyncEvent.Invoke(client);
-
-                r.Wait();
-            }
+            Task.Run(() => OnClientConnectAsyncEvent.InvokeAsync(t => t(client)));
         }
 
         /// <summary>
@@ -239,10 +252,7 @@ namespace NSL.SocketCore
 
             OnClientDisconnectEvent?.Invoke(client);
 
-            if (OnClientDisconnectAsyncEvent != null)
-            {
-                Task.Run(() => OnClientDisconnectAsyncEvent(client)).Wait();
-            }
+            Task.Run(() => OnClientDisconnectAsyncEvent.InvokeAsync(t => t(client)));
         }
     }
 }

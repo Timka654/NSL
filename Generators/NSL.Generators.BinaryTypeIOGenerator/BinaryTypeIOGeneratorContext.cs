@@ -1,6 +1,7 @@
 ﻿using Microsoft.CodeAnalysis;
 using NSL.Generators.BinaryGenerator;
 using NSL.Generators.BinaryTypeIOGenerator.Attributes;
+using System;
 using System.Linq;
 
 namespace NSL.Generators.BinaryTypeIOGenerator
@@ -15,6 +16,13 @@ namespace NSL.Generators.BinaryTypeIOGenerator
         public string WriteCurrentTypeMethodName { get; set; } = default;
 
         public bool IsStatic { get; set; } = false;
+
+        public Func<string, bool> ModelSelector { get; set; }
+
+        public BinaryTypeIOGeneratorContext()
+        {
+            ModelSelector = mname => string.Equals(For, mname);
+        }
 
         public override bool IsIgnore(ISymbol symbol, string path)
         {

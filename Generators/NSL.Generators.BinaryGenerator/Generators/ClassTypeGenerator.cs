@@ -44,9 +44,6 @@ namespace NSL.Generators.BinaryGenerator.Generators
                 {
                     var fpath = string.Join(".", path, member.Name);
 
-                    if (context.IsIgnore(member, fpath))
-                        continue;
-
                     BinaryReadMethodsGenerator.AddTypeMemberReadLine(member, context, rb, fpath);
                 }
 
@@ -90,9 +87,6 @@ namespace NSL.Generators.BinaryGenerator.Generators
                 foreach (var member in members)
                 {
                     var fpath = string.Join(".", path, member.Name);
-
-                    if (context.IsIgnore(member, fpath))
-                        continue;
 
                     BinaryWriteMethodsGenerator.AddTypeMemberWriteLine(member, context, cb, fpath);
                 }

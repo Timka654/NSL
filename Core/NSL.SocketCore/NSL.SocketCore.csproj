@@ -31,4 +31,8 @@
 		<AssemblyName>Unity.$(MSBuildProjectName)</AssemblyName>
 	</PropertyGroup>
 
+	<ItemGroup>
+	  <ProjectReference Include="..\Utils\NSL.Utils\NSL.Utils.csproj" />
+	</ItemGroup>
+
 </Project>

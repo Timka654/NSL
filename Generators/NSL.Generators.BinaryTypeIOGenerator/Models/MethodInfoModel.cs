@@ -1,4 +1,5 @@
 ﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System;
 using System.Collections.Generic;
 
 namespace NSL.Generators.BinaryTypeIOGenerator.Models
@@ -11,6 +12,8 @@ namespace NSL.Generators.BinaryTypeIOGenerator.Models
 
         public string ForGroup { get; set; }
 
+        public Func<string, bool> ModelSelector { get; set; }
+
         public string MethodModifier { get; set; }
 
         public string MethodName { get; set; }
@@ -18,6 +21,11 @@ namespace NSL.Generators.BinaryTypeIOGenerator.Models
         public string ReadType { get; set; }
 
         public List<parametermodel> Parameters { get; set; }
+
+        public MethodInfoModel()
+        {
+            ModelSelector = n => string.Equals(ForGroup, "*") || string.Equals(ForGroup, n); // old implementation - BIO has replace this
+        }
     }
 
 

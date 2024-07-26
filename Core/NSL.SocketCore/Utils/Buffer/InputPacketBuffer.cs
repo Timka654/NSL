@@ -24,6 +24,11 @@ namespace NSL.SocketCore.Utils.Buffer
         public const ushort NSLSystemMinPID = ushort.MaxValue - 235;
 
         /// <summary>
+        /// Dispose packet on finish async task execution
+        /// </summary>
+        public bool AsyncDisposing { get; set; } = true;
+
+        /// <summary>
         /// Detect if this pid used in NSL
         /// </summary>
         /// <param name="pid"></param>
