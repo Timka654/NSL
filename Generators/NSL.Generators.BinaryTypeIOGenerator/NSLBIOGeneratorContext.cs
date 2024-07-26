@@ -67,18 +67,23 @@ namespace NSL.Generators.BinaryTypeIOGenerator
             var proxyAttributes = symbol.GetAttributes()
                 .Where(x => x.AttributeClass.Name == nameof(NSLBIOProxyAttribute));
 
-//#if DEBUG
+            //#if DEBUG
 
-//            if (For == "a2")
-//            {
-//                if (path.EndsWith("b2p") || path.EndsWith("t3"))
-//                {
-//                    GenDebug.Break();
-//                }
-//            }
+            //            if (For == "a2")
+            //            {
+            //                if (path.EndsWith("b2p") || path.EndsWith("t3"))
+            //                {
+            //                    GenDebug.Break();
+            //                }
+            //            }
 
-//#endif
+            //#endif
 
+
+            //if (path.EndsWith("a2"))
+            //{
+            //    GenDebug.Break();
+            //}
 
             var map = proxyAttributes.Select(x =>
             {
@@ -92,12 +97,18 @@ namespace NSL.Generators.BinaryTypeIOGenerator
 
             var newFor = map.FirstOrDefault(x => x.Item2?.Contains(For) == true);
 
-            if (newFor == default && map.Any(x => x.Item2 == null))
+            if (newFor == default)
             {
-                For = null;
-            }
+                var globalModel = map.FirstOrDefault(x => x.Item2 == null);
 
-            For = newFor.Item1 ?? For;
+                if (globalModel != default)
+                    For = globalModel.Item1;
+            }
+            else
+                For = newFor.Item1;
+
+            if (ModelSelector("<!!_NSLBIOFULL_!!>") == true)
+                return;
 
             var type = symbol.GetTypeSymbol();
 

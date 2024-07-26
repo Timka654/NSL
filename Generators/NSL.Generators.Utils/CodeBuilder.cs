@@ -77,6 +77,11 @@ namespace NSL.Generators.Utils
             AppendLine("*/");
         }
 
+        public void AppendComment(string line)
+        {
+            AppendLine($"/* {line} */");
+        }
+
         public void AppendSummary(Action<CodeBuilder> commentAction)
         {
             AppendSummaryLine("<summary>");

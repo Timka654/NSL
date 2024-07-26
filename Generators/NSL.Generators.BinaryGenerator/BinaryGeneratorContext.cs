@@ -7,6 +7,8 @@ namespace NSL.Generators.BinaryGenerator
 {
     public class BinaryGeneratorContext
     {
+        public string For { get; set; }
+
         internal int ProcessingLevel { get; set; }
 
         public SemanticModel SemanticModel;

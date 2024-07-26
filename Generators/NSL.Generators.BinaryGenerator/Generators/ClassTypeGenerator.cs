@@ -99,7 +99,6 @@ namespace NSL.Generators.BinaryGenerator.Generators
 
             cb.AppendLine("});");
 
-
             return cb.ToString();
         }
     }

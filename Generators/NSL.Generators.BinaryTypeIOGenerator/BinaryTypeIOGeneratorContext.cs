@@ -8,8 +8,6 @@ namespace NSL.Generators.BinaryTypeIOGenerator
 {
     internal class BinaryTypeIOGeneratorContext : BinaryGeneratorContext
     {
-        public string For { get; set; } = "*";
-
         public string ProcessingType { get; set; }
 
         public string ReadCurrentTypeMethodName { get; set; } = default;
@@ -21,6 +19,7 @@ namespace NSL.Generators.BinaryTypeIOGenerator
 
         public BinaryTypeIOGeneratorContext()
         {
+            For = "*";
             ModelSelector = mname => string.Equals(For, mname);
         }
 

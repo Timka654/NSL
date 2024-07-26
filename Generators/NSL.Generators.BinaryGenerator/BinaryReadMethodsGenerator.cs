@@ -80,6 +80,8 @@ namespace NSL.Generators.BinaryGenerator
             if (context.IsIgnore(member, path))
                 return;
 
+            context.OpenTypeEntry(member, path);
+
             if (member is IPropertySymbol ps)
             {
                 if (ps.SetMethod != null)
@@ -99,6 +101,8 @@ namespace NSL.Generators.BinaryGenerator
 
                 rb.AppendLine();
             }
+
+            context.CloseTypeEntry(member, path);
         }
 
         private static string GetLinePrefix(ISymbol symbol, string path)

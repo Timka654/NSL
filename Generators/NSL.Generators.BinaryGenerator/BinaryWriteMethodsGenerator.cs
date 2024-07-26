@@ -41,34 +41,40 @@ namespace NSL.Generators.BinaryGenerator
         }
 
 
-        public static void AddTypeMemberWriteLine(ISymbol member, BinaryGeneratorContext context, CodeBuilder cb, string path)
+        public static bool AddTypeMemberWriteLine(ISymbol member, BinaryGeneratorContext context, CodeBuilder cb, string path)
         {
             if (member.DeclaredAccessibility.HasFlag(Accessibility.Public) == false || member.IsStatic)
-                return;
+                return false;
 
             if (context.IsIgnore(member, path))
-                return;
-
-            context.OpenTypeEntry(member, path);
+                return false;
 
             if (member is IPropertySymbol ps)
             {
                 if (ps.GetMethod != null)
                 {
+                    context.OpenTypeEntry(member, path);
                     var ptype = ps.GetTypeSymbol();
                     cb.AppendLine(BuildParameterWriter(ptype, context, path));
 
                     cb.AppendLine();
+
+                    context.CloseTypeEntry(member, path);
+                    return true;
                 }
             }
             else if (member is IFieldSymbol fs)
             {
+                context.OpenTypeEntry(member, path);
                 var ftype = fs.GetTypeSymbol();
                 cb.AppendLine(BuildParameterWriter(ftype, context, path));
                 cb.AppendLine();
+                context.CloseTypeEntry(member, path);
+
+                return true;
             }
 
-            context.CloseTypeEntry(member, path);
+            return false;
         }
     }
 }

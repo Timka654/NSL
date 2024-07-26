@@ -80,21 +80,46 @@ namespace NSL.Generators.BinaryTypeIOGenerator.Tests
     //    [NSLBIOInclude("a3")]
     //    public string t3 { get; set; }
     //}
-    [NSLBIOType]
-    public partial class AuctionBidResponseModel
+    //[NSLBIOType]
+    //public partial class AuctionBidResponseModel
+    //{
+    //    public AuctionNewBidResultEnum Result { get; set; }
+
+    //    public double NewBidValue { get; set; }
+
+    //    public AuctionBidResponseModel d { get; set; }
+    //}
+    //public enum AuctionNewBidResultEnum : byte
+    //{
+    //    Success,
+    //    NoFound,
+    //    NoBidRange,
+    //    NoMoney,
+    //    OwnedItem
+    //}
+
+
+    //[NSLBIOType("Response", "Sync", null)]
+    //[NSLBIOModelJoin("Sync", "Response")]
+    //public partial class a1Class
+    //{
+    //    [NSLBIOInclude("Response"), NSLBIOProxy("aaa")] public a2Class a2 { get; set; }
+    //}
+
+    //[NSLBIOModelJoin("bbb", "aaa")]
+    //public partial class a2Class
+    //{
+    //    [NSLBIOInclude("aaa")] public int a { get; set; }
+    //}
+
+    [NSLBIOType("Response")]
+    public partial class a1Class
     {
-        public AuctionNewBidResultEnum Result { get; set; }
-
-        public double NewBidValue { get; set; }
-
-        public AuctionBidResponseModel d { get; set; }
+        [NSLBIOInclude("Response")] public a2Class a2 { get; set; }
     }
-    public enum AuctionNewBidResultEnum : byte
+
+    public partial class a2Class
     {
-        Success,
-        NoFound,
-        NoBidRange,
-        NoMoney,
-        OwnedItem
+        [NSLBIOInclude("Response")] public int a { get; set; }
     }
 }
