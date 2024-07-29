@@ -1,0 +1,1 @@
+dotnet ef migrations remove --project NSL.Services.ServersHub.Shared/NSL.Services.ServersHub.Shared.Server.csproj --msbuildprojectextensionspath NSL.Services.ServersHub.Shared/artifacts/NSL.Services.ServersHub.Shared.Server/obj

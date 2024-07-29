@@ -1,0 +1,52 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+	<!--<Project Sdk="Microsoft.NET.Sdk">-->
+	<PropertyGroup>
+		<OutputType>Library</OutputType>
+		<TargetFramework>net8.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<RootNamespace>NSL.Services.ServersHub.Shared</RootNamespace>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<DefineConstants>$(DefineConstants);SERVER</DefineConstants>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<Compile Remove="artifacts\**" />
+		<Content Remove="artifacts\**" />
+		<EmbeddedResource Remove="artifacts\**" />
+		<None Remove="artifacts\**" />
+
+		<Compile Remove="Client\**" />
+		<Content Remove="Client\**" />
+		<EmbeddedResource Remove="Client\**" />
+		<None Remove="Client\**" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Content Include="..\NSL.Services.ServersHub\NSL.Services.ServersHub\appsettings.Development.json" Link="appsettings.Development.json">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </Content>
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="NSL.Generators.HttpEndPointGenerator.Shared" Version="2024.7.29.126" />
+		<PackageReference Include="NSL.HttpClient" Version="2024.7.29.126" />
+		<PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="8.0.7" />
+		<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.7" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.7" />
+		<PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.4" />
+		<PackageReference Include="NSL.Refactoring.Shared" Version="2024.7.29.126">
+		  <PrivateAssets>all</PrivateAssets>
+		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+	</ItemGroup>
+	<!--Uncomment this for link appsettings in asp.net project-->
+	<!--<ItemGroup>
+		<Content Include="..\$BaseProject$\appsettings.Development.json" Link="appsettings.Development.json" Condition="'$(Configuration)'=='Debug'">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>-->
+
+</Project>

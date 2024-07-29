@@ -5,6 +5,6 @@ namespace NSL.Generators.HttpEndPointGenerator.Shared.Attributes
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
     public class HttpEndPointImplementGenerateAttribute : Attribute
     {
-        public HttpEndPointImplementGenerateAttribute(Type _interface) { }
+        public HttpEndPointImplementGenerateAttribute(Type _interface, bool saveNames = false) { }
     }
 }

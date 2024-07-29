@@ -23,4 +23,8 @@
 		<PackageId>$(MSBuildProjectName)_Debug</PackageId>
 	</PropertyGroup>
 
+	<ItemGroup>
+		<PackageReference Include="HtmlAgilityPack" Version="1.11.61" />
+	</ItemGroup>
+
 </Project>

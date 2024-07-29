@@ -1,0 +1,4 @@
+shared_request_models_rel_path=Models\RequestModels
+shared_response_models_rel_path=Models\ResponseModels
+shared_models_rel_path=Models
+shared_entity_models_rel_path=Server\EntityModels

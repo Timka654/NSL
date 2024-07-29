@@ -92,6 +92,8 @@ namespace NSL.Generators.HttpEndPointGenerator
 
                     var containerType = fillArgs.First().GetAttributeTypeParameterValueSymbol(typeSem);
 
+                    var saveNames = fillArgs.ElementAtOrDefault(1)?.GetAttributeParameterValue<bool>(typeSem) ?? false;
+
                     var containerAttributes = containerType.GetAttributes();
 
                     var containerAttr = containerAttributes.FirstOrDefault(x => x.AttributeClass.Name.Equals(ContainerGenerateAttributeFullName));
@@ -193,7 +195,9 @@ namespace NSL.Generators.HttpEndPointGenerator
                                 //GenDebug.Break();
 #endif
 
-                                methodBuilder.AppendLine($"public async Task<{returnType}> {_vname}Request({string.Join(", ", _p)})");
+                                var requestMethodName = saveNames ? ms.Name : $"{_vname}Request";
+
+                                methodBuilder.AppendLine($"public async Task<{returnType}> {requestMethodName}({string.Join(", ", _p)})");
                                 methodBuilder.NextTab();
                                 methodBuilder.AppendLine($"=> await CreateEndPointClient({_vname}Url)");
                                 if (_t == "Post")

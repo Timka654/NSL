@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System;
@@ -14,6 +15,7 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Security.Principal;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace NSL.ASPNET.Identity.Host
 {
@@ -143,6 +145,7 @@ namespace NSL.ASPNET.Identity.Host
             this ClaimsIdentity claims,
             JWTIdentityDataModel identityData)
             => identityData.GenerateClaimsToken(claims);
+
         public static void UseAuth(this IApplicationBuilder app)
         {
             app.UseAuthentication();
@@ -151,5 +154,129 @@ namespace NSL.ASPNET.Identity.Host
 
         public static string GetId(this ClaimsPrincipal identity)
             => identity.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier)?.Value;
+
+        public static TResult GetId<TResult>(this ClaimsPrincipal identity)
+            where TResult : IConvertible
+            => (TResult)Convert.ChangeType(identity.GetId(), typeof(TResult));
+
+        public static async Task<IdentityResult> CreateAccountAsync<TSignInManager, TUser, TKey>(this IHost host, Func<(TUser user, string password)> user)
+            where TKey : IEquatable<TKey>
+            where TUser : IdentityUser<TKey>
+            where TSignInManager : SignInManager<TUser>
+        {
+            IdentityResult result = default;
+
+            await host.Services.InvokeInScopeAsync(async s =>
+            {
+                result = await s.CreateAccountAsync<TSignInManager, TUser, TKey>(user);
+            });
+
+            return result;
+        }
+
+        public static async Task<IdentityResult> CreateAccountAsync<TSignInManager, TUser, TKey>(this IServiceProvider services, Func<(TUser user, string password)> user)
+            where TKey : IEquatable<TKey>
+            where TUser : IdentityUser<TKey>
+            where TSignInManager : SignInManager<TUser>
+        {
+            var signInManager = services.GetRequiredService<TSignInManager>();
+
+            var u = user();
+
+            if (signInManager.UserManager.Users.Any(x => x.UserName == u.user.UserName))
+                return IdentityResult.Success;
+
+            return await signInManager.UserManager.CreateAsync(u.user, u.password);
+
+        }
+
+        public static async Task<IdentityResult> AssignAccountRolesAsync<TSignInManager, TUser, TKey>(this IHost host, TUser user, params string[] roles)
+            where TKey : IEquatable<TKey>
+            where TUser : IdentityUser<TKey>
+            where TSignInManager : SignInManager<TUser>
+        {
+            IdentityResult result = default;
+
+            await host.Services.InvokeInScopeAsync(async s =>
+            {
+                result = await s.AssignAccountRolesAsync<TSignInManager, TUser, TKey>(user, roles);
+            });
+
+            return result;
+        }
+
+        public static async Task<IdentityResult> AssignAccountRolesAsync<TSignInManager, TUser, TKey>(this IServiceProvider services, TUser user, params string[] roles)
+            where TKey : IEquatable<TKey>
+            where TUser : IdentityUser<TKey>
+            where TSignInManager : SignInManager<TUser>
+        {
+            var signInManager = services.GetRequiredService<TSignInManager>();
+
+            IdentityResult result = IdentityResult.Success;
+
+            foreach (var role in roles)
+            {
+                if (await signInManager.UserManager.IsInRoleAsync(user, role))
+                    continue;
+
+                result = await signInManager.UserManager.AddToRolesAsync(user, roles);
+
+                if (!result.Succeeded)
+                    return result;
+
+            }
+
+            return result;
+        }
+
+        public static async Task<IdentityResult> CreateRolesAsync<TRoleManager, TRole, TKey>(this IHost host, params string[] roles)
+            where TKey : IEquatable<TKey>
+            where TRole : IdentityRole<TKey>, new ()
+            where TRoleManager : RoleManager<TRole>
+        {
+            IdentityResult result = default;
+
+            await host.Services.InvokeInScopeAsync(async s =>
+            {
+                result = await s.CreateRolesAsync<TRoleManager, TRole, TKey>(roles);
+            });
+
+            return result;
+        }
+
+        public static async Task<IdentityResult> CreateRolesAsync<TRoleManager, TRole, TKey>(this IServiceProvider services, params string[] roles)
+            where TKey : IEquatable<TKey>
+            where TRole : IdentityRole<TKey>, new ()
+            where TRoleManager : RoleManager<TRole>
+        {
+            var roleManager = services.GetRequiredService<TRoleManager>();
+
+            IdentityResult result = IdentityResult.Success;
+
+            foreach (var role in roles)
+            {
+
+                if (await roleManager.RoleExistsAsync(role))
+                    continue;
+
+                result = await roleManager.CreateAsync(new TRole() { Name = role });
+
+                if (!result.Succeeded)
+                    return result;
+            }
+
+            return result;
+        }
+
+        public static string JoinErrors(this IdentityResult result, string splitter = "\r\n")
+            => string.Join(splitter, result.Errors.Select(x => x.Description));
+
+        public static void ThrowOnFailed(this IdentityResult result, Func<IdentityResult, Exception> errorBuilder)
+        {
+            if (result.Succeeded)
+                return;
+
+            throw errorBuilder(result);
+        }
     }
 }

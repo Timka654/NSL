@@ -25,5 +25,8 @@
 	<ItemGroup>
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.6" />
 	</ItemGroup>
+	<ItemGroup>
+	  <ProjectReference Include="..\..\NSL.ASPNET\NSL.ASPNET.csproj" />
+	</ItemGroup>
 
 </Project>
