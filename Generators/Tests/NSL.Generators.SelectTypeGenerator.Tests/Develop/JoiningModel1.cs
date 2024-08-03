@@ -8,10 +8,14 @@ using System.Threading.Tasks;
 namespace NSL.Generators.SelectTypeGenerator.Tests.Develop
 {
     [SelectGenerate("Get2")]
+    [SelectGenerate("Get2")]
+    [SelectGenerate("Get2")]
+    [SelectGenerate("Get1")]
+    [SelectGenerate("Get3")]
     [SelectGenerateModelJoin("Get2", "Get1", "Get3")]
     public partial class JoiningModel1
     {
-        [SelectGenerateInclude("Get1")] public bool v1 { get; set; }
+        [SelectGenerateInclude("Get1")][SelectGenerateInclude("Get2")][SelectGenerateInclude("Get3")] public bool v1 { get; set; }
 
         [SelectGenerateInclude("Get2")] public bool v2 { get; set; }
 

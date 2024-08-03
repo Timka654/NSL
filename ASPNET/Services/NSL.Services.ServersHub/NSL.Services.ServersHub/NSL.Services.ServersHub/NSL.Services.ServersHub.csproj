@@ -13,6 +13,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="8.0.7" />
     <PackageReference Include="NSL.ASPNET.Identity.Host" Version="2024.7.29.126" />
     <PackageReference Include="NSL.ASPNET.Mvc" Version="2024.7.29.126" />
+    <PackageReference Include="NSL.Database.EntityFramework.ASPNET" Version="2024.7.29.126" />
     <PackageReference Include="NSL.Refactoring.Shared" Version="2024.7.29.126">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Forms;
 using NSL.Services.ServersHub.Client.Services;
 using NSL.Services.ServersHub.Shared.Client.DotNetIdentity;
 using NSL.Services.ServersHub.Shared.Models.RequestModels;
@@ -30,7 +31,7 @@ namespace NSL.Services.ServersHub.Client.Pages.Account.Pages
             return Task.CompletedTask;
         }
 
-        public async Task LoginUser()
+        public async Task LoginUser(EditContext context)
         {
             var response = await HubIdentityService.IdentityLoginPostRequest(Input);
 

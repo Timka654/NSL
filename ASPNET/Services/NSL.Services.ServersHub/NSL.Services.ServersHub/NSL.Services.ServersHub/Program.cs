@@ -3,8 +3,8 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using NSL.ASPNET.Identity.Host;
+using NSL.Database.EntityFramework.ASPNET;
 using NSL.Services.ServersHub.Client.Pages;
-using NSL.Services.ServersHub.Components;
 using NSL.Services.ServersHub.Shared.Models;
 using NSL.Services.ServersHub.Shared.Server.Data;
 using NSL.Services.ServersHub.Shared.Server.Manages;
@@ -13,9 +13,11 @@ namespace NSL.Services.ServersHub
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+
+            builder.Services.AddControllers();
 
             // Add services to the container.
             builder.Services.AddRazorComponents()
@@ -36,6 +38,8 @@ namespace NSL.Services.ServersHub
 
             var app = builder.Build();
 
+            await app.AcceptDbMigrations<ApplicationDbContext>();
+
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
@@ -53,6 +57,8 @@ namespace NSL.Services.ServersHub
 
             app.UseStaticFiles();
             //app.UseAntiforgery();
+
+            app.MapDefaultControllerRoute();
 
             app.UseBlazorFrameworkFiles();
             app.MapFallbackToFile("index.html");

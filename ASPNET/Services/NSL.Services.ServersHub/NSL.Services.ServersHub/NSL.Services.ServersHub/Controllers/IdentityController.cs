@@ -37,6 +37,7 @@ namespace NSL.Services.ServersHub.Controllers
 
                 return this.DataResponse(token);
             });
+
         [HttpPostAction]
         public async Task<IActionResult> Register([FromBody] IdentityRegisterRequestModel query)
             => await this.ProcessRequestAsync(async () =>

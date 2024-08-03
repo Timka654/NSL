@@ -1,4 +1,5 @@
 ﻿using Microsoft.IdentityModel.Tokens;
+using NSL.Utils.JsonSchemeGen.Attributes;
 using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -6,19 +7,25 @@ using System.Text;
 
 namespace NSL.ASPNET.Identity.Host
 {
+    [NSLJsonScheme("JWT", Path = "Identity")]
     public class JWTIdentityDataModel
     {
+        [NSLJsonSchemeProperty(Name = "Issuer")]
         public string Issuer { get; set; }
 
+        [NSLJsonSchemeProperty()]
         public string Audience { get; set; }
 
         /// <summary>
         /// Exp lifetime for token in minutes
         /// </summary>
+        [NSLJsonSchemeProperty()]
         public long Expires { get; set; }
 
+        [NSLJsonSchemeProperty()]
         public string SecurityKey { get; set; }
 
+        [NSLJsonSchemeProperty()]
         public string SecurityAlgorithm { get; set; } = SecurityAlgorithms.HmacSha256;
 
 

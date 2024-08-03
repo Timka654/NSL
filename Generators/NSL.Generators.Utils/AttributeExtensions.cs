@@ -29,5 +29,21 @@ namespace NSL.Generators.Utils
         {
             return (syntax.Expression as TypeOfExpressionSyntax).Type.GetText().ToString();
         }
+
+        public static string GetName(this AttributeArgumentSyntax syntax)
+            => syntax.NameEquals?.Name.Identifier.Text;
+
+        public static string GetAttributeFullName(this NameSyntax syntax)
+        {
+            var name = (syntax as IdentifierNameSyntax)?.Identifier.Text;
+
+            if (name == null)
+                return null;
+
+            if (!name.EndsWith("Attribute"))
+                name += "Attribute";
+
+            return name;
+        }
     }
 }
