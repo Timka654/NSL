@@ -17,6 +17,14 @@ namespace NSL.Generators.BinaryGenerator.Generators
 
             var rb = new CodeBuilder();
 
+            var exists = context.GetExistsReadHandleCode(parameter, path, rb);
+
+            if (exists != default)
+            {
+                rb.AppendLine(exists);
+                return rb.ToString();
+            }
+
             if (type.IsTupleType)
             {
                 //GenDebug.Break();
@@ -62,6 +70,14 @@ namespace NSL.Generators.BinaryGenerator.Generators
                 return default;
 
             CodeBuilder cb = new CodeBuilder();
+
+            var exists = context.GetExistsWriteHandleCode(item, path, cb);
+
+            if (exists != default)
+            {
+                cb.AppendLine(exists);
+                return cb.ToString();
+            }
 
             bool successOpen = context.OpenTypeEntry(item, path, cb);
 

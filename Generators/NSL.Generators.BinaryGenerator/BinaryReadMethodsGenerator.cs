@@ -4,6 +4,8 @@ using Microsoft.CodeAnalysis;
 using System.Linq;
 using NSL.Generators.Utils;
 using NSL.Generators.BinaryGenerator.Generators;
+using NSL.Generators.BinaryGenerator.Utils;
+using System.Reflection.Metadata;
 
 namespace NSL.Generators.BinaryGenerator
 {
@@ -45,8 +47,11 @@ namespace NSL.Generators.BinaryGenerator
             //    Debugger.Launch();
 
             if (valueReader == default)
-                valueReader = $"({parameter.GetTypeSymbol().Name})default;";
+            {
+                context.Context.ShowBIODiagnostics("NSLBIO002", $"Not found read generator for this type", DiagnosticSeverity.Error, parameter.Locations.ToArray());
 
+                valueReader = $"({parameter.GetTypeSymbol().Name})default;";
+            }
             var linePrefix = GetLinePrefix(parameter, path);
 
             if (linePrefix == default)
@@ -83,12 +88,18 @@ namespace NSL.Generators.BinaryGenerator
             if (member is IPropertySymbol ps)
             {
                 if (ps.SetMethod == null)
+                {
+                    context.Context.ShowBIODiagnostics("NSLBIO003", $"Not found setter for this property - ignore on read", DiagnosticSeverity.Warning, member.Locations.ToArray());
+
                     return false;
+                }
 
                 type = ps.GetTypeSymbol();
             }
             else if (member is IFieldSymbol fs)
                 type = fs.GetTypeSymbol();
+            else
+                return false;
 
             context.CurrentMember = member;
 

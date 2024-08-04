@@ -1,5 +1,6 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Emit;
+using NSL.Generators.BinaryGenerator.Utils;
 using NSL.Generators.BinaryTypeIOGenerator.Attributes;
 using NSL.Generators.Utils;
 using System;
@@ -82,7 +83,7 @@ namespace NSL.Generators.BinaryTypeIOGenerator
                 var loc = CurrentPath.First().Item1.Locations;
 
 
-                Context.ReportDiagnostic(Diagnostic.Create(new DiagnosticDescriptor("NSLBIO001", msg, msg, "NSLBIO", DiagnosticSeverity.Error, true), loc.First(), loc.Skip(1)));
+                Context.ShowBIODiagnostics("NSLBIO001", msg, DiagnosticSeverity.Error, loc.ToArray());
                 //codeBuilder.AppendComment($"Error {path}  {cycl.Item2} {cycl.Item3}");
                 codeBuilder.AppendLine($"return default({type.GetTypeFullName()});");
 

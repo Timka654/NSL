@@ -2,6 +2,7 @@
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using NSL.Generators.BinaryGenerator;
+using NSL.Generators.BinaryGenerator.Utils;
 using NSL.Generators.BinaryTypeIOGenerator.Attributes;
 using NSL.Generators.BinaryTypeIOGenerator.Models;
 using NSL.Generators.Utils;
@@ -38,8 +39,7 @@ namespace NSL.Generators.BinaryTypeIOGenerator
         {
             if (!type.HasPartialModifier())
             {
-                context.ReportDiagnostic(Diagnostic.Create(
-                    new DiagnosticDescriptor("NSLBIOGEN000", "Type must have a partial modifier", "Type must have a partial modifier", "NSLBIOGEN", DiagnosticSeverity.Error, true), type.GetLocation()));
+                context.ShowBIODiagnostics("NSLBIOGEN000", "Type must have a partial modifier",DiagnosticSeverity.Error,  type.GetLocation());
                 return;
             }
             var typeClass = type as ClassDeclarationSyntax;

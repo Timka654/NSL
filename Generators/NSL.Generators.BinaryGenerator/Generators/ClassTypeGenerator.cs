@@ -4,6 +4,7 @@ using NSL.SocketCore.Utils.Buffer;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata;
 
 namespace NSL.Generators.BinaryGenerator.Generators
 {
@@ -88,6 +89,13 @@ namespace NSL.Generators.BinaryGenerator.Generators
 
             CodeBuilder cb = new CodeBuilder();
 
+            var exists = context.GetExistsWriteHandleCode(item, path, cb);
+
+            if (exists != default)
+            {
+                cb.AppendLine(exists);
+                return cb.ToString();
+            }
 
             cb.AppendLine($"__packet.{nameof(OutputPacketBuffer.WriteNullableClass)}({path}, ()=> {{");
 

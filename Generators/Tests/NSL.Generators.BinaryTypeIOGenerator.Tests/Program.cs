@@ -35,7 +35,8 @@ namespace NSL.Generators.BinaryTypeIOGenerator.Tests
     }
 
     //[NSLBIOType(null, "a1", "a2")]
-    [NSLBIOType("a1")]
+    //[NSLBIOType("a1")]
+    [NSLBIOType]
     public partial class TestStruct3
     {
         //[NSLBIOInclude, NSLBIOProxy("a2")] public TestStruct4 s4a2p { get; set; }
@@ -45,6 +46,7 @@ namespace NSL.Generators.BinaryTypeIOGenerator.Tests
         [NSLBIOInclude("a1"), NSLBIOProxy("a2")] public TestStruct4 s4a1 { get; set; }
 
         //[NSLBIOInclude("a2"), NSLBIOProxy("a1")] public TestStruct4 s4a2 { get; set; }
+        public int a1 { get; set; }
     }
 
     [NSLBIOType("a1", "a2")]

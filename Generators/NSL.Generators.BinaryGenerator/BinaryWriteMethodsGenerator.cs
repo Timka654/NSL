@@ -3,6 +3,7 @@ using System.Linq;
 using Microsoft.CodeAnalysis;
 using NSL.Generators.Utils;
 using NSL.Generators.BinaryGenerator.Generators;
+using NSL.Generators.BinaryGenerator.Utils;
 
 namespace NSL.Generators.BinaryGenerator
 {
@@ -25,21 +26,18 @@ namespace NSL.Generators.BinaryGenerator
         public static string BuildParameterWriter(ISymbol item, BinaryGeneratorContext context, string path)
         {
             string writerLine = default;
-            
-            writerLine = context.GetExistsWriteHandleCode(item, path, new CodeBuilder());
 
-            if (writerLine == default)
+            foreach (var gen in generators)
             {
-                foreach (var gen in generators)
-                {
-                    writerLine = gen(item, context, path);
+                writerLine = gen(item, context, path);
 
-                    if (writerLine != default)
-                        break;
-                }
+                if (writerLine != default)
+                    return writerLine;
             }
 
-            return writerLine ?? ""; //debug only
+            context.Context.ShowBIODiagnostics("NSLBIO002", $"Not found write generator for this type", DiagnosticSeverity.Error, item.Locations.ToArray());
+
+            return writerLine;
         }
 
 
@@ -56,7 +54,11 @@ namespace NSL.Generators.BinaryGenerator
             if (member is IPropertySymbol ps)
             {
                 if (ps.GetMethod == null)
+                {
+                    context.Context.ShowBIODiagnostics("NSLBIO004", $"Not found getter for this property - ignore on write", DiagnosticSeverity.Warning, member.Locations.ToArray());
+
                     return false;
+                }
 
                 type = ps.GetTypeSymbol();
             }
@@ -64,6 +66,8 @@ namespace NSL.Generators.BinaryGenerator
             {
                 type = fs.GetTypeSymbol();
             }
+            else
+                return false;
 
             context.CurrentMember = member;
 
