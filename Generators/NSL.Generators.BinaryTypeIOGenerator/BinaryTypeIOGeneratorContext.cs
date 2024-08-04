@@ -1,6 +1,7 @@
 ﻿using Microsoft.CodeAnalysis;
 using NSL.Generators.BinaryGenerator;
 using NSL.Generators.BinaryTypeIOGenerator.Attributes;
+using NSL.Generators.Utils;
 using System;
 using System.Linq;
 
@@ -46,7 +47,7 @@ namespace NSL.Generators.BinaryTypeIOGenerator
                     .Where(x => x.ConstructorArguments.Any(b=>b.Values.Length == 0) || x.ConstructorArguments.Any(b => b.Values.Any(n => For.Equals(n.Value))))
                     .Any();
 
-        public override string GetExistsReadHandleCode(ISymbol symbol, string path)
+        public override string GetExistsReadHandleCode(ISymbol symbol, string path, CodeBuilder codeBuilder)
         {
             bool isThis = false;
 
@@ -67,10 +68,10 @@ namespace NSL.Generators.BinaryTypeIOGenerator
             if (isThis)
                 return $"{ReadCurrentTypeMethodName}(dataPacket);";
 
-            return base.GetExistsReadHandleCode(symbol, path);
+            return base.GetExistsReadHandleCode(symbol, path, codeBuilder);
         }
 
-        public override string GetExistsWriteHandleCode(ISymbol symbol, string path)
+        public override string GetExistsWriteHandleCode(ISymbol symbol, string path, CodeBuilder codeBuilder)
         {
             bool isThis = false;
 
@@ -91,7 +92,7 @@ namespace NSL.Generators.BinaryTypeIOGenerator
             if (isThis)
                 return $"{WriteCurrentTypeMethodName}({path},__packet);";
 
-            return base.GetExistsReadHandleCode(symbol, path);
+            return base.GetExistsReadHandleCode(symbol, path, codeBuilder);
         }
     }
 }

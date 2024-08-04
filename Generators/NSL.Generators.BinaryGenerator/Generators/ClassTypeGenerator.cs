@@ -16,9 +16,18 @@ namespace NSL.Generators.BinaryGenerator.Generators
             if (type.IsValueType)
                 return default;
 
-            path = $"data{++context.ProcessingLevel}";
-
             CodeBuilder rb = new CodeBuilder();
+
+            var exists = context.GetExistsReadHandleCode(parameter, path, rb);
+
+            if (exists != default)
+            {
+                rb.AppendLine(exists);
+                return rb.ToString();
+            }
+
+
+            path = $"data{++context.ProcessingLevel}";
 
             rb.AppendLine($"dataPacket.{nameof(InputPacketBuffer.ReadNullableClass)}(() => {{");
 
@@ -26,32 +35,40 @@ namespace NSL.Generators.BinaryGenerator.Generators
 
             rb.AppendLine();
 
-            rb.AppendLine($"var {path} = new {type.GetTypeFullName(false)}();");
+            bool successOpen = context.OpenTypeEntry(parameter, path, rb);
 
-            rb.AppendLine();
-
-            do
+            if (successOpen)
             {
-                var members = type.GetMembers()
-                    .Where(x => x is IFieldSymbol || x is IPropertySymbol)
-                    .OrderBy(x => x.MetadataName);
+                rb.AppendLine($"var {path} = new {type.GetTypeFullName(false)}();");
 
+                rb.AppendLine();
 
-                //if ( ignoreMembers.Any())
-                //    GenDebug.Break();
-
-                foreach (var member in members)
+                do
                 {
-                    var fpath = string.Join(".", path, member.Name);
+                    var members = type.GetMembers()
+                        .Where(x => x is IFieldSymbol || x is IPropertySymbol)
+                        .OrderBy(x => x.MetadataName);
 
-                    BinaryReadMethodsGenerator.AddTypeMemberReadLine(member, context, rb, fpath);
-                }
 
-                type = type.BaseType;
+                    //if ( ignoreMembers.Any())
+                    //    GenDebug.Break();
 
-            } while (type != null);
+                    foreach (var member in members)
+                    {
+                        var fpath = string.Join(".", path, member.Name);
 
-            rb.AppendLine($"return {path};");
+                        BinaryReadMethodsGenerator.AddTypeMemberReadLine(member, context, rb, fpath);
+                    }
+
+                    type = type.BaseType;
+
+                } while (type != null);
+
+                rb.AppendLine($"return {path};");
+
+                context.CloseTypeEntry(parameter, path);
+            }
+
 
             rb.PrevTab();
 
@@ -78,22 +95,29 @@ namespace NSL.Generators.BinaryGenerator.Generators
 
             cb.AppendLine();
 
-            do
+            bool successOpen = context.OpenTypeEntry(item, path, cb);
+
+            if (successOpen)
             {
-                var members = type.GetMembers()
-                    .Where(x => x is IFieldSymbol || x is IPropertySymbol)
-                    .OrderBy(x => x.MetadataName);
-
-                foreach (var member in members)
+                do
                 {
-                    var fpath = string.Join(".", path, member.Name);
+                    var members = type.GetMembers()
+                        .Where(x => x is IFieldSymbol || x is IPropertySymbol)
+                        .OrderBy(x => x.MetadataName);
 
-                    BinaryWriteMethodsGenerator.AddTypeMemberWriteLine(member, context, cb, fpath);
-                }
+                    foreach (var member in members)
+                    {
+                        var fpath = string.Join(".", path, member.Name);
 
-                type = type.BaseType;
+                        BinaryWriteMethodsGenerator.AddTypeMemberWriteLine(member, context, cb, fpath);
+                    }
 
-            } while (type != null);
+                    type = type.BaseType;
+
+                } while (type != null);
+
+                context.CloseTypeEntry(item, path);
+            }
 
             cb.PrevTab();
 

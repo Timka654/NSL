@@ -7,30 +7,62 @@ namespace NSL.Generators.BinaryTypeIOGenerator.Tests
     {
         private static void Main(string[] args)
         {
-            var o = new OutputPacketBuffer();
+            //var o = new OutputPacketBuffer();
 
-            var ouData = new TestStruct1() { s1 = " abbbbcc", n1 = 75656/*, data = new ZergRush.ReactiveCore.ReactiveCollection<byte>()*/ };
+            //var ouData = new TestStruct1() { s1 = " abbbbcc", n1 = 75656/*, data = new ZergRush.ReactiveCore.ReactiveCollection<byte>()*/ };
 
-            ouData.WriteabcTo(o);
+            //ouData.WriteabcTo(o);
 
-            var i = new InputPacketBuffer(o.CompilePacket());
+            //var i = new InputPacketBuffer(o.CompilePacket());
 
-            var s = TestStruct1.ReadabcFrom(i);
-
-
+            //var s = TestStruct1.ReadabcFrom(i);
 
 
 
-            var o1 = new OutputPacketBuffer();
 
-            ouData = new TestStruct1() { s1 = "rwegrewgwrg", n1 = 6347/*, data = new ZergRush.ReactiveCore.ReactiveCollection<byte>(new byte[] { 45, 67, 85 })*/ };
-            ouData.WriteenTo(o1);
 
-            var i1 = new InputPacketBuffer(o1.CompilePacket());
+            //var o1 = new OutputPacketBuffer();
 
-            var s1 = TestStruct1.ReadenFrom(i1);
+            //ouData = new TestStruct1() { s1 = "rwegrewgwrg", n1 = 6347/*, data = new ZergRush.ReactiveCore.ReactiveCollection<byte>(new byte[] { 45, 67, 85 })*/ };
+            //ouData.WriteenTo(o1);
+
+
+            //var i1 = new InputPacketBuffer(o1.CompilePacket());
+
+            //var s1 = TestStruct1.ReadenFrom(i1);
 
         }
+    }
+
+    //[NSLBIOType(null, "a1", "a2")]
+    [NSLBIOType("a1")]
+    public partial class TestStruct3
+    {
+        //[NSLBIOInclude, NSLBIOProxy("a2")] public TestStruct4 s4a2p { get; set; }
+
+        //[NSLBIOInclude, NSLBIOProxy("a1")] public TestStruct4 s4a1p { get; set; }
+
+        [NSLBIOInclude("a1"), NSLBIOProxy("a2")] public TestStruct4 s4a1 { get; set; }
+
+        //[NSLBIOInclude("a2"), NSLBIOProxy("a1")] public TestStruct4 s4a2 { get; set; }
+    }
+
+    [NSLBIOType("a1", "a2")]
+    [NSLBIOModelJoin("a2", "a1")]
+    public partial class TestStruct4
+    {
+        [NSLBIOInclude("a1")] public int a1 { get; set; }
+        [NSLBIOInclude("a2")] public int a2 { get; set; }
+
+        [NSLBIOInclude("a2")] public TestStruct5 s5 { get; set; }
+    }
+    public partial class TestStruct5
+    {
+        [NSLBIOInclude("a2")] public TestStruct6 s6 { get; set; }
+    }
+    public partial class TestStruct6
+    {
+        [NSLBIOInclude("a2")] public TestStruct4 s4 { get; set; }
     }
 
     //[NSLBIOType("a1", "a2", "a3", null)]
@@ -112,14 +144,14 @@ namespace NSL.Generators.BinaryTypeIOGenerator.Tests
     //    [NSLBIOInclude("aaa")] public int a { get; set; }
     //}
 
-    [NSLBIOType("Response")]
-    public partial class a1Class
-    {
-        [NSLBIOInclude("Response")] public a2Class a2 { get; set; }
-    }
+    //[NSLBIOType("Response")]
+    //public partial class a1Class
+    //{
+    //    [NSLBIOInclude("Response")] public a2Class a2 { get; set; }
+    //}
 
-    public partial class a2Class
-    {
-        [NSLBIOInclude("Response")] public int a { get; set; }
-    }
+    //public partial class a2Class
+    //{
+    //    [NSLBIOInclude("Response")] public int a { get; set; }
+    //}
 }

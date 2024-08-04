@@ -1,4 +1,5 @@
 ﻿using Microsoft.CodeAnalysis;
+using NSL.Generators.Utils;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -11,16 +12,21 @@ namespace NSL.Generators.BinaryGenerator
 
         internal int ProcessingLevel { get; set; }
 
+        public List<(ISymbol, string)> CurrentPath { get; set; } = new List<(ISymbol, string)>();
+
         public SemanticModel SemanticModel;
+
+        public GeneratorExecutionContext Context { get; set; }
+        public ISymbol CurrentMember { get; internal set; }
 
         public virtual bool IsIgnore(ISymbol symbol, string path) => false;
 
-        public virtual string GetExistsReadHandleCode(ISymbol symbol, string path) => default;
+        public virtual string GetExistsReadHandleCode(ISymbol symbol, string path, CodeBuilder codeBuilder) => default;
 
-        public virtual string GetExistsWriteHandleCode(ISymbol symbol, string path) => default;
+        public virtual string GetExistsWriteHandleCode(ISymbol symbol, string path, CodeBuilder codeBuilder) => default;
 
 
-        public virtual void OpenTypeEntry(ISymbol symbol, string path) { }
+        public virtual bool OpenTypeEntry(ISymbol symbol, string path, CodeBuilder codeBuilder) => true;
         public virtual void CloseTypeEntry(ISymbol symbol, string path) { }
     }
 }

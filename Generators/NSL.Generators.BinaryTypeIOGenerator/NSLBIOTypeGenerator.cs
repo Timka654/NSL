@@ -37,12 +37,14 @@ namespace NSL.Generators.BinaryTypeIOGenerator
         private void ProcessNSLBIOType(GeneratorExecutionContext context, TypeDeclarationSyntax type)
         {
             if (!type.HasPartialModifier())
+            {
+                context.ReportDiagnostic(Diagnostic.Create(
+                    new DiagnosticDescriptor("NSLBIOGEN000", "Type must have a partial modifier", "Type must have a partial modifier", "NSLBIOGEN", DiagnosticSeverity.Error, true), type.GetLocation()));
                 return;
-
+            }
             var typeClass = type as ClassDeclarationSyntax;
 
             var typeSem = context.Compilation.GetSemanticModel(typeClass.SyntaxTree);
-
             var classBuilder = new CodeBuilder();
 
             classBuilder.AppendComment(() =>
@@ -128,8 +130,10 @@ namespace NSL.Generators.BinaryTypeIOGenerator
                     methodInfo.MethodName = $"Write{name}To";
 
                     CodeBuilder methodBuilder = new CodeBuilder();
-                    ProcessWriteMethod(methodBuilder, methodInfo, typeSem);
+                    ProcessWriteMethod(methodBuilder, methodInfo, typeSem, context);
                     classBuilder.AppendLine(methodBuilder.ToString());
+
+                    //continue;
 
                     methodInfo.MethodModifier = "public static";
                     methodInfo.Parameters = new List<parametermodel>()
@@ -139,18 +143,18 @@ namespace NSL.Generators.BinaryTypeIOGenerator
                     };
 
                     methodBuilder = new CodeBuilder();
-                    ProcessWriteMethod(methodBuilder, methodInfo, typeSem);
+                    ProcessWriteMethod(methodBuilder, methodInfo, typeSem, context);
                     classBuilder.AppendLine(methodBuilder.ToString());
 
                     methodInfo.IOType = IOTypeEnum.Read;
                     methodInfo.MethodName = $"Read{name}From";
                     methodInfo.Parameters = new List<parametermodel>()
-                {
-                    new parametermodel(){  name = "data", typeName = typeof(InputPacketBuffer).Name }
-                };
+                    {
+                        new parametermodel(){  name = "data", typeName = typeof(InputPacketBuffer).Name }
+                    };
 
                     methodBuilder = new CodeBuilder();
-                    ProcessReadMethod(methodBuilder, methodInfo, typeSem);
+                    ProcessReadMethod(methodBuilder, methodInfo, typeSem, context);
                     classBuilder.AppendLine(methodBuilder.ToString());
                 }
 
@@ -170,7 +174,7 @@ namespace NSL.Generators.BinaryTypeIOGenerator
         }
 
 
-        private void ProcessReadMethod(CodeBuilder methodBuilder, MethodInfoModel methodInfo, SemanticModel tSym)
+        private void ProcessReadMethod(CodeBuilder methodBuilder, MethodInfoModel methodInfo, SemanticModel tSym, GeneratorExecutionContext context)
         {
             var classDecl = methodInfo.ClassDeclarationSyntax;
 
@@ -197,6 +201,7 @@ namespace NSL.Generators.BinaryTypeIOGenerator
                 For = methodInfo.ForGroup,
                 ModelSelector = methodInfo.ModelSelector,
                 SemanticModel = tSym,
+                Context = context,
                 ProcessingType = classDecl.GetClassName(),
                 ReadCurrentTypeMethodName = methodInfo.MethodName,
                 IsStatic = methodInfo.MethodModifier.Contains("static")
@@ -208,7 +213,7 @@ namespace NSL.Generators.BinaryTypeIOGenerator
             methodBuilder.AppendLine("}");
         }
 
-        private void ProcessWriteMethod(CodeBuilder methodBuilder, MethodInfoModel methodInfo, SemanticModel tSym)
+        private void ProcessWriteMethod(CodeBuilder methodBuilder, MethodInfoModel methodInfo, SemanticModel tSym, GeneratorExecutionContext context)
         {
             //var method = methodInfo.MethodDeclarationSyntax;
             var classDecl = methodInfo.ClassDeclarationSyntax;
@@ -251,6 +256,7 @@ namespace NSL.Generators.BinaryTypeIOGenerator
                 For = methodInfo.ForGroup,
                 ModelSelector = methodInfo.ModelSelector,
                 SemanticModel = tSym,
+                Context = context,
                 ProcessingType = classDecl.GetClassName(),
                 WriteCurrentTypeMethodName = methodInfo.MethodName,
                 IsStatic = methodInfo.MethodModifier.Contains("static")
@@ -324,7 +330,7 @@ namespace NSL.Generators.BinaryTypeIOGenerator
 
         #endregion
 
-        private readonly string NSLBIOTypeAttributeFullName = typeof(NSLBIOTypeAttribute).Name;
-        private readonly string NSLBIOModelJoinAttributeFullName = typeof(NSLBIOModelJoinAttribute).Name;
+        internal static readonly string NSLBIOTypeAttributeFullName = typeof(NSLBIOTypeAttribute).Name;
+        internal static readonly string NSLBIOModelJoinAttributeFullName = typeof(NSLBIOModelJoinAttribute).Name;
     }
 }

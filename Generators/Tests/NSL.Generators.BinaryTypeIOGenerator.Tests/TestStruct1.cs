@@ -26,35 +26,34 @@ namespace NSL.Generators.BinaryTypeIOGenerator.Tests
     }
 
 
-    [BinaryIOType]
-    [BinaryIOMethodsFor("en", "abc")]
-    [BinaryIOMethodsFor]
+    //[NSLBIOType("en", "abc")]
+    //[NSLBIOType]
     public partial class TestStruct1 :TestStruct2
     {
-        [BinaryIOData("en")]
+        [NSLBIOInclude("en")]
         public TestStruct1 testArr { get; set; }
-        //[BinaryIOData(For = "en")]
+        //[NSLBIOInclude(For = "en")]
         //public ReactiveCollection<byte> data { get; set; }
 
-        [BinaryIOData("en")]
+        [NSLBIOInclude("en")]
         public NSL.Generators.BinaryTypeIOGenerator.Tests.abserb.erge.ergeg.erg.abcEn en1 { get; set; }
 
-        [BinaryIOData("en")]
+        [NSLBIOInclude("en")]
         public TestStruct2 en2 { get; set; }
 
-        [BinaryIOData("en")]
+        [NSLBIOInclude("en")]
         public NSL.Generators.BinaryTypeIOGenerator.Tests.abserb.erge.ergeg.erg.abcEn? en3 { get; set; }
 
-        //[BinaryIOData("en")]
+        //[NSLBIOInclude("en")]
         //public abcfff en4 { get; set; }
 
-        //[BinaryIOData("en")]
+        //[NSLBIOInclude("en")]
         //public abcfff? en5 { get; set; }
 
-        [BinaryIOData("abc")]
+        [NSLBIOInclude("abc")]
         public string s1 { get; set; }
 
-        [BinaryIOData]
+        [NSLBIOInclude]
         public int n1 { get; set; }
 
         //[BinaryIOWriteMethod]

@@ -9,6 +9,6 @@ namespace NSL.Generators.BinaryTypeIOGenerator.Tests
 {
     public class TestStruct2
     {
-        [BinaryIOData("en")] public int ab1 { get; set; }
+        [NSLBIOInclude("en")] public int ab1 { get; set; }
     }
 }

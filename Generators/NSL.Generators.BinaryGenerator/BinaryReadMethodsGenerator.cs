@@ -31,8 +31,6 @@ namespace NSL.Generators.BinaryGenerator
         {
             string valueReader = default;
 
-            valueReader = context.GetExistsReadHandleCode(parameter, path);
-
             if (valueReader == default)
             {
                 foreach (var gen in generators)
@@ -72,37 +70,33 @@ namespace NSL.Generators.BinaryGenerator
             return $"{genericType.Name}?";
         }
 
-        public static void AddTypeMemberReadLine(ISymbol member, BinaryGeneratorContext context, CodeBuilder rb, string path)
+        public static bool AddTypeMemberReadLine(ISymbol member, BinaryGeneratorContext context, CodeBuilder rb, string path)
         {
             if (member.DeclaredAccessibility.HasFlag(Accessibility.Public) == false || member.IsStatic)
-                return;
+                return false;
 
             if (context.IsIgnore(member, path))
-                return;
+                return false;
 
-            context.OpenTypeEntry(member, path);
+            ITypeSymbol type = null;
 
             if (member is IPropertySymbol ps)
             {
-                if (ps.SetMethod != null)
-                {
-                    var ptype = ps.GetTypeSymbol();
+                if (ps.SetMethod == null)
+                    return false;
 
-                    rb.AppendLine($"{path} = {GetValueReadSegment(ptype, context, path).TrimEnd(';')};");
-
-                    rb.AppendLine();
-                }
+                type = ps.GetTypeSymbol();
             }
             else if (member is IFieldSymbol fs)
-            {
-                var ftype = fs.GetTypeSymbol();
+                type = fs.GetTypeSymbol();
 
-                rb.AppendLine($"{path} = {GetValueReadSegment(ftype, context, path).TrimEnd(';')};");
+            context.CurrentMember = member;
 
-                rb.AppendLine();
-            }
+            rb.AppendLine($"{path} = {GetValueReadSegment(type, context, path).TrimEnd(';')};");
 
-            context.CloseTypeEntry(member, path);
+            rb.AppendLine();
+
+            return true;
         }
 
         private static string GetLinePrefix(ISymbol symbol, string path)

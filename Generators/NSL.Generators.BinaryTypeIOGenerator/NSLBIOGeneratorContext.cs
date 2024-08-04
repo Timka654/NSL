@@ -14,15 +14,6 @@ namespace NSL.Generators.BinaryTypeIOGenerator
     {
         public override bool IsIgnore(ISymbol symbol, string path)
         {
-
-
-            //#if DEBUG
-            //            if (path.EndsWith("t1") && string.Equals(For, null))
-            //            {
-            //                GenDebug.Break();
-            //            }
-            //#endif
-
             if (ModelSelector("<!!_NSLBIOFULL_!!>"))
                 return false;
 
@@ -49,7 +40,7 @@ namespace NSL.Generators.BinaryTypeIOGenerator
             return true;
         }
 
-        Stack<(string, Func<string, bool>)> tree = new Stack<(string, Func<string, bool>)>();
+        Stack<(string, Func<string, bool>, ISymbol)> tree = new Stack<(string, Func<string, bool>, ISymbol)>();
 
         public override void CloseTypeEntry(ISymbol symbol, string path)
         {
@@ -58,64 +49,63 @@ namespace NSL.Generators.BinaryTypeIOGenerator
             For = d.Item1;
 
             ModelSelector = d.Item2;
+
+
+            typePath.RemoveAt(typePath.Count - 1);
         }
 
-        public override void OpenTypeEntry(ISymbol symbol, string path)
+        List<string> typePath = new List<string>();
+
+        public override bool OpenTypeEntry(ISymbol __symbol, string path, CodeBuilder codeBuilder)
         {
-            tree.Push((For, ModelSelector));
-
-            var proxyAttributes = symbol.GetAttributes()
-                .Where(x => x.AttributeClass.Name == nameof(NSLBIOProxyAttribute));
-
-            //#if DEBUG
-
-            //            if (For == "a2")
-            //            {
-            //                if (path.EndsWith("b2p") || path.EndsWith("t3"))
-            //                {
-            //                    GenDebug.Break();
-            //                }
-            //            }
-
-            //#endif
-
-
-            //if (path.EndsWith("a2"))
-            //{
-            //    GenDebug.Break();
-            //}
-
-            var map = proxyAttributes.Select(x =>
-            {
-                var args = x.ConstructorArguments;
-
-                if (args.Length == 1)
-                    return ((string)args[0].Value, (string[])null);
-
-                return ((string)args[0].Value, args[1].Values.Select(n => (string)n.Value).ToArray());
-            }).ToArray();
-
-            var newFor = map.FirstOrDefault(x => x.Item2?.Contains(For) == true);
-
-            if (newFor == default)
-            {
-                var globalModel = map.FirstOrDefault(x => x.Item2 == null);
-
-                if (globalModel != default)
-                    For = globalModel.Item1;
-            }
-            else
-                For = newFor.Item1;
-
-            if (ModelSelector("<!!_NSLBIOFULL_!!>") == true)
-                return;
+            var symbol = CurrentMember ?? __symbol;
 
             var type = symbol.GetTypeSymbol();
+
+
+            typePath.Add(type.ToString());
+
+            var cycl = FindCycle(typePath);
+
+            if (cycl.Item1)
+            {
+                var spath = tree.ToArray().Reverse().Select(x => x.Item3.Name).ToArray();
+
+
+                var snpath = string.Join(".", spath.Skip(cycl.Item2));
+
+                if (string.IsNullOrEmpty(snpath))
+                    GenDebug.Break();
+
+                string msg = $"Found cycle starts path {snpath}";
+
+                var loc = CurrentPath.First().Item1.Locations;
+
+
+                Context.ReportDiagnostic(Diagnostic.Create(new DiagnosticDescriptor("NSLBIO001", msg, msg, "NSLBIO", DiagnosticSeverity.Error, true), loc.First(), loc.Skip(1)));
+                //codeBuilder.AppendComment($"Error {path}  {cycl.Item2} {cycl.Item3}");
+                codeBuilder.AppendLine($"return default({type.GetTypeFullName()});");
+
+                return false;
+            }
+
+
+            base.CurrentPath.Add((symbol, path));
+
+
+            tree.Push((For, ModelSelector, symbol));
+
+            For = GetFor(symbol, For, codeBuilder);
+
+            codeBuilder.AppendComment($"Final model for path = '{path}' - '{For}'");
+
+            if (ModelSelector("<!!_NSLBIOFULL_!!>") == true)
+                return true;
 
             var joinAttributes = type.GetAttributes()
                 .Where(x => x.AttributeClass.Name == nameof(NSLBIOModelJoinAttribute)).ToArray();
 
-            var joins = joinAttributes.Select(x =>
+            var joinMap = joinAttributes.Select(x =>
             {
                 var args = x.ConstructorArguments;
 
@@ -133,15 +123,130 @@ namespace NSL.Generators.BinaryTypeIOGenerator
             {
                 modelSelector = mname => actualModels.Contains(mname);
 
-                if (joins.TryGetValue(For, out var jns))
+                if (joinMap.TryGetValue(For, out var jns))
                     actualModels = actualModels
                                         .Concat(jns)
                                         .GroupBy(x => x)
                                         .Select(x => x.Key)
                                         .ToArray();
+
             }
 
+            codeBuilder.AppendComment($"Models selector for {For} - [{string.Join(", ", actualModels)}]");
+
             ModelSelector = modelSelector;
+
+            return true;
+        }
+
+        static (bool, int, string) FindCycle(List<string> paths)
+        {
+            Dictionary<string, int> seen = new Dictionary<string, int>();
+
+            for (int i = 0; i < paths.Count; i++)
+            {
+                for (int length = 1; length <= (paths.Count - i) / 2; length++)
+                {
+                    string subsequence = string.Join(".", paths.GetRange(i, length));
+                    if (seen.ContainsKey(subsequence))
+                    {
+                        int startIndex = seen[subsequence];
+                        string cycle = string.Join(", ", paths.GetRange(startIndex, length));
+                        return (true, startIndex, cycle);
+                    }
+                    seen[subsequence] = i;
+                }
+            }
+
+            return (false, -1, null);
+        }
+
+        public override string GetExistsReadHandleCode(ISymbol symbol, string path, CodeBuilder codeBuilder)
+        {
+            if (path != default)
+            {
+                var type = symbol.GetTypeSymbol();
+
+                //GenDebug.Break();
+
+                var models = type.GetAttributes()
+                    .Where(x => x.AttributeClass.MetadataName == NSLBIOTypeGenerator.NSLBIOTypeAttributeFullName)
+                    .SelectMany(x => x.ConstructorArguments.SelectMany(n => n.Values))
+                    .GroupBy(x => (string)x.Value)
+                    .Select(x => x.Key)
+                    .ToArray();
+
+                var _for = GetFor(CurrentMember ?? symbol, For, codeBuilder);
+
+                if (models.Contains(_for))
+                    return $"{type.GetTypeFullName()}.Read{_for}From(dataPacket);";
+            }
+
+            return default;
+        }
+
+        public override string GetExistsWriteHandleCode(ISymbol symbol, string path, CodeBuilder codeBuilder)
+        {
+            if (path != "this" && path != "value")
+            {
+                var type = symbol.GetTypeSymbol();
+
+                //GenDebug.Break();
+
+                var models = type.GetAttributes()
+                    .Where(x => x.AttributeClass.MetadataName == NSLBIOTypeGenerator.NSLBIOTypeAttributeFullName)
+                    .SelectMany(x => x.ConstructorArguments.SelectMany(n => n.Values))
+                    .GroupBy(x => (string)x.Value)
+                    .Select(x => x.Key)
+                    .ToArray();
+
+                var _for = GetFor(CurrentMember ?? symbol, For, codeBuilder);
+
+                if (models.Contains(_for))
+                    return $"{path}.Write{_for}To(__packet);";
+            }
+
+            return default;
+        }
+
+        private static string GetFor(ISymbol symbol, string For, CodeBuilder codeBuilder)
+        {
+            var proxyAttributes = symbol.GetAttributes()
+                .Where(x => x.AttributeClass.Name == nameof(NSLBIOProxyAttribute));
+
+            var proxyMap = proxyAttributes.Select(x =>
+            {
+                var args = x.ConstructorArguments;
+
+                if (args.Length == 1)
+                    return ((string)args[0].Value, (string[])null);
+
+                return ((string)args[0].Value, args[1].Values.Select(n => (string)n.Value).ToArray());
+            }).ToArray();
+
+            var newFor = proxyMap.FirstOrDefault(x => x.Item2?.Contains(For) == true);
+
+            if (newFor == default)
+            {
+                var globalModel = proxyMap.FirstOrDefault(x => x.Item2 == null);
+
+                if (globalModel != default)
+                {
+                    codeBuilder.AppendComment($"Not found special proxy model for '{For}' - use default '{globalModel.Item1}'");
+
+                    For = globalModel.Item1;
+                }
+                else
+                    codeBuilder.AppendComment($"Not found special and default model proxy, use current model - '{For}'");
+            }
+            else
+            {
+                codeBuilder.AppendComment($"Found proxy for '{For}' - '{newFor.Item1}'");
+
+                For = newFor.Item1;
+            }
+
+            return For;
         }
     }
 }

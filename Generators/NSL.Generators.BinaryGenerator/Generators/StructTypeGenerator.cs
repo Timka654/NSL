@@ -30,18 +30,25 @@ namespace NSL.Generators.BinaryGenerator.Generators
 
             rb.AppendLine();
 
-            path = parameter.GetName(path) ?? default;
+            bool successOpen = context.OpenTypeEntry(parameter, path, rb);
 
-            var members = type.GetMembers()
-                .Where(x => x is IFieldSymbol || x is IPropertySymbol)
-                .OrderBy(x => x.MetadataName);
-
-
-            foreach (var member in members)
+            if (successOpen)
             {
-                var fpath = string.Join(".", path, member.Name);
+                path = parameter.GetName(path) ?? default;
 
-                BinaryReadMethodsGenerator.AddTypeMemberReadLine(member, context, rb, fpath);
+                var members = type.GetMembers()
+                    .Where(x => x is IFieldSymbol || x is IPropertySymbol)
+                    .OrderBy(x => x.MetadataName);
+
+
+                foreach (var member in members)
+                {
+                    var fpath = string.Join(".", path, member.Name);
+
+                    BinaryReadMethodsGenerator.AddTypeMemberReadLine(member, context, rb, fpath);
+                }
+
+                context.CloseTypeEntry(parameter, path);
             }
 
             return rb.ToString();// test only
@@ -56,15 +63,22 @@ namespace NSL.Generators.BinaryGenerator.Generators
 
             CodeBuilder cb = new CodeBuilder();
 
-            var members = type.GetMembers()
-                .Where(x=>x is IFieldSymbol || x is IPropertySymbol)
-                .OrderBy(x=>x.MetadataName);
+            bool successOpen = context.OpenTypeEntry(item, path, cb);
 
-            foreach (var member in members)
+            if (successOpen)
             {
-                var fpath = string.Join(".", path, member.Name);
+                var members = type.GetMembers()
+                    .Where(x => x is IFieldSymbol || x is IPropertySymbol)
+                    .OrderBy(x => x.MetadataName);
 
-                BinaryWriteMethodsGenerator.AddTypeMemberWriteLine(member, context, cb, fpath);
+                foreach (var member in members)
+                {
+                    var fpath = string.Join(".", path, member.Name);
+
+                    BinaryWriteMethodsGenerator.AddTypeMemberWriteLine(member, context, cb, fpath);
+                }
+
+                context.CloseTypeEntry(item, path);
             }
 
             return cb.ToString();

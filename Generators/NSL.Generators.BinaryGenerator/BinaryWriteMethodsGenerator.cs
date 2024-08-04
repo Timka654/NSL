@@ -24,7 +24,9 @@ namespace NSL.Generators.BinaryGenerator
         //public static string BuildParameterWriter(ISymbol item, BinaryGeneratorContext context, string path, IEnumerable<string> ignoreMembers)
         public static string BuildParameterWriter(ISymbol item, BinaryGeneratorContext context, string path)
         {
-            string writerLine = context.GetExistsWriteHandleCode(item, path);
+            string writerLine = default;
+            
+            writerLine = context.GetExistsWriteHandleCode(item, path, new CodeBuilder());
 
             if (writerLine == default)
             {
@@ -49,32 +51,27 @@ namespace NSL.Generators.BinaryGenerator
             if (context.IsIgnore(member, path))
                 return false;
 
+            ITypeSymbol type = null;
+
             if (member is IPropertySymbol ps)
             {
-                if (ps.GetMethod != null)
-                {
-                    context.OpenTypeEntry(member, path);
-                    var ptype = ps.GetTypeSymbol();
-                    cb.AppendLine(BuildParameterWriter(ptype, context, path));
+                if (ps.GetMethod == null)
+                    return false;
 
-                    cb.AppendLine();
-
-                    context.CloseTypeEntry(member, path);
-                    return true;
-                }
+                type = ps.GetTypeSymbol();
             }
             else if (member is IFieldSymbol fs)
             {
-                context.OpenTypeEntry(member, path);
-                var ftype = fs.GetTypeSymbol();
-                cb.AppendLine(BuildParameterWriter(ftype, context, path));
-                cb.AppendLine();
-                context.CloseTypeEntry(member, path);
-
-                return true;
+                type = fs.GetTypeSymbol();
             }
 
-            return false;
+            context.CurrentMember = member;
+
+            cb.AppendLine(BuildParameterWriter(type, context, path));
+
+            cb.AppendLine();
+
+            return true;
         }
     }
 }
