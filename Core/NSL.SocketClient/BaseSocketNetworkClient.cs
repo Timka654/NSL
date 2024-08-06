@@ -14,10 +14,6 @@ namespace NSL.SocketClient
 
     public abstract class BaseSocketNetworkClient : INetworkClient
     {
-        /// <summary>
-        /// Буффер для хранения отправленных пакетов во время разрыва соединения
-        /// </summary>
-        /// 
         public CoreOptions ClientOptions => Network.Options;
 
         public void Send(OutputPacketBuffer packet)
@@ -33,7 +29,7 @@ namespace NSL.SocketClient
 
         /// <summary>
         /// Milliseconds
-        /// Важно! работает только при запуске цикла сообщений PingPongEnabled
+        /// Have default value if PingPongEnabled not set to "true"
         /// </summary>
         public int Ping { get; protected set; }
 
