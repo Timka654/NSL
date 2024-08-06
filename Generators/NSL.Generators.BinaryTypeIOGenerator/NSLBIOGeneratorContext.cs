@@ -75,8 +75,8 @@ namespace NSL.Generators.BinaryTypeIOGenerator
 
                 var snpath = string.Join(".", spath.Skip(cycl.Item2));
 
-                if (string.IsNullOrEmpty(snpath))
-                    GenDebug.Break();
+                //if (string.IsNullOrEmpty(snpath))
+                //    GenDebug.Break();
 
                 string msg = $"Found cycle starts path {snpath}";
 

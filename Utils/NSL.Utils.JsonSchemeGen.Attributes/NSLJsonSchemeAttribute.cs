@@ -1,4 +1,6 @@
-﻿namespace NSL.Utils.JsonSchemeGen.Attributes
+﻿using System;
+
+namespace NSL.Utils.JsonSchemeGen.Attributes
 {
     public class NSLJsonSchemeAttribute : Attribute
     {

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace NSL.Extensions.Version
 {
-    [BinaryIOType, BinaryIOMethodsFor]
+    [NSLBIOType]
     public partial class NSLVersionResult
     {
         public string Version { get; set; }

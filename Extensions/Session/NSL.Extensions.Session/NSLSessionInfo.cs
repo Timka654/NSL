@@ -5,7 +5,7 @@ using System.Text;
 
 namespace NSL.Extensions.Session
 {
-    [BinaryIOType, BinaryIOMethodsFor]
+    [NSLBIOType]
     public partial class NSLSessionInfo
     {
         public string Session { get; set; }

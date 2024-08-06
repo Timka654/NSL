@@ -39,7 +39,7 @@ namespace NSL.Generators.BinaryTypeIOGenerator
         {
             if (!type.HasPartialModifier())
             {
-                context.ShowBIODiagnostics("NSLBIOGEN000", "Type must have a partial modifier",DiagnosticSeverity.Error,  type.GetLocation());
+                context.ShowBIODiagnostics("NSLBIO000", "Type must have a partial modifier",DiagnosticSeverity.Error,  type.GetLocation());
                 return;
             }
             var typeClass = type as ClassDeclarationSyntax;

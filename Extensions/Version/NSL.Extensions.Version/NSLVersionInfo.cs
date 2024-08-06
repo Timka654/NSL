@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace NSL.Extensions.Version
 {
-    [BinaryIOType, BinaryIOMethodsFor]
+    [NSLBIOType]
     public partial class NSLVersionInfo
     {
         public const string ObjectBagKey = "NSL__VERSION";

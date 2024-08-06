@@ -39,16 +39,17 @@ namespace NSL.ASPNET.MemoryLogger
         public static IEndpointConventionBuilder MapDefaultMemoryLoggerViewRoute<T>(this T builder, string pattern)
             where T : IEndpointRouteBuilder
         {
-            return builder.MapGet(pattern, c =>
+            return builder.MapGet(pattern, async c =>
             {
                 var lp = c.RequestServices.GetRequiredService<ILoggerProvider>();
 
                 var logs = (lp as MemoryLoggerProvider).GetTextLogs();
 
                 c.Response.ContentType = "text/html";
-                c.Response.WriteAsync(string.Join("<br>", logs));
 
-                return Task.CompletedTask;
+                var logText = string.Join("<br>", logs);
+
+                await c.Response.WriteAsync(logText);
             });
         }
 
@@ -62,7 +63,7 @@ namespace NSL.ASPNET.MemoryLogger
         public static IEndpointConventionBuilder MapMemoryLoggerViewRouteWithFilter<T>(this T builder, string pattern)
             where T : IEndpointRouteBuilder
         {
-            return builder.MapGet(pattern, (HttpContext c, string? categoryName, LogLevel? logLevel) =>
+            return builder.MapGet(pattern, async (HttpContext c, string? categoryName, LogLevel? logLevel) =>
             {
                 var lp = c.RequestServices.GetRequiredService<ILoggerProvider>();
 
@@ -75,9 +76,7 @@ namespace NSL.ASPNET.MemoryLogger
                     logs = logs.Where(x => x.LogLevel.Equals(logLevel.Value));
 
                 c.Response.ContentType = "text/html";
-                c.Response.WriteAsync(string.Join("<br>", logs.Select(x => x.ToString())));
-
-                return Task.CompletedTask;
+                await c.Response.WriteAsync(string.Join("<br>", logs.Select(x => x.ToString())));
             });
         }
 

@@ -1,6 +1,7 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using NSL.Generators.FillTypeGenerator.Attributes;
+using NSL.Generators.FillTypeGenerator.Utils;
 using NSL.Generators.Utils;
 using System;
 using System.Collections.Generic;
@@ -48,7 +49,11 @@ namespace NSL.Generators.FillTypeGenerator
         private void ProcessFillToType(GeneratorExecutionContext context, TypeDeclarationSyntax type)
         {
             if (!type.HasPartialModifier())
+            {
+                context.ShowFillTypeDiagnostics("NSLFT000", "Type must have a partial modifier", DiagnosticSeverity.Error, type.GetLocation());
+
                 return;
+            }
 
             var typeClass = type as ClassDeclarationSyntax;
 

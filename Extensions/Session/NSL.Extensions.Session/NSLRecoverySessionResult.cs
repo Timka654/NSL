@@ -3,7 +3,7 @@ using System;
 
 namespace NSL.Extensions.Session
 {
-    [BinaryIOType, BinaryIOMethodsFor]
+    [NSLBIOType]
     public partial class NSLRecoverySessionResult
     {
         public NSLRecoverySessionResultEnum Result { get; set; }
