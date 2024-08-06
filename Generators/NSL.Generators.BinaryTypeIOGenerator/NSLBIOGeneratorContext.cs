@@ -180,7 +180,7 @@ namespace NSL.Generators.BinaryTypeIOGenerator
                 var _for = GetFor(CurrentMember ?? symbol, For, codeBuilder);
 
                 if (models.Contains(_for))
-                    return $"{type.GetTypeFullName()}.Read{_for}From(dataPacket);";
+                    return $"{type.GetTypeFullName(false)}.Read{_for}From(dataPacket);";
             }
 
             return default;
