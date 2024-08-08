@@ -1,0 +1,57 @@
+using Microsoft.Extensions.Configuration;
+using NSL.ASPNET.MemoryLogger.Tests;
+using NSL.ASPNET.Configuration;
+using Microsoft.EntityFrameworkCore;
+using System;
+
+var builder = WebApplication.CreateBuilder(args);
+
+// Add services to the container.
+
+await using (var context = TestVariablesDbContext.Create())
+{
+    await context.Database.MigrateAsync();
+}
+
+builder.Configuration.AddDbConfiguration<TestVariablesDbContext, TestVariableModel>(c =>
+c.WithDbContextOptions(c => c.UseNpgsql(TestVariablesDbContext.DEVConStr))
+.WithDbContextGetter(options => new TestVariablesDbContext(options))
+.WithAllowCreate(key=> Task.FromResult(true))
+.WithAllowUpdate(key=> Task.FromResult(true))
+.WithReloadDelay(TimeSpan.FromMinutes(10)));
+
+builder.Services.AddDbContext<TestVariablesDbContext>(c => c.UseNpgsql(TestVariablesDbContext.DEVConStr));
+
+var app = builder.Build();
+
+
+app.Configuration["dv2"] = "av1";
+
+// Configure the HTTP request pipeline.
+
+app.UseHttpsRedirection();
+
+var summaries = new[]
+{
+    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
+};
+
+app.MapGet("/weatherforecast", () =>
+{
+    var forecast = Enumerable.Range(1, 5).Select(index =>
+        new WeatherForecast
+        (
+            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
+            Random.Shared.Next(-20, 55),
+            summaries[Random.Shared.Next(summaries.Length)]
+        ))
+        .ToArray();
+    return forecast;
+});
+
+app.Run();
+
+internal record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
+{
+    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
+}

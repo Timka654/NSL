@@ -1,0 +1,6 @@
+@NSL.ASPNET.Configuration.Tests_HostAddress = http://localhost:5182
+
+GET {{NSL.ASPNET.Configuration.Tests_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
