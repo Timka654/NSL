@@ -204,7 +204,7 @@ namespace NSL.Generators.BinaryTypeIOGenerator
                 var _for = GetFor(CurrentMember ?? symbol, For, codeBuilder);
 
                 if (models.Contains(_for))
-                    return $"{type.GetTypeFullName(false)}.Write{_for}To(__packet);";
+                    return $"{type.GetTypeFullName(false)}.Write{_for}To({path}, __packet);";
             }
 
             return default;
