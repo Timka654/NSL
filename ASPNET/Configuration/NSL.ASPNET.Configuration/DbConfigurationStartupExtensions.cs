@@ -6,7 +6,7 @@ namespace NSL.ASPNET.Configuration
 {
     public static class DbConfigurationStartupExtensions
     {
-        public static ConfigurationManager AddDbConfiguration<TContext, TEntity>(this ConfigurationManager configurationManager, Action<DbConfigurationOptions<TContext>> build)
+        public static IConfigurationBuilder AddDbConfiguration<TContext, TEntity>(this IConfigurationBuilder configurationManager, Action<DbConfigurationOptions<TContext>> build)
         where TContext : DbContext
         where TEntity : DbConfigurationItemModel, new()
         {
