@@ -38,7 +38,7 @@ namespace NSL.ASPNET.Configuration
         /// <param name="set"></param>
         /// <param name="item"></param>
         /// <returns>have any for update</returns>
-        public static async Task<bool> TryUpdateValue<TItem>(this DbSet<DbConfigurationItemModel> set, TItem item)
+        public static async Task<bool> TryUpdateValueAsync<TItem>(this DbSet<TItem> set, TItem item)
             where TItem : DbConfigurationItemModel
         {
             return await set
