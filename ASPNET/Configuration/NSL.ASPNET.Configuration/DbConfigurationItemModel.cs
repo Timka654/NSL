@@ -16,5 +16,11 @@ namespace NSL.ASPNET.Configuration
         public string Value { get; set; }
 
         public DateTime UpdateTime { get; set; }
+
+        public void UpdateValue(string value)
+        {
+            Value = value;
+            UpdateTime = DateTime.UtcNow;
+        }
     }
 }
