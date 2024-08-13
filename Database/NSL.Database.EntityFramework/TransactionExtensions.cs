@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,21 +11,29 @@ namespace NSL.Database.EntityFramework
     public static class TransactionExtensions
     {
         public delegate Task<bool> InvokeDelegate<TContext>(TContext db, int n);
+        public delegate Task<bool> InvokeDelegate2<TContext>(TContext db, int n, InvokeActionContext invokeContext);
+        public delegate Task<bool> InvokeDelegate3<TContext>(TContext db, int n, IServiceProvider serviceProvider);
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <typeparam name="TContext"></typeparam>
-        /// <param name="context"></param>
-        /// <param name="action">execute transaction actions - must return "true" for save, can return "false" for ignore, on "false" - DbUpdateConcurrencyException was cleared and not throw</param>
-        /// <param name="maxCount">max available execution try count</param>
-        /// <param name="onHasThrow">handle for concurrency exception - can clear exception for prevent throw</param>
-        /// <exception cref="DbUpdateConcurrencyException">Throw on n == maxCount</exception>
-        /// <returns></returns>
-        public static async Task<bool> InvokeInTransactionAsync<TContext>(this TContext context, InvokeDelegate<TContext> action, int maxCount = 100, Func<DbUpdateConcurrencyException, DbUpdateConcurrencyException?> onHasThrow = null)
+        public static async Task<bool> InvokeDbTransactionAsync<TContext>(this IServiceProvider services, InvokeDelegate<TContext> action, int maxCount = 100)
+            where TContext : DbContext
+        {
+            bool result = false;
+
+            await using var scope = services.CreateAsyncScope();
+
+            var context = scope.ServiceProvider.GetRequiredService<TContext>();
+
+            result = await context.InvokeInTransactionAsync(action, maxCount);
+
+            return result;
+        }
+
+        public static async Task<bool> InvokeInTransactionAsync<TContext>(this TContext context, InvokeDelegate<TContext> action, int maxCount = 100)
             where TContext : DbContext
         {
             int i = 0;
+
+            bool result = false;
 
             DbUpdateConcurrencyException? latestEx = null;
 
@@ -32,45 +41,33 @@ namespace NSL.Database.EntityFramework
             {
                 try
                 {
-                    using var t = await context.Database.BeginTransactionAsync();
-
-                    if (await action(context, i++))
+                    await context.Database.CreateExecutionStrategy().ExecuteAsync(async () =>
                     {
-                        await context.SaveChangesAsync();
+                        using var t = await context.Database.BeginTransactionAsync();
 
-                        await t.CommitAsync();
+                        if (await action(context, i++))
+                        {
+                            await context.SaveChangesAsync();
 
-                        return true;
-                    }
+                            await t.CommitAsync();
 
-                    latestEx = null;
+                            result = true;
+                        }
 
-                    break;
+                        i = maxCount;
+                    });
                 }
                 catch (DbUpdateConcurrencyException dbu)
                 {
                     latestEx = dbu;
 
-                    foreach (var entry in dbu.Entries)
-                    {
-                        if (entry.State == EntityState.Deleted || entry.OriginalValues == null)
-                            //When EF deletes an item its state is set to Detached
-                            //http://msdn.microsoft.com/en-us/data/jj592676.aspx
-                            context.Entry(entry.Entity).State = EntityState.Detached;
-                        else
-                        {
-                            var dbv = entry.GetDatabaseValues();
-                            if (dbv != null && entry.State == EntityState.Modified)
-                                entry.OriginalValues.SetValues(dbv);
-                            else if (dbv == null && entry.State != EntityState.Deleted)
-                                entry.State = EntityState.Added;
-                        }
-                    }
+                    await Task.Delay(100);
 
-                    if (onHasThrow != null)
-                    {
-                        latestEx = onHasThrow(dbu);
-                    }
+                    if (dbu.Entries != null)
+                        foreach (var entity in dbu.Entries)
+                        {
+                            await entity.ReloadAsync();
+                        }
                 }
                 catch (Exception ex)
                 {
@@ -78,10 +75,55 @@ namespace NSL.Database.EntityFramework
                 }
             }
 
+            if (result)
+                return result;
+
             if (latestEx != null)
                 throw latestEx;
 
             return false;
         }
+
+        public static async Task<bool> InvokeDbTransactionAsync<TContext>(this IServiceProvider services, InvokeDelegate2<TContext> action, int maxCount = 100)
+            where TContext : DbContext
+        {
+            bool result = false;
+
+
+            await using var scope = services.CreateAsyncScope();
+
+            InvokeActionContext invokeContext = new InvokeActionContext();
+            result = await scope.ServiceProvider.GetRequiredService<TContext>().InvokeInTransactionAsync((db, i) =>
+            {
+                invokeContext.PostAction = () => Task.CompletedTask;
+
+                return action(db, i, invokeContext);
+            }, maxCount);
+
+            if (result)
+                await invokeContext.PostAction();
+
+            return result;
+        }
+
+        public static async Task<bool> InvokeDbTransactionAsync<TContext>(this IServiceProvider services, InvokeDelegate3<TContext> action, int maxCount = 100)
+            where TContext : DbContext
+        {
+            bool result = false;
+
+            await using var scope = services.CreateAsyncScope();
+
+            result = await scope.ServiceProvider.GetRequiredService<TContext>().InvokeInTransactionAsync((db, i) =>
+                {
+                    return action(db, i, scope.ServiceProvider);
+                }, maxCount);
+
+            return result;
+        }
+    }
+
+    public class InvokeActionContext
+    {
+        public Func<Task> PostAction { get; set; }
     }
 }
