@@ -39,7 +39,7 @@ namespace NSL.ASPNET.Configuration
 
             var dt = DateTime.UtcNow;
 
-            if (firstLoad || set.Any(x => x.UpdateTime > lastLoad))
+            if (firstLoad || set.Any(x => x.UpdateTime > lastLoad) || set.Count() != Data.Count)
             {
                 Data = set.ToDictionary(x => x.Name, x => x.Value);
                 lastLoad = dt;
