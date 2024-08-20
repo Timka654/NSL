@@ -1,0 +1,2 @@
+$temp = Read-Host "migration name"
+dotnet ef migrations add $temp --project "NSL.BlazorTemplate.Shared/NSL.BlazorTemplate.Shared.Server.csproj" --msbuildprojectextensionspath "NSL.BlazorTemplate.Shared\artifacts\NSL.BlazorTemplate.Shared.Server\obj"

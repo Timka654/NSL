@@ -21,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\NSL.Services.ServersHub.Shared\NSL.Services.ServersHub.Shared.csproj" PrivateAssets="All" />
+    <ProjectReference Include="..\..\NSL.BlazorTemplate.Shared\NSL.BlazorTemplate.Shared.csproj" PrivateAssets="All" />
   </ItemGroup>
 
 </Project>
