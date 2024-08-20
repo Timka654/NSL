@@ -1,4 +1,5 @@
-﻿#if DEBUG
+﻿//-:cnd:noEmit
+#if DEBUG
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
@@ -23,3 +24,4 @@ namespace NSL.BlazorTemplate.Shared.Server.Data
 }
 
 #endif
+//+:cnd:noEmit

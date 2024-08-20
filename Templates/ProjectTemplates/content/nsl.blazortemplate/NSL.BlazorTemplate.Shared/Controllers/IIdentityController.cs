@@ -1,9 +1,11 @@
-﻿#if SERVER
+﻿//-:cnd:noEmit
+#if SERVER
 using Microsoft.AspNetCore.Mvc;
 #else
 using NSL.Generators.HttpEndPointGenerator.Shared.Fake.Attributes;
 using NSL.Generators.HttpEndPointGenerator.Shared.Fake.Interfaces;
 #endif
+//+:cnd:noEmit
 
 using NSL.Generators.HttpEndPointGenerator.Shared.Attributes;
 using NSL.BlazorTemplate.Shared.Models.RequestModels;

@@ -1,4 +1,5 @@
-﻿#if CLIENT
+﻿//-:cnd:noEmit
+#if CLIENT
 
 namespace NSL.BlazorTemplate.Shared.Models
 {
@@ -8,3 +9,4 @@ namespace NSL.BlazorTemplate.Shared.Models
 }
 
 #endif
+//+:cnd:noEmit

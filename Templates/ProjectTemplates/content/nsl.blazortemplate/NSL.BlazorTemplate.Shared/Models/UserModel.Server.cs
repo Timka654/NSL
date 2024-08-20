@@ -1,4 +1,5 @@
-﻿#if SERVER
+﻿//-:cnd:noEmit
+#if SERVER
 
 using Microsoft.AspNetCore.Identity;
 
@@ -10,3 +11,4 @@ namespace NSL.BlazorTemplate.Shared.Models
 }
 
 #endif
+//+:cnd:noEmit
