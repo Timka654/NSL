@@ -23,12 +23,30 @@ namespace NSL.ASPNET.Configuration
 
         public override void Load()
         {
-            using var dbContext = options.DBContextGetter(options.DBOptions);
-
-            Data = dbContext.Set<TEntity>().ToDictionary(x => x.Name, x => x.Value);
+            reload(true);
 
             if (reloadTimer == null)
                 ProcessReloadTimer();
+        }
+
+        DateTime lastLoad = DateTime.MinValue;
+
+        private void reload(bool firstLoad = false)
+        {
+            using var dbContext = options.DBContextGetter(options.DBOptions);
+
+            var set = dbContext.Set<TEntity>();
+
+            var dt = DateTime.UtcNow;
+
+            if (firstLoad || set.Any(x => x.UpdateTime > lastLoad) || set.Count() != Data.Count)
+            {
+                Data = set.ToDictionary(x => x.Name, x => x.Value);
+                lastLoad = dt;
+
+                if (!firstLoad)
+                    base.OnReload();
+            }
         }
 
         private void ProcessReloadTimer()
@@ -43,7 +61,7 @@ namespace NSL.ASPNET.Configuration
                 // Рассчитайте оставшееся время до первой перезагрузки
                 TimeSpan timeUntilNextReload = nextReloadTime - now;
 
-                reloadTimer = new Timer(e => Load(), null, timeUntilNextReload, delay);
+                reloadTimer = new Timer(e => reload(), null, timeUntilNextReload, delay);
             }
         }
 
