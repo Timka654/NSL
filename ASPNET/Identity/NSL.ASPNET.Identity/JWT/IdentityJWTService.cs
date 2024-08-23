@@ -16,6 +16,8 @@ namespace NSL.ASPNET.Identity.JWT
         {
         }
 
+        protected virtual void ReadingClaimsErrorHandle(string jwtToken, Exception ex) { }
+
         public JwtSecurityToken? Identity { get; private set; }
 
         protected override async Task ReadClaims()
@@ -30,8 +32,9 @@ namespace NSL.ASPNET.Identity.JWT
             {
                 Identity = new JwtSecurityTokenHandler().ReadJwtToken(AuthorizationToken);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                ReadingClaimsErrorHandle(AuthorizationToken, ex);
                 await ClearIdentity();
             }
         }

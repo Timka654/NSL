@@ -17,14 +17,16 @@ namespace NSL.Generators.FillTypeGenerator.Tests
     }
 
     //[FillTypeGenerate(typeof(Test6Model), null)]
-    //[FillTypeGenerate(typeof(Test6Model))]
+    [FillTypeGenerate(typeof(Test6Model))]
+    [FillTypeFromGenerate(typeof(Test6Model))]
     //[FillTypeGenerate(typeof(Test6Model), null, "a1")]
     [FillTypeGenerate(typeof(Test6Model), "a1")]
     [FillTypeGenerate(typeof(Test6Model), "a1")]
-    [FillTypeGenerate(typeof(Test6Model),"a2")]
-    [FillTypeGenerate(typeof(Test6Model),"a3")]
-    [FillTypeGenerate(typeof(Test6Model),"a4")]
-    [FillTypeGenerate(typeof(Test5Model),"a4")]
+    [FillTypeGenerate(typeof(Test6Model), "a2")]
+    [FillTypeFromGenerate(typeof(Test6Model), "a2")]
+    [FillTypeGenerate(typeof(Test6Model), "a3")]
+    [FillTypeGenerate(typeof(Test6Model), "a4")]
+    [FillTypeGenerate(typeof(Test5Model), "a4")]
     public partial class Test7Model
     {
         [FillTypeGenerateInclude("a1")]

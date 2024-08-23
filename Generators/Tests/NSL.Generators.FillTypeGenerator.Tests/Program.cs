@@ -18,6 +18,8 @@
 
             model7.Filla1To(model6);
             model7.FillTo(model6);
+
+            model7.FillFrom(model6);
         }
     }
 }

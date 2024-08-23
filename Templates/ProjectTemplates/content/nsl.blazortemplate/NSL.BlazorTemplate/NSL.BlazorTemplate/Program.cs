@@ -35,6 +35,28 @@ namespace NSL.BlazorTemplate
                 .AddUserManager<AppUserManager>()
                 .AddRoleManager<AppRoleManager>();
 
+            builder.Services.AddDefaultAuthenticationForAPIBaseJWT()
+                .AddAPIBaseJWTBearer(builder.Configuration);
+
+            builder.Services.ConfigureApplicationCookie(c =>
+            {
+                c.Events = new Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationEvents()
+                {
+                    OnRedirectToAccessDenied = c =>
+                    {
+                        c.Response.StatusCode = (int)HttpStatusCode.Forbidden;
+
+                        return Task.CompletedTask;
+                    },
+                    OnRedirectToLogin = c =>
+                    {
+                        c.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
+
+                        return Task.CompletedTask;
+                    }
+                };
+            });
+
 
             var app = builder.Build();
 
@@ -54,6 +76,8 @@ namespace NSL.BlazorTemplate
             }
 
             app.UseHttpsRedirection();
+
+            app.UseAuth();
 
             app.UseStaticFiles();
             //app.UseAntiforgery();

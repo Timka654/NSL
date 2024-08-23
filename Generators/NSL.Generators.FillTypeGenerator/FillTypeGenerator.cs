@@ -80,39 +80,22 @@ namespace NSL.Generators.FillTypeGenerator
 
                 foreach (var attr in attrbsGrouped)
                 {
-                    var haveAll = attr.Any(x => x.ArgumentList.Arguments.Count() == 1);
-
-                    var models = attr.SelectMany(x => x.ArgumentList.Arguments
-                        .Skip(1)
-                        .Select(n=>n.GetAttributeParameterValue<string>(typeSem)))
-                    .GroupBy(x => x)
-                    .Select(x => x.Key)
-                    .ToArray();
-
-                    if (models.Contains(null))
-                        haveAll = false;
-
-                    var toType = attr.Key;
-
-                    var declaration = toType.DeclaringSyntaxReferences.First().GetSyntax() as TypeDeclarationSyntax;
-
-                    if (haveAll)
-                        classBuilder.AppendLine(CreateMethod(declaration, typeSymb, toType, null).ToString());
-
-                    if (models.Any())
-                    {
-                        var methods = new List<string>();
-
-                        foreach (var item in models)
-                        {
-                            methods.Add(CreateMethod(declaration, typeSymb, toType, item).ToString());
-                        }
-
-#pragma warning disable RS1035 // Do not use APIs banned for analyzers
-                        classBuilder.AppendLine(string.Join(Environment.NewLine + Environment.NewLine, methods));
-#pragma warning restore RS1035 // Do not use APIs banned for analyzers
-                    }
+                    ProcessAttribute(classBuilder, attr, typeSymb, typeSem, true);
                 }
+
+                attrbs = typeClass.AttributeLists
+                .SelectMany(x => x.Attributes)
+                .Where(x => x.GetAttributeFullName().Equals(FillTypeFromGenerateAttributeFullName))
+                .ToArray();
+
+                attrbsGrouped = attrbs.GroupBy(x => x.ArgumentList.Arguments.First().GetAttributeTypeParameterValueSymbol(typeSem), TypeSymbolEqualityComparer.Instance);
+
+
+                foreach (var attr in attrbsGrouped)
+                {
+                    ProcessAttribute(classBuilder, attr, typeSymb, typeSem, false);
+                }
+
             }, requiredUsings);
 
             // Visual studio have lag(or ...) cannot show changes sometime
@@ -127,25 +110,47 @@ namespace NSL.Generators.FillTypeGenerator
             context.AddSource($"{typeClass.GetTypeClassName()}.filltype.cs", classBuilder.ToString());
         }
 
-        private CodeBuilder CreateMethod(TypeDeclarationSyntax declaration, ITypeSymbol fromType, ITypeSymbol toType, string model)
+        private void ProcessAttribute(CodeBuilder classBuilder, IGrouping<ITypeSymbol, AttributeSyntax> attr, ITypeSymbol typeSymb, SemanticModel typeSem, bool dir)
+        {
+            var haveAll = attr.Any(x => x.ArgumentList.Arguments.Count() == 1);
+
+            var models = attr.SelectMany(x => x.ArgumentList.Arguments
+                .Skip(1)
+                .Select(n => n.GetAttributeParameterValue<string>(typeSem)))
+            .GroupBy(x => x)
+            .Select(x => x.Key)
+            .ToArray();
+
+            if (models.Contains(null))
+                haveAll = false;
+
+            var toType = attr.Key;
+
+            var declaration = toType.DeclaringSyntaxReferences.First().GetSyntax() as TypeDeclarationSyntax;
+
+            if (haveAll)
+                classBuilder.AppendLine(CreateMethod(declaration, typeSymb, toType, null, dir).ToString());
+
+            if (models.Any())
+            {
+                var methods = new List<string>();
+
+                foreach (var item in models)
+                {
+                    methods.Add(CreateMethod(declaration, typeSymb, toType, item, dir).ToString());
+                }
+
+#pragma warning disable RS1035 // Do not use APIs banned for analyzers
+                classBuilder.AppendLine(string.Join(Environment.NewLine + Environment.NewLine, methods));
+#pragma warning restore RS1035 // Do not use APIs banned for analyzers
+            }
+        }
+
+        private CodeBuilder CreateMethod(TypeDeclarationSyntax declaration, ITypeSymbol fromType, ITypeSymbol toType, string model, bool dir)
         {
             CodeBuilder methodBuilder = new CodeBuilder();
 
-            //methodBuilder.AppendLine($"{(declaration.HasInternalModifier() ? "internal" : "public")} {toType.Name} Fill{model}Create()");
-
-            //methodBuilder.AppendLine("{");
-
-            //methodBuilder.NextTab();
-
-
-
-            //methodBuilder.PrevTab();
-
-            //methodBuilder.AppendLine("}");
-
-            //methodBuilder.AppendLine();
-
-            methodBuilder.AppendLine($"{(declaration.HasInternalModifier() ? "internal" : "public")} void Fill{model}To({toType.Name} toFill)");
+            methodBuilder.AppendLine($"{(declaration.HasInternalModifier() ? "internal" : "public")} void Fill{model}{(dir ? "To" : "From")}({toType.Name} {(dir ? "to" : "from")}Fill)");
 
             methodBuilder.AppendLine("{");
 
@@ -153,7 +158,10 @@ namespace NSL.Generators.FillTypeGenerator
 
             List<string> memberLines = new List<string>();
 
-            FillMembers(memberLines, fromType, toType, model, "toFill", null, 0);
+            if (dir)
+                FillMembers(memberLines, fromType, toType, model, "toFill", null, dir, 0);
+            else
+                FillMembers(memberLines, fromType, toType, model, null, "fromFill", dir, 0);
 
             foreach (var ml in memberLines)
             {
@@ -293,10 +301,13 @@ namespace NSL.Generators.FillTypeGenerator
             return default;
         }
 
-        private void FillMembers(List<string> codeLines, ITypeSymbol fromType, ITypeSymbol toType, string model, string fillPath, string readPath, int t)
+        private void FillMembers(List<string> codeLines, ITypeSymbol fromType, ITypeSymbol toType, string model, string fillPath, string readPath, bool dir, int t)
         {
             var fromMembers = FilterSymbols(fromType.GetAllMembers(), model);
-            var toMembers = toType.GetAllMembers();
+            var toMembers = (IEnumerable<ISymbol>)toType.GetAllMembers();
+
+            if (!dir)
+                (fromMembers, toMembers) = (toMembers, fromMembers);
 
             var tabPrefix = string.Concat(Enumerable.Repeat("\t", t));
 
@@ -350,7 +361,7 @@ namespace NSL.Generators.FillTypeGenerator
                     {
                         var amem = new List<string>();
 
-                        FillMembers(amem, arrayItemTypeFrom, arrayItemTypeTo, itemModel, null, p, 1);
+                        FillMembers(amem, arrayItemTypeFrom, arrayItemTypeTo, itemModel, null, p, dir, 1);
 
                         if (!Equals(model, itemModel))
                             codeLines.Add($"// Proxy model merge from \"{model}\" to \"{itemModel}\"");
@@ -380,10 +391,11 @@ namespace NSL.Generators.FillTypeGenerator
         }
 
 
-        private readonly string FillTypeGenerateAttributeFullName = typeof(FillTypeGenerateAttribute).Name;
-        private readonly string FillTypeGenerateIgnoreAttributeFullName = typeof(FillTypeGenerateIgnoreAttribute).Name;
-        private readonly string FillTypeGenerateIncludeAttributeFullName = typeof(FillTypeGenerateIncludeAttribute).Name;
-        private readonly string FillTypeGenerateProxyAttributeFullName = typeof(FillTypeGenerateProxyAttribute).Name;
-        private readonly string stringFullName = typeof(string).Name;
+        internal static readonly string FillTypeGenerateAttributeFullName = typeof(FillTypeGenerateAttribute).Name;
+        internal static readonly string FillTypeFromGenerateAttributeFullName = typeof(FillTypeFromGenerateAttribute).Name;
+        internal static readonly string FillTypeGenerateIgnoreAttributeFullName = typeof(FillTypeGenerateIgnoreAttribute).Name;
+        internal static readonly string FillTypeGenerateIncludeAttributeFullName = typeof(FillTypeGenerateIncludeAttribute).Name;
+        internal static readonly string FillTypeGenerateProxyAttributeFullName = typeof(FillTypeGenerateProxyAttribute).Name;
+        internal static readonly string stringFullName = typeof(string).Name;
     }
 }

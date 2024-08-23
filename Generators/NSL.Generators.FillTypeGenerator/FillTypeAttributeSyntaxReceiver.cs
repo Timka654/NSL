@@ -13,7 +13,8 @@ namespace NSL.Generators.FillTypeGenerator
     {
         public IList<TypeDeclarationSyntax> FillTypeTypes { get; } = new List<TypeDeclarationSyntax>();
 
-        string FillTypeAttributeName = typeof(FillTypeGenerateAttribute).Name;
+        internal static readonly string FillTypeGenerateAttributeFullName = FillTypeGenerator.FillTypeGenerateAttributeFullName;
+        internal static readonly string FillTypeFromGenerateAttributeFullName = FillTypeGenerator.FillTypeFromGenerateAttributeFullName;
 
         public void OnVisitSyntaxNode(SyntaxNode syntaxNode)
         {
@@ -23,7 +24,8 @@ namespace NSL.Generators.FillTypeGenerator
                 {
                     if (typeDeclarationSyntax.AttributeLists
                         .Any(al => al.Attributes
-                            .Any(a => a.GetAttributeFullName().Equals(FillTypeAttributeName, StringComparison.InvariantCultureIgnoreCase))))
+                            .Any(a => a.GetAttributeFullName().Equals(FillTypeGenerateAttributeFullName, StringComparison.InvariantCultureIgnoreCase) 
+                            || a.GetAttributeFullName().Equals(FillTypeFromGenerateAttributeFullName, StringComparison.InvariantCultureIgnoreCase))))
                     {
                         FillTypeTypes.Add(typeDeclarationSyntax);
                     }

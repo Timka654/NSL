@@ -33,7 +33,7 @@ namespace NSL.BlazorTemplate.Client.Services
                 return;
             }
 
-            await localStorage.SetItemAsync(StorageKey, token);
+            await localStorage.SetItemAsStringAsync(StorageKey, token);
         }
     }
 }
