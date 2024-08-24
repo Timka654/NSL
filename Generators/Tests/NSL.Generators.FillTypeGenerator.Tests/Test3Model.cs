@@ -1,4 +1,4 @@
-﻿//#if !DEVELOP
+﻿#if !DEVELOP
 
 using NSL.Generators.FillTypeGenerator.Attributes;
 
@@ -19,4 +19,4 @@ namespace NSL.Generators.FillTypeGenerator.Tests
     }
 }
 
-//#endif
+#endif

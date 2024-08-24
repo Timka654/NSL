@@ -6,9 +6,13 @@ namespace NSL.Generators.FillTypeGenerator.Attributes
     public class FillTypeGenerateIgnoreAttribute : Attribute
     {
         /// <summary>
-        /// Mark as ignore property/field on fill to type <paramref name="fillTypeIgnore"/>
+        /// Mark as ignore property/field on fill to/from type <paramref name="fillTypeIgnore"/>
         /// </summary>
         /// <param name="fillTypeIgnore"></param>
         public FillTypeGenerateIgnoreAttribute(Type fillTypeIgnore) { }
+        /// <summary>
+        /// Mark as ignore property/field on fill any
+        /// </summary>
+        public FillTypeGenerateIgnoreAttribute() { }
     }
 }

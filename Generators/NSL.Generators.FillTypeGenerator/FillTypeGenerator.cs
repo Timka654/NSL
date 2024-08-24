@@ -54,8 +54,11 @@ namespace NSL.Generators.FillTypeGenerator
 
                 return;
             }
+            //GenDebug.Break();
 
             var typeClass = type as ClassDeclarationSyntax;
+
+            //Debug.WriteLine($"FillTypeGenerator -> {typeClass.Identifier.Text}");
 
             var typeSem = context.Compilation.GetSemanticModel(typeClass.SyntaxTree);
 
@@ -75,12 +78,15 @@ namespace NSL.Generators.FillTypeGenerator
                 .Where(x => x.GetAttributeFullName().Equals(FillTypeGenerateAttributeFullName))
                 .ToArray();
 
+                if (attrbs.Any(x => !x.ArgumentList.Arguments.Any()))
+                    GenDebug.Break();
+
                 var attrbsGrouped = attrbs.GroupBy(x => x.ArgumentList.Arguments.First().GetAttributeTypeParameterValueSymbol(typeSem), TypeSymbolEqualityComparer.Instance);
 
 
                 foreach (var attr in attrbsGrouped)
                 {
-                    ProcessAttribute(classBuilder, attr, typeSymb, typeSem, true);
+                    ProcessAttribute(context, classBuilder, attr, typeSymb, typeSem, true);
                 }
 
                 attrbs = typeClass.AttributeLists
@@ -88,12 +94,15 @@ namespace NSL.Generators.FillTypeGenerator
                 .Where(x => x.GetAttributeFullName().Equals(FillTypeFromGenerateAttributeFullName))
                 .ToArray();
 
+                if (attrbs.Any(x => !x.ArgumentList.Arguments.Any()))
+                    GenDebug.Break();
+
                 attrbsGrouped = attrbs.GroupBy(x => x.ArgumentList.Arguments.First().GetAttributeTypeParameterValueSymbol(typeSem), TypeSymbolEqualityComparer.Instance);
 
 
                 foreach (var attr in attrbsGrouped)
                 {
-                    ProcessAttribute(classBuilder, attr, typeSymb, typeSem, false);
+                    ProcessAttribute(context, classBuilder, attr, typeSymb, typeSem, false);
                 }
 
             }, requiredUsings);
@@ -110,7 +119,7 @@ namespace NSL.Generators.FillTypeGenerator
             context.AddSource($"{typeClass.GetTypeClassName()}.filltype.cs", classBuilder.ToString());
         }
 
-        private void ProcessAttribute(CodeBuilder classBuilder, IGrouping<ITypeSymbol, AttributeSyntax> attr, ITypeSymbol typeSymb, SemanticModel typeSem, bool dir)
+        private void ProcessAttribute(GeneratorExecutionContext context, CodeBuilder classBuilder, IGrouping<ITypeSymbol, AttributeSyntax> attr, ITypeSymbol typeSymb, SemanticModel typeSem, bool dir)
         {
             var haveAll = attr.Any(x => x.ArgumentList.Arguments.Count() == 1);
 
@@ -126,10 +135,13 @@ namespace NSL.Generators.FillTypeGenerator
 
             var toType = attr.Key;
 
-            var declaration = toType.DeclaringSyntaxReferences.First().GetSyntax() as TypeDeclarationSyntax;
+            //if (!toType.DeclaringSyntaxReferences.Any())
+            //    GenDebug.Break();
+
+            bool isInternal = (toType.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax() as TypeDeclarationSyntax)?.HasInternalModifier() ?? false;
 
             if (haveAll)
-                classBuilder.AppendLine(CreateMethod(declaration, typeSymb, toType, null, dir).ToString());
+                classBuilder.AppendLine(CreateMethod(context, isInternal, typeSymb, toType, null, dir).ToString());
 
             if (models.Any())
             {
@@ -137,20 +149,20 @@ namespace NSL.Generators.FillTypeGenerator
 
                 foreach (var item in models)
                 {
-                    methods.Add(CreateMethod(declaration, typeSymb, toType, item, dir).ToString());
+                    methods.Add(CreateMethod(context, isInternal, typeSymb, toType, item, dir).ToString());
                 }
 
 #pragma warning disable RS1035 // Do not use APIs banned for analyzers
                 classBuilder.AppendLine(string.Join(Environment.NewLine + Environment.NewLine, methods));
-#pragma warning restore RS1035 // Do not use APIs banned for analyzers
+#pragma warning restore RS1035 // Do not use APIs banned for analyzers declaration.HasInternalModifier()
             }
         }
 
-        private CodeBuilder CreateMethod(TypeDeclarationSyntax declaration, ITypeSymbol fromType, ITypeSymbol toType, string model, bool dir)
+        private CodeBuilder CreateMethod(GeneratorExecutionContext context, bool @internal, ITypeSymbol fromType, ITypeSymbol toType, string model, bool dir)
         {
             CodeBuilder methodBuilder = new CodeBuilder();
 
-            methodBuilder.AppendLine($"{(declaration.HasInternalModifier() ? "internal" : "public")} void Fill{model}{(dir ? "To" : "From")}({toType.Name} {(dir ? "to" : "from")}Fill)");
+            methodBuilder.AppendLine($"{(@internal ? "internal" : "public")} void Fill{model}{(dir ? "To" : "From")}({toType.Name} {(dir ? "to" : "from")}Fill)");
 
             methodBuilder.AppendLine("{");
 
@@ -159,9 +171,9 @@ namespace NSL.Generators.FillTypeGenerator
             List<string> memberLines = new List<string>();
 
             if (dir)
-                FillMembers(memberLines, fromType, toType, model, "toFill", null, dir, 0);
+                FillMembers(context, memberLines, fromType, toType, model, "toFill", null, dir, 0);
             else
-                FillMembers(memberLines, fromType, toType, model, null, "fromFill", dir, 0);
+                FillMembers(context, memberLines, fromType, toType, model, null, "fromFill", dir, 0);
 
             foreach (var ml in memberLines)
             {
@@ -219,25 +231,27 @@ namespace NSL.Generators.FillTypeGenerator
             return proxyModel ?? model;
         }
 
-        private ITypeSymbol GetFromTypeForFill(ISymbol fromItem, ITypeSymbol toType)
+        private ITypeSymbol GetFromTypeForFill(ISymbol fromItem, ITypeSymbol toType, bool dir)
         {
             if (fromItem is IPropertySymbol ps)
             {
-                var ignore = ps.GetAttributes()
+                var ignore = !dir ? false : ps.GetAttributes()
                 .Where(x => x.AttributeClass.Name.Equals(FillTypeGenerateIgnoreAttributeFullName))
-                .Any(q => q.ConstructorArguments.Any(x => (x.Value as INamedTypeSymbol).MetadataName.Equals(toType.MetadataName)));
+                .Any(q => !q.ConstructorArguments.Any() || q.ConstructorArguments.Any(x => (x.Value as INamedTypeSymbol).MetadataName.Equals(toType.MetadataName)));
 
                 if (!ignore)
                 {
+                    //GenDebug.Break();
+
                     if (ps.GetMethod != null)
                         return ps.Type;
                 }
             }
             else if (fromItem is IFieldSymbol fs)
             {
-                var ignore = fs.GetAttributes()
+                var ignore = !dir ? false : fs.GetAttributes()
                 .Where(x => x.AttributeClass.Name.Equals(FillTypeGenerateIgnoreAttributeFullName))
-                .Any(q => q.ConstructorArguments.Any(x => (x.Value as INamedTypeSymbol).MetadataName.Equals(toType.MetadataName)));
+                .Any(q => !q.ConstructorArguments.Any() || q.ConstructorArguments.Any(x => (x.Value as INamedTypeSymbol).MetadataName.Equals(toType.MetadataName)));
 
                 if (!ignore)
                     return fs.Type;
@@ -246,16 +260,30 @@ namespace NSL.Generators.FillTypeGenerator
             return default;
         }
 
-        private ITypeSymbol GetToTypeForFill(ISymbol toItem)
+        private ITypeSymbol GetToTypeForFill(ISymbol toItem, ITypeSymbol fromType, bool dir)
         {
             if (toItem is IPropertySymbol ps)
             {
-                if (ps.SetMethod != null)
-                    return ps.Type;
+                var ignore = dir ? false : ps.GetAttributes()
+                .Where(x => x.AttributeClass.Name.Equals(FillTypeGenerateIgnoreAttributeFullName))
+                .Any(q => !q.ConstructorArguments.Any() || q.ConstructorArguments.Any(x => (x.Value as INamedTypeSymbol).MetadataName.Equals(fromType.MetadataName)));
+
+                if (!ignore)
+                {
+                    //GenDebug.Break();
+
+                    if (ps.GetMethod != null)
+                        return ps.Type;
+                }
             }
             else if (toItem is IFieldSymbol fs)
             {
-                return fs.Type;
+                var ignore = dir ? false : fs.GetAttributes()
+                .Where(x => x.AttributeClass.Name.Equals(FillTypeGenerateIgnoreAttributeFullName))
+                .Any(q => !q.ConstructorArguments.Any() || q.ConstructorArguments.Any(x => (x.Value as INamedTypeSymbol).MetadataName.Equals(fromType.MetadataName)));
+
+                if (!ignore)
+                    return fs.Type;
             }
 
             return default;
@@ -301,13 +329,16 @@ namespace NSL.Generators.FillTypeGenerator
             return default;
         }
 
-        private void FillMembers(List<string> codeLines, ITypeSymbol fromType, ITypeSymbol toType, string model, string fillPath, string readPath, bool dir, int t)
+        private void FillMembers(GeneratorExecutionContext context, List<string> codeLines, ITypeSymbol fromType, ITypeSymbol toType, string model, string fillPath, string readPath, bool dir, int t)
         {
+            if (!dir)
+            {
+                (toType, fromType) = (fromType, toType);
+            }
+
             var fromMembers = FilterSymbols(fromType.GetAllMembers(), model);
             var toMembers = (IEnumerable<ISymbol>)toType.GetAllMembers();
 
-            if (!dir)
-                (fromMembers, toMembers) = (toMembers, fromMembers);
 
             var tabPrefix = string.Concat(Enumerable.Repeat("\t", t));
 
@@ -320,12 +351,32 @@ namespace NSL.Generators.FillTypeGenerator
                 if (toItem == default)
                     continue;
 
-                ITypeSymbol memberFromType = GetFromTypeForFill(fromItem, toType);
+                ITypeSymbol memberFromType = GetFromTypeForFill(fromItem, toType, dir);
 
-                ITypeSymbol memberToType = GetToTypeForFill(toItem);
+                ITypeSymbol memberToType = GetToTypeForFill(toItem, fromType, dir);
 
                 if (memberFromType == null || memberToType == null)
                     continue;
+
+                var conversation = context.Compilation.ClassifyCommonConversion(memberFromType, memberToType);
+
+                //var typeFromName = memberFromType.GetTypeFullName(false);
+                //var typeToName = memberToType.GetTypeFullName(false);
+
+                if (!conversation.Exists)
+                {
+
+                    var msg = $"Cannot fill \"{toItem.Name}\" value from {fromType.Name}, members types must be equals, or can be cast, or must be marked for ignore";
+
+                    context.ShowFillTypeDiagnostics("NSLFT001"
+                        , msg
+                        , DiagnosticSeverity.Error
+                        , toItem.Locations.ToArray());
+
+                    GenDebug.Break();
+
+                    continue;
+                }
 
                 string mFillPath = $"{tabPrefix}{string.Join(".", fillPath, fromItem.Name).TrimStart('.')} = ";
 
@@ -336,12 +387,6 @@ namespace NSL.Generators.FillTypeGenerator
 
                 if (arrayItemTypeFrom != default)
                 {
-                    if (arrayItemTypeTo == null)
-                    {
-                        codeLines.Add($"Cannot convert {memberFromType} to {memberToType}");
-                        continue;
-                    }
-
                     itemModel = GetProxyModel(fromItem, model);
 
                     int n = 0;
@@ -361,7 +406,7 @@ namespace NSL.Generators.FillTypeGenerator
                     {
                         var amem = new List<string>();
 
-                        FillMembers(amem, arrayItemTypeFrom, arrayItemTypeTo, itemModel, null, p, dir, 1);
+                        FillMembers(context, amem, arrayItemTypeFrom, arrayItemTypeTo, itemModel, null, p, dir, 1);
 
                         if (!Equals(model, itemModel))
                             codeLines.Add($"// Proxy model merge from \"{model}\" to \"{itemModel}\"");
@@ -382,6 +427,12 @@ namespace NSL.Generators.FillTypeGenerator
                 }
                 else
                     codeFragment = string.Join(".", readPath, fromItem.Name).TrimStart('.');
+
+                if (conversation.IsNumeric)
+                    codeFragment = $"({memberToType.GetTypeFullName()}){codeFragment}";
+                else if (conversation.IsImplicit) { }
+                else
+                    GenDebug.Break();
 
                 var result = $"{mFillPath}{codeFragment}";
 
