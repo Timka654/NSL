@@ -78,8 +78,8 @@ namespace NSL.Generators.FillTypeGenerator
                 .Where(x => x.GetAttributeFullName().Equals(FillTypeGenerateAttributeFullName))
                 .ToArray();
 
-                if (attrbs.Any(x => !x.ArgumentList.Arguments.Any()))
-                    GenDebug.Break();
+                //if (attrbs.Any(x => !x.ArgumentList.Arguments.Any()))
+                //    GenDebug.Break();
 
                 var attrbsGrouped = attrbs.GroupBy(x => x.ArgumentList.Arguments.First().GetAttributeTypeParameterValueSymbol(typeSem), TypeSymbolEqualityComparer.Instance);
 
@@ -94,8 +94,8 @@ namespace NSL.Generators.FillTypeGenerator
                 .Where(x => x.GetAttributeFullName().Equals(FillTypeFromGenerateAttributeFullName))
                 .ToArray();
 
-                if (attrbs.Any(x => !x.ArgumentList.Arguments.Any()))
-                    GenDebug.Break();
+                //if (attrbs.Any(x => !x.ArgumentList.Arguments.Any()))
+                //    GenDebug.Break();
 
                 attrbsGrouped = attrbs.GroupBy(x => x.ArgumentList.Arguments.First().GetAttributeTypeParameterValueSymbol(typeSem), TypeSymbolEqualityComparer.Instance);
 
@@ -373,7 +373,7 @@ namespace NSL.Generators.FillTypeGenerator
                         , DiagnosticSeverity.Error
                         , toItem.Locations.ToArray());
 
-                    GenDebug.Break();
+                    //GenDebug.Break();
 
                     continue;
                 }
@@ -431,8 +431,8 @@ namespace NSL.Generators.FillTypeGenerator
                 if (conversation.IsNumeric)
                     codeFragment = $"({memberToType.GetTypeFullName()}){codeFragment}";
                 else if (conversation.IsImplicit) { }
-                else
-                    GenDebug.Break();
+                //else
+                //    GenDebug.Break();
 
                 var result = $"{mFillPath}{codeFragment}";
 
