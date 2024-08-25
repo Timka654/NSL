@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Configuration;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -30,8 +31,7 @@ namespace NSL.ASPNET.MemoryLogger
         {
             builder.AddConfiguration();
 
-            builder.Services.TryAddEnumerable(
-                ServiceDescriptor.Singleton<ILoggerProvider, MemoryLoggerProvider>((s) => new MemoryLoggerProvider(validTime, maxLogCount)));
+            builder.Services.AddSingleton<ILoggerProvider>((s) => new MemoryLoggerProvider(validTime, maxLogCount));
 
             return builder;
         }
@@ -41,7 +41,12 @@ namespace NSL.ASPNET.MemoryLogger
         {
             return builder.MapGet(pattern, async c =>
             {
-                var lp = c.RequestServices.GetRequiredService<ILoggerProvider>();
+                var lps = c.RequestServices.GetRequiredService<IEnumerable<ILoggerProvider>>();
+
+                var lp = lps.FirstOrDefault(x => x is MemoryLoggerProvider);
+
+                if (lp == null)
+                    throw new Exception($"MemoryLoggerProvider not registered!!");
 
                 var logs = (lp as MemoryLoggerProvider).GetTextLogs();
 
@@ -65,7 +70,12 @@ namespace NSL.ASPNET.MemoryLogger
         {
             return builder.MapGet(pattern, async (HttpContext c, string? categoryName, LogLevel? logLevel) =>
             {
-                var lp = c.RequestServices.GetRequiredService<ILoggerProvider>();
+                var lps = c.RequestServices.GetRequiredService<IEnumerable<ILoggerProvider>>();
+
+                var lp = lps.FirstOrDefault(x => x is MemoryLoggerProvider);
+
+                if (lp == null)
+                    throw new Exception($"MemoryLoggerProvider not registered!!");
 
                 var logs = (lp as MemoryLoggerProvider).GetLogs();
 
