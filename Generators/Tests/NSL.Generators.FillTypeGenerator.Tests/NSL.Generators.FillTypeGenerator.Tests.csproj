@@ -20,6 +20,7 @@
 	<ItemGroup>
 		<ProjectReference Include="..\..\NSL.Generators.FillTypeGenerator.Attributes\NSL.Generators.FillTypeGenerator.Attributes.csproj" />
 		<ProjectReference Include="..\..\NSL.Generators.FillTypeGenerator\NSL.Generators.FillTypeGenerator.csproj" OutputItemType="Analyzer" />
+		<ProjectReference Include="..\NSL.Generators.FillTypeGenerator.Tests.From\NSL.Generators.FillTypeGenerator.Tests.From.csproj" />
 	</ItemGroup>
 
 </Project>
