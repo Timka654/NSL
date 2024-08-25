@@ -32,8 +32,6 @@ namespace NSL.ASPNET.MemoryLogger
             if (!IsEnabled(logLevel))
                 return;
 
-            StringBuilder sb = new StringBuilder();
-
             loggerProvider.EnqueueLog(new MemoryLogRecordModel(logLevel, eventId, name, formatter(state, exception)));
         }
     }
