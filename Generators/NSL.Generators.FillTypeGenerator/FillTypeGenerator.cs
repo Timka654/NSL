@@ -398,7 +398,7 @@ namespace NSL.Generators.FillTypeGenerator
                     else
                         while (readPath.Contains(p = $"x{n++}")) { }
 
-                    if (basicArrayTypes.Contains(arrayItemTypeFrom.Name))
+                    if (basicArrayTypes.Contains(arrayItemTypeFrom.Name) || arrayItemTypeFrom.TypeKind == TypeKind.Enum)
                     {
                         codeFragment = $"{string.Join(".", readPath, fromItem.Name).TrimStart('.')}?.Select({p} => {p}).{GetCollectionLinqConvertMethod(memberToType)}()";
                     }
