@@ -314,7 +314,8 @@ namespace NSL.Generators.FillTypeGenerator
             typeof(int).Name,
             typeof(ulong).Name,
             typeof(long).Name,
-            typeof(string).Name
+            typeof(string).Name,
+            typeof(Guid).Name
         };
 
         private string GetCollectionLinqConvertMethod(ITypeSymbol type)
