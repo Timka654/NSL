@@ -7,7 +7,7 @@ namespace NSL.Database.EntityFramework.Filter
 {
     public static class BaseFilteredQueryExtensions
     {
-        public static BaseFilteredQueryModel AddFilter<T>(this BaseFilteredQueryModel value, string propertyPath, CompareType compareType, T v)
+        public static EntityFilterQueryModel AddFilter<T>(this EntityFilterQueryModel value, string propertyPath, CompareType compareType, T v)
         {
             var block = value.FilterQuery?.LastOrDefault();
 
@@ -17,22 +17,22 @@ namespace NSL.Database.EntityFramework.Filter
                 block = value.FilterQuery.LastOrDefault();
             }
 
-            block.Propertyes.Add(new FilterPropertyViewModel() { PropertyPath = propertyPath, CompareType = compareType, Value = v.ToString() });
+            block.Properties.Add(new FilterPropertyViewModel() { PropertyPath = propertyPath, CompareType = compareType, Value = v.ToString() });
             return value;
 
         }
 
-        public static BaseFilteredQueryModel AddFilterBlock(this BaseFilteredQueryModel value)
+        public static EntityFilterQueryModel AddFilterBlock(this EntityFilterQueryModel value)
         {
             if (value.FilterQuery == null)
-                value.FilterQuery = new List<FilterBlockViewModel>() { };
+                value.FilterQuery = new List<EntityFilterBlockModel>() { };
 
-            value.FilterQuery.Add(new FilterBlockViewModel());
+            value.FilterQuery.Add(new EntityFilterBlockModel());
 
             return value;
         }
 
-        public static BaseFilteredQueryModel AddOrder(this BaseFilteredQueryModel value, string propertyPath, bool asc = true)
+        public static EntityFilterQueryModel AddOrder(this EntityFilterQueryModel value, string propertyPath, bool asc = true)
         {
             var block = value.OrderQuery?.LastOrDefault();
 
@@ -47,12 +47,12 @@ namespace NSL.Database.EntityFramework.Filter
 
         }
 
-        public static BaseFilteredQueryModel AddOrderBlock(this BaseFilteredQueryModel value)
+        public static EntityFilterQueryModel AddOrderBlock(this EntityFilterQueryModel value)
         {
             if (value.OrderQuery == null)
-                value.OrderQuery = new List<FilterBlockOrderViewModel>() { };
+                value.OrderQuery = new List<EntityFilterOrderBlockModel>() { };
 
-            value.OrderQuery.Add(new FilterBlockOrderViewModel());
+            value.OrderQuery.Add(new EntityFilterOrderBlockModel());
             return value;
         }
     }

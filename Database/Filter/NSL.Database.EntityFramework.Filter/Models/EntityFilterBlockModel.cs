@@ -3,13 +3,13 @@ using System.Collections.Generic;
 
 namespace NSL.Database.EntityFramework.Filter.Models
 {
-    public class FilterBlockViewModel
+    public class EntityFilterBlockModel
     {
-        public List<FilterPropertyViewModel> Propertyes { get; set; } = new List<FilterPropertyViewModel>();
+        public List<FilterPropertyViewModel> Properties { get; } = new List<FilterPropertyViewModel>();
 
-        public FilterBlockViewModel AddFilter(string propertyPath, CompareType compareType, object value)
+        public EntityFilterBlockModel AddFilter(string propertyPath, CompareType compareType, object value)
         {
-            Propertyes.Add(new FilterPropertyViewModel()
+            Properties.Add(new FilterPropertyViewModel()
             {
                 PropertyPath = propertyPath,
                 CompareType = compareType,

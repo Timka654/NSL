@@ -14,7 +14,7 @@ namespace NSL.Database.EntityFramework.Filter.Host
     public class DBSetFilter<T>
         where T : class
     {
-        public static DBSetFilteredResult<T> Filter(IQueryable<T> set, BaseFilteredQueryModel filterExt)
+        public static DBSetFilteredResult<T> Filter(IQueryable<T> set, EntityFilterQueryModel filterExt)
         {
             IQueryable<T> query = set;
 
@@ -27,7 +27,7 @@ namespace NSL.Database.EntityFramework.Filter.Host
                 foreach (var block in filterExt.FilterQuery)
                 {
                     Expression whereBlock = null;
-                    foreach (var p in block.Propertyes)
+                    foreach (var p in block.Properties)
                     {
                         BuildPropertyFilter(li, p, ref whereBlock);
                     }
@@ -100,6 +100,12 @@ namespace NSL.Database.EntityFramework.Filter.Host
                 case CompareType.Less:
                     And(Less(li, property), ref where);
                     break;
+                case CompareType.ContainsCase:
+                    And(ContainsCase(li, property), ref where);
+                    break;
+                case CompareType.ContainsIgnoreCase:
+                    And(ContainsIgnoreCase(li, property), ref where);
+                    break;
                 default:
                     break;
             }
@@ -128,11 +134,29 @@ namespace NSL.Database.EntityFramework.Filter.Host
 
         private static MethodInfo arrayContainsMethodInfo = typeof(Enumerable).GetMethods().First(x => x.Name.Equals("Contains") && x.GetParameters().Count() == 2);
 
+        private static MethodInfo stringContainsCaseMethodInfo = typeof(FilterExtensions).GetMethod("ContainsCase", BindingFlags.Public | BindingFlags.Static);
+
+        private static MethodInfo stringContainsIgnoreCaseMethodInfo = typeof(FilterExtensions).GetMethod("ContainsIgnoreCase", BindingFlags.Public | BindingFlags.Static);
+
         private static Expression ContainsCollection(Expression listOfNames, FilterPropertyViewModel property)
             => BuildBinaryExpressions(listOfNames, property, (nameProperty, nameSearch) =>
             {
                 var startsWithMethod = arrayContainsMethodInfo.MakeGenericMethod(GetPropertyType(nameProperty));
-                var startWithCall = Expression.Call(null, startsWithMethod, new Expression[] { nameProperty, nameSearch });
+                var startWithCall = Expression.Call(nameProperty, startsWithMethod, new Expression[] { nameSearch });
+                return Expression.Equal(startWithCall, trueExpression);
+            });
+
+        private static Expression ContainsCase(Expression listOfNames, FilterPropertyViewModel property)
+            => BuildBinaryExpressions(listOfNames, property, (nameProperty, nameSearch) =>
+            {
+                var startWithCall = Expression.Call(null, stringContainsCaseMethodInfo, new Expression[] { nameProperty, nameSearch });
+                return Expression.Equal(startWithCall, trueExpression);
+            });
+
+        private static Expression ContainsIgnoreCase(Expression listOfNames, FilterPropertyViewModel property)
+            => BuildBinaryExpressions(listOfNames, property, (nameProperty, nameSearch) =>
+            {
+                var startWithCall = Expression.Call(null, stringContainsIgnoreCaseMethodInfo, new Expression[] { nameProperty, nameSearch });
                 return Expression.Equal(startWithCall, trueExpression);
             });
 

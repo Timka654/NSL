@@ -7,32 +7,38 @@ using NSL.Database.EntityFramework.Filter.Models;
 
 namespace NSL.Database.EntityFramework.Filter
 {
-    public class NavigationFilterBuilder : BaseFilteredQueryModel
+    [Obsolete("Use EntityFilterBuilder.")]
+    public class NavigationFilterBuilder : EntityFilterBuilder
     {
-        private FilterBlockViewModel currentBlock = null;
-        private FilterBlockOrderViewModel currentOrderBlock = null;
 
-        private NavigationFilterBuilder()
+    }
+
+    public class EntityFilterBuilder : EntityFilterQueryModel
+    {
+        private EntityFilterBlockModel currentBlock = null;
+        private EntityFilterOrderBlockModel currentOrderBlock = null;
+
+        protected EntityFilterBuilder()
         {
-            FilterQuery = new List<FilterBlockViewModel>();
-            OrderQuery = new List<FilterBlockOrderViewModel>();
+            FilterQuery = new List<EntityFilterBlockModel>();
+            OrderQuery = new List<EntityFilterOrderBlockModel>();
         }
 
-        public static NavigationFilterBuilder Create() => new NavigationFilterBuilder();
+        public static EntityFilterBuilder Create() => new EntityFilterBuilder();
 
-        public NavigationFilterBuilder AddPageOffset(int offset, int count)
+        public EntityFilterBuilder AddPageOffset(int offset, int count)
         {
             Offset = offset;
             Count = count;
             return this;
         }
 
-        public NavigationFilterBuilder SetOffsetFromPage(int page, int pageSize)
+        public EntityFilterBuilder SetOffsetFromPage(int page, int pageSize)
         {
             return AddPageOffset((int)Math.Ceiling((page - 1.0) * pageSize), pageSize);
         }
 
-        public NavigationFilterBuilder AddFilter(string propertyPath, CompareType compareType, object value)
+        public EntityFilterBuilder AddFilter(string propertyPath, CompareType compareType, object value)
         {
             if (currentBlock == null)
                 CreateFilterBlock();
@@ -42,25 +48,25 @@ namespace NSL.Database.EntityFramework.Filter
             return this;
         }
 
-        public NavigationFilterBuilder AddFilter<T>(string propertyPath, CompareType compareType, T value) => AddFilter(propertyPath, compareType, (object)value);
+        public EntityFilterBuilder AddFilter<T>(string propertyPath, CompareType compareType, T value) => AddFilter(propertyPath, compareType, (object)value);
 
-        public NavigationFilterBuilder CreateFilterBlock()
+        public EntityFilterBuilder CreateFilterBlock()
         {
-            currentBlock = new FilterBlockViewModel();
+            currentBlock = new EntityFilterBlockModel();
             FilterQuery.Add(currentBlock);
             return this;
         }
 
-        public NavigationFilterBuilder CreateFilterBlock(Action<FilterBlockViewModel> buildBlock)
+        public EntityFilterBuilder CreateFilterBlock(Action<EntityFilterBlockModel> buildBlock)
         {
-            var cb = new FilterBlockViewModel();
+            var cb = new EntityFilterBlockModel();
             buildBlock(cb);
             FilterQuery.Add(cb);
             return this;
         }
 
 
-        public NavigationFilterBuilder AddOrder<T>(string propertyPath, bool asc = true)
+        public EntityFilterBuilder AddOrder<T>(string propertyPath, bool asc = true)
         {
             if (currentOrderBlock == null)
                 CreateOrderBlock();
@@ -68,61 +74,61 @@ namespace NSL.Database.EntityFramework.Filter
             return this;
         }
 
-        public NavigationFilterBuilder CreateOrderBlock()
+        public EntityFilterBuilder CreateOrderBlock()
         {
-            currentOrderBlock = new FilterBlockOrderViewModel();
+            currentOrderBlock = new EntityFilterOrderBlockModel();
             OrderQuery.Add(currentOrderBlock);
             return this;
         }
 
-        public NavigationFilterBuilder CreateOrderBlock(Action<FilterBlockOrderViewModel> buildBlock)
+        public EntityFilterBuilder CreateOrderBlock(Action<EntityFilterOrderBlockModel> buildBlock)
         {
-            var cb = new FilterBlockOrderViewModel();
+            var cb = new EntityFilterOrderBlockModel();
             buildBlock(cb);
             OrderQuery.Add(cb);
             return this;
         }
 
-        public NavigationFilterBuilder SetOffset(int offset)
+        public EntityFilterBuilder SetOffset(int offset)
         {
             Offset = offset;
 
             return this;
         }
 
-        public NavigationFilterBuilder SetCount(int count)
+        public EntityFilterBuilder SetCount(int count)
         {
             Count = count;
 
             return this;
         }
 
-        public static BaseFilteredQueryModel CreatePageOffsetFilter(int page, int pageSize)
+        public static EntityFilterQueryModel CreatePageOffsetFilter(int page, int pageSize)
         {
-            return CreateOffsetFilter<BaseFilteredQueryModel>((int)Math.Ceiling((page - 1.0) * pageSize), pageSize);
+            return CreateOffsetFilter<EntityFilterQueryModel>((int)Math.Ceiling((page - 1.0) * pageSize), pageSize);
         }
 
         public static T CreateOffsetFilter<T>(int offset, int pageSize)
-            where T : BaseFilteredQueryModel, new()
+            where T : EntityFilterQueryModel, new()
         {
             return new T() { Count = pageSize, Offset = offset };
         }
 
         public static T CreatePageOffsetFilter<T>(int page, int pageSize)
-            where T : BaseFilteredQueryModel, new()
+            where T : EntityFilterQueryModel, new()
         {
             return CreateOffsetFilter<T>((int)Math.Ceiling((page - 1.0) * pageSize), pageSize);
         }
 
         public string ToJson() => JsonSerializer.Serialize(this);
 
-        public NavigationFilterBuilder ClearEmptyFilter()
+        public EntityFilterBuilder ClearEmptyFilter()
         {
-            FilterQuery.RemoveAll(x => !x.Propertyes.Any());
+            FilterQuery.RemoveAll(x => !x.Properties.Any());
 
             return this;
         }
 
-        public BaseFilteredQueryModel ToFilter() => this;
+        public EntityFilterQueryModel ToFilter() => this;
     }
 }

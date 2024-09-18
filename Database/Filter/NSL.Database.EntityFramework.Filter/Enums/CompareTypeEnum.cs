@@ -10,6 +10,8 @@
         EqualsALess,
         More,
         Less,
-        ContainsCollection
+        ContainsCollection,
+        ContainsCase,
+        ContainsIgnoreCase
     }
 }
