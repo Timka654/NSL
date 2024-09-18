@@ -5,7 +5,7 @@ namespace NSL.Database.EntityFramework.Filter.Models
 {
     public class EntityFilterBlockModel
     {
-        public List<FilterPropertyViewModel> Properties { get; } = new List<FilterPropertyViewModel>();
+        public List<FilterPropertyViewModel> Properties { get; set; } = new List<FilterPropertyViewModel>();
 
         public EntityFilterBlockModel AddFilter(string propertyPath, CompareType compareType, object value)
         {

@@ -1,5 +1,6 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Operations;
 using NSL.Generators.FillTypeGenerator.Attributes;
 using NSL.Generators.FillTypeGenerator.Utils;
 using NSL.Generators.Utils;
@@ -347,9 +348,15 @@ namespace NSL.Generators.FillTypeGenerator
 
             foreach (var fromItem in fromMembers)
             {
+                if (fromItem is IPropertySymbol fprop && fprop.GetMethod == null)
+                    continue;
+
                 var toItem = toMembers.FirstOrDefault(x => x.Name.Equals(fromItem.Name) && x.DeclaredAccessibility == Accessibility.Public);
 
                 if (toItem == default)
+                    continue;
+
+                if (toItem is IPropertySymbol tprop && tprop.SetMethod == null)
                     continue;
 
                 ITypeSymbol memberFromType = GetFromTypeForFill(fromItem, toType, dir);
@@ -358,26 +365,6 @@ namespace NSL.Generators.FillTypeGenerator
 
                 if (memberFromType == null || memberToType == null)
                     continue;
-
-                var conversation = context.Compilation.ClassifyCommonConversion(memberFromType, memberToType);
-
-                //var typeFromName = memberFromType.GetTypeFullName(false);
-                //var typeToName = memberToType.GetTypeFullName(false);
-
-                if (!conversation.Exists)
-                {
-
-                    var msg = $"Cannot fill \"{toItem.Name}\" value from {fromType.Name}, members types must be equals, or can be cast, or must be marked for ignore";
-
-                    context.ShowFillTypeDiagnostics("NSLFT001"
-                        , msg
-                        , DiagnosticSeverity.Error
-                        , toItem.Locations.ToArray());
-
-                    //GenDebug.Break();
-
-                    continue;
-                }
 
                 string mFillPath = $"{tabPrefix}{string.Join(".", fillPath, fromItem.Name).TrimStart('.')} = ";
 
@@ -427,11 +414,32 @@ namespace NSL.Generators.FillTypeGenerator
                     }
                 }
                 else
+                {
+
+                    var conversation = context.Compilation.ClassifyCommonConversion(memberFromType, memberToType);
+
+                    if (!conversation.Exists)
+                    {
+
+                        var msg = $"Cannot fill \"{toItem.Name}\" value from {fromType.Name}, members types must be equals, or can be cast, or must be marked for ignore";
+
+                        context.ShowFillTypeDiagnostics("NSLFT001"
+                            , msg
+                            , DiagnosticSeverity.Error
+                            , toItem.Locations.ToArray());
+
+                        //GenDebug.Break();
+
+                        continue;
+                    }
+
                     codeFragment = string.Join(".", readPath, fromItem.Name).TrimStart('.');
 
-                if (conversation.IsNumeric)
-                    codeFragment = $"({memberToType.GetTypeFullName()}){codeFragment}";
-                else if (conversation.IsImplicit) { }
+                    if (conversation.IsNumeric)
+                        codeFragment = $"({memberToType.GetTypeFullName()}){codeFragment}";
+                    else if (conversation.IsImplicit) { }
+
+                }
                 //else
                 //    GenDebug.Break();
 
