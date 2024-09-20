@@ -142,7 +142,7 @@ namespace NSL.Database.EntityFramework.Filter.Host
             => BuildBinaryExpressions(listOfNames, property, (nameProperty, nameSearch) =>
             {
                 var startsWithMethod = arrayContainsMethodInfo.MakeGenericMethod(GetPropertyType(nameProperty));
-                var startWithCall = Expression.Call(nameProperty, startsWithMethod, new Expression[] { nameSearch });
+                var startWithCall = Expression.Call(null, startsWithMethod, new Expression[] { nameProperty, nameSearch });
                 return Expression.Equal(startWithCall, trueExpression);
             });
 
