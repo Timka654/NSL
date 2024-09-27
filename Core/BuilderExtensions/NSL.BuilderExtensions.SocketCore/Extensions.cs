@@ -176,6 +176,7 @@ namespace NSL.BuilderExtensions.SocketCore
         {
             builder.GetCoreOptions().ReceiveBufferSize = size;
         }
+
         public static void AddConnectHandle<TClient>(this IOptionableEndPointBuilder<TClient> builder, CoreOptions<TClient>.ClientConnect handle)
             where TClient : INetworkClient, new()
         {
@@ -216,6 +217,12 @@ namespace NSL.BuilderExtensions.SocketCore
             where TClient : INetworkClient, new()
         {
             builder.GetCoreOptions().OnReceivePacket += handle;
+        }
+
+        public static void AddRequestBuffer<TClient>(this IOptionableEndPointBuilder<TClient> builder, CoreOptions<TClient>.ClientConnect handle)
+            where TClient : INetworkClient, new()
+        {
+            builder.GetCoreOptions().OnClientConnectEvent += c => c.InitializeObjectBag();
         }
 
         public static void SetLogger<TClient>(this IOptionableEndPointBuilder<TClient> builder, IBasicLogger logger)
@@ -301,7 +308,7 @@ namespace NSL.BuilderExtensions.SocketCore
                     if (ex is ConnectionLostException)
                         return;
 
-                    logger.Append(LoggerLevel.Info, $"Exception error handle - {ex}");
+                    logger.Append(LoggerLevel.Error, $"Exception error handle - {ex}");
                 });
 
             if (handleOptions.HasFlag(DefaultEventHandlersEnum.Send))

@@ -19,7 +19,7 @@ namespace NSL.Database.EntityFramework.Filter.Tests
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasPostgresFilter();
+            modelBuilder.HasDbFilter();
 
             base.OnModelCreating(modelBuilder);
         }
