@@ -219,7 +219,7 @@ namespace NSL.BuilderExtensions.SocketCore
             builder.GetCoreOptions().OnReceivePacket += handle;
         }
 
-        public static void AddClientObjectBag<TClient>(this IOptionableEndPointBuilder<TClient> builder, CoreOptions<TClient>.ClientConnect handle)
+        public static void AddClientObjectBag<TClient>(this IOptionableEndPointBuilder<TClient> builder)
             where TClient : INetworkClient, new()
         {
             builder.GetCoreOptions().OnClientConnectEvent += c => c.InitializeObjectBag();
