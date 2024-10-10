@@ -106,6 +106,18 @@ namespace NSL.Database.EntityFramework.Filter.Host
                 case CompareType.ContainsIgnoreCase:
                     And(ContainsIgnoreCase(li, property), ref where);
                     break;
+                case CompareType.StartsWithCase:
+                    And(StartsWithCase(li, property), ref where);
+                    break;
+                case CompareType.StartsWithIgnoreCase:
+                    And(StartsWithIgnoreCase(li, property), ref where);
+                    break;
+                case CompareType.EndsWithCase:
+                    And(EndsWithCase(li, property), ref where);
+                    break;
+                case CompareType.EndsWithIgnoreCase:
+                    And(EndsWithIgnoreCase(li, property), ref where);
+                    break;
                 default:
                     break;
             }
@@ -138,6 +150,14 @@ namespace NSL.Database.EntityFramework.Filter.Host
 
         private static MethodInfo stringContainsIgnoreCaseMethodInfo = typeof(FilterExtensions).GetMethod("ContainsIgnoreCase", BindingFlags.Public | BindingFlags.Static);
 
+        private static MethodInfo stringStartsWithCaseMethodInfo = typeof(FilterExtensions).GetMethod("StartsWithCase", BindingFlags.Public | BindingFlags.Static);
+
+        private static MethodInfo stringStartsWithIgnoreCaseMethodInfo = typeof(FilterExtensions).GetMethod("StartsWithIgnoreCase", BindingFlags.Public | BindingFlags.Static);
+
+        private static MethodInfo stringEndsWithCaseMethodInfo = typeof(FilterExtensions).GetMethod("EndsWithCase", BindingFlags.Public | BindingFlags.Static);
+
+        private static MethodInfo stringEndsWithIgnoreCaseMethodInfo = typeof(FilterExtensions).GetMethod("EndsWithIgnoreCase", BindingFlags.Public | BindingFlags.Static);
+
         private static Expression ContainsCollection(Expression listOfNames, FilterPropertyViewModel property)
             => BuildBinaryExpressions(listOfNames, property, (nameProperty, nameSearch) =>
             {
@@ -159,6 +179,39 @@ namespace NSL.Database.EntityFramework.Filter.Host
                 var startWithCall = Expression.Call(null, stringContainsIgnoreCaseMethodInfo, new Expression[] { nameProperty, nameSearch });
                 return Expression.Equal(startWithCall, trueExpression);
             });
+
+
+
+        private static Expression StartsWithCase(Expression listOfNames, FilterPropertyViewModel property)
+            => BuildBinaryExpressions(listOfNames, property, (nameProperty, nameSearch) =>
+            {
+                var startWithCall = Expression.Call(null, stringStartsWithCaseMethodInfo, new Expression[] { nameProperty, nameSearch });
+                return Expression.Equal(startWithCall, trueExpression);
+            });
+
+        private static Expression StartsWithIgnoreCase(Expression listOfNames, FilterPropertyViewModel property)
+            => BuildBinaryExpressions(listOfNames, property, (nameProperty, nameSearch) =>
+            {
+                var startWithCall = Expression.Call(null, stringStartsWithIgnoreCaseMethodInfo, new Expression[] { nameProperty, nameSearch });
+                return Expression.Equal(startWithCall, trueExpression);
+            });
+
+
+
+        private static Expression EndsWithCase(Expression listOfNames, FilterPropertyViewModel property)
+            => BuildBinaryExpressions(listOfNames, property, (nameProperty, nameSearch) =>
+            {
+                var startWithCall = Expression.Call(null, stringEndsWithCaseMethodInfo, new Expression[] { nameProperty, nameSearch });
+                return Expression.Equal(startWithCall, trueExpression);
+            });
+
+        private static Expression EndsWithIgnoreCase(Expression listOfNames, FilterPropertyViewModel property)
+            => BuildBinaryExpressions(listOfNames, property, (nameProperty, nameSearch) =>
+            {
+                var startWithCall = Expression.Call(null, stringEndsWithIgnoreCaseMethodInfo, new Expression[] { nameProperty, nameSearch });
+                return Expression.Equal(startWithCall, trueExpression);
+            });
+
 
         private static Expression Contains(Expression listOfNames, FilterPropertyViewModel property)
             => BuildBinaryExpressions(listOfNames, property, (nameProperty, nameSearch) =>

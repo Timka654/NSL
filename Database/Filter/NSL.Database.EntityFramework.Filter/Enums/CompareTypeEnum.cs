@@ -12,6 +12,10 @@
         Less,
         ContainsCollection,
         ContainsCase,
-        ContainsIgnoreCase
+        ContainsIgnoreCase,
+        StartsWithCase,
+        StartsWithIgnoreCase,
+        EndsWithCase,
+        EndsWithIgnoreCase
     }
 }

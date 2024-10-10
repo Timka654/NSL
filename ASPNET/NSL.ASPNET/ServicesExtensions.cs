@@ -51,7 +51,7 @@ namespace NSL.ASPNET
 
             var indexFilePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "index.html");
 
-            return host.RebuildFileVersion(indexFilePath, updateIndexFilePath, removeInputAfterProcess);
+            return host.RebuildFileVersion(updateIndexFilePath, indexFilePath, removeInputAfterProcess);
         }
 
         public static bool RebuildFileVersion(this IHost host, string inputFilePath, string outputFilePath, bool removeInputAfterProcess = true)

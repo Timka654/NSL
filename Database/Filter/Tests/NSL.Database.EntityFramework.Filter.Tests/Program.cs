@@ -27,7 +27,7 @@ namespace NSL.Database.EntityFramework.Filter.Tests
 
             EntityFilterBuilder builder = EntityFilterBuilder.Create()
                 .CreateFilterBlock(b => b
-                    .AddFilter(nameof(TestEntityModel.Content), Enums.CompareType.ContainsIgnoreCase, "BA")
+                    .AddFilter(nameof(TestEntityModel.Content), Enums.CompareType.EndsWithIgnoreCase, "bb")
                 );
 
 

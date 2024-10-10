@@ -32,6 +32,19 @@ namespace NSL.UDP
 
             base.Send(client, disposeOnSend);
         }
+
+        public new static DgramOutputPacketBuffer Create(ushort packetId, int len = 32)
+        {
+            return new DgramOutputPacketBuffer(len) { PacketId = packetId };
+        }
+
+        public new static DgramOutputPacketBuffer Create<TEnum>(TEnum packetId, int len = 32)
+            where TEnum : struct, Enum, IConvertible
+        {
+            return new DgramOutputPacketBuffer(len).WithPid(packetId);
+        }
+
+        public DgramOutputPacketBuffer(int len = 32) : base(len) { }
     }
 
     [Obsolete("Replace to DgramOutputPacketBuffer", true)]
