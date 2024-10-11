@@ -27,7 +27,7 @@ namespace NSL.Extensions.Version.Server.Packets
                 RequireVersion = serverVersion.RequireVersion,
                 InvalidByMinVersion = !serverVersion.ValidateMinVersion(request.Version),
                 InvalidByReqVersion = !serverVersion.ValidateRequireVersion(request.Version)
-            }.WriteFullTo(response);
+            }.WriteResponseTo(response);
 
             client.Send(response);
         }

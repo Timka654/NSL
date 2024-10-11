@@ -82,21 +82,15 @@ namespace NSL.SocketCore.Extensions.Buffer
             Guid rid = default;
             try
             {
-                //var now = DateTime.UtcNow;
+                var result = new TaskCompletionSource<InputPacketBuffer>();
 
-                using (ManualResetEventSlim locker = new ManualResetEventSlim(false))
+                rid = SendRequest(buffer, input =>
                 {
-                    rid = SendRequest(buffer, input =>
-                    {
-                        data = input;
-                        locker.Set();
-                        return false;
-                    }, disposeOnSend);
+                    result.SetResult(input);
+                    return false;
+                }, disposeOnSend);
 
-                    await Task.Run(() => locker.Wait());
-
-                    //Debug.LogError($"Request time - {(DateTime.UtcNow - now).TotalMilliseconds}ms");
-                }
+                data = await result.Task;
 
                 if (await onResult(data))
                     data?.Dispose();

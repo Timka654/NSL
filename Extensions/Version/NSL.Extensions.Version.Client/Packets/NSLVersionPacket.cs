@@ -50,7 +50,7 @@ namespace NSL.Extensions.Version.Client.Packets
 
             FillPacket(request, versionInfo);
 
-            processor.SendRequest(request, data => { onResponse(NSLVersionResult.ReadFullFrom(data)); return true; });
+            processor.SendRequest(request, data => { onResponse(NSLVersionResult.ReadResponseFrom(data)); return true; });
         }
 
         public static async Task<NSLVersionResult> SendRequestAsync(T client, string RPObjectKey = RequestProcessor.DefaultObjectBagKey)
@@ -75,7 +75,11 @@ namespace NSL.Extensions.Version.Client.Packets
 
             NSLVersionResult result = default;
 
-            await processor.SendRequestAsync(request, data => { result = NSLVersionResult.ReadFullFrom(data); return Task.FromResult(true); });
+            await processor.SendRequestAsync(request, data =>
+            {
+                result = NSLVersionResult.ReadResponseFrom(data);
+                return Task.FromResult(true);
+            });
 
             return result;
         }
