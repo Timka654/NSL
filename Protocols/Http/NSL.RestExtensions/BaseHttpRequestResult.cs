@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Net;
 using System.Net.Http;
 
 namespace NSL.RestExtensions
@@ -45,6 +47,9 @@ namespace NSL.RestExtensions
 
             return result ?? new List<string>();
         }
+
+        public override string ToString()
+            => $"Status code: {MessageResponse?.StatusCode ?? (HttpStatusCode)ThrowStatusCode}({(int?)MessageResponse?.StatusCode ?? ThrowStatusCode}){Environment.NewLine}Errors:{Environment.NewLine}{string.Join(Environment.NewLine, ErrorMessages.SelectMany(x => x.Value))}";
     }
 
     public class HttpRequestResult<TData> : BaseHttpRequestResult
