@@ -41,7 +41,14 @@ namespace NSL.Generators.FillTypeGenerator
 
             foreach (var item in methodSyntaxReceiver.FillTypeTypes)
             {
-                ProcessFillToType(context, item);
+                try
+                {
+                    ProcessFillToType(context, item);
+                }
+                catch (Exception ex)
+                {
+                    context.ShowFillTypeDiagnostics($"NSLFT002", $"Error - {ex} on type {item.Identifier.Text}", DiagnosticSeverity.Error, item.GetLocation());
+                }
             }
         }
 
