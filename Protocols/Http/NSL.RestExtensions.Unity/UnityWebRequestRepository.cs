@@ -138,6 +138,11 @@ namespace NSL.RestExtensions.Unity
             });
         }
 
+        protected override void ErrorHandle(TClient client, HttpRequestMessage request, Exception ex)
+        {
+            Debug.LogError($"Web request error - {ex.ToString()}");
+        }
+
         protected static void SafeInvoke(HttpRequestResult result, WebResponseDelegate onResult)
         {
             ThreadHelper.InvokeOnMain(() => onResult(result));
