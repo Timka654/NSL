@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -11,10 +12,14 @@ namespace NSL.HttpClient
 {
     public class BaseHttpRequestOptions
     {
+        public delegate System.Net.Http.HttpClient RequestClientBuildHandler(System.Net.Http.HttpClient client);
+
         /// <summary>
         /// Validator ref for display errors
         /// </summary>
         public IHttpResponseContentValidator Validator { get; set; }
+
+        public RequestClientBuildHandler ClientHandler { get; set; }
 
         /// <summary>
         /// 
@@ -33,6 +38,8 @@ namespace NSL.HttpClient
         public static BaseHttpRequestOptions Create(string errorPrefix) => new BaseHttpRequestOptions() { ErrorPrefix = errorPrefix };
 
         public static BaseHttpRequestOptions Create(JsonSerializerOptions jsonOptions) => new BaseHttpRequestOptions() { JsonOptions = jsonOptions };
+
+        public static BaseHttpRequestOptions Create(RequestClientBuildHandler clientHandler) => new BaseHttpRequestOptions() { ClientHandler = clientHandler };
 
         public static BaseHttpRequestOptions Create() => new BaseHttpRequestOptions();
 
@@ -56,5 +63,22 @@ namespace NSL.HttpClient
             return this;
         }
 
+        public BaseHttpRequestOptions WithClientHandler(RequestClientBuildHandler clientHandler)
+        {
+            ClientHandler = clientHandler;
+            return this;
+        }
+
+    }
+
+    public static class RequestOptionsExtensions
+    {
+        public static System.Net.Http.HttpClient FillClientOptions(this System.Net.Http.HttpClient client, BaseHttpRequestOptions options)
+        {
+            if (options?.ClientHandler != null)
+                return options.ClientHandler(client);
+
+            return client;
+        }
     }
 }

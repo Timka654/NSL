@@ -200,6 +200,7 @@ namespace NSL.Generators.HttpEndPointGenerator
                                 methodBuilder.AppendLine($"public async Task<{returnType}> {requestMethodName}({string.Join(", ", _p)})");
                                 methodBuilder.NextTab();
                                 methodBuilder.AppendLine($"=> await CreateEndPointClient({_vname}Url)");
+                                methodBuilder.AppendLine($".FillClientOptions(__options)");
                                 if (_t == "Post")
                                 {
                                     if (!mparams.Any())
