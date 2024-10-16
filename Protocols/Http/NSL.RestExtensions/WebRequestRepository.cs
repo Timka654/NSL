@@ -129,21 +129,33 @@ namespace NSL.RestExtensions
             //Unity has throw on error status code and form data content, cannot find any fixes
             catch (ObjectDisposedException ex)
             {
-                result = new HttpResponseMessage((HttpStatusCode)BaseHttpRequestResult.ThrowStatusCode) { RequestMessage = request, Content = new StringContent(ex.ToString()) };
+                result = new HttpResponseMessage((HttpStatusCode)BaseHttpRequestResult.ThrowStatusCode) { RequestMessage = request };
+                ErrorHandle(client, request, ex);
             }
 #pragma warning disable CS0168 // Переменная объявлена, но не используется
             catch (HttpRequestException ex)
 #pragma warning restore CS0168 // Переменная объявлена, но не используется
             {
-                result = new HttpResponseMessage((HttpStatusCode)BaseHttpRequestResult.ThrowStatusCode) { RequestMessage = request, Content = new StringContent(ex.ToString()) };
+                result = new HttpResponseMessage((HttpStatusCode)BaseHttpRequestResult.ThrowStatusCode) { RequestMessage = request };
+                ErrorHandle(client, request, ex);
 
             }
-            catch (TaskCanceledException)
+            catch (TaskCanceledException ex)
             {
                 result = new HttpResponseMessage(HttpStatusCode.RequestTimeout) { RequestMessage = request };
+                ErrorHandle(client, request, ex);
+            }
+            catch (Exception ex)
+            {
+                ErrorHandle(client, request, ex);
             }
 
             return result;
+        }
+
+        protected virtual void ErrorHandle(TClient client, HttpRequestMessage request, Exception ex)
+        { 
+        
         }
 
         protected TClientPool clientPool;
