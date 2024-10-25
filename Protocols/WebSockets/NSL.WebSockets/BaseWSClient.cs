@@ -367,6 +367,8 @@ namespace NSL.WebSockets
 
         public abstract void ChangeUserData(INetworkClient data);
 
+        public abstract void SetClientData(INetworkClient from);
+
         public object GetUserData() => Data;
 
         public Socket GetSocket() => default;

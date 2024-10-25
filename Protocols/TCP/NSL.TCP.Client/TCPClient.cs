@@ -3,6 +3,7 @@ using NSL.SocketClient.Utils.SystemPackets;
 using NSL.SocketCore.Utils;
 using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 
@@ -40,6 +41,7 @@ namespace NSL.TCP.Client
 
             //установка переменной содержащую поток клиента
             this.sclient = client;
+            this.endPoint = (IPEndPoint)sclient?.RemoteEndPoint;
 
             //установка массива для приема данных, размер указан в общих настройках сервера
             this.receiveBuffer = new byte[ConnectionOptions.ReceiveBufferSize];
@@ -50,10 +52,6 @@ namespace NSL.TCP.Client
 
             _sendLocker = outputCipher.Sync() ? new AutoResetEvent(true) : null;
 
-            sclient.ReceiveBufferSize = ConnectionOptions.ReceiveBufferSize;
-
-            sclient.NoDelay = true;
-
             _sendLocker?.Set();
 
             RunReceive();
@@ -61,7 +59,9 @@ namespace NSL.TCP.Client
             ConnectionOptions.RunClientConnect();
         }
 
-        public override void ChangeUserData(INetworkClient newClientData) => ConnectionOptions.InitializeClient((T)newClientData);
+        public override void ChangeUserData(INetworkClient newClientData) => SetClientData((T)newClientData);
+
+        public override void SetClientData(INetworkClient from) => ConnectionOptions.InitializeClient((T)from);
 
         protected override void RunDisconnect() => ConnectionOptions.RunClientDisconnect();
 

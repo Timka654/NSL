@@ -28,6 +28,8 @@ namespace NSL.TCP
         /// </summary>
         protected Socket sclient;
 
+        protected IPEndPoint endPoint;
+
         #region Cipher
 
         /// <summary>
@@ -83,7 +85,7 @@ namespace NSL.TCP
 
         public IPEndPoint GetRemotePoint()
         {
-            return (IPEndPoint)sclient?.RemoteEndPoint;
+            return endPoint;
         }
 
         protected void ResetBuffer()
@@ -222,10 +224,6 @@ namespace NSL.TCP
 
         private async Task send(byte[] buf, int offset, int lenght)
         {
-            CancellationTokenSource cts = new CancellationTokenSource();
-
-            cts.CancelAfter(8_000);
-
             var sl = _sendLocker;
             try
             {
@@ -240,7 +238,7 @@ namespace NSL.TCP
 
                     do
                     {
-                        var len = await sclient.SendAsync(sndBuffer[offs..], SocketFlags.None, cts.Token);
+                        var len = await sclient.SendAsync(sndBuffer[offs..], SocketFlags.None);
                         if (len < 0)
                         {
                             Data?.OnPacketSendFail(buf, offset, lenght);
@@ -407,6 +405,8 @@ namespace NSL.TCP
         public CoreOptions Options => options;
 
         public abstract void ChangeUserData(INetworkClient data);
+
+        public abstract void SetClientData(INetworkClient from);
 
         public object GetUserData() => Data;
 

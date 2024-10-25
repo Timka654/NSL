@@ -2,6 +2,7 @@
 using NSL.SocketServer;
 using NSL.SocketServer.Utils;
 using System;
+using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 
@@ -10,31 +11,31 @@ namespace NSL.TCP.Server
     /// <summary>
     /// Класс обработки клиента
     /// </summary>
-    public class TCPServerClient<T> : BaseTcpClient<T, TCPServerClient<T>>
-        where T : IServerNetworkClient, new()
+    public class TCPServerClient<TClient> : BaseTcpClient<TClient, TCPServerClient<TClient>>
+        where TClient : IServerNetworkClient, new()
     {
-        private T clientData;
+        private TClient clientData;
 
-        public override T Data => clientData;
+        public override TClient Data => clientData;
 
         /// <summary>
         /// Общие настройки сервера
         /// </summary>
-        public ServerOptions<T> ServerOptions => (ServerOptions<T>)base.options;
+        public ServerOptions<TClient> ServerOptions => (ServerOptions<TClient>)base.options;
 
         /// <summary>
         /// Инициализация прослушивания клиента
         /// </summary>
         /// <param name="client">клиент</param>
         /// <param name="options">общие настройки сервера</param>
-        public TCPServerClient(Socket client, ServerOptions<T> options) : base(options)
+        public TCPServerClient(Socket client, ServerOptions<TClient> options) : base(options)
         {
             Initialize(client);
         }
 
         protected void Initialize(Socket client)
         {
-            clientData = new T();
+            clientData = new TClient();
 
             //обзятельная переменная в NetworkClient, для отправки данных, можно использовать привидения типов (Client)NetworkClient но это никому не поможет
             Data.Network = this;
@@ -42,6 +43,7 @@ namespace NSL.TCP.Server
 
             //установка переменной содержащую поток клиента
             sclient = client;
+            this.endPoint = (IPEndPoint)sclient?.RemoteEndPoint;
 
             //установка массива для приема данных, размер указан в общих настройках сервера
             receiveBuffer = new byte[options.ReceiveBufferSize];
@@ -66,31 +68,35 @@ namespace NSL.TCP.Server
         public void RunPacketReceiver() => RunReceive();
 
         public override void ChangeUserData(INetworkClient newClientData)
+            => SetClientData(newClientData);
+
+        public override void SetClientData(INetworkClient from)
         {
-            if (newClientData == null)
+            if (from == null)
             {
                 clientData = null;
                 return;
             }
 
-            if (newClientData is T td)
+            if (from is TClient td)
             {
+                // current data for dispose and move data
                 var oldData = clientData;
 
                 clientData = td;
                 clientData.Network = this;
 
-                newClientData.ChangeOwner(oldData);
-
                 oldData.Network = null;
+
+                from.ChangeOwner(oldData);
 
                 return;
             }
 
-            throw new Exception($"{nameof(newClientData)} must have type {typeof(T)}");
+            throw new Exception($"{nameof(from)} must have type {typeof(TClient)}");
         }
 
-        protected override TCPServerClient<T> GetParent() => this;
+        protected override TCPServerClient<TClient> GetParent() => this;
 
         protected override void OnReceive(ushort pid, int len)
         {

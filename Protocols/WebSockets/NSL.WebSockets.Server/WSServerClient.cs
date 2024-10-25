@@ -8,20 +8,20 @@ using System.Threading.Tasks;
 
 namespace NSL.WebSockets.Server
 {
-    public class WSServerClient<T> : BaseWSClient<T, WSServerClient<T>>
-        where T : IServerNetworkClient, new()
+    public class WSServerClient<TClient> : BaseWSClient<TClient, WSServerClient<TClient>>
+        where TClient : IServerNetworkClient, new()
     {
-        private T clientData;
+        private TClient clientData;
 
-        public override T Data => clientData;
+        public override TClient Data => clientData;
 
         /// <summary>
         /// Общие настройки сервера
         /// </summary>
-        public ServerOptions<T> ServerOptions => (ServerOptions<T>)base.options;
+        public ServerOptions<TClient> ServerOptions => (ServerOptions<TClient>)base.options;
 
 
-        protected WSServerClient(ServerOptions<T> options) : base(options)
+        protected WSServerClient(ServerOptions<TClient> options) : base(options)
         {
 
         }
@@ -31,7 +31,7 @@ namespace NSL.WebSockets.Server
         /// </summary>
         /// <param name="client">клиент</param>
         /// <param name="options">общие настройки сервера</param>
-        public WSServerClient(HttpListenerContext client, ServerOptions<T> options) : this(options)
+        public WSServerClient(HttpListenerContext client, ServerOptions<TClient> options) : this(options)
         {
             if (!client.Request.IsWebSocketRequest)
                 throw new Exception($"{client.Request.UserHostAddress} is not WebSocket request");
@@ -46,7 +46,7 @@ namespace NSL.WebSockets.Server
 
         protected void Initialize()
         {
-            clientData = new T();
+            clientData = new TClient();
 
             //обзятельная переменная в NetworkClient, для отправки данных, можно использовать привидения типов (Client)NetworkClient но это никому не поможет
             Data.Network = this;
@@ -83,15 +83,19 @@ namespace NSL.WebSockets.Server
             }
         }
         public override void ChangeUserData(INetworkClient newClientData)
+            => SetClientData(newClientData);
+
+        public override void SetClientData(INetworkClient from)
         {
-            if (newClientData == null)
+            if (from == null)
             {
                 clientData = null;
                 return;
             }
 
-            if (newClientData is T td)
+            if (from is TClient td)
             {
+                // current data for dispose and move data
                 var oldData = clientData;
 
                 clientData = td;
@@ -99,15 +103,15 @@ namespace NSL.WebSockets.Server
 
                 oldData.Network = null;
 
-                newClientData.ChangeOwner(oldData);
+                from.ChangeOwner(oldData);
 
                 return;
             }
 
-            throw new Exception($"{nameof(newClientData)} must have type {typeof(T)}");
+            throw new Exception($"{nameof(from)} must have type {typeof(TClient)}");
         }
 
-        protected override WSServerClient<T> GetParent() => this;
+        protected override WSServerClient<TClient> GetParent() => this;
 
         protected override void OnReceive(ushort pid, int len)
         {

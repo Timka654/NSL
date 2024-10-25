@@ -67,48 +67,49 @@ namespace NSL.TCP.Client
             if (base.disconnected == false)
                 throw new InvalidOperationException("Client must be disconnected before reconnecting");
 
-            return await Task.Run(() =>
+            //return await Task.Run(() =>
+            //{
+            try
             {
-                try
-                {
-                    if (!IPAddress.TryParse(ConnectionOptions.IpAddress, out var ip))
-                        throw new ArgumentException($"invalid connection ip {ConnectionOptions.IpAddress}", nameof(ConnectionOptions.IpAddress));
+                if (!IPAddress.TryParse(ConnectionOptions.IpAddress, out var ip))
+                    throw new ArgumentException($"invalid connection ip {ConnectionOptions.IpAddress}", nameof(ConnectionOptions.IpAddress));
 
-                    if (ConnectionOptions.AddressFamily == AddressFamily.Unspecified)
-                        ConnectionOptions.AddressFamily = ip.AddressFamily;
+                if (ConnectionOptions.AddressFamily == AddressFamily.Unspecified)
+                    ConnectionOptions.AddressFamily = ip.AddressFamily;
 
-                    if (ConnectionOptions.ProtocolType == ProtocolType.Unspecified)
-                        ConnectionOptions.ProtocolType = ProtocolType.Tcp;
+                if (ConnectionOptions.ProtocolType == ProtocolType.Unspecified)
+                    ConnectionOptions.ProtocolType = ProtocolType.Tcp;
 
-                    client = new Socket(ConnectionOptions.AddressFamily, SocketType.Stream, ConnectionOptions.ProtocolType);
-                    //await client.ConnectAsync(ConnectionOptions.IpAddress, ConnectionOptions.Port);
+                client = new Socket(ConnectionOptions.AddressFamily, SocketType.Stream, ConnectionOptions.ProtocolType);
 
-                    IAsyncResult result = client.BeginConnect(ip, ConnectionOptions.Port, null, null);
+                client.ReceiveBufferSize = ConnectionOptions.ReceiveBufferSize;
 
-                    bool success = result.AsyncWaitHandle.WaitOne(connectionTimeOut, true);
+                client.NoDelay = true;
 
-                    success = success && client.Connected;
+                CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
 
-                    if (success)
-                    {
-                        Reconnect(client);
-                    }
-                    else
-                    {
-                        ConnectionOptions.RunClientDisconnect();
-                    }
+                //await client.ConnectAsync(ConnectionOptions.IpAddress, ConnectionOptions.Port);
+                cancellationTokenSource.CancelAfter(connectionTimeOut);
 
-                    return success;
-                }
-                catch (Exception ex)
-                {
-                    Release();
-                    ConnectionOptions.RunException(ex);
-                    ConnectionOptions.RunClientDisconnect();
-                }
+                await Task.Run(() => client.ConnectAsync(ip, ConnectionOptions.Port), cancellationTokenSource.Token);
 
-                return false;
-            });
+                Reconnect(client);
+
+                return true;
+            }
+            catch (TaskCanceledException)
+            {
+                ConnectionOptions.RunClientDisconnect();
+            }
+            catch (Exception ex)
+            {
+                Release();
+                ConnectionOptions.RunException(ex);
+                ConnectionOptions.RunClientDisconnect();
+            }
+
+            return false;
+            //});
         }
 
         private void Release()

@@ -22,7 +22,7 @@ t.OnSendPacket += (c, pid, len, stackTrace) => { Console.WriteLine($"sended {pid
 
 Console.WriteLine($"Current State {t.GetState()}, Try connect");
 
-if (!t.Connect("127.0.0.1", 20004))
+if (!await t.ConnectAsync("127.0.0.1", 20004))
     Console.WriteLine($"Cannot connect, Current State {t.GetState()}");
 else
 {

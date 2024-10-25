@@ -1,5 +1,6 @@
 ﻿using NSL.SocketCore.Utils;
 using NSL.SocketCore.Utils.Buffer;
+using System;
 using System.Net;
 
 namespace NSL.SocketCore
@@ -16,7 +17,14 @@ namespace NSL.SocketCore
 
         IPEndPoint GetRemotePoint();
 
+        [Obsolete("Use SetClientData")]
         void ChangeUserData(INetworkClient newClientData);
+
+        /// <summary>
+        /// Set old or another instance of client data to current network, and disconnect from old
+        /// </summary>
+        /// <param name="from">old or another instance</param>
+        void SetClientData(INetworkClient from);
 
         object GetUserData();
 

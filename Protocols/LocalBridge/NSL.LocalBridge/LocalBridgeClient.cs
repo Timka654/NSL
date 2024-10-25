@@ -68,15 +68,19 @@ namespace NSL.LocalBridge
         private Dictionary<ushort, CoreOptions<TClient>.PacketHandle> PacketHandles;
 
         public void ChangeUserData(INetworkClient newClientData)
+            => SetClientData(newClientData);
+
+        public void SetClientData(INetworkClient from)
         {
-            if (newClientData == null)
+            if (from == null)
             {
                 clientData = null;
                 return;
             }
 
-            if (newClientData is TClient td)
+            if (from is TClient td)
             {
+                // current data for dispose and move data
                 var oldData = clientData;
 
                 clientData = td;
@@ -84,12 +88,12 @@ namespace NSL.LocalBridge
 
                 oldData.Network = null;
 
-                newClientData.ChangeOwner(oldData);
+                from.ChangeOwner(oldData);
 
                 return;
             }
 
-            throw new Exception($"{nameof(newClientData)} must have type {typeof(TClient)}");
+            throw new Exception($"{nameof(from)} must have type {typeof(TClient)}");
         }
 
         public void Disconnect()

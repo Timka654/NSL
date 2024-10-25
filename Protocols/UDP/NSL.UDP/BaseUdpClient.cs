@@ -138,6 +138,8 @@ namespace NSL.UDP
 
         public abstract void ChangeUserData(INetworkClient data);
 
+        public abstract void SetClientData(INetworkClient from);
+
         public object GetUserData() => Data;
 
         private void Disconnect(Exception ex)

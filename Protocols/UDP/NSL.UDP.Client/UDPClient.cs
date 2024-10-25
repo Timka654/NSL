@@ -6,14 +6,14 @@ using System.Net.Sockets;
 
 namespace NSL.UDP.Client
 {
-    public class UDPClient<T> : BaseUDPClient<T, UDPClient<T>>
-        where T : IServerNetworkClient, new()
+    public class UDPClient<TClient> : BaseUDPClient<TClient, UDPClient<TClient>>
+        where TClient : IServerNetworkClient, new()
     {
-        private T data;
+        private TClient clientData;
 
-        public override T Data => data;
+        public override TClient Data => clientData;
 
-        public UDPClient(IPEndPoint receivePoint, Socket listenerSocket, UDPClientOptions<T> options) : base(receivePoint, listenerSocket, options)
+        public UDPClient(IPEndPoint receivePoint, Socket listenerSocket, UDPClientOptions<TClient> options) : base(receivePoint, listenerSocket, options)
         {
             Initialize();
         }
@@ -24,7 +24,7 @@ namespace NSL.UDP.Client
 
             PacketHandles = options.GetHandleMap();
 
-            data = new T();
+            clientData = new TClient();
 
             //обзятельная переменная в NetworkClient, для отправки данных, можно использовать привидения типов (Client)NetworkClient но это никому не поможет
             Data.Network = this;
@@ -41,31 +41,35 @@ namespace NSL.UDP.Client
         }
 
         public override void ChangeUserData(INetworkClient newClientData)
+            => SetClientData(newClientData);
+
+        public override void SetClientData(INetworkClient from)
         {
-            if (newClientData == null)
+            if (from == null)
             {
-                data = null;
+                clientData = null;
                 return;
             }
 
-            if (newClientData is T td)
+            if (from is TClient td)
             {
-                var oldData = data;
+                // current data for dispose and move data
+                var oldData = clientData;
 
-                data = td;
-                data.Network = this;
+                clientData = td;
+                clientData.Network = this;
 
                 oldData.Network = null;
 
-                newClientData.ChangeOwner(oldData);
+                from.ChangeOwner(oldData);
 
                 return;
             }
 
-            throw new Exception($"{nameof(newClientData)} must have type {typeof(T)}");
+            throw new Exception($"{nameof(from)} must have type {typeof(TClient)}");
         }
 
-        protected override UDPClient<T> GetParent() => this;
+        protected override UDPClient<TClient> GetParent() => this;
 
         protected override void OnReceive(ushort pid, int len)
         {
