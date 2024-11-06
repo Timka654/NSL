@@ -1,10 +1,12 @@
-﻿using System;
+﻿#if !DEVELOP
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NSL.Generators.FillTypeGenerator.Tests.Develop.NoEqMemberTypeWithEqNames.DE1
+namespace NSL.Generators.FillTypeGenerator.Tests.NoEqMemberTypeWithEqNames
 {
     public enum DevEnum
     {
@@ -12,3 +14,5 @@ namespace NSL.Generators.FillTypeGenerator.Tests.Develop.NoEqMemberTypeWithEqNam
         Value2,
     }
 }
+
+#endif

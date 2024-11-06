@@ -1,11 +1,12 @@
-﻿using NSL.Generators.FillTypeGenerator.Tests.Develop.NoEqMemberTypeWithEqNames.DE1;
+﻿#if !DEVELOP
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NSL.Generators.FillTypeGenerator.Tests.Develop.NoEqMemberTypeWithEqNames
+namespace NSL.Generators.FillTypeGenerator.Tests.NoEqMemberTypeWithEqNames
 {
     public partial class DevClass3
     {
@@ -32,3 +33,5 @@ namespace NSL.Generators.FillTypeGenerator.Tests.Develop.NoEqMemberTypeWithEqNam
     {
     }
 }
+
+#endif

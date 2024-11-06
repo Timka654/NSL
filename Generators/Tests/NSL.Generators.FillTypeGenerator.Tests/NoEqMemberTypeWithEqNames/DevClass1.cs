@@ -1,6 +1,8 @@
-﻿using NSL.Generators.FillTypeGenerator.Attributes;
-using NSL.Generators.FillTypeGenerator.Tests.Develop.NoEqMemberTypeWithEqNames.DE1;
+﻿#if !DEVELOP
+
+using NSL.Generators.FillTypeGenerator.Attributes;
 using NSL.Generators.FillTypeGenerator.Tests.From;
+using NSL.Generators.FillTypeGenerator.Tests.NoEqMemberTypeWithEqNames;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,3 +26,5 @@ namespace NSL.Generators.FillTypeGenerator.Tests.Develop.NoEqMemberTypeWithEqNam
         public ct2 pc2Test { get; set; }
     }
 }
+
+#endif

@@ -1,4 +1,6 @@
-﻿using NSL.Generators.FillTypeGenerator.Attributes;
+﻿#if !DEVELOP
+using NSL.Generators.FillTypeGenerator.Attributes;
+using NSL.Generators.FillTypeGenerator.Tests.EnumDev;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,3 +22,4 @@ namespace NSL.Generators.FillTypeGenerator.Tests.Develop.EnumDev
         a2
     }
 }
+#endif

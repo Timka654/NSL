@@ -218,8 +218,6 @@ namespace NSL.Generators.FillTypeGenerator
         {
             //GenDebug.Break();
 
-            string proxyModel = default;
-
             var attributes = item.GetAttributes();
 
             var proxyAttribs = attributes.Where(x => x.AttributeClass.Name == FillTypeGenerateProxyAttributeFullName).ToArray();
@@ -227,16 +225,20 @@ namespace NSL.Generators.FillTypeGenerator
             var fromModel = proxyAttribs.FirstOrDefault(x => x.ConstructorArguments.Length == 2 && x.ConstructorArguments.First().Value == model);
 
             if (fromModel != null)
-                proxyModel = (string)fromModel.ConstructorArguments[1].Value;
+                return (string)fromModel.ConstructorArguments[1].Value;
             else
             {
+                //GenDebug.Break();
+
                 var toModel = proxyAttribs.FirstOrDefault(x => x.ConstructorArguments.Length == 1);
 
                 if (toModel != null)
-                    proxyModel = (string)toModel.ConstructorArguments.First().Value;
+                {
+                    return (string)toModel.ConstructorArguments.First().Value;
+                }
             }
 
-            return proxyModel ?? model;
+            return model;
         }
 
         private ITypeSymbol GetFromTypeForFill(ISymbol fromItem, ITypeSymbol toType, bool dir)
