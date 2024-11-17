@@ -3,6 +3,7 @@ using NSL.ASPNET.Identity.ClientIdentity.Providers;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Net.Http;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -48,7 +49,7 @@ namespace NSL.ASPNET.Identity.JWT
         private string _Name;
         private string _Id;
         private string _PhoneNumber;
-        private IEnumerable<string> _Roles;
+        private IEnumerable<string> _Roles = Enumerable.Empty<string>();
 
         public override string Email => _Email;
 
