@@ -21,5 +21,8 @@ namespace NSL.Database.EntityFramework.Filter.Host
 
         public static bool EndsWithIgnoreCase(this string text, string search)
             => text.EndsWith(search, StringComparison.OrdinalIgnoreCase);
+
+        public static bool EqualsIgnoreCase(this string text, string search)
+            => text.Equals(search, StringComparison.OrdinalIgnoreCase);
     }
 }

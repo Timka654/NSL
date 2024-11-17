@@ -10,7 +10,6 @@ namespace NSL.Database.EntityFramework.Filter.Host
     {
         public static ModelBuilder HasDbFilter(this ModelBuilder modelBuilder)
         {
-
             modelBuilder.HasDbFunction(() => FilterExtensions.ContainsCase(default, default))
                 .HasTranslation(args =>
                 {
@@ -181,6 +180,38 @@ namespace NSL.Database.EntityFramework.Filter.Host
                         typeMapping: value.TypeMapping),
                     typeof(string),
                     value.TypeMapping);
+
+                    var lowerSource = new SqlFunctionExpression(
+                        functionName: "LOWER",
+                        arguments: new[] { source },
+                        nullable: true,
+                        argumentsPropagateNullability: new[] { true },
+                        type: typeof(string),
+                        typeMapping: source.TypeMapping);
+
+                    return new SqlFunctionExpression(
+                        functionName: "LIKE",
+                        arguments: [lowerSource, likePattern],
+                        nullable: true,
+                        argumentsPropagateNullability: new[] { true, true },
+                        type: typeof(bool),
+                        typeMapping: null);
+                });
+
+            modelBuilder
+                .HasDbFunction(() => FilterExtensions.EqualsIgnoreCase(default, default))
+                .HasTranslation(args =>
+                {
+                    var source = args.ElementAt(0);
+                    var value = args.ElementAt(1);
+
+                    var likePattern = new SqlFunctionExpression(
+                        functionName: "LOWER",
+                        arguments: new[] { value },
+                        nullable: true,
+                        argumentsPropagateNullability: new[] { true },
+                        type: typeof(string),
+                        typeMapping: value.TypeMapping);
 
                     var lowerSource = new SqlFunctionExpression(
                         functionName: "LOWER",
