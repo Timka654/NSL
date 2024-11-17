@@ -124,9 +124,11 @@ namespace NSL.ASPNET.Identity.Host
         {
             var claims = new List<Claim>
                 {
-                    new Claim(ClaimsIdentity.DefaultNameClaimType, identity.UserName),
                     new Claim(ClaimTypes.NameIdentifier, identity.Id.ToString()),
                 };
+
+            if (identity.UserName != default)
+                claims.Add(new Claim(ClaimsIdentity.DefaultNameClaimType, identity.UserName));
 
             if (build != null)
                 build(identity, claims);
@@ -231,7 +233,7 @@ namespace NSL.ASPNET.Identity.Host
 
         public static async Task<IdentityResult> CreateRolesAsync<TRoleManager, TRole, TKey>(this IHost host, params string[] roles)
             where TKey : IEquatable<TKey>
-            where TRole : IdentityRole<TKey>, new ()
+            where TRole : IdentityRole<TKey>, new()
             where TRoleManager : RoleManager<TRole>
         {
             IdentityResult result = default;
@@ -246,7 +248,7 @@ namespace NSL.ASPNET.Identity.Host
 
         public static async Task<IdentityResult> CreateRolesAsync<TRoleManager, TRole, TKey>(this IServiceProvider services, params string[] roles)
             where TKey : IEquatable<TKey>
-            where TRole : IdentityRole<TKey>, new ()
+            where TRole : IdentityRole<TKey>, new()
             where TRoleManager : RoleManager<TRole>
         {
             var roleManager = services.GetRequiredService<TRoleManager>();
