@@ -22,22 +22,22 @@ namespace NSL.ASPNET.Identity.ClientIdentity
 
         public string? AuthorizationToken { get; protected set; }
 
-        public string Email
+        public virtual string Email
             => UserName;
 
-        public string UserName
+        public virtual string UserName
             => GetClaims()?.First(x => x.Type == ClaimTypes.Email).Value;
 
-        public string Name
+        public virtual string Name
             => GetClaims()?.First(x => x.Type == ClaimTypes.Name).Value;
 
-        public string Id
+        public virtual string Id
             => GetClaims()?.First(x => x.Type == ClaimTypes.NameIdentifier).Value;
 
-        public string PhoneNumber
+        public virtual string PhoneNumber
             => GetClaims()?.FirstOrDefault(x => x.Type == ClaimTypes.MobilePhone)?.Value ?? string.Empty;
 
-        public IEnumerable<string> Roles
+        public virtual IEnumerable<string> Roles
             => GetClaims()?.Where(x => x.Type.Equals(ClaimTypes.Role)).Select(x => x.Value) ?? Enumerable.Empty<string>();
 
         public bool IsAuthenticated
