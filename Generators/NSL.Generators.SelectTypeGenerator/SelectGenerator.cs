@@ -201,20 +201,6 @@ namespace NSL.Generators.SelectTypeGenerator
         {
             CodeBuilder methodBuilder = new CodeBuilder();
 
-            //methodBuilder.AppendLine($"{(declaration.HasInternalModifier() ? "internal" : "public")} {toType.Name} Select{model}Create()");
-
-            //methodBuilder.AppendLine("{");
-
-            //methodBuilder.NextTab();
-
-
-
-            //methodBuilder.PrevTab();
-
-            //methodBuilder.AppendLine("}");
-
-            //methodBuilder.AppendLine();
-
             methodBuilder.AppendLine($"public static {collectionType}<dynamic> Select{model}(this {collectionType}<{type.GetTypeFullName()}> ___toSelect)");
 
             methodBuilder.AppendLine("{");
@@ -257,6 +243,7 @@ namespace NSL.Generators.SelectTypeGenerator
                         .Where(x => x.AttributeClass.Name == SelectGenerateModelJoinAttributeFullName)
                         .Where(x => (x.ConstructorArguments.First().Value as string).Equals(model))
                         .SelectMany(x => x.ConstructorArguments.ElementAt(1).Values.Select(q => q.Value as string))
+                        .Append(model)
                         .ToArray();
 
             return joined;
@@ -317,19 +304,9 @@ namespace NSL.Generators.SelectTypeGenerator
             foreach (var item in members)
             {
                 ITypeSymbol memberType;
-                //var fMember = toMembers.FirstOrDefault(x => x.Name.Equals(item.Name) && x.DeclaredAccessibility == Accessibility.Public);
-
-                //if (fMember == default || fMember is IPropertySymbol fps && fps.SetMethod == default)
-                //    continue;
 
                 if (item is IPropertySymbol ps)
                 {
-                    //var ignore = ps.GetAttributes()
-                    //.Where(x => x.AttributeClass.Name.Equals(SelectGenerateIgnoreAttributeFullName))
-                    //.Any(q => q.ConstructorArguments.Any(x => (x.Value as INamedTypeSymbol).MetadataName.Equals(toType.MetadataName)));
-
-                    //if (ignore)
-                    //    continue;
 
                     if (ps.GetMethod == null)
                         continue;
@@ -338,12 +315,6 @@ namespace NSL.Generators.SelectTypeGenerator
                 }
                 else if (item is IFieldSymbol fs)
                 {
-                    //var ignore = fs.GetAttributes()
-                    //.Where(x => x.AttributeClass.Name.Equals(SelectGenerateIgnoreAttributeFullName))
-                    //.Any(q => q.ConstructorArguments.Any(x => (x.Value as INamedTypeSymbol).MetadataName.Equals(toType.MetadataName)));
-
-                    //if (ignore)
-                    //    continue;
                     memberType = fs.Type;
                 }
                 else
@@ -368,13 +339,20 @@ namespace NSL.Generators.SelectTypeGenerator
                 //   GenDebug.Break();
                 //#endif
 
+                //if (item.Name.StartsWith("JP"))
+                //{
+                //    GenDebug.Break();
+                //}
+
                 if (memberType is IArrayTypeSymbol arrt)
                 {
                     itemModel = GetProxyModel(item, model);
 
-                    //joined = GetJoinModels(arrt.ElementType, itemModel);
+                    joined = GetJoinModels(arrt.ElementType, itemModel);
 
-                    var amembers = FilterSymbols(arrt.ElementType.GetAllMembers(), Enumerable.Repeat( itemModel,1));
+                    sMembers.Add($"// Join {itemModel} to [{string.Join(",", joined)}]");
+
+                    var amembers = FilterSymbols(arrt.ElementType.GetAllMembers(), joined);
 
                     ReadCollection(sMembers, item, amembers, model, itemModel, path);
 
@@ -386,9 +364,11 @@ namespace NSL.Generators.SelectTypeGenerator
 
                     itemModel = GetProxyModel(item, model);
 
-                    //joined = GetJoinModels(pType, itemModel);
+                    joined = GetJoinModels(pType, itemModel);
 
-                    var amembers = FilterSymbols(pType.GetAllMembers(), Enumerable.Repeat(itemModel,1));
+                    sMembers.Add($"// Join {itemModel} to [{string.Join(",", joined)}]");
+
+                    var amembers = FilterSymbols(pType.GetAllMembers(), joined);
 
                     ReadCollection(sMembers, item, amembers, model, itemModel, path);
 
@@ -398,17 +378,14 @@ namespace NSL.Generators.SelectTypeGenerator
 
                 itemModel = GetProxyModel(item, model);
 
-                //joined = GetJoinModels(item.ContainingType, itemModel);
+                joined = GetJoinModels(memberType, itemModel);
 
-                var memMembers = FilterSymbols(memberType.GetAllMembers(), Enumerable.Repeat(itemModel, 1));
-
-                //if (item.Name.StartsWith("AbcModel1"))
-                //{
-                //    GenDebug.Break();
-                //}
+                var memMembers = FilterSymbols(memberType.GetAllMembers(), joined);
 
                 if (memMembers.Any())
                 {
+                    sMembers.Add($"// Join {itemModel} to [{string.Join(",", joined)}]");
+
                     var nMembers = new List<string>();
 
                     ReadMembers(memMembers, nMembers, itemModel, $"{path}.{item.Name}");

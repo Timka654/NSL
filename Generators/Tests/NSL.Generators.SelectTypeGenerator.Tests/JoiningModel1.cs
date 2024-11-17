@@ -1,11 +1,13 @@
-﻿using NSL.Generators.SelectTypeGenerator.Attributes;
+﻿#if !DEVELOP
+
+using NSL.Generators.SelectTypeGenerator.Attributes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NSL.Generators.SelectTypeGenerator.Tests.Develop
+namespace NSL.Generators.SelectTypeGenerator.Tests
 {
     [SelectGenerate("Get2")]
     [SelectGenerate("Get2")]
@@ -44,3 +46,5 @@ namespace NSL.Generators.SelectTypeGenerator.Tests.Develop
         [SelectGenerateInclude("Get")] public string b3 { get; set; }
     }
 }
+
+#endif

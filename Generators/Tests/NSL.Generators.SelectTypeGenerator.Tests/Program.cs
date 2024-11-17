@@ -9,6 +9,10 @@ namespace NSL.Generators.FillTypeGenerator.Tests
         static void Main(string[] args)
         {
 #if DEVELOP
+            IEnumerable<JoinProxyModel1> jplist = new List<JoinProxyModel1>();
+
+            jplist.SelectTestGet();
+#else
             List<JoiningModel1> jList = new List<JoiningModel1>();
 
             var selectTest = jList.SelectGet2();
@@ -16,7 +20,6 @@ namespace NSL.Generators.FillTypeGenerator.Tests
             JoiningModel1 n = new JoiningModel1();
 
             var convertTest = n.ToGet2();
-#else
 
             List<ProxyModel1> pItems = new List<ProxyModel1>();
 
