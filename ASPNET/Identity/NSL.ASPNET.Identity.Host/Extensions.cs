@@ -128,7 +128,10 @@ namespace NSL.ASPNET.Identity.Host
                 };
 
             if (identity.UserName != default)
-                claims.Add(new Claim(ClaimsIdentity.DefaultNameClaimType, identity.UserName));
+                claims.Add(new Claim(ClaimTypes.Name, identity.UserName));
+
+            if (identity.Email != default)
+                claims.Add(new Claim(ClaimTypes.Email, identity.Email));
 
             if (build != null)
                 build(identity, claims);
