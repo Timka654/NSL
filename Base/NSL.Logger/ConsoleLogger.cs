@@ -1,46 +1,21 @@
 ﻿using NSL.Logger.Interface;
 using NSL.SocketCore.Utils.Logger.Enums;
 using System;
+using System.Reflection.Emit;
+using System.Threading.Channels;
 using System.Threading.Tasks;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace NSL.Logger
 {
-    public class ConsoleLogger : ILogger
+    public class ConsoleLogger : ILogger, IDisposable
     {
-        private static object _locked = new object();
+        static Channel<(LoggerLevel level, string text)> writeChannel = Channel.CreateUnbounded<(LoggerLevel level, string text)>();
 
         internal static async void WriteLog(LoggerLevel level, string text)
         {
-            await Task.Run(() =>
-            {
-                lock (_locked)
-                {
-                    switch (level)
-                    {
-                        case LoggerLevel.Info:
-                            Console.ForegroundColor = ConsoleColor.White;
-                            break;
-                        case LoggerLevel.Error:
-                            Console.ForegroundColor = ConsoleColor.Red;
-                            break;
-                        case LoggerLevel.Log:
-                            Console.ForegroundColor = ConsoleColor.White;
-                            break;
-                        case LoggerLevel.Debug:
-                            Console.ForegroundColor = ConsoleColor.Yellow;
-                            break;
-                        case LoggerLevel.Performance:
-                            Console.ForegroundColor = ConsoleColor.Blue;
-                            break;
-                        default:
-                            break;
-                    }
-                    Console.WriteLine(text);
-#if DEBUG
-                    System.Diagnostics.Debug.WriteLine(text);
-#endif
-                }
-            });
+            await writeChannel.Writer.WriteAsync((level, text));
+
         }
 
         public void Append(LoggerLevel level, string text)
@@ -67,5 +42,54 @@ namespace NSL.Logger
 
         public static ConsoleLogger Create()
             => new ConsoleLogger();
+
+        public ConsoleLogger()
+        {
+            processing();
+        }
+
+        private async void processing()
+        {
+            while (!disposed)
+            {
+                var item = await writeChannel.Reader.ReadAsync();
+
+                switch (item.level)
+                {
+                    case LoggerLevel.Info:
+                        Console.ForegroundColor = ConsoleColor.White;
+                        break;
+                    case LoggerLevel.Error:
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        break;
+                    case LoggerLevel.Log:
+                        Console.ForegroundColor = ConsoleColor.White;
+                        break;
+                    case LoggerLevel.Debug:
+                        Console.ForegroundColor = ConsoleColor.Yellow;
+                        break;
+                    case LoggerLevel.Performance:
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        break;
+                    default:
+                        break;
+                }
+                Console.WriteLine(item.text);
+#if DEBUG
+            System.Diagnostics.Debug.WriteLine(item.text);
+#endif
+            }
+        }
+
+        private bool disposed = false;
+
+        public void Dispose()
+        {
+            if (disposed)
+                return;
+
+            writeChannel.Writer.Complete();
+            disposed = true;
+        }
     }
 }
