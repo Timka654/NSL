@@ -38,7 +38,6 @@ namespace NSL.ASPNET.Identity.JWT
         {
             _Email = base.Email;
             _UserName = base.UserName;
-            _Name = base.Name;
             _Id = base.Id;
             _PhoneNumber = base.PhoneNumber;
             _Roles = base.Roles;
@@ -46,7 +45,6 @@ namespace NSL.ASPNET.Identity.JWT
 
         private string _Email;
         private string _UserName;
-        private string _Name;
         private string _Id;
         private string _PhoneNumber;
         private IEnumerable<string> _Roles = Enumerable.Empty<string>();
@@ -54,8 +52,6 @@ namespace NSL.ASPNET.Identity.JWT
         public override string Email => _Email;
 
         public override string UserName => _UserName;
-
-        public override string Name => _Name;
 
         public override string Id => _Id;
 
