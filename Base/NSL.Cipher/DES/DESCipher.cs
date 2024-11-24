@@ -51,14 +51,14 @@ namespace NSL.Cipher.DES
             return des.IV;
         }
 
-        public byte[] Decode(byte[] buffer, int offset, int lenght)
+        public byte[] Decode(byte[] buffer, int offset, int length)
         {
-            return decrypt.TransformFinalBlock(buffer, offset, lenght);
+            return decrypt.TransformFinalBlock(buffer, offset, length);
         }
 
-        public byte[] Encode(byte[] buffer, int offset, int lenght)
+        public byte[] Encode(byte[] buffer, int offset, int length)
         {
-            return encrypt.TransformFinalBlock(buffer, offset, lenght);
+            return encrypt.TransformFinalBlock(buffer, offset, length);
         }
 
         public byte[] Peek(byte[] buffer)

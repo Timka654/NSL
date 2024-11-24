@@ -112,18 +112,18 @@ namespace NSL.Cipher.RC.RC4
 
         public State m_state;
         
-        public byte[] Decode(byte[] buffer, int offset, int lenght)
+        public byte[] Decode(byte[] buffer, int offset, int length)
         {
-            byte[] dest = new byte[lenght];
-            codeBlock(ref buffer, offset, ref dest, lenght);
+            byte[] dest = new byte[length];
+            codeBlock(ref buffer, offset, ref dest, length);
 
             return dest;
         }
 
-        public byte[] Encode(byte[] buffer, int offset, int lenght)
+        public byte[] Encode(byte[] buffer, int offset, int length)
         {
-            byte[] dest = new byte[lenght];
-            codeBlock(ref buffer, offset, ref dest, lenght);
+            byte[] dest = new byte[length];
+            codeBlock(ref buffer, offset, ref dest, length);
 
             return dest;
         }

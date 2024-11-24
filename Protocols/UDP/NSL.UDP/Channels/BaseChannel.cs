@@ -128,7 +128,7 @@ namespace NSL.UDP.Channels
                     if (packet.ContainsParts.Contains(poffset))
                         return;
 
-                    packet.Lenght = 1;
+                    packet.Length = 1;
 
                     packet.Parts.Add(data[UDPPacket.BaseHeadLen..].ToArray());
 
@@ -137,7 +137,7 @@ namespace NSL.UDP.Channels
             }
             else if (LPacket.ReadISLP(data))
             {
-                packet.Lenght = LPacket.ReadPacketLen(data);
+                packet.Length = LPacket.ReadPacketLen(data);
             }
             else // data part
             {
@@ -184,7 +184,7 @@ namespace NSL.UDP.Channels
 
             public uint PID;
 
-            public ushort Lenght;
+            public ushort Length;
 
             public ConcurrentBag<Memory<byte>> Parts;
 
@@ -192,19 +192,19 @@ namespace NSL.UDP.Channels
 
             public PacketReciveTemp(uint PID, ushort len) : this(PID)
             {
-                this.Lenght = len;
+                this.Length = len;
             }
 
             public PacketReciveTemp(uint PID)
             {
                 this.PID = PID;
-                this.Lenght = 0;
+                this.Length = 0;
                 Parts = new ConcurrentBag<Memory<byte>>();
                 ContainsParts = new ConcurrentBag<ushort>();
             }
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public bool Ready() => Lenght > 0 && Parts.Count == Lenght;
+            public bool Ready() => Length > 0 && Parts.Count == Length;
         }
     }
 

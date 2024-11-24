@@ -44,7 +44,7 @@ namespace NSL.UDP
 
         #region Network
 
-        public const int PHeadLenght = 5;
+        public const int PHeadLength = 5;
 
         #region Cipher
 
@@ -75,7 +75,7 @@ namespace NSL.UDP
         ///// <summary>
         ///// Размер читаемых данных при следующем вызове BeginReceive
         ///// </summary>
-        //protected int lenght = InputPacketBuffer.headerLenght;
+        //protected int length = InputPacketBuffer.headerLength;
 
         //protected bool data = false;
 
@@ -259,7 +259,7 @@ namespace NSL.UDP
         public void Send(byte[] buffer)
             => throw new NotImplementedException();
 
-        public void Send(byte[] buf, int offset, int lenght)
+        public void Send(byte[] buf, int offset, int length)
             => throw new NotImplementedException();
 
         internal void SocketSend(byte[] sndBuffer, PacketWaitTemp packet)

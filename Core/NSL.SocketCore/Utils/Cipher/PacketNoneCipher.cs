@@ -7,11 +7,11 @@
             return this;
         }
 
-        public byte[] Decode(byte[] buffer, int offset, int lenght)
+        public byte[] Decode(byte[] buffer, int offset, int length)
         {
-            byte[] dest = new byte[lenght];
+            byte[] dest = new byte[length];
 
-            System.Buffer.BlockCopy(buffer, offset, dest, 0, lenght);
+            System.Buffer.BlockCopy(buffer, offset, dest, 0, length);
 
             return dest;
         }
@@ -20,7 +20,7 @@
         {
         }
 
-        public byte[] Encode(byte[] buffer, int offset, int lenght)
+        public byte[] Encode(byte[] buffer, int offset, int length)
         {
             return buffer;
         }

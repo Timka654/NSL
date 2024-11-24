@@ -61,7 +61,7 @@ namespace NSL.TCP
         /// <summary>
         /// Размер читаемых данных при следующем вызове BeginReceive
         /// </summary>
-        protected int lenght = InputPacketBuffer.DefaultHeaderLength;
+        protected int length = InputPacketBuffer.DefaultHeaderLength;
 
         protected bool data = false;
 
@@ -93,7 +93,7 @@ namespace NSL.TCP
         protected void ResetBuffer()
         {
             data = false;
-            lenght = InputPacketBuffer.DefaultHeaderLength;
+            length = InputPacketBuffer.DefaultHeaderLength;
             offset = 0;
         }
 
@@ -137,35 +137,35 @@ namespace NSL.TCP
             if (sclient == null)
                 throw new ConnectionLostException(GetRemotePoint(), true);
 
-            int rlen = await sclient.ReceiveAsync(receiveBuffer.AsMemory(offset, lenght - offset));
+            int rlen = await sclient.ReceiveAsync(receiveBuffer.AsMemory(offset, length - offset), SocketFlags.None);
 
             if (rlen < 1)
                 throw new ConnectionLostException(GetRemotePoint(), true);
 
             offset += rlen;
 
-            if (offset == lenght)
+            if (offset == length)
             {
                 if (data == false)
                 {
                     var peeked = inputCipher.Peek(receiveBuffer);
 
-                    lenght = BitConverter.ToInt32(peeked, 0);
+                    length = BitConverter.ToInt32(peeked, 0);
 
                     data = true;
 
-                    while (receiveBuffer.Length < lenght)
+                    while (receiveBuffer.Length < length)
                     {
                         Array.Resize(ref receiveBuffer, receiveBuffer.Length * 2);
                         sclient.ReceiveBufferSize = receiveBuffer.Length;
                     }
                 }
 
-                if (offset == lenght && data)
+                if (offset == length && data)
                 {
-                    InputPacketBuffer pbuff = new InputPacketBuffer(inputCipher.Decode(receiveBuffer, 0, lenght));
+                    InputPacketBuffer pbuff = new InputPacketBuffer(inputCipher.Decode(receiveBuffer, 0, length));
 
-                    OnReceive(pbuff.PacketId, lenght);
+                    OnReceive(pbuff.PacketId, length);
 
                     ResetBuffer();
 
@@ -206,24 +206,32 @@ namespace NSL.TCP
         /// </summary>
         /// <param name="buffer"></param>
         public async void Send(byte[] buffer)
-            => await sendChannel.Writer.WriteAsync(buffer);
-
+        {
+            try { await sendChannel.Writer.WriteAsync(buffer); } catch (InvalidOperationException) { Data?.OnPacketSendFail(buffer, 0, buffer.Length); }
+        }
         /// <summary>
         /// Send byte buffer async to server
         /// </summary>
         /// <param name="buf"></param>
         /// <param name="offset"></param>
-        /// <param name="lenght"></param>
-        public async void Send(byte[] buf, int offset, int lenght)
+        /// <param name="length"></param>
+        public async void Send(byte[] buf, int offset, int length)
         {
-            if (offset == 0 && lenght == buf.Length)
+            try
             {
-                await sendChannel.Writer.WriteAsync(buf);
-                return;
-            }
+                if (offset == 0 && length == buf.Length)
+                {
+                    await sendChannel.Writer.WriteAsync(buf);
+                    return;
+                }
 
-            await sendChannel.Writer.WriteAsync(buf[offset..(offset + lenght)]);
+                await sendChannel.Writer.WriteAsync(buf[offset..(offset + length)]);
+            }
+            catch (InvalidOperationException) { Data?.OnPacketSendFail(buf, offset, length); }
+
         }
+
+
 
         private Channel<byte[]> sendChannel = Channel.CreateUnbounded<byte[]>();
 

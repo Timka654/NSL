@@ -30,17 +30,17 @@ namespace NSL.Cipher.RSA
             return rsa.ToXmlString(true);
         }
 
-        public byte[] Decode(byte[] buffer, int offset, int lenght)
+        public byte[] Decode(byte[] buffer, int offset, int length)
         {
-            byte[] buf = new byte[lenght];
-            Array.Copy(buffer,offset,buf,0,lenght);
+            byte[] buf = new byte[length];
+            Array.Copy(buffer,offset,buf,0,length);
             return rsa.Decrypt(buf,true);
         }
 
-        public byte[] Encode(byte[] buffer, int offset, int lenght)
+        public byte[] Encode(byte[] buffer, int offset, int length)
         {
-            byte[] buf = new byte[lenght];
-            Array.Copy(buffer, offset, buf, 0, lenght);
+            byte[] buf = new byte[length];
+            Array.Copy(buffer, offset, buf, 0, length);
             return rsa.Encrypt(buf, true);
         }
 

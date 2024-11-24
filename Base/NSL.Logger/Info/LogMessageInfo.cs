@@ -20,6 +20,7 @@ namespace NSL.Logger.Info
                 Temp = $"[{Level.ToString()}] - {DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss")}: {Text}";
                 Text = null;
             }
+
             return Temp;
         }
     }

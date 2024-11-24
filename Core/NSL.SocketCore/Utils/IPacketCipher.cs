@@ -19,17 +19,17 @@ namespace NSL.SocketCore.Utils
         /// </summary>
         /// <param name="buffer">буффер с данными</param>
         /// <param name="offset">позиция в буффере с которой нужно начинать чтение</param>
-        /// <param name="lenght">размер данных </param>
+        /// <param name="length">размер данных </param>
         /// <returns>Буффер с расшифрованным хедером пакета</returns>
-        byte[] Encode(byte[] buffer, int offset, int lenght);
+        byte[] Encode(byte[] buffer, int offset, int length);
         /// <summary>
         /// 
         /// </summary>
         /// <param name="buffer">буффер с данными</param>
         /// <param name="offset">позиция в буффере с которой нужно начинать чтение</param>
-        /// <param name="lenght"></param>
+        /// <param name="length"></param>
         /// <returns>Буффер с расшифрованным хедером пакета</returns>
-        byte[] Decode(byte[] buffer, int offset, int lenght);
+        byte[] Decode(byte[] buffer, int offset, int length);
 
         bool Sync();
 

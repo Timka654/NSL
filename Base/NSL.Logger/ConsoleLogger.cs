@@ -4,17 +4,17 @@ using System;
 using System.Reflection.Emit;
 using System.Threading.Channels;
 using System.Threading.Tasks;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace NSL.Logger
 {
-    public class ConsoleLogger : ILogger, IDisposable
+    public class ConsoleLogger : ILogger
     {
         static Channel<(LoggerLevel level, string text)> writeChannel = Channel.CreateUnbounded<(LoggerLevel level, string text)>();
 
         internal static async void WriteLog(LoggerLevel level, string text)
         {
-            await writeChannel.Writer.WriteAsync((level, text));
+            try { await writeChannel.Writer.WriteAsync((level, text)); } catch (InvalidOperationException) { }
+            
 
         }
 
@@ -43,14 +43,15 @@ namespace NSL.Logger
         public static ConsoleLogger Create()
             => new ConsoleLogger();
 
-        public ConsoleLogger()
+        static ConsoleLogger()
         {
             processing();
         }
 
-        private async void processing()
+
+        private static async void processing()
         {
-            while (!disposed)
+            while (true)
             {
                 var item = await writeChannel.Reader.ReadAsync();
 
@@ -74,22 +75,12 @@ namespace NSL.Logger
                     default:
                         break;
                 }
+
                 Console.WriteLine(item.text);
 #if DEBUG
-            System.Diagnostics.Debug.WriteLine(item.text);
+                System.Diagnostics.Debug.WriteLine(item.text);
 #endif
             }
-        }
-
-        private bool disposed = false;
-
-        public void Dispose()
-        {
-            if (disposed)
-                return;
-
-            writeChannel.Writer.Complete();
-            disposed = true;
         }
     }
 }

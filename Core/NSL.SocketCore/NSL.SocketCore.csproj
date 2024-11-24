@@ -32,6 +32,10 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <PackageReference Include="System.Threading.Channels" Version="9.0.0" />
+	</ItemGroup>
+
+	<ItemGroup>
 	  <ProjectReference Include="..\Utils\NSL.Utils\NSL.Utils.csproj" />
 	</ItemGroup>
 

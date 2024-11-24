@@ -216,20 +216,20 @@ namespace NSL.Cipher.RC.RC5
             UInt64ToBytes(b, outBuf, 8);
         }
 
-        public byte[] Decode(byte[] buffer, int offset, int lenght)
+        public byte[] Decode(byte[] buffer, int offset, int length)
         {
-            if(offset - lenght < 15)
+            if(offset - length < 15)
                 throw new Exception();
-            byte[] obuff = new byte[lenght];
+            byte[] obuff = new byte[length];
             Decipher(buffer,obuff);
             return obuff;
         }
 
-        public byte[] Encode(byte[] buffer, int offset, int lenght)
+        public byte[] Encode(byte[] buffer, int offset, int length)
         {
-            if (offset - lenght < 15)
+            if (offset - length < 15)
                 throw new Exception();
-            byte[] obuff = new byte[lenght];
+            byte[] obuff = new byte[length];
             Decipher(buffer, obuff);
             return obuff;
         }

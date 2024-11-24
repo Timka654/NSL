@@ -4,36 +4,24 @@ using NSL.SocketCore.Utils.Logger.Enums;
 using System;
 using System.Collections.Concurrent;
 using System.Threading;
+using System.Threading.Channels;
 
 namespace NSL.Logger
 {
     public abstract class BaseLogger : ILogger, IDisposable
     {
-        public bool Initialized { get; private set; }
-
-        public string InstanceName { get; protected set; }
-
         private bool ConsoleOutput;
 
         private bool UnhandledCatch;
 
-        private ConcurrentQueue<LogMessageInfo> WaitList;
-
         protected DateTime CurrentDateInitialized;
 
-        protected int Delay;
+        protected bool Disposed { get; private set; } = false;
 
-        protected string FileTemplateName;
+        protected Channel<LogMessageInfo> LogChannel = Channel.CreateUnbounded<LogMessageInfo>();
 
-        private Timer outputTimer;
-
-        internal bool Disponsed = false;
-
-        public void Append(LoggerLevel level, string text)
+        public async void Append(LoggerLevel level, string text)
         {
-            if (!Initialized)
-                return;
-
             var lm = new LogMessageInfo()
             {
                 Now = DateTime.UtcNow,
@@ -44,7 +32,7 @@ namespace NSL.Logger
             if (ConsoleOutput)
                 ConsoleLogger.WriteLog(lm.Level, lm.ToString());
 
-            WaitList.Enqueue(lm);
+            try { await LogChannel.Writer.WriteAsync(lm); } catch (InvalidOperationException) { } 
         }
 
         public void ConsoleLog(LoggerLevel level, string text)
@@ -53,32 +41,15 @@ namespace NSL.Logger
                 ConsoleLogger.WriteLog(level, $"[{level.ToString()}] - {DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss")}: {text}");
         }
 
-        protected void Initialize(string fileTemplateName, int delay)
+        protected BaseLogger()
         {
-            FileTemplateName = fileTemplateName;
-
-            Delay = delay;
-
-            WaitList = new ConcurrentQueue<LogMessageInfo>();
-
-            RunFlush();
-
-            Initialized = true;
-
             AppDomain.CurrentDomain.ProcessExit += CurrentDomain_ProcessExit;
+                
         }
 
         private void CurrentDomain_ProcessExit(object sender, EventArgs e)
         {
             Flush();
-        }
-
-        private void RunFlush()
-        {
-            if (outputTimer != null)
-                outputTimer.Dispose();
-
-            outputTimer = new Timer((e) => Flush(), null, TimeSpan.FromMilliseconds(Delay), TimeSpan.FromMilliseconds(Delay));
         }
 
         public void SetConsoleOutput(bool allow)
@@ -100,14 +71,6 @@ namespace NSL.Logger
             }
         }
 
-        protected void FlushBuffer(Action<LogMessageInfo> processMessage)
-        {
-            while (WaitList.TryDequeue(out var message))
-            {
-                processMessage(message);
-            }
-        }
-
         private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
             Append(LoggerLevel.Error, ((Exception)e.ExceptionObject).ToString());
@@ -116,17 +79,22 @@ namespace NSL.Logger
 
         public void Dispose()
         {
-            if (Disponsed)
+            if (Disposed)
                 return;
 
-            Disponsed = true;
+            Disposed = true;
 
-            outputTimer.Dispose();
+            LogChannel.Writer.Complete();
 
             Flush();
-            //LoggerStorage.DestroyLogger(InstanceName);
+
+            AppDomain.CurrentDomain.ProcessExit -= CurrentDomain_ProcessExit;
         }
 
-        public abstract void Flush();
+        public virtual void Flush()
+        {
+            LogChannel.Reader.WaitToReadAsync().AsTask().Wait();
+        }
+
     }
 }

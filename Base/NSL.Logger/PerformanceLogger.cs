@@ -18,8 +18,8 @@ namespace NSL.Logger
         /// <param name="fileTemplateName"></param>
         /// <param name="delay"></param>
         /// <param name="consoleOutput"></param>
-        public PerformanceLogger(string logsDir, string fileTemplateName = "performance {date}", int delay = 5000, bool consoleOutput = true)
-            : this(new FileLogger(logsDir, fileTemplateName, delay, consoleOutput, false))
+        public PerformanceLogger(string logsDir, string fileTemplateName = "performance {date}", bool consoleOutput = true)
+            : this(new FileLogger(logsDir, fileTemplateName, consoleOutput, false))
         {
         }
 
