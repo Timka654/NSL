@@ -4,6 +4,7 @@ using NSL.SocketCore.Utils.Buffer;
 using NSL.SocketCore.Utils.Exceptions;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Sockets;
@@ -101,78 +102,17 @@ namespace NSL.TCP
 
             PacketHandles = options.GetHandleMap();
 
-            //Возвращает значения в исходное положение
             ResetBuffer();
 
-            //Начало приема пакетов от клиента
-            sclient.BeginReceive(receiveBuffer, offset, lenght, SocketFlags.None, Receive, sclient);
+            Receive();
         }
 
-        private void Receive(IAsyncResult result)
+        private async void Receive()
         {
-            //замыкаем это все в блок try, если клиент отключился то EndReceive может вернуть ошибку
             try
             {
-                if (sclient == null)
-                    throw new ConnectionLostException(GetRemotePoint(), true);
-                //принимаем размер данных которые удалось считать
-                int rlen = sclient.EndReceive(result);
-                //при некоторых ошибках размер возвращает 0 или -1, проверяем
-                if (rlen < 1)
-                    throw new ConnectionLostException(GetRemotePoint(), true);
-
-                //добавляем offset для дальнейшей считки пакета
-                offset += rlen;
-
-                //если размер ожидаемвых данных соответствует ожидаемому - обрабатываем
-                if (offset == lenght)
-                {
-                    if (data == false)
-                    {
-                        var peeked = inputCipher.Peek(receiveBuffer);
-                        //если все ок
-                        //получаем размер пакета
-                        lenght = BitConverter.ToInt32(peeked, 0);
-
-                        ushort pid = BitConverter.ToUInt16(peeked, 4);
-                        OnReceive(pid, lenght);
-                        data = true;
-
-                        while (receiveBuffer.Length < lenght)
-                        {
-                            Array.Resize(ref receiveBuffer, receiveBuffer.Length * 2);
-                            sclient.ReceiveBufferSize = receiveBuffer.Length;
-                        }
-                    }
-
-                    //если все на месте, запускаем обработку
-                    if (offset == lenght && data)
-                    {
-                        //обработка пакета
-
-                        //дешефруем и засовываем это все в спец буффер в котором реализованы методы чтения типов, своего рода поток
-                        InputPacketBuffer pbuff = new InputPacketBuffer(inputCipher.Decode(receiveBuffer, 0, lenght));
-
-                        // обнуляем показатели что-бы успешно запустить цикл заново
-                        ResetBuffer();
-
-
-                        //предотвращение ошибок в пакете
-                        try
-                        {
-                            //ищем пакет и выполняем его, передаем ему данные сессии, полученные данные
-                            PacketHandles[pbuff.PacketId](Data, pbuff);
-                        }
-                        catch (Exception ex)
-                        {
-                            RunException(ex);
-                        }
-
-                        if (!pbuff.ManualDisposing)
-                            pbuff.Dispose();
-                    }
-                }
-                sclient.BeginReceive(receiveBuffer, offset, lenght - offset, SocketFlags.None, Receive, sclient);
+                while (!disconnected)
+                    await receive();
             }
             catch (NullReferenceException) { } // on disconnected client
             catch (SocketException ex)
@@ -186,6 +126,58 @@ namespace NSL.TCP
             catch (Exception ex)
             {
                 Disconnect(ex);
+            }
+        }
+
+        private async Task receive()
+        {
+            if (sclient == null)
+                throw new ConnectionLostException(GetRemotePoint(), true);
+
+            int rlen = await sclient.ReceiveAsync(receiveBuffer.AsMemory(offset, lenght - offset));
+
+            if (rlen < 1)
+                throw new ConnectionLostException(GetRemotePoint(), true);
+
+            offset += rlen;
+
+            if (offset == lenght)
+            {
+                if (data == false)
+                {
+                    var peeked = inputCipher.Peek(receiveBuffer);
+
+                    lenght = BitConverter.ToInt32(peeked, 0);
+
+                    data = true;
+
+                    while (receiveBuffer.Length < lenght)
+                    {
+                        Array.Resize(ref receiveBuffer, receiveBuffer.Length * 2);
+                        sclient.ReceiveBufferSize = receiveBuffer.Length;
+                    }
+                }
+
+                if (offset == lenght && data)
+                {
+                    InputPacketBuffer pbuff = new InputPacketBuffer(inputCipher.Decode(receiveBuffer, 0, lenght));
+
+                    OnReceive(pbuff.PacketId, lenght);
+
+                    ResetBuffer();
+
+                    try
+                    {
+                        PacketHandles[pbuff.PacketId](Data, pbuff);
+                    }
+                    catch (Exception ex)
+                    {
+                        RunException(ex);
+                    }
+
+                    if (!pbuff.ManualDisposing)
+                        pbuff.Dispose();
+                }
             }
         }
 
@@ -245,7 +237,7 @@ namespace NSL.TCP
                             Disconnect();
                             return;
                         }
-                        
+
                         offs += len;
 
                     } while (offs < sndBuffer.Length);
@@ -387,14 +379,12 @@ namespace NSL.TCP
 
             sl?.Dispose();
 
-            //проверяем возможно клиент и не был инициализирован, в случае дос атак, такое возможно
             if (sclient != null)
             {
-                //отключаем и очищаем данные о клиенте
                 try { sclient.Disconnect(false); } catch { }
                 try { sclient.Dispose(); } catch { }
             }
-            //очищаем буффер данных
+
             receiveBuffer = null;
 
             sclient = null;
