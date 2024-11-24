@@ -50,10 +50,6 @@ namespace NSL.TCP.Client
             //установка криптографии для шифровки исходящих данных, указана в общих настройках сервера
             this.outputCipher = ConnectionOptions.OutputCipher.CreateEntry();
 
-            _sendLocker = outputCipher.Sync() ? new AutoResetEvent(true) : null;
-
-            _sendLocker?.Set();
-
             RunReceive();
 
             ConnectionOptions.RunClientConnect();

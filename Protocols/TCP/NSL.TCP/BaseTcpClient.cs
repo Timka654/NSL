@@ -9,6 +9,7 @@ using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Sockets;
 using System.Threading;
+using System.Threading.Channels;
 using System.Threading.Tasks;
 
 namespace NSL.TCP
@@ -104,6 +105,8 @@ namespace NSL.TCP
 
             ResetBuffer();
 
+            sendCycle();
+
             Receive();
         }
 
@@ -184,9 +187,9 @@ namespace NSL.TCP
         #region Send
 
         /// <summary>
-        /// Отправка пакета
+        /// Send byte buffer async
         /// </summary>
-        /// <param name="packet">спец буффер содержащий в себе данные пакета</param>
+        /// <param name="buffer"></param>
         public void Send(OutputPacketBuffer packet, bool disposeOnSend = true)
         {
 #if DEBUG
@@ -198,137 +201,91 @@ namespace NSL.TCP
             packet.Send(this, disposeOnSend);
         }
 
+        /// <summary>
+        /// Send byte buffer async
+        /// </summary>
+        /// <param name="buffer"></param>
         public async void Send(byte[] buffer)
-            => await send(buffer, 0, buffer.Length);
-
-        protected AutoResetEvent _sendLocker;
+            => await sendChannel.Writer.WriteAsync(buffer);
 
         /// <summary>
-        /// Отправка массива байт
+        /// Send byte buffer async to server
         /// </summary>
-        /// <param name="buf">массив байт</param>
-        /// <param name="offset">смещение с которого начинается передача</param>
-        /// <param name="lenght">размер передаваемых данных</param>
+        /// <param name="buf"></param>
+        /// <param name="offset"></param>
+        /// <param name="lenght"></param>
         public async void Send(byte[] buf, int offset, int lenght)
         {
-            await send(buf, offset, lenght);
+            if (offset == 0 && lenght == buf.Length)
+            {
+                await sendChannel.Writer.WriteAsync(buf);
+                return;
+            }
+
+            await sendChannel.Writer.WriteAsync(buf[offset..(offset + lenght)]);
         }
 
-        private async Task send(byte[] buf, int offset, int lenght)
+        private Channel<byte[]> sendChannel = Channel.CreateUnbounded<byte[]>();
+
+        private async void sendCycle()
         {
-            var sl = _sendLocker;
+            var reader = sendChannel.Reader;
+
             try
             {
-                sl?.WaitOne();
-                //шифруем данные
-                byte[] sndBuffer = outputCipher.Encode(buf, offset, lenght);
-
-                //начинаем отправку данных
-                if (sclient != null)
+                while (!disconnected)
                 {
-                    var offs = 0;
-
-                    do
+                    await foreach (var buf in reader.ReadAllAsync())
                     {
-                        var len = await sclient.SendAsync(sndBuffer[offs..], SocketFlags.None);
-                        if (len < 0)
+                        byte[] sndBuffer = outputCipher.Encode(buf, 0, buf.Length);
+
+                        if (sclient == null)
                         {
-                            Data?.OnPacketSendFail(buf, offset, lenght);
+                            Data?.OnPacketSendFail(buf, 0, buf.Length);
+
                             Disconnect();
                             return;
                         }
 
-                        offs += len;
+                        var offs = 0;
 
-                    } while (offs < sndBuffer.Length);
+                        do
+                        {
+                            var len = await sclient.SendAsync(sndBuffer[offs..], SocketFlags.None);
+                            if (len < 0)
+                            {
+                                Data?.OnPacketSendFail(buf, 0, buf.Length);
+                                Disconnect();
+                                return;
+                            }
+
+                            offs += len;
+
+                        } while (offs < sndBuffer.Length);
+                    }
                 }
-                else
-                    Data?.OnPacketSendFail(buf, offset, lenght);
             }
             catch (OperationCanceledException ex)
             {
-                Data?.OnPacketSendFail(buf, offset, lenght);
                 Disconnect();
             }
             catch (SocketException ex)
             {
-                Data?.OnPacketSendFail(buf, offset, lenght);
                 Disconnect();
             }
             catch (NullReferenceException ex)
             {
-                Data?.OnPacketSendFail(buf, offset, lenght);
                 Disconnect();
             }
             catch (ObjectDisposedException ex)
             {
-                Data?.OnPacketSendFail(buf, offset, lenght);
                 Disconnect();
             }
             catch (Exception ex)
             {
-                Data?.OnPacketSendFail(buf, offset, lenght);
                 Disconnect(ex);
             }
-            finally
-            {
-                sl?.Set();
-            }
         }
-
-        ///// <summary>
-        ///// Завершение отправки данных
-        ///// </summary>
-        ///// <param name="r"></param>
-        //private void EndSend(IAsyncResult r)
-        //{
-        //    //замыкаем это все в блок try, если клиент отключился то EndSend может вернуть ошибку
-        //    try
-        //    {
-        //        //получаем размер переданных данных
-        //        int len = sclient?.EndSend(r) ?? 0;
-        //        //при некоторых ошибках размер возвращает 0 или -1, проверяем
-        //        if (len < 1)
-        //        {
-        //            var sas = ((SendAsyncState)r.AsyncState);
-        //            Data?.OnPacketSendFail(sas.buf, sas.offset, sas.len);
-        //            Disconnect();
-        //        }
-        //    }
-        //    catch (SocketException ex)
-        //    {
-
-        //        var sas = ((SendAsyncState)r.AsyncState);
-        //        Data?.OnPacketSendFail(sas.buf, sas.offset, sas.len);
-        //        Disconnect();
-        //    }
-        //    catch (NullReferenceException ex)
-        //    {
-
-        //        var sas = ((SendAsyncState)r.AsyncState);
-        //        Data?.OnPacketSendFail(sas.buf, sas.offset, sas.len);
-        //        Disconnect();
-        //    }
-        //    catch (ObjectDisposedException ex)
-        //    {
-
-        //        var sas = ((SendAsyncState)r.AsyncState);
-        //        Data?.OnPacketSendFail(sas.buf, sas.offset, sas.len);
-        //        Disconnect();
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        var sas = ((SendAsyncState)r.AsyncState);
-        //        Data?.OnPacketSendFail(sas.buf, sas.offset, sas.len);
-        //        Disconnect(ex);
-        //    }
-        //    catch
-        //    {
-        //        var sas = ((SendAsyncState)r.AsyncState);
-        //        Data?.OnPacketSendFail(sas.buf, sas.offset, sas.len);
-        //        Disconnect();
-        //    }
-        //}
 
         public void SendEmpty(ushort packetId)
         {
@@ -359,7 +316,7 @@ namespace NSL.TCP
             Disconnect();
         }
 
-        public void Disconnect()
+        public async void Disconnect()
         {
             if (disconnected == true)
                 return;
@@ -373,11 +330,10 @@ namespace NSL.TCP
             if (outputCipher != null)
                 outputCipher.Dispose();
 
-            var sl = _sendLocker;
-
-            _sendLocker = default;
-
-            sl?.Dispose();
+            await foreach (var buf in sendChannel.Reader.ReadAllAsync())
+            {
+                Data?.OnPacketSendFail(buf, 0, buf.Length);
+            }
 
             if (sclient != null)
             {
@@ -389,6 +345,8 @@ namespace NSL.TCP
 
             sclient = null;
         }
+
+
 
         private readonly TParent parent;
 
