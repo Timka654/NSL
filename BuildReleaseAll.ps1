@@ -1,7 +1,6 @@
 $ver = (Get-Date).ToString("yyyy.MM.dd.HHmm")
 $buildPath = "build/Release"
-if($LASTEXITCODE -eq 0)
-{
+
 	if (Test-Path $buildPath ) {
 		remove-item $buildPath -Recurse -Force
 	}
@@ -12,7 +11,6 @@ if($LASTEXITCODE -eq 0)
 	{
 		./BuildReleaseUnity $ver
 	}
-}
 
 
 # $patternHere  = 'Binary'

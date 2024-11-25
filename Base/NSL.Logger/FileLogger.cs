@@ -31,15 +31,13 @@ namespace NSL.Logger
             {
                 try
                 {
-                    await foreach (var message in reader.ReadAllAsync())
-                    {
-                        NextDay(message);
+                    var message = await reader.ReadAsync();
+                    NextDay(message);
 
-                        stream.WriteLine(message.ToString());
+                    stream.WriteLine(message.ToString());
 
-                        if (++n % 10 == 0)
-                            stream.Flush();
-                    }
+                    if (++n % 10 == 0)
+                        stream.Flush();
                 }
                 catch (System.Exception ex)
                 {

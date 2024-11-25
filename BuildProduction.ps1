@@ -1,4 +1,3 @@
-$LASTEXITCODE = 0
 ./BuildReleaseAll
 # Evaluate success/failure
 if($LASTEXITCODE -eq 0)

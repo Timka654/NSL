@@ -130,7 +130,7 @@ namespace NSL.TCP
             if (sclient == null)
                 throw new ObjectDisposedException(nameof(sclient));
 
-            int rlen = await sclient.ReceiveAsync(receiveBuffer.AsMemory(offset, length - offset), SocketFlags.None);
+            int rlen = await sclient.ReceiveAsync(new ArraySegment<byte>(receiveBuffer, offset, length - offset), SocketFlags.None);
 
             if (rlen < 1)
                 throw new ObjectDisposedException(nameof(sclient));
@@ -141,6 +141,7 @@ namespace NSL.TCP
             {
                 if (data == false)
                 {
+
                     var peeked = inputCipher.Peek(receiveBuffer);
 
                     if (peeked == null)
@@ -297,7 +298,7 @@ namespace NSL.TCP
             Disconnect();
         }
 
-        public async void Disconnect()
+        public void Disconnect()
         {
             if (disconnected == true)
                 return;
@@ -311,7 +312,7 @@ namespace NSL.TCP
             if (outputCipher != null)
                 outputCipher.Dispose();
 
-            await foreach (var buf in sendChannel.Reader.ReadAllAsync())
+            while (sendChannel.Reader.TryRead(out var buf))
             {
                 Data?.OnPacketSendFail(buf, 0, buf.Length);
             }
