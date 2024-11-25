@@ -1,14 +1,12 @@
 ﻿using NSL.Extensions.RPC.Generator.Declarations;
 using NSL.Generators.Utils;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis;
 using NSL.Extensions.RPC.Generator.Models;
 using NSL.Generators.BinaryGenerator;
 using NSL.Extensions.RPC.Generator.Attributes;
-using System.Diagnostics;
 
 namespace NSL.Extensions.RPC.Generator.Generators
 {

@@ -5,7 +5,6 @@ using NSL.SocketServer.Utils;
 using NSL.SocketServer;
 using NSL.SocketCore;
 using NSL.EndPointBuilder;
-using NSL.SocketClient;
 
 namespace NSL.BuilderExtensions.TCPServer
 {

@@ -1,7 +1,6 @@
 ﻿using Microsoft.CodeAnalysis;
 using NSL.Generators.Utils;
 using NSL.SocketCore.Utils.Buffer;
-using System.Collections.Generic;
 
 namespace NSL.Generators.BinaryGenerator.Generators
 {

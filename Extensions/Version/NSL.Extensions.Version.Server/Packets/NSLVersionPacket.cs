@@ -1,7 +1,6 @@
 ﻿using NSL.SocketCore.Extensions.Buffer;
 using NSL.SocketCore.Utils;
 using NSL.SocketCore.Utils.Buffer;
-using NSL.SocketServer;
 using NSL.SocketServer.Utils;
 
 namespace NSL.Extensions.Version.Server.Packets

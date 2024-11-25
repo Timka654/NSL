@@ -1,13 +1,10 @@
 ﻿using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.Emit;
 using NSL.Generators.BinaryGenerator.Utils;
 using NSL.Generators.BinaryTypeIOGenerator.Attributes;
 using NSL.Generators.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
-using System.Runtime.InteropServices.ComTypes;
 
 namespace NSL.Generators.BinaryTypeIOGenerator
 {

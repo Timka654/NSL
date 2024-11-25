@@ -1,9 +1,7 @@
 ﻿using NSL.Logger.Interface;
 using NSL.SocketCore.Utils.Logger.Enums;
 using System;
-using System.Reflection.Emit;
 using System.Threading.Channels;
-using System.Threading.Tasks;
 
 namespace NSL.Logger
 {

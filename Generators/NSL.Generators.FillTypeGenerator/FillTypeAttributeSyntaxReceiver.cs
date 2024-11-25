@@ -1,11 +1,9 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using NSL.Generators.FillTypeGenerator.Attributes;
 using NSL.Generators.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace NSL.Generators.FillTypeGenerator
 {

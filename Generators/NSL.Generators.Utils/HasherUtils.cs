@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace NSL.Generators.Utils
+﻿namespace NSL.Generators.Utils
 {
     public class HasherUtils
     {

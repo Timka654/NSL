@@ -1,6 +1,5 @@
 ﻿using NSL.Logger.Info;
 using System.IO;
-using System.Threading;
 using NSL.Utils;
 
 namespace NSL.Logger
@@ -61,7 +60,7 @@ namespace NSL.Logger
         public override void Flush()
         {
             base.Flush();
-            stream.Flush();
+            stream?.Flush();
         }
 
         private void NextDay(LogMessageInfo msg)

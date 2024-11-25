@@ -1,7 +1,6 @@
 ﻿using Microsoft.CodeAnalysis;
 using NSL.Generators.Utils;
 using NSL.SocketCore.Utils.Buffer;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 

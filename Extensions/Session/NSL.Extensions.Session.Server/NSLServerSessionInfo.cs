@@ -1,5 +1,4 @@
-﻿using NSL.Extensions.Session;
-using NSL.SocketCore.Utils;
+﻿using NSL.SocketCore.Utils;
 using System;
 
 namespace NSL.Extensions.Session.Server

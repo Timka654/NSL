@@ -1,6 +1,5 @@
 ﻿using NSL.ASPNET.Identity.ClientIdentity.Providers;
 using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Net.Http;
 using System.Security.Claims;

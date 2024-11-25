@@ -11,7 +11,6 @@ using System.Reflection;
 using NSL.Generators.BinaryGenerator;
 using NSL.SocketCore.Utils.Buffer;
 using NSL.Extensions.RPC.Generator.Attributes;
-using System.Diagnostics;
 
 namespace NSL.Extensions.RPC.Generator.Generators
 {

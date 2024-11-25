@@ -3,7 +3,6 @@ using NSL.SocketCore.Utils.SystemPackets;
 using NSL.SocketCore.Utils;
 using NSL.SocketCore.Utils.Buffer;
 using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using NSL.SocketCore;

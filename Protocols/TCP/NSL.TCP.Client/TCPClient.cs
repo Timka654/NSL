@@ -1,11 +1,8 @@
 ﻿using NSL.SocketClient;
-using NSL.SocketClient.Utils.SystemPackets;
 using NSL.SocketCore.Utils;
 using System;
-using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
-using System.Threading;
 
 namespace NSL.TCP.Client
 {

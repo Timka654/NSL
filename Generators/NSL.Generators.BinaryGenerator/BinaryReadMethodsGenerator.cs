@@ -5,7 +5,6 @@ using System.Linq;
 using NSL.Generators.Utils;
 using NSL.Generators.BinaryGenerator.Generators;
 using NSL.Generators.BinaryGenerator.Utils;
-using System.Reflection.Metadata;
 
 namespace NSL.Generators.BinaryGenerator
 {

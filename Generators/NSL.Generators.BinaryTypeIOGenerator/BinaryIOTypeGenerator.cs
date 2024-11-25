@@ -7,7 +7,6 @@ using NSL.Generators.BinaryTypeIOGenerator.Models;
 using NSL.Generators.Utils;
 using NSL.SocketCore.Utils.Buffer;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 
 namespace NSL.Generators.BinaryTypeIOGenerator

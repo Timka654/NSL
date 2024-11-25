@@ -1,5 +1,4 @@
 ﻿using NSL.Database.EntityFramework.Filter.Enums;
-using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace NSL.Database.EntityFramework.Filter.Models

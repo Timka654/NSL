@@ -1,8 +1,6 @@
-using Microsoft.Extensions.Configuration;
 using NSL.ASPNET.MemoryLogger.Tests;
 using NSL.ASPNET.Configuration;
 using Microsoft.EntityFrameworkCore;
-using System;
 
 var builder = WebApplication.CreateBuilder(args);
 

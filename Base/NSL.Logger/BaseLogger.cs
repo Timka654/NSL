@@ -2,9 +2,8 @@
 using NSL.Logger.Interface;
 using NSL.SocketCore.Utils.Logger.Enums;
 using System;
-using System.Collections.Concurrent;
-using System.Threading;
 using System.Threading.Channels;
+using System.Threading.Tasks;
 
 namespace NSL.Logger
 {
@@ -32,7 +31,7 @@ namespace NSL.Logger
             if (ConsoleOutput)
                 ConsoleLogger.WriteLog(lm.Level, lm.ToString());
 
-            try { await LogChannel.Writer.WriteAsync(lm); } catch (InvalidOperationException) { } 
+            try { await LogChannel.Writer.WriteAsync(lm); } catch (InvalidOperationException) { }
         }
 
         public void ConsoleLog(LoggerLevel level, string text)
@@ -44,7 +43,7 @@ namespace NSL.Logger
         protected BaseLogger()
         {
             AppDomain.CurrentDomain.ProcessExit += CurrentDomain_ProcessExit;
-                
+
         }
 
         private void CurrentDomain_ProcessExit(object sender, EventArgs e)
@@ -93,7 +92,12 @@ namespace NSL.Logger
 
         public virtual void Flush()
         {
-            LogChannel.Reader.WaitToReadAsync().AsTask().Wait();
+            Task.Run(async () =>
+            {
+                while (LogChannel.Reader.TryPeek(out _))
+                    await Task.Delay(100);
+
+            }).Wait();
         }
 
     }

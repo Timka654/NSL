@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
 using System.Text;
-using System.Xml.Linq;
 using System;
 
 namespace NSL.ASPNET.MemoryLogger

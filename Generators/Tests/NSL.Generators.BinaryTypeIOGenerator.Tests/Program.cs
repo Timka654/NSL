@@ -1,5 +1,4 @@
 ﻿using NSL.Generators.BinaryTypeIOGenerator.Attributes;
-using NSL.SocketCore.Utils.Buffer;
 
 namespace NSL.Generators.BinaryTypeIOGenerator.Tests
 {

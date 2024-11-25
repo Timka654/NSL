@@ -1,10 +1,4 @@
 ﻿using NSL.Generators.BinaryTypeIOGenerator.Attributes;
-using NSL.SocketCore.Utils.Buffer;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 //using ZergRush.ReactiveCore;
 
 namespace NSL.Generators.BinaryTypeIOGenerator.Tests.abserb.erge.ergeg.erg

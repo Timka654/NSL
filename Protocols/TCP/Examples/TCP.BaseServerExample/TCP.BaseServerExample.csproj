@@ -11,6 +11,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\Base\NSL.Logger\NSL.Logger.csproj" />
     <ProjectReference Include="..\..\NSL.TCP.Server\NSL.TCP.Server.csproj" />
   </ItemGroup>
 

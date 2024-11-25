@@ -11,7 +11,6 @@ using NSL.SocketCore.Utils.Exceptions;
 using NSL.SocketCore.Utils.Logger;
 using NSL.SocketCore.Utils.Logger.Enums;
 using System;
-using System.Diagnostics;
 using System.Net.Sockets;
 using System.Reflection;
 using static NSL.SocketCore.Extensions.Buffer.RequestExtensions;

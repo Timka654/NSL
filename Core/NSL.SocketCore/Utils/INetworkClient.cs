@@ -1,6 +1,5 @@
 ﻿using NSL.SocketCore.Utils.Buffer;
 using System;
-using System.Collections.Generic;
 
 namespace NSL.SocketCore.Utils
 {

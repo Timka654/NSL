@@ -4,7 +4,6 @@ using NSL.SocketServer.Utils;
 using System;
 using System.Net;
 using System.Net.Sockets;
-using System.Threading;
 
 namespace NSL.TCP.Server
 {

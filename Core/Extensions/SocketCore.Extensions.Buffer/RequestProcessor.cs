@@ -3,7 +3,6 @@ using NSL.SocketCore.Utils;
 using NSL.SocketCore.Utils.Buffer;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -82,20 +81,40 @@ namespace NSL.SocketCore.Extensions.Buffer
             Guid rid = default;
             try
             {
-                var result = new TaskCompletionSource<InputPacketBuffer>();
+                CancellationTokenSource cts = new CancellationTokenSource();
+
 
                 rid = SendRequest(buffer, input =>
                 {
-                    result.SetResult(input);
+                    try
+                    {
+                        data = input;
+                        cts.Cancel();
+
+                    }
+                    catch (Exception ex)
+                    {
+
+                        throw;
+                    }
+
                     return false;
                 }, disposeOnSend);
 
-                data = await result.Task;
+                await Task.Delay(-1, cts.Token);
 
-                if (await onResult(data))
-                    data?.Dispose();
+                //data = await result.Task;
             }
-            catch (TaskCanceledException) { }
+            catch (TaskCanceledException)
+            {
+                if (data != null)
+                    if (await onResult(data))
+                    {
+                        data?.Dispose();
+                    }
+
+                data = null;
+            }
             catch (OperationCanceledException) { }
             catch (Exception)
             {

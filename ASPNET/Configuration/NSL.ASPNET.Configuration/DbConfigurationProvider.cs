@@ -2,8 +2,6 @@
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Linq;
-using System.Linq.Expressions;
-using Microsoft.EntityFrameworkCore.Query;
 using System.Threading;
 
 namespace NSL.ASPNET.Configuration

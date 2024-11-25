@@ -1,9 +1,7 @@
 ﻿using Microsoft.CodeAnalysis;
 using NSL.Generators.BinaryGenerator;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace NSL.Extensions.RPC.Generator
 {

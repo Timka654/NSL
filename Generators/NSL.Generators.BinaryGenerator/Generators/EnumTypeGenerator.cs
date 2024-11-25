@@ -1,5 +1,4 @@
 ﻿using Microsoft.CodeAnalysis;
-using System.Collections.Generic;
 using NSL.Generators.Utils;
 
 namespace NSL.Generators.BinaryGenerator.Generators

@@ -1,9 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using NSL.Database.EntityFramework.Filter.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace NSL.Database.EntityFramework.Filter.Host.ASPNET

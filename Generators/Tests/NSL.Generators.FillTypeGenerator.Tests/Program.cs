@@ -1,6 +1,4 @@
-﻿using NSL.Generators.FillTypeGenerator.Tests.Develop.NoEqMemberTypeWithEqNames;
-using NSL.Generators.FillTypeGenerator.Tests.Develop.Proxy;
-using NSL.Generators.FillTypeGenerator.Tests.From;
+﻿using NSL.Generators.FillTypeGenerator.Tests.Develop.Proxy;
 
 namespace NSL.Generators.FillTypeGenerator.Tests
 {

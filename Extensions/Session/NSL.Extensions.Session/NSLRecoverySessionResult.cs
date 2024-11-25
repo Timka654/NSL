@@ -1,5 +1,4 @@
 ﻿using NSL.Generators.BinaryTypeIOGenerator.Attributes;
-using System;
 
 namespace NSL.Extensions.Session
 {

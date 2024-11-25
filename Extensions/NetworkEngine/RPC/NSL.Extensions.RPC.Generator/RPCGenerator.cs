@@ -10,10 +10,8 @@ using NSL.Extensions.RPC.Generator.Comparers;
 using NSL.Extensions.RPC.Generator.Declarations;
 using NSL.Extensions.RPC.Generator.Generators;
 using NSL.Extensions.RPC.Generator.Models;
-using NSL.Generators.BinaryGenerator;
 using NSL.Generators.Utils;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 
 namespace NSL.Extensions.RPC.Generator
