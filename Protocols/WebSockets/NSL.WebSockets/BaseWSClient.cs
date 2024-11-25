@@ -159,9 +159,16 @@ namespace NSL.WebSockets
 
                     data = true;
 
-                    while (receiveBuffer.Length < length)
+                    if (length > receiveBuffer.Length)
                     {
-                        Array.Resize(ref receiveBuffer, receiveBuffer.Length * 2);
+                        int n = receiveBuffer.Length;
+
+                        do
+                        {
+                            n *= 2;
+                        } while (n < length);
+
+                        Array.Resize(ref receiveBuffer, n);
                     }
                 }
 
