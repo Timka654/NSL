@@ -4,6 +4,7 @@ using NSL.SocketCore.Utils.Buffer;
 using NSL.SocketCore.Utils.Exceptions;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading.Channels;
@@ -114,30 +115,25 @@ namespace NSL.TCP
                 while (!disconnected)
                     await receive();
             }
-            catch (NullReferenceException) { } // on disconnected client
-            catch (SocketException ex)
-            {
-                Disconnect();
-            }
             catch (ConnectionLostException clex)
             {
                 Disconnect(clex);
             }
             catch (Exception ex)
             {
-                Disconnect(ex);
+                Disconnect(new ConnectionLostException(GetRemotePoint(), true, ex));
             }
         }
 
         private async Task receive()
         {
             if (sclient == null)
-                throw new ConnectionLostException(GetRemotePoint(), true);
+                throw new ObjectDisposedException(nameof(sclient));
 
             int rlen = await sclient.ReceiveAsync(receiveBuffer.AsMemory(offset, length - offset), SocketFlags.None);
 
             if (rlen < 1)
-                throw new ConnectionLostException(GetRemotePoint(), true);
+                throw new ObjectDisposedException(nameof(sclient));
 
             offset += rlen;
 
@@ -146,6 +142,9 @@ namespace NSL.TCP
                 if (data == false)
                 {
                     var peeked = inputCipher.Peek(receiveBuffer);
+
+                    if (peeked == null)
+                        throw new Exception($"Cannot peek message header {string.Join(" ", receiveBuffer?[0..7].Select(x => x.ToString("x2")) ?? Enumerable.Empty<string>())}");
 
                     length = BitConverter.ToInt32(peeked, 0);
 
@@ -206,6 +205,7 @@ namespace NSL.TCP
         {
             try { await sendChannel.Writer.WriteAsync(buffer); } catch (InvalidOperationException) { Data?.OnPacketSendFail(buffer, 0, buffer.Length); }
         }
+
         /// <summary>
         /// Send byte buffer async to server
         /// </summary>
@@ -228,67 +228,43 @@ namespace NSL.TCP
 
         }
 
-
-
         private Channel<byte[]> sendChannel = Channel.CreateUnbounded<byte[]>();
 
         private async void sendCycle()
         {
             var reader = sendChannel.Reader;
+            byte[]? buf = null;
 
             try
             {
                 while (!disconnected)
                 {
-                    await foreach (var buf in reader.ReadAllAsync())
+                    buf = await reader.ReadAsync();
+
+                    byte[] sndBuffer = outputCipher.Encode(buf, 0, buf.Length);
+
+                    var offs = 0;
+
+                    do
                     {
-                        byte[] sndBuffer = outputCipher.Encode(buf, 0, buf.Length);
+                        var len = await sclient.SendAsync(sndBuffer[offs..], SocketFlags.None);
 
-                        if (sclient == null)
-                        {
-                            Data?.OnPacketSendFail(buf, 0, buf.Length);
+                        if (len < 0)
+                            throw new ObjectDisposedException(nameof(sclient));
 
-                            Disconnect();
-                            return;
-                        }
+                        offs += len;
 
-                        var offs = 0;
+                    } while (offs < sndBuffer.Length);
 
-                        do
-                        {
-                            var len = await sclient.SendAsync(sndBuffer[offs..], SocketFlags.None);
-                            if (len < 0)
-                            {
-                                Data?.OnPacketSendFail(buf, 0, buf.Length);
-                                Disconnect();
-                                return;
-                            }
-
-                            offs += len;
-
-                        } while (offs < sndBuffer.Length);
-                    }
+                    buf = null;
                 }
-            }
-            catch (OperationCanceledException ex)
-            {
-                Disconnect();
-            }
-            catch (SocketException ex)
-            {
-                Disconnect();
-            }
-            catch (NullReferenceException ex)
-            {
-                Disconnect();
-            }
-            catch (ObjectDisposedException ex)
-            {
-                Disconnect();
             }
             catch (Exception ex)
             {
-                Disconnect(ex);
+                if (buf != null)
+                    Data?.OnPacketSendFail(buf, 0, buf.Length);
+
+                Disconnect(new ConnectionLostException(GetRemotePoint(), false, ex));
             }
         }
 

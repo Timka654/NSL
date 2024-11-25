@@ -60,13 +60,7 @@ namespace NSL.WebSockets.Client
             //установка криптографии для шифровки исходящих данных, указана в общих настройках сервера
             this.outputCipher = ConnectionOptions.OutputCipher.CreateEntry();
 
-            _sendLocker = this.outputCipher.Sync() ? new System.Threading.AutoResetEvent(true) : null;
-
-            InitReceiver();
-
-            _sendLocker?.Set();
-
-            RunReceiveAsync();
+            RunReceive();
 
             ConnectionOptions.RunClientConnect();
         }

@@ -74,6 +74,7 @@ namespace Builder.WebSockets.AspNetCoreIntegrationExample
                         app.Logger.LogInformation($"[Client] Client connected handle");
                         connection = c;
                         c.InitializeObjectBag();
+                        //c.PingPongEnabled = true;
                     });
                     builder.AddDisconnectHandle(c =>
                     {

@@ -59,11 +59,7 @@ namespace NSL.WebSockets.Server
             //установка криптографии для шифровки исходящих данных, указана в общих настройках сервера
             outputCipher = options.OutputCipher.CreateEntry();
 
-            _sendLocker = outputCipher.Sync() ? new AutoResetEvent(true) : null;
-
             disconnected = false;
-
-            InitReceiver();
         }
 
         public virtual async Task RunPacketReceiver()
@@ -75,7 +71,7 @@ namespace NSL.WebSockets.Server
                 //Начало приема пакетов от клиента
                 options.CallClientConnectEvent(Data);
 
-                RunReceiveAsync();
+                RunReceive();
             }
             catch (Exception)
             {

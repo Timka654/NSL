@@ -9,6 +9,8 @@ using System.Net;
 using System.Threading;
 using System.Net.WebSockets;
 using System.Threading.Tasks;
+using System.Linq;
+using System.Threading.Channels;
 
 namespace NSL.WebSockets
 {
@@ -97,110 +99,25 @@ namespace NSL.WebSockets
             offset = 0;
         }
 
-        protected void InitReceiver()
-        {
-            disconnected = false;
-
-            PacketHandles = options.GetHandleMap();
-
-            //Возвращает значения в исходное положение
-            ResetBuffer();
-        }
-
-        protected async void RunReceiveAsync()
+        protected async void RunReceive()
         {
             await ReceiveLoop();
         }
 
         protected async Task ReceiveLoop()
         {
-            do
-            {
-                await Receive();
+            disconnected = false;
 
-            } while (!disconnected);
-        }
+            PacketHandles = options.GetHandleMap();
 
-        private async Task Receive()
-        {
-            //замыкаем это все в блок try, если клиент отключился то EndReceive может вернуть ошибку
+            sendCycle();
+
+            ResetBuffer();
+
             try
             {
-                if (sclient == null)
-                    throw new ConnectionLostException(GetRemotePoint(), true);
-
-                var receiveData = await sclient.ReceiveAsync(new ArraySegment<byte>(receiveBuffer, offset, length - offset), CancellationToken.None);
-
-                if (receiveData.CloseStatus.HasValue)
-                {
-                    Disconnect();
-                    return;
-                }
-
-                //принимаем размер данных которые удалось считать
-                int rlen = receiveData.Count;
-                //при некоторых ошибках размер возвращает 0 или -1, проверяем
-                if (rlen < 1)
-                    throw new ConnectionLostException(GetRemotePoint(), true);
-
-                //добавляем offset для дальнейшей считки пакета
-                offset += rlen;
-
-                //если размер ожидаемвых данных соответствует ожидаемому - обрабатываем
-                if (offset == length)
-                {
-                    if (data == false)
-                    {
-                        var peeked = inputCipher.Peek(receiveBuffer);
-
-                        if (peeked == null)
-                            throw new ConnectionLostException(GetRemotePoint(), true);
-
-                        //если все ок
-                        //получаем размер пакета
-                        length = BitConverter.ToInt32(peeked, 0);
-
-                        ushort pid = BitConverter.ToUInt16(peeked, 4);
-                        OnReceive(pid, length);
-                        data = true;
-
-                        while (receiveBuffer.Length < length)
-                        {
-                            Array.Resize(ref receiveBuffer, receiveBuffer.Length * 2);
-                        }
-                    }
-
-                    //если все на месте, запускаем обработку
-                    if (offset == length && data)
-                    {
-                        //обработка пакета
-
-                        //дешефруем и засовываем это все в спец буффер в котором реализованы методы чтения типов, своего рода поток
-                        InputPacketBuffer pbuff = new InputPacketBuffer(inputCipher.Decode(receiveBuffer, 0, length));
-
-                        // обнуляем показатели что-бы успешно запустить цикл заново
-                        ResetBuffer();
-
-
-                        //предотвращение ошибок в пакете
-                        try
-                        {
-                            //ищем пакет и выполняем его, передаем ему данные сессии, полученные данные
-                            PacketHandles[pbuff.PacketId](Data, pbuff);
-                        }
-                        catch (Exception ex)
-                        {
-                            RunException(ex);
-                        }
-
-                        if (!pbuff.ManualDisposing)
-                            pbuff.Dispose();
-                    }
-                }
-            }
-            catch (WebSocketException wsex)
-            {
-                Disconnect(new ConnectionLostException(GetRemotePoint(), true, wsex));
+                while (!disconnected)
+                    await Receive();
             }
             catch (ConnectionLostException clex)
             {
@@ -208,16 +125,75 @@ namespace NSL.WebSockets
             }
             catch (Exception ex)
             {
-                Disconnect(ex);
+                Disconnect(new ConnectionLostException(GetRemotePoint(), true, ex));
+            }
+        }
+
+        private async Task Receive()
+        {
+            if (sclient == null)
+                throw new ObjectDisposedException(nameof(sclient));
+
+            var receiveData = await sclient.ReceiveAsync(new ArraySegment<byte>(receiveBuffer, offset, length - offset), CancellationToken.None);
+
+            if (receiveData.CloseStatus.HasValue)
+                throw new WebSocketClosedException(receiveData.CloseStatus, receiveData.CloseStatusDescription);
+
+            int rlen = receiveData.Count;
+
+            if (rlen < 1)
+                throw new ObjectDisposedException(nameof(sclient));
+
+            offset += rlen;
+
+            if (offset == length)
+            {
+                if (data == false)
+                {
+                    var peeked = inputCipher.Peek(receiveBuffer);
+
+                    if (peeked == null)
+                        throw new Exception($"Cannot peek message header {string.Join(" ", receiveBuffer?[0..7].Select(x => x.ToString("x2")) ?? Enumerable.Empty<string>())}");
+
+                    length = BitConverter.ToInt32(peeked, 0);
+
+                    data = true;
+
+                    while (receiveBuffer.Length < length)
+                    {
+                        Array.Resize(ref receiveBuffer, receiveBuffer.Length * 2);
+                    }
+                }
+
+                if (offset == length && data)
+                {
+                    InputPacketBuffer pbuff = new InputPacketBuffer(inputCipher.Decode(receiveBuffer, 0, length));
+
+                    OnReceive(pbuff.PacketId, length);
+
+                    ResetBuffer();
+
+                    try
+                    {
+                        PacketHandles[pbuff.PacketId](Data, pbuff);
+                    }
+                    catch (Exception ex)
+                    {
+                        RunException(ex);
+                    }
+
+                    if (!pbuff.ManualDisposing)
+                        pbuff.Dispose();
+                }
             }
         }
 
         #region Send
 
         /// <summary>
-        /// Отправка пакета
+        /// Send byte buffer async
         /// </summary>
-        /// <param name="packet">спец буффер содержащий в себе данные пакета</param>
+        /// <param name="buffer"></param>
         public void Send(OutputPacketBuffer packet, bool disposeOnSend = true)
         {
 #if DEBUG
@@ -229,80 +205,64 @@ namespace NSL.WebSockets
             packet.Send(this, disposeOnSend);
         }
 
-        public void Send(byte[] buffer)
-            => Send(buffer, 0, buffer.Length);
-
-        protected AutoResetEvent _sendLocker;
-
         /// <summary>
-        /// Отправка массива байт
+        /// Send byte buffer async
         /// </summary>
-        /// <param name="buf">массив байт</param>
-        /// <param name="offset">смещение с которого начинается передача</param>
-        /// <param name="length">размер передаваемых данных</param>
+        /// <param name="buffer"></param>
+        public async void Send(byte[] buffer)
+        {
+            try { await sendChannel.Writer.WriteAsync(buffer); } catch (InvalidOperationException) { Data?.OnPacketSendFail(buffer, 0, buffer.Length); }
+        }
+        /// <summary>
+        /// Send byte buffer async to server
+        /// </summary>
+        /// <param name="buf"></param>
+        /// <param name="offset"></param>
+        /// <param name="length"></param>
         public async void Send(byte[] buf, int offset, int length)
         {
-            var sl = _sendLocker;
             try
             {
-                sl?.WaitOne();
+                if (offset == 0 && length == buf.Length)
+                {
+                    await sendChannel.Writer.WriteAsync(buf);
+                    return;
+                }
 
-                //шифруем данные
-                byte[] sndBuffer = outputCipher.Encode(buf, offset, length);
-
-                //начинаем отправку данных
-                if (sclient != null)
-                    await sclient.SendAsync(new ArraySegment<byte>(sndBuffer, offset, length), WebSocketMessageType.Binary, true, CancellationToken.None).ContinueWith(t =>
-                    {
-                        if (t.Exception == null && !t.IsFaulted)
-                            return;
-
-                        Exception ex = null;
-
-                        if (t.Exception != null)
-                        {
-                            if (t.Exception.InnerException is WebSocketException
-                            || t.Exception.InnerException is TaskCanceledException
-                            || t.Exception.InnerException is OperationCanceledException)
-                            {
-
-                            }
-                            else
-                            {
-                                ex = t.Exception.InnerException ?? t.Exception; // dev collect exceptions
-                            }
-                        }
-
-                        Data?.OnPacketSendFail(buf, offset, length);
-
-                        if(ex != null)
-                            RunException(ex);
-
-                        Disconnect();
-                    });
-                else
-                    Data?.OnPacketSendFail(buf, offset, length);
+                await sendChannel.Writer.WriteAsync(buf[offset..(offset + length)]);
             }
-            catch (NullReferenceException ex)
+            catch (InvalidOperationException) { Data?.OnPacketSendFail(buf, offset, length); }
+
+        }
+
+        private Channel<byte[]> sendChannel = Channel.CreateUnbounded<byte[]>();
+
+        private async void sendCycle()
+        {
+            var reader = sendChannel.Reader;
+
+            byte[]? buf = null;
+
+            try
             {
-                Data?.OnPacketSendFail(buf, offset, length);
-                Disconnect();
-            }
-            catch (ObjectDisposedException ex)
-            {
-                Data?.OnPacketSendFail(buf, offset, length);
-                Disconnect();
+                while (!disconnected)
+                {
+                    buf = await reader.ReadAsync();
+
+                    byte[] sndBuffer = outputCipher.Encode(buf, offset, length);
+
+                    await sclient.SendAsync(sndBuffer, WebSocketMessageType.Binary, true, CancellationToken.None);
+
+                    buf = null;
+                }
             }
             catch (Exception ex)
             {
-                Data?.OnPacketSendFail(buf, offset, length);
+                if (buf != null)
+                    Data?.OnPacketSendFail(buf, 0, buf.Length);
+
                 Disconnect(ex);
             }
-            finally
-            {
-                sl?.Set();
-            }
-
         }
 
         public void SendEmpty(ushort packetId)
@@ -348,14 +308,14 @@ namespace NSL.WebSockets
             if (outputCipher != null)
                 outputCipher.Dispose();
 
-            //проверяем возможно клиент и не был инициализирован, в случае дос атак, такое возможно
+
             if (sclient != null)
             {
                 //отключаем и очищаем данные о клиенте
                 try { sclient.CloseAsync(WebSocketCloseStatus.NormalClosure, "", CancellationToken.None); } catch { }
                 try { sclient.Dispose(); } catch { }
             }
-            //очищаем буффер данных
+
             receiveBuffer = null;
 
             sclient = null;
