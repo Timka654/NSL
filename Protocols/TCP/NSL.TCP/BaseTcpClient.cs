@@ -2,8 +2,12 @@
 using NSL.SocketCore.Utils;
 using NSL.SocketCore.Utils.Buffer;
 using NSL.SocketCore.Utils.Exceptions;
+using NSL.SocketCore.Utils.Logger.Enums;
 using System;
+using System.Buffers;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -46,19 +50,10 @@ namespace NSL.TCP
 
         #region Buffer
 
-        /// <summary>
-        /// Буффер для приема данных
-        /// </summary>
         protected byte[] receiveBuffer;
 
-        /// <summary>
-        /// Текущее положение в буффере, для метода BeginReceive
-        /// </summary>
         protected int offset;
 
-        /// <summary>
-        /// Размер читаемых данных при следующем вызове BeginReceive
-        /// </summary>
         protected int length = InputPacketBuffer.DefaultHeaderLength;
 
         protected bool data = false;
@@ -101,6 +96,8 @@ namespace NSL.TCP
 
             PacketHandles = options.GetHandleMap();
 
+            RentSegment();
+
             ResetBuffer();
 
             sendCycle();
@@ -125,24 +122,55 @@ namespace NSL.TCP
             }
         }
 
+        int c = 0;
+
+        Stopwatch? sw = null;
+
+        static ArrayPool<byte> memoryPool = ArrayPool<byte>.Create();
+
+        //LimitedQueue<int>
+
+        List<ArraySegment<byte>> segments = new();
+
+        List<byte[]> rented = new();
+
+        int bufSize;
+
+        private static byte[] emptyArray = (byte[])Array.CreateInstance(typeof(byte), 128 * 1024);
+
+        private void RentSegment()
+        {
+            var b = memoryPool.Rent(options.ReceiveBufferSize);
+
+            rented.Add(b);
+
+            segments.Add(b);
+
+            bufSize += options.ReceiveBufferSize;
+        }
+
         private async Task receive()
         {
             if (sclient == null)
                 throw new ObjectDisposedException(nameof(sclient));
 
-            int rlen = await sclient.ReceiveAsync(new ArraySegment<byte>(receiveBuffer, offset, length - offset), SocketFlags.None);
+            int rlen = await sclient.ReceiveAsync(segments, SocketFlags.None);
 
             if (rlen < 1)
                 throw new ObjectDisposedException(nameof(sclient));
 
             offset += rlen;
 
-            if (offset == length)
+            if (offset % options.ReceiveBufferSize != 0)
+                return;
+
+            if (offset >= length)
             {
                 if (data == false)
                 {
+                    sw ??= Stopwatch.StartNew();
 
-                    var peeked = inputCipher.Peek(receiveBuffer);
+                    var peeked = inputCipher.Peek(segments[0].Array);
 
                     if (peeked == null)
                         throw new Exception($"Cannot peek message header {string.Join(" ", receiveBuffer?[0..7].Select(x => x.ToString("x2")) ?? Enumerable.Empty<string>())}");
@@ -150,26 +178,14 @@ namespace NSL.TCP
                     length = BitConverter.ToInt32(peeked, 0);
 
                     data = true;
-
-                    if (length > receiveBuffer.Length)
-                    {
-                        int n = receiveBuffer.Length;
-
-                        do
-                        {
-                            n *= 2;
-                        } while (n < length);
-
-                        Array.Resize(ref receiveBuffer, n);
-                        sclient.ReceiveBufferSize = n;
-                    }
                 }
 
-                if (offset == length && data)
+                if (offset >= length && data)
                 {
                     InputPacketBuffer pbuff = new InputPacketBuffer(inputCipher.Decode(receiveBuffer, 0, length));
 
                     OnReceive(pbuff.PacketId, length);
+                    ++c;
 
                     ResetBuffer();
 
@@ -184,7 +200,33 @@ namespace NSL.TCP
 
                     if (!pbuff.ManualDisposing)
                         pbuff.Dispose();
+
+                    Options.HelperLogger?.Append(LoggerLevel.Debug, $"Received packets {c} in {sw.Elapsed.TotalMilliseconds} ms");
                 }
+            }
+
+            if (rlen == bufSize && bufSize < options.MaxReceiveBufferSize)
+            {
+                int n = bufSize;
+
+                do
+                {
+                    n *= 2;
+                    var c = rented.Count;
+
+                    for (int i = 0; i < c; i++)
+                    {
+                        RentSegment();
+                    }
+                } while (n < sclient.Available);
+
+                if (n > options.MaxReceiveBufferSize)
+                    n = options.MaxReceiveBufferSize;
+
+                sclient.ReceiveBufferSize = n;
+            }
+            else if (rlen < bufSize / 2)
+            {
             }
         }
 
@@ -249,7 +291,7 @@ namespace NSL.TCP
                 {
                     buf = await reader.ReadAsync();
 
-                    byte[] sndBuffer = outputCipher.Encode(buf, 0, buf.Length);
+                    ArraySegment<byte> sndBuffer = outputCipher.Encode(buf, 0, buf.Length);
 
                     var offs = 0;
 
@@ -262,7 +304,22 @@ namespace NSL.TCP
 
                         offs += len;
 
-                    } while (offs < sndBuffer.Length);
+                    } while (offs < sndBuffer.Count);
+
+                    offs = 0;
+
+                    sndBuffer = emptyArray[..(options.SendSegmentSize - (sndBuffer.Count % options.SendSegmentSize))];
+                    
+                    while (offs < sndBuffer.Count)
+                    {
+                        var len = await sclient.SendAsync(sndBuffer[offs..], SocketFlags.None);
+
+                        if (len < 0)
+                            throw new ObjectDisposedException(nameof(sclient));
+
+                        offs += len;
+
+                    }
 
                     buf = null;
                 }
@@ -364,5 +421,27 @@ namespace NSL.TCP
         protected abstract void RunException(Exception ex);
 
         public short GetTtl() => sclient.Ttl;
+    }
+
+    public class LimitedQueue<T>
+    {
+        private readonly Queue<T> _queue = new();
+        private readonly int _maxSize;
+
+        public LimitedQueue(int maxSize)
+        {
+            _maxSize = maxSize;
+        }
+
+        public void Enqueue(T item)
+        {
+            if (_queue.Count >= _maxSize)
+            {
+                _queue.Dequeue();
+            }
+            _queue.Enqueue(item);
+        }
+
+        public IReadOnlyCollection<T> Items => _queue;
     }
 }

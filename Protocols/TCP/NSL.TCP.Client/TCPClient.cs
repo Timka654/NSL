@@ -40,12 +40,13 @@ namespace NSL.TCP.Client
             this.sclient = client;
             this.endPoint = (IPEndPoint)sclient?.RemoteEndPoint;
 
-            //установка массива для приема данных, размер указан в общих настройках сервера
-            this.receiveBuffer = new byte[ConnectionOptions.ReceiveBufferSize];
-            //установка криптографии для дешифровки входящих данных, указана в общих настройках сервера
+            //this.receiveBuffer = new byte[ConnectionOptions.ReceiveBufferSize];
+
             this.inputCipher = ConnectionOptions.InputCipher.CreateEntry();
-            //установка криптографии для шифровки исходящих данных, указана в общих настройках сервера
+
             this.outputCipher = ConnectionOptions.OutputCipher.CreateEntry();
+
+            sclient.ReceiveBufferSize = ConnectionOptions.ReceiveBufferSize;
 
             RunReceive();
 

@@ -1,7 +1,10 @@
-﻿using NSL.SocketCore.Utils.Buffer;
+﻿using NSL.Logger;
+using NSL.SocketCore.Utils.Buffer;
 using NSL.SocketServer;
 using NSL.SocketServer.Utils;
 using NSL.TCP.Server;
+using System.Diagnostics;
+using TCP.BaseServerExample;
 
 Console.WriteLine("TCP.Server");
 
@@ -13,18 +16,11 @@ options.IpAddress = "0.0.0.0";
 
 options.ReceiveBufferSize = 1024;
 
-options.OnReceivePacket += (c, pid, len) => { if (InputPacketBuffer.IsSystemPID(pid)) return; Console.WriteLine($"received {pid}"); };
-options.OnSendPacket += (c, pid, len, stackTrace) => { if (OutputPacketBuffer.IsSystemPID(pid)) return; Console.WriteLine($"sended {pid}"); };
-
+options.HelperLogger = new ConsoleLogger();
 
 options.AddHandle(1, (client, p) =>
 {
-    Console.WriteLine($"received from client({client.ObjectBag["uid"]}) pid:{p.PacketId} - {p.ReadString()}");
 
-    var pr = OutputPacketBuffer.Create(2);
-    pr.WriteInt32((int)p.PacketLength);
-
-    client.Send(pr);
 });
 
 int counter = 0;
