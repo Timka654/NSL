@@ -7,48 +7,36 @@ using System.Net.Sockets;
 
 namespace NSL.TCP.Server
 {
-    /// <summary>
-    /// Класс обработки клиента
-    /// </summary>
     public class TCPServerClient<TClient> : BaseTcpClient<TClient, TCPServerClient<TClient>>
         where TClient : IServerNetworkClient, new()
     {
         private TClient clientData;
+        private readonly bool legacyThread;
 
         public override TClient Data => clientData;
 
-        /// <summary>
-        /// Общие настройки сервера
-        /// </summary>
         public ServerOptions<TClient> ServerOptions => (ServerOptions<TClient>)base.options;
 
-        /// <summary>
-        /// Инициализация прослушивания клиента
-        /// </summary>
-        /// <param name="client">клиент</param>
-        /// <param name="options">общие настройки сервера</param>
-        public TCPServerClient(Socket client, ServerOptions<TClient> options) : base(options)
+        public TCPServerClient(Socket client, ServerOptions<TClient> options,bool legacyThread = false) : base(options)
         {
             Initialize(client);
+            this.legacyThread = legacyThread;
         }
 
         protected void Initialize(Socket client)
         {
             clientData = new TClient();
 
-            //обзятельная переменная в NetworkClient, для отправки данных, можно использовать привидения типов (Client)NetworkClient но это никому не поможет
             Data.Network = this;
             Data.ServerOptions = options;
 
-            //установка переменной содержащую поток клиента
             sclient = client;
             this.endPoint = (IPEndPoint)sclient?.RemoteEndPoint;
 
-            //установка массива для приема данных, размер указан в общих настройках сервера
             receiveBuffer = new byte[options.ReceiveBufferSize];
-            //установка криптографии для дешифровки входящих данных, указана в общих настройках сервера
+
             inputCipher = options.InputCipher.CreateEntry();
-            //установка криптографии для шифровки исходящих данных, указана в общих настройках сервера
+
             outputCipher = options.OutputCipher.CreateEntry();
 
             //Bug fix, в системе Windows это значение берется из реестра, мы не сможем принять больше за раз чем прописанно в нем, если данных будет больше, то цикл приема зависнет
@@ -58,11 +46,11 @@ namespace NSL.TCP.Server
             sclient.NoDelay = true;
 
             disconnected = false;
-            //Начало приема пакетов от клиента
+
             options.CallClientConnectEvent(Data);
         }
 
-        public void RunPacketReceiver() => RunReceive();
+        public virtual void RunPacketReceiver() => RunReceive(legacyThread);
 
         public override void ChangeUserData(INetworkClient newClientData)
             => SetClientData(newClientData);

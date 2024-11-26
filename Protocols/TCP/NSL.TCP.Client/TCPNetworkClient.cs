@@ -10,7 +10,7 @@ namespace NSL.TCP.Client
     public class TCPNetworkClient<T> : TCPNetworkClient<T, ClientOptions<T>>
         where T : BaseSocketNetworkClient, new()
     {
-        public TCPNetworkClient(ClientOptions<T> options) : base(options)
+        public TCPNetworkClient(ClientOptions<T> options, bool legacyThread = false) : base(options, legacyThread)
         {
         }
     }
@@ -23,7 +23,7 @@ namespace NSL.TCP.Client
 
         public const int DefaultConnectionTimeout = 8_000;
 
-        public TCPNetworkClient(TOptions options) : base(options)
+        public TCPNetworkClient(TOptions options, bool legacyThread = false) : base(options, legacyThread)
         {
         }
 

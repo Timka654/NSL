@@ -4,9 +4,11 @@ using NSL.SocketCore.Utils.Buffer;
 using NSL.SocketCore.Utils.Exceptions;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
 
@@ -81,7 +83,7 @@ namespace NSL.TCP
 
         protected CoreOptions<TClient> options;
 
-        private Dictionary<ushort, CoreOptions<TClient>.PacketHandle> PacketHandles;
+        protected Dictionary<ushort, CoreOptions<TClient>.PacketHandle> PacketHandles;
 
         public IPEndPoint GetRemotePoint()
         {
@@ -95,7 +97,7 @@ namespace NSL.TCP
             offset = 0;
         }
 
-        protected void RunReceive()
+        protected void RunReceive(bool legacyThread = false)
         {
             disconnected = false;
 
@@ -105,15 +107,21 @@ namespace NSL.TCP
 
             sendCycle();
 
-            Receive();
+            if (legacyThread)
+            {
+                threadReceive();
+                return;
+            }
+
+            taskReceive();
         }
 
-        private async void Receive()
+        private async void taskReceive()
         {
             try
             {
                 while (!disconnected)
-                    await receive();
+                    await taskReceiveIter();
             }
             catch (ConnectionLostException clex)
             {
@@ -125,7 +133,7 @@ namespace NSL.TCP
             }
         }
 
-        private async Task receive()
+        private async Task taskReceiveIter()
         {
             if (sclient == null)
                 throw new ObjectDisposedException(nameof(sclient));
@@ -188,12 +196,118 @@ namespace NSL.TCP
             }
         }
 
+
+
+        Thread receiveThread;
+        CancellationTokenSource threadCancelTS;
+
+        int c = 0;
+        Stopwatch? sw = null;
+
+        protected void threadReceive()
+        {
+            threadCancelTS?.Cancel();
+
+            threadCancelTS = new CancellationTokenSource();
+
+            var token = threadCancelTS.Token;
+
+            receiveThread = new Thread(() =>
+            {
+                try
+                {
+                    while (!disconnected && !token.IsCancellationRequested)
+                        threadReceiveIter(token);
+                }
+                catch (ConnectionLostException clex)
+                {
+                    Disconnect(clex);
+                }
+                catch (Exception ex)
+                {
+                    Disconnect(new ConnectionLostException(GetRemotePoint(), true, ex));
+                }
+
+
+            });
+
+            receiveThread.Start();
+        }
+
+        private void threadReceiveIter(CancellationToken token)
+        {
+            if (sclient == null)
+                throw new ObjectDisposedException(nameof(sclient));
+
+            int rlen = sclient.Receive(new ArraySegment<byte>(receiveBuffer, offset, length - offset), SocketFlags.None);
+
+            if (rlen < 1)
+                throw new ObjectDisposedException(nameof(sclient));
+
+            offset += rlen;
+
+            if (offset == length)
+            {
+                if (data == false)
+                {
+                    sw ??= Stopwatch.StartNew();
+
+                    var peeked = inputCipher.Peek(receiveBuffer);
+
+                    if (peeked == null)
+                        throw new Exception($"Cannot peek message header {string.Join(" ", receiveBuffer?[0..7].Select(x => x.ToString("x2")) ?? Enumerable.Empty<string>())}");
+
+                    length = BitConverter.ToInt32(peeked, 0);
+
+                    data = true;
+
+                    if (length > receiveBuffer.Length)
+                    {
+                        int n = receiveBuffer.Length;
+
+                        do
+                        {
+                            n *= 2;
+                        } while (n < length);
+
+                        Array.Resize(ref receiveBuffer, n);
+                        sclient.ReceiveBufferSize = n;
+                    }
+                }
+
+                if (offset == length && data)
+                {
+                    InputPacketBuffer pbuff = new InputPacketBuffer(inputCipher.Decode(receiveBuffer, 0, length));
+
+                    OnReceive(pbuff.PacketId, length);
+                    ++c;
+
+                    ResetBuffer();
+
+                    try
+                    {
+                        PacketHandles[pbuff.PacketId](Data, pbuff);
+                    }
+                    catch (Exception ex)
+                    {
+                        RunException(ex);
+                    }
+
+                    if (!pbuff.ManualDisposing)
+                        pbuff.Dispose();
+
+                    options.HelperLogger?.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Debug, $"{c}, {sw.Elapsed.TotalMilliseconds}");
+                }
+            }
+        }
+
+
         #region Send
 
-        /// <summary>
-        /// Send byte buffer async
-        /// </summary>
-        /// <param name="buffer"></param>
+            /// <summary>
+            /// Send byte buffer async
+            /// </summary>
+            /// <param name="buffer"></param>
         public void Send(OutputPacketBuffer packet, bool disposeOnSend = true)
         {
 #if DEBUG
