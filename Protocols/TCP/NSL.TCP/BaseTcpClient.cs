@@ -201,8 +201,10 @@ namespace NSL.TCP
         Thread receiveThread;
         CancellationTokenSource threadCancelTS;
 
+#if DEBUGEXAMPLES
         int c = 0;
         Stopwatch? sw = null;
+#endif
 
         protected void threadReceive()
         {
@@ -250,7 +252,9 @@ namespace NSL.TCP
             {
                 if (data == false)
                 {
+#if DEBUGEXAMPLES
                     sw ??= Stopwatch.StartNew();
+#endif
 
                     var peeked = inputCipher.Peek(receiveBuffer);
 
@@ -280,7 +284,10 @@ namespace NSL.TCP
                     InputPacketBuffer pbuff = new InputPacketBuffer(inputCipher.Decode(receiveBuffer, 0, length));
 
                     OnReceive(pbuff.PacketId, length);
+
+#if DEBUGEXAMPLES
                     ++c;
+#endif
 
                     ResetBuffer();
 
@@ -296,7 +303,9 @@ namespace NSL.TCP
                     if (!pbuff.ManualDisposing)
                         pbuff.Dispose();
 
+#if DEBUGEXAMPLES
                     options.HelperLogger?.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Debug, $"{c}, {sw.Elapsed.TotalMilliseconds}");
+#endif
                 }
             }
         }
