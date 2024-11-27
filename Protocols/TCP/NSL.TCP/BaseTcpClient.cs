@@ -122,13 +122,13 @@ namespace NSL.TCP
             receiveEventArg.SetBuffer(new byte[rpSegmentSize], 0, (int)rpSegmentSize);
             receiveEventArg.Completed += (s, ea) =>
             {
-                while (!ProcessReceive(ea)) {  }
+                while (!ProcessReceive(ea)) { }
             };
             receiveEventArg.AcceptSocket = sclient;
 
             if (!sclient.ReceiveAsync(receiveEventArg))
             {
-                while(!ProcessReceive(receiveEventArg)) { }
+                while (!ProcessReceive(receiveEventArg)) { }
             }
         }
 
@@ -181,8 +181,6 @@ namespace NSL.TCP
         int soffset = 0;
         int poffset = 0;
         int hSkip = 0;
-        int sskip = 0;
-        int offs;
 
         InputPacketBuffer rBuff = null;
 
@@ -221,11 +219,6 @@ namespace NSL.TCP
 
                 rBuff.OnDispose += buff => rented.Return(buff.Data);
 
-                if (rBuff.DataLength < 1)
-                { 
-                
-                }
-
                 rBuff.SetData(rented.Rent(rBuff.DataLength));
 
                 poffset = 7;
@@ -244,9 +237,7 @@ namespace NSL.TCP
 
             if (poffset >= rBuff.DataLength)
             {
-                sskip = (int)(rpSegmentSize -  (rBuff.DataLength + 7));
-
-                OnReceive(rBuff.PacketId, length);
+                OnReceive(rBuff.PacketId, rBuff.DataLength);
 
                 ++c;
 
@@ -265,7 +256,8 @@ namespace NSL.TCP
 
                 rBuff = null;
 
-                Options.HelperLogger?.Append(LoggerLevel.Debug, $"Received packets {c} in {sw.Elapsed.TotalMilliseconds} ms");
+                if (c % 1000 == 0)
+                    Options.HelperLogger?.Append(LoggerLevel.Debug, $"Received packets {c} in {sw.Elapsed.TotalMilliseconds} ms");
             }
 
             return sclient.ReceiveAsync(e);
