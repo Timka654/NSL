@@ -1,5 +1,7 @@
-﻿using NSL.SocketCore.Utils.Exceptions;
+﻿using Newtonsoft.Json.Linq;
+using NSL.SocketCore.Utils.Exceptions;
 using System;
+using System.Buffers.Binary;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.CompilerServices;
@@ -7,7 +9,7 @@ using System.Text;
 
 namespace NSL.SocketCore.Utils.Buffer
 {
-    public class InputPacketBuffer : MemoryStream
+    public class InputPacketBuffer : IDisposable
     {
         /// <summary>
         /// Default header part packet len
@@ -41,13 +43,17 @@ namespace NSL.SocketCore.Utils.Buffer
         /// </summary>
         Encoding coding = Encoding.UTF8;
 
+        private byte[] data;
+
+        public byte[] Data => data;
+
         /// <summary>
         /// Current position in data segment
         /// </summary>
         public int DataPosition
         {
-            get { return (int)base.Position - DefaultHeaderLength; }
-            set { base.Position = value + DefaultHeaderLength; }
+            get;
+            set;
         }
 
         readonly int packetLength;
@@ -82,47 +88,27 @@ namespace NSL.SocketCore.Utils.Buffer
         /// </summary>
         public ushort PacketId { get; set; }
 
-        public InputPacketBuffer()
-        {
-
-        }
-
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="buf">input buffer</param>
+        /// <param name="buf">header buffer</param>
         /// <param name="checkHash">validate packet header hash</param>
-        public InputPacketBuffer(byte[] buf, bool checkHash = false) : base(buf, 0, buf.Length, false, true)
+        public InputPacketBuffer(Span<byte> buf, bool checkHash = false)
         {
-            //установка позиции на 0 без смещения
-            Position = 0;
+            packetLength = BinaryPrimitives.ReadInt32LittleEndian(buf);
 
-            //чтение размера пакета
-            packetLength = ReadInt32();
+            PacketId = BinaryPrimitives.ReadUInt16LittleEndian(buf.Slice(4));
 
-            //чтение идентификатора пакета
-            PacketId = ReadUInt16();
-
-            //проверка хеша шапки пакета
             if (checkHash)
             {
-                if (!CheckHash())
+                if (buf[6] != ((packetLength) + PacketId) % 255)
                 {
                     throw new InvalidPacketHashException();
                 }
             }
 
-            //установка позиции на текущий размер хедера, для дальнейшего чтения
             DataPosition = 0;
         }
-
-        /// <summary>
-        /// Check header hash
-        /// </summary>
-        /// <returns></returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool CheckHash()
-            => GetBuffer()[6] == ((packetLength) + PacketId) % 255;
 
         /// <summary>
         /// Read float value (4 bytes)
@@ -132,7 +118,7 @@ namespace NSL.SocketCore.Utils.Buffer
         public float ReadFloat()
         {
             DataPosition += 4;
-            return BitConverter.ToSingle(GetBuffer(), (int)Position - 4);
+            return Int32BitsToSingle(ReadInt32()); ;
         }
 
         /// <summary>
@@ -142,8 +128,7 @@ namespace NSL.SocketCore.Utils.Buffer
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public double ReadDouble()
         {
-            DataPosition += 8;
-            return BitConverter.ToDouble(GetBuffer(), (int)Position - 8);
+            return BitConverter.Int64BitsToDouble(ReadInt64());
         }
 
         /// <summary>
@@ -154,7 +139,7 @@ namespace NSL.SocketCore.Utils.Buffer
         public short ReadInt16()
         {
             DataPosition += 2;
-            return BitConverter.ToInt16(GetBuffer(), (int)Position - 2);
+            return BinaryPrimitives.ReadInt16LittleEndian(data.AsSpan(DataPosition - 2));
         }
 
         /// <summary>
@@ -165,7 +150,7 @@ namespace NSL.SocketCore.Utils.Buffer
         public ushort ReadUInt16()
         {
             DataPosition += 2;
-            return BitConverter.ToUInt16(GetBuffer(), (int)Position - 2);
+            return BinaryPrimitives.ReadUInt16LittleEndian(data.AsSpan(DataPosition - 2));
         }
 
         /// <summary>
@@ -176,7 +161,7 @@ namespace NSL.SocketCore.Utils.Buffer
         public int ReadInt32()
         {
             DataPosition += 4;
-            return BitConverter.ToInt32(GetBuffer(), (int)Position - 4);
+            return BinaryPrimitives.ReadInt32LittleEndian(data.AsSpan(DataPosition - 4));
         }
 
         /// <summary>
@@ -187,7 +172,7 @@ namespace NSL.SocketCore.Utils.Buffer
         public uint ReadUInt32()
         {
             DataPosition += 4;
-            return BitConverter.ToUInt32(GetBuffer(), (int)Position - 4);
+            return BinaryPrimitives.ReadUInt32LittleEndian(data.AsSpan(DataPosition - 4));
         }
 
         /// <summary>
@@ -198,7 +183,7 @@ namespace NSL.SocketCore.Utils.Buffer
         public long ReadInt64()
         {
             DataPosition += 8;
-            return BitConverter.ToInt64(GetBuffer(), (int)Position - 8);
+            return BinaryPrimitives.ReadInt64LittleEndian(data.AsSpan(DataPosition - 8));
         }
 
         /// <summary>
@@ -209,7 +194,7 @@ namespace NSL.SocketCore.Utils.Buffer
         public ulong ReadUInt64()
         {
             DataPosition += 8;
-            return BitConverter.ToUInt64(GetBuffer(), (int)Position - 8);
+            return BinaryPrimitives.ReadUInt64LittleEndian(data.AsSpan(DataPosition - 8));
         }
 
         /// <summary>
@@ -217,8 +202,11 @@ namespace NSL.SocketCore.Utils.Buffer
         /// </summary>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public new byte ReadByte() => (byte)base.ReadByte();
-
+        public new byte ReadByte()
+        {
+            DataPosition += 1;
+            return data[DataPosition - 1];
+        }
         [Obsolete("Use \"ReadString\"")]
         /// <summary>
         /// Read string value, with ushort(2 bytes) header, max - 32k len
@@ -266,7 +254,7 @@ namespace NSL.SocketCore.Utils.Buffer
         {
             if (len < 1)
                 throw new ArgumentOutOfRangeException(nameof(len));
-            return coding.GetString(Read((int)len));
+            return coding.GetString(Read((int)len).ToArray());
         }
 
         /// <summary>
@@ -303,6 +291,12 @@ namespace NSL.SocketCore.Utils.Buffer
             }
 
             return null;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static unsafe float Int32BitsToSingle(int value)
+        {
+            return *((float*)&value);
         }
 
         /// <summary>
@@ -350,7 +344,7 @@ namespace NSL.SocketCore.Utils.Buffer
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Guid ReadGuid()
         {
-            return new Guid(Read(16));
+            return new Guid(Read(16).ToArray());
         }
 
         /// <summary>
@@ -358,7 +352,7 @@ namespace NSL.SocketCore.Utils.Buffer
         /// </summary>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public byte[] ReadByteArray()
+        public Span<byte> ReadByteArray()
         {
             var len = Read7BitEncodedUInt();
 
@@ -419,16 +413,14 @@ namespace NSL.SocketCore.Utils.Buffer
         /// <param name="len"></param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public byte[] Read(int len)
+        public Span<byte> Read(int len)
         {
-            if (base.Length - this.Position < len)
+            if (DataLength - DataPosition < len)
                 throw new OutOfMemoryException();
 
-            byte[] buf = new byte[len];
+            DataPosition += len;
 
-            base.Read(buf, 0, len);
-
-            return buf;
+            return data.AsSpan(DataPosition - len, len);
         }
 
         /// <summary>
@@ -488,35 +480,19 @@ namespace NSL.SocketCore.Utils.Buffer
             return DataPosition;
         }
 
-        /// <summary>
-        /// Add Packet body segment
-        /// </summary>
-        /// <param name="buffer"></param>
-        /// <param name="off"></param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void AppendBody(byte[] buffer, int off)
+        public void SetData(byte[] data, bool replace = false)
         {
-            int tempPos = DataPosition;
+            if (!replace && this.data != null)
+                throw new Exception("Data already set");
 
-            DataPosition = 0;
-
-            Write(buffer, off, this.packetLength - 7);
-
-            DataPosition = tempPos;
+            this.data = data;
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public byte[] GetBody()
+        public void Dispose()
         {
-            byte[] buf = new byte[DataLength];
-            Array.Copy(GetBuffer(), DefaultHeaderLength, buf, 0, DataLength);
-
-            return buf;
+            OnDispose(this);
         }
 
-        protected override void Dispose(bool disposing)
-        {
-            base.Dispose(disposing);
-        }
+        public event Action<InputPacketBuffer> OnDispose = i=> { };
     }
 }

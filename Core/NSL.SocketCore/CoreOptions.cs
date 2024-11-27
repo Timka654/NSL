@@ -45,7 +45,7 @@ namespace NSL.SocketCore
 
         public int MaxReceiveBufferSize { get; set; } = int.MaxValue;
 
-        public int SendSegmentSize { get; set; } = 1 * 1024;
+        public uint SegmentSize { get; set; } = 1 * 1024;
         
         private IPacketCipher inputCipher = new PacketNoneCipher();
 
