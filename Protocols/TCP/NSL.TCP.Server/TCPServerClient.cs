@@ -17,10 +17,9 @@ namespace NSL.TCP.Server
 
         public ServerOptions<TClient> ServerOptions => (ServerOptions<TClient>)base.options;
 
-        public TCPServerClient(Socket client, ServerOptions<TClient> options,bool legacyThread = false) : base(options)
+        public TCPServerClient(Socket client, ServerOptions<TClient> options,bool legacyTransport = false) : base(options, legacyTransport)
         {
             Initialize(client);
-            this.legacyThread = legacyThread;
         }
 
         protected void Initialize(Socket client)
@@ -50,7 +49,7 @@ namespace NSL.TCP.Server
             options.CallClientConnectEvent(Data);
         }
 
-        public virtual void RunPacketReceiver() => RunReceive(legacyThread);
+        public virtual void RunPacketReceiver() => RunReceive();
 
         public override void ChangeUserData(INetworkClient newClientData)
             => SetClientData(newClientData);

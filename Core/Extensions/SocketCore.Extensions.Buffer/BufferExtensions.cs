@@ -278,25 +278,8 @@ namespace NSL.SocketCore.Extensions.Buffer
 
         public static OutputPacketBuffer WithWaitableAnswer(this OutputPacketBuffer buffer, InputPacketBuffer data)
         {
-            var boffset = buffer.Position;
-
-            var doffset = data.Position;
-
-            data.DataPosition = 0;
-
-            buffer.DataPosition = 0;
-
-            buffer.WriteGuid(data.ReadGuid());
-
-            if (boffset > RequestPacketBuffer.DefaultHeaderLength)
-                buffer.Position = boffset;
-            else
-                buffer.DataPosition = 16;
-
-            if (doffset > RequestPacketBuffer.DefaultHeaderLength)
-                data.Position = doffset;
-            else
-                data.DataPosition = 16;
+            data.Data.AsSpan(0, 16)
+                .CopyTo(buffer.GetBuffer());
 
             return buffer;
         }

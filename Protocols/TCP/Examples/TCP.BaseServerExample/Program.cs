@@ -20,7 +20,17 @@ options.HelperLogger = new ConsoleLogger();
 
 options.AddHandle(1, (client, p) =>
 {
+    Console.WriteLine($"Receive from client {p.ReadString()}");
 
+    var o = OutputPacketBuffer.Create(4);
+
+    o.WriteInt32(p.DataLength);
+
+    client.Send(o);
+});
+
+options.AddHandle(3, (client, p) =>
+{
 });
 
 int counter = 0;
@@ -45,7 +55,7 @@ options.OnClientDisconnectEvent += (client) =>
     Console.WriteLine($"Client({client.ObjectBag["uid"]}) disconnected!!");
 };
 
-var t = new TCPServerListener<BaseServerNetworkClient>(options);
+var t = new TCPServerListener<BaseServerNetworkClient>(options, true);
 
 t.Start();
 

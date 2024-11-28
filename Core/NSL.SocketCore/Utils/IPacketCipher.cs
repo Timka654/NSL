@@ -15,7 +15,9 @@ namespace NSL.SocketCore.Utils
 
         byte[] Decode(byte[] buffer, int offset, int length);
 
-        void DecodeRef(ref byte[] buffer, int offset, int length);
+        bool DecodeRef(ref byte[] buffer, int offset, int length);
+
+        bool DecodeHeaderRef(ref byte[] buffer, int offset);
 
         bool Sync();
 

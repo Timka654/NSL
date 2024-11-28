@@ -8,47 +8,54 @@ Console.WriteLine("TCP.Client");
 
 ClientOptions<NetworkClient> options = new ClientOptions<NetworkClient>();
 
-options.ReceiveBufferSize = 1024;
+options.ReceiveBufferSize = 20480;
 //options.OnClientConnectEvent += (client) => client.PingPongEnabled = true;
 
-options.AddHandle(1, (c, p) =>
+options.OnExceptionEvent += (ex, c) =>
 {
-    //Console.WriteLine($"received from server {p.PacketId} - {p.ReadString()}");
+
+};
+
+options.AddHandle(4, (c, p) =>
+{
+    Console.WriteLine($"received from server {p.PacketId} - packet received on server with len {p.ReadInt32()}");
 });
 
-var t = new TCPNetworkClient<NetworkClient>(options);
+options.SegmentSize = 20480;
+
+var t = new TCPNetworkClient<NetworkClient>(options, true);
 
 //t.OnReceivePacket += (c, pid, len) => { if (InputPacketBuffer.IsSystemPID(pid)) return; Console.WriteLine($"received {pid}"); };
 //t.OnSendPacket += (c, pid, len, stackTrace) => { Console.WriteLine($"sended {pid}"); };
 
 Console.WriteLine($"Current State {t.GetState()}, Try connect");
+    await Task.Delay(3000);
 
-if (!await t.ConnectAsync("127.0.0.1", 20004))
+if (!await t.ConnectAsync("127.0.0.1", 20004, 20_000))
     Console.WriteLine($"Cannot connect, Current State {t.GetState()}");
 else
 {
 
-    await Task.Delay(1000);
-    using var opb = new OutputPacketBuffer();
+    //using var opb = OutputPacketBuffer.Create(3);
 
-    opb.PacketId = 1;
+    //byte[] buf = new byte[ushort.MaxValue];
 
-    byte[] buf = new byte[ushort.MaxValue];
+    //Random.Shared.NextBytes(buf);
 
-    Random.Shared.NextBytes(buf);
+    ////opb.WriteByteArray(buf);
 
 
-    Stopwatch sw = new Stopwatch();
-    for (int i = 0; i < 1_000_000; i++)
-    {
-        sw.Start();
+    //Stopwatch sw = new Stopwatch();
+    //for (int i = 0; i < 1_000_000; i++)
+    //{
+    //    sw.Start();
 
-        t.Send(opb, false);
+    //    t.Send(opb, false);
 
-        sw.Stop();
-    }
+    //    sw.Stop();
+    //}
 
-    Console.WriteLine($"Send {sw.ElapsedMilliseconds}");
+    //Console.WriteLine($"Send {sw.ElapsedMilliseconds}");
 
 
     while (true)

@@ -11,6 +11,8 @@ using System.Net.WebSockets;
 using System.Threading.Tasks;
 using System.Linq;
 using System.Threading.Channels;
+using NSL.SocketCore.Utils.Cipher;
+using System.Buffers;
 
 namespace NSL.WebSockets
 {
@@ -65,8 +67,6 @@ namespace NSL.WebSockets
         /// </summary>
         protected int length = InputPacketBuffer.DefaultHeaderLength;
 
-        protected bool data = false;
-
         #endregion
 
         #endregion
@@ -94,7 +94,7 @@ namespace NSL.WebSockets
 
         protected void ResetBuffer()
         {
-            data = false;
+            rBuff = null;
             length = InputPacketBuffer.DefaultHeaderLength;
             offset = 0;
         }
@@ -129,8 +129,14 @@ namespace NSL.WebSockets
             }
         }
 
+        static ArrayPool<byte> byteArrayPool = ArrayPool<byte>.Create();
+
+        private InputPacketBuffer? rBuff = null;
+
         private async Task Receive()
         {
+            var sclient = this.sclient;
+
             if (sclient == null)
                 throw new ObjectDisposedException(nameof(sclient));
 
@@ -139,59 +145,62 @@ namespace NSL.WebSockets
             if (receiveData.CloseStatus.HasValue)
                 throw new WebSocketClosedException(receiveData.CloseStatus, receiveData.CloseStatusDescription);
 
-            int rlen = receiveData.Count;
-
-            if (rlen < 1)
+            if (receiveData.Count < 1)
                 throw new ObjectDisposedException(nameof(sclient));
 
-            offset += rlen;
+            offset += receiveData.Count;
 
-            if (offset == length)
+            if (rBuff == null && offset == length)
             {
-                if (data == false)
+                if (!inputCipher.DecodeHeaderRef(ref receiveBuffer, 0))
+                    throw new Exception($"Cannot peek message header {string.Join(" ", receiveBuffer?[0..7].Select(x => x.ToString("x2")) ?? Enumerable.Empty<string>())}");
+
+                rBuff = new InputPacketBuffer(receiveBuffer);
+
+                rBuff.SetData(byteArrayPool.Rent(rBuff.DataLength));
+
+                rBuff.OnDispose += (rBuff) =>
                 {
-                    var peeked = inputCipher.Peek(receiveBuffer);
+                    byteArrayPool.Return(rBuff.Data);
+                };
 
-                    if (peeked == null)
-                        throw new Exception($"Cannot peek message header {string.Join(" ", receiveBuffer?[0..7].Select(x => x.ToString("x2")) ?? Enumerable.Empty<string>())}");
+                length = rBuff.PacketLength;
 
-                    length = BitConverter.ToInt32(peeked, 0);
+                if (length > receiveBuffer.Length)
+                {
+                    int n = receiveBuffer.Length;
 
-                    data = true;
-
-                    if (length > receiveBuffer.Length)
+                    do
                     {
-                        int n = receiveBuffer.Length;
+                        n *= 2;
+                    } while (n < length);
 
-                        do
-                        {
-                            n *= 2;
-                        } while (n < length);
+                    Array.Resize(ref receiveBuffer, n);
+                }
+            }
 
-                        Array.Resize(ref receiveBuffer, n);
-                    }
+            if (rBuff != null && offset == length)
+            {
+                if (!inputCipher.DecodeRef(ref receiveBuffer, 7, rBuff.DataLength))
+                    throw new CipherCodingException();
+
+                Buffer.BlockCopy(receiveBuffer, 7, rBuff.Data, 0, rBuff.DataLength);
+
+                OnReceive(rBuff.PacketId, length);
+
+                try
+                {
+                    PacketHandles[rBuff.PacketId](Data, rBuff);
+                }
+                catch (Exception ex)
+                {
+                    RunException(ex);
                 }
 
-                if (offset == length && data)
-                {
-                    InputPacketBuffer pbuff = new InputPacketBuffer(inputCipher.Decode(receiveBuffer, 0, length));
+                if (!rBuff.ManualDisposing)
+                    rBuff.Dispose();
 
-                    OnReceive(pbuff.PacketId, length);
-
-                    ResetBuffer();
-
-                    try
-                    {
-                        PacketHandles[pbuff.PacketId](Data, pbuff);
-                    }
-                    catch (Exception ex)
-                    {
-                        RunException(ex);
-                    }
-
-                    if (!pbuff.ManualDisposing)
-                        pbuff.Dispose();
-                }
+                ResetBuffer();
             }
         }
 

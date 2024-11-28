@@ -10,6 +10,7 @@ using NSL.Extensions.RPC.Generator.Comparers;
 using NSL.Extensions.RPC.Generator.Declarations;
 using NSL.Extensions.RPC.Generator.Generators;
 using NSL.Extensions.RPC.Generator.Models;
+using NSL.Extensions.RPC.Generator.Utils;
 using NSL.Generators.Utils;
 using System.Collections.Generic;
 using System.Linq;
@@ -62,7 +63,15 @@ namespace NSL.Extensions.RPC.Generator
 
             foreach (var classDecl in data)
             {
-                BuildClass(context, classDecl);
+                try
+                {
+                    BuildClass(context, classDecl);
+
+                }
+                catch (System.Exception ex)
+                {
+                    context.ShowRPCGenDiagnostics($"NSLRPC000", $"Error - {ex} on type {classDecl.Class.Identifier.Text}", DiagnosticSeverity.Error, classDecl.Class.GetLocation());
+                }
             }
         }
 

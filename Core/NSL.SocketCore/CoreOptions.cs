@@ -27,7 +27,7 @@ namespace NSL.SocketCore
         public virtual ProtocolType ProtocolType { get; set; } = ProtocolType.Unspecified;
 
         /// <summary>
-        /// Размер буффера приходящих данных, если пакет больше этого значения то данные по реализованному алгоритму принять не получиться, значение по умолчанию - 1024
+        /// Sockets receive fragment size
         /// </summary>
         public int ReceiveBufferSize
         {

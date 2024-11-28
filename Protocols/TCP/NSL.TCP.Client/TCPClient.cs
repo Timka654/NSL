@@ -19,9 +19,8 @@ namespace NSL.TCP.Client
         public ClientOptions<T> ConnectionOptions => base.options as ClientOptions<T>;
 
 
-        public TCPClient(ClientOptions<T> options, bool legacyThread = false) : base(options)
+        public TCPClient(ClientOptions<T> options, bool legacyTransport = false) : base(options, legacyTransport)
         {
-            this.legacyThread = legacyThread;
         }
 
 
@@ -43,7 +42,7 @@ namespace NSL.TCP.Client
 
             this.outputCipher = ConnectionOptions.OutputCipher.CreateEntry();
 
-            RunReceive(legacyThread);
+            RunReceive();
 
             ConnectionOptions.RunClientConnect();
         }

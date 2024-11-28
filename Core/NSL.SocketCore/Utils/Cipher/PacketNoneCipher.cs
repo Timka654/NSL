@@ -9,7 +9,9 @@ namespace NSL.SocketCore.Utils.Cipher
             return this;
         }
 
-        public void DecodeRef(ref byte[] buffer, int offset, int length) { }
+        public bool DecodeRef(ref byte[] buffer, int offset, int length) => true;
+
+        public bool DecodeHeaderRef(ref byte[] buffer, int offset) => true;
 
         public byte[] Decode(byte[] buffer, int offset, int length)
         {

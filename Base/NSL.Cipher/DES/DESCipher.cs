@@ -51,7 +51,10 @@ namespace NSL.Cipher.DES
         {
             return des.IV;
         }
-        public void DecodeRef(ref byte[] buffer, int offset, int length) => throw new NotImplementedException();
+
+        public bool DecodeRef(ref byte[] buffer, int offset, int length) => throw new NotImplementedException();
+
+        public bool DecodeHeaderRef(ref byte[] buffer, int offset) => throw new NotImplementedException();
 
         public byte[] Decode(byte[] buffer, int offset, int length)
         {
