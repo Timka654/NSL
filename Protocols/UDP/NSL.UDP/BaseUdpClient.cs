@@ -191,11 +191,16 @@ namespace NSL.UDP
 
         public virtual void Receive(byte[] result, UDPChannelEnum channel)
         {
-            //замыкаем это все в блок try, если клиент отключился то EndReceive может вернуть ошибку
             try
             {
-                //дешефруем и засовываем это все в спец буффер в котором реализованы методы чтения типов, своего рода поток
-                DgramInputPacketBuffer pbuff = new DgramInputPacketBuffer(inputCipher.Decode(result, 0, result.Length), channel, true);
+                inputCipher.DecodeHeaderRef(ref result, 0);
+
+                inputCipher.DecodeRef(ref result, 7, result.Length - 7);
+
+
+
+                DgramInputPacketBuffer pbuff = new DgramInputPacketBuffer(result, channel, true);
+                pbuff.SetData(result[7..]);
 
                 OnReceive(pbuff.PacketId, pbuff.PacketLength);
 
