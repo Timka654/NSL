@@ -18,16 +18,13 @@ namespace NSL.TCP.Client
 
         public ClientOptions<T> ConnectionOptions => base.options as ClientOptions<T>;
 
-        /// <summary>
-        /// Инициализация прослушивания клиента
-        /// </summary>
-        /// <param name="options">общие настройки сервера</param>
-        public TCPClient(ClientOptions<T> options) : base(options) { }
 
-        /// <summary>
-        /// Запуск цикла приема пакетов
-        /// </summary>
-        /// <param name="client">клиент</param>
+        public TCPClient(ClientOptions<T> options, bool legacyThread = false) : base(options)
+        {
+            this.legacyThread = legacyThread;
+        }
+
+
         public void Reconnect(Socket client)
         {
             disconnected = false;
@@ -46,9 +43,7 @@ namespace NSL.TCP.Client
 
             this.outputCipher = ConnectionOptions.OutputCipher.CreateEntry();
 
-            sclient.ReceiveBufferSize = ConnectionOptions.ReceiveBufferSize;
-
-            RunReceive();
+            RunReceive(legacyThread);
 
             ConnectionOptions.RunClientConnect();
         }

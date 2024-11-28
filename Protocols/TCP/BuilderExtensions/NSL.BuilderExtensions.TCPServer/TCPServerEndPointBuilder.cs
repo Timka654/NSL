@@ -105,7 +105,7 @@ namespace NSL.BuilderExtensions.TCPServer
             options.OnSendPacket += handle;
         }
 
-        public TCPServerListener<TClient> Build()
-            => new TCPServerListener<TClient>(options);
+        public TCPServerListener<TClient> Build(bool legacyThread = false)
+            => new TCPServerListener<TClient>(options, legacyThread);
     }
 }

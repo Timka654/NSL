@@ -10,7 +10,7 @@ namespace NSL.TCP.Server
     public class TCPServerListener<T> : TCPServerListener<T, ServerOptions<T>>
         where T : IServerNetworkClient, new()
     {
-        public TCPServerListener(ServerOptions<T> options) : base(options)
+        public TCPServerListener(ServerOptions<T> options, bool legacyThread = false) : base(options, legacyThread)
         {
             //BitConverter.ToInt16(new ReadOnlySpan<byte>(new byte[] { 0, 0 }), 0);   
         }
@@ -37,14 +37,16 @@ namespace NSL.TCP.Server
         /// Настройки сервера
         /// </summary>
         private TOptions serverOptions;
+        private readonly bool legacyThread;
 
         /// <summary>
         /// Инициализация сервера
         /// </summary>
         /// <param name="options">Настройки</param>
-        public TCPServerListener(TOptions options)
+        public TCPServerListener(TOptions options, bool legacyThread = false)
         {
             serverOptions = options;
+            this.legacyThread = legacyThread;
         }
 
         /// <summary>
@@ -127,7 +129,7 @@ namespace NSL.TCP.Server
                 client = listener.EndAccept(result);
                 //инициализация слушателя клиента клиента
                 //#if DEBUG
-                var c = new TCPServerClient<T>(client, serverOptions);
+                var c = new TCPServerClient<T>(client, serverOptions, legacyThread);
                 c.OnReceivePacket += OnReceivePacket;
                 c.OnSendPacket += OnSendPacket;
                 c.RunPacketReceiver();

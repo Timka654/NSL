@@ -95,7 +95,7 @@ namespace NSL.BuilderExtensions.TCPClient
             options.OnSendPacket += handle;
         }
 
-        public TCPNetworkClient<TClient, TOptions> Build()
-            => new TCPNetworkClient<TClient, TOptions>(options);
+        public TCPNetworkClient<TClient, TOptions> Build(bool legacyThread = false)
+            => new TCPNetworkClient<TClient, TOptions>(options, legacyThread);
     }
 }
