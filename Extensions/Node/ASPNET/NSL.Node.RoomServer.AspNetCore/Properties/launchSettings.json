@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "NSL.Node.RoomServer.AspNetCore": {
+      "commandName": "Project",
+      "launchBrowser": false,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:52459;http://localhost:52460"
+    }
+  }
+}

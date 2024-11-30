@@ -6,10 +6,15 @@
 		<Nullable>disable</Nullable>
 		<IsPackable>false</IsPackable>
 		<Version>$(VersionSuffix)</Version>
+		<Configurations>Debug;Release;UnityDebug</Configurations>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
 		<DefineConstants>$(DefineConstants);DEVELOP</DefineConstants>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='UnityDebug|AnyCPU'">
+	  <DefineConstants>$(DefineConstants);DEVELOP</DefineConstants>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">

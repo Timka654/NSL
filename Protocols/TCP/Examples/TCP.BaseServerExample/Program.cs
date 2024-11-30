@@ -1,4 +1,5 @@
 ﻿using NSL.Logger;
+using NSL.SocketCore.Extensions.Buffer;
 using NSL.SocketCore.Utils.Buffer;
 using NSL.SocketServer;
 using NSL.SocketServer.Utils;
@@ -10,13 +11,18 @@ Console.WriteLine("TCP.Server");
 
 ServerOptions<BaseServerNetworkClient> options = new ServerOptions<BaseServerNetworkClient>();
 
-options.Port = 20004;
+options.Port = 20008;
 
 options.IpAddress = "0.0.0.0";
 
 options.ReceiveBufferSize = 1024;
 
 options.HelperLogger = new ConsoleLogger();
+
+options.OnExceptionEvent += (ex, c) =>
+{
+    Console.WriteLine($"Exception {ex}");
+};
 
 options.AddHandle(1, (client, p) =>
 {
@@ -27,6 +33,20 @@ options.AddHandle(1, (client, p) =>
     o.WriteInt32(p.DataLength);
 
     client.Send(o);
+});
+
+options.AddHandle(7, (c, req) =>
+{
+    var d = req.ReadNullableClass<object>(() =>
+    {
+        var s1 = Enumerable.Range(0,1000).Select(x=> req.ReadString()).ToArray();
+
+        return s1;
+    });
+    //res.WriteString("invoked");
+
+    //return false;
+
 });
 
 options.AddHandle(3, (client, p) =>
@@ -55,7 +75,7 @@ options.OnClientDisconnectEvent += (client) =>
     Console.WriteLine($"Client({client.ObjectBag["uid"]}) disconnected!!");
 };
 
-var t = new TCPServerListener<BaseServerNetworkClient>(options, true);
+var t = new TCPServerListener<BaseServerNetworkClient>(options, false);
 
 t.Start();
 

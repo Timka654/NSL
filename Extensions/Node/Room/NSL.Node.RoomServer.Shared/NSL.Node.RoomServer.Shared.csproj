@@ -1,0 +1,40 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<Nullable>enable</Nullable>
+
+		<Version>$(VersionSuffix)</Version>
+		<Authors>Relife87</Authors>
+		<Configurations>Debug;Release;DebugExamples;ReleaseRoomServer;DebugRoomServer;UnityDebug</Configurations>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+	  <DefineConstants>$(DefineConstants)TRACE;SERVER</DefineConstants>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='UnityDebug|AnyCPU'">
+	  <DefineConstants>$(DefineConstants)TRACE;SERVER</DefineConstants>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugExamples|AnyCPU'">
+	  <DefineConstants>$(DefineConstants)TRACE;SERVER</DefineConstants>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugRoomServer|AnyCPU'">
+	  <DefineConstants>$(DefineConstants)TRACE;SERVER</DefineConstants>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+	  <DefineConstants>$(DefineConstants)TRACE;SERVER</DefineConstants>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseRoomServer|AnyCPU'">
+	  <DefineConstants>$(DefineConstants)TRACE;SERVER</DefineConstants>
+	</PropertyGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\..\NSL.Node.Core\NSL.Node.Core.csproj" />
+	</ItemGroup>
+
+</Project>

@@ -1,0 +1,35 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<Configurations>Debug;Release;Unity;UnityDebug;DebugExamples;Dev</Configurations>
+
+		<PublishRepositoryUrl>true</PublishRepositoryUrl>
+		<EmbedUntrackedSources>true</EmbedUntrackedSources>
+		<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+		<GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
+
+		<Authors>Relife87</Authors>
+		<Version>$(VersionSuffix)</Version>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)'=='UnityDebug'">
+		<AssemblyName>Unity.$(MSBuildProjectName)</AssemblyName>
+		<TargetFramework>netstandard2.1</TargetFramework>
+		<DefineConstants>DEBUG;TRACE</DefineConstants>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)'=='Unity'">
+		<AssemblyName>Unity.$(MSBuildProjectName)</AssemblyName>
+		<TargetFramework>netstandard2.1</TargetFramework>
+	</PropertyGroup>
+
+
+	<ItemGroup>
+	  <ProjectReference Include="..\..\..\Generators\NSL.Generators.BinaryTypeIOGenerator.Attributes\NSL.Generators.BinaryTypeIOGenerator.Attributes.csproj" />
+	  <ProjectReference Include="..\..\..\Generators\NSL.Generators.BinaryTypeIOGenerator\NSL.Generators.BinaryTypeIOGenerator.csproj" OutputItemType="Analyzer" />
+	  <ProjectReference Include="..\..\..\Protocols\UDP\NSL.UDP\NSL.UDP.csproj" />
+	  <ProjectReference Include="..\..\Session\NSL.Extensions.Session\NSL.Extensions.Session.csproj" />
+	</ItemGroup>
+
+</Project>

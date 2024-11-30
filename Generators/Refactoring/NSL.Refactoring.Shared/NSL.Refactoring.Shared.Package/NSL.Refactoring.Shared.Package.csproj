@@ -18,7 +18,7 @@
 		<Version>$(VersionSuffix)</Version>
 		<Authors>Relife87</Authors>
 		<Description>
-			Must contains "NSLGen.options" file in solution/project directory(can override solution options from project directory NSLGen.options file)<br/>
+			Must contains "NSLGen.options" file in solution/project directory(can override solution options from project directory NSLGen.options file)<br />
 			shared_project_name* - project name for store shared types
 			shared_request_models_rel_path? - request models path(has contains RequestModel in type name)
 			shared_response_models_rel_path? - response models path(has contains ResponseModel in type name)
@@ -26,6 +26,7 @@
 			shared_entity_models_rel_path? - entity models path(has contains EntityModel in type name)
 			shared_models_rel_path? - models path(has contains Model in type name)
 		</Description>
+		<Configurations>Debug;Release;UnityDebug</Configurations>
 	</PropertyGroup>
 
 	<ItemGroup>

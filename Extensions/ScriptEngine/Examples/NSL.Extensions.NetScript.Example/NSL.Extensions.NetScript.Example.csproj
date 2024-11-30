@@ -5,7 +5,7 @@
     <TargetFramework>net8.0</TargetFramework>
 	  <IsPackable>false</IsPackable>
 	  <Version>$(VersionSuffix)</Version>
-	  <Configurations>Debug;Release;DebugExamples</Configurations>
+	  <Configurations>Debug;Release;DebugExamples;UnityDebug</Configurations>
 		<Nullable>disable</Nullable>
   </PropertyGroup>
 

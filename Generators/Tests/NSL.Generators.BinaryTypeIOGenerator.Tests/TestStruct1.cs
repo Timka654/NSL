@@ -20,8 +20,8 @@ namespace NSL.Generators.BinaryTypeIOGenerator.Tests
     }
 
 
-    //[NSLBIOType("en", "abc")]
-    //[NSLBIOType]
+    [NSLBIOType("abc")]
+    [NSLBIOType]
     public partial class TestStruct1 :TestStruct2
     {
         [NSLBIOInclude("en")]
@@ -49,6 +49,10 @@ namespace NSL.Generators.BinaryTypeIOGenerator.Tests
 
         [NSLBIOInclude]
         public int n1 { get; set; }
+
+
+        [NSLBIOInclude("abc")]
+        public byte[] buf { get; set; }
 
         //[BinaryIOWriteMethod]
         //public partial void BinaryWriteFull(OutputPacketBuffer packet);

@@ -12,7 +12,7 @@
 		<Copyright>Copyright Alan McGovern, Ben Motmans, Lucas Ontivero ©  2006-2014</Copyright>
 
 		<OutputType>Library</OutputType>
-		<Configurations>Debug;Release;DebugExamples</Configurations>
+		<Configurations>Debug;Release;DebugExamples;UnityDebug</Configurations>
 
 		<Authors>Relife87</Authors>
 		<Version>$(VersionSuffix)</Version>

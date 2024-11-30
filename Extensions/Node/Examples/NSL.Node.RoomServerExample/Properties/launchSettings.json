@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "NSL.Node.RoomServerExample": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "transport__public__endpoint": "ws://localhost:5920",
+        "client_binding_point": "http://localhost:5920/"
+      }
+    }
+  }
+}

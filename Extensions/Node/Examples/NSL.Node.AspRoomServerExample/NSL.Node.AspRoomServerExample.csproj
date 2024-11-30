@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Configurations>Debug;Release;Dev</Configurations>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Remove="configuration.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="configuration.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\NSL.Node.RoomServer.AspNetCore\NSL.Node.RoomServer.AspNetCore.csproj" />
+    <ProjectReference Include="..\..\NSL.Node.RoomServer\NSL.Node.RoomServer.csproj" />
+  </ItemGroup>
+
+</Project>

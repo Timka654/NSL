@@ -88,6 +88,13 @@ namespace NSL.SocketCore.Utils.Buffer
         /// </summary>
         public ushort PacketId { get; set; }
 
+        public InputPacketBuffer(int packetLength, ushort packetId)
+        {
+            this.packetLength = packetLength;
+
+            this.PacketId = packetId;
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -491,8 +498,9 @@ namespace NSL.SocketCore.Utils.Buffer
         public void Dispose()
         {
             OnDispose(this);
+            data = null;
         }
 
-        public event Action<InputPacketBuffer> OnDispose = i=> { };
+        public event Action<InputPacketBuffer> OnDispose = i => { };
     }
 }

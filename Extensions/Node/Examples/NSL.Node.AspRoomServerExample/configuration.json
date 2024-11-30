@@ -1,0 +1,4 @@
+﻿{
+  "bridge_address": "wss://localhost:7016/room_server",
+  "client_public_endpoint": "wss://localhost:7213/room_server"
+}

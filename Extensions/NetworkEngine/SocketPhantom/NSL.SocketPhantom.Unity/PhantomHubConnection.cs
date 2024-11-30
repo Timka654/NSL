@@ -198,13 +198,11 @@ namespace NSL.SocketPhantom.Unity
 
         internal async void Invoke(InputPacketBuffer packet)
         {
-            using (var ip = new InputPacketBuffer())
+            using (var ip = new InputPacketBuffer(packet.PacketLength, packet.PacketId))
             {
-                packet.CopyTo(ip);
+                ip.SetData(packet.Data);
 
-                ip.Position = 0;
-
-                string methodName = ip.ReadString16().ToLower();
+                string methodName = ip.ReadString().ToLower();
 
                 if (methodDelegates.TryGetValue($"{methodName}_{ip.ReadInt32()}", out var func))
                 {

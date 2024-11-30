@@ -99,6 +99,7 @@ namespace NSL.TCP.Client
             }
             catch (TaskCanceledException)
             {
+                Release();
                 ConnectionOptions.RunClientDisconnect();
             }
             catch (Exception ex)

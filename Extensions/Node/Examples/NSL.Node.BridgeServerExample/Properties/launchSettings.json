@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "NSL.Node.BridgeServerExample": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "lobby_server_point": "http://localhost:6999/",
+        "room_server_point": "http://localhost:6998/",
+        "client_server_point": "http://localhost:7000/"
+      }
+    }
+  }
+}

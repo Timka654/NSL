@@ -278,11 +278,19 @@ namespace NSL.SocketCore.Extensions.Buffer
 
         public static OutputPacketBuffer WithWaitableAnswer(this OutputPacketBuffer buffer, InputPacketBuffer data)
         {
+            if (buffer.Length < 23)
+                buffer.SetLength(23);
+
             data.Data.AsSpan(0, 16)
-                .CopyTo(buffer.GetBuffer());
+                .CopyTo(new ArraySegment<byte>(buffer.GetBuffer(), 7, 16));
+
+            if (buffer.DataPosition < 16)
+                buffer.DataPosition = 16;
+
+            if (data.DataPosition < 16)
+                data.DataPosition = 16;
 
             return buffer;
         }
-
     }
 }
