@@ -13,7 +13,7 @@
 
 		<IsPackable>false</IsPackable>
 
-		<Configurations>Debug;Release;DebugExamples;ReleaseRoomServer;Dev</Configurations>
+		<Configurations>DebugExamples;Debug;Release;UnityDebug;Unity</Configurations>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -23,7 +23,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\NSL.Node.RoomServer\NSL.Node.RoomServer.csproj" />
+	  <ProjectReference Include="..\..\Room\NSL.Node.RoomServer\NSL.Node.RoomServer.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

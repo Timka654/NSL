@@ -16,6 +16,8 @@ namespace NSL.SocketPhantom.AspNetCore.Network
 
         public string UserId => Claims?.FindFirstValue(ClaimsIdentity.DefaultNameClaimType) ?? default;
 
+        public string Session { get; set; }
+
         public ClaimsPrincipal Claims { get; internal set; }
 
         public BasePhantomHub Hub { get; internal set; }

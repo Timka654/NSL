@@ -9,11 +9,11 @@
 
 		<Version>$(VersionSuffix)</Version>
 		<Authors>Relife87</Authors>
-		<Configurations>Debug;Release;DebugExamples;Dev</Configurations>
+		<Configurations>DebugExamples;Debug;Release;UnityDebug;Unity</Configurations>
 	</PropertyGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\NSL.Node.BridgeServer\NSL.Node.BridgeServer.csproj" />
+	  <ProjectReference Include="..\..\Bridge\NSL.Node.BridgeServer\NSL.Node.BridgeServer.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

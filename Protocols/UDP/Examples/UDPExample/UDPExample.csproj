@@ -2,7 +2,7 @@
 
 	<PropertyGroup>
 		<NSLProjectTypes>Example</NSLProjectTypes>
-		<Configurations>Debug;Release;Unity;UnityDebug;DebugStable;DebugExamples</Configurations>
+		<Configurations>DebugExamples;Debug;Release;UnityDebug;Unity</Configurations>
 		<OutputType>Library</OutputType>
 		<TargetFramework>net8.0</TargetFramework>
 		<IsPackable>false</IsPackable>

@@ -7,6 +7,7 @@
 		<Configurations>DebugExamples;Debug;Release</Configurations>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<Nullable>disable</Nullable>
+		<Platforms>AnyCPU;ARM32;x86;ARM64;x64</Platforms>
 		<IsPackable>true</IsPackable>
 		<OutputType>Library</OutputType>
 
@@ -27,7 +28,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\..\Utils\NSL.Utils.JsonSchemeGen.Attributes\NSL.Utils.JsonSchemeGen.Attributes.csproj" />
+		<ProjectReference Include="..\..\..\Base\NSL.Utils.JsonSchemeGen.Attributes\NSL.Utils.JsonSchemeGen.Attributes.csproj" />
 		<ProjectReference Include="..\..\NSL.ASPNET\NSL.ASPNET.csproj" />
 	</ItemGroup>
 

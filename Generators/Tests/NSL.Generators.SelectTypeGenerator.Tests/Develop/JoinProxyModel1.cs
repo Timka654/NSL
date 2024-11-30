@@ -1,6 +1,6 @@
 ﻿using NSL.Generators.SelectTypeGenerator.Attributes;
 
-namespace NSL.Generators.SelectTypeGenerator.Tests.Develop
+namespace NSL.Generators.SelectTypeGenerator.Tests
 {
     [SelectGenerate("TestGet")]
     public partial class JoinProxyModel1

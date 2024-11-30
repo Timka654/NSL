@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<NSLProjectTypes>UnitySupport</NSLProjectTypes>
@@ -7,6 +7,7 @@
 		<Configurations>DebugExamples;Debug;Release;UnityDebug;Unity</Configurations>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<Nullable>disable</Nullable>
+		<Platforms>AnyCPU;ARM32;x86;ARM64;x64</Platforms>
 
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
 		<EmbedUntrackedSources>true</EmbedUntrackedSources>
@@ -35,6 +36,7 @@
 	<ItemGroup>
 		<ProjectReference Include="..\..\..\Core\Extensions\SocketCore.Extensions.Buffer\NSL.SocketCore.Extensions.Buffer.csproj" />
 		<ProjectReference Include="..\..\..\Core\NSL.SocketServer\NSL.SocketServer.csproj" />
+		<ProjectReference Include="..\..\..\Generators\NSL.Generators.BinaryTypeIOGenerator\NSL.Generators.BinaryTypeIOGenerator.csproj" OutputItemType="Analyzer" />
 		<ProjectReference Include="..\NSL.Extensions.Version\NSL.Extensions.Version.csproj" />
 	</ItemGroup>
 

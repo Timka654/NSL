@@ -4,14 +4,15 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using NSL.BuilderExtensions.SocketCore;
 using NSL.BuilderExtensions.WebSocketsServer.AspNet;
+using NSL.SocketCore.Utils.Buffer;
 using NSL.SocketPhantom.AspNetCore.Network;
-using NSL.SocketPhantom.AspNetCore.Network.Packets;
 using NSL.SocketPhantom.Cipher;
 using NSL.SocketPhantom.Enums;
 using System;
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 
 namespace NSL.SocketPhantom.AspNetCore
 {
@@ -47,8 +48,8 @@ namespace NSL.SocketPhantom.AspNetCore
             {
                 cipher.SetProvider(builder.GetCoreOptions());
 
-                builder.AddPacket(PacketEnum.SignIn, new SessionPacket(this));
-                builder.AddPacket(PacketEnum.Invoke, new InvokePacket());
+                builder.AddAsyncPacketHandle(PacketEnum.SignIn, SessionPacketHandle);
+                builder.AddAsyncPacketHandle(PacketEnum.Invoke, InvokePacketHandle);
             }, async context =>
             {
                 if (!context.WebSockets.IsWebSocketRequest)
@@ -81,6 +82,29 @@ namespace NSL.SocketPhantom.AspNetCore
 
             if (hub.RequiredAuth)
                 action.WithMetadata(authAttribute);
+        }
+
+        public async Task SessionPacketHandle(PhantomHubClientProxy client, InputPacketBuffer data)
+        {
+            var path = data.ReadString();
+
+            client.Session = data.ReadString();
+
+            var sessionResultPacket = OutputPacketBuffer.Create(PacketEnum.SignInResult);
+
+            if (ProcessClient(client, path, out var hub))
+                sessionResultPacket.WriteByte(byte.MaxValue);
+            else if (hub == null)
+                sessionResultPacket.WriteByte((byte)SignStatusCodeEnum.ErrorPath);
+            else
+                sessionResultPacket.WriteByte((byte)SignStatusCodeEnum.ErrorSession);
+
+            client.Send(sessionResultPacket);
+        }
+
+        public async Task InvokePacketHandle(PhantomHubClientProxy client, InputPacketBuffer data)
+        {
+            await client.Hub.Invoke(client, data);
         }
 
         public BasePhantomHub GetHub(string relativeUrl)

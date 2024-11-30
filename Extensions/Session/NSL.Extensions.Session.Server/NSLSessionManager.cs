@@ -141,7 +141,7 @@ namespace NSL.Extensions.Session.Server
 
             keys = GenerateKeys();
 
-            client.Network.ChangeUserData(oldSession.Client);
+            client.Network.SetClientData(oldSession.Client);
 
             client.ChangeOwner(oldSession.Client);
 

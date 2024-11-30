@@ -71,6 +71,6 @@ namespace NSL.Node.P2Proxy.Client
             return builder;
         }
 
-        private ConcurrentDictionary<string, Lazy<ProxyRoomInfo>> roomMap = new();
+        private ConcurrentDictionary<string, Lazy<ProxyRoomInfo>> roomMap = new ConcurrentDictionary<string, Lazy<ProxyRoomInfo>>();
     }
 }

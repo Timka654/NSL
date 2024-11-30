@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NSL.Generators.FillTypeGenerator.Tests
+namespace NSL.Generators.SelectTypeGenerator.Tests
 {
     public partial class WithModelName2
     {

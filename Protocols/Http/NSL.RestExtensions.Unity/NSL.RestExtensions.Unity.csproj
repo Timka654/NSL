@@ -7,6 +7,7 @@
 		<Configurations>UnityDebug;Unity</Configurations>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<Nullable>disable</Nullable>
+		<Platforms>AnyCPU;ARM32;x86;ARM64;x64</Platforms>
 
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
 		<EmbedUntrackedSources>true</EmbedUntrackedSources>

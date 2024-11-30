@@ -8,7 +8,7 @@
 		<Nullable>disable</Nullable>
 		<IsPackable>false</IsPackable>
 		<Version>$(VersionSuffix)</Version>
-		<Configurations>Debug;Release;UnityDebug</Configurations>
+		<Configurations>DebugExamples;Debug;Release;UnityDebug;Unity</Configurations>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -24,6 +24,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\..\NSL.Generators.FillTypeGenerator.Attributes\NSL.Generators.FillTypeGenerator.Attributes.csproj" />
 		<ProjectReference Include="..\..\NSL.Generators.SelectTypeGenerator.Attributes\NSL.Generators.SelectTypeGenerator.Attributes.csproj" />
 		<ProjectReference Include="..\..\NSL.Generators.SelectTypeGenerator\NSL.Generators.SelectTypeGenerator.csproj" OutputItemType="Analyzer" />
 	</ItemGroup>

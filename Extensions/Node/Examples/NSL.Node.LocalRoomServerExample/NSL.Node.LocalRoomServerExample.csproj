@@ -5,12 +5,11 @@
 		<TargetFramework>net8.0</TargetFramework>
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
-		<Configurations>Debug;Release;Dev</Configurations>
+		<Configurations>DebugExamples;Debug;Release;UnityDebug;Unity</Configurations>
 	</PropertyGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\NSL.Node.RoomServer.AspNetCore\NSL.Node.RoomServer.AspNetCore.csproj" />
-		<ProjectReference Include="..\..\NSL.Node.RoomServer\NSL.Node.RoomServer.csproj" />
+	  <ProjectReference Include="..\..\ASPNET\NSL.Node.RoomServer.AspNetCore\NSL.Node.RoomServer.AspNetCore.csproj" />
 	</ItemGroup>
 
 </Project>

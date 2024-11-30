@@ -24,7 +24,7 @@ namespace NSL.Generators.BinaryGenerator
         public virtual string GetExistsWriteHandleCode(ISymbol symbol, string path, CodeBuilder codeBuilder) => default;
 
 
-        public virtual bool OpenTypeEntry(ISymbol symbol, string path, CodeBuilder codeBuilder) => true;
+        public virtual bool OpenTypeEntry(ISymbol symbol, string path, CodeBuilder codeBuilder, bool read) => true;
         public virtual void CloseTypeEntry(ISymbol symbol, string path) { }
     }
 }

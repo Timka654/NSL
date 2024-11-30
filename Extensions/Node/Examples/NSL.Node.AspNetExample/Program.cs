@@ -4,6 +4,7 @@ using NSL.Node.BridgeLobbyClient;
 using NSL.Node.BridgeLobbyClient.AspNetCore;
 using NSL.Node.BridgeServer;
 using NSL.Node.BridgeServer.LS;
+using NSL.Node.BridgeServer.Shared;
 
 namespace NSL.Node.AspNetExample
 {
@@ -66,7 +67,7 @@ namespace NSL.Node.AspNetExample
                 .WithAspLogger(logger)
                 .WithDefaultManagers(string.Empty)
                 .WithRoomServerAspBinding(builder, "/room_server")
-                .WithLobbyServerLocalBridgeBinding(out nodeLocalLobbyServerClient));
+                .WithLobbyServerLocalBridgeBinding(out nodeLocalLobbyServerClient, NodeNetworkHandles<LobbyServerNetworkClient>.Create()));
 
             builder.RunNodeBridgeLobbyLocalBridgeClient(nodeLocalLobbyServerClient);
 

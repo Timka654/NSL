@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NSL.Generators.FillTypeGenerator.Tests.NoEqMemberTypeWithEqNames
+namespace NSL.Generators.FillTypeGenerator.Tests
 {
     public enum DevEnum
     {

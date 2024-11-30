@@ -1,4 +1,5 @@
-﻿namespace NSL.Generators.FillTypeGenerator.Tests.Develop.Proxy
+﻿
+namespace NSL.Generators.FillTypeGenerator.Tests
 {
     internal class ProxyModel2
     {

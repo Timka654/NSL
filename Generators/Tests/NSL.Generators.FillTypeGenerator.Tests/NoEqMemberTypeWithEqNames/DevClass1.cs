@@ -1,15 +1,13 @@
 ﻿#if !DEVELOP
 
 using NSL.Generators.FillTypeGenerator.Attributes;
-using NSL.Generators.FillTypeGenerator.Tests.From;
-using NSL.Generators.FillTypeGenerator.Tests.NoEqMemberTypeWithEqNames;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NSL.Generators.FillTypeGenerator.Tests.Develop.NoEqMemberTypeWithEqNames
+namespace NSL.Generators.FillTypeGenerator.Tests
 {
     [FillTypeFromGenerate(typeof(DevClass2))]
     [FillTypeGenerate(typeof(DevClass3))]

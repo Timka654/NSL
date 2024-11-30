@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NSL.Generators.FillTypeGenerator.Tests.Develop.Cast
+namespace NSL.Generators.FillTypeGenerator.Tests
 {
     internal class CastContainer1
     {

@@ -13,7 +13,7 @@
 
 		<IsPackable>false</IsPackable>
 
-		<Configurations>Debug;Release;DebugExamples;ReleaseRoomServer;Dev</Configurations>
+		<Configurations>DebugExamples;Debug;Release;UnityDebug;Unity</Configurations>
 	</PropertyGroup>
 
 	<ItemGroup>

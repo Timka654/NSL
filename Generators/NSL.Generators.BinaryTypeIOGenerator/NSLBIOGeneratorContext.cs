@@ -54,7 +54,7 @@ namespace NSL.Generators.BinaryTypeIOGenerator
 
         List<string> typePath = new List<string>();
 
-        public override bool OpenTypeEntry(ISymbol __symbol, string path, CodeBuilder codeBuilder)
+        public override bool OpenTypeEntry(ISymbol __symbol, string path, CodeBuilder codeBuilder, bool read)
         {
             var symbol = CurrentMember ?? __symbol;
 
@@ -82,7 +82,9 @@ namespace NSL.Generators.BinaryTypeIOGenerator
 
                 Context.ShowBIODiagnostics("NSLBIO001", msg, DiagnosticSeverity.Error, loc.ToArray());
                 //codeBuilder.AppendComment($"Error {path}  {cycl.Item2} {cycl.Item3}");
-                codeBuilder.AppendLine($"return default({type.GetTypeFullName()});");
+
+                if (read)
+                    codeBuilder.AppendLine($"return default({type.GetTypeFullName()});");
 
                 return false;
             }

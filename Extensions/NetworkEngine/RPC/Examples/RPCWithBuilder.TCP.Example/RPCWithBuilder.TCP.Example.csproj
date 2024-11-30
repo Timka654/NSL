@@ -8,7 +8,7 @@
 		<Nullable>disable</Nullable>
 		<IsPackable>false</IsPackable>
 		<Version>$(VersionSuffix)</Version>
-		<Configurations>Debug;Release;DebugExamples;UnityDebug</Configurations>
+		<Configurations>DebugExamples;Debug;Release;UnityDebug;Unity</Configurations>
 	</PropertyGroup>
 
 	<ItemGroup>

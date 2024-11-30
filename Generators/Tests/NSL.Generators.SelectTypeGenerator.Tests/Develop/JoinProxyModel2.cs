@@ -1,6 +1,6 @@
 ﻿using NSL.Generators.SelectTypeGenerator.Attributes;
 
-namespace NSL.Generators.SelectTypeGenerator.Tests.Develop
+namespace NSL.Generators.SelectTypeGenerator.Tests
 {
     [SelectGenerateModelJoin("Get", "Get1", "Get2")]
     [SelectGenerateModelJoin("GetA", "Get1")]

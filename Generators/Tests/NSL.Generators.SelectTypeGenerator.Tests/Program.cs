@@ -1,8 +1,4 @@
-﻿
-
-using NSL.Generators.SelectTypeGenerator.Tests.Develop;
-
-namespace NSL.Generators.FillTypeGenerator.Tests
+﻿namespace NSL.Generators.SelectTypeGenerator.Tests
 {
     internal class Program
     {
@@ -37,11 +33,6 @@ namespace NSL.Generators.FillTypeGenerator.Tests
             bb.Selectmodel2().FirstOrDefault();
             bb.Selectmodel3().FirstOrDefault();
 
-            Test1Model tmodel1 = new Test1Model() { TestValue1 = "abcxaca", TestValue2 = "35t2452" };
-
-            Test2Model tmodel2 = new Test2Model() { };
-
-            tmodel1.FillTo(tmodel2);
 #endif
         }
     }

@@ -8,165 +8,6 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace NSLLibProjectFileFormatter
 {
-    public record ProjectFileInfo(string Path, string[] Profiles, string dir);
-
-    public class SolutionProject
-    {
-        public ProjectFileInfo Info { get; set; }
-
-        public Guid Id { get; internal set; }
-
-        public string Path { get; set; }
-
-        public string Name { get; set; }
-    }
-
-    public class SolutionProjectPath
-    {
-        public List<SolutionProject> Projects { get; set; } = new();
-
-        public string? Dir { get; set; }
-
-        public Guid Id { get; set; } = Guid.NewGuid();
-
-        public Dictionary<string, SolutionProjectPath> Pathes { get; set; } = new();
-
-        public SolutionProjectPath? Parent { get; set; }
-
-        public override string ToString()
-        => $"{Dir} (Parent = {Parent?.Dir ?? "{none}"})";
-    }
-
-    class SLNBuilder
-    {
-        private static SolutionProjectPath ProcessSolutionFolder(Dictionary<string, SolutionProjectPath> pathes, string pathDir)
-        {
-            if (!pathes.TryGetValue(pathDir, out var path))
-            {
-                path = new SolutionProjectPath() { Dir = pathDir.Split(Path.DirectorySeparatorChar).Last() };
-                pathes.Add(pathDir, path);
-
-                var pi = pathDir.LastIndexOf(Path.DirectorySeparatorChar);
-
-                if (pi > -1)
-                {
-                    pathDir = pathDir.Substring(0, pi);
-
-                    var cdir = ProcessSolutionFolder(pathes, pathDir);
-
-                    cdir.Pathes.TryAdd(pathDir, path);
-
-                    path.Parent = cdir;
-                }
-            }
-
-            return path;
-        }
-
-        private static string[] Archs = new string[] {
-            "Any CPU",
-            "x64",
-            "x86"
-        };
-
-        public static void BuildSln(string solutionPath, IEnumerable<ProjectFileInfo> projects, string[] availableProfiles)
-        {
-            availableProfiles = availableProfiles.OrderBy(x => x).ToArray();
-
-            var slnHeader = "Microsoft Visual Studio Solution File, Format Version 12.00\n# Visual Studio Version 17\nVisualStudioVersion = 17.12.35521.163\nMinimumVisualStudioVersion = 10.0.40219.1\n";
-            var slnProjects = new List<string>();
-            var slnConfigs = new List<string>();
-            var slnProjectConfigs = new List<string>();
-            //var folderGuids = new Dictionary<string, string>();
-            var nestedProjects = new List<string>();
-
-            Dictionary<string, SolutionProjectPath> pathes = new Dictionary<string, SolutionProjectPath>();
-
-            List<SolutionProjectPath> cpDirs = new();
-
-            // Генерируем GUID для папок
-            foreach (var projectPath in projects)
-            {
-                string projectName = Path.GetFileNameWithoutExtension(projectPath.Path);
-                string relativePath = Path.GetRelativePath(Path.GetDirectoryName(solutionPath), projectPath.Path);
-
-
-                var dir = ProcessSolutionFolder(pathes, projectPath.dir);
-
-                var proj = new SolutionProject()
-                {
-                    Info = projectPath,
-                    Id = Guid.NewGuid(),
-                    Path = relativePath,
-                    Name = projectName
-                };
-
-                dir.Projects.Add(proj);
-            }
-
-            // Генерируем проекты
-            foreach (var projectPath in pathes.SelectMany(x => x.Value.Projects))
-            {
-                // Формируем блок для проекта
-                slnProjects.Add($@"Project(""{{9A19103F-16F7-4668-BE54-9A1E7A4F7556}}"") = ""{projectPath.Name}"", ""{projectPath.Path}"", ""{{{projectPath.Id}}}""
-EndProject");
-
-                foreach (var profile in availableProfiles)
-                {
-                    foreach (var arch in Archs)
-                    {
-                        slnProjectConfigs.Add($@"{{{projectPath.Id}}}.{profile}|{arch}.ActiveCfg = {profile}|Any CPU");
-                        if (projectPath.Info.Profiles.Contains(profile))
-                            slnProjectConfigs.Add($@"{{{projectPath.Id}}}.{profile}|{arch}.Build.0 = {profile}|Any CPU");
-                    }
-                }
-            }
-
-            foreach (var item in pathes.Values)
-            {
-                slnProjects.Add($@"Project(""{{2150E333-8FDC-42A3-9474-1A3956D46DE8}}"") = ""{item.Dir}"", ""{item.Dir}"", ""{{{item.Id}}}""
-EndProject");
-            }
-
-            foreach (var dir in pathes.Values)
-            {
-                if (dir.Parent != null)
-                    nestedProjects.Add($@"{{{dir.Id}}} = {{{dir.Parent.Id}}}");
-
-                foreach (var proj in dir.Projects)
-                {
-                    nestedProjects.Add($@"{{{proj.Id}}} = {{{dir.Id}}}");
-                }
-            }
-
-            foreach (var profile in availableProfiles)
-            {
-                foreach (var arch in Archs)
-                {
-                    slnConfigs.Add($@"{profile}|{arch} = {profile}|{arch}");
-                }
-            }
-
-            // Формируем итоговый .sln
-            var slnContent = slnHeader +
-                             string.Join("\n", slnProjects) +
-                             "\nGlobal\n" +
-                             "\tGlobalSection(SolutionConfigurationPlatforms) = preSolution\n" +
-                             string.Join("\n", slnConfigs.Select(cfg => $"\t\t{cfg}")) +
-                             "\n\tEndGlobalSection\n" +
-                             "\n\tGlobalSection(ProjectConfigurationPlatforms) = postSolution\n" +
-                             string.Join("\n", slnProjectConfigs.Select(cfg => $"\t\t{cfg}")) +
-                             "\n\tEndGlobalSection\n" +
-                             "\tGlobalSection(NestedProjects) = preSolution\n" +
-                             string.Join("\n", nestedProjects.Select(x=> $"\t\t{x}")) +
-                             "\n\tEndGlobalSection\n" +
-                             "EndGlobal";
-
-            File.WriteAllText(solutionPath, slnContent);
-            Console.WriteLine($"Solution file created at: {solutionPath}");
-        }
-    }
-
     internal partial class Formatter
     {
         [GeneratedRegex(@"\s*<Project\sSdk\s*=\s*""(\S*)""\s*>")]
@@ -221,7 +62,7 @@ EndProject");
         {
             this.path = path;
 
-            slnPath = Path.Combine(this.path, "Dev.sln");
+            slnPath = Path.Combine(this.path, "NSL.sln");
         }
 
         public void Run()
@@ -237,7 +78,6 @@ EndProject");
             }
 
             SLNBuilder.BuildSln(slnPath, projects, new string[] { "Debug", "Release", "DebugExamples", "Unity", "UnityDebug" });
-            SLNBuilder.BuildSln(slnPath + ".dev", projects, new string[] { "Debug", "Release", "DebugExamples", "Unity", "UnityDebug" });
         }
 
         private List<ProjectFileInfo> projects = new List<ProjectFileInfo>();
@@ -258,6 +98,17 @@ EndProject");
 
         void BuildNewProjectFile(string path, string[] currentContent)
         {
+
+            //if (path.Contains("Generator"))
+            //{
+            //    return;
+            //}
+
+            //if (path.Contains("Refactor"))
+            //{
+            //    return;
+            //}
+
 
             var outputType = GetGroupValue(FindGroupsByRegex(currentContent, GetProjectOutputTypeRegex()));
 
@@ -311,6 +162,13 @@ EndProject");
 
             var embeddedResourceItems = FindAllByRegex(fileContent, GetEmbeddedResourceRegex());
 
+            //if (unityOnly)
+            //    return;
+            //if (aspNetOnly)
+            //{
+            //    return;
+            //}
+
             tb.WriteProjectRoot(sdk, () =>
             {
                 tb.WritePropertyGroup(() =>
@@ -343,6 +201,7 @@ EndProject");
                             NSLProjectTypes.Add("UnityReference");
                     }
 
+
                     var tf = "net8.0";
 
                     if (HasUnityTarget(NSLProjectTypes))
@@ -362,7 +221,8 @@ EndProject");
                     tb.AppendLine($"<TargetFramework>{tf}</TargetFramework>")
                       .AppendLine($"<Configurations>{string.Join(';', configurations)}</Configurations>")
                       .AppendLine("<AllowUnsafeBlocks>true</AllowUnsafeBlocks>")
-                      .AppendLine("<Nullable>disable</Nullable>");
+                      .AppendLine("<Nullable>disable</Nullable>")
+                      .AppendLine("<Platforms>AnyCPU;ARM32;x86;ARM64;x64</Platforms>");
 
                     if (aspNetOnly)
                         tb.AppendLine("<IsPackable>true</IsPackable>")
@@ -653,6 +513,13 @@ EndProject");
         public bool HasTemplateType(List<string> types)
         {
             return types.Contains("Template");
+        }
+
+        private bool IsVsix(string path)
+        { 
+            var name = new FileInfo(path).Name;
+
+            return name.Contains(".Vsix", StringComparison.OrdinalIgnoreCase);
         }
 
         private bool hasUnityInProjectName(string path)
