@@ -58,6 +58,8 @@ namespace NSLLibProjectFileFormatter
         private readonly string path;
         private readonly string slnPath;
 
+        private string[] AvailableConfigurations = new string[] { "Debug", "Release", "DebugExamples", "Unity", "UnityDebug" };
+
         public Formatter(string path)
         {
             this.path = path;
@@ -77,7 +79,7 @@ namespace NSLLibProjectFileFormatter
                 processDirectory(d);
             }
 
-            SLNBuilder.BuildSln(slnPath, projects, new string[] { "Debug", "Release", "DebugExamples", "Unity", "UnityDebug" });
+            SLNBuilder.BuildSln(slnPath, projects, AvailableConfigurations);
         }
 
         private List<ProjectFileInfo> projects = new List<ProjectFileInfo>();
@@ -98,18 +100,6 @@ namespace NSLLibProjectFileFormatter
 
         void BuildNewProjectFile(string path, string[] currentContent)
         {
-
-            //if (path.Contains("Generator"))
-            //{
-            //    return;
-            //}
-
-            //if (path.Contains("Refactor"))
-            //{
-            //    return;
-            //}
-
-
             var outputType = GetGroupValue(FindGroupsByRegex(currentContent, GetProjectOutputTypeRegex()));
 
             var NSLTypes = FindAllLinesByRegex(currentContent, GetProjectNSLTypes()).FirstOrDefault();
@@ -118,13 +108,22 @@ namespace NSLLibProjectFileFormatter
 
             List<string> configurations = new List<string> { "DebugExamples" };
 
-            if (Equals(outputType, "Exe") 
-                || HasTest(NSLProjectTypes) 
-                || HasExternal(NSLProjectTypes) 
-                || hasVsixInProjectName(path) 
+            if (Equals(outputType, "Exe")
+                || HasTest(NSLProjectTypes)
+                || HasExternal(NSLProjectTypes)
+                || hasVsixInProjectName(path)
                 || IsTestOExample(path))
             {
+                if (HasExternal(NSLProjectTypes))
+                {
+                    configurations.AddRange(new string[] { "Debug", "Release" });
+
+                    if (HasUnitySupport(NSLProjectTypes))
+                        configurations.AddRange(new[] { "UnityDebug", "Unity" });
+                }
+
                 projects.Add(new ProjectFileInfo(path, configurations.ToArray(), Path.GetRelativePath(this.path, Path.GetDirectoryName(path) + "/..")));
+
                 return;
             }
 
@@ -161,13 +160,6 @@ namespace NSLLibProjectFileFormatter
             var compileItems = FindAllByRegex(fileContent, GetCompileRegex());
 
             var embeddedResourceItems = FindAllByRegex(fileContent, GetEmbeddedResourceRegex());
-
-            //if (unityOnly)
-            //    return;
-            //if (aspNetOnly)
-            //{
-            //    return;
-            //}
 
             tb.WriteProjectRoot(sdk, () =>
             {
@@ -219,10 +211,9 @@ namespace NSLLibProjectFileFormatter
 
 
                     tb.AppendLine($"<TargetFramework>{tf}</TargetFramework>")
-                      .AppendLine($"<Configurations>{string.Join(';', configurations)}</Configurations>")
+                      .AppendLine($"<Configurations>{string.Join(';', AvailableConfigurations)}</Configurations>")
                       .AppendLine("<AllowUnsafeBlocks>true</AllowUnsafeBlocks>")
-                      .AppendLine("<Nullable>disable</Nullable>")
-                      .AppendLine("<Platforms>AnyCPU;ARM32;x86;ARM64;x64</Platforms>");
+                      .AppendLine("<Nullable>disable</Nullable>");
 
                     if (aspNetOnly)
                         tb.AppendLine("<IsPackable>true</IsPackable>")
@@ -516,7 +507,7 @@ namespace NSLLibProjectFileFormatter
         }
 
         private bool IsVsix(string path)
-        { 
+        {
             var name = new FileInfo(path).Name;
 
             return name.Contains(".Vsix", StringComparison.OrdinalIgnoreCase);
@@ -563,9 +554,9 @@ namespace NSLLibProjectFileFormatter
         {
             var name = new FileInfo(path).Name;
 
-            return name.Contains("AspNet", StringComparison.OrdinalIgnoreCase) 
-                || name.Contains("Blazor", StringComparison.OrdinalIgnoreCase) 
-                || sdk.Equals("Microsoft.NET.Sdk.Web", StringComparison.OrdinalIgnoreCase) 
+            return name.Contains("AspNet", StringComparison.OrdinalIgnoreCase)
+                || name.Contains("Blazor", StringComparison.OrdinalIgnoreCase)
+                || sdk.Equals("Microsoft.NET.Sdk.Web", StringComparison.OrdinalIgnoreCase)
                 || sdk.Equals("Microsoft.NET.Sdk.Razor", StringComparison.OrdinalIgnoreCase);
         }
 

@@ -4,10 +4,9 @@
 		<NSLProjectTypes>UnityTarget;UnitySupport;UnityReference</NSLProjectTypes>
 
 		<TargetFramework>net8.0</TargetFramework>
-		<Configurations>UnityDebug;Unity</Configurations>
+		<Configurations>Debug;Release;DebugExamples;Unity;UnityDebug</Configurations>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<Nullable>disable</Nullable>
-		<Platforms>AnyCPU;ARM32;x86;ARM64;x64</Platforms>
 
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
 		<EmbedUntrackedSources>true</EmbedUntrackedSources>

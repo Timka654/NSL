@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<NSLProjectTypes>External</NSLProjectTypes>
+		<NSLProjectTypes>External UnitySupport</NSLProjectTypes>
 		<TargetFrameworks>netstandard2.1</TargetFrameworks>
 		<Platforms>AnyCPU;x64;x86</Platforms>
 		<PackageId>Open.Nat</PackageId>
@@ -23,4 +23,13 @@
 		<Compile Remove="Upnp\Messages\Responses\AddPortMappingResponseMessage.cs" />
 		<Compile Remove="Upnp\Messages\Responses\DeletePortMappingResponseMessage.cs" />
 	</ItemGroup>
+
+	<PropertyGroup Condition="'$(Configuration)'=='UnityDebug'">
+		<AssemblyName>Unity.$(MSBuildProjectName)</AssemblyName>
+		<DefineConstants>DEBUG;TRACE</DefineConstants>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)'=='Unity'">
+		<AssemblyName>Unity.$(MSBuildProjectName)</AssemblyName>
+	</PropertyGroup>
 </Project>
