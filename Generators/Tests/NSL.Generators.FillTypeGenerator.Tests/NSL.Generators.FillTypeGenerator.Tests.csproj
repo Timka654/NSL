@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
+		<NSLProjectTypes>Test</NSLProjectTypes>
 		<OutputType>Exe</OutputType>
 		<TargetFramework>net8.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
@@ -11,15 +12,15 @@
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-	  <DefineConstants>$(DefineConstants);DEVELOP</DefineConstants>
+		<DefineConstants>$(DefineConstants);DEVELOP</DefineConstants>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='UnityDebug|AnyCPU'">
-	  <DefineConstants>$(DefineConstants);DEVELOP</DefineConstants>
+		<DefineConstants>$(DefineConstants);DEVELOP</DefineConstants>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-	  <DefineConstants>$(DefineConstants);DEVELOP</DefineConstants>
+		<DefineConstants>$(DefineConstants);DEVELOP</DefineConstants>
 	</PropertyGroup>
 
 	<ItemGroup>

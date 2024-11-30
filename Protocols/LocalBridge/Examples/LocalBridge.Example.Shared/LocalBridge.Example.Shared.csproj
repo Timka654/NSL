@@ -1,18 +1,19 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
+	<PropertyGroup>
+		<NSLProjectTypes>Example</NSLProjectTypes>
+		<TargetFramework>net8.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>disable</Nullable>
 		<Configurations>Debug;Release;UnityDebug</Configurations>
-  </PropertyGroup>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\TCP\BuilderExtensions\NSL.BuilderExtensions.TCPClient\NSL.BuilderExtensions.TCPClient.csproj" />
-    <ProjectReference Include="..\..\..\TCP\BuilderExtensions\NSL.BuilderExtensions.TCPServer\NSL.BuilderExtensions.TCPServer.csproj" />
-    <ProjectReference Include="..\..\..\TCP\NSL.TCP.Client\NSL.TCP.Client.csproj" />
-    <ProjectReference Include="..\..\..\TCP\NSL.TCP.Server\NSL.TCP.Server.csproj" />
-    <ProjectReference Include="..\..\NSL.LocalBridge\NSL.LocalBridge.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\..\..\TCP\BuilderExtensions\NSL.BuilderExtensions.TCPClient\NSL.BuilderExtensions.TCPClient.csproj" />
+		<ProjectReference Include="..\..\..\TCP\BuilderExtensions\NSL.BuilderExtensions.TCPServer\NSL.BuilderExtensions.TCPServer.csproj" />
+		<ProjectReference Include="..\..\..\TCP\NSL.TCP.Client\NSL.TCP.Client.csproj" />
+		<ProjectReference Include="..\..\..\TCP\NSL.TCP.Server\NSL.TCP.Server.csproj" />
+		<ProjectReference Include="..\..\NSL.LocalBridge\NSL.LocalBridge.csproj" />
+	</ItemGroup>
 
 </Project>

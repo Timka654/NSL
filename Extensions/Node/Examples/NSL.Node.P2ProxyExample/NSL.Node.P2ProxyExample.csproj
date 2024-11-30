@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
+		<NSLProjectTypes>Example</NSLProjectTypes>
 		<OutputType>Exe</OutputType>
 		<TargetFramework>net8.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
@@ -22,7 +23,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\..\NSL.Node.P2Proxy\NSL.Node.P2Proxy.csproj" />
+		<ProjectReference Include="..\..\NSL.Node.P2Proxy\NSL.Node.P2Proxy.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

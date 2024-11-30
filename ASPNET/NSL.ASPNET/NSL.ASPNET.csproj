@@ -4,7 +4,7 @@
 		<NSLProjectTypes>ASPTarget</NSLProjectTypes>
 
 		<TargetFramework>net8.0</TargetFramework>
-		<Configurations>Debug;Release;DebugExamples;Unity;UnityDebug</Configurations>
+		<Configurations>DebugExamples;Debug;Release</Configurations>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<Nullable>disable</Nullable>
 		<IsPackable>true</IsPackable>
@@ -22,7 +22,6 @@
 	<PropertyGroup Condition="'$(Configuration)'=='Debug'">
 		<PackageId>$(MSBuildProjectName)_Debug</PackageId>
 	</PropertyGroup>
-
 	<ItemGroup>
 		<PackageReference Include="HtmlAgilityPack" Version="1.11.67" />
 	</ItemGroup>

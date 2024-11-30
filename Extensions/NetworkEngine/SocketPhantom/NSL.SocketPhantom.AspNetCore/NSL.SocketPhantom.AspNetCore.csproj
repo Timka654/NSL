@@ -4,7 +4,7 @@
 		<NSLProjectTypes>ASPTarget</NSLProjectTypes>
 
 		<TargetFramework>net8.0</TargetFramework>
-		<Configurations>Debug;Release;DebugExamples;Unity;UnityDebug</Configurations>
+		<Configurations>DebugExamples;Debug;Release</Configurations>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<Nullable>disable</Nullable>
 		<IsPackable>true</IsPackable>
@@ -31,7 +31,6 @@
 		<ProjectReference Include="..\..\..\..\Core\NSL.SocketServer\NSL.SocketServer.csproj" />
 		<ProjectReference Include="..\..\..\..\Protocols\WebSockets\BuilderExtensions\NSL.BuilderExtensions.WebSocketsServer.AspNet\NSL.BuilderExtensions.WebSocketsServer.AspNet.csproj" />
 		<ProjectReference Include="..\..\..\..\Protocols\WebSockets\BuilderExtensions\NSL.BuilderExtensions.WebSocketsServer\NSL.BuilderExtensions.WebSocketsServer.csproj" />
-		<ProjectReference Include="..\..\..\..\Protocols\WebSockets\Examples\Builder.WebSockets.AspNetCoreIntegrationExample\Builder.WebSockets.AspNetCoreIntegrationExample.csproj" />
 		<ProjectReference Include="..\..\..\..\Protocols\WebSockets\NSL.WebSockets.Server.AspNetPoint\NSL.WebSockets.Server.AspNetPoint.csproj" />
 		<ProjectReference Include="..\NSL.SocketPhantom\NSL.SocketPhantom.csproj" />
 	</ItemGroup>

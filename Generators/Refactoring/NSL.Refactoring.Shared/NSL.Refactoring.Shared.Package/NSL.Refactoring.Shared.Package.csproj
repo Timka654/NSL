@@ -1,42 +1,40 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>netstandard2.0</TargetFramework>
+		<NSLProjectTypes>UnitySupport</NSLProjectTypes>
+
+		<TargetFramework>net8.0</TargetFramework>
+		<Configurations>DebugExamples;Debug;Release;UnityDebug;Unity</Configurations>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<Nullable>disable</Nullable>
-		
-		<IncludeBuildOutput>false</IncludeBuildOutput>
+
+		<PublishRepositoryUrl>true</PublishRepositoryUrl>
+		<EmbedUntrackedSources>true</EmbedUntrackedSources>
+		<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+		<GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
 		<SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
-		
-		<DevelopmentDependency>true</DevelopmentDependency>
-		<NoPackageAnalysis>true</NoPackageAnalysis>
 
-		<TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);_AddAnalyzersToOutput</TargetsForTfmSpecificContentInPackage>
-
-
-
-		<PackageId>NSL.Refactoring.Shared</PackageId>
 		<Version>$(VersionSuffix)</Version>
 		<Authors>Relife87</Authors>
-		<Description>
-			Must contains "NSLGen.options" file in solution/project directory(can override solution options from project directory NSLGen.options file)<br />
-			shared_project_name* - project name for store shared types
-			shared_request_models_rel_path? - request models path(has contains RequestModel in type name)
-			shared_response_models_rel_path? - response models path(has contains ResponseModel in type name)
-			shared_data_models_rel_path? - data models path(has contains DataModel in type name)
-			shared_entity_models_rel_path? - entity models path(has contains EntityModel in type name)
-			shared_models_rel_path? - models path(has contains Model in type name)
-		</Description>
-		<Configurations>Debug;Release;UnityDebug</Configurations>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)'=='Debug'">
+		<PackageId>$(MSBuildProjectName)_Debug</PackageId>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)'=='UnityDebug'">
+		<AssemblyName>Unity.$(MSBuildProjectName)</AssemblyName>
+		<TargetFramework>netstandard2.1</TargetFramework>
+		<DefineConstants>DEBUG;TRACE</DefineConstants>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)'=='Unity'">
+		<AssemblyName>Unity.$(MSBuildProjectName)</AssemblyName>
+		<TargetFramework>netstandard2.1</TargetFramework>
 	</PropertyGroup>
 
 	<ItemGroup>
 		<ProjectReference Include="..\NSL.Refactoring.Shared\NSL.Refactoring.Shared.csproj" />
 	</ItemGroup>
-
-	<Target Name="_AddAnalyzersToOutput">
-		<ItemGroup>
-			<TfmSpecificPackageFile Include="$(OutputPath)\NSL.Refactoring.Shared.dll" PackagePath="analyzers/dotnet/cs" />
-		</ItemGroup>
-	</Target>
 
 </Project>

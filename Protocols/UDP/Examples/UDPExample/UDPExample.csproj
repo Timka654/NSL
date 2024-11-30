@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
+		<NSLProjectTypes>Example</NSLProjectTypes>
 		<Configurations>Debug;Release;Unity;UnityDebug;DebugStable;DebugExamples</Configurations>
 		<OutputType>Library</OutputType>
 		<TargetFramework>net8.0</TargetFramework>
@@ -10,7 +11,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\..\NSL.UDP.Client\NSL.UDP.Client.csproj" />
+		<ProjectReference Include="..\..\NSL.UDP.Client\NSL.UDP.Client.csproj" />
 	</ItemGroup>
 
 </Project>

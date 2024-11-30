@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
 	<PropertyGroup>
+		<NSLProjectTypes>Test</NSLProjectTypes>
 		<OutputType>Library</OutputType>
 		<TargetFramework>net8.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
@@ -8,25 +9,25 @@
 		<IsPackable>false</IsPackable>
 		<Version>$(VersionSuffix)</Version>
 		<Configurations>Debug;Release;UnityDebug</Configurations>
-		
+
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-	  <DefineConstants>$(DefineConstants);DEVELOP</DefineConstants>
+		<DefineConstants>$(DefineConstants);DEVELOP</DefineConstants>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='UnityDebug|AnyCPU'">
-	  <DefineConstants>$(DefineConstants);DEVELOP</DefineConstants>
+		<DefineConstants>$(DefineConstants);DEVELOP</DefineConstants>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-	  <DefineConstants>$(DefineConstants);DEVELOP</DefineConstants>
+		<DefineConstants>$(DefineConstants);DEVELOP</DefineConstants>
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\..\..\..\ASPNET\NSL.ASPNET\NSL.ASPNET.csproj" />
-	  <ProjectReference Include="..\..\..\..\Protocols\Http\NSL.HttpClient\NSL.HttpClient.csproj" />
-	  <ProjectReference Include="..\..\..\NSL.Generators.HttpEndPointGenerator.Shared\NSL.Generators.HttpEndPointGenerator.Shared.csproj" />
+		<ProjectReference Include="..\..\..\..\ASPNET\NSL.ASPNET\NSL.ASPNET.csproj" />
+		<ProjectReference Include="..\..\..\..\Protocols\Http\NSL.HttpClient\NSL.HttpClient.csproj" />
+		<ProjectReference Include="..\..\..\NSL.Generators.HttpEndPointGenerator.Shared\NSL.Generators.HttpEndPointGenerator.Shared.csproj" />
 	</ItemGroup>
 
 </Project>

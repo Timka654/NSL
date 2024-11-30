@@ -1,10 +1,10 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<NSLProjectTypes>UnitySupport</NSLProjectTypes>
 
 		<TargetFramework>net8.0</TargetFramework>
-		<Configurations>Debug;Release;DebugExamples;Unity;UnityDebug</Configurations>
+		<Configurations>DebugExamples;Debug;Release;UnityDebug;Unity</Configurations>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<Nullable>disable</Nullable>
 

@@ -4,7 +4,7 @@
 		<NSLProjectTypes>ASPNET</NSLProjectTypes>
 
 		<TargetFramework>net8.0</TargetFramework>
-		<Configurations>Debug;Release;DebugExamples;Unity;UnityDebug</Configurations>
+		<Configurations>DebugExamples;Debug;Release</Configurations>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<Nullable>disable</Nullable>
 

@@ -1,16 +1,24 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
+		<NSLProjectTypes>UnitySupport</NSLProjectTypes>
+
 		<TargetFramework>net8.0</TargetFramework>
-		<Configurations>Debug;Release;Unity;UnityDebug;DebugExamples;Dev</Configurations>
+		<Configurations>DebugExamples;Debug;Release;UnityDebug;Unity</Configurations>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<Nullable>disable</Nullable>
 
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
 		<EmbedUntrackedSources>true</EmbedUntrackedSources>
 		<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
 		<GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
 
-		<Authors>Relife87</Authors>
 		<Version>$(VersionSuffix)</Version>
+		<Authors>Relife87</Authors>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)'=='Debug'">
+		<PackageId>$(MSBuildProjectName)_Debug</PackageId>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)'=='UnityDebug'">
@@ -24,12 +32,11 @@
 		<TargetFramework>netstandard2.1</TargetFramework>
 	</PropertyGroup>
 
-
 	<ItemGroup>
-	  <ProjectReference Include="..\..\..\Generators\NSL.Generators.BinaryTypeIOGenerator.Attributes\NSL.Generators.BinaryTypeIOGenerator.Attributes.csproj" />
-	  <ProjectReference Include="..\..\..\Generators\NSL.Generators.BinaryTypeIOGenerator\NSL.Generators.BinaryTypeIOGenerator.csproj" OutputItemType="Analyzer" />
-	  <ProjectReference Include="..\..\..\Protocols\UDP\NSL.UDP\NSL.UDP.csproj" />
-	  <ProjectReference Include="..\..\Session\NSL.Extensions.Session\NSL.Extensions.Session.csproj" />
+		<ProjectReference Include="..\..\..\Generators\NSL.Generators.BinaryTypeIOGenerator.Attributes\NSL.Generators.BinaryTypeIOGenerator.Attributes.csproj" />
+		<ProjectReference Include="..\..\..\Generators\NSL.Generators.BinaryTypeIOGenerator\NSL.Generators.BinaryTypeIOGenerator.csproj" OutputItemType="Analyzer" />
+		<ProjectReference Include="..\..\..\Protocols\UDP\NSL.UDP\NSL.UDP.csproj" />
+		<ProjectReference Include="..\..\Session\NSL.Extensions.Session\NSL.Extensions.Session.csproj" />
 	</ItemGroup>
 
 </Project>
