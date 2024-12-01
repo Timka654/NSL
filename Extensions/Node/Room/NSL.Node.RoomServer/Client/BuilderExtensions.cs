@@ -28,9 +28,5 @@ namespace NSL.Node.RoomServer.Client
         public static NodeRoomServerEntryBuilder WithWSClientServerBinding(this NodeRoomServerEntryBuilder builder, string bindingPoint, NodeNetworkHandles<TransportNetworkClient> handles,
             string logPrefix = null)
             => builder.WithClientServerListener(new ClientWSServerEntry(builder.Entry, handles, bindingPoint, logPrefix));
-
-        public static NodeRoomServerEntryBuilder WithTCPClientServerBinding(this NodeRoomServerEntryBuilder builder, int bindingPort, NodeNetworkHandles<TransportNetworkClient> handles,
-            string logPrefix = null)
-            => builder.WithClientServerListener(new ClientTcpServerEntry(builder.Entry, handles, bindingPort, logPrefix));
     }
 }

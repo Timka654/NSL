@@ -23,6 +23,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <ProjectReference Include="..\..\Room\NSL.Node.RoomServer.TCP\NSL.Node.RoomServer.TCP.csproj" />
 	  <ProjectReference Include="..\..\Room\NSL.Node.RoomServer\NSL.Node.RoomServer.csproj" />
 	</ItemGroup>
 
