@@ -1,4 +1,5 @@
-﻿using NSL.SocketCore;
+﻿using Microsoft.Extensions.ObjectPool;
+using NSL.SocketCore;
 using NSL.SocketCore.Utils;
 using NSL.SocketCore.Utils.Buffer;
 using NSL.SocketCore.Utils.Cipher;
@@ -66,6 +67,7 @@ namespace NSL.TCP
 
         protected CoreOptions<TClient> options;
         private readonly bool legacyTransport;
+        private uint segmentSize;
         private Dictionary<ushort, CoreOptions<TClient>.PacketHandle> PacketHandles;
 
         public IPEndPoint GetRemotePoint()
@@ -73,22 +75,25 @@ namespace NSL.TCP
             return endPoint;
         }
 
-        protected void RunReceive()
+        protected async void RunReceive()
         {
+            segmentSize = Options.SegmentSize;
+
             disconnected = false;
 
             PacketHandles = options.GetHandleMap();
 
             if (!legacyTransport)
             {
-                SendRPData();
+                if (!await SendRPData())
+                    return;
 
-                ReceiveRPDataAsync(() =>
-                {
-                    startSend();
+                if (!await ReceiveRPDataAsync())
+                    return;
 
-                    asyncReceive();
-                });
+                startSend();
+
+                asyncReceive();
 
                 return;
             }
@@ -99,6 +104,7 @@ namespace NSL.TCP
 
             threadReceive();
         }
+
 
         private void asyncReceive()
         {
@@ -164,7 +170,7 @@ namespace NSL.TCP
 
         uint rpSegmentSize = 0;
 
-        protected void SendRPData()
+        protected async Task<bool> SendRPData()
         {
             var data = new byte[2048];
 
@@ -177,19 +183,38 @@ namespace NSL.TCP
                 if (sclient == null)
                 {
                     Disconnect();
-                    return;
+                    return false;
                 }
 
-                sclient.Send(data);
+                int offset = 0;
+
+                do
+                {
+                    var r = await sclient.SendAsync(new ArraySegment<byte>(data, offset, data.Length - offset), SocketFlags.None);
+
+                    if (r < 1)
+                    {
+                        Disconnect();
+                        return false;
+                    }
+
+                    offset += r;
+                } while (offset < data.Length);
+
+                return true;
 
             }
+            catch (NullReferenceException) { Disconnect(); }
+            catch (ObjectDisposedException) { Disconnect(); }
             catch (Exception ex)
             {
                 Disconnect(new ConnectionLostException(GetRemotePoint(), false, ex));
             }
+
+            return false;
         }
 
-        protected async void ReceiveRPDataAsync(Action onReceive)
+        protected async Task<bool> ReceiveRPDataAsync()
         {
             var receive = new byte[2048];
 
@@ -202,17 +227,27 @@ namespace NSL.TCP
                 {
                     int r = await sclient.ReceiveAsync(new ArraySegment<byte>(receive, offset, receive.Length - offset), SocketFlags.None);
 
+                    if (r < 1)
+                    {
+                        Disconnect();
+                        return false;
+                    }
+
                     offset += r;
                 } while (offset < receive.Length);
 
                 rpSegmentSize = BitConverter.ToUInt32(receive, 0);
 
-                onReceive();
+                return true;
             }
+            catch (NullReferenceException) { Disconnect(); }
+            catch (ObjectDisposedException) { Disconnect(); }
             catch (Exception ex)
             {
                 Disconnect(new ConnectionLostException(GetRemotePoint(), true, ex));
             }
+
+            return false;
         }
 
         #endregion
@@ -505,31 +540,57 @@ namespace NSL.TCP
         private Channel<byte[]> sendChannel = Channel.CreateUnbounded<byte[]>();
 
         private SocketAsyncEventArgs sendArgs;
+        ChannelReader<byte[]> sendChannelReader;
 
         private async void startSend()
         {
+            sendChannelReader = sendChannel.Reader;
+
             sendArgs = new SocketAsyncEventArgs()
             {
                 SocketError = SocketError.Success,
-                BufferList = new List<ArraySegment<byte>>()
+                BufferList = new List<ArraySegment<byte>>(),
+                UserToken = false
             };
 
-            sendArgs.Completed += async (s, e) =>
-            {
-                while (!await sendProc(e)) { }
-            };
+            sendArgs.Completed += sendBufHandle;
 
             while (!await sendProc(sendArgs)) { }
+        }
+        public int maxSendTime = 0;
+
+        private int spc = 0;
+
+        static ObjectPool<SocketAsyncEventArgs> sendBufferPool = ObjectPool.Create<SocketAsyncEventArgs>();
+
+        private async void sendBufHandle(object s, SocketAsyncEventArgs e)
+        {
+            while (!await sendProc(e)) { }
+        }
+
+        private void returnBufferPool(SocketAsyncEventArgs args)
+        {
+            args.Completed -= sendBufHandle;
+            Interlocked.Decrement(ref spc);
+            sendBufferPool.Return(args);
         }
 
         private async Task<bool> sendProc(SocketAsyncEventArgs args)
         {
+            bool pooledObject = ((bool)args.UserToken);
+
             byte[] buf = null;
 
             try
             {
                 if (args.SocketError != SocketError.Success)
                 {
+                    Data?.OnPacketSendFail(args.BufferList[0].Array, 0, args.BufferList[0].Count);
+
+                    if (pooledObject)
+                    {
+                        returnBufferPool(args);
+                    }
                     Disconnect();
                     return true;
                 }
@@ -539,27 +600,43 @@ namespace NSL.TCP
                 if (disconnected || sclient == null)
                     return true;
 
-                var reader = sendChannel.Reader;
 
-                if (!reader.TryPeek(out buf))
-                    buf = await reader.ReadAsync();
 
-                ArraySegment<byte> sndBuffer = outputCipher.Encode(buf, 0, buf.Length);
+                if (pooledObject)
+                {
+                    if (!sendChannelReader.TryRead(out buf))
+                    {
+                        returnBufferPool(args);
+                        return true;
+                    }
+                }
+                else
+                {
+                    if (!sendChannelReader.TryRead(out buf))
+                        buf = await sendChannelReader.ReadAsync();
+                }
 
-                args.BufferList.Clear();
 
-                args.BufferList.Add(sndBuffer);
+                bool r = sendBuf(buf, args);
 
-                int s = (int)(sndBuffer.Count % rpSegmentSize);
+                if (!pooledObject)
+                {
+                    while (sendChannelReader.TryRead(out buf))
+                    {
+                        args = sendBufferPool.Get();
+                        args.BufferList = new List<ArraySegment<byte>>();
+                        args.Completed += sendBufHandle;
+                        args.UserToken = true;
 
-                s = (int)(rpSegmentSize - s);
 
-                if (s > 0)
-                    args.BufferList.Add(new ArraySegment<byte>(emptyArray, 0, s));
+                        Interlocked.Increment(ref spc);
+                        sendBuf(buf, args);
+                    }
+                }
 
-                args.BufferList = args.BufferList;
+                buf = null;
 
-                return sclient.SendAsync(args);
+                return r;
             }
             catch (NullReferenceException) { Disconnect(); }
             catch (ObjectDisposedException) { Disconnect(); }
@@ -574,6 +651,30 @@ namespace NSL.TCP
             }
 
             return true;
+        }
+
+        private bool sendBuf(byte[] buf, SocketAsyncEventArgs args)
+        {
+
+            var pid = BitConverter.ToUInt16(buf, 4);
+
+            ArraySegment<byte> sndBuffer = outputCipher.Encode(buf, 0, buf.Length);
+
+            args.BufferList.Clear();
+
+            args.BufferList.Add(sndBuffer);
+
+            int s = (int)(sndBuffer.Count % segmentSize);
+
+            s = (int)(segmentSize - s);
+
+            if (s > 0)
+                args.BufferList.Add(new ArraySegment<byte>(emptyArray, 0, s));
+
+            args.BufferList = args.BufferList;
+
+
+            return sclient.SendAsync(args);
         }
 
         public void SendEmpty(ushort packetId)

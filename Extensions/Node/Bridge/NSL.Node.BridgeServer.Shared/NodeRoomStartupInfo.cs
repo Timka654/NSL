@@ -117,6 +117,8 @@ namespace NSL.Node.BridgeServer.Shared
             => GetValue<bool>(RoomShutdownOnMissedReadyVariableName);
     }
 
+    public delegate void NodeConfiguringDelegate<TClient>(object builder);
+
     public class NodeNetworkHandles<TClient>
         where TClient : INetworkClient, new()
     {
@@ -130,6 +132,8 @@ namespace NSL.Node.BridgeServer.Shared
 
         public CoreOptions<TClient>.ExceptionHandle OnException = (ex, client) => { };
 
+        public NodeConfiguringDelegate<TClient> OnConfiguring = (builder) => { };
+
         public TBuilder Fill<TBuilder>(TBuilder builder)
             where TBuilder : IOptionableEndPointBuilder<TClient>
         {
@@ -140,6 +144,8 @@ namespace NSL.Node.BridgeServer.Shared
             options.OnClientConnectAsyncEvent += OnConnectAsync;
             options.OnClientDisconnectAsyncEvent += OnDisconnectAsync;
             options.OnExceptionEvent += OnException;
+
+            OnConfiguring(builder);
 
             return builder;
         }
@@ -161,6 +167,9 @@ namespace NSL.Node.BridgeServer.Shared
 
         public NodeNetworkHandles<TClient> WithExceptionHandle(CoreOptions<TClient>.ExceptionHandle value)
             => Set(() => OnException = value);
+
+        public NodeNetworkHandles<TClient> WithConfiguringHandle(NodeConfiguringDelegate<TClient> value)
+            => Set(() => OnConfiguring = value);
 
         private NodeNetworkHandles<TClient> Set(Action action)
         {
