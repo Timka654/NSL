@@ -1,4 +1,5 @@
-﻿using System.Security.Cryptography;
+﻿using System;
+using System.Security.Cryptography;
 using NSL.SocketCore.Utils;
 using NSL.SocketCore.Utils.Buffer;
 
@@ -51,6 +52,10 @@ namespace NSL.Cipher.DES
             return des.IV;
         }
 
+        public bool DecodeRef(ref byte[] buffer, int offset, int length) => throw new NotImplementedException();
+
+        public bool DecodeHeaderRef(ref byte[] buffer, int offset) => throw new NotImplementedException();
+
         public byte[] Decode(byte[] buffer, int offset, int length)
         {
             return decrypt.TransformFinalBlock(buffer, offset, length);
@@ -64,6 +69,11 @@ namespace NSL.Cipher.DES
         public byte[] Peek(byte[] buffer)
         {
             return decrypt.TransformFinalBlock(buffer, 0, InputPacketBuffer.DefaultHeaderLength);
+        }
+
+        public void Peek(ArraySegment<byte> buffer)
+        {
+            throw new NotImplementedException();
         }
 
         public IPacketCipher CreateEntry()

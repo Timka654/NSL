@@ -81,7 +81,7 @@ namespace NSL.SocketCore.Utils.Buffer
 
         public static OutputPacketBuffer Create(ushort packetId, int len = 32)
         {
-            return new OutputPacketBuffer(len) { PacketId = packetId};
+            return new OutputPacketBuffer(len) { PacketId = packetId };
         }
 
         public static OutputPacketBuffer Create<TEnum>(TEnum packetId, int len = 32)
@@ -497,8 +497,12 @@ namespace NSL.SocketCore.Utils.Buffer
         public static TBuffer WithPid<TBuffer, TEnum>(this TBuffer buffer, TEnum packetId)
             where TBuffer : OutputPacketBuffer
             where TEnum : struct, Enum, IConvertible
+        => buffer.WithPid(packetId.ToUInt16(null));
+
+        public static TBuffer WithPid<TBuffer>(this TBuffer buffer, ushort packetId)
+            where TBuffer : OutputPacketBuffer
         {
-            buffer.PacketId = packetId.ToUInt16(null);
+            buffer.PacketId = packetId;
 
             return buffer;
         }

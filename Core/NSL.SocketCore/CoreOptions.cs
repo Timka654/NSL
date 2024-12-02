@@ -27,10 +27,26 @@ namespace NSL.SocketCore
         public virtual ProtocolType ProtocolType { get; set; } = ProtocolType.Unspecified;
 
         /// <summary>
-        /// Размер буффера приходящих данных, если пакет больше этого значения то данные по реализованному алгоритму принять не получиться, значение по умолчанию - 1024
+        /// Sockets receive fragment size
         /// </summary>
-        public int ReceiveBufferSize { get; set; } = 1024;
+        public int ReceiveBufferSize
+        {
+            get => receiveBufferSize; set
+            {
+                if (value % 2 > 0)
+                    throw new InvalidOperationException($"receiveBufferSize must have value % 2");
 
+                if(value < 7)
+                    throw new InvalidOperationException($"receiveBufferSize cannot set value less 7");
+
+                receiveBufferSize = value;
+            }
+        }
+
+        public int MaxReceiveBufferSize { get; set; } = int.MaxValue;
+
+        public uint SegmentSize { get; set; } = 1 * 1024;
+        
         private IPacketCipher inputCipher = new PacketNoneCipher();
 
         /// <summary>
@@ -50,6 +66,7 @@ namespace NSL.SocketCore
 
 
         private IPacketCipher outputCipher = new PacketNoneCipher();
+        private int receiveBufferSize = 1024;
 
         /// <summary>
         /// Алгоритм шифрования исходящих пакетов

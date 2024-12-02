@@ -111,7 +111,11 @@ namespace NSL.Cipher.RC.RC4
         }
 
         public State m_state;
-        
+
+        public bool DecodeRef(ref byte[] buffer, int offset, int length) => throw new NotImplementedException();
+
+        public bool DecodeHeaderRef(ref byte[] buffer, int offset) => throw new NotImplementedException();
+
         public byte[] Decode(byte[] buffer, int offset, int length)
         {
             byte[] dest = new byte[length];
@@ -134,6 +138,11 @@ namespace NSL.Cipher.RC.RC4
             codeBlock(ref buffer, 0, ref dest, InputPacketBuffer.DefaultHeaderLength);
 
             return dest;
+        }
+
+        public void Peek(ArraySegment<byte> buffer)
+        {
+            throw new NotImplementedException();
         }
 
         private RC4Cipher(string key)

@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "NSL.Node.BridgeServer": {
+      "commandName": "Project",
+      "launchBrowser": false,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:63082;http://localhost:63083"
+    }
+  }
+}

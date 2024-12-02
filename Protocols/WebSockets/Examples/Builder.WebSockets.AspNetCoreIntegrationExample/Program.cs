@@ -20,7 +20,8 @@ namespace Builder.WebSockets.AspNetCoreIntegrationExample
 
             app.UseWebSockets();
 
-            app.MapWebSocketsPoint("/server", builder => {
+            app.MapWebSocketsPoint("/server", builder =>
+            {
 
                 builder.AddConnectHandle(c =>
                 {
@@ -29,15 +30,17 @@ namespace Builder.WebSockets.AspNetCoreIntegrationExample
                 });
                 builder.AddDisconnectHandle(c =>
                 {
-                    app.Logger.LogInformation($"[Server] Client disconnected handle");
+                    Console.WriteLine($"[Server] Client disconnected handle");
                 });
 
-                builder.AddReceiveHandle((client, pid, len) => {
-                    app.Logger.LogInformation($"[Server] Receive packet pid:{pid} with len: {len}");
+                builder.AddReceiveHandle((client, pid, len) =>
+                {
+                    Console.WriteLine($"[Server] Receive packet pid:{pid} with len: {len}");
                 });
 
-                builder.AddSendHandle((client, pid, len, stack) => {
-                    app.Logger.LogInformation($"[Server] Send packet pid:{pid} with len:{len}");
+                builder.AddSendHandle((client, pid, len, stack) =>
+                {
+                    Console.WriteLine($"[Server] Send packet pid:{pid} with len:{len}");
                 });
 
                 builder.AddExceptionHandle((ex, c) =>
@@ -45,8 +48,13 @@ namespace Builder.WebSockets.AspNetCoreIntegrationExample
                     app.Logger.LogError($"[Server] Error {ex}");
                 });
 
-                builder.RegisterRPCProcessor();
-                builder.AddRPCContainer(x => new TestRPCContainerRPCRepository<AspNetWSNetworkServerClient>());
+                builder.AddPacketHandle(1, (c, d) =>
+                {
+                    Console.WriteLine($"receive from client pid = {d.PacketId}, data = {d.ReadInt32()}");
+                });
+
+                //builder.RegisterRPCProcessor();
+                //builder.AddRPCContainer(x => new TestRPCContainerRPCRepository<AspNetWSNetworkServerClient>());
 
             });
 
@@ -71,32 +79,35 @@ namespace Builder.WebSockets.AspNetCoreIntegrationExample
                 {
                     builder.AddConnectHandle(c =>
                     {
-                        app.Logger.LogInformation($"[Client] Client connected handle");
+                        Console.WriteLine($"[Client] Client connected handle");
                         connection = c;
                         c.InitializeObjectBag();
                         //c.PingPongEnabled = true;
                     });
                     builder.AddDisconnectHandle(c =>
                     {
-                        app.Logger.LogInformation($"[Client] Client disconnected handle");
+                        Console.WriteLine($"[Client] Client disconnected handle");
                     });
 
-                    builder.AddReceiveHandle((client, pid, len) => {
+                    builder.AddReceiveHandle((client, pid, len) =>
+                    {
                         if (InputPacketBuffer.IsSystemPID(pid))
                             return;
-                        app.Logger.LogInformation($"[Client] Receive packet pid:{pid} with len: {len}");
+                        Console.WriteLine($"[Client] Receive packet pid:{pid} with len: {len}");
                     });
 
-                    builder.AddSendHandle((client, pid, len, stack) => {
-                        app.Logger.LogInformation($"[Client] Send packet pid:{pid} with len:{len}");
+                    builder.AddSendHandle((client, pid, len, stack) =>
+                    {
+                        Console.WriteLine($"[Client] Send packet pid:{pid} with len:{len}");
                     });
 
-                    builder.AddExceptionHandle((ex, c) => {
+                    builder.AddExceptionHandle((ex, c) =>
+                    {
                         app.Logger.LogError($"[Client] Error {ex}");
                     });
 
-                    builder.RegisterRPCProcessor();
-                    builder.AddRPCContainer(c => c.TestRepo);
+                    //builder.RegisterRPCProcessor();
+                    //builder.AddRPCContainer(c => c.TestRepo);
                 })
                 .WithUrl(new Uri("wss://localhost:7084/server"))
                 .Build();
@@ -105,41 +116,51 @@ namespace Builder.WebSockets.AspNetCoreIntegrationExample
 
             if (result)
             {
-                app.Logger.LogInformation($"[Client] Try call \"test\" method with 22 value");
+                for (int i = 0; i < 15; i++)
+                {
+                    Console.WriteLine($"send to server pid = {1}, data = {i}");
+                    var packet = OutputPacketBuffer.Create(1);
 
-                var r = connection.TestRepo.test(22);
+                    packet.WriteInt32(i);
 
-                app.Logger.LogInformation($"[Client] Try call \"test\" with 22 return {r} value");
+                    client.Send(packet);
+                }
 
-                app.Logger.LogInformation($"[Client] Try call \"test\" method with 33 value");
+                //Console.WriteLine($"[Client] Try call \"test\" method with 22 value");
 
-                r = connection.TestRepo.test(33);
+                //var r = connection.TestRepo.test(22);
 
-                app.Logger.LogInformation($"[Client] Try call \"test\" with 33 return {r} value");
+                //Console.WriteLine($"[Client] Try call \"test\" with 22 return {r} value");
 
-                app.Logger.LogInformation($"[Client] Try call \"test\" method with 44 value");
+                //Console.WriteLine($"[Client] Try call \"test\" method with 33 value");
 
-                r = connection.TestRepo.test(44);
+                //r = connection.TestRepo.test(33);
 
-                app.Logger.LogInformation($"[Client] Try call \"test\" with 44 return {r} value");
+                //Console.WriteLine($"[Client] Try call \"test\" with 33 return {r} value");
 
-                app.Logger.LogInformation($"[Client] Try call \"testasynctaskwithresult\" with 66");
+                //Console.WriteLine($"[Client] Try call \"test\" method with 44 value");
 
-                r = await connection.TestRepo.testasynctaskwithresult(66);
+                //r = connection.TestRepo.test(44);
 
-                app.Logger.LogInformation($"[Client] Try call \"testasynctaskwithresult\" with 66 return {r} value");
+                //Console.WriteLine($"[Client] Try call \"test\" with 44 return {r} value");
 
-                app.Logger.LogInformation($"[Client] Try call \"testasyncvoid\" with 122");
+                //Console.WriteLine($"[Client] Try call \"testasynctaskwithresult\" with 66");
 
-                connection.TestRepo.testasyncvoid(122);
+                //r = await connection.TestRepo.testasynctaskwithresult(66);
 
-                app.Logger.LogInformation($"[Client] Try call \"testasyncvoid\" has not result");
+                //Console.WriteLine($"[Client] Try call \"testasynctaskwithresult\" with 66 return {r} value");
 
-                app.Logger.LogInformation($"[Client] Try call \"testasyncTask\" with 244");
+                //Console.WriteLine($"[Client] Try call \"testasyncvoid\" with 122");
 
-                await connection.TestRepo.testasyncTask(244);
+                //connection.TestRepo.testasyncvoid(122);
 
-                app.Logger.LogInformation($"[Client] Try call \"testasyncTask\" has not result");
+                //Console.WriteLine($"[Client] Try call \"testasyncvoid\" has not result");
+
+                //Console.WriteLine($"[Client] Try call \"testasyncTask\" with 244");
+
+                //await connection.TestRepo.testasyncTask(244);
+
+                //Console.WriteLine($"[Client] Try call \"testasyncTask\" has not result");
             }
 
             await Task.Delay(2000);

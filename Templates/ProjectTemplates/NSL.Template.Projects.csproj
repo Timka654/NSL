@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<NSLProjectTypes>Template;ProjectTemplate</NSLProjectTypes>
@@ -23,18 +23,19 @@
 		<Version>$(VersionSuffix)</Version>
 		<Authors>Relife87</Authors>
 	</PropertyGroup>
-	
 	<ItemGroup>
-		<Compile Remove="content\**\*" />
-		<Content Include="content\**\*" />
+	    <Content Include="**\*\.template.config\template.json" />
 	</ItemGroup>
 
 	<PropertyGroup Condition="'$(Configuration)'=='Debug'">
 		<PackageId>$(MSBuildProjectName)_Debug</PackageId>
 	</PropertyGroup>
-
 	<ItemGroup>
 		<PackageReference Include="Microsoft.TemplateEngine.Tasks" Version="*" PrivateAssets="all" IsImplicitlyDefined="true" />
+	</ItemGroup>
+	<ItemGroup>
+		<Compile Remove="content\**\*" />
+		<Content Include="content\**\*" />
 	</ItemGroup>
 
 </Project>

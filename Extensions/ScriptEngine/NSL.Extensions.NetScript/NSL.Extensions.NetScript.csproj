@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<NSLProjectTypes>UnitySupport</NSLProjectTypes>
+		<NSLProjectTypes>None</NSLProjectTypes>
 
 		<TargetFramework>net8.0</TargetFramework>
 		<Configurations>Debug;Release;DebugExamples;Unity;UnityDebug</Configurations>
@@ -20,18 +20,7 @@
 	<PropertyGroup Condition="'$(Configuration)'=='Debug'">
 		<PackageId>$(MSBuildProjectName)_Debug</PackageId>
 	</PropertyGroup>
-
-	<PropertyGroup Condition="'$(Configuration)'=='UnityDebug'">
-		<AssemblyName>Unity.$(MSBuildProjectName)</AssemblyName>
-		<TargetFramework>netstandard2.1</TargetFramework>
-		<DefineConstants>DEBUG;TRACE</DefineConstants>
-	</PropertyGroup>
-
-	<PropertyGroup Condition="'$(Configuration)'=='Unity'">
-		<AssemblyName>Unity.$(MSBuildProjectName)</AssemblyName>
-		<TargetFramework>netstandard2.1</TargetFramework>
-	</PropertyGroup>
-	<ItemGroup Condition="'$(Configuration)'=='Debug' Or '$(Configuration)'=='Release'">
+	<ItemGroup Condition="'$(Configuration)'=='Debug' Or '$(Configuration)'=='Release' Or '$(Configuration)'=='DebugExamples'">
 		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.8.0" PrivateAssets="all" />
 	</ItemGroup>
 	<ItemGroup Condition="'$(Configuration)'=='UnityDebug' Or '$(Configuration)'=='Unity'">

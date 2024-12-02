@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace NSLLibProjectFileFormatter
 {
@@ -51,18 +52,23 @@ namespace NSLLibProjectFileFormatter
         [GeneratedRegex(@"\s*<ItemGroup>(\s*<Content Include=""([\S]+)"">\s*<CopyToOutputDirectory>([\S]+)</CopyToOutputDirectory>\s*</Content>\s*)+</ItemGroup>\s*")]
         public partial Regex GetProjectContentItemGroupRegex();
 
-        private readonly string path;
 
-        private readonly string UnityRefPath;
+
+
+        private readonly string path;
+        private readonly string slnPath;
+
+        private string[] AvailableConfigurations = new string[] { "Debug", "Release", "DebugExamples", "Unity", "UnityDebug" };
 
         public Formatter(string path)
         {
             this.path = path;
+
+            slnPath = Path.Combine(this.path, "NSL.sln");
         }
 
         public void Run()
         {
-
             var di = new DirectoryInfo(path);
 
             foreach (var d in di.GetDirectories())
@@ -72,16 +78,17 @@ namespace NSLLibProjectFileFormatter
 
                 processDirectory(d);
             }
+
+            SLNBuilder.BuildSln(slnPath, projects, AvailableConfigurations);
         }
+
+        private List<ProjectFileInfo> projects = new List<ProjectFileInfo>();
 
         void processDirectory(DirectoryInfo di)
         {
             foreach (var item in di.GetFiles("*.csproj", SearchOption.AllDirectories))
             {
                 var relPath = Path.GetRelativePath(di.FullName, item.FullName);
-
-                if (relPath.Contains(".Test") || relPath.Contains("Example"))
-                    continue;
 
                 if (relPath.Contains("Templates") && relPath.Contains("content"))
                     continue;
@@ -99,14 +106,35 @@ namespace NSLLibProjectFileFormatter
 
             List<string> NSLProjectTypes = NSLTypes == null ? new List<string>() : NSLTypes[2].Captures.Select(x => x.Value).ToList();
 
-            if (Equals(outputType, "Exe") || HasTest(NSLProjectTypes) || HasExternal(NSLProjectTypes))
+            List<string> configurations = new List<string> { "DebugExamples" };
+
+            if (Equals(outputType, "Exe")
+                || HasTest(NSLProjectTypes)
+                || HasExternal(NSLProjectTypes)
+                || hasVsixInProjectName(path)
+                || IsTestOExample(path))
+            {
+                if (HasExternal(NSLProjectTypes))
+                {
+                    configurations.AddRange(new string[] { "Debug", "Release" });
+
+                    if (HasUnitySupport(NSLProjectTypes))
+                        configurations.AddRange(new[] { "UnityDebug", "Unity" });
+                }
+
+                projects.Add(new ProjectFileInfo(path, configurations.ToArray(), Path.GetRelativePath(this.path, Path.GetDirectoryName(path) + "/..")));
+
                 return;
+            }
 
-            bool unityOnly = hasUnityInProjectName(path);
-
-            TemplateBuilder tb = new TemplateBuilder();
+            configurations.AddRange(new string[] { "Debug", "Release" });
 
             var sdk = GetGroupValue(FindGroupsByRegex(currentContent, GetProjectSdkRegex()));
+
+            bool unityOnly = hasUnityInProjectName(path);
+            bool aspNetOnly = isOnlyAspNetProject(path, sdk);
+
+            TemplateBuilder tb = new TemplateBuilder();
 
             var description = GetGroupValue(FindGroupsByRegex(currentContent, GetProjectDescriptionRegex()));
 
@@ -137,15 +165,17 @@ namespace NSLLibProjectFileFormatter
             {
                 tb.WritePropertyGroup(() =>
                 {
-
                     if (!NSLProjectTypes.Any())
                     {
+                        if (unityOnly && aspNetOnly)
+                            throw new Exception($"{path} cannot contains multiple '*Only' types");
+
                         if (unityOnly)
                         {
                             NSLProjectTypes.Add("UnityTarget");
                             NSLProjectTypes.Add("UnitySupport");
                         }
-                        else if (isOnlyAspNetProject(path, sdk))
+                        else if (aspNetOnly)
                         {
                             NSLProjectTypes.Add("ASPTarget");
                         }
@@ -164,19 +194,13 @@ namespace NSLLibProjectFileFormatter
                     }
 
 
-                    List<string> configurations = new List<string> { "Debug", "Release", "DebugExamples" };
-
                     var tf = "net8.0";
 
-                    if (!unityOnly)
-                    {
-                        configurations.AddRange(new[] { "Unity", "UnityDebug" });
-                    }
-                    else if (!isOnlyAspNetProject(path, sdk))
-                    {
-                        configurations = new List<string>(new[] { "Unity", "UnityDebug" });
-                        tf = "netstandard2.1";
-                    }
+                    if (HasUnityTarget(NSLProjectTypes))
+                        configurations.Clear();
+
+                    if (HasUnitySupport(NSLProjectTypes))
+                        configurations.AddRange(new[] { "UnityDebug", "Unity" });
 
 
                     if (HasAnalyzer(NSLProjectTypes) || HasAnalyzerUtils(NSLProjectTypes))
@@ -187,11 +211,11 @@ namespace NSLLibProjectFileFormatter
 
 
                     tb.AppendLine($"<TargetFramework>{tf}</TargetFramework>")
-                      .AppendLine($"<Configurations>{string.Join(';', configurations)}</Configurations>")
+                      .AppendLine($"<Configurations>{string.Join(';', AvailableConfigurations)}</Configurations>")
                       .AppendLine("<AllowUnsafeBlocks>true</AllowUnsafeBlocks>")
                       .AppendLine("<Nullable>disable</Nullable>");
 
-                    if (isOnlyAspNetProject(path, sdk))
+                    if (aspNetOnly)
                         tb.AppendLine("<IsPackable>true</IsPackable>")
                         .AppendLine("<OutputType>Library</OutputType>");
 
@@ -239,6 +263,7 @@ namespace NSLLibProjectFileFormatter
                     if (description != null)
                         tb.AppendLine($"<Description>{description}</Description>");
                 });
+
 
                 if (isTemplate)
                     tb.AppendLine("""
@@ -443,10 +468,7 @@ namespace NSLLibProjectFileFormatter
 
             File.WriteAllText(path, v);
 
-            return;
-
-
-            // todo write
+            projects.Add(new ProjectFileInfo(path, configurations.ToArray(), Path.GetRelativePath(this.path, Path.GetDirectoryName(path) + "/..")));
         }
 
         public bool HasUnitySupport(List<string> types)
@@ -476,12 +498,19 @@ namespace NSLLibProjectFileFormatter
 
         public bool HasASPTarget(List<string> types)
         {
-            return types.Contains("UnityTarget");
+            return types.Contains("ASPTarget");
         }
 
         public bool HasTemplateType(List<string> types)
         {
             return types.Contains("Template");
+        }
+
+        private bool IsVsix(string path)
+        {
+            var name = new FileInfo(path).Name;
+
+            return name.Contains(".Vsix", StringComparison.OrdinalIgnoreCase);
         }
 
         private bool hasUnityInProjectName(string path)
@@ -491,11 +520,44 @@ namespace NSLLibProjectFileFormatter
             return name.Contains("Unity", StringComparison.OrdinalIgnoreCase);
         }
 
+        private bool hasVsixInProjectName(string path)
+        {
+            var name = new FileInfo(path).Name;
+
+            return name.Contains(".Vsix", StringComparison.OrdinalIgnoreCase);
+        }
+
+        private bool IsTestOExample(string path)
+        {
+            if (!IsExample(path))
+                return IsTest(path);
+
+            return true;
+        }
+
+        private bool IsExample(string path)
+        {
+            var name = new FileInfo(path).Name;
+
+            return name.Contains("Example");
+
+        }
+
+        private bool IsTest(string path)
+        {
+            var name = new FileInfo(path).Name;
+
+            return name.Contains(".Test");
+        }
+
         private bool isOnlyAspNetProject(string path, string sdk)
         {
             var name = new FileInfo(path).Name;
 
-            return name.Contains("AspNet", StringComparison.OrdinalIgnoreCase) || sdk.Equals("Microsoft.NET.Sdk.Web", StringComparison.OrdinalIgnoreCase) || sdk.Equals("Microsoft.NET.Sdk.Razor", StringComparison.OrdinalIgnoreCase);
+            return name.Contains("AspNet", StringComparison.OrdinalIgnoreCase)
+                || name.Contains("Blazor", StringComparison.OrdinalIgnoreCase)
+                || sdk.Equals("Microsoft.NET.Sdk.Web", StringComparison.OrdinalIgnoreCase)
+                || sdk.Equals("Microsoft.NET.Sdk.Razor", StringComparison.OrdinalIgnoreCase);
         }
 
         private string GetGroupValue(GroupCollection collection, int idx = 1) // first group by default

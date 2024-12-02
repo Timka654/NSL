@@ -1,0 +1,4 @@
+﻿{
+  "bridge_address": "ws://localhost:6998",
+  "client_public_endpoint": "ws://localhost:5920"
+}

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using NSL.Generators.Utils;
 using NSL.Generators.BinaryGenerator.Generators.CustomGenerators;
+using System;
 
 namespace NSL.Generators.BinaryGenerator.Generators
 {
@@ -87,6 +88,10 @@ namespace NSL.Generators.BinaryGenerator.Generators
             customTypeReadHandlers.Add(
                 typeof(byte[]).Name,
                 (ByteArrayTypeGenerator.GetReadLine, ByteArrayTypeGenerator.GetWriteLine));
+
+            customTypeReadHandlers.Add(
+                typeof(Span<byte>).Name,
+                (ByteArrayTypeGenerator.GetSpanReadLine, ByteArrayTypeGenerator.GetSpanWriteLine));
 
             customTypeReadHandlers.Add(
                 typeof(Dictionary<,>).Name,

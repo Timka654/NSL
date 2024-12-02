@@ -3,8 +3,8 @@
 	<PropertyGroup>
 		<NSLProjectTypes>UnityTarget;UnitySupport</NSLProjectTypes>
 
-		<TargetFramework>netstandard2.1</TargetFramework>
-		<Configurations>Unity;UnityDebug</Configurations>
+		<TargetFramework>net8.0</TargetFramework>
+		<Configurations>Debug;Release;DebugExamples;Unity;UnityDebug</Configurations>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<Nullable>disable</Nullable>
 
@@ -15,7 +15,6 @@
 
 		<Version>$(VersionSuffix)</Version>
 		<Authors>Relife87</Authors>
-		<Description>Библиотека для расширения функций буффера</Description>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)'=='Debug'">

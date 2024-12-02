@@ -216,6 +216,10 @@ namespace NSL.Cipher.RC.RC5
             UInt64ToBytes(b, outBuf, 8);
         }
 
+        public bool DecodeRef(ref byte[] buffer, int offset, int length) => throw new NotImplementedException();
+
+        public bool DecodeHeaderRef(ref byte[] buffer, int offset) => throw new NotImplementedException();
+
         public byte[] Decode(byte[] buffer, int offset, int length)
         {
             if(offset - length < 15)
@@ -235,6 +239,11 @@ namespace NSL.Cipher.RC.RC5
         }
 
         public byte[] Peek(byte[] buffer)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Peek(ArraySegment<byte> buffer)
         {
             throw new NotImplementedException();
         }

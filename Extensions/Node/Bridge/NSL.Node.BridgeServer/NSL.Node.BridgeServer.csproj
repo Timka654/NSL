@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<NSLProjectTypes>None</NSLProjectTypes>
+
+		<TargetFramework>net8.0</TargetFramework>
+		<Configurations>Debug;Release;DebugExamples;Unity;UnityDebug</Configurations>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<Nullable>disable</Nullable>
+
+		<PublishRepositoryUrl>true</PublishRepositoryUrl>
+		<EmbedUntrackedSources>true</EmbedUntrackedSources>
+		<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+		<GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
+
+		<Version>$(VersionSuffix)</Version>
+		<Authors>Relife87</Authors>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)'=='Debug'">
+		<PackageId>$(MSBuildProjectName)_Debug</PackageId>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\..\..\ASPNET\Logging\NSL.Logger.AspNet\NSL.Logger.AspNet.csproj" />
+		<ProjectReference Include="..\..\..\..\Core\BuilderExtensions\NSL.BuilderExtensions.SocketCore\NSL.BuilderExtensions.SocketCore.csproj" />
+		<ProjectReference Include="..\..\..\..\Protocols\LocalBridge\BuilderExtensions\NSL.BuilderExtensions.LocalBridge\NSL.BuilderExtensions.LocalBridge.csproj" />
+		<ProjectReference Include="..\..\..\..\Protocols\WebSockets\BuilderExtensions\NSL.BuilderExtensions.WebSocketsServer.AspNet\NSL.BuilderExtensions.WebSocketsServer.AspNet.csproj" />
+		<ProjectReference Include="..\..\Room\NSL.Node.RoomServer\NSL.Node.RoomServer.csproj" />
+		<ProjectReference Include="..\NSL.Node.BridgeServer.Shared\NSL.Node.BridgeServer.Shared.csproj" />
+	</ItemGroup>
+
+</Project>

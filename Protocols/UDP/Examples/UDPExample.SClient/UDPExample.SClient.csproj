@@ -1,7 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<Configurations>Debug;Release;Unity;UnityDebug;DebugStable;DebugExamples</Configurations>
+		<NSLProjectTypes>Example</NSLProjectTypes>
+		<Configurations>DebugExamples;Debug;Release;UnityDebug;Unity</Configurations>
 		<OutputType>Exe</OutputType>
 		<TargetFramework>net8.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>

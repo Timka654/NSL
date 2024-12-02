@@ -6,12 +6,12 @@ using System.Net.Sockets;
 
 namespace NSL.TCP.Client
 {
-
+    /// <summary>
+    /// Класс обработки клиента
+    /// </summary>
     public class TCPClient<T> : BaseTcpClient<T, TCPClient<T>>
         where T : BaseSocketNetworkClient, new()
     {
-        private readonly bool legacyThread;
-
         public long Version { get; set; }
 
         public override T Data => ConnectionOptions.ClientData;
@@ -19,9 +19,8 @@ namespace NSL.TCP.Client
         public ClientOptions<T> ConnectionOptions => base.options as ClientOptions<T>;
 
 
-        public TCPClient(ClientOptions<T> options, bool legacyThread = false) : base(options)
+        public TCPClient(ClientOptions<T> options, bool legacyTransport = false) : base(options, legacyTransport)
         {
-            this.legacyThread = legacyThread;
         }
 
 
@@ -33,17 +32,17 @@ namespace NSL.TCP.Client
 
             ConnectionOptions.ClientData.Network = this;
 
+            //установка переменной содержащую поток клиента
             this.sclient = client;
-
             this.endPoint = (IPEndPoint)sclient?.RemoteEndPoint;
 
-            this.receiveBuffer = new byte[ConnectionOptions.ReceiveBufferSize];
+            //this.receiveBuffer = new byte[ConnectionOptions.ReceiveBufferSize];
 
             this.inputCipher = ConnectionOptions.InputCipher.CreateEntry();
 
             this.outputCipher = ConnectionOptions.OutputCipher.CreateEntry();
 
-            RunReceive(legacyThread);
+            RunReceive();
 
             ConnectionOptions.RunClientConnect();
         }

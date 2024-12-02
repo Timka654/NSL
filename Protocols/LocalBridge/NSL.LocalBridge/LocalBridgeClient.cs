@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.Sockets;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace NSL.LocalBridge
 {
@@ -170,6 +171,8 @@ namespace NSL.LocalBridge
         private void Receive(byte[] buf)
         {
             var pbuff = new InputPacketBuffer(buf);
+
+            pbuff.SetData(buf[7..].ToArray());
 
             OnReceive(pbuff.PacketId, pbuff.PacketLength);
 

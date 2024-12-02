@@ -1,5 +1,4 @@
-﻿using NSL.Generators.FillTypeGenerator.Tests.Develop.Proxy;
-
+﻿
 namespace NSL.Generators.FillTypeGenerator.Tests
 {
     internal class Program
@@ -17,7 +16,7 @@ namespace NSL.Generators.FillTypeGenerator.Tests
                 }
             }.FillInstanceUpdateTo(p);
 #else
-            DevClass1 devClass1 = new DevClass1();
+             DevClass1 devClass1 = new DevClass1();
 
             DevClass2 devClass2 = new DevClass2();
 
@@ -31,6 +30,12 @@ namespace NSL.Generators.FillTypeGenerator.Tests
             model7.FillTo(model6);
 
             model7.FillFrom(model6);
+
+            Test1Model tmodel1 = new Test1Model() { TestValue1 = "abcxaca", TestValue2 = "35t2452" };
+
+            Test2Model tmodel2 = new Test2Model() { };
+
+            tmodel1.FillTo(tmodel2);
 #endif
         }
     }

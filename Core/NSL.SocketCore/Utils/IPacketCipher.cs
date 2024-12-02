@@ -7,29 +7,17 @@ namespace NSL.SocketCore.Utils
     /// </summary>
     public interface IPacketCipher : IDisposable
     {
-        /// <summary>
-        /// Дешифровка заголовка пакета
-        /// </summary>
-        /// <param name="buffer">буффер с данными</param>
-        /// <returns>Буффер с расшифрованным хедером пакета</returns>
         byte[] Peek(byte[] buffer);
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="buffer">буффер с данными</param>
-        /// <param name="offset">позиция в буффере с которой нужно начинать чтение</param>
-        /// <param name="length">размер данных </param>
-        /// <returns>Буффер с расшифрованным хедером пакета</returns>
+        void Peek(ArraySegment<byte> buffer);
+
         byte[] Encode(byte[] buffer, int offset, int length);
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="buffer">буффер с данными</param>
-        /// <param name="offset">позиция в буффере с которой нужно начинать чтение</param>
-        /// <param name="length"></param>
-        /// <returns>Буффер с расшифрованным хедером пакета</returns>
+
         byte[] Decode(byte[] buffer, int offset, int length);
+
+        bool DecodeRef(ref byte[] buffer, int offset, int length);
+
+        bool DecodeHeaderRef(ref byte[] buffer, int offset);
 
         bool Sync();
 

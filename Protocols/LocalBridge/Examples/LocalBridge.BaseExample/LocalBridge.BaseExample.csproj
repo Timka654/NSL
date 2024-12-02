@@ -1,17 +1,19 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <OutputType>Exe</OutputType>
-    <TargetFramework>net8.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
+	<PropertyGroup>
+		<NSLProjectTypes>Example</NSLProjectTypes>
+		<OutputType>Exe</OutputType>
+		<TargetFramework>net8.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>disable</Nullable>
-  </PropertyGroup>
+		<Configurations>DebugExamples;Debug;Release;UnityDebug;Unity</Configurations>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\TCP\NSL.TCP.Client\NSL.TCP.Client.csproj" />
-    <ProjectReference Include="..\..\..\TCP\NSL.TCP.Server\NSL.TCP.Server.csproj" />
-    <ProjectReference Include="..\..\NSL.LocalBridge\NSL.LocalBridge.csproj" />
-    <ProjectReference Include="..\LocalBridge.Example.Shared\LocalBridge.Example.Shared.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\..\..\TCP\NSL.TCP.Client\NSL.TCP.Client.csproj" />
+		<ProjectReference Include="..\..\..\TCP\NSL.TCP.Server\NSL.TCP.Server.csproj" />
+		<ProjectReference Include="..\..\NSL.LocalBridge\NSL.LocalBridge.csproj" />
+		<ProjectReference Include="..\LocalBridge.Example.Shared\LocalBridge.Example.Shared.csproj" />
+	</ItemGroup>
 
 </Project>

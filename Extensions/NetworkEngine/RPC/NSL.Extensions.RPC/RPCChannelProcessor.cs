@@ -104,15 +104,14 @@ namespace NSL.Extensions.RPC
 
             using (var stream = new MemoryStream())
             {
+                packet.WriteString(exception.GetType().FullName);
+
                 new BinaryFormatter().Serialize(stream, exception);
                 var buf = stream.GetBuffer();
 
-                packet.WriteString(exception.GetType().FullName);
-
-                packet.WriteInt32(buf.Length);
-
-                packet.Write(buf);
+                packet.WriteByteArray(buf);
             }
+
             //var context = new StreamingContext(StreamingContextStates.CrossAppDomain);
 
             //SerializationInfo serializationInfo = new SerializationInfo(exception.GetType(), new FormatterConverter());
@@ -132,9 +131,9 @@ namespace NSL.Extensions.RPC
 
             int len = pin.ReadInt32();
 
-            byte[] bytes = pin.Read(len);
+            var bytes = pin.ReadByteArray();
 
-            using (var stream = new MemoryStream(bytes))
+            using (var stream = new MemoryStream(bytes.ToArray()))
             {
                 throw Convert.ChangeType(new BinaryFormatter().Deserialize(stream), type) as Exception;
             }
@@ -177,7 +176,6 @@ namespace NSL.Extensions.RPC
             } while (!handleMap.TryAdd(newWID, pin =>
             {
                 if (pin.ReadBool())
-
                     onReceive(pin);
                 else
                     ProcessException(pin);

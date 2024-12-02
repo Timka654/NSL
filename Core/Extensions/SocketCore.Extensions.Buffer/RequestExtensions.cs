@@ -64,7 +64,18 @@ namespace NSL.SocketCore.Extensions.Buffer
 
         public static void AddRequestPacketHandle<TClient, TEnum>(this CoreOptions<TClient> builder, TEnum packetId, RequestPacketHandle<TClient> packet) where TClient : INetworkClient, new() where TEnum : struct, IConvertible
         {
-            builder.AddHandle(packetId.ToUInt16(null), (client, data) => {
+            builder.AddRequestPacketHandle(packetId.ToUInt16(null), packet);
+        }
+
+        public static void AddRequestPacketHandle<TClient, TEnum>(this CoreOptions<TClient> builder, TEnum packetId, RequestPacketHandle2<TClient> packet, ushort responsePacketId = 1) where TClient : INetworkClient, new() where TEnum : struct, IConvertible
+        {
+            builder.AddRequestPacketHandle(packetId.ToUInt16(null), packet, responsePacketId);
+        }
+
+        public static void AddRequestPacketHandle<TClient>(this CoreOptions<TClient> builder, ushort packetId, RequestPacketHandle<TClient> packet) where TClient : INetworkClient, new()
+        {
+            builder.AddHandle(packetId, (client, data) =>
+            {
 
                 var result = packet.Invoke(client, data);
 
@@ -74,9 +85,10 @@ namespace NSL.SocketCore.Extensions.Buffer
             });
         }
 
-        public static void AddRequestPacketHandle<TClient, TEnum>(this CoreOptions<TClient> builder, TEnum packetId, RequestPacketHandle2<TClient> packet, ushort responsePacketId = 1) where TClient : INetworkClient, new() where TEnum : struct, IConvertible
+        public static void AddRequestPacketHandle<TClient>(this CoreOptions<TClient> builder, ushort packetId, RequestPacketHandle2<TClient> packet, ushort responsePacketId = 1) where TClient : INetworkClient
         {
-            builder.AddHandle(packetId.ToUInt16(null), (client, data) => {
+            builder.AddHandle(packetId, (client, data) =>
+            {
 
                 using (var response = data.CreateResponse(responsePacketId))
                 {
@@ -90,7 +102,8 @@ namespace NSL.SocketCore.Extensions.Buffer
 
         public static void AddAsyncRequestPacketHandle<TClient, TEnum>(this CoreOptions<TClient> builder, TEnum packetId, RequestPacketAsyncHandle<TClient> packet) where TClient : INetworkClient, new() where TEnum : struct, IConvertible
         {
-            builder.AddAsyncHandle(packetId.ToUInt16(null), async (client, data) => {
+            builder.AddAsyncHandle(packetId.ToUInt16(null), async (client, data) =>
+            {
 
                 var result = await packet.Invoke(client, data);
 
@@ -102,7 +115,8 @@ namespace NSL.SocketCore.Extensions.Buffer
 
         public static void AddAsyncRequestPacketHandle<TClient, TEnum>(this CoreOptions<TClient> builder, TEnum packetId, RequestPacketAsyncHandle2<TClient> packet, ushort responsePacketId = 1) where TClient : INetworkClient, new() where TEnum : struct, IConvertible
         {
-            builder.AddAsyncHandle(packetId.ToUInt16(null), async (client, data) => {
+            builder.AddAsyncHandle(packetId.ToUInt16(null), async (client, data) =>
+            {
 
                 using (var response = data.CreateResponse(responsePacketId))
                 {

@@ -1,4 +1,4 @@
-﻿namespace NSL.Generators.FillTypeGenerator.Tests.Develop.NoEqMemberTypeWithEqNames.DE2
+﻿namespace NSL.Generators.FillTypeGenerator.Tests
 {
     public enum DevEnum
     {

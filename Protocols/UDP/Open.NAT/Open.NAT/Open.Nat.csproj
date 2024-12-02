@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<NSLProjectTypes>External</NSLProjectTypes>
+		<NSLProjectTypes>External UnitySupport</NSLProjectTypes>
 		<TargetFrameworks>netstandard2.1</TargetFrameworks>
 		<Platforms>AnyCPU;x64;x86</Platforms>
 		<PackageId>Open.Nat</PackageId>
@@ -12,7 +12,7 @@
 		<Copyright>Copyright Alan McGovern, Ben Motmans, Lucas Ontivero ©  2006-2014</Copyright>
 
 		<OutputType>Library</OutputType>
-		<Configurations>Debug;Release;DebugExamples</Configurations>
+		<Configurations>DebugExamples;Debug;Release;UnityDebug;Unity</Configurations>
 
 		<Authors>Relife87</Authors>
 		<Version>$(VersionSuffix)</Version>
@@ -23,4 +23,13 @@
 		<Compile Remove="Upnp\Messages\Responses\AddPortMappingResponseMessage.cs" />
 		<Compile Remove="Upnp\Messages\Responses\DeletePortMappingResponseMessage.cs" />
 	</ItemGroup>
+
+	<PropertyGroup Condition="'$(Configuration)'=='UnityDebug'">
+		<AssemblyName>Unity.$(MSBuildProjectName)</AssemblyName>
+		<DefineConstants>DEBUG;TRACE</DefineConstants>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)'=='Unity'">
+		<AssemblyName>Unity.$(MSBuildProjectName)</AssemblyName>
+	</PropertyGroup>
 </Project>

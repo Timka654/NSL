@@ -22,7 +22,6 @@
 	<PropertyGroup Condition="'$(Configuration)'=='Debug'">
 		<PackageId>$(MSBuildProjectName)_Debug</PackageId>
 	</PropertyGroup>
-
 	<ItemGroup>
 		<PackageReference Include="HtmlAgilityPack" Version="1.11.67" />
 	</ItemGroup>

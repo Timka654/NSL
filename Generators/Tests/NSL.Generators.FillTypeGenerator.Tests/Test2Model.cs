@@ -1,13 +1,12 @@
 ﻿#if !DEVELOP
 
-using NSL.Generators.MergeTypeGenerator.Attributes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NSL.Generators.MergeTypeGenerator.Tests
+namespace NSL.Generators.FillTypeGenerator.Tests
 {
     internal class Test2Model : Test2Model_p1
     {

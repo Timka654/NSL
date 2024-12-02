@@ -36,7 +36,7 @@ namespace NSL.Generators.BinaryGenerator.Generators
 
             rb.AppendLine();
 
-            bool successOpen = context.OpenTypeEntry(parameter, path, rb);
+            bool successOpen = context.OpenTypeEntry(parameter, path, rb, true);
 
             if (successOpen)
             {
@@ -77,7 +77,7 @@ namespace NSL.Generators.BinaryGenerator.Generators
                 return cb.ToString();
             }
 
-            bool successOpen = context.OpenTypeEntry(item, path, cb);
+            bool successOpen = context.OpenTypeEntry(item, path, cb, false);
 
             if (successOpen)
             {

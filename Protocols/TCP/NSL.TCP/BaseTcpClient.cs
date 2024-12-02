@@ -1,8 +1,13 @@
-﻿using NSL.SocketCore;
+﻿using Microsoft.Extensions.ObjectPool;
+using NSL.SocketCore;
 using NSL.SocketCore.Utils;
 using NSL.SocketCore.Utils.Buffer;
+using NSL.SocketCore.Utils.Cipher;
 using NSL.SocketCore.Utils.Exceptions;
+using NSL.SocketCore.Utils.Logger.Enums;
 using System;
+using System.Buffers;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -46,33 +51,12 @@ namespace NSL.TCP
 
         #endregion
 
-        #region Buffer
-
-        /// <summary>
-        /// Буффер для приема данных
-        /// </summary>
-        protected byte[] receiveBuffer;
-
-        /// <summary>
-        /// Текущее положение в буффере, для метода BeginReceive
-        /// </summary>
-        protected int offset;
-
-        /// <summary>
-        /// Размер читаемых данных при следующем вызове BeginReceive
-        /// </summary>
-        protected int length = InputPacketBuffer.DefaultHeaderLength;
-
-        protected bool data = false;
-
         #endregion
 
-        #endregion
-
-        public BaseTcpClient(CoreOptions<TClient> options)
+        public BaseTcpClient(CoreOptions<TClient> options, bool legacyTransport)
         {
             this.options = options;
-
+            this.legacyTransport = legacyTransport;
             OnReceivePacket += (client, pid, len) => options.CallReceivePacketEvent(client.Data, pid, len);
             OnSendPacket += (client, pid, len, st) => options.CallSendPacketEvent(client.Data, pid, len, st);
 
@@ -82,47 +66,86 @@ namespace NSL.TCP
         protected abstract TParent GetParent();
 
         protected CoreOptions<TClient> options;
-
-        protected Dictionary<ushort, CoreOptions<TClient>.PacketHandle> PacketHandles;
+        private readonly bool legacyTransport;
+        private uint segmentSize;
+        private Dictionary<ushort, CoreOptions<TClient>.PacketHandle> PacketHandles;
 
         public IPEndPoint GetRemotePoint()
         {
             return endPoint;
         }
 
-        protected void ResetBuffer()
+        protected async void RunReceive()
         {
-            data = false;
-            length = InputPacketBuffer.DefaultHeaderLength;
-            offset = 0;
-        }
+            segmentSize = Options.SegmentSize;
 
-        protected void RunReceive(bool legacyThread = false)
-        {
             disconnected = false;
 
             PacketHandles = options.GetHandleMap();
 
-            ResetBuffer();
-
-            sendCycle();
-
-            if (legacyThread)
+            if (!legacyTransport)
             {
-                threadReceive();
+                if (!await SendRPData())
+                    return;
+
+                if (!await ReceiveRPDataAsync())
+                    return;
+
+                startSend();
+
+                asyncReceive();
+
                 return;
             }
 
-            taskReceive();
+            ResetBuffer();
+
+            startSend();
+
+            threadReceive();
         }
 
-        private async void taskReceive()
+
+        private void asyncReceive()
         {
+            var sclient = this.sclient;
+
+            if (sclient == null)
+            {
+                Disconnect();
+                return;
+            }
+
+            SocketAsyncEventArgs receiveEventArg = new SocketAsyncEventArgs();
+            receiveEventArg.SetBuffer(new byte[rpSegmentSize], 0, (int)rpSegmentSize);
+            receiveEventArg.Completed += (s, ea) =>
+            {
+                try
+                {
+                    while (!asyncReceiveIter(ea)) { }
+                }
+                catch (NullReferenceException) { Disconnect(); }
+                catch (ObjectDisposedException) { Disconnect(); }
+                catch (ConnectionLostException clex)
+                {
+                    Disconnect(clex);
+                }
+                catch (Exception ex)
+                {
+                    Disconnect(new ConnectionLostException(GetRemotePoint(), true, ex));
+                }
+            };
+            receiveEventArg.AcceptSocket = sclient;
+
             try
             {
-                while (!disconnected)
-                    await taskReceiveIter();
+                if (!sclient.ReceiveAsync(receiveEventArg))
+                {
+                    while (!asyncReceiveIter(receiveEventArg)) { }
+                }
             }
+            catch (NullReferenceException) { Disconnect(); }
+            catch (ObjectDisposedException) { Disconnect(); }
             catch (ConnectionLostException clex)
             {
                 Disconnect(clex);
@@ -133,94 +156,240 @@ namespace NSL.TCP
             }
         }
 
-        private async Task taskReceiveIter()
+#if DEBUGEXAMPLES
+
+        int c = 0;
+
+        Stopwatch? sw = null;
+
+#endif
+
+        private static byte[] emptyArray = (byte[])Array.CreateInstance(typeof(byte), 128 * 1024);
+
+        #region remotePointSettings
+
+        uint rpSegmentSize = 0;
+
+        protected async Task<bool> SendRPData()
         {
-            if (sclient == null)
-                throw new ObjectDisposedException(nameof(sclient));
+            var data = new byte[2048];
 
-            int rlen = await sclient.ReceiveAsync(new ArraySegment<byte>(receiveBuffer, offset, length - offset), SocketFlags.None);
+            BitConverter.GetBytes(Options.SegmentSize).CopyTo(data.AsSpan(0));
 
-            if (rlen < 1)
-                throw new ObjectDisposedException(nameof(sclient));
-
-            offset += rlen;
-
-            if (offset == length)
+            try
             {
-                if (data == false)
+                var sclient = this.sclient;
+
+                if (sclient == null)
                 {
-
-                    var peeked = inputCipher.Peek(receiveBuffer);
-
-                    if (peeked == null)
-                        throw new Exception($"Cannot peek message header {string.Join(" ", receiveBuffer?[0..7].Select(x => x.ToString("x2")) ?? Enumerable.Empty<string>())}");
-
-                    length = BitConverter.ToInt32(peeked, 0);
-
-                    data = true;
-
-                    if (length > receiveBuffer.Length)
-                    {
-                        int n = receiveBuffer.Length;
-
-                        do
-                        {
-                            n *= 2;
-                        } while (n < length);
-
-                        Array.Resize(ref receiveBuffer, n);
-                        sclient.ReceiveBufferSize = n;
-                    }
+                    Disconnect();
+                    return false;
                 }
 
-                if (offset == length && data)
+                int offset = 0;
+
+                do
                 {
-                    InputPacketBuffer pbuff = new InputPacketBuffer(inputCipher.Decode(receiveBuffer, 0, length));
+                    var r = await sclient.SendAsync(new ArraySegment<byte>(data, offset, data.Length - offset), SocketFlags.None);
 
-                    OnReceive(pbuff.PacketId, length);
-
-                    ResetBuffer();
-
-                    try
+                    if (r < 1)
                     {
-                        PacketHandles[pbuff.PacketId](Data, pbuff);
-                    }
-                    catch (Exception ex)
-                    {
-                        RunException(ex);
+                        Disconnect();
+                        return false;
                     }
 
-                    if (!pbuff.ManualDisposing)
-                        pbuff.Dispose();
-                }
+                    offset += r;
+                } while (offset < data.Length);
+
+                return true;
+
             }
+            catch (NullReferenceException) { Disconnect(); }
+            catch (ObjectDisposedException) { Disconnect(); }
+            catch (Exception ex)
+            {
+                Disconnect(new ConnectionLostException(GetRemotePoint(), false, ex));
+            }
+
+            return false;
+        }
+
+        protected async Task<bool> ReceiveRPDataAsync()
+        {
+            var receive = new byte[2048];
+
+            int offset = 0;
+
+            try
+            {
+
+                do
+                {
+                    int r = await sclient.ReceiveAsync(new ArraySegment<byte>(receive, offset, receive.Length - offset), SocketFlags.None);
+
+                    if (r < 1)
+                    {
+                        Disconnect();
+                        return false;
+                    }
+
+                    offset += r;
+                } while (offset < receive.Length);
+
+                rpSegmentSize = BitConverter.ToUInt32(receive, 0);
+
+                return true;
+            }
+            catch (NullReferenceException) { Disconnect(); }
+            catch (ObjectDisposedException) { Disconnect(); }
+            catch (Exception ex)
+            {
+                Disconnect(new ConnectionLostException(GetRemotePoint(), true, ex));
+            }
+
+            return false;
+        }
+
+        #endregion
+
+        int soffset = 0;
+        int poffset = 0;
+        int hSkip = 0;
+
+        InputPacketBuffer rBuff = null;
+
+        static ArrayPool<byte> byteArrayPool = ArrayPool<byte>.Create();
+
+        private bool asyncReceiveIter(SocketAsyncEventArgs e)
+        {
+            if (e.BytesTransferred == 0 || e.SocketError != SocketError.Success)
+            {
+                Disconnect();
+                return true;
+            }
+
+            soffset += e.BytesTransferred;
+
+            if (soffset < rpSegmentSize)
+            {
+                e.SetBuffer(e.Buffer, soffset, (int)(rpSegmentSize - soffset));
+                return e.AcceptSocket.ReceiveAsync(e);
+            }
+
+            hSkip = 0;
+
+            var buf = e.Buffer;
+
+
+            if (rBuff == null)
+            {
+#if DEBUGEXAMPLES
+                sw ??= Stopwatch.StartNew();
+#endif
+
+                if (!inputCipher.DecodeHeaderRef(ref buf, hSkip))
+                    throw new CipherCodingException();
+
+                rBuff = new InputPacketBuffer(buf.AsSpan(hSkip));
+
+                length = rBuff.PacketLength;
+
+                if (length < 1)
+                    throw new NSLInvalidDataException(length, hSkip, buf, rBuff);
+
+                rBuff.OnDispose += buff => byteArrayPool.Return(buff.Data);
+
+                rBuff.SetData(byteArrayPool.Rent(rBuff.DataLength));
+
+                poffset = 7;
+                hSkip += 7;
+            }
+
+            var recv = Math.Min(soffset - hSkip, length - poffset);
+
+
+            if (!inputCipher.DecodeRef(ref buf, hSkip, recv))
+                throw new CipherCodingException();
+
+            Buffer.BlockCopy(buf, hSkip, rBuff.Data, poffset - 7, recv);
+
+            poffset += recv;
+
+            if (poffset >= length)
+            {
+                OnReceive(rBuff.PacketId, rBuff.DataLength);
+
+#if DEBUGEXAMPLES
+                ++c;
+#endif
+
+                try
+                {
+                    PacketHandles[rBuff.PacketId](Data, rBuff);
+                }
+                catch (Exception ex)
+                {
+                    RunException(ex);
+                }
+
+                if (!rBuff.ManualDisposing)
+                    rBuff.Dispose();
+
+                rBuff = null;
+
+#if DEBUGEXAMPLES
+                if (c % 10000 == 0)
+                    Options.HelperLogger?.Append(LoggerLevel.Debug, $"Received packets {c} in {sw.Elapsed.TotalMilliseconds} ms");
+#endif
+            }
+
+            if (e.Count < rpSegmentSize)
+                e.SetBuffer(e.Buffer, 0, (int)rpSegmentSize);
+
+            soffset = default;
+
+            return e.AcceptSocket.ReceiveAsync(e);
+        }
+
+        #region ThreadReceive
+
+        protected byte[] receiveBuffer;
+
+        protected int offset;
+
+        protected int length;
+
+
+        protected void ResetBuffer()
+        {
+            rBuff = null;
+            length = InputPacketBuffer.DefaultHeaderLength;
+            offset = 0;
         }
 
 
-
-        Thread receiveThread;
-        CancellationTokenSource threadCancelTS;
-
-#if DEBUGEXAMPLES
-        int c = 0;
-        Stopwatch? sw = null;
-#endif
+        CancellationTokenSource? thCancelTS;
+        Thread? thReceiveThread;
 
         protected void threadReceive()
         {
-            threadCancelTS?.Cancel();
+            thCancelTS?.Cancel();
 
-            threadCancelTS = new CancellationTokenSource();
+            thCancelTS = new CancellationTokenSource();
 
-            var token = threadCancelTS.Token;
+            var token = thCancelTS.Token;
 
-            receiveThread = new Thread(() =>
+            receiveBuffer = new byte[options.ReceiveBufferSize];
+
+            thReceiveThread = new Thread(() =>
             {
                 try
                 {
                     while (!disconnected && !token.IsCancellationRequested)
                         threadReceiveIter(token);
                 }
+                catch (NullReferenceException) { Disconnect(); }
+                catch (ObjectDisposedException) { Disconnect(); }
                 catch (ConnectionLostException clex)
                 {
                     Disconnect(clex);
@@ -229,15 +398,15 @@ namespace NSL.TCP
                 {
                     Disconnect(new ConnectionLostException(GetRemotePoint(), true, ex));
                 }
-
-
             });
 
-            receiveThread.Start();
+            thReceiveThread.Start();
         }
 
         private void threadReceiveIter(CancellationToken token)
         {
+            var sclient = this.sclient;
+
             if (sclient == null)
                 throw new ObjectDisposedException(nameof(sclient));
 
@@ -248,75 +417,84 @@ namespace NSL.TCP
 
             offset += rlen;
 
-            if (offset == length)
+            if (rBuff == null && offset == length)
             {
-                if (data == false)
+#if DEBUGEXAMPLES
+                sw ??= Stopwatch.StartNew();
+#endif
+
+                if (!inputCipher.DecodeHeaderRef(ref receiveBuffer, 0))
+                    throw new CipherCodingException($"Cannot peek message header {string.Join(" ", receiveBuffer?[0..7].Select(x => x.ToString("x2")) ?? Enumerable.Empty<string>())}");
+
+                rBuff = new InputPacketBuffer(receiveBuffer);
+
+                rBuff.SetData(byteArrayPool.Rent(rBuff.DataLength));
+
+                rBuff.OnDispose += (rBuff) =>
                 {
-#if DEBUGEXAMPLES
-                    sw ??= Stopwatch.StartNew();
-#endif
+                    if (rBuff.ManualDisposing)
+                        byteArrayPool.Return(rBuff.Data);
+                };
 
-                    var peeked = inputCipher.Peek(receiveBuffer);
+                length = rBuff.PacketLength;
 
-                    if (peeked == null)
-                        throw new Exception($"Cannot peek message header {string.Join(" ", receiveBuffer?[0..7].Select(x => x.ToString("x2")) ?? Enumerable.Empty<string>())}");
-
-                    length = BitConverter.ToInt32(peeked, 0);
-
-                    data = true;
-
-                    if (length > receiveBuffer.Length)
-                    {
-                        int n = receiveBuffer.Length;
-
-                        do
-                        {
-                            n *= 2;
-                        } while (n < length);
-
-                        Array.Resize(ref receiveBuffer, n);
-                        sclient.ReceiveBufferSize = n;
-                    }
-                }
-
-                if (offset == length && data)
+                if (length > receiveBuffer.Length)
                 {
-                    InputPacketBuffer pbuff = new InputPacketBuffer(inputCipher.Decode(receiveBuffer, 0, length));
+                    int n = receiveBuffer.Length;
 
-                    OnReceive(pbuff.PacketId, length);
-
-#if DEBUGEXAMPLES
-                    ++c;
-#endif
-
-                    ResetBuffer();
-
-                    try
+                    do
                     {
-                        PacketHandles[pbuff.PacketId](Data, pbuff);
-                    }
-                    catch (Exception ex)
-                    {
-                        RunException(ex);
-                    }
+                        n *= 2;
+                    } while (n < length);
 
-                    if (!pbuff.ManualDisposing)
-                        pbuff.Dispose();
-
-#if DEBUGEXAMPLES
-                    options.HelperLogger?.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Debug, $"{c}, {sw.Elapsed.TotalMilliseconds}");
-#endif
+                    Array.Resize(ref receiveBuffer, n);
+                    sclient.ReceiveBufferSize = n;
                 }
             }
+
+            if (rBuff != null && offset == length)
+            {
+                if (!inputCipher.DecodeRef(ref receiveBuffer, 7, rBuff.DataLength))
+                    throw new CipherCodingException();
+
+                Buffer.BlockCopy(receiveBuffer, 7, rBuff.Data, 0, rBuff.DataLength);
+
+                OnReceive(rBuff.PacketId, rBuff.DataLength);
+
+#if DEBUGEXAMPLES
+                ++c;
+#endif
+
+                try
+                {
+                    PacketHandles[rBuff.PacketId](Data, rBuff);
+                }
+                catch (Exception ex)
+                {
+                    RunException(ex);
+                }
+
+                if (!rBuff.ManualDisposing)
+                    rBuff.Dispose();
+
+                ResetBuffer();
+#if DEBUGEXAMPLES
+                if (c % 10000 == 0)
+                    options.HelperLogger?.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Debug, $"{c}, {sw.Elapsed.TotalMilliseconds}");
+#endif
+            }
         }
+
+        #endregion
+
 
 
         #region Send
 
-            /// <summary>
-            /// Send byte buffer async
-            /// </summary>
-            /// <param name="buffer"></param>
+        /// <summary>
+        /// Send byte buffer async
+        /// </summary>
+        /// <param name="buffer"></param>
         public void Send(OutputPacketBuffer packet, bool disposeOnSend = true)
         {
 #if DEBUG
@@ -361,42 +539,142 @@ namespace NSL.TCP
 
         private Channel<byte[]> sendChannel = Channel.CreateUnbounded<byte[]>();
 
-        private async void sendCycle()
+        private SocketAsyncEventArgs sendArgs;
+        ChannelReader<byte[]> sendChannelReader;
+
+        private async void startSend()
         {
-            var reader = sendChannel.Reader;
-            byte[]? buf = null;
+            sendChannelReader = sendChannel.Reader;
+
+            sendArgs = new SocketAsyncEventArgs()
+            {
+                SocketError = SocketError.Success,
+                BufferList = new List<ArraySegment<byte>>(),
+                UserToken = false
+            };
+
+            sendArgs.Completed += sendBufHandle;
+
+            while (!await sendProc(sendArgs)) { }
+        }
+        public int maxSendTime = 0;
+
+        private int spc = 0;
+
+        static ObjectPool<SocketAsyncEventArgs> sendBufferPool = ObjectPool.Create<SocketAsyncEventArgs>();
+
+        private async void sendBufHandle(object s, SocketAsyncEventArgs e)
+        {
+            while (!await sendProc(e)) { }
+        }
+
+        private void returnBufferPool(SocketAsyncEventArgs args)
+        {
+            args.Completed -= sendBufHandle;
+            Interlocked.Decrement(ref spc);
+            sendBufferPool.Return(args);
+        }
+
+        private async Task<bool> sendProc(SocketAsyncEventArgs args)
+        {
+            bool pooledObject = ((bool)args.UserToken);
+
+            byte[] buf = null;
 
             try
             {
-                while (!disconnected)
+                if (args.SocketError != SocketError.Success)
                 {
-                    buf = await reader.ReadAsync();
+                    Data?.OnPacketSendFail(args.BufferList[0].Array, 0, args.BufferList[0].Count);
 
-                    byte[] sndBuffer = outputCipher.Encode(buf, 0, buf.Length);
-
-                    var offs = 0;
-
-                    do
+                    if (pooledObject)
                     {
-                        var len = await sclient.SendAsync(sndBuffer[offs..], SocketFlags.None);
-
-                        if (len < 0)
-                            throw new ObjectDisposedException(nameof(sclient));
-
-                        offs += len;
-
-                    } while (offs < sndBuffer.Length);
-
-                    buf = null;
+                        returnBufferPool(args);
+                    }
+                    Disconnect();
+                    return true;
                 }
+
+                var sclient = this.sclient;
+
+                if (disconnected || sclient == null)
+                    return true;
+
+
+
+                if (pooledObject)
+                {
+                    if (!sendChannelReader.TryRead(out buf))
+                    {
+                        returnBufferPool(args);
+                        return true;
+                    }
+                }
+                else
+                {
+                    if (!sendChannelReader.TryRead(out buf))
+                        buf = await sendChannelReader.ReadAsync();
+                }
+
+
+                bool r = sendBuf(buf, args);
+
+                if (!pooledObject)
+                {
+                    while (sendChannelReader.TryRead(out buf))
+                    {
+                        args = sendBufferPool.Get();
+                        args.BufferList = new List<ArraySegment<byte>>();
+                        args.Completed += sendBufHandle;
+                        args.UserToken = true;
+
+
+                        Interlocked.Increment(ref spc);
+                        sendBuf(buf, args);
+                    }
+                }
+
+                buf = null;
+
+                return r;
             }
+            catch (NullReferenceException) { Disconnect(); }
+            catch (ObjectDisposedException) { Disconnect(); }
             catch (Exception ex)
+            {
+                Disconnect(new ConnectionLostException(GetRemotePoint(), false, ex));
+            }
+            finally
             {
                 if (buf != null)
                     Data?.OnPacketSendFail(buf, 0, buf.Length);
-
-                Disconnect(new ConnectionLostException(GetRemotePoint(), false, ex));
             }
+
+            return true;
+        }
+
+        private bool sendBuf(byte[] buf, SocketAsyncEventArgs args)
+        {
+
+            var pid = BitConverter.ToUInt16(buf, 4);
+
+            ArraySegment<byte> sndBuffer = outputCipher.Encode(buf, 0, buf.Length);
+
+            args.BufferList.Clear();
+
+            args.BufferList.Add(sndBuffer);
+
+            int s = (int)(sndBuffer.Count % segmentSize);
+
+            s = (int)(segmentSize - s);
+
+            if (s > 0)
+                args.BufferList.Add(new ArraySegment<byte>(emptyArray, 0, s));
+
+            args.BufferList = args.BufferList;
+
+
+            return sclient.SendAsync(args);
         }
 
         public void SendEmpty(ushort packetId)
@@ -434,6 +712,12 @@ namespace NSL.TCP
                 return;
 
             disconnected = true;
+
+            if (rBuff != null)
+            {
+                rBuff?.Dispose();
+                rBuff = null;
+            }
             RunDisconnect();
 
             if (inputCipher != null)

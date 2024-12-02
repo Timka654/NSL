@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.6.33815.320
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NSL.Node.Core", "NSL.Node.Core.csproj", "{EBB2A724-5B8E-4380-9A2B-EE3DDDA6BB75}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		DebugExamples|Any CPU = DebugExamples|Any CPU
+		Release|Any CPU = Release|Any CPU
+		Unity|Any CPU = Unity|Any CPU
+		UnityDebug|Any CPU = UnityDebug|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{EBB2A724-5B8E-4380-9A2B-EE3DDDA6BB75}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EBB2A724-5B8E-4380-9A2B-EE3DDDA6BB75}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EBB2A724-5B8E-4380-9A2B-EE3DDDA6BB75}.DebugExamples|Any CPU.ActiveCfg = DebugExamples|Any CPU
+		{EBB2A724-5B8E-4380-9A2B-EE3DDDA6BB75}.DebugExamples|Any CPU.Build.0 = DebugExamples|Any CPU
+		{EBB2A724-5B8E-4380-9A2B-EE3DDDA6BB75}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EBB2A724-5B8E-4380-9A2B-EE3DDDA6BB75}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EBB2A724-5B8E-4380-9A2B-EE3DDDA6BB75}.Unity|Any CPU.ActiveCfg = Unity|Any CPU
+		{EBB2A724-5B8E-4380-9A2B-EE3DDDA6BB75}.Unity|Any CPU.Build.0 = Unity|Any CPU
+		{EBB2A724-5B8E-4380-9A2B-EE3DDDA6BB75}.UnityDebug|Any CPU.ActiveCfg = UnityDebug|Any CPU
+		{EBB2A724-5B8E-4380-9A2B-EE3DDDA6BB75}.UnityDebug|Any CPU.Build.0 = UnityDebug|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {8F598F24-D466-445A-909A-61DEB865D31A}
+	EndGlobalSection
+EndGlobal

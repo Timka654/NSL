@@ -145,5 +145,13 @@ namespace NSL.SocketClient
         {
             return AddPacket(packetId, (IPacket<TClient>)packet);
         }
+
+        public void InitializeClientObjectBagOnConnect()
+        {
+            this.OnClientConnectEvent += (c) =>
+            {
+                c.InitializeObjectBag();
+            };
+        }
     }
 }

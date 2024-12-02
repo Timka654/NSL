@@ -30,6 +30,10 @@ namespace NSL.Cipher.RSA
             return rsa.ToXmlString(true);
         }
 
+        public bool DecodeRef(ref byte[] buffer, int offset, int length) => throw new NotImplementedException();
+
+        public bool DecodeHeaderRef(ref byte[] buffer, int offset) => throw new NotImplementedException();
+
         public byte[] Decode(byte[] buffer, int offset, int length)
         {
             byte[] buf = new byte[length];
@@ -49,6 +53,11 @@ namespace NSL.Cipher.RSA
             byte[] buf = new byte[InputPacketBuffer.DefaultHeaderLength];
             Array.Copy(buffer, 0, buf, 0, InputPacketBuffer.DefaultHeaderLength);
             return rsa.Encrypt(buf,true);
+        }
+
+        public void Peek(ArraySegment<byte> buffer)
+        {
+            throw new NotImplementedException();
         }
 
         public IPacketCipher CreateEntry()

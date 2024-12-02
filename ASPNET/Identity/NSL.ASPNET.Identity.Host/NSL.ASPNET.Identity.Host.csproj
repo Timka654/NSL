@@ -25,9 +25,10 @@
 	<ItemGroup>
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.10" />
 	</ItemGroup>
+
 	<ItemGroup>
-	  <ProjectReference Include="..\..\..\Utils\NSL.Utils.JsonSchemeGen.Attributes\NSL.Utils.JsonSchemeGen.Attributes.csproj" />
-	  <ProjectReference Include="..\..\NSL.ASPNET\NSL.ASPNET.csproj" />
+		<ProjectReference Include="..\..\..\Base\NSL.Utils.JsonSchemeGen.Attributes\NSL.Utils.JsonSchemeGen.Attributes.csproj" />
+		<ProjectReference Include="..\..\NSL.ASPNET\NSL.ASPNET.csproj" />
 	</ItemGroup>
 
 </Project>

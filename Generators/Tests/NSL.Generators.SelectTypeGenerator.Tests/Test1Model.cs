@@ -1,13 +1,13 @@
 ﻿#if !DEVELOP
 
-using NSL.Generators.MergeTypeGenerator.Attributes;
+using NSL.Generators.FillTypeGenerator.Attributes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NSL.Generators.MergeTypeGenerator.Tests
+namespace NSL.Generators.SelectTypeGenerator.Tests
 {
     [FillTypeGenerate(typeof(Test2Model))]
     public partial class Test1Model : Test1Model_p1

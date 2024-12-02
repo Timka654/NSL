@@ -1,0 +1,35 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<NSLProjectTypes>Example</NSLProjectTypes>
+		<OutputType>Exe</OutputType>
+		<TargetFramework>net8.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+
+
+		<Version>$(VersionSuffix)</Version>
+		<Authors>Relife87</Authors>
+
+		<IsPackable>false</IsPackable>
+
+		<Configurations>DebugExamples;Debug;Release;UnityDebug;Unity</Configurations>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="NSL.ConfigurationEngine.Providers.Json" Version="2024.11.29.2336" />
+		<PackageReference Include="NSL.Logger" Version="2024.11.29.2336" />
+		<PackageReference Include="NSL.UDP.Client" Version="2024.11.29.2336" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\NSL.Node.P2Proxy\NSL.Node.P2Proxy.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Update="configuration.json">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
+
+</Project>

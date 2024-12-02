@@ -1,7 +1,7 @@
 ﻿#if !DEVELOP
 using NSL.Generators.SelectTypeGenerator.Attributes;
 
-namespace NSL.Generators.FillTypeGenerator.Tests
+namespace NSL.Generators.SelectTypeGenerator.Tests
 {
     [SelectGenerate("model1", "model2", "model3")]
     public partial class WithModelName4

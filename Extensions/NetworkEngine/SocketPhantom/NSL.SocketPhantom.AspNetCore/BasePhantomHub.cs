@@ -126,27 +126,20 @@ namespace NSL.SocketPhantom.AspNetCore
 
         public override async Task<bool> Invoke(PhantomHubClientProxy client, InputPacketBuffer packet)
         {
-            using (var ip = new InputPacketBuffer())
+            var methodName = packet.ReadString().ToLower();
+
+            if (methodDelegates.TryGetValue($"{methodName}_{packet.ReadInt32()}", out var func))
             {
-                packet.CopyTo(ip);
-
-                ip.Position = 0;
-
-                var methodName = ip.ReadString().ToLower();
-
-                if (methodDelegates.TryGetValue($"{methodName}_{ip.ReadInt32()}", out var func))
+                using (var scope = ServiceProvider.CreateScope())
                 {
-                    using (var scope = ServiceProvider.CreateScope())
-                    {
-                        var hub = instanceFunc(scope.ServiceProvider);
+                    var hub = instanceFunc(scope.ServiceProvider);
 
-                        hub.SetBase(this, client);
+                    hub.SetBase(this, client);
 
-                        await func(hub, ip);
-                    }
-
-                    return true;
+                    await func(hub, packet);
                 }
+
+                return true;
             }
 
             return false;

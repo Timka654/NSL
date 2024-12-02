@@ -50,8 +50,11 @@ namespace NSL.SocketCore.Extensions.Buffer
             where TEnum : struct, Enum, IConvertible
             => new RequestPacketBuffer(rid, len).WithPid(packetId);
 
-        public static RequestPacketBuffer Create(int len = 48)
-            => new RequestPacketBuffer(len);
+        public static RequestPacketBuffer Create(ushort packetId, int len = 48)
+            => new RequestPacketBuffer(len).WithPid(packetId);
+
+        public static RequestPacketBuffer Create()
+            => new RequestPacketBuffer();
     }
 
     [Obsolete("Replace to RequestPacketBuffer", true)]

@@ -35,6 +35,7 @@
 	<ItemGroup>
 		<ProjectReference Include="..\..\..\Core\Extensions\SocketCore.Extensions.Buffer\NSL.SocketCore.Extensions.Buffer.csproj" />
 		<ProjectReference Include="..\..\..\Core\NSL.SocketServer\NSL.SocketServer.csproj" />
+		<ProjectReference Include="..\..\..\Generators\NSL.Generators.BinaryTypeIOGenerator\NSL.Generators.BinaryTypeIOGenerator.csproj" OutputItemType="Analyzer" />
 		<ProjectReference Include="..\NSL.Extensions.Version\NSL.Extensions.Version.csproj" />
 	</ItemGroup>
 

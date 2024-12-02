@@ -12,6 +12,7 @@ namespace NSL.TCP.Server
     {
         public TCPServerListener(ServerOptions<T> options, bool legacyThread = false) : base(options, legacyThread)
         {
+            //BitConverter.ToInt16(new ReadOnlySpan<byte>(new byte[] { 0, 0 }), 0);   
         }
     }
     public class TCPServerListener<T, TOptions> : INetworkListener<T>

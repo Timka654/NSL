@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<NSLProjectTypes>Example</NSLProjectTypes>
+		<OutputType>Exe</OutputType>
+		<TargetFramework>net8.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+
+		<Version>$(VersionSuffix)</Version>
+		<Authors>Relife87</Authors>
+		<Configurations>DebugExamples;Debug;Release;UnityDebug;Unity</Configurations>
+	</PropertyGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\..\Bridge\NSL.Node.BridgeServer\NSL.Node.BridgeServer.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Update="configuration.json">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
+
+</Project>

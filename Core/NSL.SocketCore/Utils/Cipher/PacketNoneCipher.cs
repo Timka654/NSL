@@ -1,4 +1,6 @@
-﻿namespace NSL.SocketCore.Utils.Cipher
+﻿using System;
+
+namespace NSL.SocketCore.Utils.Cipher
 {
     public class PacketNoneCipher : IPacketCipher
     {
@@ -6,6 +8,10 @@
         {
             return this;
         }
+
+        public bool DecodeRef(ref byte[] buffer, int offset, int length) => true;
+
+        public bool DecodeHeaderRef(ref byte[] buffer, int offset) => true;
 
         public byte[] Decode(byte[] buffer, int offset, int length)
         {
@@ -28,6 +34,10 @@
         public byte[] Peek(byte[] buffer)
         {
             return buffer;
+        }
+
+        public void Peek(ArraySegment<byte> buffer)
+        {
         }
 
         public bool Sync() => false;

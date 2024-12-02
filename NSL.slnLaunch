@@ -3,11 +3,24 @@
     "Name": "TCPExampleRun",
     "Projects": [
       {
-        "Path": "Protocols\\TCP\\Examples\\TCP.BaseClientExample\\TCP.BaseClientExample.csproj",
+        "Path": "Protocols\\TCP\\Examples\\TCP.BaseServerExample\\TCP.BaseServerExample.csproj",
         "Action": "Start"
       },
       {
-        "Path": "Protocols\\TCP\\Examples\\TCP.BaseServerExample\\TCP.BaseServerExample.csproj",
+        "Path": "Protocols\\TCP\\Examples\\TCP.BaseClientExample\\TCP.BaseClientExample.csproj",
+        "Action": "Start"
+      }
+    ]
+  },
+  {
+    "Name": "UDPExampleRun",
+    "Projects": [
+      {
+        "Path": "Protocols\\UDP\\Examples\\UDPExample.FClient\\UDPExample.FClient.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "Protocols\\UDP\\Examples\\UDPExample.SClient\\UDPExample.SClient.csproj",
         "Action": "Start"
       }
     ]

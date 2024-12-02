@@ -1,30 +1,56 @@
-﻿using NSL.SocketCore.Utils.Buffer;
+﻿using NSL.Logger;
+using NSL.SocketCore.Extensions.Buffer;
+using NSL.SocketCore.Utils.Buffer;
 using NSL.SocketServer;
 using NSL.SocketServer.Utils;
 using NSL.TCP.Server;
+using System.Diagnostics;
+using TCP.BaseServerExample;
 
 Console.WriteLine("TCP.Server");
 
 ServerOptions<BaseServerNetworkClient> options = new ServerOptions<BaseServerNetworkClient>();
 
-options.Port = 20004;
+options.Port = 20008;
 
 options.IpAddress = "0.0.0.0";
 
 options.ReceiveBufferSize = 1024;
 
-options.OnReceivePacket += (c, pid, len) => { if (InputPacketBuffer.IsSystemPID(pid)) return; Console.WriteLine($"received {pid}"); };
-options.OnSendPacket += (c, pid, len, stackTrace) => { if (OutputPacketBuffer.IsSystemPID(pid)) return; Console.WriteLine($"sended {pid}"); };
+options.HelperLogger = new ConsoleLogger();
 
+options.OnExceptionEvent += (ex, c) =>
+{
+    Console.WriteLine($"Exception {ex}");
+};
 
 options.AddHandle(1, (client, p) =>
 {
-    Console.WriteLine($"received from client({client.ObjectBag["uid"]}) pid:{p.PacketId} - {p.ReadString()}");
+    Console.WriteLine($"Receive from client {p.ReadString()}");
 
-    var pr = OutputPacketBuffer.Create(2);
-    pr.WriteInt32((int)p.PacketLength);
+    var o = OutputPacketBuffer.Create(4);
 
-    client.Send(pr);
+    o.WriteInt32(p.DataLength);
+
+    client.Send(o);
+});
+
+options.AddHandle(7, (c, req) =>
+{
+    var d = req.ReadNullableClass<object>(() =>
+    {
+        var s1 = Enumerable.Range(0,1000).Select(x=> req.ReadString()).ToArray();
+
+        return s1;
+    });
+    //res.WriteString("invoked");
+
+    //return false;
+
+});
+
+options.AddHandle(3, (client, p) =>
+{
 });
 
 int counter = 0;
@@ -49,7 +75,7 @@ options.OnClientDisconnectEvent += (client) =>
     Console.WriteLine($"Client({client.ObjectBag["uid"]}) disconnected!!");
 };
 
-var t = new TCPServerListener<BaseServerNetworkClient>(options);
+var t = new TCPServerListener<BaseServerNetworkClient>(options, false);
 
 t.Start();
 
