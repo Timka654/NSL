@@ -36,7 +36,7 @@ namespace NSL.SocketCore
                 if (value % 2 > 0)
                     throw new InvalidOperationException($"receiveBufferSize must have value % 2");
 
-                if(value < 7)
+                if(value < InputPacketBuffer.DefaultHeaderLength)
                     throw new InvalidOperationException($"receiveBufferSize cannot set value less 7");
 
                 receiveBufferSize = value;

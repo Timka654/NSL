@@ -301,8 +301,8 @@ namespace NSL.TCP
 
                 rBuff.SetData(byteArrayPool.Rent(rBuff.DataLength));
 
-                poffset = 7;
-                hSkip += 7;
+                poffset = InputPacketBuffer.DefaultHeaderLength;
+                hSkip += InputPacketBuffer.DefaultHeaderLength;
             }
 
             var recv = Math.Min(soffset - hSkip, length - poffset);
@@ -311,7 +311,7 @@ namespace NSL.TCP
             if (!inputCipher.DecodeRef(ref buf, hSkip, recv))
                 throw new CipherCodingException();
 
-            Buffer.BlockCopy(buf, hSkip, rBuff.Data, poffset - 7, recv);
+            Buffer.BlockCopy(buf, hSkip, rBuff.Data, poffset - InputPacketBuffer.DefaultHeaderLength, recv);
 
             poffset += recv;
 
@@ -424,7 +424,7 @@ namespace NSL.TCP
 #endif
 
                 if (!inputCipher.DecodeHeaderRef(ref receiveBuffer, 0))
-                    throw new CipherCodingException($"Cannot peek message header {string.Join(" ", receiveBuffer?[0..7].Select(x => x.ToString("x2")) ?? Enumerable.Empty<string>())}");
+                    throw new CipherCodingException($"Cannot peek message header {string.Join(" ", receiveBuffer?[0..InputPacketBuffer.DefaultHeaderLength].Select(x => x.ToString("x2")) ?? Enumerable.Empty<string>())}");
 
                 rBuff = new InputPacketBuffer(receiveBuffer);
 
@@ -454,10 +454,10 @@ namespace NSL.TCP
 
             if (rBuff != null && offset == length)
             {
-                if (!inputCipher.DecodeRef(ref receiveBuffer, 7, rBuff.DataLength))
+                if (!inputCipher.DecodeRef(ref receiveBuffer, InputPacketBuffer.DefaultHeaderLength, rBuff.DataLength))
                     throw new CipherCodingException();
 
-                Buffer.BlockCopy(receiveBuffer, 7, rBuff.Data, 0, rBuff.DataLength);
+                Buffer.BlockCopy(receiveBuffer, InputPacketBuffer.DefaultHeaderLength, rBuff.Data, 0, rBuff.DataLength);
 
                 OnReceive(rBuff.PacketId, rBuff.DataLength);
 
@@ -512,7 +512,13 @@ namespace NSL.TCP
         /// <param name="buffer"></param>
         public async void Send(byte[] buffer)
         {
-            try { await sendChannel.Writer.WriteAsync(buffer); } catch (InvalidOperationException) { Data?.OnPacketSendFail(buffer, 0, buffer.Length); }
+            try
+            {
+                outputCipher.EncodeHeaderRef(ref buffer, 0);
+                outputCipher.EncodeRef(ref buffer, InputPacketBuffer.DefaultHeaderLength, buffer.Length - InputPacketBuffer.DefaultHeaderLength);
+                await sendChannel.Writer.WriteAsync(buffer);
+            }
+            catch (InvalidOperationException) { Data?.OnPacketSendFail(buffer, 0, buffer.Length); }
         }
 
         /// <summary>
@@ -527,9 +533,14 @@ namespace NSL.TCP
             {
                 if (offset == 0 && length == buf.Length)
                 {
+                    outputCipher.EncodeHeaderRef(ref buf, 0);
+                    outputCipher.EncodeRef(ref buf, InputPacketBuffer.DefaultHeaderLength, buf.Length - InputPacketBuffer.DefaultHeaderLength);
                     await sendChannel.Writer.WriteAsync(buf);
                     return;
                 }
+
+                outputCipher.EncodeHeaderRef(ref buf, offset);
+                outputCipher.EncodeRef(ref buf, offset + InputPacketBuffer.DefaultHeaderLength, buf.Length - InputPacketBuffer.DefaultHeaderLength - offset);
 
                 await sendChannel.Writer.WriteAsync(buf[offset..(offset + length)]);
             }

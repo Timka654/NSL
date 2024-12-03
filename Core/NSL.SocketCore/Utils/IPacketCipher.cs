@@ -19,6 +19,10 @@ namespace NSL.SocketCore.Utils
 
         bool DecodeHeaderRef(ref byte[] buffer, int offset);
 
+        bool EncodeRef(ref byte[] buffer, int offset, int length);
+
+        bool EncodeHeaderRef(ref byte[] buffer, int offset);
+
         bool Sync();
 
         IPacketCipher CreateEntry();

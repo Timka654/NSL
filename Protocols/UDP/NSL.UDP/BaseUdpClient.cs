@@ -195,7 +195,7 @@ namespace NSL.UDP
             {
                 inputCipher.DecodeHeaderRef(ref result, 0);
 
-                inputCipher.DecodeRef(ref result, 7, result.Length - 7);
+                inputCipher.DecodeRef(ref result, InputPacketBuffer.DefaultHeaderLength, result.Length - InputPacketBuffer.DefaultHeaderLength);
 
 
 
@@ -253,12 +253,13 @@ namespace NSL.UDP
 
         public void Send(UDPChannelEnum channel, byte[] buffer)
         {
-            var sndBuf = outputCipher.Encode(buffer, 0, buffer.Length);
+            outputCipher.EncodeHeaderRef(ref buffer, 0);
+            outputCipher.EncodeRef(ref buffer, OutputPacketBuffer.DefaultHeaderLength, buffer.Length - OutputPacketBuffer.DefaultHeaderLength);
 
             if (channel.HasFlag(UDPChannelEnum.Reliable))
-                reliableChannel.Send(channel, sndBuf);
+                reliableChannel.Send(channel, buffer);
             else
-                unreliableChannel.Send(channel, sndBuf);
+                unreliableChannel.Send(channel, buffer);
         }
 
         public void Send(byte[] buffer)

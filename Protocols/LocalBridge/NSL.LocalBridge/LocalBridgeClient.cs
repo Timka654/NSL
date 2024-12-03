@@ -172,7 +172,7 @@ namespace NSL.LocalBridge
         {
             var pbuff = new InputPacketBuffer(buf);
 
-            pbuff.SetData(buf[7..].ToArray());
+            pbuff.SetData(buf[InputPacketBuffer.DefaultHeaderLength..].ToArray());
 
             OnReceive(pbuff.PacketId, pbuff.PacketLength);
 

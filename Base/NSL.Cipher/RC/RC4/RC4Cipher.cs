@@ -38,11 +38,11 @@ namespace NSL.Cipher.RC.RC4
         {
             if (String.IsNullOrEmpty(pKey))
                 return false;
-            
+
             byte[] asciiBytes = Encoding.Convert(Encoding.Unicode, Encoding.ASCII, Encoding.Unicode.GetBytes(pKey));
-            
+
             long KeyLen = pKey.Length;
-            
+
             m_state.m_nBox = new byte[256];
             for (long count = 0; count < 256; count++)
             {
@@ -50,7 +50,7 @@ namespace NSL.Cipher.RC.RC4
             }
 
             long index2 = 0;
-            
+
             for (long count = 0; count < 256; count++)
             {
                 index2 = (index2 + m_state.m_nBox[index2] + asciiBytes[index2 % KeyLen]) % 256;
@@ -70,7 +70,7 @@ namespace NSL.Cipher.RC.RC4
         {
             long i = m_state.x;
             long j = m_state.y;
-            
+
             for (long offset = 0; offset < len; offset++)
             {
                 i = (i + 1) % 256;
@@ -84,24 +84,19 @@ namespace NSL.Cipher.RC.RC4
             m_state.y = (int)j;
         }
 
-        public void code(ref byte[] pSrc, int off, ref byte[] pDst, int len)
-        {
-            codeBlock(ref pSrc, off, ref pDst, len);
-        }
-
-        void codeBlock(ref byte[] pSrc, int off, ref byte[] pDst, int len)
+        public void codeBlock(Span<byte> pSrc, ArraySegment<byte> pDst)
         {
             long i = m_state.x;
             long j = m_state.y;
-            
-            for (long offset = 0; offset < len; offset++)
+
+            for (int offset = 0; offset < pSrc.Length; offset++)
             {
                 i = (i + 1) % 256;
                 j = (j + m_state.m_nBox[i]) % 256;
                 byte temp = m_state.m_nBox[i];
                 m_state.m_nBox[i] = m_state.m_nBox[j];
                 m_state.m_nBox[j] = temp;
-                byte a = pSrc[offset + off];
+                byte a = pSrc[offset];
                 byte b = m_state.m_nBox[(m_state.m_nBox[i] + m_state.m_nBox[j]) % 256];
                 pDst[offset] = (byte)(a ^ b);
             }
@@ -112,14 +107,42 @@ namespace NSL.Cipher.RC.RC4
 
         public State m_state;
 
-        public bool DecodeRef(ref byte[] buffer, int offset, int length) => throw new NotImplementedException();
+        public bool DecodeRef(ref byte[] buffer, int offset, int length)
+        {
+            codeBlock(buffer.AsSpan(offset, length)
+            , new ArraySegment<byte>(buffer, offset, length));
 
-        public bool DecodeHeaderRef(ref byte[] buffer, int offset) => throw new NotImplementedException();
+            return true;
+        }
+
+        public bool DecodeHeaderRef(ref byte[] buffer, int offset)
+        {
+            codeBlock(buffer.AsSpan(offset, InputPacketBuffer.DefaultHeaderLength)
+            , new ArraySegment<byte>(buffer, offset, InputPacketBuffer.DefaultHeaderLength));
+
+            return true;
+        }
+
+        public bool EncodeRef(ref byte[] buffer, int offset, int length)
+        {
+            codeBlock(buffer.AsSpan(offset, length)
+            , new ArraySegment<byte>(buffer, offset, length));
+
+            return true;
+        }
+
+        public bool EncodeHeaderRef(ref byte[] buffer, int offset)
+        {
+            codeBlock(buffer.AsSpan(offset, InputPacketBuffer.DefaultHeaderLength)
+            , new ArraySegment<byte>(buffer, offset, InputPacketBuffer.DefaultHeaderLength)); 
+            
+            return true;
+        }
 
         public byte[] Decode(byte[] buffer, int offset, int length)
         {
             byte[] dest = new byte[length];
-            codeBlock(ref buffer, offset, ref dest, length);
+            codeBlock(buffer.AsSpan(offset, length), dest);
 
             return dest;
         }
@@ -127,15 +150,15 @@ namespace NSL.Cipher.RC.RC4
         public byte[] Encode(byte[] buffer, int offset, int length)
         {
             byte[] dest = new byte[length];
-            codeBlock(ref buffer, offset, ref dest, length);
+            codeBlock(buffer.AsSpan(offset, length), dest);
 
             return dest;
         }
 
         public byte[] Peek(byte[] buffer)
         {
-            byte[] dest = new byte[7];
-            codeBlock(ref buffer, 0, ref dest, InputPacketBuffer.DefaultHeaderLength);
+            byte[] dest = new byte[InputPacketBuffer.DefaultHeaderLength];
+            codeBlock(buffer.AsSpan(0, InputPacketBuffer.DefaultHeaderLength), dest);
 
             return dest;
         }
@@ -146,9 +169,9 @@ namespace NSL.Cipher.RC.RC4
         }
 
         private RC4Cipher(string key)
-        { 
+        {
             init(key);
-            }
+        }
 
         public IPacketCipher CreateEntry()
         {

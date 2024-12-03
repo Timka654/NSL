@@ -282,7 +282,7 @@ namespace NSL.SocketCore.Extensions.Buffer
                 buffer.SetLength(23);
 
             data.Data.AsSpan(0, 16)
-                .CopyTo(new ArraySegment<byte>(buffer.GetBuffer(), 7, 16));
+                .CopyTo(new ArraySegment<byte>(buffer.GetBuffer(), OutputPacketBuffer.DefaultHeaderLength, 16));
 
             if (buffer.DataPosition < 16)
                 buffer.DataPosition = 16;

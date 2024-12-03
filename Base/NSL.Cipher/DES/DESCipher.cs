@@ -56,6 +56,10 @@ namespace NSL.Cipher.DES
 
         public bool DecodeHeaderRef(ref byte[] buffer, int offset) => throw new NotImplementedException();
 
+        public bool EncodeRef(ref byte[] buffer, int offset, int length) => throw new NotImplementedException();
+
+        public bool EncodeHeaderRef(ref byte[] buffer, int offset) => throw new NotImplementedException();
+
         public byte[] Decode(byte[] buffer, int offset, int length)
         {
             return decrypt.TransformFinalBlock(buffer, offset, length);

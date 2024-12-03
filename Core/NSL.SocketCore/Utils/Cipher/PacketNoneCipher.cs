@@ -13,6 +13,10 @@ namespace NSL.SocketCore.Utils.Cipher
 
         public bool DecodeHeaderRef(ref byte[] buffer, int offset) => true;
 
+        public bool EncodeRef(ref byte[] buffer, int offset, int length) => true;
+
+        public bool EncodeHeaderRef(ref byte[] buffer, int offset) => true;
+
         public byte[] Decode(byte[] buffer, int offset, int length)
         {
             byte[] dest = new byte[length];

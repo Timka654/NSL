@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<NSLProjectTypes>Example</NSLProjectTypes>
+		<OutputType>Exe</OutputType>
+		<TargetFramework>net8.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>disable</Nullable>
+		<IsPackable>false</IsPackable>
+		<Version>$(VersionSuffix)</Version>
+		<Configurations>DebugExamples;Debug;Release;UnityDebug;Unity</Configurations>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\NSL.Cipher\NSL.Cipher.csproj" />
+	</ItemGroup>
+
+</Project>

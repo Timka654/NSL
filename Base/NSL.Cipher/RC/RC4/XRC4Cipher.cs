@@ -1,5 +1,6 @@
 ﻿using System;
 using NSL.SocketCore.Utils;
+using NSL.SocketCore.Utils.Buffer;
 
 namespace NSL.Cipher.RC.RC4
 {
@@ -24,8 +25,8 @@ namespace NSL.Cipher.RC.RC4
 
         public byte[] Peek(byte[] buff)
         {
-            byte[] res = new byte[7];
-            TryCipher(ref buff, 0, ref res, 7);
+            byte[] res = new byte[InputPacketBuffer.DefaultHeaderLength];
+            TryCipher(ref buff, 0, ref res, InputPacketBuffer.DefaultHeaderLength);
             return res;
         }
 
@@ -36,8 +37,8 @@ namespace NSL.Cipher.RC.RC4
 
         public byte[] Peek(byte[] buff, int offset)
         {
-            byte[] res = new byte[7];
-            TryCipher(ref buff, offset, ref res, 7);
+            byte[] res = new byte[InputPacketBuffer.DefaultHeaderLength];
+            TryCipher(ref buff, offset, ref res, InputPacketBuffer.DefaultHeaderLength);
             return res;
         }
 
@@ -54,9 +55,35 @@ namespace NSL.Cipher.RC.RC4
             return res;
         }
 
-        public bool DecodeRef(ref byte[] buffer, int offset, int length) => throw new NotImplementedException();
+        public bool DecodeRef(ref byte[] buffer, int offset, int length)
+        {
+            rc4.codeBlock(buffer.AsSpan(offset, length)
+                , new ArraySegment<byte>(buffer, offset, length));
 
-        public bool DecodeHeaderRef(ref byte[] buffer, int offset) => throw new NotImplementedException();
+            return true;
+        }
+
+        public bool DecodeHeaderRef(ref byte[] buffer, int offset)
+        {
+            DoCipher(ref buffer, offset, ref buffer, InputPacketBuffer.DefaultHeaderLength);
+
+            return true;
+        }
+
+        public bool EncodeRef(ref byte[] buffer, int offset, int length)
+        {
+            DoCipher(ref buffer, offset, ref buffer, length);
+
+            return true;
+        }
+
+        public bool EncodeHeaderRef(ref byte[] buffer, int offset)
+        {
+            rc4.codeBlock(buffer.AsSpan(offset, InputPacketBuffer.DefaultHeaderLength)
+                , new ArraySegment<byte>(buffer, offset, InputPacketBuffer.DefaultHeaderLength));
+
+            return true;
+        }
 
         public byte[] Decode(byte[] buff)
         {
@@ -96,7 +123,8 @@ namespace NSL.Cipher.RC.RC4
             ss.x = rc4.m_state.x;
             ss.y = rc4.m_state.y;
 
-            rc4.code(ref pSource, off, ref pTarget, len);
+            rc4.codeBlock(pSource.AsSpan(off, len)
+                , new ArraySegment<byte>(pTarget, off, len));
 
             ss.m_nBox.CopyTo(rc4.m_state.m_nBox, 0);
             rc4.m_state.x = ss.x;
@@ -106,7 +134,8 @@ namespace NSL.Cipher.RC.RC4
 
         private void DoCipher(ref byte[] pSource, int off, ref byte[] pTarget, int len)
         {
-            rc4.code(ref pSource, off, ref pTarget, len);
+            rc4.codeBlock(pSource.AsSpan(off, len)
+                , new ArraySegment<byte>(pTarget, off, len));
         }
 
         public IPacketCipher CreateEntry()
