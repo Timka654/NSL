@@ -168,7 +168,7 @@ namespace NSL.Cipher.RC.RC4
             throw new NotImplementedException();
         }
 
-        private RC4Cipher(string key)
+        public RC4Cipher(string key)
         {
             init(key);
         }

@@ -227,13 +227,7 @@ namespace NSL.WebSockets
         /// <param name="buffer"></param>
         public async void Send(byte[] buffer)
         {
-            try
-            {
-                outputCipher.EncodeHeaderRef(ref buffer, 0);
-                outputCipher.EncodeRef(ref buffer, OutputPacketBuffer.DefaultHeaderLength, buffer.Length - OutputPacketBuffer.DefaultHeaderLength);
-                await sendChannel.Writer.WriteAsync(buffer);
-            }
-            catch (InvalidOperationException) { Data?.OnPacketSendFail(buffer, 0, buffer.Length); }
+            try { await sendChannel.Writer.WriteAsync(buffer); } catch (InvalidOperationException) { Data?.OnPacketSendFail(buffer, 0, buffer.Length); }
         }
 
         /// <summary>
@@ -248,14 +242,9 @@ namespace NSL.WebSockets
             {
                 if (offset == 0 && length == buf.Length)
                 {
-                    outputCipher.EncodeHeaderRef(ref buf, 0);
-                    outputCipher.EncodeRef(ref buf, OutputPacketBuffer.DefaultHeaderLength, buf.Length - OutputPacketBuffer.DefaultHeaderLength);
                     await sendChannel.Writer.WriteAsync(buf);
                     return;
                 }
-
-                outputCipher.EncodeHeaderRef(ref buf, offset);
-                outputCipher.EncodeRef(ref buf, offset + OutputPacketBuffer.DefaultHeaderLength, buf.Length - OutputPacketBuffer.DefaultHeaderLength - offset);
 
                 await sendChannel.Writer.WriteAsync(buf[offset..(offset + length)]);
             }
@@ -275,11 +264,13 @@ namespace NSL.WebSockets
             {
                 while (!disconnected)
                 {
-                    buf = await reader.ReadAsync();
+                    if (!reader.TryRead(out buf))
+                        buf = await reader.ReadAsync();
 
-                    byte[] sndBuffer = outputCipher.Encode(buf, offset, length);
+                    outputCipher.EncodeHeaderRef(ref buf, 0);
+                    outputCipher.EncodeRef(ref buf, OutputPacketBuffer.DefaultHeaderLength, buf.Length - OutputPacketBuffer.DefaultHeaderLength);
 
-                    await sclient.SendAsync(sndBuffer, WebSocketMessageType.Binary, true, CancellationToken.None);
+                    await sclient.SendAsync(buf, WebSocketMessageType.Binary, true, CancellationToken.None);
 
                     buf = null;
                 }

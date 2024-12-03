@@ -1,4 +1,5 @@
-﻿using NSL.Logger;
+﻿using NSL.Cipher.RC.RC4;
+using NSL.Logger;
 using NSL.SocketCore.Extensions.Buffer;
 using NSL.SocketCore.Utils.Buffer;
 using NSL.SocketServer;
@@ -18,6 +19,9 @@ options.IpAddress = "0.0.0.0";
 options.ReceiveBufferSize = 1024;
 
 options.HelperLogger = new ConsoleLogger();
+
+options.InputCipher = new XRC4Cipher("werty65343g353g");
+options.OutputCipher = new XRC4Cipher("werty65343g353g");
 
 options.OnExceptionEvent += (ex, c) =>
 {

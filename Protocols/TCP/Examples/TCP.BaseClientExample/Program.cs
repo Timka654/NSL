@@ -1,4 +1,5 @@
-﻿using NSL.SocketClient;
+﻿using NSL.Cipher.RC.RC4;
+using NSL.SocketClient;
 using NSL.SocketCore.Extensions.Buffer;
 using NSL.SocketCore.Utils.Buffer;
 using NSL.TCP.Client;
@@ -28,6 +29,9 @@ options.AddHandle(4, (c, p) =>
 
 options.SegmentSize = 1024;
 
+options.InputCipher = new XRC4Cipher("werty65343g353g");
+options.OutputCipher = new XRC4Cipher("werty65343g353g");
+
 var t = new TCPNetworkClient<NetworkClient>(options, false);
 
 //t.OnReceivePacket += (c, pid, len) => { if (InputPacketBuffer.IsSystemPID(pid)) return; Console.WriteLine($"received {pid}"); };
@@ -41,21 +45,21 @@ if (!await t.ConnectAsync("127.0.0.1", 20008, 20_000))
 else
 {
 
-    var request = OutputPacketBuffer.Create(7);
+    //var request = OutputPacketBuffer.Create(7);
 
-    request.WriteNullableClass(t, () =>
-    {
-        for (int i = 0; i < 1000; i++)
-        {
-            request.WriteString($"qqqqqqqqqqq{i}");
-        }
-    });
+    //request.WriteNullableClass(t, () =>
+    //{
+    //    for (int i = 0; i < 1000; i++)
+    //    {
+    //        request.WriteString($"qqqqqqqqqqq{i}");
+    //    }
+    //});
 
-    t.Send(request);
+    //t.Send(request);
 
-    await Task.Delay(120_000);
+    //await Task.Delay(120_000);
 
-    return;
+    //return;
 
     //using var opb = OutputPacketBuffer.Create(3);
 
@@ -79,15 +83,19 @@ else
     //Console.WriteLine($"Send {sw.ElapsedMilliseconds}");
 
 
+    var outputPacketBuffer2 = OutputPacketBuffer.Create(1);
+
+    outputPacketBuffer2.WriteString(string.Join(' ', Enumerable.Repeat("_",4096)));
+
+    t.Send(outputPacketBuffer2);
+
     while (true)
     {
         Console.WriteLine($"Write any text:");
 
         var line = Console.ReadLine();
 
-        var outputPacketBuffer = new OutputPacketBuffer();
-
-        outputPacketBuffer.PacketId = 1;
+        var outputPacketBuffer = OutputPacketBuffer.Create(1);
 
         outputPacketBuffer.WriteString(line);
 

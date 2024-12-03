@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<NSLProjectTypes>Example</NSLProjectTypes>
@@ -12,6 +12,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\..\..\..\Base\NSL.Cipher\NSL.Cipher.csproj" />
 		<ProjectReference Include="..\..\..\..\Base\NSL.Logger\NSL.Logger.csproj" />
 		<ProjectReference Include="..\..\..\..\Core\Extensions\SocketCore.Extensions.Buffer\NSL.SocketCore.Extensions.Buffer.csproj" />
 		<ProjectReference Include="..\..\NSL.TCP.Server\NSL.TCP.Server.csproj" />
