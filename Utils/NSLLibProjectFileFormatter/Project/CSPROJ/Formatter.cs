@@ -91,6 +91,7 @@ namespace NSLLibProjectFileFormatter.Project.CSPROJ
             bool unityOnly = hasUnityInProjectName(path);
             bool aspNetOnly = isOnlyAspNetProject(path, sdk);
 
+
             CSProjBuilder tb = new CSProjBuilder();
 
             var description = GetGroupValue(FindGroupsByRegex(currentContent, CSProjRegex.GetProjectDescriptionRegex()));
@@ -118,6 +119,8 @@ namespace NSLLibProjectFileFormatter.Project.CSPROJ
             var compileItems = FindAllByRegex(fileContent, CSProjRegex.GetCompileRegex());
 
             var embeddedResourceItems = FindAllByRegex(fileContent, CSProjRegex.GetEmbeddedResourceRegex());
+
+            bool analyzerPackage = false;
 
             tb.WriteProjectRoot(sdk, () =>
             {
@@ -151,6 +154,7 @@ namespace NSLLibProjectFileFormatter.Project.CSPROJ
                             NSLProjectTypes.Add("UnityReference");
                     }
 
+                    analyzerPackage = HasAnalyzerPackageTarget(NSLProjectTypes);
 
                     var tf = "net8.0";
 
@@ -173,6 +177,13 @@ namespace NSLLibProjectFileFormatter.Project.CSPROJ
                       .WritePropertyItem("AllowUnsafeBlocks", true)
                       .WritePropertyItem("Nullable", "disable")
                       .WritePropertyItem("RootNamespace", rootNamespace, rootNamespace != null);
+
+
+                    tb.AppendLine(analyzerPackage)
+                    .WritePropertyItem("IncludeBuildOutput", false, analyzerPackage)
+                    .WritePropertyItem("DevelopmentDependency", true, analyzerPackage)
+                    .WritePropertyItem("NoPackageAnalysis", true, analyzerPackage)
+                    .WritePropertyItem("TargetsForTfmSpecificContentInPackage", "$(TargetsForTfmSpecificContentInPackage);_AddAnalyzersToOutput", analyzerPackage);
 
 
                     tb.WritePropertyItem("IsPackable", true, aspNetOnly)
@@ -341,10 +352,11 @@ namespace NSLLibProjectFileFormatter.Project.CSPROJ
                     }
 
 
-                tb.AppendLine(isRoslyn)
+                tb.AppendLine(analyzerPackage)
+                .WriteTarget("_AddAnalyzersToOutput",()=> tb
                 .WriteItemGroup(() =>
-                    tb.AppendLine("<None Include=\"$(OutputPath)\\*NSL.*.dll\" Pack=\"true\" PackagePath=\"analyzers/dotnet/cs\" Visible=\"false\" />")
-                , isRoslyn);
+                    tb.AppendLine("<TfmSpecificPackageFile Include=\"$(OutputPath)\\*NSL.*.dll\" PackagePath=\"analyzers/dotnet/cs\" />")
+                ), analyzerPackage);
 
                 tb.AppendLine(unityRef != null)
                     .WriteItemGroup(() =>
@@ -399,11 +411,16 @@ namespace NSLLibProjectFileFormatter.Project.CSPROJ
             => types.Contains("Analyzer");
 
         public bool HasAnalyzerUtils(List<string> types)
-            => HasAnalyzer(types) || types.Contains("AnalyzerUtils");
+            => HasAnalyzer(types) || HasAnalyzerPackageTarget(types) || types.Contains("AnalyzerUtils");
 
         public bool HasUnityTarget(List<string> types)
         {
             return types.Contains("UnityTarget");
+        }
+
+        public bool HasAnalyzerPackageTarget(List<string> types)
+        {
+            return types.Contains("AnalyzerPackage");
         }
 
         public bool HasASPTarget(List<string> types)
