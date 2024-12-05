@@ -84,6 +84,27 @@ namespace NSLLibProjectFileFormatter.Project.CSPROJ
             return this;
         }
 
+        public CSProjBuilder WriteTarget(string name, Action body, bool writeCondition)
+        {
+            if (writeCondition)
+                return WriteTarget(name, body);
+
+            return this;
+        }
+
+        public CSProjBuilder WriteTarget(string name, Action body)
+        {
+            AppendLine($"<Target Name=\"{name}\">")
+                .NextTab();
+
+            body();
+
+            PrevTab()
+                .AppendLine("</Target>");
+
+            return this;
+        }
+
         public CSProjBuilder WriteItemGroup(Action body, bool writeCondition)
         {
             if (writeCondition)
@@ -91,6 +112,7 @@ namespace NSLLibProjectFileFormatter.Project.CSPROJ
 
             return this;
         }
+
         public CSProjBuilder WriteItemGroup(IEnumerable<string> props, Action body)
         {
             if (props?.Any() != true)
