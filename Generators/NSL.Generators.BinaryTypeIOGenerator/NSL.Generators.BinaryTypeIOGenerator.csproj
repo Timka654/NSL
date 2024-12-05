@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<NSLProjectTypes>UnitySupport;Analyzer</NSLProjectTypes>
+		<NSLProjectTypes>UnitySupport;AnalyzerUtils;AnalyzerCore</NSLProjectTypes>
 
 		<TargetFramework>netstandard2.0</TargetFramework>
 		<Configurations>Debug;Release;DebugExamples;Unity;UnityDebug</Configurations>
@@ -19,6 +19,9 @@
 		<Version>$(VersionSuffix)</Version>
 		<Authors>Relife87</Authors>
 		<Description>-</Description>
+
+		<IsPackable>false</IsPackable>
+		<PackageId>$(PackageId)_Core</PackageId>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)'=='Debug'">
@@ -41,14 +44,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\Core\NSL.SocketCore\NSL.SocketCore.csproj" PrivateAssets="all" OutputItemType="Analyzer" />
-		<ProjectReference Include="..\NSL.Generators.BinaryTypeIOGenerator.Attributes\NSL.Generators.BinaryTypeIOGenerator.Attributes.csproj" PrivateAssets="all" OutputItemType="Analyzer" />
-		<ProjectReference Include="..\NSL.Generators.BinaryGenerator\NSL.Generators.BinaryGenerator.csproj" PrivateAssets="all" OutputItemType="Analyzer" />
-		<ProjectReference Include="..\NSL.Generators.Utils\NSL.Generators.Utils.csproj" PrivateAssets="all" OutputItemType="Analyzer" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<None Include="$(OutputPath)\*NSL.*.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+		<ProjectReference Include="..\..\Core\NSL.SocketCore\NSL.SocketCore.csproj" OutputItemType="Analyzer" />
+		<ProjectReference Include="..\NSL.Generators.BinaryTypeIOGenerator.Shared\NSL.Generators.BinaryTypeIOGenerator.Shared.csproj" OutputItemType="Analyzer" />
+		<ProjectReference Include="..\NSL.Generators.BinaryGenerator\NSL.Generators.BinaryGenerator.csproj" OutputItemType="Analyzer" />
+		<ProjectReference Include="..\NSL.Generators.Utils\NSL.Generators.Utils.csproj" OutputItemType="Analyzer" />
 	</ItemGroup>
 
 </Project>

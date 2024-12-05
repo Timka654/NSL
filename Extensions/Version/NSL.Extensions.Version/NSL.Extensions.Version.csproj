@@ -33,9 +33,9 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\..\Core\NSL.SocketCore\NSL.SocketCore.csproj" />
-		<ProjectReference Include="..\..\..\Generators\NSL.Generators.BinaryTypeIOGenerator.Attributes\NSL.Generators.BinaryTypeIOGenerator.Attributes.csproj" />
+		<ProjectReference Include="..\..\..\Generators\NSL.Generators.BinaryTypeIOGenerator.Shared\NSL.Generators.BinaryTypeIOGenerator.Shared.csproj" />
 		<ProjectReference Include="..\..\..\Generators\NSL.Generators.BinaryTypeIOGenerator\NSL.Generators.BinaryTypeIOGenerator.csproj" OutputItemType="Analyzer" />
+		<ProjectReference Include="..\..\..\Core\NSL.SocketCore\NSL.SocketCore.csproj" />
 	</ItemGroup>
 
 </Project>

@@ -1,4 +1,4 @@
-﻿namespace NSLLibProjectFileFormatter
+﻿namespace NSLLibProjectFileFormatter.Solution
 {
     class SLNBuilder
     {
@@ -121,7 +121,7 @@ EndProject");
                              string.Join("\n", slnProjectConfigs.Select(cfg => $"\t\t{cfg}")) +
                              "\n\tEndGlobalSection\n" +
                              "\tGlobalSection(NestedProjects) = preSolution\n" +
-                             string.Join("\n", nestedProjects.Select(x=> $"\t\t{x}")) +
+                             string.Join("\n", nestedProjects.Select(x => $"\t\t{x}")) +
                              "\n\tEndGlobalSection\n" +
                              "EndGlobal";
 

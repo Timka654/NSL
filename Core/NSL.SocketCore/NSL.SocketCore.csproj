@@ -31,7 +31,7 @@
 		<AssemblyName>Unity.$(MSBuildProjectName)</AssemblyName>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include="System.Memory" Version="4.5.0" />
+		<PackageReference Include="System.Memory" Version="4.5.4" />
 		  <PackageReference Include="System.Runtime" Version="4.3.1" />
 		  <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.0.0" />
 		  <PackageReference Include="System.Threading.Channels" Version="9.0.0" />

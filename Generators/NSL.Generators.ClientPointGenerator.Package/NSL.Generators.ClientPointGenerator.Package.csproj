@@ -29,7 +29,8 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\NSL.Refactoring.Shared\NSL.Refactoring.Shared.csproj" />
+		<ProjectReference Include="..\NSL.Generators.ClientPointGenerator.Shared\NSL.Generators.ClientPointGenerator.Shared.csproj" />
+		<ProjectReference Include="..\NSL.Generators.ClientPointGenerator\NSL.Generators.ClientPointGenerator.csproj" />
 	</ItemGroup>
 
 	<Target Name="_AddAnalyzersToOutput">

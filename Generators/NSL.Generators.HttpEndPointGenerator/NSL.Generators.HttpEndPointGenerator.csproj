@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<NSLProjectTypes>UnitySupport;Analyzer</NSLProjectTypes>
+		<NSLProjectTypes>UnitySupport;Analyzer;AnalyzerCore</NSLProjectTypes>
 
 		<TargetFramework>netstandard2.0</TargetFramework>
 		<Configurations>Debug;Release;DebugExamples;Unity;UnityDebug</Configurations>
@@ -19,6 +19,9 @@
 		<Version>$(VersionSuffix)</Version>
 		<Authors>Relife87</Authors>
 		<Description>-</Description>
+
+		<IsPackable>false</IsPackable>
+		<PackageId>$(PackageId)_Core</PackageId>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)'=='Debug'">
@@ -43,10 +46,6 @@
 	<ItemGroup>
 		<ProjectReference Include="..\NSL.Generators.HttpEndPointGenerator.Shared\NSL.Generators.HttpEndPointGenerator.Shared.csproj" PrivateAssets="all" OutputItemType="Analyzer" />
 		<ProjectReference Include="..\NSL.Generators.Utils\NSL.Generators.Utils.csproj" PrivateAssets="all" OutputItemType="Analyzer" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<None Include="$(OutputPath)\*NSL.*.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
 	</ItemGroup>
 
 </Project>

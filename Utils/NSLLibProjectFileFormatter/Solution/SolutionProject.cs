@@ -1,4 +1,4 @@
-﻿namespace NSLLibProjectFileFormatter
+﻿namespace NSLLibProjectFileFormatter.Solution
 {
     public class SolutionProject
     {

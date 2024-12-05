@@ -1,4 +1,6 @@
-﻿namespace NSLLibProjectFileFormatter
+﻿using NSLLibProjectFileFormatter.Project.CSPROJ;
+
+namespace NSLLibProjectFileFormatter
 {
     internal class Program
     {

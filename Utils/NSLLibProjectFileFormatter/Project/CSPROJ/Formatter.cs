@@ -1,60 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using NSLLibProjectFileFormatter.Solution;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
-namespace NSLLibProjectFileFormatter
+namespace NSLLibProjectFileFormatter.Project.CSPROJ
 {
+
     internal partial class Formatter
     {
-        [GeneratedRegex(@"\s*<Project\sSdk\s*=\s*""(\S*)""\s*>")]
-        public partial Regex GetProjectSdkRegex();
-
-        [GeneratedRegex(@"<ItemGroup>(\s*<ProjectReference(\s*(\S+)\s*=\s*""([\s\S]+?)"")\s*/>)+\s*</ItemGroup>")]
-        public partial Regex GetProjectReferenceRegex();
-
-        [GeneratedRegex(@"(<ItemGroup(\s*(\S*)\s*=\s*""([\S\s]+?)"")*>(\s*<PackageReference(\s*([\S]+?)\s*=\s*""([\s\S]+?)""\s*)+)(/>\s*|>(\s*<([\S]+?)>\s*([\S\s]+?)</([\S]+)>)+\s*</PackageReference>\s*)*</ItemGroup>)+")]
-        public partial Regex GetPackageReferenceRegex();
-
-        [GeneratedRegex(@"(<ItemGroup(\s*(\S*)\s*=\s*""([\S\s]+?)"")*>(\s*<Compile(\s*([\S]+?)\s*=\s*""([\s\S]+?)""\s*)+)(/>\s*|>(\s*<([\S]+?)>\s*([\S\s]+?)</([\S]+)>)+\s*</Compile>\s*)*</ItemGroup>)+")]
-        public partial Regex GetCompileRegex();
-
-        [GeneratedRegex(@"(<ItemGroup(\s*(\S*)\s*=\s*""([\S\s]+?)"")*>(\s*<EmbeddedResource(\s*([\S]+?)\s*=\s*""([\s\S]+?)""\s*)+)(/>\s*|>(\s*<([\S]+?)>\s*([\S\s]+?)</([\S]+)>)+\s*</EmbeddedResource>\s*)*</ItemGroup>)+")]
-        public partial Regex GetEmbeddedResourceRegex();
-
-        [GeneratedRegex(@"<ItemGroup(\s*(\S*)\s*=\s*""([\S\s]+?)"")*>([\S\s]+?)</ItemGroup>")]
-        public partial Regex GetItemGroupWithConditionRegex();
-
-        [GeneratedRegex(@"\s*<Description>([\S\s]*)</Description>")]
-        public partial Regex GetProjectDescriptionRegex();
-
-        [GeneratedRegex(@"\s*<OutputType>([\S\s]*)</OutputType>")]
-        public partial Regex GetProjectOutputTypeRegex();
-
-        [GeneratedRegex(@"\s*<Authors>([\S\s]*)</Authors>")]
-        public partial Regex GetProjectAuthorsRegex();
-
-        [GeneratedRegex(@"\s*<SuppressDependenciesWhenPacking>([\S\s]*)</SuppressDependenciesWhenPacking>")]
-        public partial Regex GetProjectSuppressDependenciesWhenPackingRegex();
-
-        [GeneratedRegex(@"\s*<NSLProjectTypes>(([\S\s]+?)(;|\b))+</NSLProjectTypes>")]
-        public partial Regex GetProjectNSLTypes();
-
-        [GeneratedRegex(@"\s*<IsRoslynComponent>\s*([\s\S]*)\s*</IsRoslynComponent>")]
-        public partial Regex GetProjectIsRoslynRegex();
-
-        [GeneratedRegex(@"<ItemGroup>\s*<Reference\s*Include\s*=\s*""UnityEngine""\s*>\s*<HintPath>([\s\S]+?)</HintPath>\s*</Reference>\s*</ItemGroup>")]
-        public partial Regex GetProjectUnityRefRegex();
-
-        [GeneratedRegex(@"\s*<ItemGroup>(\s*<Content Include=""([\S]+)"">\s*<CopyToOutputDirectory>([\S]+)</CopyToOutputDirectory>\s*</Content>\s*)+</ItemGroup>\s*")]
-        public partial Regex GetProjectContentItemGroupRegex();
-
-
-
-
         private readonly string path;
         private readonly string slnPath;
 
@@ -100,9 +51,9 @@ namespace NSLLibProjectFileFormatter
 
         void BuildNewProjectFile(string path, string[] currentContent)
         {
-            var outputType = GetGroupValue(FindGroupsByRegex(currentContent, GetProjectOutputTypeRegex()));
+            var outputType = GetGroupValue(FindGroupsByRegex(currentContent, CSProjRegex.GetProjectOutputTypeRegex()));
 
-            var NSLTypes = FindAllLinesByRegex(currentContent, GetProjectNSLTypes()).FirstOrDefault();
+            var NSLTypes = FindAllLinesByRegex(currentContent, CSProjRegex.GetProjectNSLTypes()).FirstOrDefault();
 
             List<string> NSLProjectTypes = NSLTypes == null ? new List<string>() : NSLTypes[2].Captures.Select(x => x.Value).ToList();
 
@@ -129,37 +80,43 @@ namespace NSLLibProjectFileFormatter
 
             configurations.AddRange(new string[] { "Debug", "Release" });
 
-            var sdk = GetGroupValue(FindGroupsByRegex(currentContent, GetProjectSdkRegex()));
+            var sdk = GetGroupValue(FindGroupsByRegex(currentContent, CSProjRegex.GetProjectSdkRegex()));
 
             bool unityOnly = hasUnityInProjectName(path);
             bool aspNetOnly = isOnlyAspNetProject(path, sdk);
 
-            TemplateBuilder tb = new TemplateBuilder();
 
-            var description = GetGroupValue(FindGroupsByRegex(currentContent, GetProjectDescriptionRegex()));
+            CSProjBuilder tb = new CSProjBuilder();
 
-            var authors = GetGroupValue(FindGroupsByRegex(currentContent, GetProjectAuthorsRegex()));
-            var suppressDependenciesWhenPacking = GetGroupValue(FindGroupsByRegex(currentContent, GetProjectSuppressDependenciesWhenPackingRegex()));
+            var description = GetGroupValue(FindGroupsByRegex(currentContent, CSProjRegex.GetProjectDescriptionRegex()));
+            var rootNamespace = GetGroupValue(FindGroupsByRegex(currentContent, CSProjRegex.GetProjectRootNamespaceRegex()));
 
-            var isRoslyn = bool.TryParse(GetGroupValue(FindGroupsByRegex(currentContent, GetProjectIsRoslynRegex())), out var rv) && rv;
+            var authors = GetGroupValue(FindGroupsByRegex(currentContent, CSProjRegex.GetProjectAuthorsRegex()));
+            var suppressDependenciesWhenPacking = GetGroupValue(FindGroupsByRegex(currentContent, CSProjRegex.GetProjectSuppressDependenciesWhenPackingRegex()));
+
+            var isRoslyn = bool.TryParse(GetGroupValue(FindGroupsByRegex(currentContent, CSProjRegex.GetProjectIsRoslynRegex())), out var rv) && rv;
 
             var isTemplate = HasTemplateType(NSLProjectTypes);
 
             var fileContent = string.Join(Environment.NewLine, currentContent);
 
-            var projectRefs = FindAllByRegex(fileContent, GetProjectReferenceRegex());
+            var projectRefs = FindAllByRegex(fileContent, CSProjRegex.GetProjectReferenceRegex());
 
             //var projectRefsWithConditions = FindAllByRegex(fileContent, GetItemGroupWithConditionRegex());
 
-            var unityRef = FindAllByRegex(fileContent, GetProjectUnityRefRegex()).FirstOrDefault();
+            var unityRef = FindAllByRegex(fileContent, CSProjRegex.GetProjectUnityRefRegex()).FirstOrDefault();
 
-            var contentItems = FindAllByRegex(fileContent, GetProjectContentItemGroupRegex());
+            var contentItems = FindAllByRegex(fileContent, CSProjRegex.GetProjectContentItemGroupRegex());
 
-            var packagesRefs = FindAllByRegex(fileContent, GetPackageReferenceRegex());
+            var packagesRefs = FindAllByRegex(fileContent, CSProjRegex.GetPackageReferenceRegex());
 
-            var compileItems = FindAllByRegex(fileContent, GetCompileRegex());
+            var compileItems = FindAllByRegex(fileContent, CSProjRegex.GetCompileRegex());
 
-            var embeddedResourceItems = FindAllByRegex(fileContent, GetEmbeddedResourceRegex());
+            var embeddedResourceItems = FindAllByRegex(fileContent, CSProjRegex.GetEmbeddedResourceRegex());
+
+            bool analyzerPackage = false;
+
+            bool analyzerUtils = false;
 
             tb.WriteProjectRoot(sdk, () =>
             {
@@ -193,7 +150,6 @@ namespace NSLLibProjectFileFormatter
                             NSLProjectTypes.Add("UnityReference");
                     }
 
-
                     var tf = "net8.0";
 
                     if (HasUnityTarget(NSLProjectTypes))
@@ -203,116 +159,104 @@ namespace NSLLibProjectFileFormatter
                         configurations.AddRange(new[] { "UnityDebug", "Unity" });
 
 
-                    if (HasAnalyzer(NSLProjectTypes) || HasAnalyzerUtils(NSLProjectTypes))
+                    analyzerPackage = HasAnalyzerPackageTarget(NSLProjectTypes);
+                    analyzerUtils = HasAnalyzerUtils(NSLProjectTypes);
+                    var analyzerCore = HasAnalyzerCoreTarget(NSLProjectTypes);
+
+                    if (analyzerUtils)
                         tf = "netstandard2.0";
 
-                    tb.AppendLine($"<NSLProjectTypes>{string.Join(';', NSLProjectTypes)}</NSLProjectTypes>")
+                    tb.WritePropertyItem("NSLProjectTypes", string.Join(';', NSLProjectTypes))
                     .AppendLine();
 
 
-                    tb.AppendLine($"<TargetFramework>{tf}</TargetFramework>")
-                      .AppendLine($"<Configurations>{string.Join(';', AvailableConfigurations)}</Configurations>")
-                      .AppendLine("<AllowUnsafeBlocks>true</AllowUnsafeBlocks>")
-                      .AppendLine("<Nullable>disable</Nullable>");
+                    tb.WritePropertyItem("TargetFramework", tf)
+                      .WritePropertyItem("Configurations", string.Join(';', AvailableConfigurations))
+                      .WritePropertyItem("AllowUnsafeBlocks", true)
+                      .WritePropertyItem("Nullable", "disable")
+                      .WritePropertyItem("RootNamespace", rootNamespace, rootNamespace != null);
 
-                    if (aspNetOnly)
-                        tb.AppendLine("<IsPackable>true</IsPackable>")
-                        .AppendLine("<OutputType>Library</OutputType>");
+
+                    tb.AppendLine(analyzerPackage)
+                    .WritePropertyItem("IncludeBuildOutput", false, analyzerPackage)
+                    .WritePropertyItem("DevelopmentDependency", true, analyzerPackage)
+                    .WritePropertyItem("NoPackageAnalysis", true, analyzerPackage)
+                    .WritePropertyItem("TargetsForTfmSpecificContentInPackage", "$(TargetsForTfmSpecificContentInPackage);_AddAnalyzersToOutput", analyzerPackage);
+
+
+                    tb.WritePropertyItem("IsPackable", true, aspNetOnly)
+                    .WritePropertyItem("OutputType", "Library", aspNetOnly);
 
                     tb.AppendLine();
 
-                    tb.AppendLine("<PublishRepositoryUrl>true</PublishRepositoryUrl>")
-                      .AppendLine("<EmbedUntrackedSources>true</EmbedUntrackedSources>")
-                      .AppendLine("<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>")
-                      .AppendLine("<GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>");
+                    tb.WritePropertyItem("PublishRepositoryUrl", true)
+                      .WritePropertyItem("EmbedUntrackedSources", true)
+                      .WritePropertyItem("AutoGenerateBindingRedirects", true)
+                      .WritePropertyItem("GenerateBindingRedirectsOutputType", true);
 
-                    if (isRoslyn)
-                    {
-                        tb.AppendLine()
-                          .AppendLine("<EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>")
-                          .AppendLine("<IsRoslynComponent>true</IsRoslynComponent>");
-                    }
+                    tb.AppendLine(isRoslyn)
+                      .WritePropertyItem("EnforceExtendedAnalyzerRules", true, isRoslyn)
+                      .WritePropertyItem("IsRoslynComponent", true, isRoslyn)
+                      .WritePropertyItem("IncludeBuildOutput", false, analyzerPackage);
 
-                    if (suppressDependenciesWhenPacking != null)
-                    {
-                        tb.AppendLine($"<SuppressDependenciesWhenPacking>{suppressDependenciesWhenPacking}</SuppressDependenciesWhenPacking>");
-                    }
+                    tb.WritePropertyItem("SuppressDependenciesWhenPacking", suppressDependenciesWhenPacking, suppressDependenciesWhenPacking != null);
+
 
                     if (isTemplate)
                     {
-                        tb.AppendLine("""
-                            <PackageType>Template</PackageType>
-                            <IncludeContentInPack>true</IncludeContentInPack>
-                            <IncludeBuildOutput>false</IncludeBuildOutput>
-                            <ContentTargetFolders>content</ContentTargetFolders>
-                            <NoWarn>$(NoWarn);NU5128</NoWarn>
-                            <NoDefaultExcludes>true</NoDefaultExcludes>
-                            <LocalizeTemplates>false</LocalizeTemplates>
-                            """);
+                        tb.WritePropertyItem("PackageType", "Template")
+                            .WritePropertyItem("IncludeContentInPack", true)
+                            .WritePropertyItem("IncludeBuildOutput", false)
+                            .WritePropertyItem("ContentTargetFolders", "content")
+                            .WritePropertyItem("NoWarn", "$(NoWarn);NU5128")
+                            .WritePropertyItem("NoDefaultExcludes", true)
+                            .WritePropertyItem("LocalizeTemplates", false);
                     }
 
-                    tb.AppendLine();
+                    tb.AppendLine()
+                    .WritePropertyItem("Version", "$(VersionSuffix)")
 
-                    tb.AppendLine("<Version>$(VersionSuffix)</Version>");
+                    .WritePropertyItem("Authors", authors, authors != null)
+                    .WritePropertyItem("Authors", "Relife87", authors == null)
 
-                    if (authors != null)
-                        tb.AppendLine($"<Authors>{authors}</Authors>");
-                    else
-                        tb.AppendLine("<Authors>Relife87</Authors>");
+                    .WritePropertyItem($"Description", description, description != null);
 
-                    if (description != null)
-                        tb.AppendLine($"<Description>{description}</Description>");
+
+                    if (analyzerUtils && analyzerCore)
+                    {
+                        tb.AppendLine()
+                            .WritePropertyItem("IsPackable", false)
+                            .WritePropertyItem("PackageId", $"$(PackageId)_Core");
+                    }
+                    else if (HasUnpacking(NSLProjectTypes))
+                        tb.AppendLine()
+                            .WritePropertyItem("IsPackable", false);
                 });
 
 
-                if (isTemplate)
-                    tb.AppendLine("""
-                    <ItemGroup>
-                        <Content Include="**\*\.template.config\template.json" />
-                    </ItemGroup>
-                    """);
-
-                tb.AppendLine()
+                tb.WriteItemGroup(() => tb.AppendLine("<Content Include=\"**\\*\\.template.config\\template.json\" />"), isTemplate)
+                .AppendLine()
                 .WritePropertyGroup("'$(Configuration)'=='Debug'", () =>
-                    tb.AppendLine("<PackageId>$(MSBuildProjectName)_Debug</PackageId>")
+                    tb.WritePropertyItem("PackageId", "$(MSBuildProjectName)_Debug")
                 );
 
                 if (HasUnitySupport(NSLProjectTypes))
                 {
                     tb.AppendLine()
-                    .WritePropertyGroup("'$(Configuration)'=='UnityDebug'", () =>
-                    {
-                        if (!HasUnityTarget(NSLProjectTypes))
-                            tb.AppendLine("<AssemblyName>Unity.$(MSBuildProjectName)</AssemblyName>");
-
-                        if (!HasAnalyzerUtils(NSLProjectTypes))
-                            tb.AppendLine("<TargetFramework>netstandard2.1</TargetFramework>");
-
-                        tb.AppendLine("<DefineConstants>DEBUG;TRACE</DefineConstants>");
-                    });
+                    .WritePropertyGroup("'$(Configuration)'=='UnityDebug'", () => tb
+                        .WritePropertyItem("AssemblyName", "Unity.$(MSBuildProjectName)", !HasUnityTarget(NSLProjectTypes))
+                        .WritePropertyItem("TargetFramework", "netstandard2.1", !HasAnalyzerUtils(NSLProjectTypes))
+                        .WritePropertyItem("DefineConstants", "DEBUG;TRACE")
+                    );
 
                     if (!HasUnityTarget(NSLProjectTypes) || !HasAnalyzerUtils(NSLProjectTypes))
                         tb.AppendLine()
-                        .WritePropertyGroup("'$(Configuration)'=='Unity'", () =>
-                        {
-                            if (!HasUnityTarget(NSLProjectTypes))
-                                tb.AppendLine("<AssemblyName>Unity.$(MSBuildProjectName)</AssemblyName>");
-
-                            if (!HasAnalyzerUtils(NSLProjectTypes))
-                                tb.AppendLine("<TargetFramework>netstandard2.1</TargetFramework>");
-                        });
+                        .WritePropertyGroup("'$(Configuration)'=='Unity'", () => tb
+                            .WritePropertyItem("AssemblyName", "Unity.$(MSBuildProjectName)", !HasUnityTarget(NSLProjectTypes))
+                            .WritePropertyItem("TargetFramework", "netstandard2.1", !HasAnalyzerUtils(NSLProjectTypes))
+                        );
 
                 }
-
-                //if (projectRefsWithConditions.Any())
-                //    foreach (Match item in projectRefsWithConditions)
-                //    {
-                //        tb.AppendLine()
-                //        .WriteItemGroup(item.Groups[3].Value, () =>
-                //        {
-                //            tb.AppendLine(item.Groups[4].Value.Trim());
-                //        });
-                //    }
 
                 if (packagesRefs.Any())
                     foreach (Match item in packagesRefs)
@@ -356,15 +300,6 @@ namespace NSLLibProjectFileFormatter
                             {
                                 tb.AppendLine($"<ProjectReference {inc.Value.TrimStart()} />");
                             }
-                            //var pr = item.Captures.Select(x => x.Value.TrimEnd()).ToArray();
-                            //foreach (var item in t0.gr)
-                            //{
-
-                            //}
-                            //tb.AppendLine($"<ProjectReference {string.Join(" ", pr)} />");
-                            //else
-                            //    tb.AppendLine($"<ProjectReference Include=\"{p}\" OutputItemType=\"{t}\" />");
-
                         }
                     });
 
@@ -427,40 +362,37 @@ namespace NSLLibProjectFileFormatter
                     }
 
 
-                if (isRoslyn)
-                    tb.AppendLine().WriteItemGroup(() =>
-                        tb.AppendLine("<None Include=\"$(OutputPath)\\*NSL.*.dll\" Pack=\"true\" PackagePath=\"analyzers/dotnet/cs\" Visible=\"false\" />")
-                    );
+                tb.AppendLine(analyzerPackage)
+                .WriteTarget("_AddAnalyzersToOutput",()=> tb
+                .WriteItemGroup(() =>
+                    tb.AppendLine("<TfmSpecificPackageFile Include=\"$(OutputPath)\\*NSL.*.dll\" PackagePath=\"analyzers/dotnet/cs\" />")
+                ), analyzerPackage);
 
-                if (unityRef != null)
-                {
-                    tb.AppendLine()
-                        .WriteItemGroup(() =>
-                        {
-                            tb.AppendLine("<Reference Include=\"UnityEngine\">");
-                            tb.NextTab();
-                            tb.AppendLine($"<HintPath>{GetGroupValue(unityRef.Groups)}</HintPath>");
-                            tb.PrevTab();
-                            tb.AppendLine("</Reference>");
-                        });
-                }
-
-                if (contentItems.Any())
-                    tb.AppendLine()
+                tb.AppendLine(unityRef != null)
                     .WriteItemGroup(() =>
                     {
-                        foreach (Match item in contentItems)
-                        {
-                            Group pathGroup = item.Groups[2];
-                            Group typeGroup = item.Groups[3];
+                        tb.AppendLine("<Reference Include=\"UnityEngine\">");
+                        tb.NextTab();
+                        tb.AppendLine($"<HintPath>{GetGroupValue(unityRef.Groups)}</HintPath>");
+                        tb.PrevTab();
+                        tb.AppendLine("</Reference>");
+                    }, unityRef != null);
+
+                tb.AppendLine(contentItems.Any())
+                .WriteItemGroup(() =>
+                {
+                    foreach (Match item in contentItems)
+                    {
+                        Group pathGroup = item.Groups[2];
+                        Group typeGroup = item.Groups[3];
 
 
-                            tb.AppendLine($"<Content Include=\"{pathGroup.Value}\">").NextTab();
-                            tb.AppendLine($"<CopyToOutputDirectory>{typeGroup.Value}</CopyToOutputDirectory>");
-                            tb.PrevTab().AppendLine($"</Content>");
+                        tb.AppendLine($"<Content Include=\"{pathGroup.Value}\">").NextTab();
+                        tb.AppendLine($"<CopyToOutputDirectory>{typeGroup.Value}</CopyToOutputDirectory>");
+                        tb.PrevTab().AppendLine($"</Content>");
 
-                        }
-                    });
+                    }
+                }, contentItems.Any());
 
             });
 
@@ -488,12 +420,31 @@ namespace NSLLibProjectFileFormatter
         public bool HasAnalyzer(List<string> types)
             => types.Contains("Analyzer");
 
+        public bool HasUnpacking(List<string> types)
+            => types.Contains("Unpacking");
+
         public bool HasAnalyzerUtils(List<string> types)
-            => HasAnalyzer(types) || types.Contains("AnalyzerUtils");
+            => HasAnalyzer(types) || HasAnalyzerPackageTarget(types) || types.Contains("AnalyzerUtils");
 
         public bool HasUnityTarget(List<string> types)
         {
             return types.Contains("UnityTarget");
+        }
+
+        public bool HasAnalyzerPackageTarget(List<string> types)
+        {
+            return types.Contains("AnalyzerPackage");
+        }
+
+        public bool HasAnalyzerCoreTarget(List<string> types)
+        {
+            return types.Contains("AnalyzerCore");
+        }
+
+
+        public bool HasAnalyzerSharedTarget(List<string> types)
+        {
+            return types.Contains("AnalyzerShared");
         }
 
         public bool HasASPTarget(List<string> types)

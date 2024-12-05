@@ -24,8 +24,8 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\NSL.Generators.FillTypeGenerator.Attributes\NSL.Generators.FillTypeGenerator.Attributes.csproj" />
-		<ProjectReference Include="..\..\NSL.Generators.SelectTypeGenerator.Attributes\NSL.Generators.SelectTypeGenerator.Attributes.csproj" />
+		<ProjectReference Include="..\..\NSL.Generators.FillTypeGenerator.Shared\NSL.Generators.FillTypeGenerator.Shared.csproj" />
+		<ProjectReference Include="..\..\NSL.Generators.SelectTypeGenerator.Shared\NSL.Generators.SelectTypeGenerator.Shared.csproj" />
 		<ProjectReference Include="..\..\NSL.Generators.SelectTypeGenerator\NSL.Generators.SelectTypeGenerator.csproj" OutputItemType="Analyzer" />
 	</ItemGroup>
 
