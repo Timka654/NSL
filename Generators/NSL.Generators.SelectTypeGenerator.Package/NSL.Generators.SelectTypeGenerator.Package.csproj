@@ -28,15 +28,6 @@
 		<PackageId>$(MSBuildProjectName)_Debug</PackageId>
 	</PropertyGroup>
 
-	<PropertyGroup Condition="'$(Configuration)'=='UnityDebug'">
-		<AssemblyName>Unity.$(MSBuildProjectName)</AssemblyName>
-		<DefineConstants>DEBUG;TRACE</DefineConstants>
-	</PropertyGroup>
-
-	<PropertyGroup Condition="'$(Configuration)'=='Unity'">
-		<AssemblyName>Unity.$(MSBuildProjectName)</AssemblyName>
-	</PropertyGroup>
-
 	<ItemGroup>
 		<ProjectReference Include="..\NSL.Generators.SelectTypeGenerator\NSL.Generators.SelectTypeGenerator.csproj" />
 	</ItemGroup>
