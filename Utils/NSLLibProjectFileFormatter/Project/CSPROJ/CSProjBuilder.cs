@@ -1,25 +1,34 @@
 ﻿using System.Text;
 
-namespace NSLLibProjectFileFormatter
+namespace NSLLibProjectFileFormatter.Project.CSPROJ
 {
-    class TemplateBuilder
+    class CSProjBuilder
     {
         private byte tab;
 
         private StringBuilder sb = new StringBuilder();
 
-        public TemplateBuilder NextTab() { ++tab; return this; }
+        public CSProjBuilder NextTab() { ++tab; return this; }
 
-        public TemplateBuilder PrevTab() { --tab; return this; }
+        public CSProjBuilder PrevTab() { --tab; return this; }
 
-        public TemplateBuilder AppendLine()
+        public CSProjBuilder AppendLine()
         {
             sb.AppendLine();
+
+            return this;
+        }
+
+        public CSProjBuilder AppendLine(bool writeCondition)
+        {
+            if (writeCondition)
+                return AppendLine();
+
             return this;
         }
 
 
-        public TemplateBuilder AppendLine(string content)
+        public CSProjBuilder AppendLine(string content)
         {
             var pref = string.Concat(Enumerable.Repeat('\t', tab).ToArray());
 
@@ -34,7 +43,7 @@ namespace NSLLibProjectFileFormatter
 
 
 
-        public TemplateBuilder WriteProjectRoot(string sdk, Action body)
+        public CSProjBuilder WriteProjectRoot(string sdk, Action body)
         {
             AppendLine($"<Project Sdk=\"{sdk}\">")
                 .AppendLine()
@@ -49,7 +58,7 @@ namespace NSLLibProjectFileFormatter
             return this;
         }
 
-        public TemplateBuilder WritePropertyGroup(Action body)
+        public CSProjBuilder WritePropertyGroup(Action body)
         {
             AppendLine($"<PropertyGroup>")
                 .NextTab();
@@ -62,7 +71,7 @@ namespace NSLLibProjectFileFormatter
             return this;
         }
 
-        public TemplateBuilder WriteItemGroup(Action body)
+        public CSProjBuilder WriteItemGroup(Action body)
         {
             AppendLine($"<ItemGroup>")
                 .NextTab();
@@ -74,7 +83,15 @@ namespace NSLLibProjectFileFormatter
 
             return this;
         }
-        public TemplateBuilder WriteItemGroup(IEnumerable<string> props, Action body)
+
+        public CSProjBuilder WriteItemGroup(Action body, bool writeCondition)
+        {
+            if (writeCondition)
+                return WriteItemGroup(body);
+
+            return this;
+        }
+        public CSProjBuilder WriteItemGroup(IEnumerable<string> props, Action body)
         {
             if (props?.Any() != true)
                 return WriteItemGroup(body);
@@ -90,7 +107,7 @@ namespace NSLLibProjectFileFormatter
             return this;
         }
 
-        public TemplateBuilder WriteItemGroup(string condition, Action body)
+        public CSProjBuilder WriteItemGroup(string condition, Action body)
         {
             if (string.IsNullOrWhiteSpace(condition))
             {
@@ -108,7 +125,7 @@ namespace NSLLibProjectFileFormatter
             return this;
         }
 
-        public TemplateBuilder WritePropertyGroup(string condition, Action body)
+        public CSProjBuilder WritePropertyGroup(string condition, Action body)
         {
             AppendLine($"<PropertyGroup Condition=\"{condition}\">")
                 .NextTab();
@@ -117,6 +134,36 @@ namespace NSLLibProjectFileFormatter
 
             PrevTab()
                 .AppendLine("</PropertyGroup>");
+
+            return this;
+        }
+
+        public CSProjBuilder WritePropertyItem(string name, object value)
+        {
+            AppendLine($"<{name}>{value}</{name}>");
+
+            return this;
+        }
+
+        public CSProjBuilder WritePropertyItem(string name, bool value)
+        {
+            AppendLine($"<{name}>{(value == true ? "true" : "false")}</{name}>");
+
+            return this;
+        }
+
+        public CSProjBuilder WritePropertyItem(string name, object value, bool writeCondition)
+        {
+            if (writeCondition)
+                WritePropertyItem(name, value);
+
+            return this;
+        }
+
+        public CSProjBuilder WritePropertyItem(string name, bool value, bool writeCondition)
+        {
+            if (writeCondition)
+                WritePropertyItem(name, value);
 
             return this;
         }
