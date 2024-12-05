@@ -161,6 +161,7 @@ namespace NSLLibProjectFileFormatter.Project.CSPROJ
 
                     analyzerPackage = HasAnalyzerPackageTarget(NSLProjectTypes);
                     analyzerUtils = HasAnalyzerUtils(NSLProjectTypes);
+                    var analyzerCore = HasAnalyzerCoreTarget(NSLProjectTypes);
 
                     if (analyzerUtils)
                         tf = "netstandard2.0";
@@ -195,7 +196,8 @@ namespace NSLLibProjectFileFormatter.Project.CSPROJ
 
                     tb.AppendLine(isRoslyn)
                       .WritePropertyItem("EnforceExtendedAnalyzerRules", true, isRoslyn)
-                      .WritePropertyItem("IsRoslynComponent", true, isRoslyn);
+                      .WritePropertyItem("IsRoslynComponent", true, isRoslyn)
+                      .WritePropertyItem("IncludeBuildOutput", false, analyzerPackage);
 
                     tb.WritePropertyItem("SuppressDependenciesWhenPacking", suppressDependenciesWhenPacking, suppressDependenciesWhenPacking != null);
 
@@ -220,11 +222,11 @@ namespace NSLLibProjectFileFormatter.Project.CSPROJ
                     .WritePropertyItem($"Description", description, description != null);
 
 
-                    if (analyzerUtils && !(analyzerPackage || HasAnalyzerSharedTarget(NSLProjectTypes)))
+                    if (analyzerUtils && analyzerCore)
                     {
                         tb.AppendLine()
                             .WritePropertyItem("IsPackable", false)
-                            .WritePropertyItem("PackageId", $"$(PackageId)_Generator");
+                            .WritePropertyItem("PackageId", $"$(PackageId)_Core");
                     }
                 });
 
@@ -427,6 +429,12 @@ namespace NSLLibProjectFileFormatter.Project.CSPROJ
         {
             return types.Contains("AnalyzerPackage");
         }
+
+        public bool HasAnalyzerCoreTarget(List<string> types)
+        {
+            return types.Contains("AnalyzerCore");
+        }
+
 
         public bool HasAnalyzerSharedTarget(List<string> types)
         {

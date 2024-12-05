@@ -15,8 +15,6 @@
 
 		<Version>$(VersionSuffix)</Version>
 		<Authors>Relife87</Authors>
-		<IsPackable>false</IsPackable>
-		<PackageId>$(PackageId)_Generator</PackageId>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)'=='Debug'">

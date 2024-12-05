@@ -21,7 +21,7 @@ namespace NSL.Generators.BinaryTypeIOGenerator.Tests
 
 
     [NSLBIOType("abc")]
-    [NSLBIOType]
+    //[NSLBIOType]
     public partial class TestStruct1 :TestStruct2
     {
         [NSLBIOInclude("en")]

@@ -33,7 +33,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\..\Generators\NSL.Generators.BinaryTypeIOGenerator.Attributes\NSL.Generators.BinaryTypeIOGenerator.Attributes.csproj" />
+		<ProjectReference Include="..\..\..\Generators\NSL.Generators.BinaryTypeIOGenerator.Shared\NSL.Generators.BinaryTypeIOGenerator.Shared.csproj" />
 		<ProjectReference Include="..\..\..\Generators\NSL.Generators.BinaryTypeIOGenerator\NSL.Generators.BinaryTypeIOGenerator.csproj" OutputItemType="Analyzer" />
 		<ProjectReference Include="..\..\..\Protocols\UDP\NSL.UDP\NSL.UDP.csproj" />
 		<ProjectReference Include="..\..\Session\NSL.Extensions.Session\NSL.Extensions.Session.csproj" />

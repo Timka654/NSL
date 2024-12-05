@@ -24,7 +24,7 @@
 		<Authors>Relife87</Authors>
 	</PropertyGroup>
 	<ItemGroup>
-	    <Content Include="**\*\.template.config\template.json" />
+		<Content Include="**\*\.template.config\template.json" />
 	</ItemGroup>
 
 	<PropertyGroup Condition="'$(Configuration)'=='Debug'">

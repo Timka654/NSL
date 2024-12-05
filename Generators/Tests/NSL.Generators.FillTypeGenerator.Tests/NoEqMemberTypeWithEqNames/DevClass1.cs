@@ -11,7 +11,7 @@ namespace NSL.Generators.FillTypeGenerator.Tests
 {
     [FillTypeFromGenerate(typeof(DevClass2))]
     [FillTypeGenerate(typeof(DevClass3))]
-    internal partial class DevClass1
+    public partial class DevClass1
     {
         [FillTypeGenerateIgnore(typeof(DevClass2))]
         //[FillTypeGenerateIgnore(typeof(DevClass3))]

@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<NSLProjectTypes>None</NSLProjectTypes>
@@ -7,6 +7,7 @@
 		<Configurations>Debug;Release;DebugExamples;Unity;UnityDebug</Configurations>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<Nullable>disable</Nullable>
+		<RootNamespace>NSL.Node.RoomServer</RootNamespace>
 
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
 		<EmbedUntrackedSources>true</EmbedUntrackedSources>
@@ -15,7 +16,6 @@
 
 		<Version>$(VersionSuffix)</Version>
 		<Authors>Relife87</Authors>
-		<RootNamespace>NSL.Node.RoomServer</RootNamespace>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)'=='Debug'">

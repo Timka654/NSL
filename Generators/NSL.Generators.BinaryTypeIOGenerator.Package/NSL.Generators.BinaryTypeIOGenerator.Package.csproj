@@ -1,17 +1,23 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<NSLProjectTypes>UnitySupport</NSLProjectTypes>
+		<NSLProjectTypes>UnitySupport;AnalyzerPackage</NSLProjectTypes>
 
-		<TargetFramework>net8.0</TargetFramework>
+		<TargetFramework>netstandard2.0</TargetFramework>
 		<Configurations>Debug;Release;DebugExamples;Unity;UnityDebug</Configurations>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<Nullable>disable</Nullable>
+
+		<IncludeBuildOutput>false</IncludeBuildOutput>
+		<DevelopmentDependency>true</DevelopmentDependency>
+		<NoPackageAnalysis>true</NoPackageAnalysis>
+		<TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);_AddAnalyzersToOutput</TargetsForTfmSpecificContentInPackage>
 
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
 		<EmbedUntrackedSources>true</EmbedUntrackedSources>
 		<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
 		<GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
+		<IncludeBuildOutput>false</IncludeBuildOutput>
 		<SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
 
 		<Version>$(VersionSuffix)</Version>
@@ -24,17 +30,21 @@
 
 	<PropertyGroup Condition="'$(Configuration)'=='UnityDebug'">
 		<AssemblyName>Unity.$(MSBuildProjectName)</AssemblyName>
-		<TargetFramework>netstandard2.1</TargetFramework>
 		<DefineConstants>DEBUG;TRACE</DefineConstants>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)'=='Unity'">
 		<AssemblyName>Unity.$(MSBuildProjectName)</AssemblyName>
-		<TargetFramework>netstandard2.1</TargetFramework>
 	</PropertyGroup>
 
 	<ItemGroup>
 		<ProjectReference Include="..\NSL.Generators.BinaryTypeIOGenerator\NSL.Generators.BinaryTypeIOGenerator.csproj" />
 	</ItemGroup>
+
+	<Target Name="_AddAnalyzersToOutput">
+		<ItemGroup>
+			<TfmSpecificPackageFile Include="$(OutputPath)\*NSL.*.dll" PackagePath="analyzers/dotnet/cs" />
+		</ItemGroup>
+	</Target>
 
 </Project>
