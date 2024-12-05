@@ -1,11 +1,5 @@
 ﻿using NSLLibProjectFileFormatter.Solution;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace NSLLibProjectFileFormatter.Project.CSPROJ
 {
@@ -122,6 +116,8 @@ namespace NSLLibProjectFileFormatter.Project.CSPROJ
 
             bool analyzerPackage = false;
 
+            bool analyzerUtils = false;
+
             tb.WriteProjectRoot(sdk, () =>
             {
                 tb.WritePropertyGroup(() =>
@@ -154,8 +150,6 @@ namespace NSLLibProjectFileFormatter.Project.CSPROJ
                             NSLProjectTypes.Add("UnityReference");
                     }
 
-                    analyzerPackage = HasAnalyzerPackageTarget(NSLProjectTypes);
-
                     var tf = "net8.0";
 
                     if (HasUnityTarget(NSLProjectTypes))
@@ -165,7 +159,10 @@ namespace NSLLibProjectFileFormatter.Project.CSPROJ
                         configurations.AddRange(new[] { "UnityDebug", "Unity" });
 
 
-                    if (HasAnalyzer(NSLProjectTypes) || HasAnalyzerUtils(NSLProjectTypes))
+                    analyzerPackage = HasAnalyzerPackageTarget(NSLProjectTypes);
+                    analyzerUtils = HasAnalyzerUtils(NSLProjectTypes);
+
+                    if (analyzerUtils)
                         tf = "netstandard2.0";
 
                     tb.WritePropertyItem("NSLProjectTypes", string.Join(';', NSLProjectTypes))
@@ -221,6 +218,14 @@ namespace NSLLibProjectFileFormatter.Project.CSPROJ
                     .WritePropertyItem("Authors", "Relife87", authors == null)
 
                     .WritePropertyItem($"Description", description, description != null);
+
+
+                    if (analyzerUtils && !(analyzerPackage || HasAnalyzerSharedTarget(NSLProjectTypes)))
+                    {
+                        tb.AppendLine()
+                            .WritePropertyItem("IsPackable", false)
+                            .WritePropertyItem("PackageId", $"$(PackageId)_Generator");
+                    }
                 });
 
 
@@ -421,6 +426,11 @@ namespace NSLLibProjectFileFormatter.Project.CSPROJ
         public bool HasAnalyzerPackageTarget(List<string> types)
         {
             return types.Contains("AnalyzerPackage");
+        }
+
+        public bool HasAnalyzerSharedTarget(List<string> types)
+        {
+            return types.Contains("AnalyzerShared");
         }
 
         public bool HasASPTarget(List<string> types)
