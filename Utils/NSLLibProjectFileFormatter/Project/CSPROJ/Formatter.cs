@@ -228,6 +228,9 @@ namespace NSLLibProjectFileFormatter.Project.CSPROJ
                             .WritePropertyItem("IsPackable", false)
                             .WritePropertyItem("PackageId", $"$(PackageId)_Core");
                     }
+                    else if (HasUnpacking(NSLProjectTypes))
+                        tb.AppendLine()
+                            .WritePropertyItem("IsPackable", false);
                 });
 
 
@@ -416,6 +419,9 @@ namespace NSLLibProjectFileFormatter.Project.CSPROJ
 
         public bool HasAnalyzer(List<string> types)
             => types.Contains("Analyzer");
+
+        public bool HasUnpacking(List<string> types)
+            => types.Contains("Unpacking");
 
         public bool HasAnalyzerUtils(List<string> types)
             => HasAnalyzer(types) || HasAnalyzerPackageTarget(types) || types.Contains("AnalyzerUtils");

@@ -29,6 +29,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\NSL.Generators.ClientPointGenerator.Shared\NSL.Generators.ClientPointGenerator.Shared.csproj" />
 		<ProjectReference Include="..\NSL.Generators.ClientPointGenerator\NSL.Generators.ClientPointGenerator.csproj" />
 	</ItemGroup>
 
