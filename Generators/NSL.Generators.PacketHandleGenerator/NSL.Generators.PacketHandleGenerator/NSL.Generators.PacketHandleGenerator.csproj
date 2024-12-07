@@ -1,0 +1,53 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<NSLProjectTypes>UnitySupport;AnalyzerUtils;AnalyzerCore</NSLProjectTypes>
+
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<Configurations>Debug;Release;DebugExamples;Unity;UnityDebug</Configurations>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<Nullable>disable</Nullable>
+
+		<PublishRepositoryUrl>true</PublishRepositoryUrl>
+		<EmbedUntrackedSources>true</EmbedUntrackedSources>
+		<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+		<GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
+
+		<EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+		<IsRoslynComponent>true</IsRoslynComponent>
+
+		<Version>$(VersionSuffix)</Version>
+		<Authors>Relife87</Authors>
+		<Description>-</Description>
+
+		<IsPackable>false</IsPackable>
+		<PackageId>$(PackageId)_Core</PackageId>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)'=='Debug'">
+		<PackageId>$(MSBuildProjectName)_Debug</PackageId>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)'=='UnityDebug'">
+		<AssemblyName>Unity.$(MSBuildProjectName)</AssemblyName>
+		<DefineConstants>DEBUG;TRACE</DefineConstants>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)'=='Unity'">
+		<AssemblyName>Unity.$(MSBuildProjectName)</AssemblyName>
+	</PropertyGroup>
+	<ItemGroup Condition="'$(Configuration)'=='Debug' Or '$(Configuration)'=='Release' Or '$(Configuration)'=='DebugExamples'">
+		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.8.0" PrivateAssets="all" />
+	</ItemGroup>
+	<ItemGroup Condition="'$(Configuration)'=='UnityDebug' Or '$(Configuration)'=='Unity'">
+		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.8.0" PrivateAssets="all" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\..\Core\NSL.SocketCore\NSL.SocketCore.csproj" OutputItemType="Analyzer" />
+		<ProjectReference Include="..\NSL.Generators.PacketHandleGenerator.Shared\NSL.Generators.PacketHandleGenerator.Shared.csproj" OutputItemType="Analyzer" />
+		<ProjectReference Include="..\..\NSL.Generators.BinaryGenerator\NSL.Generators.BinaryGenerator.csproj" OutputItemType="Analyzer" />
+		<ProjectReference Include="..\..\NSL.Generators.Utils\NSL.Generators.Utils.csproj" OutputItemType="Analyzer" />
+	</ItemGroup>
+
+</Project>
