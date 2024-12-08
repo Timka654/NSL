@@ -137,17 +137,18 @@ namespace NSL.Generators.BinaryTypeIOGenerator
                 return;
             }
 
-            if (bufferParam.name != "__packet")
-            {
-                methodBuilder.AppendLine($"var dataPacket = {bufferParam.name};");
-                methodBuilder.AppendLine();
-            }
+            //if (bufferParam.name != "__packet")
+            //{
+            //    methodBuilder.AppendLine($"var dataPacket = {bufferParam.name};");
+            //    methodBuilder.AppendLine();
+            //}
 
             var bgContext = new BinaryTypeIOGeneratorContext()
             {
                 For = methodInfo.ForGroup,
                 SemanticModel = tSym,
                 ProcessingType = classDecl.GetClassName(),
+                IOPath = bufferParam.name,
                 ReadCurrentTypeMethodName = methodInfo.MethodName,
                 IsStatic = methodInfo.MethodModifier.Contains("static")
             };
@@ -190,16 +191,17 @@ namespace NSL.Generators.BinaryTypeIOGenerator
 
             var typeParamName = existsObject ? typeParam.name : "this";
 
-            if (bufferParam.name != "__packet")
-            {
-                methodBuilder.AppendLine($"var __packet = {bufferParam.name};");
-                methodBuilder.AppendLine();
-            }
+            //if (bufferParam.name != "__packet")
+            //{
+            //    methodBuilder.AppendLine($"var __packet = {bufferParam.name};");
+            //    methodBuilder.AppendLine();
+            //}
 
             var bgContext = new BinaryTypeIOGeneratorContext()
             {
                 For = methodInfo.ForGroup,
                 SemanticModel = tSym,
+                IOPath = bufferParam.name,
                 ProcessingType = classDecl.GetClassName(),
                 WriteCurrentTypeMethodName = methodInfo.MethodName,
                 IsStatic = methodInfo.MethodModifier.Contains("static")

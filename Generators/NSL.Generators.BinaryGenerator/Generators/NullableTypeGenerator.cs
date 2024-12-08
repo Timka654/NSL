@@ -25,7 +25,7 @@ namespace NSL.Generators.BinaryGenerator.Generators
             if (genericType == null || !genericType.IsValueType)
                 return default;
 
-            return $"dataPacket.{nameof(InputPacketBuffer.ReadNullable)}(()=>{{ return {BinaryReadMethodsGenerator.GetValueReadSegment(genericType, context, path)}; }})";
+            return $"{context.IOPath}.{nameof(InputPacketBuffer.ReadNullable)}(()=>{{ return {BinaryReadMethodsGenerator.GetValueReadSegment(genericType, context, path)}; }})";
         }
 
         public static string GetWriteLine(ISymbol parameter, BinaryGeneratorContext context, string path)
@@ -42,7 +42,7 @@ namespace NSL.Generators.BinaryGenerator.Generators
             if (genericType == null || !genericType.IsValueType)
                 return default;
 
-            return $"__packet.{nameof(OutputPacketBuffer.WriteNullable)}({path},()=>{{ {BinaryWriteMethodsGenerator.BuildParameterWriter(genericType, context, $"{path}.Value")} }});";
+            return $"{context.IOPath}.{nameof(OutputPacketBuffer.WriteNullable)}({path},()=>{{ {BinaryWriteMethodsGenerator.BuildParameterWriter(genericType, context, $"{path}.Value")} }});";
         }
     }
 }

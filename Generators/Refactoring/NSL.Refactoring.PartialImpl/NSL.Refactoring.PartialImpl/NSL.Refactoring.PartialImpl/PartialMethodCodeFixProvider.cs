@@ -65,7 +65,10 @@ namespace NSL.Refactoring.PartialImpl
             {
                 var generatedBody = SyntaxFactory.Block(SyntaxFactory.ParseStatement("throw new NotImplementedException();"));
 
+                var newModifiers = method.Modifiers.Where(m => m.Kind() != SyntaxKind.PartialKeyword);
+
                 return method
+                .WithModifiers(SyntaxFactory.TokenList(newModifiers))
                     .WithBody(generatedBody)
                     .WithSemicolonToken(SyntaxFactory.Token(SyntaxKind.None))
                     .WithAdditionalAnnotations(Formatter.Annotation); // Для автоматического форматирования

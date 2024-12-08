@@ -9,5 +9,10 @@ namespace NSL.Generators.PacketHandleGenerator.Shared
         {
 
         }
+
+        public NSLPHGenResultAttribute(Type type, string binaryModel)
+        {
+
+        }
     }
 }

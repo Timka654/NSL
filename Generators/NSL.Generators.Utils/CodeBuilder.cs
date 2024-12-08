@@ -10,6 +10,8 @@ namespace NSL.Generators.Utils
     {
         private StringBuilder sb = new StringBuilder();
 
+        public int Length => sb.Length;
+
         public byte Tabs { get; private set; }
 
         public void NextTab()

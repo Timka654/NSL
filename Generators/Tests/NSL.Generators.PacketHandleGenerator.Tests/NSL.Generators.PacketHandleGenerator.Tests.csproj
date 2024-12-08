@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\Core\NSL.SocketCore\NSL.SocketCore.csproj" />
+    <ProjectReference Include="..\..\..\Protocols\TCP\BuilderExtensions\NSL.BuilderExtensions.TCPServer\NSL.BuilderExtensions.TCPServer.csproj" />
     <ProjectReference Include="..\..\NSL.Generators.BinaryTypeIOGenerator.Shared\NSL.Generators.BinaryTypeIOGenerator.Shared.csproj" />
     <ProjectReference Include="..\..\NSL.Generators.PacketHandleGenerator\NSL.Generators.PacketHandleGenerator.Shared\NSL.Generators.PacketHandleGenerator.Shared.csproj" />
     <ProjectReference Include="..\..\NSL.Generators.PacketHandleGenerator\NSL.Generators.PacketHandleGenerator\NSL.Generators.PacketHandleGenerator.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />

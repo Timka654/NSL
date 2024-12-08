@@ -16,7 +16,7 @@ namespace NSL.Generators.BinaryGenerator.Generators
             if (!readTypeHandlers.TryGetValue(type.Name, out var tReadLine))
                 return default;
 
-            return $"dataPacket.{tReadLine}()";
+            return $"{context.IOPath}.{tReadLine}()";
         }
 
         public static string GetWriteLine(ISymbol item, BinaryGeneratorContext context, string path)
@@ -24,7 +24,7 @@ namespace NSL.Generators.BinaryGenerator.Generators
             var type = item.GetTypeSymbol();
 
             if (writeTypeHandlers.TryGetValue(type.Name, out var baseValueWriter))
-                return $"__packet.{baseValueWriter}({path});";
+                return $"{context.IOPath}.{baseValueWriter}({path});";
 
             return default;
         }

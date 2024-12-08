@@ -66,7 +66,7 @@ namespace NSL.Generators.BinaryTypeIOGenerator
             }
 
             if (isThis)
-                return $"{ReadCurrentTypeMethodName}(dataPacket);";
+                return $"{ReadCurrentTypeMethodName}({IOPath});";
 
             return base.GetExistsReadHandleCode(symbol, path, codeBuilder);
         }
@@ -90,7 +90,7 @@ namespace NSL.Generators.BinaryTypeIOGenerator
             }
 
             if (isThis)
-                return $"{WriteCurrentTypeMethodName}({path},__packet);";
+                return $"{WriteCurrentTypeMethodName}({path},{IOPath});";
 
             return base.GetExistsReadHandleCode(symbol, path, codeBuilder);
         }

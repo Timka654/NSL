@@ -9,11 +9,13 @@ using NSL.Generators.BinaryGenerator.Utils;
 namespace NSL.Generators.BinaryGenerator
 {
     internal delegate string CustomTypeHandle(INamedTypeSymbol type, BinaryGeneratorContext context, string path);
-    internal delegate string GenerateHandle(ISymbol type, BinaryGeneratorContext context, string path);
+    public delegate string GenerateHandle(ISymbol type, BinaryGeneratorContext context, string path);
 
     public class BinaryReadMethodsGenerator
     {
         private static List<GenerateHandle> generators = new List<GenerateHandle>();
+
+        public static List<GenerateHandle> GetGenerators() => generators;
 
         static BinaryReadMethodsGenerator()
         {

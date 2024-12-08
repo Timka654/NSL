@@ -27,7 +27,7 @@ namespace NSL.Generators.BinaryGenerator.Generators
 
             path = $"data{++context.ProcessingLevel}";
 
-            rb.AppendLine($"dataPacket.{nameof(InputPacketBuffer.ReadNullableClass)}(() => {{");
+            rb.AppendLine($"{context.IOPath}.{nameof(InputPacketBuffer.ReadNullableClass)}(() => {{");
 
             rb.NextTab();
 
@@ -94,7 +94,7 @@ namespace NSL.Generators.BinaryGenerator.Generators
                 return cb.ToString();
             }
 
-            cb.AppendLine($"__packet.{nameof(OutputPacketBuffer.WriteNullableClass)}({path}, ()=> {{");
+            cb.AppendLine($"{context.IOPath}.{nameof(OutputPacketBuffer.WriteNullableClass)}({path}, ()=> {{");
 
             cb.NextTab();
 

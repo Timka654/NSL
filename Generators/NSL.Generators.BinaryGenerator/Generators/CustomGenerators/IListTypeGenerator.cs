@@ -31,7 +31,7 @@ namespace NSL.Generators.BinaryGenerator.Generators.CustomGenerators
             if (constructor == default)
                 return default;
 
-            cb.AppendLine($"dataPacket.{nameof(InputPacketBuffer.ReadNullableClass)}(() => new {type.ToDisplayString()}(dataPacket.{nameof(InputPacketBuffer.ReadCollection)}(()=>{{");
+            cb.AppendLine($"{context.IOPath}.{nameof(InputPacketBuffer.ReadNullableClass)}(() => new {type.ToDisplayString()}({context.IOPath}.{nameof(InputPacketBuffer.ReadCollection)}(()=>{{");
 
             cb.NextTab();
 
@@ -54,7 +54,7 @@ namespace NSL.Generators.BinaryGenerator.Generators.CustomGenerators
 
             var cb = new CodeBuilder();
 
-            cb.AppendLine($"__packet.{nameof(OutputPacketBuffer.WriteNullableClass)}({path},() => __packet.{nameof(OutputPacketBuffer.WriteCollection)}({path},(i)=>{{");
+            cb.AppendLine($"{context.IOPath}.{nameof(OutputPacketBuffer.WriteNullableClass)}({path},() => {context.IOPath}.{nameof(OutputPacketBuffer.WriteCollection)}({path},(i)=>{{");
 
             cb.NextTab();
 

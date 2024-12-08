@@ -14,7 +14,7 @@ namespace NSL.Generators.BinaryGenerator.Generators
 
                 var cb = new CodeBuilder();
 
-                cb.AppendLine($"dataPacket.{nameof(InputPacketBuffer.ReadCollection)}(()=>{{");
+                cb.AppendLine($"{context.IOPath}.{nameof(InputPacketBuffer.ReadCollection)}(()=>{{");
 
                 cb.NextTab();
 
@@ -43,7 +43,7 @@ namespace NSL.Generators.BinaryGenerator.Generators
 
                 var cb = new CodeBuilder();
 
-                cb.AppendLine($"__packet.{nameof(OutputPacketBuffer.WriteCollection)}({path},(i)=>{{");
+                cb.AppendLine($"{context.IOPath}.{nameof(OutputPacketBuffer.WriteCollection)}({path},(i)=>{{");
 
                 cb.NextTab();
 

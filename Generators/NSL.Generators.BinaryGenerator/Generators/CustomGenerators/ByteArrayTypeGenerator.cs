@@ -7,23 +7,23 @@ namespace NSL.Generators.BinaryGenerator.Generators.CustomGenerators
     {
         public static string GetReadLine(INamedTypeSymbol type, BinaryGeneratorContext context, string path)
         {
-            return $"dataPacket.{nameof(InputPacketBuffer.ReadNullableClass)}(() => dataPacket.{nameof(InputPacketBuffer.ReadByteArray)}().ToArray());";
+            return $"{context.IOPath}.{nameof(InputPacketBuffer.ReadNullableClass)}(() => {context.IOPath}.{nameof(InputPacketBuffer.ReadByteArray)}().ToArray());";
         }
 
  
         public static string GetWriteLine(INamedTypeSymbol type, BinaryGeneratorContext context, string path)
         {
-            return $"__packet.{nameof(OutputPacketBuffer.WriteNullableClass)}({path},() => __packet.{nameof(OutputPacketBuffer.WriteByteArray)}({path}));";
+            return $"{context.IOPath}.{nameof(OutputPacketBuffer.WriteNullableClass)}({path},() => {context.IOPath}.{nameof(OutputPacketBuffer.WriteByteArray)}({path}));";
         }
         public static string GetSpanReadLine(INamedTypeSymbol type, BinaryGeneratorContext context, string path)
         {
-            return $"dataPacket.{nameof(InputPacketBuffer.ReadByteArray)}();";
+            return $"{context.IOPath}.{nameof(InputPacketBuffer.ReadByteArray)}();";
         }
 
 
         public static string GetSpanWriteLine(INamedTypeSymbol type, BinaryGeneratorContext context, string path)
         {
-            return $"__packet.{nameof(OutputPacketBuffer.WriteByteArray)}({path});";
+            return $"{context.IOPath}.{nameof(OutputPacketBuffer.WriteByteArray)}({path});";
         }
     }
 }

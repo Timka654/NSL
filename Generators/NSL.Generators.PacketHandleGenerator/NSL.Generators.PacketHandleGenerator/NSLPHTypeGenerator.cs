@@ -3,13 +3,18 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using NSL.Generators.BinaryGenerator;
 using NSL.Generators.BinaryGenerator.Utils;
+using NSL.Generators.BinaryTypeIOGenerator.Attributes;
 using NSL.Generators.PacketHandleGenerator.Shared;
 using NSL.Generators.PacketHandleGenerator.Utils;
 using NSL.Generators.Utils;
+using NSL.SocketCore;
+using NSL.SocketCore.Utils;
 using NSL.SocketCore.Utils.Buffer;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Runtime.InteropServices.ComTypes;
 
 namespace NSL.Generators.PacketHandleGenerator
 {
@@ -59,7 +64,7 @@ namespace NSL.Generators.PacketHandleGenerator
                     .SelectMany(x => x.Attributes)
                     .Where(x => x.GetAttributeFullName().Equals(NSLPHGenImplementAttributeFullName)).ToArray();
 
-                //GenDebug.Break();
+                GenDebug.Break();
 
                 var typeModels = typeAttributes
                     .Select(x =>
@@ -70,7 +75,7 @@ namespace NSL.Generators.PacketHandleGenerator
 
                         var args = x.ArgumentList?.Arguments;
 
-                        var r = new HandlesData();
+                        var r = new HandlesData() { Context = context };
 
 
                         r.Type = args.Value[0].GetAttributeTypeParameterValueSymbol(typeSem);
@@ -78,6 +83,14 @@ namespace NSL.Generators.PacketHandleGenerator
                         r.Direction = args.Value[2].GetAttributeParameterValue<HPDirTypeEnum>(typeSem);
 
                         r.Modifiers = AccessModifierEnum.Private | AccessModifierEnum.Static;
+
+                        var defaults = r.Type.GetAttributes()
+                        .FirstOrDefault(a => a.AttributeClass.Name == NSLPHGenAttributeFullName);
+
+                        if (defaults != null)
+                        {
+                            //todo
+                        }
 
                         if (attributeParameters[3].Type.ToString() == NSLPHGenAccessModifierEnumFullName)
                         {
@@ -108,30 +121,51 @@ namespace NSL.Generators.PacketHandleGenerator
                     //.GroupBy(x => x).Select(x => x.Key)
                     .ToArray();
 
-
-                var partCB = new CodeBuilder();
-
-                foreach (var item in typeModels)
+                if (typeModels.Length > 0)
                 {
-                    if (item.Direction == HPDirTypeEnum.Input)
-                        BuildInputType(item, typeSem, partCB);
-                    else
+                    var cbData = new CodeBuilderData();
+
+                    foreach (var item in typeModels)
                     {
-                        //throw new NotImplementedException();
+                        var typeCBData = new CodeBuilderData();
+
+                        if (item.Direction == HPDirTypeEnum.Input)
+                            BuildInputType(item, typeSem, typeCBData);
+                        else
+                        {
+                            //throw new NotImplementedException();
+                        }
+
+                        cbData.PacketHandlesBuilder.AppendLine(typeCBData.PacketHandlesBuilder.ToString());
+                        cbData.HandlesBuilder.AppendLine(typeCBData.HandlesBuilder.ToString());
+                        if (item.Direction == HPDirTypeEnum.Input)
+                        {
+                            cbData.ConfigureBuilder.AppendLine($"{item.BuildModifierForHandles(AccessModifierEnum.Protected)} void ConfigurePacketHandles({nameof(CoreOptions)}<{item.NetworkDataType.Name}> options)");
+                            cbData.ConfigureBuilder.AppendBodyTabContent(() =>
+                            {
+                                cbData.ConfigureBuilder.AppendLine(typeCBData.ConfigureBuilder.ToString());
+                            });
+                        }
+                    }
+
+                    classBuilder.AppendLine(cbData.HandlesBuilder.ToString());
+                    classBuilder.AppendLine();
+                    classBuilder.AppendLine(cbData.PacketHandlesBuilder.ToString());
+
+                    if (cbData.ConfigureBuilder.Length > 0)
+                    {
+                        classBuilder.AppendLine();
+                        classBuilder.AppendLine(cbData.ConfigureBuilder.ToString());
                     }
                 }
-
-                classBuilder.AppendLine(partCB.ToString());
-
-
             }, requiredUsings);
 
             // Visual studio have lag(or ...) cannot show changes any time
-            //#if DEVELOP
-            //#pragma warning disable RS1035 // Do not use APIs banned for analyzers
-            //            System.IO.File.WriteAllText($@"C:\Work\temp\{classIdentityName}.binaryio.cs", outputValue);
-            //#pragma warning restore RS1035 // Do not use APIs banned for analyzers
-            //#endif
+#if DEVELOP
+#pragma warning disable RS1035 // Do not use APIs banned for analyzers
+            System.IO.File.WriteAllText($@"D:\Temp\{typeClass.GetClassName()}.ph.cs", classBuilder.ToString());
+#pragma warning restore RS1035 // Do not use APIs banned for analyzers
+#endif
 
 #if DEBUG
             //GenDebug.Break();
@@ -139,27 +173,178 @@ namespace NSL.Generators.PacketHandleGenerator
             context.AddSource($"{typeClass.GetTypeClassName()}.ph.cs", classBuilder.ToString());
         }
 
-        private void BuildInputType(HandlesData handle, SemanticModel typeSem, CodeBuilder classBuilder)
+        private void BuildInputType(HandlesData handle, SemanticModel typeSem, CodeBuilderData buildData)
         {
             foreach (var item in handle.Packets)
             {
-                if (item.PacketType.HasFlag(PacketTypeEnum.Message))
-                    BuildInputPacketMessage(item, typeSem, classBuilder, item.PacketType.HasFlag(PacketTypeEnum.Async));
-                else if (item.PacketType.HasFlag(PacketTypeEnum.Request))
-                {
-                    //throw new NotImplementedException();
-                }
+                BuildInputMessagePacket(item, typeSem, buildData, item.PacketType.HasFlag(PacketTypeEnum.Async));
             }
         }
 
-        private void BuildInputPacketMessage(PacketData packet, SemanticModel typeSem, CodeBuilder classBuilder, bool isAsync)
+        private void BuildInputMessagePacket(PacketData packet, SemanticModel typeSem, CodeBuilderData buildData, bool isAsync)
         {
             int pi = 0;
-            var args = string.Join(", ", Enumerable.Repeat($"{packet.HandlesData.NetworkDataType.Name} client", 1).Concat(packet.Parameters.Select(x => $"{x.Type.Name} item{pi++}")).ToArray());
+            var args = string.Join(", ", Enumerable.Repeat($"{packet.HandlesData.NetworkDataType.Name} client", 1).Concat(packet.Parameters.Select(x =>
+            {
+                ++pi;
+                return $"{x.Type.Name} {(x.Name ?? $"item{pi - 1}")}";
+            })).ToArray());
 
-            classBuilder.AppendLine($"{packet.HandlesData.BuildModifiers()} partial void Receive{packet.Name}Handle({args});");
+
+
+            var rType = isAsync ? "Task" : "void";
+
+            if (packet.PacketType.HasFlag(PacketTypeEnum.Request) && packet.Result != null)
+            {
+                rType = packet.Result.Type.Name;
+
+                if (isAsync)
+                    rType = $"Task<{rType}>";
+            }
+
+            //Debugger.Break();
+
+            var partName = $"Receive{packet.Name}Handle";
+
+            var hb = buildData.HandlesBuilder;
+
+            hb.AppendLine($"{packet.HandlesData.BuildModifiers()} partial {rType} {partName}({args});");
+
+            hb.AppendLine();
+
+            var phb = buildData.PacketHandlesBuilder;
+
+            phb.AppendLine($"{packet.HandlesData.BuildModifierForHandles()} {(isAsync ? "async Task" : "void")} NSLPacketHandle_{packet.Name}({packet.HandlesData.NetworkDataType.Name} client, {nameof(InputPacketBuffer)} data)");
+
+
+            phb.AppendBodyTabContent(() =>
+            {
+                if (packet.PacketType.HasFlag(PacketTypeEnum.Request))
+                {
+                    phb.AppendLine("var __response = data.CreateResponse();");
+                    phb.AppendLine();
+                    if (packet.Parameters.Any())
+                        phb.AppendLine();
+                }
+
+                pi = 0;
+                foreach (var item in packet.Parameters)
+                {
+                    var tname = item.Type.GetTypeFullName();
+
+                    string readSegment = buildParameterBinaryReadSegment(packet, item, tname);
+
+                    phb.AppendLine($"{tname} {(item.Name ?? $"data{pi}")} = {readSegment};");
+                    phb.AppendLine();
+
+                    ++pi;
+                }
+
+                //if (packet.Parameters.Any())
+                //    phb.AppendLine();
+
+                string invokeLine = $"{(isAsync ? "await " : string.Empty)}{partName}({(string.Join(", ", Enumerable.Repeat("client", 1).Concat(Enumerable.Range(0, packet.Parameters.Length).Select(i => packet.Parameters[i].Name ?? $"data{i}"))))})";
+
+                if (packet.PacketType.HasFlag(PacketTypeEnum.Request) && packet.Result != null)
+                {
+                    phb.AppendLine();
+                    phb.AppendLine($"var ___invokeResult = {invokeLine};");
+                    phb.AppendLine();
+                    invokeLine = buildResultBinaryWriteSegment(packet, packet.Result, $"___invokeResult");
+                }
+
+
+                phb.AppendLine($"{invokeLine};");
+
+                if (packet.PacketType.HasFlag(PacketTypeEnum.Request))
+                {
+                    phb.AppendLine();
+                    phb.AppendLine($"client.Send(__response);");
+                }
+            });
+
+            phb.AppendLine();
+
+
+            var cb = buildData.ConfigureBuilder;
+
+            if (isAsync)
+                cb.AppendLine($"options.{nameof(CoreOptions<INetworkClient>.AddAsyncPacket)}({packet.HandlesData.Type.Name}.{packet.Name}, NSLPacketHandle_{packet.Name});");
+            else
+                cb.AppendLine($"options.{nameof(CoreOptions<INetworkClient>.AddPacket)}({packet.HandlesData.Type.Name}.{packet.Name}, NSLPacketHandle_{packet.Name});");
         }
 
+
+        private string buildParameterBinaryReadSegment(PacketData packet, PacketParamData item, string tname)
+        {
+            var typeAttributes = item.Type.GetAttributes()
+                .Where(x => x.AttributeClass.Name.Equals(NSLBIOTypeAttributeFullName)).ToArray();
+
+            var typeModels = typeAttributes
+                .SelectMany(x =>
+                {
+                    var models = x.ConstructorArguments.SelectMany(n => n.Values.Select(d => (string)d.Value)).ToArray();
+
+                    if (!models.Any())
+                        return Enumerable.Repeat<string>("<!!_NSLBIOFULL_!!>", 1);
+
+                    return models;
+                })
+                .GroupBy(x => x).Select(x => x.Key)
+                .ToArray();
+
+            var model = item.BinaryModel ?? "<!!_NSLBIOFULL_!!>";
+
+            if (typeModels.Contains(model))
+            {
+                if (item.BinaryModel == null)
+                    return $"{tname}.ReadFullFrom(data)";
+                else
+                    return $"{tname}.Read{item.BinaryModel}From(data)";
+            }
+
+            return BinaryReadMethodsGenerator.GetValueReadSegment(item.Type, new BinaryGeneratorContext()
+            {
+                Context = packet.HandlesData.Context,
+                IOPath = "data",
+                For = model
+            }, "data");
+        }
+        private string buildResultBinaryWriteSegment(PacketData packet, PacketResultData item, string tname)
+        {
+            var typeAttributes = item.Type.GetAttributes()
+                .Where(x => x.AttributeClass.Name.Equals(NSLBIOTypeAttributeFullName)).ToArray();
+
+            var typeModels = typeAttributes
+                .SelectMany(x =>
+                {
+                    var models = x.ConstructorArguments.SelectMany(n => n.Values.Select(d => (string)d.Value)).ToArray();
+
+                    if (!models.Any())
+                        return Enumerable.Repeat<string>("<!!_NSLBIOFULL_!!>", 1);
+
+                    return models;
+                })
+                .GroupBy(x => x).Select(x => x.Key)
+                .ToArray();
+
+            var model = item.BinaryModel ?? "<!!_NSLBIOFULL_!!>";
+
+            if (typeModels.Contains(model))
+            {
+                if (item.BinaryModel == null)
+                    return $"{tname}.WriteFullTo(__response)";
+                else
+                    return $"{tname}.Write{item.BinaryModel}To(__response)";
+            }
+
+            return BinaryWriteMethodsGenerator.BuildParameterWriter(item.Type, new BinaryGeneratorContext()
+            {
+                Context = packet.HandlesData.Context,
+                IOPath = "__response",
+                For = model
+            }, tname).TrimEnd(';');
+        }
 
         private PacketData[] loadPackets(HandlesData item, GeneratorExecutionContext context)
             => item.Type.GetMembers()
@@ -167,7 +352,6 @@ namespace NSL.Generators.PacketHandleGenerator
                         .Where(field => field.IsStatic && field.HasConstantValue)
                         .Select(packet =>
                         {
-
                             var attributes = packet.GetAttributes();
 
                             var attr = attributes
@@ -182,7 +366,8 @@ namespace NSL.Generators.PacketHandleGenerator
                             {
                                 HandlesData = item,
                                 PacketType = PacketTypeEnum.Message,
-                                Name = packet.Name
+                                Name = packet.Name,
+                                EnumMember = packet
                             };
 
                             if (args[0].Type.ToString() == NSLPHGenPacketTypeEnumFullName)
@@ -206,9 +391,8 @@ namespace NSL.Generators.PacketHandleGenerator
                                     else if (r.Name.EndsWith("Message"))
                                         r.PacketType |= PacketTypeEnum.Message;
                                     else
-                                        context.ShowPHDiagnostics("NSLHP003", "Need to set packet type", DiagnosticSeverity.Error, packet.Locations.ToArray());
+                                        context.ShowPHDiagnostics("NSLHP003", "Need to set packet type (Cannot detect Receive or Message)", DiagnosticSeverity.Error, packet.Locations.ToArray());
                                 }
-
 
                                 r.Models = args
                                 .Skip(1)
@@ -221,6 +405,8 @@ namespace NSL.Generators.PacketHandleGenerator
                                     r.PacketType = PacketTypeEnum.Request;
                                 else if (r.Name.EndsWith("Message"))
                                     r.PacketType = PacketTypeEnum.Message;
+
+                                //r.PacketType |= PacketTypeEnum.Async;
 
                                 r.Models = args
                                 .Skip(0)
@@ -242,25 +428,39 @@ namespace NSL.Generators.PacketHandleGenerator
 
             item.Parameters = parameters.Select(x =>
             {
-                var r = new PacketParamData();
-
-                r.Type = (ITypeSymbol)x.ConstructorArguments[0].Value;
+                var r = new PacketParamData()
+                {
+                    Type = (ITypeSymbol)x.ConstructorArguments[0].Value,
+                    Attribute = x
+                };
 
                 if (x.ConstructorArguments.Length > 1)
                     r.BinaryModel = (string)x.ConstructorArguments[1].Value;
+
+                var name = x.NamedArguments.FirstOrDefault(n => n.Key == "Name");
+
+                if (!Equals(name, default))
+                    r.Name = (string)name.Value.Value;
 
                 return r;
             }).ToArray();
 
 
-            var result = attributes
-            .FirstOrDefault(a => a.AttributeClass.Name == NSLPHGenResultAttributeFullName);
 
-            if (result != null)
-                item.Result = new PacketResultData()
+            if (item.PacketType.HasFlag(PacketTypeEnum.Request))
+            {
+                var result = attributes
+                .FirstOrDefault(a => a.AttributeClass.Name == NSLPHGenResultAttributeFullName);
+
+                if (result != null)
                 {
-                    Type = (ITypeSymbol)result.ConstructorArguments[0].Value
-                };
+                    item.Result = new PacketResultData()
+                    {
+                        Type = (ITypeSymbol)result.ConstructorArguments[0].Value,
+                        BinaryModel = result.ConstructorArguments.Length > 1 ? (string)result.ConstructorArguments[1].Value : default
+                    };
+                }
+            }
         }
 
         #region ISourceGenerator
@@ -283,6 +483,8 @@ namespace NSL.Generators.PacketHandleGenerator
 
         internal static readonly string NSLPHGenImplementAttributeFullName = typeof(NSLPHGenImplementAttribute).Name;
 
+        internal static readonly string NSLPHGenDefaultsAttributeFullName = typeof(NSLPHGenDefaultsAttribute).Name;
+
         internal static readonly string NSLPHGenAttributeFullName = typeof(NSLPHGenAttribute).Name;
 
         internal static readonly string NSLPHGenParamAttributeFullName = typeof(NSLPHGenParamAttribute).Name;
@@ -292,53 +494,7 @@ namespace NSL.Generators.PacketHandleGenerator
         internal static readonly string NSLPHGenAccessModifierEnumFullName = typeof(AccessModifierEnum).FullName;
 
         internal static readonly string NSLPHGenPacketTypeEnumFullName = typeof(PacketTypeEnum).FullName;
-    }
 
-    internal class HandlesData
-    {
-        public ITypeSymbol Type { get; set; }
-
-        public AccessModifierEnum Modifiers { get; set; }
-
-        public HPDirTypeEnum Direction { get; set; }
-
-        public ITypeSymbol NetworkDataType { get; set; }
-
-        public string[] Models { get; set; }
-
-        public PacketData[] Packets { get; set; }
-
-        public string BuildModifiers()
-            => string.Join(" ", Enum.GetValues(typeof(AccessModifierEnum))
-            .Cast<AccessModifierEnum>()
-            .Where(x => Modifiers.HasFlag(x))
-            .Select(x => x.ToString().ToLower()));
-    }
-
-    internal class PacketData
-    {
-        public HandlesData HandlesData { get; set; }
-
-        public string Name { get; set; }
-
-        public PacketTypeEnum PacketType { get; set; }
-
-        public string[] Models { get; set; }
-
-        public PacketParamData[] Parameters { get; set; }
-
-        public PacketResultData Result { get; set; }
-    }
-
-    internal class PacketParamData
-    {
-        public ITypeSymbol Type { get; set; }
-
-        public string BinaryModel { get; set; }
-    }
-
-    internal class PacketResultData
-    {
-        public ITypeSymbol Type { get; set; }
+        internal static readonly string NSLBIOTypeAttributeFullName = typeof(NSLBIOTypeAttribute).Name;
     }
 }

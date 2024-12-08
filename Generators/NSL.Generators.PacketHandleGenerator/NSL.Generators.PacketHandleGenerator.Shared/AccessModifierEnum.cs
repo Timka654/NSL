@@ -8,6 +8,9 @@ namespace NSL.Generators.PacketHandleGenerator.Shared
         Private = 1,
         Internal = 2,
         Public = 4, 
-        Static = 8
+        Protected = 8,
+        Static = 16,
+        Virtual = 32,
+        Abstract = 64
     }
 }

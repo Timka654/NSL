@@ -15,7 +15,10 @@ namespace NSL.Generators.BinaryGenerator
         public SemanticModel SemanticModel;
 
         public GeneratorExecutionContext Context { get; set; }
+
         public ISymbol CurrentMember { get; internal set; }
+
+        public string IOPath { get; set; }
 
         public virtual bool IsIgnore(ISymbol symbol, string path) => false;
 

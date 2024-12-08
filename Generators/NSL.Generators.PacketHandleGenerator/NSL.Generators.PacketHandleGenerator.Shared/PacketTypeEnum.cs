@@ -7,12 +7,7 @@ namespace NSL.Generators.PacketHandleGenerator.Shared
     {
         Request = 1,
         Message = 2,
-        Async = 4
-    }
-
-    public enum HPDirTypeEnum
-    {
-        Output,
-        Input
+        Async = 4,
+        Sync = 8
     }
 }
