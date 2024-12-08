@@ -7,21 +7,12 @@ namespace NSL.Generators.PacketHandleGenerator.Shared
     [AttributeUsage(AttributeTargets.Field)]
     public class NSLPHGenAttribute : Attribute
     {
-        public NSLPHGenAttribute(PacketTypeEnum packetType, params string[] models)
+        public NSLPHGenAttribute(NSLPacketTypeEnum packetType, params string[] models)
         {
                 
         }
 
         public NSLPHGenAttribute(params string[] models)
-        {
-                
-        }
-    }
-
-    [AttributeUsage(AttributeTargets.Enum)]
-    public class NSLPHGenDefaultsAttribute : Attribute
-    {
-        public NSLPHGenDefaultsAttribute(AccessModifierEnum defaultModifiers = 0, bool defaultAsync = false)
         {
                 
         }

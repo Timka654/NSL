@@ -3,7 +3,7 @@
 namespace NSL.Generators.PacketHandleGenerator.Shared
 {
     [Flags]
-    public enum PacketTypeEnum
+    public enum NSLPacketTypeEnum
     {
         Request = 1,
         Message = 2,

@@ -3,7 +3,7 @@
 namespace NSL.Generators.PacketHandleGenerator.Shared
 {
     [Flags]
-    public enum AccessModifierEnum
+    public enum NSLAccessModifierEnum
     {
         Private = 1,
         Internal = 2,

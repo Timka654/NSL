@@ -11,26 +11,28 @@ namespace NSL.Generators.PacketHandleGenerator
 
         public ITypeSymbol Type { get; set; }
 
-        public AccessModifierEnum Modifiers { get; set; }
+        public NSLAccessModifierEnum Modifiers { get; set; }
 
-        public HPDirTypeEnum Direction { get; set; }
+        public NSLHPDirTypeEnum Direction { get; set; }
 
         public ITypeSymbol NetworkDataType { get; set; }
 
         public string[] Models { get; set; }
 
+        public bool IsStaticNetwork { get; set; }
+
         public PacketData[] Packets { get; set; }
 
         public string BuildModifiers()
-            => string.Join(" ", Enum.GetValues(typeof(AccessModifierEnum))
-            .Cast<AccessModifierEnum>()
+            => string.Join(" ", Enum.GetValues(typeof(NSLAccessModifierEnum))
+            .Cast<NSLAccessModifierEnum>()
             .Where(x => Modifiers.HasFlag(x))
             .Select(x => x.ToString().ToLower()));
 
-        public string BuildModifierForHandles(AccessModifierEnum mod = AccessModifierEnum.Private)
-            => string.Join(" ", Enumerable.Repeat(mod, 1).Concat(Enum.GetValues(typeof(AccessModifierEnum))
-                .Cast<AccessModifierEnum>()
-                .Where(x => x == AccessModifierEnum.Static)
+        public string BuildModifierForHandles(NSLAccessModifierEnum mod = NSLAccessModifierEnum.Private)
+            => string.Join(" ", Enumerable.Repeat(mod, 1).Concat(Enum.GetValues(typeof(NSLAccessModifierEnum))
+                .Cast<NSLAccessModifierEnum>()
+                .Where(x => x == NSLAccessModifierEnum.Static)
                 .Where(x => Modifiers.HasFlag(x)))
                 .Select(x => x.ToString().ToLower()));
     }

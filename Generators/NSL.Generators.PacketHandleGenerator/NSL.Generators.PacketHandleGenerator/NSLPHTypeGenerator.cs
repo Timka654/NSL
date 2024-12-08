@@ -80,9 +80,9 @@ namespace NSL.Generators.PacketHandleGenerator
 
                         r.Type = args.Value[0].GetAttributeTypeParameterValueSymbol(typeSem);
                         r.NetworkDataType = args.Value[1].GetAttributeTypeParameterValueSymbol(typeSem);
-                        r.Direction = args.Value[2].GetAttributeParameterValue<HPDirTypeEnum>(typeSem);
+                        r.Direction = args.Value[2].GetAttributeParameterValue<NSLHPDirTypeEnum>(typeSem);
 
-                        r.Modifiers = AccessModifierEnum.Private | AccessModifierEnum.Static;
+                        r.Modifiers = NSLAccessModifierEnum.Private | NSLAccessModifierEnum.Static;
 
                         var defaults = r.Type.GetAttributes()
                         .FirstOrDefault(a => a.AttributeClass.Name == NSLPHGenAttributeFullName);
@@ -94,11 +94,11 @@ namespace NSL.Generators.PacketHandleGenerator
 
                         if (attributeParameters[3].Type.ToString() == NSLPHGenAccessModifierEnumFullName)
                         {
-                            r.Modifiers = args.Value[3].GetAttributeParameterValue<AccessModifierEnum>(typeSem);
+                            r.Modifiers = args.Value[3].GetAttributeParameterValue<NSLAccessModifierEnum>(typeSem);
 
-                            if (Enum.GetValues(typeof(AccessModifierEnum))
-                            .Cast<AccessModifierEnum>()
-                            .Where(n => n < AccessModifierEnum.Static)
+                            if (Enum.GetValues(typeof(NSLAccessModifierEnum))
+                            .Cast<NSLAccessModifierEnum>()
+                            .Where(n => n < NSLAccessModifierEnum.Static)
                             .Where(n => r.Modifiers.HasFlag(n))
                                 .Count() > 3)
                                 context.ShowPHDiagnostics("NSLHP001", "Have invalid modifier combination", DiagnosticSeverity.Error, attributeParameters[1].Locations.ToArray());
@@ -129,7 +129,7 @@ namespace NSL.Generators.PacketHandleGenerator
                     {
                         var typeCBData = new CodeBuilderData();
 
-                        if (item.Direction == HPDirTypeEnum.Input)
+                        if (item.Direction == NSLHPDirTypeEnum.Input)
                             BuildInputType(item, typeSem, typeCBData);
                         else
                         {
@@ -138,9 +138,9 @@ namespace NSL.Generators.PacketHandleGenerator
 
                         cbData.PacketHandlesBuilder.AppendLine(typeCBData.PacketHandlesBuilder.ToString());
                         cbData.HandlesBuilder.AppendLine(typeCBData.HandlesBuilder.ToString());
-                        if (item.Direction == HPDirTypeEnum.Input)
+                        if (item.Direction == NSLHPDirTypeEnum.Input)
                         {
-                            cbData.ConfigureBuilder.AppendLine($"{item.BuildModifierForHandles(AccessModifierEnum.Protected)} void ConfigurePacketHandles({nameof(CoreOptions)}<{item.NetworkDataType.Name}> options)");
+                            cbData.ConfigureBuilder.AppendLine($"{item.BuildModifierForHandles(NSLAccessModifierEnum.Protected)} void ConfigurePacketHandles({nameof(CoreOptions)}<{item.NetworkDataType.Name}> options)");
                             cbData.ConfigureBuilder.AppendBodyTabContent(() =>
                             {
                                 cbData.ConfigureBuilder.AppendLine(typeCBData.ConfigureBuilder.ToString());
@@ -177,7 +177,7 @@ namespace NSL.Generators.PacketHandleGenerator
         {
             foreach (var item in handle.Packets)
             {
-                BuildInputMessagePacket(item, typeSem, buildData, item.PacketType.HasFlag(PacketTypeEnum.Async));
+                BuildInputMessagePacket(item, typeSem, buildData, item.PacketType.HasFlag(NSLPacketTypeEnum.Async));
             }
         }
 
@@ -194,7 +194,7 @@ namespace NSL.Generators.PacketHandleGenerator
 
             var rType = isAsync ? "Task" : "void";
 
-            if (packet.PacketType.HasFlag(PacketTypeEnum.Request) && packet.Result != null)
+            if (packet.PacketType.HasFlag(NSLPacketTypeEnum.Request) && packet.Result != null)
             {
                 rType = packet.Result.Type.Name;
 
@@ -219,7 +219,7 @@ namespace NSL.Generators.PacketHandleGenerator
 
             phb.AppendBodyTabContent(() =>
             {
-                if (packet.PacketType.HasFlag(PacketTypeEnum.Request))
+                if (packet.PacketType.HasFlag(NSLPacketTypeEnum.Request))
                 {
                     phb.AppendLine("var __response = data.CreateResponse();");
                     phb.AppendLine();
@@ -245,7 +245,7 @@ namespace NSL.Generators.PacketHandleGenerator
 
                 string invokeLine = $"{(isAsync ? "await " : string.Empty)}{partName}({(string.Join(", ", Enumerable.Repeat("client", 1).Concat(Enumerable.Range(0, packet.Parameters.Length).Select(i => packet.Parameters[i].Name ?? $"data{i}"))))})";
 
-                if (packet.PacketType.HasFlag(PacketTypeEnum.Request) && packet.Result != null)
+                if (packet.PacketType.HasFlag(NSLPacketTypeEnum.Request) && packet.Result != null)
                 {
                     phb.AppendLine();
                     phb.AppendLine($"var ___invokeResult = {invokeLine};");
@@ -256,7 +256,7 @@ namespace NSL.Generators.PacketHandleGenerator
 
                 phb.AppendLine($"{invokeLine};");
 
-                if (packet.PacketType.HasFlag(PacketTypeEnum.Request))
+                if (packet.PacketType.HasFlag(NSLPacketTypeEnum.Request))
                 {
                     phb.AppendLine();
                     phb.AppendLine($"client.Send(__response);");
@@ -365,19 +365,19 @@ namespace NSL.Generators.PacketHandleGenerator
                             var r = new PacketData()
                             {
                                 HandlesData = item,
-                                PacketType = PacketTypeEnum.Message,
+                                PacketType = NSLPacketTypeEnum.Message,
                                 Name = packet.Name,
                                 EnumMember = packet
                             };
 
                             if (args[0].Type.ToString() == NSLPHGenPacketTypeEnumFullName)
                             {
-                                r.PacketType = (PacketTypeEnum)args[0].Value;
+                                r.PacketType = (NSLPacketTypeEnum)args[0].Value;
 
 
-                                var modCount = Enum.GetValues(typeof(PacketTypeEnum))
-                                .Cast<PacketTypeEnum>()
-                                .Where(x => x < PacketTypeEnum.Async)
+                                var modCount = Enum.GetValues(typeof(NSLPacketTypeEnum))
+                                .Cast<NSLPacketTypeEnum>()
+                                .Where(x => x < NSLPacketTypeEnum.Async)
                                 .Where(x => r.PacketType.HasFlag(x))
                                 .Count();
 
@@ -387,9 +387,9 @@ namespace NSL.Generators.PacketHandleGenerator
                                 if (modCount == 0)
                                 {
                                     if (r.Name.EndsWith("Request"))
-                                        r.PacketType |= PacketTypeEnum.Request;
+                                        r.PacketType |= NSLPacketTypeEnum.Request;
                                     else if (r.Name.EndsWith("Message"))
-                                        r.PacketType |= PacketTypeEnum.Message;
+                                        r.PacketType |= NSLPacketTypeEnum.Message;
                                     else
                                         context.ShowPHDiagnostics("NSLHP003", "Need to set packet type (Cannot detect Receive or Message)", DiagnosticSeverity.Error, packet.Locations.ToArray());
                                 }
@@ -402,9 +402,9 @@ namespace NSL.Generators.PacketHandleGenerator
                             else
                             {
                                 if (r.Name.EndsWith("Request"))
-                                    r.PacketType = PacketTypeEnum.Request;
+                                    r.PacketType = NSLPacketTypeEnum.Request;
                                 else if (r.Name.EndsWith("Message"))
-                                    r.PacketType = PacketTypeEnum.Message;
+                                    r.PacketType = NSLPacketTypeEnum.Message;
 
                                 //r.PacketType |= PacketTypeEnum.Async;
 
@@ -447,7 +447,7 @@ namespace NSL.Generators.PacketHandleGenerator
 
 
 
-            if (item.PacketType.HasFlag(PacketTypeEnum.Request))
+            if (item.PacketType.HasFlag(NSLPacketTypeEnum.Request))
             {
                 var result = attributes
                 .FirstOrDefault(a => a.AttributeClass.Name == NSLPHGenResultAttributeFullName);
@@ -491,9 +491,9 @@ namespace NSL.Generators.PacketHandleGenerator
 
         internal static readonly string NSLPHGenResultAttributeFullName = typeof(NSLPHGenResultAttribute).Name;
 
-        internal static readonly string NSLPHGenAccessModifierEnumFullName = typeof(AccessModifierEnum).FullName;
+        internal static readonly string NSLPHGenAccessModifierEnumFullName = typeof(NSLAccessModifierEnum).FullName;
 
-        internal static readonly string NSLPHGenPacketTypeEnumFullName = typeof(PacketTypeEnum).FullName;
+        internal static readonly string NSLPHGenPacketTypeEnumFullName = typeof(NSLPacketTypeEnum).FullName;
 
         internal static readonly string NSLBIOTypeAttributeFullName = typeof(NSLBIOTypeAttribute).Name;
     }

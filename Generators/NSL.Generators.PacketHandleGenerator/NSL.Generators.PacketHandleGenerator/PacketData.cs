@@ -9,7 +9,7 @@ namespace NSL.Generators.PacketHandleGenerator
 
         public string Name { get; set; }
 
-        public PacketTypeEnum PacketType { get; set; }
+        public NSLPacketTypeEnum PacketType { get; set; }
 
         public string[] Models { get; set; }
 

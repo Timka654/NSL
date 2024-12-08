@@ -1,6 +1,6 @@
 ﻿namespace NSL.Generators.PacketHandleGenerator.Shared
 {
-    public enum HPDirTypeEnum
+    public enum NSLHPDirTypeEnum
     {
         Output,
         Input
