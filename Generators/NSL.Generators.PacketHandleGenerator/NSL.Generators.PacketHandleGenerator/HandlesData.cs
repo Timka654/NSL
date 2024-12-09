@@ -25,6 +25,8 @@ namespace NSL.Generators.PacketHandleGenerator
 
         public PacketData[] Packets { get; set; }
 
+        public Func<string, bool> HaveReceiveHandleImplementation { get; set; } = (name) => false;
+
         public string BuildModifiers()
             => string.Join(" ", Enum.GetValues(typeof(NSLAccessModifierEnum))
             .Cast<NSLAccessModifierEnum>()

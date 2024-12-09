@@ -29,11 +29,15 @@ namespace NSL.Generators.PacketHandleGenerator.Tests
                 .WithEndPoint("127.0.0.1", 9996)
                 .WithCode(b =>
                 {
+                    b.GetOptions().InitializeClientObjectBagOnConnect();
                     b.GetOptions().ConfigureRequestProcessor();
 
 
                 })
                 .Build();
+
+            if (!await c.ConnectAsync())
+                throw new Exception();
 
 
             SendRepositoryDelegateOutputStaticNetwork.client = c;
@@ -43,16 +47,16 @@ namespace NSL.Generators.PacketHandleGenerator.Tests
             ClientLog($"{nameof(SendRepositoryDelegateOutputStaticNetwork.SendPT2PacketRequest)} request");
             SendRepositoryDelegateOutputStaticNetwork.SendPT2PacketRequest(new Param3Struct() { D3 = 56, D4 = 66, }, new Param2Struct() { D4 = 55, D3 = 11 }, 9999, r =>
             {
-                ClientLog($"{nameof(SendRepositoryDelegateOutputStaticNetwork.SendPT2PacketRequest)} response {r.D4} {r.D3}");
+                ClientLog($"{nameof(SendRepositoryDelegateOutputStaticNetwork.SendPT2PacketRequest)} response {r.D3} {r.D4}");
             });
 
-            await Task.Delay(1000);
+            await Task.Delay(3000);
 
         }
 
         private static void ClientLog(string content)
-        { 
-        Console.WriteLine($"Client: ",content);
+        {
+            Console.WriteLine($"Client: {content}");
         }
     }
 

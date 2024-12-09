@@ -1,6 +1,6 @@
-﻿#if DEBUGEXAMPLES
-#define DEVELOP
-#endif
+﻿//#if DEBUGEXAMPLES
+//#define DEVELOP
+//#endif
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -77,6 +77,13 @@ namespace NSL.Generators.PacketHandleGenerator
 
                 //GenDebug.Break();
 
+                var methodNames = type.Members
+                .Where(x => x is MethodDeclarationSyntax)
+                .Cast<MethodDeclarationSyntax>()
+                .Select(x => x.Identifier.Text)
+                //.Where(x => x.StartsWith("Receive") && x.EndsWith("Handle"))
+                .ToArray();
+
                 var typeModels = typeAttributes
                     .Select(x =>
                     {
@@ -88,7 +95,7 @@ namespace NSL.Generators.PacketHandleGenerator
 
                         var args = x.ArgumentList?.Arguments;
 
-                        var r = new HandlesData() { Context = context };
+                        var r = new HandlesData() { Context = context, HaveReceiveHandleImplementation = methodNames.Contains };
 
 
                         var parameters = args.Value
@@ -176,9 +183,11 @@ namespace NSL.Generators.PacketHandleGenerator
 
                     if (tm != null)
                     {
+                        if(!methodNames.Contains("GetNetworkClient"))
                         classBuilder.AppendLine($"{tm.BuildModifierForHandles(NSLAccessModifierEnum.Protected)} partial {tm.NetworkDataType.Name} GetNetworkClient();");
 
-                        classBuilder.AppendLine($"{tm.BuildModifierForHandles(NSLAccessModifierEnum.Protected)} partial NSL.SocketCore.Extensions.Buffer.RequestProcessor GetRequestProcessor();");
+                        if (!methodNames.Contains("GetRequestProcessor"))
+                            classBuilder.AppendLine($"{tm.BuildModifierForHandles(NSLAccessModifierEnum.Protected)} partial NSL.SocketCore.Extensions.Buffer.RequestProcessor GetRequestProcessor();");
                     }
 
                     if (cbData.HandlesBuilder.Length > 0)
@@ -201,7 +210,7 @@ namespace NSL.Generators.PacketHandleGenerator
             // Visual studio have lag(or ...) cannot show changes any time
 #if DEVELOP
 #pragma warning disable RS1035 // Do not use APIs banned for analyzers
-            System.IO.File.WriteAllText($@"D:\Temp\{typeClass.GetClassName()}.ph.cs", classBuilder.ToString());
+            System.IO.File.WriteAllText($@"C:\Temp\{typeClass.GetClassName()}.ph.cs", classBuilder.ToString());
 #pragma warning restore RS1035 // Do not use APIs banned for analyzers
 #endif
 
@@ -359,7 +368,7 @@ namespace NSL.Generators.PacketHandleGenerator
                             bodyBuilder.AppendLine($"___result = {buildResultBinaryReadSegment(packet, packet.Result, packet.Result.Type.GetTypeFullName())};");
                             bodyBuilder.AppendLine();
                         }
-                        else if(packet.HandlesData.DelegateOutputResponse)
+                        else if (packet.HandlesData.DelegateOutputResponse)
                         {
                             bodyBuilder.AppendLine($"if(onResponseHandle != null)");
                             bodyBuilder.AppendBodyTabContent(() =>
@@ -408,34 +417,39 @@ namespace NSL.Generators.PacketHandleGenerator
         private void BuildReceivePacket(PacketData packet, SemanticModel typeSem, CodeBuilderData buildData, bool isAsync)
         {
             int pi = 0;
-            var args = string.Join(", ", Enumerable.Repeat($"{packet.HandlesData.NetworkDataType.Name} client", 1).Concat(packet.Parameters.Select(x =>
-            {
-                ++pi;
-                return $"{x.Type.Name} {(x.Name ?? $"item{pi - 1}")}";
-            })).ToArray());
-
-
-
-            var rType = isAsync ? "Task" : "void";
-
-            if (packet.PacketType.HasFlag(NSLPacketTypeEnum.Request) && packet.Result != null)
-            {
-                rType = packet.Result.Type.Name;
-
-                if (isAsync)
-                    rType = $"Task<{rType}>";
-            }
-
-            //Debugger.Break();
 
             var partName = $"Receive{packet.Name}Handle";
 
-            var hb = buildData.HandlesBuilder;
+            if (!packet.HandlesData.HaveReceiveHandleImplementation(partName))
+            {
 
-            hb.AppendSummaryLine($"Generate for <see cref=\"{packet.HandlesData.Type.Name}.{packet.Name}\"/>");
-            hb.AppendLine($"{packet.HandlesData.BuildModifiers()} partial {rType} {partName}({args});");
+                var args = string.Join(", ", Enumerable.Repeat($"{packet.HandlesData.NetworkDataType.Name} client", 1).Concat(packet.Parameters.Select(x =>
+                {
+                    ++pi;
+                    return $"{x.Type.Name} {(x.Name ?? $"item{pi - 1}")}";
+                })).ToArray());
 
-            hb.AppendLine();
+
+
+                var rType = isAsync ? "Task" : "void";
+
+                if (packet.PacketType.HasFlag(NSLPacketTypeEnum.Request) && packet.Result != null)
+                {
+                    rType = packet.Result.Type.Name;
+
+                    if (isAsync)
+                        rType = $"Task<{rType}>";
+                }
+
+                //Debugger.Break();
+
+                var hb = buildData.HandlesBuilder;
+
+                hb.AppendSummaryLine($"Generate for <see cref=\"{packet.HandlesData.Type.Name}.{packet.Name}\"/>");
+                hb.AppendLine($"{packet.HandlesData.BuildModifiers()} partial {rType} {partName}({args});");
+
+                hb.AppendLine();
+            }
 
             var phb = buildData.PacketHandlesBuilder;
 
