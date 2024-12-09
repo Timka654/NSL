@@ -68,7 +68,7 @@ namespace NSL.Refactoring.PartialImpl
                 var newModifiers = method.Modifiers.Where(m => m.Kind() != SyntaxKind.PartialKeyword);
 
                 return method
-                .WithModifiers(SyntaxFactory.TokenList(newModifiers))
+                    //.WithModifiers(SyntaxFactory.TokenList(newModifiers))
                     .WithBody(generatedBody)
                     .WithSemicolonToken(SyntaxFactory.Token(SyntaxKind.None))
                     .WithAdditionalAnnotations(Formatter.Annotation); // Для автоматического форматирования

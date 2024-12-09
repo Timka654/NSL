@@ -1,4 +1,4 @@
-﻿#if DEBUG
+﻿#if DEBUGEXAMPLES
 #define DEVELOP
 #endif
 
@@ -494,9 +494,9 @@ namespace NSL.Generators.PacketHandleGenerator
             var cb = buildData.ConfigureBuilder;
 
             if (isAsync)
-                cb.AppendLine($"options.{nameof(CoreOptions<INetworkClient>.AddAsyncPacket)}({packet.HandlesData.Type.Name}.{packet.Name}, NSLPacketHandle_{packet.Name});");
+                cb.AppendLine($"options.{nameof(CoreOptions<INetworkClient>.AddAsyncHandle)}((ushort){packet.HandlesData.Type.Name}.{packet.Name}, NSLPacketHandle_{packet.Name});");
             else
-                cb.AppendLine($"options.{nameof(CoreOptions<INetworkClient>.AddPacket)}({packet.HandlesData.Type.Name}.{packet.Name}, NSLPacketHandle_{packet.Name});");
+                cb.AppendLine($"options.{nameof(CoreOptions<INetworkClient>.AddHandle)}((ushort){packet.HandlesData.Type.Name}.{packet.Name}, NSLPacketHandle_{packet.Name});");
         }
 
 

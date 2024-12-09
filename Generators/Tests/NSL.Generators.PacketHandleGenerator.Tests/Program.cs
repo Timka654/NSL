@@ -15,7 +15,8 @@ namespace NSL.Generators.PacketHandleGenerator.Tests
                 .WithClientProcessor<BaseServerNetworkClient>()
                 .WithOptions()
                 .WithBindingPoint(9996)
-                .WithCode(b => {
+                .WithCode(b =>
+                {
                     ReceiveRepository.ConfigurePacketHandles(b.GetCoreOptions());
                 })
                 .Build();
@@ -42,7 +43,7 @@ namespace NSL.Generators.PacketHandleGenerator.Tests
             ClientLog($"{nameof(SendRepositoryDelegateOutputStaticNetwork.SendPT2PacketRequest)} request");
             SendRepositoryDelegateOutputStaticNetwork.SendPT2PacketRequest(new Param3Struct() { D3 = 56, D4 = 66, }, new Param2Struct() { D4 = 55, D3 = 11 }, 9999, r =>
             {
-                ClientLog($"{nameof(SendRepositoryDelegateOutputStaticNetwork.SendPT2PacketRequest)} response { r.D4} { r.D3}");
+                ClientLog($"{nameof(SendRepositoryDelegateOutputStaticNetwork.SendPT2PacketRequest)} response {r.D4} {r.D3}");
             });
 
             await Task.Delay(1000);
