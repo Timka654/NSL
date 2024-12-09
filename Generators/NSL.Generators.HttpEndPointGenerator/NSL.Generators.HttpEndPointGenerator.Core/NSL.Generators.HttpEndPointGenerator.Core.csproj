@@ -21,7 +21,6 @@
 		<Description>-</Description>
 
 		<IsPackable>false</IsPackable>
-		<PackageId>$(PackageId)_Core</PackageId>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)'=='Debug'">

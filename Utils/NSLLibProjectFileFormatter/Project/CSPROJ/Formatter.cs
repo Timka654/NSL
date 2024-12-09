@@ -226,8 +226,7 @@ namespace NSLLibProjectFileFormatter.Project.CSPROJ
                     if (analyzerUtils && analyzerCore)
                     {
                         tb.AppendLine()
-                            .WritePropertyItem("IsPackable", false)
-                            .WritePropertyItem("PackageId", $"$(PackageId)_Core");
+                            .WritePropertyItem("IsPackable", false);
                     }
                     else if (HasUnpacking(NSLProjectTypes))
                         tb.AppendLine()
