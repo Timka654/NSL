@@ -33,7 +33,14 @@ namespace NSL.Generators.PacketHandleGenerator
 
             foreach (var type in methodSyntaxReceiver.BinaryIOTypes)
             {
-                ProcessNSLPHType(context, type);
+                try
+                {
+                    ProcessNSLPHType(context, type);
+                }
+                catch (Exception ex)
+                {
+                    context.ShowPHDiagnostics("NSLHP999", $"Error on build {ex.ToString()}", DiagnosticSeverity.Error, type.GetLocation());
+                }
             }
         }
 
@@ -68,7 +75,7 @@ namespace NSL.Generators.PacketHandleGenerator
                     .SelectMany(x => x.Attributes)
                     .Where(x => x.GetAttributeFullName().Equals(NSLPHGenImplementAttributeFullName)).ToArray();
 
-                GenDebug.Break();
+                //GenDebug.Break();
 
                 var typeModels = typeAttributes
                     .Select(x =>
@@ -148,16 +155,16 @@ namespace NSL.Generators.PacketHandleGenerator
                     {
                         var typeCBData = new CodeBuilderData();
 
-                        if (item.Direction == NSLHPDirTypeEnum.Input)
+                        if (item.Direction == NSLHPDirTypeEnum.Receive)
                             BuildInputType(item, typeSem, typeCBData);
                         else
-                            BuildOutputType(item, typeSem, typeCBData);
+                            BuildSendType(item, typeSem, typeCBData);
 
                         cbData.PacketHandlesBuilder.AppendLine(typeCBData.PacketHandlesBuilder.ToString());
                         cbData.HandlesBuilder.AppendLine(typeCBData.HandlesBuilder.ToString());
-                        if (item.Direction == NSLHPDirTypeEnum.Input)
+                        if (item.Direction == NSLHPDirTypeEnum.Receive)
                         {
-                            cbData.ConfigureBuilder.AppendLine($"{item.BuildModifierForHandles(NSLAccessModifierEnum.Protected)} void ConfigurePacketHandles({nameof(CoreOptions)}<{item.NetworkDataType.Name}> options)");
+                            cbData.ConfigureBuilder.AppendLine($"{item.BuildModifierForHandles(NSLAccessModifierEnum.Protected)} void NSLConfigurePacketHandles({nameof(CoreOptions)}<{item.NetworkDataType.Name}> options)");
                             cbData.ConfigureBuilder.AppendBodyTabContent(() =>
                             {
                                 cbData.ConfigureBuilder.AppendLine(typeCBData.ConfigureBuilder.ToString());
@@ -165,17 +172,7 @@ namespace NSL.Generators.PacketHandleGenerator
                         }
                     }
 
-                    classBuilder.AppendLine(cbData.HandlesBuilder.ToString());
-                    classBuilder.AppendLine();
-                    classBuilder.AppendLine(cbData.PacketHandlesBuilder.ToString());
-
-                    if (cbData.ConfigureBuilder.Length > 0)
-                    {
-                        classBuilder.AppendLine();
-                        classBuilder.AppendLine(cbData.ConfigureBuilder.ToString());
-                    }
-
-                    var tm = typeModels.FirstOrDefault(x => x.IsStaticNetwork);
+                    var tm = typeModels.FirstOrDefault(x => x.IsStaticNetwork && x.Direction == NSLHPDirTypeEnum.Send);
 
                     if (tm != null)
                     {
@@ -183,13 +180,28 @@ namespace NSL.Generators.PacketHandleGenerator
 
                         classBuilder.AppendLine($"{tm.BuildModifierForHandles(NSLAccessModifierEnum.Protected)} partial NSL.SocketCore.Extensions.Buffer.RequestProcessor GetRequestProcessor();");
                     }
+
+                    if (cbData.HandlesBuilder.Length > 0)
+                    {
+                        classBuilder.AppendLine(cbData.HandlesBuilder.ToString());
+                        classBuilder.AppendLine();
+                    }
+
+                    if (cbData.PacketHandlesBuilder.Length > 0)
+                        classBuilder.AppendLine(cbData.PacketHandlesBuilder.ToString());
+
+                    if (cbData.ConfigureBuilder.Length > 0)
+                    {
+                        classBuilder.AppendLine();
+                        classBuilder.AppendLine(cbData.ConfigureBuilder.ToString());
+                    }
                 }
             }, requiredUsings);
 
             // Visual studio have lag(or ...) cannot show changes any time
 #if DEVELOP
 #pragma warning disable RS1035 // Do not use APIs banned for analyzers
-            System.IO.File.WriteAllText($@"C:\Temp\{typeClass.GetClassName()}.ph.cs", classBuilder.ToString());
+            System.IO.File.WriteAllText($@"D:\Temp\{typeClass.GetClassName()}.ph.cs", classBuilder.ToString());
 #pragma warning restore RS1035 // Do not use APIs banned for analyzers
 #endif
 
@@ -203,22 +215,22 @@ namespace NSL.Generators.PacketHandleGenerator
         {
             foreach (var item in handle.Packets)
             {
-                BuildInputPacket(item,
+                BuildReceivePacket(item,
                                  typeSem,
                                  buildData,
                                  item.PacketType.HasFlag(NSLPacketTypeEnum.Async));
             }
         }
 
-        private void BuildOutputType(HandlesData handle, SemanticModel typeSem, CodeBuilderData buildData)
+        private void BuildSendType(HandlesData handle, SemanticModel typeSem, CodeBuilderData buildData)
         {
             foreach (var item in handle.Packets)
             {
-                BuildOutputPacket(item, typeSem, buildData, item.PacketType.HasFlag(NSLPacketTypeEnum.Async));
+                BuildSendPacket(item, typeSem, buildData, item.PacketType.HasFlag(NSLPacketTypeEnum.Async));
             }
         }
 
-        private void BuildOutputPacket(PacketData packet, SemanticModel typeSem, CodeBuilderData buildData, bool isAsync)
+        private void BuildSendPacket(PacketData packet, SemanticModel typeSem, CodeBuilderData buildData, bool isAsync)
         {
             int pi = 0;
             var _args = packet.Parameters.Select(x =>
@@ -236,13 +248,13 @@ namespace NSL.Generators.PacketHandleGenerator
                 }
                 else if (packet.PacketType.HasFlag(NSLPacketTypeEnum.Request))
                 {
-                    _args = Enumerable.Repeat($"RequestProcessor requestProcessor", 1).Concat(_args).ToArray();
+                    _args = Enumerable.Repeat($"NSL.SocketCore.Extensions.Buffer.RequestProcessor requestProcessor", 1).Concat(_args).ToArray();
 
 
                 }
             }
 
-            if (packet.HandlesData.DelegateOutputResponse)
+            if (packet.HandlesData.DelegateOutputResponse && packet.PacketType.HasFlag(NSLPacketTypeEnum.Request))
             {
                 var res = "Action";
 
@@ -251,7 +263,7 @@ namespace NSL.Generators.PacketHandleGenerator
                     res += $"<{packet.Result.Type.Name}>";
                 }
 
-                _args = _args.Append($"{res} responseDelegate");
+                _args = _args.Append($"{res} onResponseHandle");
             }
 
             var args = string.Join(", ", _args);
@@ -263,12 +275,17 @@ namespace NSL.Generators.PacketHandleGenerator
 
             if (packet.PacketType.HasFlag(NSLPacketTypeEnum.Request))
             {
-                if (!packet.HandlesData.DelegateOutputResponse && isAsync)
+                if (!packet.HandlesData.DelegateOutputResponse)
                 {
                     rType = packet.Result?.Type.Name;
 
-                    rType = $"Task<{rType}>";
+                    if (rType != null)
+                        rType = $"async Task<{rType}>";
+                    else
+                        rType = $"async Task";
                 }
+                //else
+                //    rType = "async void";
             }
 
             //Debugger.Break();
@@ -277,7 +294,8 @@ namespace NSL.Generators.PacketHandleGenerator
 
             var phb = buildData.PacketHandlesBuilder;
 
-            phb.AppendLine($"{packet.HandlesData.BuildModifierForHandles()} {rType} {partName}({args})");
+            phb.AppendSummaryLine($"Generate for <see cref=\"{packet.HandlesData.Type.Name}.{packet.Name}\"/>");
+            phb.AppendLine($"{packet.HandlesData.BuildModifiers()} {rType} {partName}({args})");
 
 
             phb.AppendBodyTabContent(() =>
@@ -309,9 +327,11 @@ namespace NSL.Generators.PacketHandleGenerator
                 //if (packet.Parameters.Any())
                 //    phb.AppendLine();
 
-                string invokeLine = $"{(isAsync ? "await " : string.Empty)}{partName}({(string.Join(", ", Enumerable.Repeat("client", 1).Concat(Enumerable.Range(0, packet.Parameters.Length).Select(i => packet.Parameters[i].Name ?? $"data{i}"))))})";
 
-                bool returnResult = packet.PacketType.HasFlag(NSLPacketTypeEnum.Request) && packet.Result != null && !packet.HandlesData.DelegateOutputResponse;
+                bool haveResult = packet.PacketType.HasFlag(NSLPacketTypeEnum.Request) && packet.Result != null;
+
+                bool returnResult = haveResult && !packet.HandlesData.DelegateOutputResponse;
+                bool delegateResult = haveResult && packet.HandlesData.DelegateOutputResponse;
 
                 if (returnResult)
                 {
@@ -322,41 +342,70 @@ namespace NSL.Generators.PacketHandleGenerator
                 }
 
 
-                phb.AppendLine($"{invokeLine};");
+                string clientField = string.Empty;
 
                 if (packet.PacketType.HasFlag(NSLPacketTypeEnum.Request))
                 {
-                    string requestCode = $"(c,i)=>{{ \n\n  \n\n }}";
+                    clientField = packet.HandlesData.IsStaticNetwork ? $"GetRequestProcessor()" : "requestProcessor";
+
+                    var bodyBuilder = new CodeBuilder();
+
+                    bodyBuilder.AppendLine("__response => ");
+
+                    bodyBuilder.AppendBodyTabContent(() =>
+                    {
+                        if (returnResult)
+                        {
+                            bodyBuilder.AppendLine($"___result = {buildResultBinaryReadSegment(packet, packet.Result, packet.Result.Type.GetTypeFullName())};");
+                            bodyBuilder.AppendLine();
+                        }
+                        else if(packet.HandlesData.DelegateOutputResponse)
+                        {
+                            bodyBuilder.AppendLine($"if(onResponseHandle != null)");
+                            bodyBuilder.AppendBodyTabContent(() =>
+                            {
+                                if (packet.Result != null)
+                                    bodyBuilder.AppendLine($"onResponseHandle({buildResultBinaryReadSegment(packet, packet.Result, packet.Result.Type.GetTypeFullName())});");
+                                else
+                                    bodyBuilder.AppendLine($"onResponseHandle();");
+                            });
+                        }
+
+                        bodyBuilder.AppendLine();
+
+                        if (packet.HandlesData.DelegateOutputResponse)
+                            bodyBuilder.AppendLine($"return true;");
+                        else
+                            bodyBuilder.AppendLine($"return Task.FromResult(true);");
+                    });
 
 
                     phb.AppendLine();
 
-                    if (packet.HandlesData.IsStaticNetwork)
-                        phb.AppendLine($"await GetRequestProcessor().SendRequestAsync(__outputBuf, {requestCode})");
-                    else
-                        phb.AppendLine($"await requestProcessor.SendRequestAsync(__outputBuf, {requestCode});");
-                    //phb.AppendLine($"client.Send(__response);");
+                    var sendRequestInvokeName = packet.HandlesData.DelegateOutputResponse ? $"{clientField}.SendRequest" : $"await {clientField}.SendRequestAsync";
+
+                    phb.AppendLine($"{sendRequestInvokeName}(__outputBuf, {bodyBuilder});");
                 }
                 else if (packet.PacketType.HasFlag(NSLPacketTypeEnum.Message))
                 {
+                    clientField = packet.HandlesData.IsStaticNetwork ? $"GetNetworkClient()" : "client";
+
                     phb.AppendLine();
-                    if (packet.HandlesData.IsStaticNetwork)
-                        phb.AppendLine($"GetNetworkClient().Send(__response);");
-                    else
-                        phb.AppendLine($"client.Send(__response);");
+
+                    phb.AppendLine($"{clientField}.Send(__outputBuf);");
                 }
 
                 if (returnResult)
                 {
                     phb.AppendLine();
-                    phb.AppendLine($"return __result;");
+                    phb.AppendLine($"return ___result;");
                 }
             });
 
             phb.AppendLine();
         }
 
-        private void BuildInputPacket(PacketData packet, SemanticModel typeSem, CodeBuilderData buildData, bool isAsync)
+        private void BuildReceivePacket(PacketData packet, SemanticModel typeSem, CodeBuilderData buildData, bool isAsync)
         {
             int pi = 0;
             var args = string.Join(", ", Enumerable.Repeat($"{packet.HandlesData.NetworkDataType.Name} client", 1).Concat(packet.Parameters.Select(x =>
@@ -383,6 +432,7 @@ namespace NSL.Generators.PacketHandleGenerator
 
             var hb = buildData.HandlesBuilder;
 
+            hb.AppendSummaryLine($"Generate for <see cref=\"{packet.HandlesData.Type.Name}.{packet.Name}\"/>");
             hb.AppendLine($"{packet.HandlesData.BuildModifiers()} partial {rType} {partName}({args});");
 
             hb.AppendLine();

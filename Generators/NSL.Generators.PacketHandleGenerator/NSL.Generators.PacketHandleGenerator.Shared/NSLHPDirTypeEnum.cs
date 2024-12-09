@@ -2,7 +2,7 @@
 {
     public enum NSLHPDirTypeEnum
     {
-        Output,
-        Input
+        Send,
+        Receive
     }
 }

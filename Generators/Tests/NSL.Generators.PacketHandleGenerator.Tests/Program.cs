@@ -1,21 +1,57 @@
-﻿using NSL.Generators.BinaryTypeIOGenerator.Attributes;
+﻿using NSL.BuilderExtensions.TCPClient;
+using NSL.BuilderExtensions.TCPServer;
+using NSL.Generators.BinaryTypeIOGenerator.Attributes;
+using NSL.SocketClient;
 using NSL.SocketServer.Utils;
+using NSL.SocketCore.Extensions.Buffer;
 
 namespace NSL.Generators.PacketHandleGenerator.Tests
 {
     internal class Program
     {
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
-            NSL.BuilderExtensions.TCPServer.TCPServerEndPointBuilder.Create()
+            var l = NSL.BuilderExtensions.TCPServer.TCPServerEndPointBuilder.Create()
                 .WithClientProcessor<BaseServerNetworkClient>()
                 .WithOptions()
+                .WithBindingPoint(9996)
                 .WithCode(b => {
-                    //TestRepository._ConfigurePacketHandles(b.GetCoreOptions());
+                    ReceiveRepository.ConfigurePacketHandles(b.GetCoreOptions());
                 })
                 .Build();
 
-            Console.WriteLine("Hello, World!");
+            l.Start();
+
+            var c = TCPClientEndPointBuilder.Create()
+                .WithClientProcessor<BasicNetworkClient>()
+                .WithOptions()
+                .WithEndPoint("127.0.0.1", 9996)
+                .WithCode(b =>
+                {
+                    b.GetOptions().ConfigureRequestProcessor();
+
+
+                })
+                .Build();
+
+
+            SendRepositoryDelegateOutputStaticNetwork.client = c;
+            SendRepositoryDelegateOutputStaticNetwork.requestProcessor = c.Data.GetRequestProcessor();
+
+
+            ClientLog($"{nameof(SendRepositoryDelegateOutputStaticNetwork.SendPT2PacketRequest)} request");
+            SendRepositoryDelegateOutputStaticNetwork.SendPT2PacketRequest(new Param3Struct() { D3 = 56, D4 = 66, }, new Param2Struct() { D4 = 55, D3 = 11 }, 9999, r =>
+            {
+                ClientLog($"{nameof(SendRepositoryDelegateOutputStaticNetwork.SendPT2PacketRequest)} response { r.D4} { r.D3}");
+            });
+
+            await Task.Delay(1000);
+
+        }
+
+        private static void ClientLog(string content)
+        { 
+        Console.WriteLine($"Client: ",content);
         }
     }
 
