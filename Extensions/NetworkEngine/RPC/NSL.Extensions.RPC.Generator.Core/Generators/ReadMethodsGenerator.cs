@@ -285,7 +285,10 @@ namespace NSL.Extensions.RPC.Generator.Generators
             return cb.ToString();
         }
 
-        private static RPCBinaryGeneratorContext binaryContext = new RPCBinaryGeneratorContext();
+        private static RPCBinaryGeneratorContext binaryContext = new RPCBinaryGeneratorContext()
+        {
+            IOPath = "dataPacket"
+        };
 
         private static readonly string RPCCustomMemberIgnoreAttributeFullName = typeof(RPCCustomMemberIgnoreAttribute).Name;
 

@@ -58,7 +58,7 @@ namespace NSL.Extensions.RPC.Generator.Generators
 
             cb.NextTab();
 
-            cb.AppendLine($"var __packet = Processor.CreateCall(GetContainerName(), {HasherUtils.GetInt32HashCode(mcm.methodSyntax.Identifier.Text)}, {HasherUtils.GetInt32HashCode(mcm.methodSyntax.ParameterList.Parameters.Select(x=>x.ToFullString()).ToArray())});");
+            cb.AppendLine($"var __packet = Processor.CreateCall(GetContainerName(), {HasherUtils.GetInt32HashCode(mcm.methodSyntax.Identifier.Text)}, {HasherUtils.GetInt32HashCode(mcm.methodSyntax.ParameterList.Parameters.Select(x => x.ToFullString()).ToArray())});");
 
             foreach (var parameter in mcm.methodSyntax.ParameterList.Parameters)
             {
@@ -152,7 +152,10 @@ namespace NSL.Extensions.RPC.Generator.Generators
         public static string BuildParameterWriter(ISymbol item, MethodContextModel mcm, string path)
             => BinaryWriteMethodsGenerator.BuildParameterWriter(item, binaryContext, path);
 
-        private static RPCBinaryGeneratorContext binaryContext = new RPCBinaryGeneratorContext();
+        private static RPCBinaryGeneratorContext binaryContext = new RPCBinaryGeneratorContext()
+        {
+            IOPath = "__packet"
+        };
 
         private static readonly string RPCCustomMemberIgnoreAttributeFullName = typeof(RPCCustomMemberIgnoreAttribute).Name;
     }
