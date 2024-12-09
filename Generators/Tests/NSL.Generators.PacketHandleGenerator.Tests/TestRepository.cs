@@ -4,7 +4,7 @@ using NSL.SocketServer.Utils;
 
 namespace NSL.Generators.PacketHandleGenerator.Tests
 {
-    [NSLPHGenImplement(typeof(DevPackets), typeof(BaseServerNetworkClient), NSLHPDirTypeEnum.Output, NSLAccessModifierEnum.Internal | NSLAccessModifierEnum.Static, IsStaticNetwork = true)]
+    [NSLPHGenImplement(PacketsEnum = typeof(DevPackets), NetworkDataType = typeof(BaseServerNetworkClient), Direction = NSLHPDirTypeEnum.Input, Modifier = NSLAccessModifierEnum.Internal | NSLAccessModifierEnum.Static, IsStaticNetwork = true)]
     internal partial class TestRepository
     {
         internal static void ReceiveWithoutTypePacketRequestHandle(BaseServerNetworkClient client)
@@ -47,5 +47,11 @@ namespace NSL.Generators.PacketHandleGenerator.Tests
         {
             ConfigurePacketHandles(options);
         }
+    }
+
+    [NSLPHGenImplement(PacketsEnum = typeof(DevPackets), NetworkDataType = typeof(BaseServerNetworkClient), Direction = NSLHPDirTypeEnum.Output, Modifier = NSLAccessModifierEnum.Internal | NSLAccessModifierEnum.Static)]
+    internal partial class TestRepository2
+    { 
+    
     }
 }

@@ -21,6 +21,8 @@ namespace NSL.Generators.PacketHandleGenerator
 
         public bool IsStaticNetwork { get; set; }
 
+        public bool DelegateOutputResponse { get; set; }
+
         public PacketData[] Packets { get; set; }
 
         public string BuildModifiers()

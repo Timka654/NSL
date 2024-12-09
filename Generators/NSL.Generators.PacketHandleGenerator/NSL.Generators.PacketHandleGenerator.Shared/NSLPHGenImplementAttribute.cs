@@ -7,8 +7,16 @@ namespace NSL.Generators.PacketHandleGenerator.Shared
     {
         public bool IsStaticNetwork { get; set; }
 
-        public NSLPHGenImplementAttribute(Type packetsEnum, Type networkDataType, NSLHPDirTypeEnum direction, params string[] models) { }
+        public bool DelegateOutputResponse { get; set; }
 
-        public NSLPHGenImplementAttribute(Type packetsEnum, Type networkDataType, NSLHPDirTypeEnum direction, NSLAccessModifierEnum modifier, params string[] models) { }
+        public Type PacketsEnum { get; set; }
+
+        public Type NetworkDataType { get; set; }
+
+        public NSLHPDirTypeEnum Direction { get; set; }
+
+        public NSLAccessModifierEnum Modifier { get; set; }
+
+        public NSLPHGenImplementAttribute(params string[] models) { }
     }
 }
