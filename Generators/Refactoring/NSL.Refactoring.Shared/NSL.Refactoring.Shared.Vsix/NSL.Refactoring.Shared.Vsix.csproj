@@ -92,9 +92,9 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\NSL.Refactoring.Shared\NSL.Refactoring.Shared.csproj">
-      <Project>{79a93d23-2335-4f78-9fbf-3c145de6dd29}</Project>
-      <Name>NSL.Refactoring.Shared</Name>
+    <ProjectReference Include="..\NSL.Refactoring.Shared\NSL.Refactoring.Shared.Core.csproj">
+      <Project>{29D905CC-8D70-4E87-98C7-02F92D7FA833}</Project>
+      <Name>NSL.Refactoring.Shared.Core</Name>
       <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup%3bBuiltProjectOutputGroupDependencies%3bGetCopyToOutputDirectoryItems%3bSatelliteDllsProjectOutputGroup%3b</IncludeOutputGroupsInVSIX>
       <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup%3b</IncludeOutputGroupsInVSIXLocalOnly>
     </ProjectReference>

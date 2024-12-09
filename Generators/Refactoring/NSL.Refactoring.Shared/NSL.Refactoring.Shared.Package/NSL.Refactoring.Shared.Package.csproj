@@ -20,6 +20,7 @@
 		<IncludeBuildOutput>false</IncludeBuildOutput>
 		<SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
 
+		<PackageId>NSL.Refactoring.Shared</PackageId>
 		<Version>$(VersionSuffix)</Version>
 		<Authors>Relife87</Authors>
 	</PropertyGroup>
@@ -29,7 +30,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\NSL.Refactoring.Shared\NSL.Refactoring.Shared.csproj" />
+		<ProjectReference Include="..\NSL.Refactoring.Shared\NSL.Refactoring.Shared.Core.csproj" />
 	</ItemGroup>
 
 	<Target Name="_AddAnalyzersToOutput">

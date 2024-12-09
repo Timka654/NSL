@@ -20,6 +20,7 @@
 		<IncludeBuildOutput>false</IncludeBuildOutput>
 		<SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
 
+		<PackageId>NSL.Generators.HttpEndPointGenerator</PackageId>
 		<Version>$(VersionSuffix)</Version>
 		<Authors>Relife87</Authors>
 	</PropertyGroup>
@@ -30,7 +31,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\NSL.Generators.HttpEndPointGenerator.Shared\NSL.Generators.HttpEndPointGenerator.Shared.csproj" />
-		<ProjectReference Include="..\NSL.Generators.HttpEndPointGenerator\NSL.Generators.HttpEndPointGenerator.csproj" />
+		<ProjectReference Include="..\NSL.Generators.HttpEndPointGenerator\NSL.Generators.HttpEndPointGenerator.Core.csproj" />
 	</ItemGroup>
 
 	<Target Name="_AddAnalyzersToOutput">

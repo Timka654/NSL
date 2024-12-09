@@ -20,6 +20,7 @@
 		<IncludeBuildOutput>false</IncludeBuildOutput>
 		<SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
 
+		<PackageId>NSL.Generators.ClientPointGenerator</PackageId>
 		<Version>$(VersionSuffix)</Version>
 		<Authors>Relife87</Authors>
 	</PropertyGroup>
@@ -29,8 +30,8 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\NSL.Generators.SelectTypeGenerator.Shared\NSL.Generators.SelectTypeGenerator.Shared.csproj" />
-		<ProjectReference Include="..\NSL.Generators.SelectTypeGenerator\NSL.Generators.SelectTypeGenerator.csproj" />
+		<ProjectReference Include="..\NSL.Generators.ClientPointGenerator.Shared\NSL.Generators.ClientPointGenerator.Shared.csproj" />
+		<ProjectReference Include="..\NSL.Generators.ClientPointGenerator\NSL.Generators.ClientPointGenerator.Core.csproj" />
 	</ItemGroup>
 
 	<Target Name="_AddAnalyzersToOutput">

@@ -214,6 +214,7 @@ namespace NSLLibProjectFileFormatter.Project.CSPROJ
                     }
 
                     tb.AppendLine()
+                    .WritePropertyItem("PackageId", Path.GetFileName(path).Replace(".Package.csproj",""), analyzerPackage)
                     .WritePropertyItem("Version", "$(VersionSuffix)")
 
                     .WritePropertyItem("Authors", authors, authors != null)

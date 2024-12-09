@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<NSLProjectTypes>AnalyzerPackage</NSLProjectTypes>
@@ -20,6 +20,7 @@
 		<IncludeBuildOutput>false</IncludeBuildOutput>
 		<SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
 
+		<PackageId>NSL.Generators.PacketHandleGenerator</PackageId>
 		<Version>$(VersionSuffix)</Version>
 		<Authors>Relife87</Authors>
 	</PropertyGroup>
@@ -30,7 +31,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\NSL.Generators.PacketHandleGenerator.Shared\NSL.Generators.PacketHandleGenerator.Shared.csproj" />
-		<ProjectReference Include="..\NSL.Generators.PacketHandleGenerator\NSL.Generators.PacketHandleGenerator.csproj" />
+		<ProjectReference Include="..\NSL.Generators.PacketHandleGenerator\NSL.Generators.PacketHandleGenerator.Core.csproj" />
 	</ItemGroup>
 
 	<Target Name="_AddAnalyzersToOutput">

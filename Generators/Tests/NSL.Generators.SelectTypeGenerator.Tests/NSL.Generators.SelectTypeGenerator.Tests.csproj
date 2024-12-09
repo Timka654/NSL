@@ -26,7 +26,7 @@
 	<ItemGroup>
 		<ProjectReference Include="..\..\NSL.Generators.FillTypeGenerator.Shared\NSL.Generators.FillTypeGenerator.Shared.csproj" />
 		<ProjectReference Include="..\..\NSL.Generators.SelectTypeGenerator.Shared\NSL.Generators.SelectTypeGenerator.Shared.csproj" />
-		<ProjectReference Include="..\..\NSL.Generators.SelectTypeGenerator\NSL.Generators.SelectTypeGenerator.csproj" OutputItemType="Analyzer" />
+		<ProjectReference Include="..\..\NSL.Generators.SelectTypeGenerator\NSL.Generators.SelectTypeGenerator.Core.csproj" OutputItemType="Analyzer" />
 	</ItemGroup>
 
 </Project>

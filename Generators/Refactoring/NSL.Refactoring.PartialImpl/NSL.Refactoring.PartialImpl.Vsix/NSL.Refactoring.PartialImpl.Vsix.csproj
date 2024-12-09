@@ -92,9 +92,9 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\NSL.Refactoring.PartialImpl\NSL.Refactoring.PartialImpl.csproj">
-      <Project>{79a93d23-2335-4f78-9fbf-3c145de6dd29}</Project>
-      <Name>NSL.Refactoring.PartialImpl</Name>
+    <ProjectReference Include="..\NSL.Refactoring.PartialImpl\NSL.Refactoring.PartialImpl.Core.csproj">
+      <Project>{00ECD351-33FF-47A2-8D8C-E95B073AB3B7}</Project>
+      <Name>NSL.Refactoring.PartialImpl.Core</Name>
       <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup%3bBuiltProjectOutputGroupDependencies%3bGetCopyToOutputDirectoryItems%3bSatelliteDllsProjectOutputGroup%3b</IncludeOutputGroupsInVSIX>
       <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup%3b</IncludeOutputGroupsInVSIXLocalOnly>
     </ProjectReference>

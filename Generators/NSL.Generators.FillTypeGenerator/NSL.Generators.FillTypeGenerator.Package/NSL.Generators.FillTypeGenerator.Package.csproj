@@ -20,6 +20,7 @@
 		<IncludeBuildOutput>false</IncludeBuildOutput>
 		<SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
 
+		<PackageId>NSL.Generators.FillTypeGenerator</PackageId>
 		<Version>$(VersionSuffix)</Version>
 		<Authors>Relife87</Authors>
 	</PropertyGroup>
@@ -30,7 +31,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\NSL.Generators.FillTypeGenerator.Shared\NSL.Generators.FillTypeGenerator.Shared.csproj" />
-		<ProjectReference Include="..\NSL.Generators.FillTypeGenerator\NSL.Generators.FillTypeGenerator.csproj" />
+		<ProjectReference Include="..\NSL.Generators.FillTypeGenerator\NSL.Generators.FillTypeGenerator.Core.csproj" />
 	</ItemGroup>
 
 	<Target Name="_AddAnalyzersToOutput">
