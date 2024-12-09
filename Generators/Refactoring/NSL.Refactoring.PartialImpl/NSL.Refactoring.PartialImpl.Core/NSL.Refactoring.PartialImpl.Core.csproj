@@ -31,7 +31,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\..\..\NSL.Generators.Utils\NSL.Generators.Utils.csproj" />
+		<ProjectReference Include="..\..\..\NSL.Generators.Utils\NSL.Generators.Utils.csproj" />
 	</ItemGroup>
 
 </Project>

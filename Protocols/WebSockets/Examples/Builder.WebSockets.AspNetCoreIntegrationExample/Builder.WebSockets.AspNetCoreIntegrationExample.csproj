@@ -12,7 +12,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\..\..\..\Extensions\NetworkEngine\RPC\NSL.Extensions.RPC.EndPointBuilder\NSL.Extensions.RPC.EndPointBuilder.csproj" />
-		<ProjectReference Include="..\..\..\..\Extensions\NetworkEngine\RPC\NSL.Extensions.RPC.Generator\NSL.Extensions.RPC.Generator.csproj" OutputItemType="Analyzer" />
+		<ProjectReference Include="..\..\..\..\Extensions\NetworkEngine\RPC\NSL.Extensions.RPC.Generator.Core\NSL.Extensions.RPC.Generator.Core.csproj" OutputItemType="Analyzer" />
 		<ProjectReference Include="..\..\BuilderExtensions\NSL.BuilderExtensions.WebSocketsClient\NSL.BuilderExtensions.WebSocketsClient.csproj" />
 		<ProjectReference Include="..\..\BuilderExtensions\NSL.BuilderExtensions.WebSocketsServer.AspNet\NSL.BuilderExtensions.WebSocketsServer.AspNet.csproj" />
 	</ItemGroup>

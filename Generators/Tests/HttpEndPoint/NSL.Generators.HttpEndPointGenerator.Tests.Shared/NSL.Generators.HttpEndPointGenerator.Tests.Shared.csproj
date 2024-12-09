@@ -27,7 +27,7 @@
 	<ItemGroup>
 		<ProjectReference Include="..\..\..\..\ASPNET\NSL.ASPNET\NSL.ASPNET.csproj" />
 		<ProjectReference Include="..\..\..\..\Protocols\Http\NSL.HttpClient\NSL.HttpClient.csproj" />
-		<ProjectReference Include="..\..\..\NSL.Generators.HttpEndPointGenerator.Shared\NSL.Generators.HttpEndPointGenerator.Shared.csproj" />
+		<ProjectReference Include="..\..\..\NSL.Generators.HttpEndPointGenerator\NSL.Generators.HttpEndPointGenerator.Shared\NSL.Generators.HttpEndPointGenerator.Shared.csproj" />
 	</ItemGroup>
 
 </Project>

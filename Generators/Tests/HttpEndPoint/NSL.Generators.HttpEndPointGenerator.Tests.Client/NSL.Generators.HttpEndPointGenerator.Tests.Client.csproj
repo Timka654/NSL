@@ -10,8 +10,8 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\..\NSL.Generators.HttpEndPointGenerator.Shared\NSL.Generators.HttpEndPointGenerator.Shared.csproj" />
-		<ProjectReference Include="..\..\..\NSL.Generators.HttpEndPointGenerator\NSL.Generators.HttpEndPointGenerator.Core.csproj" OutputItemType="Analyzer" />
+		<ProjectReference Include="..\..\..\NSL.Generators.HttpEndPointGenerator\NSL.Generators.HttpEndPointGenerator.Shared\NSL.Generators.HttpEndPointGenerator.Shared.csproj" />
+		<ProjectReference Include="..\..\..\NSL.Generators.HttpEndPointGenerator\NSL.Generators.HttpEndPointGenerator.Core\NSL.Generators.HttpEndPointGenerator.Core.csproj" OutputItemType="Analyzer" />
 		<ProjectReference Include="..\NSL.Generators.HttpEndPointGenerator.Tests.Shared\NSL.Generators.HttpEndPointGenerator.Tests.Shared.csproj" />
 	</ItemGroup>
 

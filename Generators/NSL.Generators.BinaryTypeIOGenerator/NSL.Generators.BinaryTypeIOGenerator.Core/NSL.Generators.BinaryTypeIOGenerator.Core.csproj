@@ -44,10 +44,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\Core\NSL.SocketCore\NSL.SocketCore.csproj" OutputItemType="Analyzer" />
+		<ProjectReference Include="..\..\..\Core\NSL.SocketCore\NSL.SocketCore.csproj" OutputItemType="Analyzer" />
 		<ProjectReference Include="..\NSL.Generators.BinaryTypeIOGenerator.Shared\NSL.Generators.BinaryTypeIOGenerator.Shared.csproj" OutputItemType="Analyzer" />
-		<ProjectReference Include="..\NSL.Generators.BinaryGenerator\NSL.Generators.BinaryGenerator.csproj" OutputItemType="Analyzer" />
-		<ProjectReference Include="..\NSL.Generators.Utils\NSL.Generators.Utils.csproj" OutputItemType="Analyzer" />
+		<ProjectReference Include="..\..\NSL.Generators.BinaryGenerator\NSL.Generators.BinaryGenerator.csproj" OutputItemType="Analyzer" />
+		<ProjectReference Include="..\..\NSL.Generators.Utils\NSL.Generators.Utils.csproj" OutputItemType="Analyzer" />
 	</ItemGroup>
 
 </Project>

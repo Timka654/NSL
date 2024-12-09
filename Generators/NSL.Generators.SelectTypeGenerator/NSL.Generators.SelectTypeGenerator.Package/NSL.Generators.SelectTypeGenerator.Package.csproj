@@ -31,7 +31,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\NSL.Generators.SelectTypeGenerator.Shared\NSL.Generators.SelectTypeGenerator.Shared.csproj" />
-		<ProjectReference Include="..\NSL.Generators.SelectTypeGenerator\NSL.Generators.SelectTypeGenerator.Core.csproj" />
+		<ProjectReference Include="..\NSL.Generators.SelectTypeGenerator.Core\NSL.Generators.SelectTypeGenerator.Core.csproj" />
 	</ItemGroup>
 
 	<Target Name="_AddAnalyzersToOutput">

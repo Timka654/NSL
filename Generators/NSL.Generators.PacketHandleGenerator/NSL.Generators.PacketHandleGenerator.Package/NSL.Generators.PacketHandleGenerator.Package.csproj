@@ -31,7 +31,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\NSL.Generators.PacketHandleGenerator.Shared\NSL.Generators.PacketHandleGenerator.Shared.csproj" />
-		<ProjectReference Include="..\NSL.Generators.PacketHandleGenerator\NSL.Generators.PacketHandleGenerator.Core.csproj" />
+		<ProjectReference Include="..\NSL.Generators.PacketHandleGenerator.Core\NSL.Generators.PacketHandleGenerator.Core.csproj" />
 	</ItemGroup>
 
 	<Target Name="_AddAnalyzersToOutput">

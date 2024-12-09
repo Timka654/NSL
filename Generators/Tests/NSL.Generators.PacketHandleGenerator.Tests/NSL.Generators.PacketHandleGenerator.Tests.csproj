@@ -16,10 +16,10 @@
 		<ProjectReference Include="..\..\..\Core\NSL.SocketCore\NSL.SocketCore.csproj" />
 		<ProjectReference Include="..\..\..\Protocols\TCP\BuilderExtensions\NSL.BuilderExtensions.TCPClient\NSL.BuilderExtensions.TCPClient.csproj" />
 		<ProjectReference Include="..\..\..\Protocols\TCP\BuilderExtensions\NSL.BuilderExtensions.TCPServer\NSL.BuilderExtensions.TCPServer.csproj" />
-		<ProjectReference Include="..\..\NSL.Generators.BinaryTypeIOGenerator.Shared\NSL.Generators.BinaryTypeIOGenerator.Shared.csproj" />
+		<ProjectReference Include="..\..\NSL.Generators.BinaryTypeIOGenerator\NSL.Generators.BinaryTypeIOGenerator.Shared\NSL.Generators.BinaryTypeIOGenerator.Shared.csproj" />
 		<ProjectReference Include="..\..\NSL.Generators.PacketHandleGenerator\NSL.Generators.PacketHandleGenerator.Shared\NSL.Generators.PacketHandleGenerator.Shared.csproj" />
 		<ProjectReference Include="..\..\NSL.Generators.PacketHandleGenerator\NSL.Generators.PacketHandleGenerator\NSL.Generators.PacketHandleGenerator.Core.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
-		<ProjectReference Include="..\..\NSL.Generators.BinaryTypeIOGenerator\NSL.Generators.BinaryTypeIOGenerator.Core.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
+		<ProjectReference Include="..\..\NSL.Generators.BinaryTypeIOGenerator\NSL.Generators.BinaryTypeIOGenerator.Core\NSL.Generators.BinaryTypeIOGenerator.Core.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
 		<ProjectReference Include="..\..\Refactoring\NSL.Refactoring.PartialImpl\NSL.Refactoring.PartialImpl\NSL.Refactoring.PartialImpl\NSL.Refactoring.PartialImpl.Core.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
 	</ItemGroup>
 
