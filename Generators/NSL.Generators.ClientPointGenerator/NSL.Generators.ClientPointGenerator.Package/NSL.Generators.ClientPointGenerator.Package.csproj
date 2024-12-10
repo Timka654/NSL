@@ -8,15 +8,11 @@
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<Nullable>disable</Nullable>
 
-		<IncludeBuildOutput>false</IncludeBuildOutput>
-		<DevelopmentDependency>true</DevelopmentDependency>
 		<NoPackageAnalysis>true</NoPackageAnalysis>
-		<TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);_AddAnalyzersToOutput</TargetsForTfmSpecificContentInPackage>
 
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
 		<EmbedUntrackedSources>true</EmbedUntrackedSources>
 		<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-		<GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
 		<IncludeBuildOutput>false</IncludeBuildOutput>
 		<SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
 
@@ -34,10 +30,9 @@
 		<ProjectReference Include="..\NSL.Generators.ClientPointGenerator.Core\NSL.Generators.ClientPointGenerator.Core.csproj" />
 	</ItemGroup>
 
-	<Target Name="_AddAnalyzersToOutput">
-		<ItemGroup>
-			<TfmSpecificPackageFile Include="$(OutputPath)\*NSL.*.dll" PackagePath="analyzers/dotnet/cs" />
-		</ItemGroup>
-	</Target>
+	<ItemGroup>
+		<None Include="$(OutputPath)\*NSL.*.dll" Pack="true" PackagePath="analyzers/dotnet/cs" />
+		<None Include="$(OutputPath)\*NSL.*.Shared.dll" Pack="true" PackagePath="lib/$(TargetFramework)" />
+	</ItemGroup>
 
 </Project>

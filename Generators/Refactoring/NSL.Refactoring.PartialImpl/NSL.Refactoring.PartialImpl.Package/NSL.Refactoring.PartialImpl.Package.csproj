@@ -16,7 +16,7 @@
 		<IncludeBuildOutput>false</IncludeBuildOutput>
 		<SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
 
-		<PackageId>NSL.Generators.BinaryTypeIOGenerator</PackageId>
+		<PackageId>NSL.Refactoring.PartialImpl</PackageId>
 		<Version>$(VersionSuffix)</Version>
 		<Authors>Relife87</Authors>
 	</PropertyGroup>
@@ -26,8 +26,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\NSL.Generators.BinaryTypeIOGenerator.Shared\NSL.Generators.BinaryTypeIOGenerator.Shared.csproj" />
-		<ProjectReference Include="..\NSL.Generators.BinaryTypeIOGenerator.Core\NSL.Generators.BinaryTypeIOGenerator.Core.csproj" />
+		<ProjectReference Include="..\NSL.Refactoring.PartialImpl.Core\NSL.Refactoring.PartialImpl.Core.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

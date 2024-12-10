@@ -178,10 +178,10 @@ namespace NSLLibProjectFileFormatter.Project.CSPROJ
 
 
                     tb.AppendLine(analyzerPackage)
-                    .WritePropertyItem("IncludeBuildOutput", false, analyzerPackage)
-                    .WritePropertyItem("DevelopmentDependency", true, analyzerPackage)
+                    //.WritePropertyItem("IncludeBuildOutput", false, analyzerPackage)
+                    //.WritePropertyItem("DevelopmentDependency", true, analyzerPackage)
                     .WritePropertyItem("NoPackageAnalysis", true, analyzerPackage)
-                    .WritePropertyItem("TargetsForTfmSpecificContentInPackage", "$(TargetsForTfmSpecificContentInPackage);_AddAnalyzersToOutput", analyzerPackage);
+                    /*.WritePropertyItem("TargetsForTfmSpecificContentInPackage", "$(TargetsForTfmSpecificContentInPackage);_AddAnalyzersToOutput", analyzerPackage)*/;
 
 
                     tb.WritePropertyItem("IsPackable", true, aspNetOnly)
@@ -192,7 +192,7 @@ namespace NSLLibProjectFileFormatter.Project.CSPROJ
                     tb.WritePropertyItem("PublishRepositoryUrl", true)
                       .WritePropertyItem("EmbedUntrackedSources", true)
                       .WritePropertyItem("AutoGenerateBindingRedirects", true)
-                      .WritePropertyItem("GenerateBindingRedirectsOutputType", true);
+                      .WritePropertyItem("GenerateBindingRedirectsOutputType", true, !analyzerPackage);
 
                     tb.AppendLine(isRoslyn)
                       .WritePropertyItem("EnforceExtendedAnalyzerRules", true, isRoslyn)
@@ -363,10 +363,11 @@ namespace NSLLibProjectFileFormatter.Project.CSPROJ
 
 
                 tb.AppendLine(analyzerPackage)
-                .WriteTarget("_AddAnalyzersToOutput",()=> tb
+                //.WriteTarget("_AddAnalyzersToOutput",()=> tb
                 .WriteItemGroup(() =>
-                    tb.AppendLine("<TfmSpecificPackageFile Include=\"$(OutputPath)\\*NSL.*.dll\" PackagePath=\"analyzers/dotnet/cs\" />")
-                ), analyzerPackage);
+                    tb.AppendLine("<None Include=\"$(OutputPath)\\*NSL.*.dll\" Pack=\"true\" PackagePath=\"analyzers/dotnet/cs\" />")
+                    .AppendLine("<None Include=\"$(OutputPath)\\*NSL.*.Shared.dll\" Pack=\"true\" PackagePath=\"lib/$(TargetFramework)\" />")
+                , analyzerPackage)/*, analyzerPackage)*/;
 
                 tb.AppendLine(unityRef != null)
                     .WriteItemGroup(() =>
