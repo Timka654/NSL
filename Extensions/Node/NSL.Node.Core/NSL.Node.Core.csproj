@@ -34,7 +34,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\..\..\Generators\NSL.Generators.BinaryTypeIOGenerator\NSL.Generators.BinaryTypeIOGenerator.Shared\NSL.Generators.BinaryTypeIOGenerator.Shared.csproj" />
-		<ProjectReference Include="..\..\..\Generators\NSL.Generators.BinaryTypeIOGenerator\NSL.Generators.BinaryTypeIOGenerator.Core\NSL.Generators.BinaryTypeIOGenerator.Core.csproj" OutputItemType="Analyzer" />
+		<ProjectReference Include="..\..\..\Generators\NSL.Generators.BinaryTypeIOGenerator\NSL.Generators.BinaryTypeIOGenerator.Core\NSL.Generators.BinaryTypeIOGenerator.Core.csproj" PrivateAssets="all" OutputItemType="Analyzer" />
 		<ProjectReference Include="..\..\..\Protocols\UDP\NSL.UDP\NSL.UDP.csproj" />
 		<ProjectReference Include="..\..\Session\NSL.Extensions.Session\NSL.Extensions.Session.csproj" />
 	</ItemGroup>

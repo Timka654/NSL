@@ -179,7 +179,7 @@ namespace NSLLibProjectFileFormatter.Project.CSPROJ
 
                     tb.AppendLine(analyzerPackage)
                     //.WritePropertyItem("IncludeBuildOutput", false, analyzerPackage)
-                    //.WritePropertyItem("DevelopmentDependency", true, analyzerPackage)
+                    .WritePropertyItem("DevelopmentDependency", true, analyzerPackage)
                     .WritePropertyItem("NoPackageAnalysis", true, analyzerPackage)
                     /*.WritePropertyItem("TargetsForTfmSpecificContentInPackage", "$(TargetsForTfmSpecificContentInPackage);_AddAnalyzersToOutput", analyzerPackage)*/;
 
@@ -192,7 +192,7 @@ namespace NSLLibProjectFileFormatter.Project.CSPROJ
                     tb.WritePropertyItem("PublishRepositoryUrl", true)
                       .WritePropertyItem("EmbedUntrackedSources", true)
                       .WritePropertyItem("AutoGenerateBindingRedirects", true)
-                      .WritePropertyItem("GenerateBindingRedirectsOutputType", true, !analyzerPackage);
+                      .WritePropertyItem("GenerateBindingRedirectsOutputType", true);
 
                     tb.AppendLine(isRoslyn)
                       .WritePropertyItem("EnforceExtendedAnalyzerRules", true, isRoslyn)
@@ -366,7 +366,7 @@ namespace NSLLibProjectFileFormatter.Project.CSPROJ
                 //.WriteTarget("_AddAnalyzersToOutput",()=> tb
                 .WriteItemGroup(() =>
                     tb.AppendLine("<None Include=\"$(OutputPath)\\*NSL.*.dll\" Pack=\"true\" PackagePath=\"analyzers/dotnet/cs\" />")
-                    .AppendLine("<None Include=\"$(OutputPath)\\*NSL.*.Shared.dll\" Pack=\"true\" PackagePath=\"lib/$(TargetFramework)\" />")
+                    //.AppendLine("<None Include=\"$(OutputPath)\\*NSL.*.Shared.dll\" Pack=\"true\" PackagePath=\"lib/$(TargetFramework)\" />")
                 , analyzerPackage)/*, analyzerPackage)*/;
 
                 tb.AppendLine(unityRef != null)
