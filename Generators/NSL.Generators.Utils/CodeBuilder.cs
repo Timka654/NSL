@@ -127,8 +127,12 @@ namespace NSL.Generators.Utils
             AppendLine("}");
         }
 
-        public void CreatePartialClass(ClassDeclarationSyntax classDecl, Action bodyBuild, IEnumerable<string> requiredDirectives = null)
+        public void CreatePartialClass(ClassDeclarationSyntax classDecl, Action<CodeBuilder> bodyBuild, IEnumerable<string> requiredDirectives = null)
         {
+            var body = new CodeBuilder();
+
+            bodyBuild(body);
+
             var @namespace = classDecl.Parent as NamespaceDeclarationSyntax;
 
             var usings = classDecl.GetTypeClassUsingDirectives();
@@ -177,7 +181,7 @@ namespace NSL.Generators.Utils
 
             NextTab();
 
-            bodyBuild();
+            AppendLine(body.ToString());
 
             PrevTab();
 
