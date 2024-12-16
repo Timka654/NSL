@@ -168,6 +168,13 @@ namespace NSL.Generators.PacketHandleGenerator
 
                 if (typeModels.Length > 0)
                 {
+                    bool haveReceiveRequest = typeModels.Any(x => x.Direction == NSLHPDirTypeEnum.Receive && x.Packets.Any(n => n.PacketType == NSLPacketTypeEnum.Request));
+
+                    if (haveReceiveRequest)
+                    {
+                        requiredUsings.Add("NSL.SocketCore.Extensions.Buffer");
+                    }
+
                     var cbData = new CodeBuilderData();
 
                     foreach (var item in typeModels)
