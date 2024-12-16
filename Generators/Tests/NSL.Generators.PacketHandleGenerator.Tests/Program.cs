@@ -40,14 +40,24 @@ namespace NSL.Generators.PacketHandleGenerator.Tests
                 throw new Exception();
 
 
-            SendRepositoryDelegateOutputStaticNetwork.client = c;
-            SendRepositoryDelegateOutputStaticNetwork.requestProcessor = c.Data.GetRequestProcessor();
+            StaticAsyncSendRepository.client = c;
+            StaticAsyncSendRepository.requestProcessor = c.Data.GetRequestProcessor();
+            
+            StaticSendRepository.client = c;
+            StaticSendRepository.requestProcessor = c.Data.GetRequestProcessor();
 
 
-            ClientLog($"{nameof(SendRepositoryDelegateOutputStaticNetwork.SendPT2PacketRequest)} request");
-            SendRepositoryDelegateOutputStaticNetwork.SendPT2PacketRequest(new Param3Struct() { D3 = 56, D4 = 66, }, new Param2Struct() { D4 = 55, D3 = 11 }, 9999, r =>
+            StaticAsyncDelegateSendRepository.client = c;
+            StaticAsyncDelegateSendRepository.requestProcessor = c.Data.GetRequestProcessor();
+            
+            StaticDelegateSendRepository.client = c;
+            StaticDelegateSendRepository.requestProcessor = c.Data.GetRequestProcessor();
+
+
+            ClientLog($"{nameof(StaticDelegateSendRepository.SendPT2PacketRequest)} request");
+            StaticDelegateSendRepository.SendPT2PacketRequest(new Param3Struct() { D3 = 56, D4 = 66, }, new Param2Struct() { D4 = 55, D3 = 11 }, 9999, r =>
             {
-                ClientLog($"{nameof(SendRepositoryDelegateOutputStaticNetwork.SendPT2PacketRequest)} response {r.D3} {r.D4}");
+                ClientLog($"{nameof(StaticDelegateSendRepository.SendPT2PacketRequest)} response {r.D3} {r.D4}");
             });
 
             await Task.Delay(3000);

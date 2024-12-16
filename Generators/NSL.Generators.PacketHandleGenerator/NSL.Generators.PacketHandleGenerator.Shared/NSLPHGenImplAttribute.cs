@@ -3,7 +3,7 @@
 namespace NSL.Generators.PacketHandleGenerator.Shared
 {
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
-    public class NSLPHGenImplementAttribute : Attribute
+    public class NSLPHGenImplAttribute : Attribute
     {
         /// <summary>
         /// Generate static method for get client/requestProcessor for <see cref="NSLHPDirTypeEnum.Send"/> direction
@@ -35,6 +35,8 @@ namespace NSL.Generators.PacketHandleGenerator.Shared
         /// </summary>
         public NSLAccessModifierEnum Modifier { get; set; }
 
-        public NSLPHGenImplementAttribute(params string[] models) { }
+        public bool IsAsync { get; set; }
+
+        public NSLPHGenImplAttribute(params string[] models) { }
     }
 }

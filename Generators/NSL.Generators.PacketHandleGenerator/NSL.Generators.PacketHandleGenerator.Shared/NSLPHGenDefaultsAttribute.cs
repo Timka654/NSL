@@ -2,12 +2,8 @@
 
 namespace NSL.Generators.PacketHandleGenerator.Shared
 {
-    [AttributeUsage(AttributeTargets.Enum)]
-    public class NSLPHGenDefaultsAttribute : Attribute
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
+    public class NSLPHGenImplDefaultsAttribute : NSLPHGenImplAttribute
     {
-        public NSLPHGenDefaultsAttribute(NSLAccessModifierEnum defaultModifiers = 0, bool defaultAsync = false)
-        {
-                
-        }
     }
 }

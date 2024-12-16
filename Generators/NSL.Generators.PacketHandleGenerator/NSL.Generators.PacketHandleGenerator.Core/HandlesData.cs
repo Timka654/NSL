@@ -27,6 +27,8 @@ namespace NSL.Generators.PacketHandleGenerator
 
         public Func<string, bool> HaveReceiveHandleImplementation { get; set; } = (name) => false;
 
+        public bool IsAsync { get; set; }
+
         public string BuildModifiers()
             => string.Join(" ", Enum.GetValues(typeof(NSLAccessModifierEnum))
             .Cast<NSLAccessModifierEnum>()

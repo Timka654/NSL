@@ -20,7 +20,7 @@
 		<ProjectReference Include="..\..\NSL.Generators.PacketHandleGenerator\NSL.Generators.PacketHandleGenerator.Shared\NSL.Generators.PacketHandleGenerator.Shared.csproj" />
 		<ProjectReference Include="..\..\NSL.Generators.PacketHandleGenerator\NSL.Generators.PacketHandleGenerator.Core\NSL.Generators.PacketHandleGenerator.Core.csproj" ReferenceOutputAssembly="false" PrivateAssets="all" OutputItemType="Analyzer" />
 		<ProjectReference Include="..\..\NSL.Generators.BinaryTypeIOGenerator\NSL.Generators.BinaryTypeIOGenerator.Core\NSL.Generators.BinaryTypeIOGenerator.Core.csproj" ReferenceOutputAssembly="false" PrivateAssets="all" OutputItemType="Analyzer" />
-		<ProjectReference Include="..\..\Refactoring\NSL.Refactoring.PartialImpl\NSL.Refactoring.PartialImpl\NSL.Refactoring.PartialImpl\NSL.Refactoring.PartialImpl.Core.csproj" PrivateAssets="all" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
+		<ProjectReference Include="..\..\Refactoring\NSL.Refactoring.PartialImpl\NSL.Refactoring.PartialImpl.Core\NSL.Refactoring.PartialImpl.Core.csproj" PrivateAssets="all" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
 	</ItemGroup>
 
 </Project>

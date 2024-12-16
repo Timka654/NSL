@@ -10,23 +10,23 @@ namespace NSL.Generators.PacketHandleGenerator.Tests
         WithoutTypePacketRequest,
 
         [NSLPHGen]
-        [NSLPHGenParam(typeof(Param1Struct), Name = "p1s"), NSLPHGenParam(typeof(Param2Struct))]
+        [NSLPHGenArg(typeof(Param1Struct), Name = "p1s"), NSLPHGenArg(typeof(Param2Struct))]
         WithoutTypePacketMessage,
 
-        [NSLPHGen(NSLPacketTypeEnum.Message | NSLPacketTypeEnum.Async)]
-        [NSLPHGenParam(typeof(Param1Struct), Name = "p1s"), NSLPHGenParam(typeof(Param2Struct))]
+        [NSLPHGen(NSLPacketTypeEnum.Message)]
+        [NSLPHGenArg(typeof(Param1Struct), Name = "p1s"), NSLPHGenArg(typeof(Param2Struct))]
         WithoutType2PacketMessage,
 
-        [NSLPHGen(NSLPacketTypeEnum.Request | NSLPacketTypeEnum.Async)]
-        [NSLPHGenParam(typeof(Param1Struct), Name = "p1s"), NSLPHGenParam(typeof(Param2Struct)), NSLPHGenResult(typeof(Param2Struct))]
+        [NSLPHGen(NSLPacketTypeEnum.Request)]
+        [NSLPHGenArg(typeof(Param1Struct), Name = "p1s"), NSLPHGenArg(typeof(Param2Struct)), NSLPHGenResult(typeof(Param2Struct))]
         WithoutType2PacketRequest,
 
         [NSLPHGen(NSLPacketTypeEnum.Request)]
-        [NSLPHGenParam(typeof(Param3Struct)), NSLPHGenParam(typeof(Param2Struct)), NSLPHGenParam(typeof(int)), NSLPHGenResult(typeof(int))]
+        [NSLPHGenArg(typeof(Param3Struct)), NSLPHGenArg(typeof(Param2Struct)), NSLPHGenArg(typeof(int)), NSLPHGenResult(typeof(int))]
         PTPacketRequest,
 
         [NSLPHGen(NSLPacketTypeEnum.Request)]
-        [NSLPHGenParam(typeof(Param3Struct)), NSLPHGenParam(typeof(Param2Struct)), NSLPHGenParam(typeof(int)), NSLPHGenResult(typeof(Param3Struct))]
+        [NSLPHGenArg(typeof(Param3Struct)), NSLPHGenArg(typeof(Param2Struct)), NSLPHGenArg(typeof(int)), NSLPHGenResult(typeof(Param3Struct))]
         PT2PacketRequest,
 
         [NSLPHGen(NSLPacketTypeEnum.Message)]

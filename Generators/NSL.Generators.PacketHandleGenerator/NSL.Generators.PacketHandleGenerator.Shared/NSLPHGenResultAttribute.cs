@@ -2,6 +2,9 @@
 
 namespace NSL.Generators.PacketHandleGenerator.Shared
 {
+    /// <summary>
+    /// Set Result type for request
+    /// </summary>
     [AttributeUsage(AttributeTargets.Field)]
     public class NSLPHGenResultAttribute : Attribute
     {

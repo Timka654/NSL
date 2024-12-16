@@ -73,8 +73,18 @@ namespace NSL.Generators.PacketHandleGenerator
             {
                 var typeAttributes = typeClass.AttributeLists
                     .SelectMany(x => x.Attributes)
-                    .Where(x => x.GetAttributeFullName().Equals(NSLPHGenImplementAttributeFullName)).ToArray();
+                    .Where(x => x.GetAttributeFullName().Equals(NSLPHGenImplAttributeFullName)).ToArray();
 
+                var defaultsAttribute = typeClass.AttributeLists
+                    .SelectMany(x => x.Attributes)
+                    .Where(x => x.GetAttributeFullName().Equals(NSLPHGenDefaultsAttributeFullName)).FirstOrDefault();
+
+
+                var defaultParameters = defaultsAttribute?
+                .ArgumentList?
+                .Arguments
+                .Where(n => n.NameEquals != null)
+                .ToDictionary(n => n.NameEquals.Name.ToString(), n => n);
                 //GenDebug.Break();
 
                 var methodNames = type.Members
@@ -102,38 +112,40 @@ namespace NSL.Generators.PacketHandleGenerator
                         .Where(n => n.NameEquals != null)
                         .ToDictionary(n => n.NameEquals.Name.ToString(), n => n);
 
-                        if (parameters.TryGetValue(nameof(NSLPHGenImplementAttribute.PacketsEnum), out var packetsType))
+                        if (parameters.TryGetValue(nameof(NSLPHGenImplAttribute.PacketsEnum), out var packetsType)
+                        || defaultParameters?.TryGetValue(nameof(NSLPHGenImplAttribute.PacketsEnum), out packetsType) == true)
                         {
                             r.Type = packetsType.GetAttributeTypeParameterValueSymbol(typeSem);
                         }
                         else
                             context.ShowPHDiagnostics("NSLHP004", $"Required parameter {"PacketsEnum"}", DiagnosticSeverity.Error, attributeParameters[1].Locations.ToArray());
 
-                        if (parameters.TryGetValue(nameof(NSLPHGenImplementAttribute.NetworkDataType), out var networkDataType))
+                        if (parameters.TryGetValue(nameof(NSLPHGenImplAttribute.NetworkDataType), out var networkDataType)
+                        || defaultParameters?.TryGetValue(nameof(NSLPHGenImplAttribute.NetworkDataType), out networkDataType) == true)
                             r.NetworkDataType = networkDataType.GetAttributeTypeParameterValueSymbol(typeSem);
                         else
                             context.ShowPHDiagnostics("NSLHP004", $"Required parameter {"NetworkDataType"}", DiagnosticSeverity.Error, attributeParameters[1].Locations.ToArray());
 
-                        if (parameters.TryGetValue(nameof(NSLPHGenImplementAttribute.Direction), out var direction))
+                        if (parameters.TryGetValue(nameof(NSLPHGenImplAttribute.Direction), out var direction)
+                        || defaultParameters?.TryGetValue(nameof(NSLPHGenImplAttribute.Direction), out direction) == true)
                             r.Direction = direction.GetAttributeParameterValue<NSLHPDirTypeEnum>(typeSem);
 
                         r.Modifiers = NSLAccessModifierEnum.Private | NSLAccessModifierEnum.Static;
 
-                        var defaults = r.Type.GetAttributes()
-                        .FirstOrDefault(a => a.AttributeClass.Name == NSLPHGenAttributeFullName);
-
-                        if (defaults != null)
-                        {
-                            //todo
-                        }
-
-                        if (parameters.TryGetValue(nameof(NSLPHGenImplementAttribute.Modifier), out var modifier))
+                        if (parameters.TryGetValue(nameof(NSLPHGenImplAttribute.Modifier), out var modifier)
+                        || defaultParameters?.TryGetValue(nameof(NSLPHGenImplAttribute.Modifier), out modifier) == true)
                             r.Modifiers = modifier.GetAttributeParameterValue<NSLAccessModifierEnum>(typeSem);
 
-                        if (parameters.TryGetValue(nameof(NSLPHGenImplementAttribute.IsStaticNetwork), out var isStaticNetwork))
+                        if (parameters.TryGetValue(nameof(NSLPHGenImplAttribute.IsStaticNetwork), out var isStaticNetwork)
+                        || defaultParameters?.TryGetValue(nameof(NSLPHGenImplAttribute.IsStaticNetwork), out isStaticNetwork) == true)
                             r.IsStaticNetwork = isStaticNetwork.GetAttributeParameterValue<bool>(typeSem);
 
-                        if (parameters.TryGetValue(nameof(NSLPHGenImplementAttribute.DelegateOutputResponse), out var delegateOutputResponse))
+                        if (parameters.TryGetValue(nameof(NSLPHGenImplAttribute.IsAsync), out var isAsync)
+                        || defaultParameters?.TryGetValue(nameof(NSLPHGenImplAttribute.IsAsync), out isAsync) == true)
+                            r.IsAsync = isAsync.GetAttributeParameterValue<bool>(typeSem);
+
+                        if (parameters.TryGetValue(nameof(NSLPHGenImplAttribute.DelegateOutputResponse), out var delegateOutputResponse)
+                        || defaultParameters?.TryGetValue(nameof(NSLPHGenImplAttribute.DelegateOutputResponse), out delegateOutputResponse) == true)
                             r.DelegateOutputResponse = delegateOutputResponse.GetAttributeParameterValue<bool>(typeSem);
 
                         if (Enum.GetValues(typeof(NSLAccessModifierEnum))
@@ -226,8 +238,7 @@ namespace NSL.Generators.PacketHandleGenerator
             {
                 BuildReceivePacket(item,
                                  typeSem,
-                                 buildData,
-                                 item.PacketType.HasFlag(NSLPacketTypeEnum.Async));
+                                 buildData);
             }
         }
 
@@ -235,11 +246,11 @@ namespace NSL.Generators.PacketHandleGenerator
         {
             foreach (var item in handle.Packets)
             {
-                BuildSendPacket(item, typeSem, buildData, item.PacketType.HasFlag(NSLPacketTypeEnum.Async));
+                BuildSendPacket(item, typeSem, buildData);
             }
         }
 
-        private void BuildSendPacket(PacketData packet, SemanticModel typeSem, CodeBuilderData buildData, bool isAsync)
+        private void BuildSendPacket(PacketData packet, SemanticModel typeSem, CodeBuilderData buildData)
         {
             int pi = 0;
             var _args = packet.Parameters.Select(x =>
@@ -414,8 +425,11 @@ namespace NSL.Generators.PacketHandleGenerator
             phb.AppendLine();
         }
 
-        private void BuildReceivePacket(PacketData packet, SemanticModel typeSem, CodeBuilderData buildData, bool isAsync)
+        private void BuildReceivePacket(PacketData packet, SemanticModel typeSem, CodeBuilderData buildData)
         {
+
+            bool isAsync = packet.HandlesData.IsAsync;
+
             int pi = 0;
 
             var partName = $"Receive{packet.Name}Handle";
@@ -688,12 +702,11 @@ namespace NSL.Generators.PacketHandleGenerator
 
                                 var modCount = Enum.GetValues(typeof(NSLPacketTypeEnum))
                                 .Cast<NSLPacketTypeEnum>()
-                                .Where(x => x < NSLPacketTypeEnum.Async)
                                 .Where(x => r.PacketType.HasFlag(x))
                                 .Count();
 
                                 if (modCount > 1)
-                                    context.ShowPHDiagnostics("NSLHP002", "Have invalid packet type combination", DiagnosticSeverity.Error, packet.Locations.ToArray());
+                                    context.ShowPHDiagnostics("NSLHP002", "Have invalid packet type", DiagnosticSeverity.Error, packet.Locations.ToArray());
 
                                 if (modCount == 0)
                                 {
@@ -799,13 +812,13 @@ namespace NSL.Generators.PacketHandleGenerator
 
         #endregion
 
-        internal static readonly string NSLPHGenImplementAttributeFullName = typeof(NSLPHGenImplementAttribute).Name;
+        internal static readonly string NSLPHGenImplAttributeFullName = typeof(NSLPHGenImplAttribute).Name;
 
-        internal static readonly string NSLPHGenDefaultsAttributeFullName = typeof(NSLPHGenDefaultsAttribute).Name;
+        internal static readonly string NSLPHGenDefaultsAttributeFullName = typeof(NSLPHGenImplDefaultsAttribute).Name;
 
         internal static readonly string NSLPHGenAttributeFullName = typeof(NSLPHGenAttribute).Name;
 
-        internal static readonly string NSLPHGenParamAttributeFullName = typeof(NSLPHGenParamAttribute).Name;
+        internal static readonly string NSLPHGenParamAttributeFullName = typeof(NSLPHGenArgAttribute).Name;
 
         internal static readonly string NSLPHGenResultAttributeFullName = typeof(NSLPHGenResultAttribute).Name;
 

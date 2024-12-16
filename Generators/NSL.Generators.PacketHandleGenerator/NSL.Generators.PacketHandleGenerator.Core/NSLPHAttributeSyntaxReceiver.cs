@@ -12,7 +12,7 @@ namespace NSL.Generators.PacketHandleGenerator
     {
         public IList<TypeDeclarationSyntax> BinaryIOTypes { get; } = new List<TypeDeclarationSyntax>();
 
-        string NSLBIOTypeAttributeName = typeof(NSLPHGenImplementAttribute).Name;
+        static string NSLPHGenImplAttributeName = typeof(NSLPHGenImplAttribute).Name;
 
         public void OnVisitSyntaxNode(SyntaxNode syntaxNode)
         {
@@ -22,7 +22,7 @@ namespace NSL.Generators.PacketHandleGenerator
                 {
                     if (typeDeclarationSyntax.AttributeLists
                         .Any(al => al.Attributes
-                            .Any(a => a.GetAttributeFullName().Equals(NSLBIOTypeAttributeName, StringComparison.InvariantCultureIgnoreCase))))
+                            .Any(a => a.GetAttributeFullName().Equals(NSLPHGenImplAttributeName, StringComparison.InvariantCultureIgnoreCase))))
                     {
                         BinaryIOTypes.Add(typeDeclarationSyntax);
                     }
