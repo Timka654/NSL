@@ -7,25 +7,19 @@ namespace NSL.Database.EntityFramework
 {
     public static class TransactionExtensions
     {
-        public delegate Task<bool> InvokeDelegate<TContext>(TContext db, int n);
-        public delegate Task<bool> InvokeDelegate2<TContext>(TContext db, int n, InvokeActionContext invokeContext);
-        public delegate Task<bool> InvokeDelegate3<TContext>(TContext db, int n, IServiceProvider serviceProvider);
+        public delegate Task<bool> InvokeDelegate<TContext>(TContext db);
+        public delegate Task<bool> InvokeDelegate2<TContext>(TContext db, InvokeActionContext invokeContext);
 
         public static async Task<bool> InvokeDbTransactionAsync<TContext>(this IServiceProvider services, InvokeDelegate<TContext> action, int maxCount = 100)
             where TContext : DbContext
         {
-            bool result = false;
-
             await using var scope = services.CreateAsyncScope();
 
-            var context = scope.ServiceProvider.GetRequiredService<TContext>();
-
-            result = await context.InvokeInTransactionAsync(action, maxCount);
-
-            return result;
+            return await scope.ServiceProvider.GetRequiredService<TContext>()
+                .InvokeDbTransactionAsync(action, maxCount);
         }
 
-        public static async Task<bool> InvokeInTransactionAsync<TContext>(this TContext context, InvokeDelegate<TContext> action, int maxCount = 100)
+        public static async Task<bool> InvokeDbTransactionAsync<TContext>(this TContext context, InvokeDelegate<TContext> action, int maxCount = 100)
             where TContext : DbContext
         {
             int i = 0;
@@ -42,7 +36,7 @@ namespace NSL.Database.EntityFramework
                     {
                         using var t = await context.Database.BeginTransactionAsync();
 
-                        if (await action(context, i++))
+                        if (await action(context))
                         {
                             await context.SaveChangesAsync();
 
@@ -84,36 +78,24 @@ namespace NSL.Database.EntityFramework
         public static async Task<bool> InvokeDbTransactionAsync<TContext>(this IServiceProvider services, InvokeDelegate2<TContext> action, int maxCount = 100)
             where TContext : DbContext
         {
-            bool result = false;
-
-
             await using var scope = services.CreateAsyncScope();
 
-            InvokeActionContext invokeContext = new InvokeActionContext();
-            result = await scope.ServiceProvider.GetRequiredService<TContext>().InvokeInTransactionAsync((db, i) =>
+            InvokeActionContext invokeContext = new()
+            {
+                Services = scope.ServiceProvider
+            };
+
+            var result = await scope.ServiceProvider.GetRequiredService<TContext>().InvokeDbTransactionAsync((db) =>
             {
                 invokeContext.PostAction = () => Task.CompletedTask;
 
-                return action(db, i, invokeContext);
+                ++invokeContext.Iter;
+
+                return action(db, invokeContext);
             }, maxCount);
 
-            if (result)
+            if (result && invokeContext.PostAction != null)
                 await invokeContext.PostAction();
-
-            return result;
-        }
-
-        public static async Task<bool> InvokeDbTransactionAsync<TContext>(this IServiceProvider services, InvokeDelegate3<TContext> action, int maxCount = 100)
-            where TContext : DbContext
-        {
-            bool result = false;
-
-            await using var scope = services.CreateAsyncScope();
-
-            result = await scope.ServiceProvider.GetRequiredService<TContext>().InvokeInTransactionAsync((db, i) =>
-                {
-                    return action(db, i, scope.ServiceProvider);
-                }, maxCount);
 
             return result;
         }
@@ -122,5 +104,9 @@ namespace NSL.Database.EntityFramework
     public class InvokeActionContext
     {
         public Func<Task> PostAction { get; set; }
+
+        public IServiceProvider Services { get; set; }
+
+        public int Iter { get; set; }
     }
 }
