@@ -3,9 +3,9 @@ using System.Threading;
 
 namespace NSL.Utils
 {
-    public class ReplaceableLogOutput
+    public class NSLConsoleOutput
     {
-        public static ReplaceableLogOutput Instance { get; } = new ReplaceableLogOutput();
+        public static NSLConsoleOutput Instance { get; } = new NSLConsoleOutput();
 
         private AutoResetEvent outputLocker = new AutoResetEvent(true);
 
@@ -17,7 +17,7 @@ namespace NSL.Utils
 
         int savedCursorTop = 0;
 
-        private void ReplaceLog(string text, int type)
+        public void ReplaceLog(string text, int type)
         {
             outputLocker.WaitOne();
 
@@ -48,7 +48,7 @@ namespace NSL.Utils
             outputLocker.Set();
         }
 
-        private void LineLog(string text)
+        public void LineLog(string text)
         {
             outputLocker.WaitOne();
 
