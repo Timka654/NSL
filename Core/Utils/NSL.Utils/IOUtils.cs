@@ -26,5 +26,54 @@ namespace NSL.Utils
                 Directory.CreateDirectory(path);
         }
 
+        public delegate bool FileConfirmDelegate(string destinationPath, FileInfo sourceFile);
+        public delegate void FileDelegate(string destinationPath, FileInfo sourceFile);
+
+        public static void CopyDirectory(string sourceDir
+            , string destinationDir
+            , bool recursive
+            , bool overwrite = true
+            , FileDelegate onCopy = null
+            , FileConfirmDelegate filter = null)
+        {
+            onCopy = onCopy ?? ((destinationPath, sourceFile) => { });
+            filter = filter ?? ((destinationPath, relativePath) => true);
+
+            var _sourceDir = new DirectoryInfo(sourceDir);
+
+            if (!_sourceDir.Exists)
+                throw new DirectoryNotFoundException($"Source directory not found: {_sourceDir.FullName}");
+
+            int srcDirSubStrOffset = _sourceDir.FullName.Length + 1;
+
+            Directory.CreateDirectory(destinationDir);
+
+            if (recursive)
+            {
+                var dirs = _sourceDir.GetDirectories("*", SearchOption.AllDirectories);
+
+                foreach (DirectoryInfo subDir in dirs)
+                {
+                    var destPath = Path.Combine(destinationDir, subDir.FullName.Substring(srcDirSubStrOffset));
+
+                    Directory.CreateDirectory(destPath);
+                }
+            }
+
+
+            var copyFiles = _sourceDir.GetFiles("*", recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
+
+            foreach (FileInfo file in copyFiles)
+            {
+                string targetFilePath = Path.Combine(destinationDir, file.FullName.Substring(srcDirSubStrOffset));
+
+                if (!filter(targetFilePath, file))
+                    continue;
+
+                file.CopyTo(targetFilePath, overwrite);
+
+                onCopy(targetFilePath, file);
+            }
+        }
     }
 }
