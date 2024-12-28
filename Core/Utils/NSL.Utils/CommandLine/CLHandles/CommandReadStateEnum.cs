@@ -13,9 +13,19 @@
         HelpInvoked,
 
         /// <summary>
+        /// 
+        /// </summary>
+        InvalidPathHelpInvoked,
+
+        /// <summary>
         /// Invalid path for execute command
         /// </summary>
         InvalidPath,
+
+        /// <summary>
+        /// 
+        /// </summary>
+        InvalidArgumentHelpInvoked,
 
         /// <summary>
         /// Invalid argument for execute command, or argument required not found
@@ -27,6 +37,11 @@
         /// <summary>
         /// Status for return from a command that failed to execute
         /// </summary>
-        Failed
+        Failed,
+
+        /// <summary>
+        /// Status for return from a command that was cancelled
+        /// </summary>
+        Cancelled
     }
 }

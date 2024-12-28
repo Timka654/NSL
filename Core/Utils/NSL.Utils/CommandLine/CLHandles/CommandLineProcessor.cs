@@ -18,6 +18,8 @@ namespace NSL.Utils.CommandLine.CLHandles
 
         public virtual string Description { get; set; }
 
+        public virtual string ShortDescription { get; set; }
+
         protected void AddCommands(params CommandLineProcessor[] commands)
         {
             foreach (var command in commands)
@@ -167,7 +169,7 @@ namespace NSL.Utils.CommandLine.CLHandles
         protected virtual async Task<CommandReadStateEnum> InvalidArgsHandle(CommandLineArgsReader reader, CommandLineReadException exception)
         {
             if (await ProcessHelp(reader, CommandReadStateEnum.InvalidArgument, exception))
-                return CommandReadStateEnum.HelpInvoked;
+                return CommandReadStateEnum.InvalidArgumentHelpInvoked;
 
             return CommandReadStateEnum.InvalidArgument;
         }
@@ -175,7 +177,7 @@ namespace NSL.Utils.CommandLine.CLHandles
         protected virtual async Task<CommandReadStateEnum> InvalidPathHandle(CommandLineArgsReader reader)
         {
             if (await ProcessHelp(reader, CommandReadStateEnum.InvalidPath, null))
-                return CommandReadStateEnum.HelpInvoked;
+                return CommandReadStateEnum.InvalidPathHelpInvoked;
 
             return CommandReadStateEnum.InvalidPath;
         }
@@ -217,7 +219,7 @@ namespace NSL.Utils.CommandLine.CLHandles
 
                 foreach (var arg in ChildCommands)
                 {
-                    sb.AppendLine($"{arg.Key.PadRight(argMSize)} - {(arg.Value.Description ?? "<NO DESCRIPTIOM>")}");
+                    sb.AppendLine($"{arg.Key.PadRight(argMSize)} - {(arg.Value.ShortDescription ?? arg.Value.Description ?? "<NO DESCRIPTIOM>")}");
                 }
             }
 
