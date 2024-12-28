@@ -1,13 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace NSL.Utils.CommandLine.CLHandles
+namespace NSL.Utils.CommandLine.CLHandles.Arguments
 {
-    public class CommandLineArgumentValues
+    public class CLArgumentValues
     {
         Dictionary<string, object> Values = new Dictionary<string, object>();
 
-        public async Task<bool> TryRead(CommandLineArgsReader reader, CommandLineArgument arg)
+        public async Task<bool> TryRead(CommandLineArgsReader reader, CLArgument arg)
         {
             if (!reader.Args.ContainsKey(arg.ArgName))
             {

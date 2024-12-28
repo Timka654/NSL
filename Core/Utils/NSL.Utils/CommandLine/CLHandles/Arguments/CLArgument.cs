@@ -1,14 +1,14 @@
 ﻿using System.Threading.Tasks;
 
-namespace NSL.Utils.CommandLine.CLHandles
+namespace NSL.Utils.CommandLine.CLHandles.Arguments
 {
-    public class CommandLineArgument<T> : CommandLineArgument
+    public class CLArgument<T> : CLArgument
     {
         public delegate Task<(bool Success, T Result)> CommandArgumentHandler(CommandLineArgsReader reader, string name);
 
         private CommandArgumentHandler Handler { get; }
 
-        public CommandLineArgument(string argName, CommandArgumentHandler handler) : base(argName)
+        public CLArgument(string argName, CommandArgumentHandler handler) : base(argName)
         {
             Handler = handler;
         }
@@ -26,7 +26,7 @@ namespace NSL.Utils.CommandLine.CLHandles
         }
     }
 
-    public abstract class CommandLineArgument
+    public abstract class CLArgument
     {
         public string ArgName { get; }
 
@@ -34,26 +34,26 @@ namespace NSL.Utils.CommandLine.CLHandles
 
         public string Description { get; set; }
 
-        public CommandLineArgument(string argName)
+        public CLArgument(string argName)
         {
             ArgName = argName;
         }
-        
-        public CommandLineArgument WithDescription(string description)
+
+        public CLArgument WithDescription(string description)
         {
             Description = description;
             return this;
-        }   
-        
-        public CommandLineArgument WithOptional(bool optional = true)
+        }
+
+        public CLArgument WithOptional(bool optional = true)
         {
             Optional = optional;
             return this;
-        }   
+        }
 
         public async Task<(bool Success, T Result)> TryCast<T>(CommandLineArgsReader reader)
         {
-            return await (this as CommandLineArgument<T>).TryReadTyped(reader);
+            return await (this as CLArgument<T>).TryReadTyped(reader);
         }
 
         public abstract Task<(bool Success, object Result)> TryRead(CommandLineArgsReader reader);

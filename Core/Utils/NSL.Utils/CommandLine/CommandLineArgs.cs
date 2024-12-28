@@ -72,7 +72,7 @@ namespace NSL.Utils.CommandLine
         {
             if (_args.TryGetValue(key, out var text))
             {
-                result = (T)Convert.ChangeType(text, typeof(T));
+                    result = (T)Convert.ChangeType(text.Value, typeof(T));
                 return true;
             }
 
