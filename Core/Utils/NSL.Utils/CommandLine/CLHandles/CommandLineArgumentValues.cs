@@ -24,11 +24,23 @@ namespace NSL.Utils.CommandLine.CLHandles
             return result.Success;
         }
 
-        public bool GetValue<TResult>(string name, out TResult result)
+        public bool ContainsArg(string name)
+        {
+            return Values.ContainsKey(name);
+        }
+
+        public TResult GetValue<TResult>(string name, TResult defaultValue = default)
+        {
+            TryGetValue(name, out var result, defaultValue);
+
+            return result;
+        }
+
+        public bool TryGetValue<TResult>(string name, out TResult result, TResult defaultValue = default)
         {
             if (!Values.TryGetValue(name, out var _result))
             {
-                result = default;
+                result = defaultValue;
                 return false;
             }
 
