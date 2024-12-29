@@ -189,7 +189,9 @@ namespace NSL.Utils.CommandLine.CLHandles
         {
             StringBuilder sb = new StringBuilder();
 
-            sb.AppendLine($"Command: {Command}");
+            sb.AppendLine();
+
+            sb.AppendLine($"Command: {(Command ?? "<EMPTY>")}");
 
             if (!string.IsNullOrEmpty(Description))
             {
@@ -200,13 +202,13 @@ namespace NSL.Utils.CommandLine.CLHandles
             if (Arguments.Any())
             {
                 sb.AppendLine();
-                sb.AppendLine($"{Command} argument list:");
+                sb.AppendLine($"Available options list:");
 
-                var argMSize = Arguments.Max(x => x.Key.Length) + 1;
+                var argMSize = Arguments.Max(x => x.Key.Length) + 2 + 1;
 
                 foreach (var arg in Arguments)
                 {
-                    sb.AppendLine($"{(arg.Key + (arg.Value.Optional ? string.Empty : "*")).PadRight(argMSize)} - {(arg.Value.Description ?? "<NO DESCRIPTIOM>")}");
+                    sb.AppendLine($"   /{(arg.Key + (arg.Value.Optional ? string.Empty : "*")).PadRight(argMSize)} - {(arg.Value.Description ?? "<NO DESCRIPTIOM>")}");
                 }
 
                 if (Arguments.Any(x => x.Value.Optional))
@@ -216,13 +218,13 @@ namespace NSL.Utils.CommandLine.CLHandles
             if (ChildCommands.Any())
             {
                 sb.AppendLine();
-                sb.AppendLine($"{Command} command list:");
+                sb.AppendLine($"Available command list:");
 
-                var argMSize = ChildCommands.Max(x => x.Key.Length);
+                var argMSize = ChildCommands.Max(x => x.Key.Length) + 4;
 
                 foreach (var arg in ChildCommands)
                 {
-                    sb.AppendLine($"{arg.Key.PadRight(argMSize)} - {(arg.Value.ShortDescription ?? arg.Value.Description ?? "<NO DESCRIPTIOM>")}");
+                    sb.AppendLine($"   {arg.Key.PadRight(argMSize)} - {(arg.Value.ShortDescription ?? arg.Value.Description ?? "<NO DESCRIPTIOM>")}");
                 }
             }
 
