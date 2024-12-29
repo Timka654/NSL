@@ -14,7 +14,7 @@ namespace NSL.Utils.CommandLine
         public CommandLineArgsReader(CommandLineArgs args)
         {
             Args = args;
-            index = 0;
+            index = -1;
             current = default;
         }
 
