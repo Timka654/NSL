@@ -36,6 +36,20 @@ namespace NSL.Utils
             }
         }
 
+        public static bool HaveAdminPermission()
+        {
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                using (WindowsIdentity identity = WindowsIdentity.GetCurrent())
+                {
+                    WindowsPrincipal principal = new WindowsPrincipal(identity);
+                    return principal.IsInRole(WindowsBuiltInRole.Administrator);
+                }
+            }
+
+            return false;
+        }
+
         public static bool RequireRunningAsAdministrator()
         {
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))

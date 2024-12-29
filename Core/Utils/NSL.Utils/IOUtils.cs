@@ -65,7 +65,7 @@ namespace NSL.Utils
 
             foreach (FileInfo file in copyFiles)
             {
-                string targetFilePath = Path.Combine(destinationDir, file.FullName.Substring(srcDirSubStrOffset));
+                string targetFilePath = Path.Combine(destinationDir, file.FullName.Substring(srcDirSubStrOffset - 1));
 
                 if (!filter(targetFilePath, file))
                     continue;
