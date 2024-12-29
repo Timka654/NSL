@@ -54,7 +54,7 @@ namespace NSL.Utils
 
                 foreach (DirectoryInfo subDir in dirs)
                 {
-                    var destPath = Path.Combine(destinationDir, subDir.FullName.Substring(srcDirSubStrOffset));
+                    var destPath = Path.Combine(destinationDir, subDir.FullName.Substring(srcDirSubStrOffset - 1));
 
                     Directory.CreateDirectory(destPath);
                 }
