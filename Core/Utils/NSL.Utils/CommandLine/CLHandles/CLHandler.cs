@@ -70,6 +70,11 @@ namespace NSL.Utils.CommandLine.CLHandles
 
         public virtual async Task<CommandReadStateEnum> ProcessCommand(CommandLineArgsReader reader)
         {
+            bool haveNext = reader.TryNext();
+
+            if (!haveNext)
+               return await invokeProcessCommand(reader);
+
             if (await TryRunHelp(reader))
                 return CommandReadStateEnum.HelpInvoked;
 
@@ -77,12 +82,7 @@ namespace NSL.Utils.CommandLine.CLHandles
 
             if (result.CurrentState == CommandReadStateEnum.FinishPath)
             {
-                var args = await ReadArguments(reader);
-
-                if (!args.Success)
-                    return await InvalidArgsHandle(reader, args.error);
-
-                return await ProcessCommand(reader, args.Values);
+                return await invokeProcessCommand(reader);
             }
 
             if (result.CurrentState == CommandReadStateEnum.InvalidPath)
@@ -91,6 +91,16 @@ namespace NSL.Utils.CommandLine.CLHandles
             }
 
             return result.ResultState ?? result.CurrentState;
+        }
+
+        private async Task<CommandReadStateEnum> invokeProcessCommand(CommandLineArgsReader reader)
+        {
+            var args = await ReadArguments(reader);
+
+            if (!args.Success)
+                return await InvalidArgsHandle(reader, args.error);
+
+            return await ProcessCommand(reader, args.Values);
         }
 
         public virtual Task<CommandReadStateEnum> ProcessCommand(CommandLineArgsReader reader, CLArgumentValues values)
@@ -104,7 +114,6 @@ namespace NSL.Utils.CommandLine.CLHandles
 
             if (getResult.Result == CommandReadStateEnum.Success)
             {
-                reader.TryNext();
                 return (CommandReadStateEnum.Success, await getResult.Next.ProcessCommand(reader));
             }
 
