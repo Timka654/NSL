@@ -1,6 +1,7 @@
 ﻿using NSL.Logger.Info;
 using System.IO;
 using NSL.Utils;
+using System.Threading.Channels;
 
 namespace NSL.Logger
 {
@@ -32,13 +33,18 @@ namespace NSL.Logger
                 try
                 {
                     var message = await reader.ReadAsync();
-                    NextDay(message);
 
-                    stream.WriteLine(message.ToString());
+                    do
+                    {
+                        NextDay(message);
 
-                    if (++n % 10 == 0)
-                        stream.Flush();
+                        stream.WriteLine(message.ToString());
+
+                        if (++n % 10 == 0)
+                            stream.Flush();
+                    } while (reader.TryRead(out message));
                 }
+                catch (ChannelClosedException) { }
                 catch (System.Exception ex)
                 {
                     ConsoleLog(SocketCore.Utils.Logger.Enums.LoggerLevel.Error, ex.ToString());

@@ -12,7 +12,7 @@ namespace NSL.Logger
         internal static async void WriteLog(LoggerLevel level, string text)
         {
             try { await writeChannel.Writer.WriteAsync((level, text)); } catch (InvalidOperationException) { }
-            
+
 
         }
 
@@ -49,35 +49,41 @@ namespace NSL.Logger
 
         private static async void processing()
         {
+            var reader = writeChannel.Reader;
+
             while (true)
             {
-                var item = await writeChannel.Reader.ReadAsync();
+                var item = await reader.ReadAsync();
 
-                switch (item.level)
+                do
                 {
-                    case LoggerLevel.Info:
-                        Console.ForegroundColor = ConsoleColor.White;
-                        break;
-                    case LoggerLevel.Error:
-                        Console.ForegroundColor = ConsoleColor.Red;
-                        break;
-                    case LoggerLevel.Log:
-                        Console.ForegroundColor = ConsoleColor.White;
-                        break;
-                    case LoggerLevel.Debug:
-                        Console.ForegroundColor = ConsoleColor.Yellow;
-                        break;
-                    case LoggerLevel.Performance:
-                        Console.ForegroundColor = ConsoleColor.Blue;
-                        break;
-                    default:
-                        break;
-                }
+                    switch (item.level)
+                    {
+                        case LoggerLevel.Info:
+                            Console.ForegroundColor = ConsoleColor.White;
+                            break;
+                        case LoggerLevel.Error:
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            break;
+                        case LoggerLevel.Log:
+                            Console.ForegroundColor = ConsoleColor.White;
+                            break;
+                        case LoggerLevel.Debug:
+                            Console.ForegroundColor = ConsoleColor.Yellow;
+                            break;
+                        case LoggerLevel.Performance:
+                            Console.ForegroundColor = ConsoleColor.Blue;
+                            break;
+                        default:
+                            break;
+                    }
 
-                Console.WriteLine(item.text);
+                    Console.WriteLine(item.text);
+
 #if DEBUG
-                System.Diagnostics.Debug.WriteLine(item.text);
+                    System.Diagnostics.Debug.WriteLine(item.text);
 #endif
+                } while (reader.TryRead(out item));
             }
         }
     }
