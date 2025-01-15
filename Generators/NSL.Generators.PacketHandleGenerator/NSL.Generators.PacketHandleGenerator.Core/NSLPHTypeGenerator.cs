@@ -296,16 +296,21 @@ namespace NSL.Generators.PacketHandleGenerator
                 }
             }
 
-            if (packet.HandlesData.DelegateOutputResponse && packet.PacketType.HasFlag(NSLPacketTypeEnum.Request))
+            if (packet.PacketType.HasFlag(NSLPacketTypeEnum.Request))
             {
-                var res = "Action";
-
-                if (packet.Result != null)
+                if (packet.HandlesData.DelegateOutputResponse)
                 {
-                    res += $"<{packet.Result.Type.GetTypeFullName()}>";
+                    var res = "Action";
+
+                    if (packet.Result != null)
+                    {
+                        res += $"<{packet.Result.Type.GetTypeFullName()}>";
+                    }
+
+                    _args = _args.Append($"{res} onResponseHandle");
                 }
 
-                _args = _args.Append($"{res} onResponseHandle");
+                _args = _args.Append("System.Threading.CancellationToken __cancellationToken");
             }
 
             var args = string.Join(", ", _args);
@@ -426,7 +431,7 @@ namespace NSL.Generators.PacketHandleGenerator
 
                     var sendRequestInvokeName = packet.HandlesData.DelegateOutputResponse ? $"{clientField}.SendRequest" : $"await {clientField}.SendRequestAsync";
 
-                    phb.AppendLine($"{sendRequestInvokeName}(__outputBuf, {bodyBuilder});");
+                    phb.AppendLine($"{sendRequestInvokeName}(__outputBuf, {bodyBuilder}, __cancellationToken);");
                 }
                 else if (packet.PacketType.HasFlag(NSLPacketTypeEnum.Message))
                 {

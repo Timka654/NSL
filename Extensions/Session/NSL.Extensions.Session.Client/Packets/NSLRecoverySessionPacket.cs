@@ -1,6 +1,7 @@
 ﻿using NSL.SocketClient;
 using NSL.SocketCore.Extensions.Buffer;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace NSL.Extensions.Session.Client.Packets
@@ -8,6 +9,7 @@ namespace NSL.Extensions.Session.Client.Packets
     public static class NSLRecoverySessionPacketExtension
     {
         public static async Task<NSLRecoverySessionResult> NSLSessionSendRequestAsync<TClient>(this TClient client
+            , CancellationToken cancellationToken
             , string SOObjectKey = NSLSessionClientOptions.ObjectBagKey
             , string RPObjectKey = RequestProcessor.DefaultObjectBagKey)
             where TClient : BaseSocketNetworkClient
@@ -19,11 +21,11 @@ namespace NSL.Extensions.Session.Client.Packets
             if (options == null)
                 throw new Exception($"ObjectBag not contains session options item {SOObjectKey}");
 
-            return await client.NSLSessionSendRequestAsync(options, RPObjectKey);
+            return await client.NSLSessionSendRequestAsync(options, cancellationToken, RPObjectKey);
         }
 
         public static void NSLSessionSendRequest<TClient>(this TClient client
-            , Action<NSLRecoverySessionResult> onResponse
+            , Action<NSLRecoverySessionResult> onResponse, CancellationToken cancellationToken
             , string SOObjectKey = NSLSessionClientOptions.ObjectBagKey
             , string RPObjectKey = RequestProcessor.DefaultObjectBagKey)
             where TClient : BaseSocketNetworkClient
@@ -35,10 +37,10 @@ namespace NSL.Extensions.Session.Client.Packets
             if (options == null)
                 throw new Exception($"ObjectBag not contains session options item {SOObjectKey}");
 
-            client.NSLSessionSendRequest(onResponse, options, RPObjectKey);
+            client.NSLSessionSendRequest(onResponse, options, cancellationToken, RPObjectKey);
         }
 
-        public static async Task<NSLRecoverySessionResult> NSLSessionSendRequestAsync<TClient>(this TClient client, NSLSessionClientOptions sessionOptions, string RPObjectKey = RequestProcessor.DefaultObjectBagKey)
+        public static async Task<NSLRecoverySessionResult> NSLSessionSendRequestAsync<TClient>(this TClient client, NSLSessionClientOptions sessionOptions, CancellationToken cancellationToken, string RPObjectKey = RequestProcessor.DefaultObjectBagKey)
             where TClient : BaseSocketNetworkClient
         {
             client.ThrowIfObjectBagNull();
@@ -48,11 +50,11 @@ namespace NSL.Extensions.Session.Client.Packets
             if (info == null)
                 throw new Exception($"ObjectBag not contains session info item {sessionOptions.ClientSessionBagKey}");
 
-            return await client.NSLSessionSendRequestAsync(info, RPObjectKey);
+            return await client.NSLSessionSendRequestAsync(info, cancellationToken, RPObjectKey);
 
         }
 
-        public static void NSLSessionSendRequest<TClient>(this TClient client, Action<NSLRecoverySessionResult> onResponse, NSLSessionClientOptions sessionOptions, string RPObjectKey = RequestProcessor.DefaultObjectBagKey)
+        public static void NSLSessionSendRequest<TClient>(this TClient client, Action<NSLRecoverySessionResult> onResponse, NSLSessionClientOptions sessionOptions, CancellationToken cancellationToken, string RPObjectKey = RequestProcessor.DefaultObjectBagKey)
             where TClient : BaseSocketNetworkClient
         {
             client.ThrowIfObjectBagNull();
@@ -62,10 +64,10 @@ namespace NSL.Extensions.Session.Client.Packets
             if (info == null)
                 throw new Exception($"ObjectBag not contains session info item {sessionOptions.ClientSessionBagKey}");
 
-            client.NSLSessionSendRequest(onResponse, info, RPObjectKey);
+            client.NSLSessionSendRequest(onResponse, info, cancellationToken, RPObjectKey);
         }
 
-        public static async Task<NSLRecoverySessionResult> NSLSessionSendRequestAsync<TClient>(this TClient client, NSLSessionInfo sessionInfo, string RPObjectKey = RequestProcessor.DefaultObjectBagKey)
+        public static async Task<NSLRecoverySessionResult> NSLSessionSendRequestAsync<TClient>(this TClient client, NSLSessionInfo sessionInfo, CancellationToken cancellationToken, string RPObjectKey = RequestProcessor.DefaultObjectBagKey)
             where TClient : BaseSocketNetworkClient
         {
             client.ThrowIfObjectBagNull();
@@ -77,12 +79,12 @@ namespace NSL.Extensions.Session.Client.Packets
                 result = NSLRecoverySessionResult.ReadFullFrom(d);
 
                 return Task.FromResult(true);
-            });
+            }, cancellationToken);
 
             return result;
         }
 
-        public static void NSLSessionSendRequest<TClient>(this TClient client, Action<NSLRecoverySessionResult> onResponse, NSLSessionInfo sessionInfo, string RPObjectKey = RequestProcessor.DefaultObjectBagKey)
+        public static void NSLSessionSendRequest<TClient>(this TClient client, Action<NSLRecoverySessionResult> onResponse, NSLSessionInfo sessionInfo, CancellationToken cancellationToken, string RPObjectKey = RequestProcessor.DefaultObjectBagKey)
             where TClient : BaseSocketNetworkClient
         {
             client.ThrowIfObjectBagNull();
@@ -94,7 +96,7 @@ namespace NSL.Extensions.Session.Client.Packets
                 onResponse(NSLRecoverySessionResult.ReadFullFrom(d));
 
                 return true;
-            });
+            }, cancellationToken);
         }
 
     }

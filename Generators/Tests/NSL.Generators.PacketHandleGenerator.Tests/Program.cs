@@ -58,7 +58,7 @@ namespace NSL.Generators.PacketHandleGenerator.Tests
             StaticDelegateSendRepository.SendPT2PacketRequest(new Param3Struct() { D3 = 56, D4 = 66, }, new Param2Struct() { D4 = 55, D3 = 11 }, 9999, r =>
             {
                 ClientLog($"{nameof(StaticDelegateSendRepository.SendPT2PacketRequest)} response {r.D3} {r.D4}");
-            });
+            }, CancellationToken.None);
 
             await Task.Delay(3000);
 

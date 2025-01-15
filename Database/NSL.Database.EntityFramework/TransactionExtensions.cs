@@ -8,7 +8,7 @@ namespace NSL.Database.EntityFramework
     public static class TransactionExtensions
     {
         public delegate Task<bool> InvokeDelegate<TContext>(TContext db);
-        public delegate Task<bool> InvokeDelegate2<TContext>(TContext db, InvokeActionContext invokeContext);
+        public delegate Task<bool> InvokeDelegate2<TContext>(TContext db, InvokeDbActionContext invokeContext);
 
         public static async Task<bool> InvokeDbTransactionAsync<TContext>(this IServiceProvider services, InvokeDelegate<TContext> action, int maxCount = 100)
             where TContext : DbContext
@@ -16,10 +16,34 @@ namespace NSL.Database.EntityFramework
             await using var scope = services.CreateAsyncScope();
 
             return await scope.ServiceProvider.GetRequiredService<TContext>()
-                .InvokeDbTransactionAsync(action, maxCount);
+                .InvokeTransactionAsync(action, maxCount);
         }
 
-        public static async Task<bool> InvokeDbTransactionAsync<TContext>(this TContext context, InvokeDelegate<TContext> action, int maxCount = 100)
+        public static async Task<bool> InvokeDbTransactionAsync<TContext>(this IServiceProvider services, InvokeDelegate2<TContext> action, int maxCount = 100)
+            where TContext : DbContext
+        {
+            await using var scope = services.CreateAsyncScope();
+
+            InvokeDbActionContext invokeContext = new()
+            {
+            };
+
+            var result = await scope.ServiceProvider.GetRequiredService<TContext>().InvokeTransactionAsync((db) =>
+            {
+                invokeContext.PostAction = () => Task.CompletedTask;
+
+                ++invokeContext.Iter;
+
+                return action(db, invokeContext);
+            }, maxCount);
+
+            if (result && invokeContext.PostAction != null)
+                await invokeContext.PostAction();
+
+            return result;
+        }
+
+        public static async Task<bool> InvokeTransactionAsync<TContext>(this TContext context, InvokeDelegate<TContext> action, int maxCount = 100)
             where TContext : DbContext
         {
             int i = 0;
@@ -75,17 +99,14 @@ namespace NSL.Database.EntityFramework
             return false;
         }
 
-        public static async Task<bool> InvokeDbTransactionAsync<TContext>(this IServiceProvider services, InvokeDelegate2<TContext> action, int maxCount = 100)
+        public static async Task<bool> InvokeTransactionAsync<TContext>(this TContext context, InvokeDelegate2<TContext> action, int maxCount = 100)
             where TContext : DbContext
         {
-            await using var scope = services.CreateAsyncScope();
-
-            InvokeActionContext invokeContext = new()
+            InvokeDbActionContext invokeContext = new()
             {
-                Services = scope.ServiceProvider
             };
 
-            var result = await scope.ServiceProvider.GetRequiredService<TContext>().InvokeDbTransactionAsync((db) =>
+            var result = await context.InvokeTransactionAsync((db) =>
             {
                 invokeContext.PostAction = () => Task.CompletedTask;
 
@@ -101,11 +122,9 @@ namespace NSL.Database.EntityFramework
         }
     }
 
-    public class InvokeActionContext
+    public class InvokeDbActionContext
     {
         public Func<Task> PostAction { get; set; }
-
-        public IServiceProvider Services { get; set; }
 
         public int Iter { get; set; }
     }

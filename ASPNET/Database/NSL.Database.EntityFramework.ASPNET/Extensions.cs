@@ -10,19 +10,6 @@ namespace NSL.Database.EntityFramework.ASPNET
 {
     public static class Extensions
     {
-        public static async Task<bool> InvokeDbTransactionAsync<TContext>(this IServiceProvider services, TransactionExtensions.InvokeDelegate<TContext> action, int maxCount = 100)
-            where TContext : DbContext
-        {
-            bool result = false;
-
-            await services.InvokeInScopeAsync(async provider =>
-            {
-                result = await provider.GetRequiredService<TContext>().InvokeDbTransactionAsync(action, maxCount);
-            });
-
-            return result;
-        }
-
         public static async Task AcceptDbMigrations<TContext>(this IHost host)
             where TContext : DbContext
         {

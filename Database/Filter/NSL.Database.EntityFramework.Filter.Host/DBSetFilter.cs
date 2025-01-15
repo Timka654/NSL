@@ -126,7 +126,7 @@ namespace NSL.Database.EntityFramework.Filter.Host
                 property.ASC ? "OrderBy" : "OrderByDescending" :
                 property.ASC ? "ThenBy" : "ThenByDescending";
 
-            var p = GetPropertyExp(li, property.PropertyPath);
+            var p = GetPropertyExp(li, property.PropertyPath, false);
             var orderByExpression = Expression.Lambda(p, li);
 
             var result = Expression.Call(typeof(Queryable), command, new Type[] { typeof(T), p.Type },
@@ -251,7 +251,7 @@ namespace NSL.Database.EntityFramework.Filter.Host
 
         private static (MemberExpression member, ConstantExpression value) BuildConvertibleExpressions(Expression listOfNames, FilterPropertyViewModel property)
         {
-            var userIdParam = GetPropertyExp(listOfNames, property.PropertyPath);
+            var userIdParam = GetPropertyExp(listOfNames, property.PropertyPath, property.ValueNull);
 
             var type = GetPropertyType(userIdParam);
 
@@ -279,7 +279,7 @@ namespace NSL.Database.EntityFramework.Filter.Host
         #endregion
 
 
-        public static MemberExpression GetPropertyExp(Expression t, string path)
+        public static MemberExpression GetPropertyExp(Expression t, string path, bool @null)
         {
             var props = path.Split('.');
 
@@ -293,7 +293,7 @@ namespace NSL.Database.EntityFramework.Filter.Host
                 }
             }
 
-            if (IsNullable(exp.Type))
+            if (IsNullable(exp.Type) && !@null)
                 exp = Expression.Property(exp, "Value");
 
             return exp;
@@ -301,6 +301,9 @@ namespace NSL.Database.EntityFramework.Filter.Host
 
         private static object NormalizePropertyValue(Type type, FilterPropertyViewModel property)
         {
+            if (property.ValueNull)
+                return null;
+
             if (type == typeof(string))
                 return property.Value;
 

@@ -44,9 +44,17 @@ namespace NSL.SocketCore.Extensions.Buffer
         /// <param name="buffer"></param>
         /// <param name="onResponse">Delegate must return <see langword="true"/> for dispose or input buffer must manual disposing after processing</param>
         /// <returns>request id</returns>
-        public Guid SendRequest(RequestPacketBuffer buffer, Func<InputPacketBuffer, bool> onResponse, bool disposeOnSend = true)
+        public Guid SendRequest(RequestPacketBuffer buffer, Func<InputPacketBuffer, bool> onResponse, CancellationToken cancellationToken, bool disposeOnSend = true)
         {
             Guid rid = default;
+            
+            cancellationToken.Register(() =>
+            {
+                lock (this)
+                {
+                    requests.Remove(rid);
+                }
+            });
 
             Action<InputPacketBuffer> action = (input) =>
             {
@@ -81,31 +89,32 @@ namespace NSL.SocketCore.Extensions.Buffer
             Guid rid = default;
             try
             {
-                CancellationTokenSource cts = new CancellationTokenSource();
-
-
-                rid = SendRequest(buffer, input =>
+                using (CancellationTokenSource cts = new CancellationTokenSource())
                 {
-                    try
+
+                    rid = SendRequest(buffer, input =>
                     {
-                        data = input;
-                        cts.Cancel();
+                        try
+                        {
+                            data = input;
+                            cts.Cancel();
 
-                    }
-                    catch (Exception ex)
-                    {
+                        }
+                        catch (Exception ex)
+                        {
 
-                        throw;
-                    }
+                            throw;
+                        }
 
-                    return false;
-                }, disposeOnSend);
+                        return false;
+                    }, cancellationToken, disposeOnSend);
 
-                await Task.Delay(-1, cts.Token);
-
+                    using (var linkedTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cts.Token, cancellationToken))
+                        await Task.Delay(-1, linkedTokenSource.Token);
+                }
                 //data = await result.Task;
             }
-            catch (TaskCanceledException)
+            catch (OperationCanceledException)
             {
                 if (data != null)
                     if (await onResult(data))
@@ -115,7 +124,6 @@ namespace NSL.SocketCore.Extensions.Buffer
 
                 data = null;
             }
-            catch (OperationCanceledException) { }
             catch (Exception)
             {
                 throw;

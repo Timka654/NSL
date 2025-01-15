@@ -2,6 +2,7 @@
 using NSL.SocketCore.Extensions.Buffer;
 using NSL.SocketCore.Utils.Buffer;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace NSL.Extensions.Version.Client.Packets
@@ -30,27 +31,27 @@ namespace NSL.Extensions.Version.Client.Packets
             return packet;
         }
 
-        public static void SendRequest(T client, Action<NSLVersionResult> onResponse, string RPObjectKey = RequestProcessor.DefaultObjectBagKey)
+        public static void SendRequest(T client, Action<NSLVersionResult> onResponse, CancellationToken cancellationToken, string RPObjectKey = RequestProcessor.DefaultObjectBagKey)
         {
             client.ThrowIfObjectBagNull();
 
-            SendRequest(client, GetClientVersionInfo(client), onResponse, RPObjectKey);
+            SendRequest(client, GetClientVersionInfo(client), onResponse, cancellationToken, RPObjectKey);
         }
 
-        public static void SendRequest(T client, NSLVersionInfo versionInfo, Action<NSLVersionResult> onResponse, string RPObjectKey = RequestProcessor.DefaultObjectBagKey)
+        public static void SendRequest(T client, NSLVersionInfo versionInfo, Action<NSLVersionResult> onResponse, CancellationToken cancellationToken, string RPObjectKey = RequestProcessor.DefaultObjectBagKey)
         {
             client.ThrowIfObjectBagNull();
 
-            SendRequest(client.GetRequestProcessor(RPObjectKey), versionInfo, onResponse);
+            SendRequest(client.GetRequestProcessor(RPObjectKey), versionInfo, onResponse, cancellationToken);
         }
 
-        public static void SendRequest(RequestProcessor processor, NSLVersionInfo versionInfo, Action<NSLVersionResult> onResponse)
+        public static void SendRequest(RequestProcessor processor, NSLVersionInfo versionInfo, Action<NSLVersionResult> onResponse, CancellationToken cancellationToken)
         {
             var request = RequestPacketBuffer.Create();
 
             FillPacket(request, versionInfo);
 
-            processor.SendRequest(request, data => { onResponse(NSLVersionResult.ReadResponseFrom(data)); return true; });
+            processor.SendRequest(request, data => { onResponse(NSLVersionResult.ReadResponseFrom(data)); return true; }, cancellationToken);
         }
 
         public static async Task<NSLVersionResult> SendRequestAsync(T client, string RPObjectKey = RequestProcessor.DefaultObjectBagKey)

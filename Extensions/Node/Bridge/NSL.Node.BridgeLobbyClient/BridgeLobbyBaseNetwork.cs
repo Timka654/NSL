@@ -7,6 +7,7 @@ using NSL.Node.BridgeServer.Shared.Response;
 using NSL.SocketCore.Extensions.Buffer;
 using NSL.SocketCore.Utils;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace NSL.Node.BridgeLobbyClient
@@ -88,7 +89,7 @@ namespace NSL.Node.BridgeLobbyClient
 
             PacketWaitBuffer = client.PacketWaitBuffer;
 
-            if (!await TrySign())
+            if (!await TrySign(CancellationToken.None))
             {
                 network.Network.Options.HelperLogger?.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Error, "Invalid identity data");
                 client.Network.Disconnect();
@@ -119,7 +120,7 @@ namespace NSL.Node.BridgeLobbyClient
             await InitNetwork();
         }
 
-        private async Task<bool> TrySign()
+        private async Task<bool> TrySign(CancellationToken cancellationToken)
         {
             var output = RequestPacketBuffer.Create(NodeBridgeLobbyPacketEnum.SignServerRequest);
 
@@ -141,7 +142,7 @@ namespace NSL.Node.BridgeLobbyClient
                 OnStateChanged(State);
 
                 return Task.FromResult(true);
-            });
+            }, cancellationToken);
 
             return signResult;
         }

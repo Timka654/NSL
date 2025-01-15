@@ -66,7 +66,7 @@ namespace NSL.Database.EntityFramework.Filter
         }
 
 
-        public EntityFilterBuilder AddOrder<T>(string propertyPath, bool asc = true)
+        public EntityFilterBuilder AddOrder(string propertyPath, bool asc = true)
         {
             if (currentOrderBlock == null)
                 CreateOrderBlock();

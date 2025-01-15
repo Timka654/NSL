@@ -13,7 +13,8 @@ namespace NSL.Database.EntityFramework.Filter.Models
             {
                 PropertyPath = propertyPath,
                 CompareType = compareType,
-                Value = value.ToString()
+                ValueNull = value == null,
+                Value = value?.ToString()
             });
 
             return this;
