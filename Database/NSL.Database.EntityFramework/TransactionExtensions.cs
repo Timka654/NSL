@@ -52,7 +52,7 @@ namespace NSL.Database.EntityFramework
 
             DbUpdateConcurrencyException? latestEx = null;
 
-            while (i < maxCount) // throw count limit for concurrent - m/b can contains logic error 
+            for (; i < maxCount; i++) // throw count limit for concurrent - m/b can contains logic error 
             {
                 try
                 {

@@ -161,7 +161,7 @@ namespace NSL.Extensions.Session.Example
 
             client.Data.SetNSLSessionInfo(session);
 
-            var recovery = await client.Data.NSLSessionSendRequestAsync();
+            var recovery = await client.Data.NSLSessionSendRequestAsync(CancellationToken.None);
 
             var validInfo = recovery.SessionInfo;
 

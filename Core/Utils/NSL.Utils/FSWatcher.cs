@@ -17,26 +17,15 @@ namespace NSL.Utils
 
         public Action<FileSystemEventArgs> OnAnyChanges { get; set; } = null;
 
-        public FSWatcher(string path, Action<FileSystemEventArgs> onCreated = null, Action<FileSystemEventArgs> onChanged = null, Action<FileSystemEventArgs> onDeleted = null, Action<FileSystemEventArgs> onAnyChanges = null)
+        public FSWatcher(string path) : this(() => new FileSystemWatcher(path))
+        { }
+
+        public FSWatcher(string path, string filter) : this(() => new FileSystemWatcher(path, filter))
+        { }
+
+        public FSWatcher(Func<FileSystemWatcher> buildWatcherAction)
         {
-            OnCreated = onCreated;
-            OnChanged = onChanged;
-            OnDeleted = onDeleted;
-            OnAnyChanges = onAnyChanges;
-
-            fsWatcher = new FileSystemWatcher(path);
-
-            initWatcher();
-        }
-
-        public FSWatcher(string path, string filter, Action<FileSystemEventArgs> onCreated = null, Action<FileSystemEventArgs> onChanged = null, Action<FileSystemEventArgs> onDeleted = null, Action<FileSystemEventArgs> onAnyChanges = null)
-        {
-            OnCreated = onCreated;
-            OnChanged = onChanged;
-            OnDeleted = onDeleted;
-            OnAnyChanges = onAnyChanges;
-
-            fsWatcher = new FileSystemWatcher(path, filter);
+            fsWatcher = buildWatcherAction();
 
             initWatcher();
         }
