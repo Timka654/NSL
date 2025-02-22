@@ -41,16 +41,16 @@ namespace NSL.ASPNET
         /// <param name="host"></param>
         /// <param name="removeInputAfterProcess"></param>
         /// <returns></returns>
-        public static bool RebuildIndexFileVersion(this IHost host, bool removeInputAfterProcess = true)
+        public static bool RebuildHtmlIndexFileVersion(this IHost host, bool removeInputAfterProcess = true)
         {
             var updateIndexFilePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "index.html.update");
 
             var indexFilePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "index.html");
 
-            return host.RebuildFileVersion(updateIndexFilePath, indexFilePath, removeInputAfterProcess);
+            return host.RebuildHtmlFileVersion(updateIndexFilePath, indexFilePath, removeInputAfterProcess);
         }
 
-        public static bool RebuildFileVersion(this IHost host, string inputFilePath, string outputFilePath, bool removeInputAfterProcess = true)
+        public static bool RebuildHtmlFileVersion(this IHost host, string inputFilePath, string outputFilePath, bool removeInputAfterProcess = true)
         {
             if (!System.IO.File.Exists(inputFilePath))
                 return false;
@@ -87,8 +87,11 @@ namespace NSL.ASPNET
 
                     if (!src.StartsWith("http") && !string.IsNullOrEmpty(src))
                     {
-                        src = $"{src}?ver={ver}";
-                        item.SetAttributeValue("src", src);
+                        if (!src.Contains("ver"))
+                        {
+                            src = $"{src}?ver={ver}";
+                            item.SetAttributeValue("src", src);
+                        }
                     }
                 }
                 else if (item.Name == "link")
@@ -97,8 +100,11 @@ namespace NSL.ASPNET
 
                     if (!href.StartsWith("http") && !string.IsNullOrEmpty(href))
                     {
-                        href = $"{href}?ver={ver}";
-                        item.SetAttributeValue("href", href);
+                        if (!href.Contains("ver"))
+                        {
+                            href = $"{href}?ver={ver}";
+                            item.SetAttributeValue("href", href);
+                        }
                     }
                 }
 

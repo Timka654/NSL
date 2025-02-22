@@ -7,6 +7,11 @@ namespace NSL.Generators.HttpEndPointGenerator.Shared.Attributes
     {
         public HttpEndPointContainerGenerateAttribute() { }
 
-        public HttpEndPointContainerGenerateAttribute(string path) { }
+        public HttpEndPointContainerGenerateAttribute(string path)
+        {
+            Path = path;
+        }
+
+        public string Path { get; }
     }
 }

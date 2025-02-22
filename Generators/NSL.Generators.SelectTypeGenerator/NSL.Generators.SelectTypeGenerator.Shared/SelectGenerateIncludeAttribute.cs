@@ -9,6 +9,11 @@ namespace NSL.Generators.SelectTypeGenerator.Attributes
         /// Include property to model for select generate
         /// </summary>
         /// <param name="models"></param>
-        public SelectGenerateIncludeAttribute(params string[] models) { }
+        public SelectGenerateIncludeAttribute(params string[] models)
+        {
+            Models = models;
+        }
+
+        public string[] Models { get; }
     }
 }

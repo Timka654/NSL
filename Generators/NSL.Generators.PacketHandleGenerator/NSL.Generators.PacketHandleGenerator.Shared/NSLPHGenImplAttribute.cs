@@ -36,7 +36,11 @@ namespace NSL.Generators.PacketHandleGenerator.Shared
         public NSLAccessModifierEnum Modifier { get; set; }
 
         public bool IsAsync { get; set; }
+        public string[] Models { get; }
 
-        public NSLPHGenImplAttribute(params string[] models) { }
+        public NSLPHGenImplAttribute(params string[] models)
+        {
+            Models = models;
+        }
     }
 }

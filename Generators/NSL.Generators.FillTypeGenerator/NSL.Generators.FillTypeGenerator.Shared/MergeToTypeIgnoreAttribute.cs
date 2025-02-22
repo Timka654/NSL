@@ -6,6 +6,11 @@ namespace NSL.Generators.FillTypeGenerator.Attributes
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = true)]
     public class MergeToTypeIgnoreAttribute : Attribute
     {
-        public MergeToTypeIgnoreAttribute(Type forTypeIgnore) { }
+        public MergeToTypeIgnoreAttribute(Type forTypeIgnore)
+        {
+            ForTypeIgnore = forTypeIgnore;
+        }
+
+        public Type ForTypeIgnore { get; }
     }
 }

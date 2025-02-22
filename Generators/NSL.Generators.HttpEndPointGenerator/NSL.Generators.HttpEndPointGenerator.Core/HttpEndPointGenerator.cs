@@ -183,7 +183,7 @@ namespace NSL.Generators.HttpEndPointGenerator
 
                                 _p.AddRange(GetParameter(mparams));
 
-                                _p.Add($"{BaseHttpRequestOptionsFullName} __options = null");
+                                _p.Add($"{BaseHttpRequestOptionsFullName}? __options = null");
 
 
                                 CodeBuilder methodBuilder = new CodeBuilder();
@@ -206,7 +206,7 @@ namespace NSL.Generators.HttpEndPointGenerator
                                 if (_t == "Post")
                                 {
                                     if (!mparams.Any())
-                                        methodBuilder.AppendLine($".PostEmptyAsync({_vname}Url)");
+                                        methodBuilder.AppendLine($".PostEmptyAsync({_vname}Url, __options)");
                                     //if (mparams.Length == 1 && !mparams[0].GetAttributes().Any(x=>x.AttributeClass.Name.Equals(ParameterAttributeFullName) && (GenHttpParameterEnum)x.ConstructorArguments[0].Value != GenHttpParameterEnum.Particle))
                                     //    methodBuilder.AppendLine($".PostJsonAsync({_vname}Url, {mparams[0].Name})");
                                     else
@@ -220,7 +220,7 @@ namespace NSL.Generators.HttpEndPointGenerator
                                         methodBuilder.AppendLine("return ____content;");
                                         methodBuilder.PrevTab();
                                         //JsonHttpContent.Create(data)
-                                        methodBuilder.AppendLine("})");
+                                        methodBuilder.AppendLine("}, __options)");
                                     }
                                 }
 

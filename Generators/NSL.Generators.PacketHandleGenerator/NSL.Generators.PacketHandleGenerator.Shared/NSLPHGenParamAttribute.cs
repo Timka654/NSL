@@ -9,15 +9,18 @@ namespace NSL.Generators.PacketHandleGenerator.Shared
     public class NSLPHGenArgAttribute : Attribute
     {
         public string Name { get; set; }
+        public Type ItemType { get; }
+        public string BinaryModel { get; }
 
         public NSLPHGenArgAttribute(Type itemType)
         {
-
+            ItemType = itemType;
         }
 
         public NSLPHGenArgAttribute(Type itemType, string binaryModel)
         {
-
+            ItemType = itemType;
+            BinaryModel = binaryModel;
         }
     }
 }

@@ -7,7 +7,11 @@ namespace NSL.Generators.SelectTypeGenerator.Attributes
     {
         public SelectGenerateModelJoinAttribute(string model, params string[] includeModels)
         {
-                
+            Model = model;
+            IncludeModels = includeModels;
         }
+
+        public string Model { get; }
+        public string[] IncludeModels { get; }
     }
 }

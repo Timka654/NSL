@@ -10,12 +10,16 @@ namespace NSL.Generators.PacketHandleGenerator.Shared
     {
         public NSLPHGenResultAttribute(Type type)
         {
-
+            Type = type;
         }
 
         public NSLPHGenResultAttribute(Type type, string binaryModel)
         {
-
+            Type = type;
+            BinaryModel = binaryModel;
         }
+
+        public Type Type { get; }
+        public string BinaryModel { get; }
     }
 }

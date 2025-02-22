@@ -9,6 +9,11 @@ namespace NSL.Generators.FillTypeGenerator.Attributes
         /// Include property/field on generate method to fill with model
         /// </summary>
         /// <param name="models"></param>
-        public FillTypeGenerateIncludeAttribute(params string[] models) { }
+        public FillTypeGenerateIncludeAttribute(params string[] models)
+        {
+            Models = models;
+        }
+
+        public string[] Models { get; }
     }
 }

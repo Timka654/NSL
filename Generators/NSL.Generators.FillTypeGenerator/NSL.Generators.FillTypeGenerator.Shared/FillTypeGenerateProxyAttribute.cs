@@ -9,13 +9,23 @@ namespace NSL.Generators.FillTypeGenerator.Attributes
         /// From unconfigured models to child object model change on fill
         /// </summary>
         /// <param name="toModel"></param>
-        public FillTypeGenerateProxyAttribute(string toModel) { }
+        public FillTypeGenerateProxyAttribute(string toModel)
+        {
+            ToModel = toModel;
+        }
 
         /// <summary>
         /// Configure model to child object model change on fill
         /// </summary>
         /// <param name="fromModel"></param>
         /// <param name="toModel"></param>
-        public FillTypeGenerateProxyAttribute(string fromModel, string toModel) { }
+        public FillTypeGenerateProxyAttribute(string fromModel, string toModel)
+        {
+            FromModel = fromModel;
+            ToModel = toModel;
+        }
+
+        public string ToModel { get; }
+        public string FromModel { get; }
     }
 }

@@ -10,6 +10,9 @@ namespace NSL.Generators.PacketHandleGenerator.Shared
     [AttributeUsage(AttributeTargets.Field)]
     public class NSLPHGenAttribute : Attribute
     {
+        public NSLPacketTypeEnum PacketType { get; }
+        public string[] Models { get; }
+
         /// <summary>
         /// 
         /// </summary>
@@ -17,7 +20,8 @@ namespace NSL.Generators.PacketHandleGenerator.Shared
         /// <param name="models">Models for include to <see cref="NSLPHGenImplAttribute"/></param>
         public NSLPHGenAttribute(NSLPacketTypeEnum packetType, params string[] models)
         {
-                
+            PacketType = packetType;
+            Models = models;
         }
 
         /// <summary>
@@ -26,7 +30,7 @@ namespace NSL.Generators.PacketHandleGenerator.Shared
         /// <param name="models">Models for include to <see cref="NSLPHGenImplAttribute"/></param>
         public NSLPHGenAttribute(params string[] models)
         {
-                
+            Models = models;
         }
     }
 }

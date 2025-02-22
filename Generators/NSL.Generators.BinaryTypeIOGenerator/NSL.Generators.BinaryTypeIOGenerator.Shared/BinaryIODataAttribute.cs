@@ -8,7 +8,9 @@ namespace NSL.Generators.BinaryTypeIOGenerator.Attributes
     {
         public BinaryIODataAttribute(params string[] @for)
         {
-
+            For = @for;
         }
+
+        public string[] For { get; }
     }
 }

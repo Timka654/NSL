@@ -1,6 +1,7 @@
 ﻿using NSL.HttpClient.Validators;
 using System;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace NSL.HttpClient
@@ -15,6 +16,8 @@ namespace NSL.HttpClient
         public IHttpResponseContentValidator Validator { get; set; }
 
         public RequestClientBuildHandler ClientHandler { get; set; }
+
+        public CancellationToken CancellationToken { get; set; } = CancellationToken.None;
 
         /// <summary>
         /// 
@@ -35,6 +38,8 @@ namespace NSL.HttpClient
         public static BaseHttpRequestOptions Create(JsonSerializerOptions jsonOptions) => new BaseHttpRequestOptions() { JsonOptions = jsonOptions };
 
         public static BaseHttpRequestOptions Create(RequestClientBuildHandler clientHandler) => new BaseHttpRequestOptions() { ClientHandler = clientHandler };
+
+        public static BaseHttpRequestOptions Create(CancellationToken cancellationToken) => new BaseHttpRequestOptions() { CancellationToken = cancellationToken };
 
         public static BaseHttpRequestOptions Create() => new BaseHttpRequestOptions();
 
@@ -61,6 +66,12 @@ namespace NSL.HttpClient
         public BaseHttpRequestOptions WithClientHandler(RequestClientBuildHandler clientHandler)
         {
             ClientHandler = clientHandler;
+            return this;
+        }
+
+        public BaseHttpRequestOptions WithCancellationToken(CancellationToken cancellationToken)
+        {
+            CancellationToken = cancellationToken;
             return this;
         }
 

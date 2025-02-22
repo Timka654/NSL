@@ -1,0 +1,31 @@
+{
+  "profiles": {
+    "CommandLineHandler.Tests": {
+      "commandName": "Project"
+    },
+    "worp": {
+      "commandName": "Project",
+      "commandLineArgs": "run test -echo /echo2 /echo3"
+    },
+    "wrp": {
+      "commandName": "Project",
+      "commandLineArgs": "run test -echo /echo2 /echo3 /string:s"
+    },
+    "wrpao": {
+      "commandName": "Project",
+      "commandLineArgs": "run test -echo /echo2 /echo3 /string=s /optional=dev"
+    },
+    "ic": {
+      "commandName": "Project",
+      "commandLineArgs": "run test2 -echo /echo2 /echo3 /string=s /optional=dev"
+    },
+    "help": {
+      "commandName": "Project",
+      "commandLineArgs": "run test help"
+    },
+    "wa": {
+      "commandName": "Project",
+      "commandLineArgs": "run test2"
+    }
+  }
+}

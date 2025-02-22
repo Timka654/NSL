@@ -5,6 +5,11 @@ namespace NSL.Generators.BinaryTypeIOGenerator.Attributes
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
     public class NSLBIOIncludeAttribute : Attribute
     {
-        public NSLBIOIncludeAttribute(params string[] models) { }
+        public NSLBIOIncludeAttribute(params string[] models)
+        {
+            Models = models;
+        }
+
+        public string[] Models { get; }
     }
 }

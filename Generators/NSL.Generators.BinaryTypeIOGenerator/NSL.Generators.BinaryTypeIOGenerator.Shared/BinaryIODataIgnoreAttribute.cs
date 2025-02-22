@@ -8,7 +8,9 @@ namespace NSL.Generators.BinaryTypeIOGenerator.Attributes
     {
         public BinaryIODataIgnoreAttribute(params string[] @for)
         {
-
+            For = @for;
         }
+
+        public string[] For { get; }
     }
 }

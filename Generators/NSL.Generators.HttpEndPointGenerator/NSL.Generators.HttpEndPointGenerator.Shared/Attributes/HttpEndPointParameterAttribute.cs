@@ -5,7 +5,12 @@ namespace NSL.Generators.HttpEndPointGenerator.Shared.Attributes
     [AttributeUsage(AttributeTargets.Parameter)]
     public class HttpEndPointParameterAttribute : Attribute
     {
-        public HttpEndPointParameterAttribute(GenHttpParameterEnum type = GenHttpParameterEnum.Normal) { }
+        public HttpEndPointParameterAttribute(GenHttpParameterEnum type = GenHttpParameterEnum.Normal)
+        {
+            Type = type;
+        }
+
+        public GenHttpParameterEnum Type { get; }
     }
 
     public enum GenHttpParameterEnum

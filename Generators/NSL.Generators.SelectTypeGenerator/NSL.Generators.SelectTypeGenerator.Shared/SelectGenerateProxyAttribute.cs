@@ -9,13 +9,23 @@ namespace NSL.Generators.SelectTypeGenerator.Attributes
         /// From unconfigured models to child object model change on select
         /// </summary>
         /// <param name="toModel"></param>
-        public SelectGenerateProxyAttribute(string toModel) { }
+        public SelectGenerateProxyAttribute(string toModel)
+        {
+            ToModel = toModel;
+        }
 
         /// <summary>
         /// Configure model to child object model change on select
         /// </summary>
         /// <param name="fromModel"></param>
         /// <param name="toModel"></param>
-        public SelectGenerateProxyAttribute(string fromModel, string toModel) { }
+        public SelectGenerateProxyAttribute(string fromModel, string toModel)
+        {
+            FromModel = fromModel;
+            ToModel = toModel;
+        }
+
+        public string FromModel { get; }
+        public string ToModel { get; }
     }
 }
