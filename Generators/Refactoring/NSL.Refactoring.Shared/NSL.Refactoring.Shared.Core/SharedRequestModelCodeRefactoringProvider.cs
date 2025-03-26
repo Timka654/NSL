@@ -69,13 +69,13 @@ namespace NSL.Refactoring.Shared
 
             context.RegisterRefactoring(PreviewedCodeAction.Create(
                 string.Format("Generate create request model \"{0}\"", createIdentifier),
-                (c, preview) => SharedBuilder.CreateSharedModel(sharedProj, createIdentifier, modelsFullPath, sharedRootPath, context.Document, c, preview, doc => BuildDocumentContent(typeDecl, doc))));
+                (c, preview) => SharedBuilder.CreateSharedModel(typeDecl, sharedProj, createIdentifier, modelsFullPath, sharedRootPath, context.Document, c, preview, doc => BuildDocumentContent(typeDecl, doc))));
 
             var editIdentifier = $"Edit{defaultIdentifier}RequestModel";
 
             context.RegisterRefactoring(PreviewedCodeAction.Create(
                 string.Format("Generate edit request model \"{0}\"", editIdentifier),
-                (c, preview) => SharedBuilder.CreateSharedModel(sharedProj, editIdentifier, modelsFullPath, sharedRootPath, context.Document, c, preview, doc => BuildDocumentContent(typeDecl, doc))));
+                (c, preview) => SharedBuilder.CreateSharedModel(typeDecl, sharedProj, editIdentifier, modelsFullPath, sharedRootPath, context.Document, c, preview, doc => BuildDocumentContent(typeDecl, doc))));
 
             context.RegisterRefactoring(PreviewedCodeAction.Create(
                 string.Format("Generate both request models for \"{0}\"", defaultIdentifier),
@@ -86,11 +86,11 @@ namespace NSL.Refactoring.Shared
         {
             var createIdentifier = $"Create{defaultIdentifier}RequestModel";
 
-            var sol = await SharedBuilder.CreateSharedModel(sharedProj, createIdentifier, modelsFullPath, sharedRootPath, sourceDoc, cancellationToken, preview, doc => BuildDocumentContent(rootNode, doc));
+            var sol = await SharedBuilder.CreateSharedModel(rootNode,sharedProj, createIdentifier, modelsFullPath, sharedRootPath, sourceDoc, cancellationToken, preview, doc => BuildDocumentContent(rootNode, doc));
 
             var editIdentifier = $"Edit{defaultIdentifier}RequestModel";
 
-            sol = await SharedBuilder.CreateSharedModel(sharedProj, editIdentifier, modelsFullPath, sharedRootPath, sourceDoc, cancellationToken, preview, doc => BuildDocumentContent(rootNode, doc), sol);
+            sol = await SharedBuilder.CreateSharedModel(rootNode,sharedProj, editIdentifier, modelsFullPath, sharedRootPath, sourceDoc, cancellationToken, preview, doc => BuildDocumentContent(rootNode, doc), sol);
 
             return sol;
         }

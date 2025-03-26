@@ -26,23 +26,31 @@ namespace NSL.ASPNET.Mvc
             return await action();
         }
 
-        public static IActionResult ProcessRequest(this ControllerBase controller, Action action, Func<IActionResult> result)
+        public static async Task<TActionResult> ProcessRequestAsync<TActionResult>(this ControllerBase controller, Func<Task> action, Func<TActionResult> result)
+            where TActionResult : IActionResult
         {
             if (!controller.ModelState.IsValid)
-                return controller.ModelStateResponse();
-
-            action();
+            {
+                await controller.ModelStateResponse().ExecuteResultAsync(controller.ControllerContext);
+                return default;
+            }
+            await action();
 
             return result();
         }
 
-        public static IActionResult ProcessRequest(this ControllerBase controller, Func<IActionResult> action)
+        public static async Task<TActionResult> ProcessRequestAsync<TActionResult>(this ControllerBase controller, Func<Task<TActionResult>> action)
+            where TActionResult : IActionResult
         {
             if (!controller.ModelState.IsValid)
-                return controller.ModelStateResponse();
+            {
+                await controller.ModelStateResponse().ExecuteResultAsync(controller.ControllerContext);
+                return default;
+            }
 
-            return action();
+            return await action();
         }
+
 
         public static IActionResult IdResponse(this ControllerBase controller, object id)
             => controller.Ok(new { id });

@@ -70,6 +70,7 @@ namespace NSL.Refactoring.Shared
             context.RegisterRefactoring(PreviewedCodeAction.Create(
                 string.Format("Generate entity model \"{0}\"", createIdentifier),
                 (c, preview) => SharedBuilder.CreateSharedModel(
+                    typeDecl,
                     sharedProj,
                     createIdentifier,
                     modelsFullPath,
