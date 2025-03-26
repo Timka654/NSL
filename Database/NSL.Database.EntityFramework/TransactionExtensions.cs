@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace NSL.Database.EntityFramework
@@ -10,16 +11,16 @@ namespace NSL.Database.EntityFramework
         public delegate Task<bool> InvokeDelegate<TContext>(TContext db);
         public delegate Task<bool> InvokeDelegate2<TContext>(TContext db, InvokeDbActionContext invokeContext);
 
-        public static async Task<bool> InvokeDbTransactionAsync<TContext>(this IServiceProvider services, InvokeDelegate<TContext> action, int maxCount = 100)
+        public static async Task<bool> InvokeDbTransactionAsync<TContext>(this IServiceProvider services, InvokeDelegate<TContext> action, int maxCount = 100, CancellationToken cancellationToken = default)
             where TContext : DbContext
         {
             await using var scope = services.CreateAsyncScope();
 
             return await scope.ServiceProvider.GetRequiredService<TContext>()
-                .InvokeTransactionAsync(action, maxCount);
+                .InvokeTransactionAsync(action, maxCount, cancellationToken);
         }
 
-        public static async Task<bool> InvokeDbTransactionAsync<TContext>(this IServiceProvider services, InvokeDelegate2<TContext> action, int maxCount = 100)
+        public static async Task<bool> InvokeDbTransactionAsync<TContext>(this IServiceProvider services, InvokeDelegate2<TContext> action, int maxCount = 100, CancellationToken cancellationToken = default)
             where TContext : DbContext
         {
             await using var scope = services.CreateAsyncScope();
@@ -35,7 +36,7 @@ namespace NSL.Database.EntityFramework
                 ++invokeContext.Iter;
 
                 return action(db, invokeContext);
-            }, maxCount);
+            }, maxCount, cancellationToken);
 
             if (result && invokeContext.PostAction != null)
                 await invokeContext.PostAction();
@@ -43,7 +44,7 @@ namespace NSL.Database.EntityFramework
             return result;
         }
 
-        public static async Task<bool> InvokeTransactionAsync<TContext>(this TContext context, InvokeDelegate<TContext> action, int maxCount = 100)
+        public static async Task<bool> InvokeTransactionAsync<TContext>(this TContext context, InvokeDelegate<TContext> action, int maxCount = 100, CancellationToken cancellationToken = default)
             where TContext : DbContext
         {
             int i = 0;
@@ -52,19 +53,19 @@ namespace NSL.Database.EntityFramework
 
             DbUpdateConcurrencyException? latestEx = null;
 
-            for (; i < maxCount; i++) // throw count limit for concurrent - m/b can contains logic error 
+            for (; i < maxCount && !cancellationToken.IsCancellationRequested; i++) // throw count limit for concurrent - m/b can contains logic error 
             {
                 try
                 {
                     await context.Database.CreateExecutionStrategy().ExecuteAsync(async () =>
                     {
-                        using var t = await context.Database.BeginTransactionAsync();
+                        using var t = await context.Database.BeginTransactionAsync(cancellationToken);
 
                         if (await action(context))
                         {
-                            await context.SaveChangesAsync();
+                            await context.SaveChangesAsync(cancellationToken);
 
-                            await t.CommitAsync();
+                            await t.CommitAsync(cancellationToken);
 
                             result = true;
                         }
@@ -81,7 +82,7 @@ namespace NSL.Database.EntityFramework
                     if (dbu.Entries != null)
                         foreach (var entity in dbu.Entries)
                         {
-                            await entity.ReloadAsync();
+                            await entity.ReloadAsync(cancellationToken);
                         }
                 }
                 catch (Exception ex)
@@ -99,7 +100,7 @@ namespace NSL.Database.EntityFramework
             return false;
         }
 
-        public static async Task<bool> InvokeTransactionAsync<TContext>(this TContext context, InvokeDelegate2<TContext> action, int maxCount = 100)
+        public static async Task<bool> InvokeTransactionAsync<TContext>(this TContext context, InvokeDelegate2<TContext> action, int maxCount = 100, CancellationToken cancellationToken = default)
             where TContext : DbContext
         {
             InvokeDbActionContext invokeContext = new()
@@ -113,7 +114,7 @@ namespace NSL.Database.EntityFramework
                 ++invokeContext.Iter;
 
                 return action(db, invokeContext);
-            }, maxCount);
+            }, maxCount, cancellationToken);
 
             if (result && invokeContext.PostAction != null)
                 await invokeContext.PostAction();

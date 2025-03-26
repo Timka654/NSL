@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace NSL.Database.EntityFramework.Filter.Host
@@ -22,16 +23,16 @@ namespace NSL.Database.EntityFramework.Filter.Host
             return DBSetFilter<T>.Filter(queryBuilder(set), query);
         }
 
-        public static async Task<FilterResultModel<T>> ToDataResultAsync<T>(this DBSetFilteredResult<T> query)
+        public static async Task<EntityFilterResultModel<T>> ToDataResultAsync<T>(this DBSetFilteredResult<T> query, CancellationToken cancellationToken = default)
             where T : class
         {
-            return await query.GetDataResultAsync(query.Data);
+            return await query.GetDataResultAsync(query.Data, cancellationToken);
         }
 
-        public static async Task<FilterResultModel<TResult>> ToDataResultAsync<T, TResult>(this DBSetFilteredResult<T> query, Func<IQueryable<T>, IQueryable<TResult>> builder)
+        public static async Task<EntityFilterResultModel<TResult>> ToDataResultAsync<T, TResult>(this DBSetFilteredResult<T> query, Func<IQueryable<T>, IQueryable<TResult>> builder, CancellationToken cancellationToken = default)
             where T : class
         {
-            return await query.GetDataResultAsync(builder(query.Data));
+            return await query.GetDataResultAsync(builder(query.Data), cancellationToken);
         }
 
         /// <summary>

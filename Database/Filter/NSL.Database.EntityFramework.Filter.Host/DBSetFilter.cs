@@ -120,7 +120,7 @@ namespace NSL.Database.EntityFramework.Filter.Host
             }
         }
 
-        private static void BuildPropertyOrder(ParameterExpression li, FilterPropertyOrderViewModel property, ref IQueryable<T> order, bool first)
+        private static void BuildPropertyOrder(ParameterExpression li, EntityFilterPropertyOrderModel property, ref IQueryable<T> order, bool first)
         {
             string command = first ?
                 property.ASC ? "OrderBy" : "OrderByDescending" :

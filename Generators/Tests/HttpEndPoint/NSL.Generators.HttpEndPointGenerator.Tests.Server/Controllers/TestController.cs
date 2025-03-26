@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using NSL.ASPNET.ModelBinders;
+using NSL.ASPNET.Mvc;
 using NSL.ASPNET.Mvc.Route.Attributes;
 using NSL.Generators.FillTypeGenerator.Tests.Develop.WithModelName;
 using NSL.Generators.HttpEndPointGenerator.Tests.Shared;
@@ -14,6 +15,7 @@ namespace NSL.Generators.HttpEndPointGenerator.Tests.Server.Controllers
         {
             return Ok();
         }
+
         [HttpPostAction]
         public async Task<IActionResult> TestPost2([FromForm,ModelBinder<FormDataJsonBinder>] WithModelName3 query)
         {
@@ -49,5 +51,14 @@ namespace NSL.Generators.HttpEndPointGenerator.Tests.Server.Controllers
         {
             return Ok();
         }
+
+
+        [HttpPostAction]
+        public async Task<DataResponseResult<TestBaseModel1>> NewPost1([FromForm] WithModelName2 query)
+        {
+            return DataResponseResult.Ok(new TestBaseModel1() { Abc1 = 1, Abc2 = 2 });
+        }
+
+
     }
 }

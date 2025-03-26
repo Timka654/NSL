@@ -17,23 +17,23 @@ namespace NSL.BlazorTemplate.Client.Services
 
         private const string StorageKey = "Identity.Token";
 
-        protected override async Task<string?> ReadToken()
+        protected override async Task<string?> ReadTokenAsync(CancellationToken cancellationToken = default)
         {
-            if (!await localStorage.ContainKeyAsync(StorageKey))
+            if (!await localStorage.ContainKeyAsync(StorageKey, cancellationToken))
                 return default;
 
-            return await localStorage.GetItemAsStringAsync(StorageKey);
+            return await localStorage.GetItemAsStringAsync(StorageKey, cancellationToken);
         }
 
-        protected override async Task SaveToken(string? token)
+        protected override async Task SaveTokenAsync(string? token, CancellationToken cancellationToken = default)
         {
             if (token == default)
             {
-                await localStorage.RemoveItemAsync(StorageKey);
+                await localStorage.RemoveItemAsync(StorageKey, cancellationToken);
                 return;
             }
 
-            await localStorage.SetItemAsStringAsync(StorageKey, token);
+            await localStorage.SetItemAsStringAsync(StorageKey, token, cancellationToken);
         }
     }
 }

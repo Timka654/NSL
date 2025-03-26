@@ -152,7 +152,7 @@ namespace NSL.ASPNET.Mvc
         public static IActionResult ModelStateResponse(ModelStateDictionary modelState)
             => BadRequest(formatModelState(modelState));
 
-        private static object formatModelState(ModelStateDictionary modelState)
+        internal static object formatModelState(ModelStateDictionary modelState)
             => modelState.ToDictionary(x => x.Key, x => x.Value.Errors.Select(b => b.ErrorMessage).ToArray());
     }
 }

@@ -41,7 +41,7 @@ namespace NSL.WebSockets.Server.AspNetPoint
         /// </summary>
         public void Run()
         {
-            throw new NotSupportedException($"AspNet example working on all http appilication live cycle");
+            throw new NotSupportedException($"AspNet example working on all http application live cycle");
         }
 
         /// <summary>
@@ -49,7 +49,7 @@ namespace NSL.WebSockets.Server.AspNetPoint
         /// </summary>
         public void Stop()
         {
-            throw new NotSupportedException($"AspNet example working on all http appilication live cycle");
+            throw new NotSupportedException($"AspNet example working on all http application live cycle");
         }
 
         /// <summary>

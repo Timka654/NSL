@@ -15,5 +15,7 @@ namespace NSL.Generators.SelectTypeGenerator.Attributes
         }
 
         public string[] Models { get; }
+
+        public bool Typed { get; set; } = true;
     }
 }

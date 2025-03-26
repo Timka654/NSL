@@ -6,6 +6,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Net.Http;
 using System.Security.Claims;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace NSL.ASPNET.Identity.JWT
@@ -57,7 +58,7 @@ namespace NSL.ASPNET.Identity.JWT
 
         public override IEnumerable<string> Roles => _Roles;
 
-        protected override async Task ReadClaims()
+        protected override async Task ReadClaimsAsync(CancellationToken cancellationToken = default)
         {
             if (!IsAuthenticated)
             {
@@ -72,7 +73,7 @@ namespace NSL.ASPNET.Identity.JWT
             catch (Exception ex)
             {
                 ReadingClaimsErrorHandle(AuthorizationToken, ex);
-                await ClearIdentity();
+                await ClearIdentityAsync(cancellationToken);
             }
         }
 

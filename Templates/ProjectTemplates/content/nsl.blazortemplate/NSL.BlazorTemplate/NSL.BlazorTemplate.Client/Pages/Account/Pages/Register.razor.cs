@@ -28,7 +28,7 @@ namespace NSL.BlazorTemplate.Client.Pages.Account.Pages
 
             if (response.IsSuccess)
             {
-                await HubIdentityService.SetIdentity(response.Data);
+                await HubIdentityService.SetIdentityAsync(response.Data);
                 NavigationManager.NavigateTo(ReturnUrl ?? string.Empty);
             }
             else if (response.IsBadRequest)

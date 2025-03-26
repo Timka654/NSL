@@ -3,6 +3,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using NSL.Generators.HttpEndPointGenerator.Shared.Attributes;
 using NSL.Generators.HttpEndPointGenerator.Shared.Fake.Attributes;
 using NSL.Generators.HttpEndPointGenerator.Shared.Fake.Interfaces;
+using NSL.Generators.HttpEndPointGenerator.Utils;
 using NSL.Generators.Utils;
 using System;
 using System.Collections.Generic;
@@ -40,7 +41,15 @@ namespace NSL.Generators.HttpEndPointGenerator
 #endif
             foreach (var item in methodSyntaxReceiver.Types)
             {
-                ProcessHttpEndPoint(context, item);
+                try
+                {
+                    ProcessHttpEndPoint(context, item);
+                }
+                catch (Exception ex)
+                {
+
+                    context.ShowHttpEndPointDiagnostics($"NSLHTTPEP002", $"Error - {ex} on type {item.Identifier.Text}", DiagnosticSeverity.Error, item.GetLocation());
+                }
             }
         }
 
@@ -146,12 +155,25 @@ namespace NSL.Generators.HttpEndPointGenerator
 
                         var genAttribute = mattrbs.FirstOrDefault(x => x.AttributeClass.Name.Equals(GenerateAttributeFullName));
 
-                        if (genAttribute == null)
-                            continue;
-
                         var returnType = genAttribute?.ConstructorArguments.FirstOrDefault().Value as ITypeSymbol;
 
                         var url = genAttribute?.ConstructorArguments.ElementAtOrDefault(1).Value as string;
+
+                        if (genAttribute == null)
+                        {
+                            GenDebug.Break(true);
+                            var rt = ms.ReturnType as INamedTypeSymbol;
+
+                            if (rt.ConstructedFrom.GetTypeFullName() == TaskConstructedFromTypeFullName)
+                            {
+                                rt = rt.TypeArguments.FirstOrDefault() as INamedTypeSymbol;
+                            }
+
+                            if (rt == null)
+                                continue;
+
+                            returnType = rt;
+                        }
 
                         if (url == default)
                         {
@@ -440,5 +462,7 @@ namespace NSL.Generators.HttpEndPointGenerator
 
         private readonly string RouteAttributeFullName = "RouteAttribute";
         private readonly string BaseHttpRequestOptionsFullName = "BaseHttpRequestOptions";
+
+        private const string TaskConstructedFromTypeFullName = "System.Threading.Tasks.Task<TResult>";
     }
 }

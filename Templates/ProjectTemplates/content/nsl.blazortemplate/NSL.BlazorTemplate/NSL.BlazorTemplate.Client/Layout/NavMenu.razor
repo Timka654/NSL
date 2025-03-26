@@ -48,7 +48,7 @@
                 <div class="nav-item px-3">
                     @* <form action="Account/Logout" method="post"> *@
                     @* <input type="hidden" name="ReturnUrl" value="@currentUrl" /> *@
-                    <button @onclick="IdentityService.ClearIdentity" class="nav-link">
+                    <button @onclick="()=>IdentityService.ClearIdentityAsync(CancellationToken.None)" class="nav-link">
                         <span class="bi bi-arrow-bar-left-nav-menu" aria-hidden="true"></span> Logout
                     </button>
                     @* </form> *@

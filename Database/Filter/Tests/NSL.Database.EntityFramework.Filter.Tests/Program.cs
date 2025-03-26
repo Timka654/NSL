@@ -25,16 +25,16 @@ namespace NSL.Database.EntityFramework.Filter.Tests
 
             await context.SaveChangesAsync();
 
-            EntityFilterBuilder builder = EntityFilterBuilder.Create()
+            var builder = EntityFilterBuilder.Create()
                 .CreateFilterBlock(b => b
-                    .AddFilter(nameof(TestEntityModel.NullCheckDate), Enums.CompareType.NotEquals, null)
+                    .AddProperty(nameof(TestEntityModel.NullCheckDate), Enums.CompareType.NotEquals, null)
                     //.AddFilter(nameof(TestEntityModel.Content), Enums.CompareType.ContainsCase, "bb")
                 )
-                .AddOrder(nameof(TestEntityModel.NullCheckDate));
+                .AddOrderProperty(nameof(TestEntityModel.NullCheckDate));
 
 
             var result = await context.Tests
-                .Filter(builder.ToFilter())
+                .Filter(builder.GetFilter())
                 .ToDataResultAsync();
         }
     }

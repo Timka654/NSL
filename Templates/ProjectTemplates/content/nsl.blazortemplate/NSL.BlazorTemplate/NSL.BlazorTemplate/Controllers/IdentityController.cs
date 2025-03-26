@@ -16,7 +16,7 @@ namespace NSL.BlazorTemplate.Controllers
         AppSignInManager signInManager) : Controller, IIdentityController
     {
         [HttpPostAction]
-        public async Task<IActionResult> Login([FromBody] IdentityLoginRequestModel query)
+        public async Task<IActionResult> Login([FromBody] IdentityLoginRequestModel query, CancellationToken cancellationToken = default)
             => await this.ProcessRequestAsync(async () =>
             {
                 var user = await signInManager.UserManager.FindByNameAsync(query.Email);
@@ -39,7 +39,7 @@ namespace NSL.BlazorTemplate.Controllers
             });
 
         [HttpPostAction]
-        public async Task<IActionResult> Register([FromBody] IdentityRegisterRequestModel query)
+        public async Task<IActionResult> Register([FromBody] IdentityRegisterRequestModel query, CancellationToken cancellationToken)
             => await this.ProcessRequestAsync(async () =>
             {
                 var u = new UserModel()

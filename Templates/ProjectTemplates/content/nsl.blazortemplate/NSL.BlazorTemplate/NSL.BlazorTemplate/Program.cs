@@ -8,6 +8,7 @@ using NSL.BlazorTemplate.Client.Pages;
 using NSL.BlazorTemplate.Shared.Models;
 using NSL.BlazorTemplate.Shared.Server.Data;
 using NSL.BlazorTemplate.Shared.Server.Manages;
+using System.Net;
 
 namespace NSL.BlazorTemplate
 {

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Security.Claims;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace NSL.ASPNET.Identity.ClientIdentity
@@ -39,40 +40,40 @@ namespace NSL.ASPNET.Identity.ClientIdentity
         public bool IsAuthenticated
             => AuthorizationToken != default;
 
-        protected abstract Task<string?> ReadToken();
+        protected abstract Task<string?> ReadTokenAsync(CancellationToken cancellationToken = default);
 
-        protected abstract Task SaveToken(string? token);
+        protected abstract Task SaveTokenAsync(string? token, CancellationToken cancellationToken = default);
 
         public abstract string GetAuthenticationScheme();
 
         public abstract IEnumerable<Claim>? GetClaims();
 
 
-        protected abstract Task ReadClaims();
+        protected abstract Task ReadClaimsAsync(CancellationToken cancellationToken = default);
 
-        public async Task LoadIdentity()
+        public async Task LoadIdentityAsync(CancellationToken cancellationToken = default)
         {
-            await SetIdentity(await ReadToken(), false);
+            await SetIdentityAsync(await ReadTokenAsync(cancellationToken), false);
         }
 
         public bool ExistsAnyRole(params string[] roleNames)
             => roleNames.Any(roleName => Roles.Contains(roleName));
 
-        public async Task SetIdentity(string? jwtToken, bool save = true)
+        public async Task SetIdentityAsync(string? jwtToken, bool save = true, CancellationToken cancellationToken = default)
         {
             AuthorizationToken = jwtToken;
 
-            await ReadClaims();
+            await ReadClaimsAsync(cancellationToken);
 
             if (save)
-                await SaveToken(AuthorizationToken);
+                await SaveTokenAsync(AuthorizationToken, cancellationToken);
 
             identityStateProvider.LoadAuthState(this);
         }
 
-        public async Task ClearIdentity()
+        public async Task ClearIdentityAsync(CancellationToken cancellationToken = default)
         {
-            await SetIdentity(default);
+            await SetIdentityAsync(default, true, cancellationToken);
         }
 
         #endregion

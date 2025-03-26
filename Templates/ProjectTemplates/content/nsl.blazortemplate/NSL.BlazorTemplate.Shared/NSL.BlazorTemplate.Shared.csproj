@@ -24,12 +24,12 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <PackageReference Include="NSL.Generators.FillTypeGenerator" Version="2024.8.13.1657" />
-	  <PackageReference Include="NSL.Generators.FillTypeGenerator.Attributes" Version="2024.8.13.1657" />
-	  <PackageReference Include="NSL.Generators.HttpEndPointGenerator.Shared" Version="2024.8.13.1657" />
-	  <PackageReference Include="NSL.Generators.SelectTypeGenerator.Attributes" Version="2024.8.13.1657" />
-	  <PackageReference Include="NSL.HttpClient" Version="2024.8.13.1657" />
-	  <PackageReference Include="NSL.Refactoring.Shared" Version="2024.8.13.1657">
+	  <PackageReference Include="NSL.Generators.FillTypeGenerator" Version="2025.3.26.451" />
+	  <PackageReference Include="NSL.Generators.FillTypeGenerator.Shared" Version="2025.3.26.451" />
+	  <PackageReference Include="NSL.Generators.HttpEndPointGenerator.Shared" Version="2025.3.26.451" />
+	  <PackageReference Include="NSL.Generators.SelectTypeGenerator.Shared" Version="2025.3.26.451" />
+	  <PackageReference Include="NSL.HttpClient" Version="2025.3.26.451" />
+	  <PackageReference Include="NSL.Refactoring.Shared" Version="2025.3.26.451">
 	    <PrivateAssets>all</PrivateAssets>
 	    <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 	  </PackageReference>

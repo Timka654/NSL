@@ -24,7 +24,7 @@ namespace NSL.ASPNET.Identity.ClientIdentity.MessageHandlers
             var response = await base.SendAsync(request, cancellationToken);
 
             if (response.IsSuccessStatusCode == false && response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
-                await identityService.SetIdentity(default);
+                await identityService.ClearIdentityAsync(cancellationToken);
 
             return response;
         }

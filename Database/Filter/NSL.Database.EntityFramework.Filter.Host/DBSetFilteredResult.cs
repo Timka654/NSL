@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using NSL.Database.EntityFramework.Filter.Models;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace NSL.Database.EntityFramework.Filter.Host
@@ -14,14 +15,14 @@ namespace NSL.Database.EntityFramework.Filter.Host
 
         public long Count => CountQuery.LongCount();
 
-        public FilterResultModel<T> GetDataResult()
-            => new FilterResultModel<T> { Data = Data.ToArray(), Count = Count };
+        public EntityFilterResultModel<T> GetDataResult()
+            => new EntityFilterResultModel<T> { Data = Data.ToArray(), Count = Count };
 
-        public async Task<FilterResultModel<T>> GetDataResultAsync()
-            => new FilterResultModel<T> { Data = await Data.ToArrayAsync(), Count = await CountQuery.LongCountAsync() };
+        public async Task<EntityFilterResultModel<T>> GetDataResultAsync(CancellationToken cancellationToken = default)
+            => new EntityFilterResultModel<T> { Data = await Data.ToArrayAsync(cancellationToken), Count = await CountQuery.LongCountAsync(cancellationToken) };
 
-        public async Task<FilterResultModel<TType>> GetDataResultAsync<TType>(IQueryable<TType> dataQuery)
-            => new FilterResultModel<TType> { Data = await dataQuery.ToArrayAsync(), Count = await CountQuery.LongCountAsync() };
+        public async Task<EntityFilterResultModel<TType>> GetDataResultAsync<TType>(IQueryable<TType> dataQuery, CancellationToken cancellationToken = default)
+            => new EntityFilterResultModel<TType> { Data = await dataQuery.ToArrayAsync(cancellationToken), Count = await CountQuery.LongCountAsync(cancellationToken) };
     }
 
 }

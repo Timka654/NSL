@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace NSL.ASPNET.Configuration
@@ -36,14 +37,15 @@ namespace NSL.ASPNET.Configuration
         /// <param name="set"></param>
         /// <param name="item"></param>
         /// <returns>have any for update</returns>
-        public static async Task<bool> TryUpdateValueAsync<TItem>(this DbSet<TItem> set, TItem item)
+        public static async Task<bool> TryUpdateValueAsync<TItem>(this DbSet<TItem> set, TItem item, CancellationToken cancellationToken = default)
             where TItem : DbConfigurationItemModel
         {
             return await set
                     .Where(x => x.Name == item.Name)
                     .ExecuteUpdateAsync(x => x
                         .SetProperty(x => x.UpdateTime, DateTime.UtcNow)
-                        .SetProperty(x => x.Value, item.Value)) > 0;
+                        .SetProperty(x => x.Value, item.Value)
+                        , cancellationToken) > 0;
         }
     }
 }

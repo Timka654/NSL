@@ -23,8 +23,8 @@
 
             List<WithModelName1> aa = new List<WithModelName1>();
 
-            var t = aa.Selectabc2().FirstOrDefault();
-            var t2 = aa.Selectabc1();
+            var t = aa.SelectTypedabc2().FirstOrDefault();
+            var t2 = aa.SelectTypedabc1();
 
 
             List<WithModelName4> bb = new List<WithModelName4>();

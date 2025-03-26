@@ -6,6 +6,7 @@ using NSL.ASPNET.Identity.ClientIdentity.Providers;
 using NSL.ASPNET.Identity.ClientIdentity.Providers.Options;
 using System;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace NSL.ASPNET.Identity.ClientIdentity
@@ -101,11 +102,11 @@ namespace NSL.ASPNET.Identity.ClientIdentity
         public static IServiceCollection AddHttpMessageIdentityHandler(this IServiceCollection services)
             => services.AddTransient<HttpMessageIdentityHandler>();
 
-        public static async Task LoadIdentityAsync(this IServiceProvider services)
-            => await services.LoadIdentityAsync<IdentityService>();
+        public static async Task LoadIdentityAsync(this IServiceProvider services, CancellationToken cancellationToken = default)
+            => await services.LoadIdentityAsync<IdentityService>(cancellationToken);
 
-        public static async Task LoadIdentityAsync<TIService>(this IServiceProvider services)
+        public static async Task LoadIdentityAsync<TIService>(this IServiceProvider services, CancellationToken cancellationToken = default)
             where TIService : IdentityService
-            => await services.GetRequiredService<TIService>().LoadIdentity();
+            => await services.GetRequiredService<TIService>().LoadIdentityAsync(cancellationToken);
     }
 }

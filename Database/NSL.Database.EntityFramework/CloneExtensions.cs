@@ -4,25 +4,26 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace NSL.Database.EntityFramework
 {
     public static class CloneExtensions
     {
-        private static async Task LoadUnattachedAsync(DbContext dbContext, object value, IReadOnlyList<RuntimeProperty> p = null)
+        private static async Task LoadUnattachedAsync(DbContext dbContext, object value, IReadOnlyList<RuntimeProperty> p = null, CancellationToken cancellationToken = default)
         {
             var entry = dbContext.Entry(value);
 
             foreach (var collectionItem in entry.Collections)
             {
-                await collectionItem.LoadAsync();
+                await collectionItem.LoadAsync(cancellationToken);
 
                 var key = (collectionItem.Metadata as RuntimeNavigation).ForeignKey;
 
                 foreach (var item in collectionItem.CurrentValue)
                 {
-                    await LoadUnattachedAsync(dbContext, item, key.Properties);
+                    await LoadUnattachedAsync(dbContext, item, key.Properties, cancellationToken);
                 }
             }
 
@@ -65,15 +66,15 @@ namespace NSL.Database.EntityFramework
         /// <param name="dbContext"></param>
         /// <param name="key"></param>
         /// <returns></returns>
-        public static async Task<TEntity> LoadUnattachedAsync<TEntity>(this DbContext dbContext, params object[] key)
+        public static async Task<TEntity> LoadUnattachedAsync<TEntity>(this DbContext dbContext, CancellationToken cancellationToken, params object[] key)
             where TEntity : class
         {
-            var value = await dbContext.Set<TEntity>().FindAsync(key);
+            var value = await dbContext.Set<TEntity>().FindAsync(key, cancellationToken);
 
             if (value == default)
                 return null;
 
-            await LoadUnattachedAsync(dbContext, value);
+            await LoadUnattachedAsync(dbContext, value, cancellationToken: cancellationToken);
 
             return value;
         }
@@ -85,10 +86,10 @@ namespace NSL.Database.EntityFramework
         /// <param name="dbContext"></param>
         /// <param name="key"></param>
         /// <returns></returns>
-        public static async Task<bool> CloneEntityAsync<TEntity>(this DbContext dbContext, params object[] key)
+        public static async Task<bool> CloneEntityAsync<TEntity>(this DbContext dbContext, CancellationToken cancellationToken, params object[] key)
             where TEntity : class
         {
-            var value = await dbContext.LoadUnattachedAsync<TEntity>(key);
+            var value = await dbContext.LoadUnattachedAsync<TEntity>(cancellationToken, key);
 
             if (value == null)
                 return false;

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace NSL.Generators.SelectTypeGenerator.Tests
 {
-    [SelectGenerate("abc1", "abc2")]
+    [SelectGenerate("abc1", "abc2", Typed = true)]
     public partial class WithModelName1
     {
         [SelectGenerateInclude("abc1")] public int Abc1 { get; set; }
@@ -27,5 +27,7 @@ namespace NSL.Generators.SelectTypeGenerator.Tests
 
         [SelectGenerateInclude("abc2")] public WithModelName3 AbcModel2 { get; set; }
     }
+
+
 }
 #endif
