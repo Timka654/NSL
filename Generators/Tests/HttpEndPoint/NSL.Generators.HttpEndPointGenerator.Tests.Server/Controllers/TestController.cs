@@ -54,9 +54,9 @@ namespace NSL.Generators.HttpEndPointGenerator.Tests.Server.Controllers
 
 
         [HttpPostAction]
-        public async Task<DataResponseResult<TestBaseModel1>> NewPost1([FromForm] WithModelName2 query)
+        public async Task<DataResponse<TestBaseModel1>> NewPost1([FromForm] WithModelName2 query)
         {
-            return DataResponseResult.Ok(new TestBaseModel1() { Abc1 = 1, Abc2 = 2 });
+            return DataResponse.Ok(new TestBaseModel1() { Abc1 = 1, Abc2 = 2 });
         }
 
 

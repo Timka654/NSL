@@ -42,7 +42,7 @@ namespace NSL.Database.EntityFramework.Filter
                 block = value.OrderQuery.LastOrDefault();
             }
 
-            block.Properties.Add(new FilterPropertyOrderViewModel() { PropertyPath = propertyPath, ASC = asc });
+            block.Properties.Add(new EntityFilterPropertyOrderModel() { PropertyPath = propertyPath, ASC = asc });
             return value;
 
         }

@@ -1,6 +1,7 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using NSL.Generators.Utils;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -107,10 +108,27 @@ namespace NSL.Refactoring.Shared
                     if (sharedProj.Documents.Any(x => Equals(x.FilePath, endPath)))
                         continue;
 
+                    string summary = string.Empty;
+
+                    if (sourceDoc.TryGetSyntaxTree(out var tree) && sourceDoc.TryGetSemanticModel(out var sem))
+                    {
+
+                        var root = await tree.GetRootAsync();
+                        var classDeclSyntax = root.DescendantNodes()
+                                      .OfType<ClassDeclarationSyntax>()
+                                      .FirstOrDefault();
+                        if (classDeclSyntax != null)
+                        {
+                            var tsymb = sem.GetDeclaredSymbol(classDeclSyntax) as ITypeSymbol;
+                            summary = $"Generate for <see cref=\"{tsymb.GetTypeSeeCRef()}\"/>";
+                        }
+                    }
+
                     var srcContent = new StreamReader(stream).ReadToEnd();
 
                     srcContent = srcContent.Replace("$rootnamespace$", ns);
                     srcContent = srcContent.Replace("$safeitemname$", newName);
+                    srcContent = srcContent.Replace("$model_summary$", summary);
 
                     if (onPostDocumentContent != null)
                         srcContent = onPostDocumentContent(name, srcContent);

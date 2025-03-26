@@ -66,6 +66,11 @@ namespace NSL.Generators.SelectTypeGenerator
                 namespaces.Add("System.Collections.Generic");
             }
 
+            classBuilder.AppendSummary(b =>
+            {
+                b.AppendSummaryLine($"Generate for <see cref=\"{typeSymb.GetTypeSeeCRef()}\"/>");
+            });
+
             classBuilder.CreateStaticClass(typeClass, $"{typeClass.GetClassName()}_Selection", () =>
             {
                 var attrbs = typeClass.AttributeLists

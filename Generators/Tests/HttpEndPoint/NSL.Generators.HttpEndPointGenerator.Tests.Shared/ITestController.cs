@@ -5,9 +5,8 @@ using Microsoft.AspNetCore.Mvc;
 using NSL.Generators.HttpEndPointGenerator.Shared.Fake;
 using NSL.Generators.HttpEndPointGenerator.Shared.Fake.Attributes;
 using NSL.Generators.HttpEndPointGenerator.Shared.Fake.Interfaces;
-using NSL.HttpClient.Models.Results;
-#endif
 using NSL.HttpClient.Models;
+#endif
 
 using NSL.Generators.FillTypeGenerator.Tests.Develop.WithModelName;
 using NSL.Generators.HttpEndPointGenerator.Shared.Attributes;
@@ -17,7 +16,7 @@ namespace NSL.Generators.HttpEndPointGenerator.Tests.Shared
     [HttpEndPointContainerGenerate("api/[controller]")]
     public interface ITestController
     {
-        Task<DataResponseResult<TestBaseModel1>> NewPost1([FromForm] WithModelName2 query);
+        Task<DataResponse<TestBaseModel1>> NewPost1([FromForm] WithModelName2 query);
 
         [HttpEndPointGenerate(typeof(IdResponse<Guid>))] public Task<IActionResult> TestPost([FromForm, HttpEndPointParameter(GenHttpParameterEnum.Particle)] WithModelName2 query);
 

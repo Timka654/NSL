@@ -108,7 +108,7 @@ namespace NSL.Refactoring.Shared
 
             var c = ns.Members.First() as ClassDeclarationSyntax;
 
-            c = c.WithMembers(new SyntaxList<MemberDeclarationSyntax>(properties));
+            c = c.WithMembers(new SyntaxList<MemberDeclarationSyntax>(properties.Select(x=>x.WithAttributeLists(new SyntaxList<AttributeListSyntax>()))));
 
             ns = ns.WithMembers(new SyntaxList<MemberDeclarationSyntax>(c));
 

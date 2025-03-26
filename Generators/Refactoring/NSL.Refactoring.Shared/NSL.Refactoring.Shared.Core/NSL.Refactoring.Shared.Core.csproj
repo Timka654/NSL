@@ -41,5 +41,8 @@
 		<EmbeddedResource Include="Templates\Shared\ItemModel.cs" />
 		<EmbeddedResource Include="Templates\Shared\ItemModel.Server.cs" />
 	</ItemGroup>
+	<ItemGroup>
+	  <ProjectReference Include="..\..\..\NSL.Generators.Utils\NSL.Generators.Utils.csproj" />
+	</ItemGroup>
 
 </Project>

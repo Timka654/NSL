@@ -166,6 +166,12 @@ namespace NSL.Generators.FillTypeGenerator
         {
             CodeBuilder methodBuilder = new CodeBuilder();
 
+
+            methodBuilder.AppendSummary(b =>
+            {
+                b.AppendSummaryLine($"Generate for fill <see cref=\"{fromType.GetTypeSeeCRef()}\"/> to  <see cref=\"{toType.GetTypeSeeCRef()}\"/>");
+            });
+
             methodBuilder.AppendLine($"{(@internal ? "internal" : "public")} void Fill{model}{(dir ? "To" : "From")}({toType.Name} {(dir ? "to" : "from")}Fill)");
 
             methodBuilder.AppendLine("{");
