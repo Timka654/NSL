@@ -73,7 +73,7 @@ namespace NSLLibProjectFileFormatter.Project.CSPROJ
                         configurations.AddRange(new[] { "UnityDebug", "Unity" });
                 }
 
-                projects.Add(new ProjectFileInfo(path, configurations.ToArray(), Path.GetRelativePath(this.path, Path.GetDirectoryName(path) + "/..")));
+                projects.Add(new ProjectFileInfo(path, configurations.ToArray(), Path.GetRelativePath(this.path, Path.GetDirectoryName(path) + "/.."), NSLProjectTypes));
 
                 return;
             }
@@ -401,7 +401,7 @@ namespace NSLLibProjectFileFormatter.Project.CSPROJ
 
             File.WriteAllText(path, v);
 
-            projects.Add(new ProjectFileInfo(path, configurations.ToArray(), Path.GetRelativePath(this.path, Path.GetDirectoryName(path) + "/..")));
+            projects.Add(new ProjectFileInfo(path, configurations.ToArray(), Path.GetRelativePath(this.path, Path.GetDirectoryName(path) + "/.."), NSLProjectTypes));
         }
 
         public bool HasUnitySupport(List<string> types)

@@ -40,10 +40,66 @@
 		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.3.1" PrivateAssets="all" />
 	</ItemGroup>
 
+	<!--<ItemGroup>
+		<ProjectReference Include="..\..\..\..\Generators\NSL.Generators.BinaryGenerator\NSL.Generators.BinaryGenerator.csproj" PrivateAssets="all" />
+		<ProjectReference Include="..\..\..\..\Generators\NSL.Generators.Utils\NSL.Generators.Utils.csproj" PrivateAssets="all" />
+		<ProjectReference Include="..\NSL.Extensions.RPC\NSL.Extensions.RPC.csproj" PrivateAssets="all" />
+	</ItemGroup>-->
+
 	<ItemGroup>
-		<ProjectReference Include="..\..\..\..\Generators\NSL.Generators.BinaryGenerator\NSL.Generators.BinaryGenerator.csproj" PrivateAssets="all" OutputItemType="Analyzer" />
-		<ProjectReference Include="..\..\..\..\Generators\NSL.Generators.Utils\NSL.Generators.Utils.csproj" PrivateAssets="all" OutputItemType="Analyzer" />
-		<ProjectReference Include="..\NSL.Extensions.RPC\NSL.Extensions.RPC.csproj" PrivateAssets="all" OutputItemType="Analyzer" />
+		<Compile Include="..\..\..\..\Core\NSL.SocketCore\**\*.cs" Exclude="..\..\..\..\Core\NSL.SocketCore\**\bin\**;..\..\..\..\Core\NSL.SocketCore\**\obj\**">
+			<Link>NSL.SocketCore\%(RecursiveDir)%(FileName)%(Extension)</Link>
+		</Compile>
+	</ItemGroup>
+
+	<ItemGroup>
+		<Compile Include="..\..\..\..\Core\NSL.EndPointBuilder\**\*.cs" Exclude="..\..\..\..\Core\NSL.EndPointBuilder\**\bin\**;..\..\..\..\Core\NSL.EndPointBuilder\**\obj\**">
+			<Link>NSL.EndPointBuilder\%(RecursiveDir)%(FileName)%(Extension)</Link>
+		</Compile>
+	</ItemGroup>
+
+	<ItemGroup>
+		<Compile Include="..\..\..\..\Core\NSL.SocketClient\**\*.cs" Exclude="..\..\..\..\Core\NSL.SocketClient\**\bin\**;..\..\..\..\Core\NSL.SocketClient\**\obj\**">
+			<Link>NSL.SocketClient\%(RecursiveDir)%(FileName)%(Extension)</Link>
+		</Compile>
+	</ItemGroup>
+
+	<ItemGroup>
+		<Compile Include="..\..\..\..\Core\NSL.SocketServer\**\*.cs" Exclude="..\..\..\..\Core\NSL.SocketServer\**\bin\**;..\..\..\..\Core\NSL.SocketServer\**\obj\**">
+			<Link>NSL.SocketServer\%(RecursiveDir)%(FileName)%(Extension)</Link>
+		</Compile>
+	</ItemGroup>
+	
+	<ItemGroup>
+		<Compile Include="..\..\..\..\Core\Utils\NSL.Utils\**\*.cs" Exclude="..\..\..\..\Core\Utils\NSL.Utils\**\bin\**;..\..\..\..\Core\Utils\NSL.Utils\**\obj\**">
+			<Link>NSL.Utils\%(RecursiveDir)%(FileName)%(Extension)</Link>
+		</Compile>
+	</ItemGroup>
+	<ItemGroup>
+		<Compile Include="..\..\..\..\Generators\NSL.Generators.BinaryGenerator\**\*.cs" Exclude="..\..\..\..\Generators\NSL.Generators.BinaryGenerator\**\bin\**;..\..\..\..\Generators\NSL.Generators.BinaryGenerator\**\obj\**">
+			<Link>NSL.Generators.BinaryGenerator\%(RecursiveDir)%(FileName)%(Extension)</Link>
+		</Compile>
+	</ItemGroup>
+
+	<ItemGroup>
+		<Compile Include="..\..\..\..\Generators\NSL.Generators.Utils\**\*.cs" Exclude="..\..\..\..\Generators\NSL.Generators.Utils\**\bin\**;..\..\..\..\Generators\NSL.Generators.Utils\**\obj\**">
+			<Link>NSL.Generators.Utils\\%(RecursiveDir)%(FileName)%(Extension)</Link>
+		</Compile>
+	</ItemGroup>
+
+	<ItemGroup>
+		<Compile Include="..\NSL.Extensions.RPC\**\*.cs" Exclude="..\NSL.Extensions.RPC\**\bin\**;..\NSL.Extensions.RPC\**\obj\**">
+			<Link>NSL.Extensions.RPC\%(RecursiveDir)%(FileName)%(Extension)</Link>
+		</Compile>
+	</ItemGroup>
+	<ItemGroup>
+		<Compile Remove="..\..\..\..\Core\Utils\NSL.Utils\CommandLine\**" />
+	</ItemGroup>
+	<ItemGroup>
+		<Compile Remove="..\..\..\..\Core\Utils\NSL.Utils\IOUtils.cs" />
+		<Compile Remove="..\..\..\..\Core\Utils\NSL.Utils\NSLConsoleOutput.cs" />
+		<Compile Remove="..\..\..\..\Core\Utils\NSL.Utils\PermissionUtils.cs" />
+		<Compile Remove="..\..\..\..\Core\Utils\NSL.Utils\Token.cs" />
 	</ItemGroup>
 
 </Project>

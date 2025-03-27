@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<NSLProjectTypes>UnitySupport;Analyzer;AnalyzerCore</NSLProjectTypes>
@@ -43,8 +43,20 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\NSL.Generators.SelectTypeGenerator.Shared\NSL.Generators.SelectTypeGenerator.Shared.csproj" PrivateAssets="all" OutputItemType="Analyzer" />
-		<ProjectReference Include="..\..\NSL.Generators.Utils\NSL.Generators.Utils.csproj" PrivateAssets="all" OutputItemType="Analyzer" />
+		<Compile Include="..\NSL.Generators.SelectTypeGenerator.Shared\**\*.cs"
+			  Exclude="..\NSL.Generators.SelectTypeGenerator.Shared\**\bin\**;..\NSL.Generators.SelectTypeGenerator.Shared\**\obj\**">
+			<Link>NSL.Generators.SelectTypeGenerator.Shared\%(RecursiveDir)%(FileName)%(Extension)</Link>
+		</Compile>
 	</ItemGroup>
+	<ItemGroup>
+		<Compile Include="..\..\NSL.Generators.Utils\**\*.cs"
+			  Exclude="..\..\NSL.Generators.Utils\**\bin\**;..\..\NSL.Generators.Utils\**\obj\**">
+			<Link>NSL.Generators.Utils\%(RecursiveDir)%(FileName)%(Extension)</Link>
+		</Compile>
+	</ItemGroup>
+	<!--<ItemGroup>
+		<ProjectReference Include="..\NSL.Generators.SelectTypeGenerator.Shared\NSL.Generators.SelectTypeGenerator.Shared.csproj" PrivateAssets="all" OutputItemType="Analyzer"/>
+		<ProjectReference Include="..\..\NSL.Generators.Utils\NSL.Generators.Utils.csproj" PrivateAssets="all" OutputItemType="Analyzer"/>
+	</ItemGroup>-->
 
 </Project>

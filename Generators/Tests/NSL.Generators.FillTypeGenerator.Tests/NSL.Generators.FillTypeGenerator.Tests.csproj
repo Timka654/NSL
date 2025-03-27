@@ -24,8 +24,8 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\NSL.Generators.FillTypeGenerator\NSL.Generators.FillTypeGenerator.Shared\NSL.Generators.FillTypeGenerator.Shared.csproj" />
-		<ProjectReference Include="..\..\NSL.Generators.FillTypeGenerator\NSL.Generators.FillTypeGenerator.Core\NSL.Generators.FillTypeGenerator.Core.csproj" ReferenceOutputAssembly="false" PrivateAssets="all" OutputItemType="Analyzer" />
+		<ProjectReference Include="..\..\NSL.Generators.FillTypeGenerator\NSL.Generators.FillTypeGenerator.Core\NSL.Generators.FillTypeGenerator.Core.csproj" PrivateAssets="all" OutputItemType="Analyzer" />
+		
 		<ProjectReference Include="..\NSL.Generators.FillTypeGenerator.Tests.From\NSL.Generators.FillTypeGenerator.Tests.From.csproj" />
 	</ItemGroup>
 

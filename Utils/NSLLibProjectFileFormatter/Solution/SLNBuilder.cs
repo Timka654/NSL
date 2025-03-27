@@ -81,9 +81,9 @@ EndProject");
                 {
                     var targetProfile = profile;
 
-                    if (isVsix)
+                    if (isVsix || projectPath.Info.nSLProjectTypes?.Contains("Test") == true)
                     {
-                        targetProfile = profile.Contains("Debug") ? $"Debug" : "Release";
+                        targetProfile =  profile.Contains("Debug") ? $"Debug" : "Release";
                     }
 
                     foreach (var arch in Archs)

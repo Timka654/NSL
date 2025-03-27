@@ -38,7 +38,7 @@ namespace BufferAnlyzeTests
         {
 
             int i = 9999;
-            Test("noExep", () =>
+            Test("noExep", (sw) =>
             {
                 if (i > 255)
                 {
