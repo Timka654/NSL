@@ -29,6 +29,10 @@
 		</PackageReference>
 		<PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.8.0" />
 	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\..\NSL.Generators.Utils\NSL.Generators.Utils.csproj" />
+	</ItemGroup>
 	<ItemGroup>
 		<Compile Remove="Templates\Entity\EntityItemModel.cs" />
 		<Compile Remove="Templates\Shared\ItemModel.Client.cs" />
@@ -40,9 +44,6 @@
 		<EmbeddedResource Include="Templates\Shared\ItemModel.Client.cs" />
 		<EmbeddedResource Include="Templates\Shared\ItemModel.cs" />
 		<EmbeddedResource Include="Templates\Shared\ItemModel.Server.cs" />
-	</ItemGroup>
-	<ItemGroup>
-	  <ProjectReference Include="..\..\..\NSL.Generators.Utils\NSL.Generators.Utils.csproj" />
 	</ItemGroup>
 
 </Project>

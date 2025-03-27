@@ -14,8 +14,8 @@
 		<Dependency Id="Microsoft.Framework.NDP" DisplayName="Microsoft .NET Framework" d:Source="Manual" Version="[4.5,)" />
 	</Dependencies>
 	<Assets>
-		<Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="Project" d:ProjectName="NSL.Refactoring.Shared" Path="|NSL.Refactoring.Shared|" />
-		<Asset Type="Microsoft.VisualStudio.Analyzer" d:Source="Project" d:ProjectName="NSL.Refactoring.Shared" Path="|NSL.Refactoring.Shared|" />
+		<Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="Project" d:ProjectName="NSL.Refactoring.Shared.Core" Path="|NSL.Refactoring.Shared.Core|" />
+		<Asset Type="Microsoft.VisualStudio.Analyzer" d:Source="Project" d:ProjectName="NSL.Refactoring.Shared.Core" Path="|NSL.Refactoring.Shared.Core|" />
 	</Assets>
 	<Prerequisites>
 		<Prerequisite Id="Microsoft.VisualStudio.Component.CoreEditor" Version="[17.0,18.0)" DisplayName="Visual Studio core editor" />
