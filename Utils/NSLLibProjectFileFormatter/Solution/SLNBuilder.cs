@@ -96,18 +96,18 @@ EndProject");
 
             foreach (var item in pathes.Values)
             {
-                slnProjects.Add($@"Project(""{{{FolderProjectTypeId}}}"") = ""{item.Dir}"", ""{item.Dir}"", ""{{{item.Id}}}""
+                slnProjects.Add($@"Project(""{{{FolderProjectTypeId}}}"") = ""{item.Dir}"", ""{item.Dir}"", ""{{{item.UpperId}}}""
 EndProject");
             }
 
             foreach (var dir in pathes.Values)
             {
                 if (dir.Parent != null)
-                    nestedProjects.Add($@"{{{dir.Id}}} = {{{dir.Parent.Id}}}");
+                    nestedProjects.Add($@"{{{dir.UpperId}}} = {{{dir.Parent.UpperId}}}");
 
                 foreach (var proj in dir.Projects)
                 {
-                    nestedProjects.Add($@"{{{proj.UppedId}}} = {{{dir.Id}}}");
+                    nestedProjects.Add($@"{{{proj.UppedId}}} = {{{dir.UpperId}}}");
                 }
             }
 

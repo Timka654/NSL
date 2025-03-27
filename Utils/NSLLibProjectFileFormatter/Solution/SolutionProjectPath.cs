@@ -7,6 +7,7 @@
         public string Dir { get; set; }
 
         public Guid Id { get; set; } = Guid.NewGuid();
+        public string UpperId => Id.ToString().ToUpper();
 
         public Dictionary<string, SolutionProjectPath> Pathes { get; set; } = new();
 
