@@ -13,12 +13,13 @@ using NSL.Extensions.RPC.Generator.Models;
 using NSL.Extensions.RPC.Generator.Utils;
 using NSL.Generators.Utils;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 
 namespace NSL.Extensions.RPC.Generator
 {
     [Generator]
-    internal class RPCGenerator : ISourceGenerator
+    internal class RPCGenerator : IIncrementalGenerator
     {
         internal static ClassDeclComparer classDeclComparer = new ClassDeclComparer();
         internal static MethodDeclarationSyntaxComparer methodDeclarationSyntaxComparer = new MethodDeclarationSyntaxComparer();
@@ -31,21 +32,38 @@ namespace NSL.Extensions.RPC.Generator
 
         public static string GetClassRPCHandleName(ClassDeclarationSyntax classDecl)
             => $"{classDecl.GetClassName()}RPCRepository";
+        #region ISourceGenerator
 
-        private void ProcessRPCMethods(GeneratorExecutionContext context, RPCMethodAttributeSyntaxReceiver syntaxReceiver)
+        public void Initialize(IncrementalGeneratorInitializationContext context)
+        {
+            var pip = context.SyntaxProvider.CreateSyntaxProvider(
+                RPCMethodAttributeSyntaxReceiver.OnVisitSyntaxNode,
+                (syntax, _) => syntax)
+                .Collect();
+
+            context.RegisterSourceOutput(pip, ProcessRPCMethods);
+        }
+
+        #endregion
+
+        private void ProcessRPCMethods(SourceProductionContext context, ImmutableArray<GeneratorSyntaxContext> items)
         {
 #if DEBUG
             //GenDebug.Break();
 #endif
 
-            var data = syntaxReceiver.RPCMethods
-                .Select(x => new
+            var data = items
+                .Select(x =>
                 {
-                    Class = (ClassDeclarationSyntax)x.Parent,
-                    Method = x
+                    var method = (MethodDeclarationSyntax)x.Node;
+                    return new
+                    {
+                        Class = (ClassDeclarationSyntax)method.Parent,
+                        Method = method,
+                        Context = x
+                    };
                 })
-                .GroupBy(x => new ClassDeclModel { Class = x.Class, Context = context }, classDeclComparer)
-
+                .GroupBy(x => new ClassDeclModel { Class = x.Class, Context = x.Context }, classDeclComparer)
                 .Select(item =>
                 {
                     item.Key.Methods = item.GroupBy(b => b.Method, methodDeclarationSyntaxComparer)
@@ -75,21 +93,13 @@ namespace NSL.Extensions.RPC.Generator
             }
         }
 
-        public void Execute(GeneratorExecutionContext context)
-        {
-            //GenDebug.Break();
-
-            if (context.SyntaxReceiver is RPCMethodAttributeSyntaxReceiver methodSyntaxReceiver)
-                ProcessRPCMethods(context, methodSyntaxReceiver);
-        }
-
         private SyntaxList<UsingDirectiveSyntax> UpdateUsingDirectives(SyntaxTree originalTree)
         {
             var rootNode = originalTree.GetRoot() as CompilationUnitSyntax;
             return rootNode.Usings;
         }
 
-        private void BuildClass(GeneratorExecutionContext context, ClassDeclModel classDecl)
+        private void BuildClass(SourceProductionContext sourceContext, ClassDeclModel classDecl)
         {
             var ns = classDecl.Class.Parent as NamespaceDeclarationSyntax;
 
@@ -185,7 +195,7 @@ namespace NSL.Extensions.RPC.Generator
 #pragma warning restore RS1035 // Do not use APIs banned for analyzers
 #endif
 
-            context.AddSource($"{classIdentityName}.rpcgen.cs", outputValue);
+            sourceContext.AddSource($"{classIdentityName}.rpcgen.cs", outputValue);
         }
 
         private string BuildContainerNameOverride(ClassDeclModel classDecl)
@@ -194,14 +204,6 @@ namespace NSL.Extensions.RPC.Generator
     typeQualificationStyle: SymbolDisplayTypeQualificationStyle.NameAndContainingTypesAndNamespaces);
 
             return $"public override string GetContainerName() => \"{classDecl.ClassSymbol.ToDisplayString(classNameSymbolDisplayFormat)}\";";
-        }
-
-        public void Initialize(GeneratorInitializationContext context)
-        {
-            //context.RegisterForSyntaxNotifications(() =>
-            //    new RPCMethodAttributeSyntaxReceiver<RPCTypeHandleAttribute>());
-            context.RegisterForSyntaxNotifications(() =>
-                new RPCMethodAttributeSyntaxReceiver());
         }
 
 

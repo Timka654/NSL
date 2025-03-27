@@ -5,16 +5,32 @@ using NSL.Generators.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 
 namespace NSL.Generators.BinaryTypeIOGenerator
 {
-    internal class BinaryIOAttributeSyntaxReceiver : ISyntaxReceiver
+    internal class BinaryIOAttributeSyntaxReceiver /* : ISyntaxReceiver*/
     {
-        public IList<TypeDeclarationSyntax> BinaryIOTypes { get; } = new List<TypeDeclarationSyntax>();
+        //public IList<TypeDeclarationSyntax> BinaryIOTypes { get; } = new List<TypeDeclarationSyntax>();
 
-        string BinaryIOAttributeName = typeof(BinaryIOTypeAttribute).Name;
+        static readonly string BinaryIOAttributeName = typeof(BinaryIOTypeAttribute).Name;
 
-        public void OnVisitSyntaxNode(SyntaxNode syntaxNode)
+        //public void OnVisitSyntaxNode(SyntaxNode syntaxNode)
+        //{
+        //    if (syntaxNode is TypeDeclarationSyntax typeDeclarationSyntax)
+        //    {
+        //        if (typeDeclarationSyntax.AttributeLists.Count > 0)
+        //        {
+        //            if (typeDeclarationSyntax.AttributeLists
+        //                .Any(al => al.Attributes
+        //                    .Any(a => a.GetAttributeFullName().Equals(BinaryIOAttributeName, StringComparison.InvariantCultureIgnoreCase))))
+        //            {
+        //                BinaryIOTypes.Add(typeDeclarationSyntax);
+        //            }
+        //        }
+        //    }
+        //}
+        public static bool OnVisitSyntaxNode(SyntaxNode syntaxNode, CancellationToken cancellationToken)
         {
             if (syntaxNode is TypeDeclarationSyntax typeDeclarationSyntax)
             {
@@ -24,10 +40,12 @@ namespace NSL.Generators.BinaryTypeIOGenerator
                         .Any(al => al.Attributes
                             .Any(a => a.GetAttributeFullName().Equals(BinaryIOAttributeName, StringComparison.InvariantCultureIgnoreCase))))
                     {
-                        BinaryIOTypes.Add(typeDeclarationSyntax);
+                        return true;
                     }
                 }
             }
+
+            return false;
         }
     }
 }

@@ -5,7 +5,7 @@ namespace NSL.Generators.HttpEndPointGenerator.Utils
 {
     public static class GeneratorExecutionContextExtensions
     {
-        public static void ShowHttpEndPointDiagnostics(this GeneratorExecutionContext genContext, string code, string message, DiagnosticSeverity diagnosticSeverity, params Location[] locations)
+        public static void ShowHttpEndPointDiagnostics(this SourceProductionContext genContext, string code, string message, DiagnosticSeverity diagnosticSeverity, params Location[] locations)
         {
             var l = locations.First();
 

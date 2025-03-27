@@ -5,19 +5,20 @@ using NSL.Generators.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 
 namespace NSL.Extensions.RPC.Generator
 {
-    internal class RPCMethodAttributeSyntaxReceiver : ISyntaxReceiver
+    internal class RPCMethodAttributeSyntaxReceiver
     {
-        public IList<MethodDeclarationSyntax> RPCMethods { get; } = new List<MethodDeclarationSyntax>();
+        //public IList<MethodDeclarationSyntax> RPCMethods { get; } = new List<MethodDeclarationSyntax>();
 
-        public IList<MethodDeclarationSyntax> RPCTypeHandleMethods { get; } = new List<MethodDeclarationSyntax>();
+        //public IList<MethodDeclarationSyntax> RPCTypeHandleMethods { get; } = new List<MethodDeclarationSyntax>();
 
-        string RPCMethodAttributeName = typeof(RPCMethodAttribute).Name;
-        string RPCTypeHanleAttributeName = typeof(RPCTypeHandleAttribute).Name;
+        static readonly string RPCMethodAttributeName = typeof(RPCMethodAttribute).Name;
+        static readonly string RPCTypeHandleAttributeName = typeof(RPCTypeHandleAttribute).Name;
 
-        public void OnVisitSyntaxNode(SyntaxNode syntaxNode)
+        public static bool OnVisitSyntaxNode(SyntaxNode syntaxNode, CancellationToken cancellationToken)
         {
             if (syntaxNode is MethodDeclarationSyntax methodDeclarationSyntax)
             {
@@ -27,16 +28,18 @@ namespace NSL.Extensions.RPC.Generator
                         .Any(al => al.Attributes
                             .Any(a => a.GetAttributeFullName().Equals(RPCMethodAttributeName, StringComparison.InvariantCultureIgnoreCase))))
                     {
-                        RPCMethods.Add(methodDeclarationSyntax);
+                        return true;
                     }
-                    else if (methodDeclarationSyntax.AttributeLists
-                        .Any(al => al.Attributes
-                            .Any(a => a.GetAttributeFullName().Equals(RPCTypeHanleAttributeName, StringComparison.InvariantCultureIgnoreCase))))
-                    {
-                        RPCTypeHandleMethods.Add(methodDeclarationSyntax);
-                    }
+                    //else if (methodDeclarationSyntax.AttributeLists
+                    //    .Any(al => al.Attributes
+                    //        .Any(a => a.GetAttributeFullName().Equals(RPCTypeHandleAttributeName, StringComparison.InvariantCultureIgnoreCase))))
+                    //{
+                    //    RPCTypeHandleMethods.Add(methodDeclarationSyntax);
+                    //}
                 }
             }
+
+            return false;
         }
     }
 }

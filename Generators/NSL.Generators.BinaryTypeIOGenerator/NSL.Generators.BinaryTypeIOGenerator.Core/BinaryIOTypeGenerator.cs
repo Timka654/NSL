@@ -2,39 +2,64 @@
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using NSL.Generators.BinaryGenerator;
+using NSL.Generators.BinaryGenerator.Utils;
 using NSL.Generators.BinaryTypeIOGenerator.Attributes;
 using NSL.Generators.BinaryTypeIOGenerator.Models;
 using NSL.Generators.Utils;
 using NSL.SocketCore.Utils.Buffer;
+using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 
 namespace NSL.Generators.BinaryTypeIOGenerator
 {
     [Generator]
-    internal class BinaryIOTypeGenerator : ISourceGenerator
+    internal class BinaryIOTypeGenerator : IIncrementalGenerator
     {
-        private void ProcessBinaryIOTypes(GeneratorExecutionContext context, BinaryIOAttributeSyntaxReceiver methodSyntaxReceiver)
+        #region ISourceGenerator
+
+        public void Initialize(IncrementalGeneratorInitializationContext context)
+        {
+            var pip = context.SyntaxProvider.CreateSyntaxProvider(
+                BinaryIOAttributeSyntaxReceiver.OnVisitSyntaxNode,
+                (syntax, _) => syntax)
+                .Collect();
+
+            context.RegisterSourceOutput(pip, ProcessBinaryIOTypes);
+        }
+
+        #endregion
+        private void ProcessBinaryIOTypes(SourceProductionContext context, ImmutableArray<GeneratorSyntaxContext> types)
         {
 #if DEBUG
             //GenDebug.Break();
 #endif
 
-            foreach (var type in methodSyntaxReceiver.BinaryIOTypes)
+            foreach (var item in types)
             {
-                ProcessBinaryIOType(context, type);
+                var @class = (ClassDeclarationSyntax)item.Node;
+
+                try
+                {
+                    ProcessBinaryIOType(context, item, @class);
+                }
+                catch (Exception ex)
+                {
+                    context.ShowBIODiagnostics($"NSLBIO002", $"Error - {ex} on type {@class.Identifier.Text}", DiagnosticSeverity.Error, @class.GetLocation());
+                }
             }
         }
 
 
-        private void ProcessBinaryIOType(GeneratorExecutionContext context, TypeDeclarationSyntax type)
+        private void ProcessBinaryIOType(SourceProductionContext sourceContext, GeneratorSyntaxContext context, TypeDeclarationSyntax type)
         {
             if (!type.HasPartialModifier())
                 return;
 
             var typeClass = type as ClassDeclarationSyntax;
 
-            var typeSem = context.Compilation.GetSemanticModel(typeClass.SyntaxTree);
+            var typeSem = context.SemanticModel;
 
             var codeBuilder = new CodeBuilder();
 
@@ -118,7 +143,7 @@ namespace NSL.Generators.BinaryTypeIOGenerator
             //#pragma warning restore RS1035 // Do not use APIs banned for analyzers
             //#endif
 
-            context.AddSource($"{typeClass.GetTypeClassName()}.binaryio.cs", codeBuilder.ToString());
+            sourceContext.AddSource($"{typeClass.GetTypeClassName()}.binaryio.cs", codeBuilder.ToString());
         }
 
 
@@ -220,61 +245,6 @@ namespace NSL.Generators.BinaryTypeIOGenerator
             var rootNode = originalTree.GetRoot() as CompilationUnitSyntax;
             return rootNode.Usings;
         }
-
-        #region ISourceGenerator
-
-        public void Execute(GeneratorExecutionContext context)
-        {
-            //if (!context.Compilation.ReferencedAssemblyNames.Any(ai => ai.Name.Equals("NSL.Generators.BinaryGenerator", StringComparison.OrdinalIgnoreCase)))
-            //{
-            //    context.ReportDiagnostic(Diagnostic.Create(
-            //    new DiagnosticDescriptor(
-            //        "SG0001",
-            //        "Not found reference",
-            //        $"Cannot find reference \"NSL.Generators.BinaryGenerator\"",
-            //        "none",
-            //        DiagnosticSeverity.Error,
-            //        true,
-            //        $"Cannot find reference \"NSL.Generators.BinaryGenerator\""), Location.None));
-            //}
-            //if (!context.Compilation.ReferencedAssemblyNames.Any(ai => ai.Name.Equals("NSL.Generators.Utils", StringComparison.OrdinalIgnoreCase)))
-            //{
-            //    context.ReportDiagnostic(Diagnostic.Create(
-            //    new DiagnosticDescriptor(
-            //        "SG0001",
-            //        "Not found reference",
-            //        $"Cannot find reference \"NSL.Generators.Utils\"",
-            //        "none",
-            //        DiagnosticSeverity.Error,
-            //        true, 
-            //        $"Cannot find reference \"NSL.Generators.Utils\""), Location.None));
-            //}
-            //if (!context.Compilation.ReferencedAssemblyNames.Any(ai => ai.Name.Equals("NSL.Generators.BinaryTypeIOGenerator.Attributes", StringComparison.OrdinalIgnoreCase)))
-            //{
-            //    context.ReportDiagnostic(Diagnostic.Create(
-            //    new DiagnosticDescriptor(
-            //        "SG0001",
-            //        "Not found reference",
-            //        $"Cannot find reference \"NSL.Generators.BinaryTypeIOGenerator.Attributes\"",
-            //        "none",
-            //        DiagnosticSeverity.Error,
-            //        true,
-            //        $"Cannot find reference \"NSL.Generators.BinaryTypeIOGenerator.Attributes\""), Location.None));
-            //}
-
-            if (context.SyntaxReceiver is BinaryIOAttributeSyntaxReceiver methodSyntaxReceiver)
-            {
-                ProcessBinaryIOTypes(context, methodSyntaxReceiver);
-            }
-        }
-
-        public void Initialize(GeneratorInitializationContext context)
-        {
-            context.RegisterForSyntaxNotifications(() =>
-                new BinaryIOAttributeSyntaxReceiver());
-        }
-
-        #endregion
 
         private readonly string IOMethodsForAttributeFullName = typeof(BinaryIOMethodsForAttribute).Name;
     }

@@ -5,7 +5,7 @@ namespace NSL.Generators.BinaryGenerator.Utils
 {
     public static class GeneratorExecutionContextExtensions
     {
-        public static void ShowBIODiagnostics(this GeneratorExecutionContext genContext, string code, string message, DiagnosticSeverity diagnosticSeverity, params Location[] locations)
+        public static void ShowBIODiagnostics(this SourceProductionContext genContext, string code, string message, DiagnosticSeverity diagnosticSeverity, params Location[] locations)
         {
             var l = locations.First();
 

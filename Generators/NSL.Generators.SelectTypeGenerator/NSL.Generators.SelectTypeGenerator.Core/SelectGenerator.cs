@@ -1,49 +1,71 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using NSL.Generators.SelectGenerator.Utils;
 using NSL.Generators.SelectTypeGenerator.Attributes;
 using NSL.Generators.Utils;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 
 namespace NSL.Generators.SelectTypeGenerator
 {
     [Generator]
-    internal class SelectGenerator : ISourceGenerator
+    internal class SelectGenerator : IIncrementalGenerator
     {
         #region ISourceGenerator
 
-        public void Execute(GeneratorExecutionContext context)
+        //public void Execute(GeneratorExecutionContext context)
+        //{
+        //    if (context.SyntaxReceiver is SelectAttributeSyntaxReceiver methodSyntaxReceiver)
+        //    {
+        //        ProcessFillTypes(context, methodSyntaxReceiver);
+        //    }
+        //}
+
+
+        public void Initialize(IncrementalGeneratorInitializationContext context)
         {
-            if (context.SyntaxReceiver is SelectAttributeSyntaxReceiver methodSyntaxReceiver)
-            {
-                ProcessFillTypes(context, methodSyntaxReceiver);
-            }
+            var pip = context.SyntaxProvider.CreateSyntaxProvider(
+                SelectAttributeSyntaxReceiver.OnVisitSyntaxNode,
+                (syntax, _) => syntax)
+                .Collect();
+
+            context.RegisterSourceOutput(pip, ProcessSelectTypes);
         }
 
-        public void Initialize(GeneratorInitializationContext context)
-        {
-            context.RegisterForSyntaxNotifications(() =>
-                new SelectAttributeSyntaxReceiver());
-        }
+        //public void Initialize(GeneratorInitializationContext context)
+        //{
+        //    context.RegisterForSyntaxNotifications(() =>
+        //        new SelectAttributeSyntaxReceiver());
+        //}
 
         #endregion
 
-        private void ProcessFillTypes(GeneratorExecutionContext context, SelectAttributeSyntaxReceiver methodSyntaxReceiver)
+        private void ProcessSelectTypes(SourceProductionContext context, ImmutableArray<GeneratorSyntaxContext> types)
         {
             //GenDebug.Break();
 
-            foreach (var item in methodSyntaxReceiver.SelectTypes)
+            foreach (var item in types)
             {
-                ProcessSelectToType(context, item);
+                var @class = (ClassDeclarationSyntax)item.Node;
+
+                try
+                {
+                    ProcessSelectToType(context, item, @class);
+                }
+                catch (Exception ex)
+                {
+                    context.ShowSelectDiagnostics($"NSLSELECT002", $"Error - {ex} on type {@class.Identifier.Text}", DiagnosticSeverity.Error, item.Node.GetLocation());
+                }
             }
         }
 
-        private void ProcessSelectToType(GeneratorExecutionContext context, TypeDeclarationSyntax type)
+        private void ProcessSelectToType(SourceProductionContext sourceContext, GeneratorSyntaxContext context, TypeDeclarationSyntax type)
         {
             var typeClass = type as ClassDeclarationSyntax;
 
-            var typeSem = context.Compilation.GetSemanticModel(typeClass.SyntaxTree);
+            var typeSem = context.SemanticModel;
 
             var typeSymb = typeSem.GetDeclaredSymbol(type) as ITypeSymbol;
 
@@ -133,7 +155,7 @@ namespace NSL.Generators.SelectTypeGenerator
 #pragma warning restore RS1035 // Do not use APIs banned for analyzers
             //#endif
 
-            context.AddSource($"{typeClass.GetTypeClassName()}.selectgen.cs", classBuilder.ToString());
+            sourceContext.AddSource($"{typeClass.GetTypeClassName()}.selectgen.cs", classBuilder.ToString());
         }
 
         private IEnumerable<ISymbol> FilterSymbols(IEnumerable<ISymbol> symbols, IEnumerable<string> joinedArr)

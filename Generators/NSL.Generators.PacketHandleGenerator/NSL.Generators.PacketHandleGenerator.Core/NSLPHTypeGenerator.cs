@@ -16,6 +16,7 @@ using NSL.SocketCore.Utils;
 using NSL.SocketCore.Utils.Buffer;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices.ComTypes;
@@ -23,37 +24,65 @@ using System.Runtime.InteropServices.ComTypes;
 namespace NSL.Generators.PacketHandleGenerator
 {
     [Generator]
-    internal class NSLPHTypeGenerator : ISourceGenerator
+    internal class NSLPHTypeGenerator : IIncrementalGenerator /* : ISourceGenerator*/
     {
-        private void ProcessNSLPHTypes(GeneratorExecutionContext context, NSLPHAttributeSyntaxReceiver methodSyntaxReceiver)
+        #region ISourceGenerator
+
+        //public void Execute(GeneratorExecutionContext context)
+        //{
+        //    if (context.SyntaxReceiver is NSLPHAttributeSyntaxReceiver methodSyntaxReceiver)
+        //    {
+        //        ProcessNSLPHTypes(context, methodSyntaxReceiver);
+        //    }
+        //}
+
+        //public void Initialize(GeneratorInitializationContext context)
+        //{
+        //    context.RegisterForSyntaxNotifications(() =>
+        //        new NSLPHAttributeSyntaxReceiver());
+        //}
+        public void Initialize(IncrementalGeneratorInitializationContext context)
+        {
+            var pip = context.SyntaxProvider.CreateSyntaxProvider(
+                NSLPHAttributeSyntaxReceiver.OnVisitSyntaxNode,
+                (syntax, _) => syntax)
+                .Collect();
+
+            context.RegisterSourceOutput(pip, ProcessNSLPHTypes);
+        }
+
+        #endregion
+
+        private void ProcessNSLPHTypes(SourceProductionContext context, ImmutableArray<GeneratorSyntaxContext> types)
         {
 #if DEBUG
             //GenDebug.Break();
 #endif
 
-            foreach (var type in methodSyntaxReceiver.BinaryIOTypes)
+            foreach (var item in types)
             {
+                var @class = (ClassDeclarationSyntax)item.Node;
                 try
                 {
-                    ProcessNSLPHType(context, type);
+                    ProcessNSLPHType(context, item, @class);
                 }
                 catch (Exception ex)
                 {
-                    context.ShowPHDiagnostics("NSLHP999", $"Error on build {ex.ToString()}", DiagnosticSeverity.Error, type.GetLocation());
+                    context.ShowPHDiagnostics("NSLHP999", $"Error on build {ex.ToString()}", DiagnosticSeverity.Error, @class.GetLocation());
                 }
             }
         }
 
-        private void ProcessNSLPHType(GeneratorExecutionContext context, TypeDeclarationSyntax type)
+        private void ProcessNSLPHType(SourceProductionContext sourceContext, GeneratorSyntaxContext context, TypeDeclarationSyntax type)
         {
             if (!type.HasPartialModifier())
             {
-                context.ShowPHDiagnostics("NSLHP000", "Type must have a partial modifier", DiagnosticSeverity.Error, type.GetLocation());
+                sourceContext.ShowPHDiagnostics("NSLHP000", "Type must have a partial modifier", DiagnosticSeverity.Error, type.GetLocation());
                 return;
             }
             var typeClass = type as ClassDeclarationSyntax;
 
-            var typeSem = context.Compilation.GetSemanticModel(typeClass.SyntaxTree);
+            var typeSem = context.SemanticModel;
             var codeBuilder = new CodeBuilder();
 
             codeBuilder.AppendComment(() =>
@@ -72,7 +101,7 @@ namespace NSL.Generators.PacketHandleGenerator
             var classSymbol = typeSem.GetDeclaredSymbol(typeClass);
 
             var allClassDeclarations = classSymbol.DeclaringSyntaxReferences
-                .Select(reference => reference.GetSyntax(context.CancellationToken))
+                .Select(reference => reference.GetSyntax(sourceContext.CancellationToken))
                 .OfType<ClassDeclarationSyntax>();
 
             var classMethodIdentifiers = allClassDeclarations
@@ -108,7 +137,7 @@ namespace NSL.Generators.PacketHandleGenerator
                 var typeModels = typeAttributes
                     .Select(x =>
                     {
-                        var sem = context.Compilation.GetSemanticModel(x.SyntaxTree);
+                        var sem = context.SemanticModel;
 
                         var attributeConstructor = sem.GetSymbolInfo(x).Symbol as IMethodSymbol;
 
@@ -118,7 +147,7 @@ namespace NSL.Generators.PacketHandleGenerator
 
                         var r = new HandlesData()
                         {
-                            Context = context,
+                            Context = sourceContext,
                             HaveReceiveHandleImplementation = classMethodIdentifiers.Contains
                         };
 
@@ -133,13 +162,13 @@ namespace NSL.Generators.PacketHandleGenerator
                             r.Type = packetsType.GetAttributeTypeParameterValueSymbol(typeSem);
                         }
                         else
-                            context.ShowPHDiagnostics("NSLHP004", $"Required parameter {"PacketsEnum"}", DiagnosticSeverity.Error, attributeParameters[1].Locations.ToArray());
+                            sourceContext.ShowPHDiagnostics("NSLHP004", $"Required parameter {"PacketsEnum"}", DiagnosticSeverity.Error, attributeParameters[1].Locations.ToArray());
 
                         if (parameters.TryGetValue(nameof(NSLPHGenImplAttribute.NetworkDataType), out var networkDataType)
                         || defaultParameters?.TryGetValue(nameof(NSLPHGenImplAttribute.NetworkDataType), out networkDataType) == true)
                             r.NetworkDataType = networkDataType.GetAttributeTypeParameterValueSymbol(typeSem);
                         else
-                            context.ShowPHDiagnostics("NSLHP004", $"Required parameter {"NetworkDataType"}", DiagnosticSeverity.Error, attributeParameters[1].Locations.ToArray());
+                            sourceContext.ShowPHDiagnostics("NSLHP004", $"Required parameter {"NetworkDataType"}", DiagnosticSeverity.Error, attributeParameters[1].Locations.ToArray());
 
                         if (parameters.TryGetValue(nameof(NSLPHGenImplAttribute.Direction), out var direction)
                         || defaultParameters?.TryGetValue(nameof(NSLPHGenImplAttribute.Direction), out direction) == true)
@@ -168,13 +197,13 @@ namespace NSL.Generators.PacketHandleGenerator
                         .Where(n => n < NSLAccessModifierEnum.Static)
                         .Where(n => r.Modifiers.HasFlag(n))
                             .Count() > 3)
-                            context.ShowPHDiagnostics("NSLHP001", "Have invalid modifier combination", DiagnosticSeverity.Error, attributeParameters[1].Locations.ToArray());
+                            sourceContext.ShowPHDiagnostics("NSLHP001", "Have invalid modifier combination", DiagnosticSeverity.Error, attributeParameters[1].Locations.ToArray());
 
                         r.Models = args.Value.Where(n => n.NameEquals == null)
                         .Select(n => n.GetAttributeParameterValue<string>(typeSem))
                         .ToArray();
 
-                        r.Packets = loadPackets(r, context);
+                        r.Packets = loadPackets(r, sourceContext);
 
                         return r;
                     })
@@ -251,7 +280,7 @@ namespace NSL.Generators.PacketHandleGenerator
 #if DEBUG
             //GenDebug.Break();
 #endif
-            context.AddSource($"{typeClass.GetTypeClassName()}.ph.cs", codeBuilder.ToString());
+            sourceContext.AddSource($"{typeClass.GetTypeClassName()}.ph.cs", codeBuilder.ToString());
         }
 
         private void BuildInputType(HandlesData handle, SemanticModel typeSem, CodeBuilderData buildData)
@@ -698,7 +727,7 @@ namespace NSL.Generators.PacketHandleGenerator
             }, tname).TrimEnd(';');
         }
 
-        private PacketData[] loadPackets(HandlesData item, GeneratorExecutionContext context)
+        private PacketData[] loadPackets(HandlesData item, SourceProductionContext sourceContext)
             => item.Type.GetMembers()
                         .OfType<IFieldSymbol>()
                         .Where(field => field.IsStatic && field.HasConstantValue)
@@ -733,7 +762,7 @@ namespace NSL.Generators.PacketHandleGenerator
                                 .Count();
 
                                 if (modCount > 1)
-                                    context.ShowPHDiagnostics("NSLHP002", "Have invalid packet type", DiagnosticSeverity.Error, packet.Locations.ToArray());
+                                    sourceContext.ShowPHDiagnostics("NSLHP002", "Have invalid packet type", DiagnosticSeverity.Error, packet.Locations.ToArray());
 
                                 if (modCount == 0)
                                 {
@@ -742,7 +771,7 @@ namespace NSL.Generators.PacketHandleGenerator
                                     else if (r.Name.EndsWith("Message"))
                                         r.PacketType |= NSLPacketTypeEnum.Message;
                                     else
-                                        context.ShowPHDiagnostics("NSLHP003", "Need to set packet type (Cannot detect Receive or Message)", DiagnosticSeverity.Error, packet.Locations.ToArray());
+                                        sourceContext.ShowPHDiagnostics("NSLHP003", "Need to set packet type (Cannot detect Receive or Message)", DiagnosticSeverity.Error, packet.Locations.ToArray());
                                 }
 
                                 r.Models = args
@@ -820,24 +849,6 @@ namespace NSL.Generators.PacketHandleGenerator
                 }
             }
         }
-
-        #region ISourceGenerator
-
-        public void Execute(GeneratorExecutionContext context)
-        {
-            if (context.SyntaxReceiver is NSLPHAttributeSyntaxReceiver methodSyntaxReceiver)
-            {
-                ProcessNSLPHTypes(context, methodSyntaxReceiver);
-            }
-        }
-
-        public void Initialize(GeneratorInitializationContext context)
-        {
-            context.RegisterForSyntaxNotifications(() =>
-                new NSLPHAttributeSyntaxReceiver());
-        }
-
-        #endregion
 
         internal static readonly string NSLPHGenImplAttributeFullName = typeof(NSLPHGenImplAttribute).Name;
 

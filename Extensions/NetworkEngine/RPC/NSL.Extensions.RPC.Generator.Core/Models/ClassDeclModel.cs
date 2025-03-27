@@ -8,9 +8,11 @@ namespace NSL.Extensions.RPC.Generator.Declarations
     {
         public ClassDeclarationSyntax Class { get; set; }
 
-        public GeneratorExecutionContext Context { get; set; }
+        public GeneratorSyntaxContext Context { get; set; }
 
-        public Compilation Compilation => Context.Compilation;
+        public SemanticModel SemanticModel => Context.SemanticModel;
+
+        public Compilation Compilation => SemanticModel.Compilation;
 
         public IEnumerable<MethodDeclModel> Methods { get; set; }
 

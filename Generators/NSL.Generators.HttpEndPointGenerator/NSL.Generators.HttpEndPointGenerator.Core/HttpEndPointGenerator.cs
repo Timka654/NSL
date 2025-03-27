@@ -13,54 +13,65 @@ using System.Linq;
 namespace NSL.Generators.HttpEndPointGenerator
 {
     [Generator]
-    internal class HttpEndPointGenerator : ISourceGenerator
+    internal class HttpEndPointGenerator : IIncrementalGenerator
     {
         #region ISourceGenerator
 
-        public void Execute(GeneratorExecutionContext context)
+        //public void Execute(GeneratorExecutionContext context)
+        //{
+        //    if (context.SyntaxReceiver is HttpEndPointImplementAttributeSyntaxReceiver methodSyntaxReceiver)
+        //    {
+        //        ProcessHttpEndPoints(context, methodSyntaxReceiver);
+        //    }
+        //}
+
+        public void Initialize(IncrementalGeneratorInitializationContext context)
         {
-            if (context.SyntaxReceiver is HttpEndPointImplementAttributeSyntaxReceiver methodSyntaxReceiver)
-            {
-                ProcessHttpEndPoints(context, methodSyntaxReceiver);
-            }
+            var pip = context.SyntaxProvider.CreateSyntaxProvider(
+                HttpEndPointImplementAttributeSyntaxReceiver.OnVisitSyntaxNode,
+                (syntax, _) => syntax)
+                .Collect();
+
+            context.RegisterSourceOutput(pip, ProcessHttpEndPoints);
         }
 
-        public void Initialize(GeneratorInitializationContext context)
-        {
-            context.RegisterForSyntaxNotifications(() =>
-                new HttpEndPointImplementAttributeSyntaxReceiver());
-        }
+        //public void Initialize(GeneratorInitializationContext context)
+        //{
+        //    context.RegisterForSyntaxNotifications(() =>
+        //        new HttpEndPointImplementAttributeSyntaxReceiver());
+        //}
 
         #endregion
 
-        private void ProcessHttpEndPoints(GeneratorExecutionContext context, HttpEndPointImplementAttributeSyntaxReceiver methodSyntaxReceiver)
+        private void ProcessHttpEndPoints(SourceProductionContext context, ImmutableArray<GeneratorSyntaxContext> types)
         {
 #if DEBUG
             //GenDebug.Break();
 
 #endif
-            foreach (var item in methodSyntaxReceiver.Types)
+            foreach (var item in types)
             {
+                var @class = (ClassDeclarationSyntax)item.Node;
                 try
                 {
-                    ProcessHttpEndPoint(context, item);
+                    ProcessHttpEndPoint(context, item, @class);
                 }
                 catch (Exception ex)
                 {
 
-                    context.ShowHttpEndPointDiagnostics($"NSLHTTPEP002", $"Error - {ex} on type {item.Identifier.Text}", DiagnosticSeverity.Error, item.GetLocation());
+                    context.ShowHttpEndPointDiagnostics($"NSLHTTPEP002", $"Error - {ex} on type {@class.Identifier.Text}", DiagnosticSeverity.Error, @class.GetLocation());
                 }
             }
         }
 
-        private void ProcessHttpEndPoint(GeneratorExecutionContext context, TypeDeclarationSyntax type)
+        private void ProcessHttpEndPoint(SourceProductionContext sourceContext, GeneratorSyntaxContext context, TypeDeclarationSyntax type)
         {
             if (!type.HasPartialModifier())
                 return;
 
             var typeClass = type as ClassDeclarationSyntax;
 
-            var typeSem = context.Compilation.GetSemanticModel(typeClass.SyntaxTree);
+            var typeSem = context.SemanticModel;
 
             var typeSymb = typeSem.GetDeclaredSymbol(type) as ITypeSymbol;
 
@@ -271,7 +282,7 @@ namespace NSL.Generators.HttpEndPointGenerator
 #pragma warning restore RS1035 // Do not use APIs banned for analyzers
             //#endif
 
-            context.AddSource($"{typeClass.GetTypeClassName()}.httpendpoints.cs", codeBuilder.ToString());
+            sourceContext.AddSource($"{typeClass.GetTypeClassName()}.httpendpoints.cs", codeBuilder.ToString());
         }
 
         private List<string> GetParameter(IEnumerable<ISymbol> parameters, string path = null)

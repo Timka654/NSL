@@ -80,16 +80,17 @@ EndProject");
                 foreach (var profile in availableProfiles)
                 {
                     var targetProfile = profile;
-                    if(isVsix)
-                        {
+
+                    if (isVsix)
+                    {
                         targetProfile = profile.Contains("Debug") ? $"Debug" : "Release";
                     }
 
                     foreach (var arch in Archs)
                     {
-                        slnProjectConfigs.Add($@"{{{projectPath.UppedId}}}.{profile}|{arch}.ActiveCfg = {profile}|Any CPU");
+                        slnProjectConfigs.Add($@"{{{projectPath.UppedId}}}.{profile}|{arch}.ActiveCfg = {targetProfile}|Any CPU");
                         if (projectPath.Info.Profiles.Contains(profile))
-                            slnProjectConfigs.Add($@"{{{projectPath.UppedId}}}.{profile}|{arch}.Build.0 = {profile}|Any CPU");
+                            slnProjectConfigs.Add($@"{{{projectPath.UppedId}}}.{profile}|{arch}.Build.0 = {targetProfile}|Any CPU");
                     }
                 }
             }

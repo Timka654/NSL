@@ -1,6 +1,8 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeRefactorings;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using NSL.Generators.Utils;
 using System.Collections.Generic;
 using System.Composition;
 using System.Diagnostics;
@@ -100,7 +102,12 @@ namespace NSL.Refactoring.Shared
             if (!document.FilePath.EndsWith("Model.cs"))
                 return document;
 
-            var properties = srcRootNode.Members.Where(x => x is PropertyDeclarationSyntax).Select(x => x as PropertyDeclarationSyntax).ToArray();
+            if(!document.TryGetSemanticModel(out var semanticModel))
+                return document;
+
+            var t = semanticModel.GetDeclaredSymbol(srcRootNode) as ITypeSymbol;
+
+            var properties = t.GetAllMembers().Where(x => x is IPropertySymbol).Select(x => x as IPropertySymbol).ToArray();
 
             var droot = await document.GetSyntaxRootAsync() as CompilationUnitSyntax;
 
@@ -108,7 +115,14 @@ namespace NSL.Refactoring.Shared
 
             var c = ns.Members.First() as ClassDeclarationSyntax;
 
-            c = c.WithMembers(new SyntaxList<MemberDeclarationSyntax>(properties.Select(x=>x.WithAttributeLists(new SyntaxList<AttributeListSyntax>()))));
+            c = c.WithMembers(new SyntaxList<MemberDeclarationSyntax>(properties.Select(x=> SyntaxFactory.PropertyDeclaration(SyntaxFactory.ParseTypeName(x.Type.Name), x.Name)
+                .AddModifiers(SyntaxFactory.Token(SyntaxKind.PublicKeyword))
+                .AddAccessorListAccessors(
+                    SyntaxFactory.AccessorDeclaration(SyntaxKind.GetAccessorDeclaration)
+                        .WithSemicolonToken(SyntaxFactory.Token(SyntaxKind.SemicolonToken)),
+                    SyntaxFactory.AccessorDeclaration(SyntaxKind.SetAccessorDeclaration)
+                        .WithSemicolonToken(SyntaxFactory.Token(SyntaxKind.SemicolonToken))
+            ))));
 
             ns = ns.WithMembers(new SyntaxList<MemberDeclarationSyntax>(c));
 

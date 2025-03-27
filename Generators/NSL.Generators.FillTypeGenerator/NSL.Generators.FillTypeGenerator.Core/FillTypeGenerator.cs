@@ -1,60 +1,61 @@
 ﻿using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Text;
 using NSL.Generators.FillTypeGenerator.Attributes;
 using NSL.Generators.FillTypeGenerator.Utils;
 using NSL.Generators.Utils;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
+using System.Text;
 
 namespace NSL.Generators.FillTypeGenerator
 {
-
     [Generator]
-    internal class FillTypeGenerator : ISourceGenerator
+    internal class FillTypeGenerator : IIncrementalGenerator
     {
         #region ISourceGenerator
 
-        public void Execute(GeneratorExecutionContext context)
+        public void Initialize(IncrementalGeneratorInitializationContext context)
         {
-            if (context.SyntaxReceiver is FillTypeAttributeSyntaxReceiver methodSyntaxReceiver)
-            {
-                ProcessFillTypes(context, methodSyntaxReceiver);
-            }
-        }
+            var pip = context.SyntaxProvider.CreateSyntaxProvider(
+                FillTypeAttributeSyntaxReceiver.OnVisitSyntaxNode,
+                (syntax, _) => syntax)
+                .Collect();
 
-        public void Initialize(GeneratorInitializationContext context)
-        {
-            context.RegisterForSyntaxNotifications(() =>
-                new FillTypeAttributeSyntaxReceiver());
+            context.RegisterSourceOutput(pip, ProcessFillTypes);
         }
 
         #endregion
 
-        private void ProcessFillTypes(GeneratorExecutionContext context, FillTypeAttributeSyntaxReceiver methodSyntaxReceiver)
+        private void ProcessFillTypes(SourceProductionContext context, ImmutableArray<GeneratorSyntaxContext> types)
         {
             //GenDebug.Break();
-
-            foreach (var item in methodSyntaxReceiver.FillTypeTypes)
+            
+            foreach (var item in types)
             {
+                var @class = (ClassDeclarationSyntax)item.Node;
+
                 try
                 {
-                    ProcessFillToType(context, item);
+                    ProcessFillToType(context, item, @class);
                 }
                 catch (Exception ex)
                 {
-                    context.ShowFillTypeDiagnostics($"NSLFT002", $"Error - {ex} on type {item.Identifier.Text}", DiagnosticSeverity.Error, item.GetLocation());
+                    context.ShowFillTypeDiagnostics($"NSLFT002", $"Error - {ex} on type {@class.Identifier.Text}", DiagnosticSeverity.Error, @class.GetLocation());
                 }
             }
         }
 
         private static string[] requiredUsings = new string[] { "System.Linq" };
 
-        private void ProcessFillToType(GeneratorExecutionContext context, TypeDeclarationSyntax type)
+        private void ProcessFillToType(SourceProductionContext sourceContext, GeneratorSyntaxContext context, TypeDeclarationSyntax type)
         {
             if (!type.HasPartialModifier())
             {
-                context.ShowFillTypeDiagnostics("NSLFT000", "Type must have a partial modifier", DiagnosticSeverity.Error, type.GetLocation());
+                sourceContext.ShowFillTypeDiagnostics("NSLFT000", "Type must have a partial modifier", DiagnosticSeverity.Error, type.GetLocation());
 
                 return;
             }
@@ -64,7 +65,7 @@ namespace NSL.Generators.FillTypeGenerator
 
             //Debug.WriteLine($"FillTypeGenerator -> {typeClass.Identifier.Text}");
 
-            var typeSem = context.Compilation.GetSemanticModel(typeClass.SyntaxTree);
+            var typeSem = context.SemanticModel;
 
             var typeSymb = typeSem.GetDeclaredSymbol(type) as ITypeSymbol;
 
@@ -87,10 +88,9 @@ namespace NSL.Generators.FillTypeGenerator
 
                 var attrbsGrouped = attrbs.GroupBy(x => x.ArgumentList.Arguments.First().GetAttributeTypeParameterValueSymbol(typeSem), TypeSymbolEqualityComparer.Instance);
 
-
                 foreach (var attr in attrbsGrouped)
                 {
-                    ProcessAttribute(context, classBuilder, attr, typeSymb, typeSem, true);
+                    ProcessAttribute(sourceContext, context, classBuilder, attr, typeSymb, typeSem, true);
                 }
 
                 attrbs = typeClass.AttributeLists
@@ -106,7 +106,7 @@ namespace NSL.Generators.FillTypeGenerator
 
                 foreach (var attr in attrbsGrouped)
                 {
-                    ProcessAttribute(context, classBuilder, attr, typeSymb, typeSem, false);
+                    ProcessAttribute(sourceContext, context, classBuilder, attr, typeSymb, typeSem, false);
                 }
 
             }, requiredUsings);
@@ -120,10 +120,10 @@ namespace NSL.Generators.FillTypeGenerator
 
             //GenDebug.Break();
 
-            context.AddSource($"{typeClass.GetTypeClassName()}.filltype.cs", codeBuilder.ToString());
+            sourceContext.AddSource($"{typeClass.GetTypeClassName()}.filltype.cs", codeBuilder.ToString());
         }
 
-        private void ProcessAttribute(GeneratorExecutionContext context, CodeBuilder classBuilder, IGrouping<ITypeSymbol, AttributeSyntax> attr, ITypeSymbol typeSymb, SemanticModel typeSem, bool dir)
+        private void ProcessAttribute(SourceProductionContext sourceContext, GeneratorSyntaxContext context, CodeBuilder classBuilder, IGrouping<ITypeSymbol, AttributeSyntax> attr, ITypeSymbol typeSymb, SemanticModel typeSem, bool dir)
         {
             var haveAll = attr.Any(x => x.ArgumentList.Arguments.Count() == 1);
 
@@ -145,7 +145,7 @@ namespace NSL.Generators.FillTypeGenerator
             bool isInternal = (toType.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax() as TypeDeclarationSyntax)?.HasInternalModifier() ?? false;
 
             if (haveAll)
-                classBuilder.AppendLine(CreateMethod(context, isInternal, typeSymb, toType, null, dir).ToString());
+                classBuilder.AppendLine(CreateMethod(sourceContext, context, isInternal, typeSymb, toType, null, dir).ToString());
 
             if (models.Any())
             {
@@ -153,7 +153,7 @@ namespace NSL.Generators.FillTypeGenerator
 
                 foreach (var item in models)
                 {
-                    methods.Add(CreateMethod(context, isInternal, typeSymb, toType, item, dir).ToString());
+                    methods.Add(CreateMethod(sourceContext, context, isInternal, typeSymb, toType, item, dir).ToString());
                 }
 
 #pragma warning disable RS1035 // Do not use APIs banned for analyzers
@@ -162,7 +162,7 @@ namespace NSL.Generators.FillTypeGenerator
             }
         }
 
-        private CodeBuilder CreateMethod(GeneratorExecutionContext context, bool @internal, ITypeSymbol fromType, ITypeSymbol toType, string model, bool dir)
+        private CodeBuilder CreateMethod(SourceProductionContext sourceContext, GeneratorSyntaxContext context, bool @internal, ITypeSymbol fromType, ITypeSymbol toType, string model, bool dir)
         {
             CodeBuilder methodBuilder = new CodeBuilder();
 
@@ -181,9 +181,9 @@ namespace NSL.Generators.FillTypeGenerator
             List<string> memberLines = new List<string>();
 
             if (dir)
-                FillMembers(context, memberLines, fromType, toType, model, "toFill", null, dir, 0);
+                FillMembers(sourceContext, context, memberLines, fromType, toType, model, "toFill", null, dir, 0);
             else
-                FillMembers(context, memberLines, fromType, toType, model, null, "fromFill", dir, 0);
+                FillMembers(sourceContext, context, memberLines, fromType, toType, model, null, "fromFill", dir, 0);
 
             foreach (var ml in memberLines)
             {
@@ -342,7 +342,7 @@ namespace NSL.Generators.FillTypeGenerator
             return default;
         }
 
-        private void FillMembers(GeneratorExecutionContext context, List<string> codeLines, ITypeSymbol fromType, ITypeSymbol toType, string model, string fillPath, string readPath, bool dir, int t)
+        private void FillMembers(SourceProductionContext sourceContext, GeneratorSyntaxContext context, List<string> codeLines, ITypeSymbol fromType, ITypeSymbol toType, string model, string fillPath, string readPath, bool dir, int t)
         {
             if (!dir)
             {
@@ -405,7 +405,7 @@ namespace NSL.Generators.FillTypeGenerator
                     {
                         var amem = new List<string>();
 
-                        FillMembers(context, amem, arrayItemTypeFrom, arrayItemTypeTo, itemModel, null, p, dir, 1);
+                        FillMembers(sourceContext, context, amem, arrayItemTypeFrom, arrayItemTypeTo, itemModel, null, p, dir, 1);
 
                         if (!Equals(model, itemModel))
                             codeLines.Add($"// Proxy model merge from \"{model}\" to \"{itemModel}\"");
@@ -426,15 +426,13 @@ namespace NSL.Generators.FillTypeGenerator
                 }
                 else
                 {
-
-                    var conversation = context.Compilation.ClassifyCommonConversion(memberFromType, memberToType);
+                    var conversation = context.SemanticModel.Compilation.ClassifyCommonConversion(memberFromType, memberToType);
 
                     if (!conversation.Exists)
                     {
-
                         var msg = $"Cannot fill \"{toItem.Name}\" value from {fromType.Name}, members types must be equals, or can be cast, or must be marked for ignore";
 
-                        context.ShowFillTypeDiagnostics("NSLFT001"
+                        sourceContext.ShowFillTypeDiagnostics("NSLFT001"
                             , msg
                             , DiagnosticSeverity.Error
                             , toItem.Locations.ToArray());
@@ -469,4 +467,6 @@ namespace NSL.Generators.FillTypeGenerator
         internal static readonly string FillTypeGenerateProxyAttributeFullName = typeof(FillTypeGenerateProxyAttribute).Name;
         internal static readonly string stringFullName = typeof(string).Name;
     }
+
+
 }

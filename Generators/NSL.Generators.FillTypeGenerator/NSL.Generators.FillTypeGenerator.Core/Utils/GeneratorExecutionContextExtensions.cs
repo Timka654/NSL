@@ -5,7 +5,7 @@ namespace NSL.Generators.FillTypeGenerator.Utils
 {
     public static class GeneratorExecutionContextExtensions
     {
-        public static void ShowFillTypeDiagnostics(this GeneratorExecutionContext genContext, string code, string message, DiagnosticSeverity diagnosticSeverity, params Location[] locations)
+        public static void ShowFillTypeDiagnostics(this SourceProductionContext genContext, string code, string message, DiagnosticSeverity diagnosticSeverity, params Location[] locations)
         {
             var l = locations.First();
 

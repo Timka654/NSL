@@ -14,7 +14,7 @@ namespace NSL.Generators.BinaryGenerator
 
         public SemanticModel SemanticModel;
 
-        public GeneratorExecutionContext Context { get; set; }
+        public SourceProductionContext Context { get; set; }
 
         public ISymbol CurrentMember { get; internal set; }
 

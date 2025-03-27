@@ -106,7 +106,7 @@ namespace NSL.Extensions.RPC.Generator.Generators
 
             mb.NextTab(); // 2
 
-            var classSemanticModel = methodDecl.Class.Context.Compilation.GetSemanticModel(methodDecl.Class.Class.SyntaxTree);
+            var classSemanticModel = methodDecl.Class.SemanticModel;
 
             foreach (var mov in methodDecl.Overrides)
             {
@@ -118,7 +118,7 @@ namespace NSL.Extensions.RPC.Generator.Generators
 
                 List<string> parameters = new List<string>();
 
-                var semanticModel = methodDecl.Class.Context.Compilation.GetSemanticModel(mov.DeclSyntax.SyntaxTree);
+                var semanticModel = methodDecl.Class.SemanticModel;
 
                 var returnTypeInfo = semanticModel.GetTypeInfo(mov.DeclSyntax.ReturnType);
 

@@ -21,7 +21,7 @@ namespace NSL.Extensions.RPC.Generator.Generators
                 if (!mov.DeclSyntax.Modifiers.Any(x => x.Text.Equals("virtual")))
                     continue;
 
-                var semanticModel = methodDecl.Class.Context.Compilation.GetSemanticModel(mov.DeclSyntax.SyntaxTree);
+                var semanticModel = methodDecl.Class.SemanticModel;
 
                 var returnTypeInfo = semanticModel.GetTypeInfo(mov.DeclSyntax.ReturnType);
 

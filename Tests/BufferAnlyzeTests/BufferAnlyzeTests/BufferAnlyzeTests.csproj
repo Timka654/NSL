@@ -3,7 +3,7 @@
 	<PropertyGroup>
 		<NSLProjectTypes>Test</NSLProjectTypes>
 		<OutputType>Exe</OutputType>
-		<TargetFramework>netcoreapp3.1</TargetFramework>
+		<TargetFramework>net8</TargetFramework>
 		<Platforms>AnyCPU;ARM32;x86;ARM64;x64</Platforms>
 	</PropertyGroup>
 

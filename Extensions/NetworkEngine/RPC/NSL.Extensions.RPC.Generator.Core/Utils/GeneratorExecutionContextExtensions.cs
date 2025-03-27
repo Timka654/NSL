@@ -5,7 +5,7 @@ namespace NSL.Extensions.RPC.Generator.Utils
 {
     public static class GeneratorExecutionContextExtensions
     {
-        public static void ShowRPCGenDiagnostics(this GeneratorExecutionContext genContext, string code, string message, DiagnosticSeverity diagnosticSeverity, params Location[] locations)
+        public static void ShowRPCGenDiagnostics(this SourceProductionContext genContext, string code, string message, DiagnosticSeverity diagnosticSeverity, params Location[] locations)
         {
             var l = locations.First();
 

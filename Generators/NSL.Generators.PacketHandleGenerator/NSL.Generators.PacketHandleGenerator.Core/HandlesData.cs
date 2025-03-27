@@ -7,7 +7,7 @@ namespace NSL.Generators.PacketHandleGenerator
 {
     internal class HandlesData
     {
-        public GeneratorExecutionContext Context { get; set; }
+        public SourceProductionContext Context { get; set; }
 
         public ITypeSymbol Type { get; set; }
 
