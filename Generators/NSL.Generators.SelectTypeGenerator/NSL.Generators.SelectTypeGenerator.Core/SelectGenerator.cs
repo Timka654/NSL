@@ -136,7 +136,7 @@ namespace NSL.Generators.SelectTypeGenerator
                         .Append(item)
                         .ToArray();
 
-                        CreateMethods(methods, typeSymb, FilterSymbols(members, mjoins), item, typedModels.Key);
+                        CreateMethods(methods, typeSymb, FilterSymbols(members, mjoins, typedModels.Key), item, typedModels.Key);
                     }
                 }
 
@@ -158,9 +158,12 @@ namespace NSL.Generators.SelectTypeGenerator
             sourceContext.AddSource($"{typeClass.GetTypeClassName()}.selectgen.cs", classBuilder.ToString());
         }
 
-        private IEnumerable<ISymbol> FilterSymbols(IEnumerable<ISymbol> symbols, IEnumerable<string> joinedArr)
+        private IEnumerable<ISymbol> FilterSymbols(IEnumerable<ISymbol> symbols, IEnumerable<string> joinedArr, bool typed)
             => symbols.Where(x =>
          {
+             if (typed && x is IPropertySymbol ps && (ps.SetMethod == null || ps.GetMethod == null))
+                 return false;
+
              var a = x
              .GetAttributes()
              .Where(n => n.AttributeClass.Name == SelectGenerateIncludeAttributeFullName)
@@ -427,7 +430,7 @@ namespace NSL.Generators.SelectTypeGenerator
 
                     sMembers.Add($"// Join {itemModel} to [{string.Join(",", joined)}]");
 
-                    var amembers = FilterSymbols(arrt.ElementType.GetAllMembers(), joined);
+                    var amembers = FilterSymbols(arrt.ElementType.GetAllMembers(), joined, typed);
 
                     ReadCollection(sMembers, item, amembers, model, itemModel, path, typed, arrt.ElementType, ".ToArray()");
 
@@ -443,7 +446,7 @@ namespace NSL.Generators.SelectTypeGenerator
 
                     sMembers.Add($"// Join {itemModel} to [{string.Join(",", joined)}]");
 
-                    var amembers = FilterSymbols(pType.GetAllMembers(), joined);
+                    var amembers = FilterSymbols(pType.GetAllMembers(), joined, typed);
 
                     ReadCollection(sMembers, item, amembers, model, itemModel, path, typed, pType, ".ToList()");
 
@@ -455,7 +458,7 @@ namespace NSL.Generators.SelectTypeGenerator
 
                 joined = GetJoinModels(memberType, itemModel);
 
-                var memMembers = FilterSymbols(memberType.GetAllMembers(), joined);
+                var memMembers = FilterSymbols(memberType.GetAllMembers(), joined, typed);
 
                 if (memMembers.Any())
                 {

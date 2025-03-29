@@ -48,4 +48,14 @@ namespace NSL.Generators.SelectTypeGenerator.Tests
         [SelectGenerateInclude("temp1")]
         public CollectionSelectorModel1 item { get; set; }
     }
+
+    [SelectGenerate("temp1", Typed = true)]
+    public partial class ReadOnlyTyped1
+    {
+        [SelectGenerateInclude("temp1")]
+        public int MyProperty1 { get; }
+
+        [SelectGenerateInclude("temp1")]
+        public int MyProperty2 { set { } }
+    }
 }
