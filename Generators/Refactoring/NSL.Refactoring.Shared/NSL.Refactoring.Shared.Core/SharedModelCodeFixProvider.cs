@@ -70,7 +70,8 @@ namespace NSL.Refactoring.Shared
 
                     var className = typeDecl.Identifier.Text;
 
-                    context.RegisterCodeFix(PreviewedCodeAction.Create(string.Format(item.Value.title, typeDecl.Identifier.Text), (c, preview) => SharedBuilder.CreateSharedModel(node as ClassDeclarationSyntax, sharedProj, className, modelsFullPath, sharedRootPath, context.Document, c, preview)), diag);
+                    context.RegisterCodeFix(PreviewedCodeAction.Create(string.Format(item.Value.title, typeDecl.Identifier.Text), async (c, preview) => await SharedBuilder.CreateSharedModel(node as ClassDeclarationSyntax, sharedProj, className, modelsFullPath, sharedRootPath, context.Document,
+                    await context.Document.GetSemanticModelAsync(), c, preview)), diag);
                 }
             }
         }

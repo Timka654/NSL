@@ -25,7 +25,7 @@ namespace NSL.Refactoring.Shared
         public const string SharedTemplateRelativePath = "Templates.Shared.";
         public const string EntityTemplateRelativePath = "Templates.Entity.";
 
-        public delegate Task<Document> ModelProcessingDelegate(Document document);
+        public delegate Task<Document> ModelProcessingDelegate(Document document, SemanticModel semanticModel);
 
         public delegate string DocumentContentPostProcessingDelegate(string fileName, string sourceCode);
 
@@ -36,6 +36,7 @@ namespace NSL.Refactoring.Shared
             string modelsFullPath,
             string sharedRootPath,
             Document sourceDoc,
+            SemanticModel semanticModel,
             CancellationToken cancellationToken,
             bool preview,
             ModelProcessingDelegate onModelProcessing = null,
@@ -111,12 +112,12 @@ namespace NSL.Refactoring.Shared
 
                     string summary = string.Empty;
 
-                    if (sourceDoc.TryGetSyntaxTree(out var tree) && sourceDoc.TryGetSemanticModel(out var sem))
+                    if (sourceDoc.TryGetSyntaxTree(out var tree))
                     {
 
                         var root = await tree.GetRootAsync();
 
-                        var tsymb = sem.GetDeclaredSymbol(classDeclaration) as ITypeSymbol;
+                        var tsymb = semanticModel.GetDeclaredSymbol(classDeclaration) as ITypeSymbol;
                         summary = $"Generate for <see cref=\"{tsymb.GetTypeSeeCRef()}\"/>";
                     }
 
@@ -133,7 +134,7 @@ namespace NSL.Refactoring.Shared
 
 
                     if (onModelProcessing != null)
-                        doc = await onModelProcessing(doc);
+                        doc = await onModelProcessing(doc, semanticModel);
 
                     sharedProj = doc.Project;
 

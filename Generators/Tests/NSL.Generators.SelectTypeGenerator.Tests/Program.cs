@@ -1,4 +1,6 @@
-﻿namespace NSL.Generators.SelectTypeGenerator.Tests
+﻿using NSL.Generators.SelectTypeGenerator.Attributes;
+
+namespace NSL.Generators.SelectTypeGenerator.Tests
 {
     internal class Program
     {
@@ -35,5 +37,15 @@
 
 #endif
         }
+    }
+
+    [SelectGenerate("temp1")]
+    public partial class CollectionSelectorModel1
+    {
+        [SelectGenerateInclude("temp1")]
+        public CollectionSelectorModel1[] items { get; set; }
+
+        [SelectGenerateInclude("temp1")]
+        public CollectionSelectorModel1 item { get; set; }
     }
 }

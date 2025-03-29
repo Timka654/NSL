@@ -71,38 +71,38 @@ namespace NSL.Refactoring.Shared
 
             context.RegisterRefactoring(PreviewedCodeAction.Create(
                 string.Format("Generate create request model \"{0}\"", createIdentifier),
-                (c, preview) => SharedBuilder.CreateSharedModel(typeDecl, sharedProj, createIdentifier, modelsFullPath, sharedRootPath, context.Document, c, preview, doc => BuildDocumentContent(typeDecl, doc))));
+                async (c, preview) => await SharedBuilder.CreateSharedModel(typeDecl, sharedProj, createIdentifier, modelsFullPath, sharedRootPath, context.Document,
+                    await context.Document.GetSemanticModelAsync(), c, preview, (doc, sem) => BuildDocumentContent(typeDecl, doc, sem))));
 
             var editIdentifier = $"Edit{defaultIdentifier}RequestModel";
 
             context.RegisterRefactoring(PreviewedCodeAction.Create(
                 string.Format("Generate edit request model \"{0}\"", editIdentifier),
-                (c, preview) => SharedBuilder.CreateSharedModel(typeDecl, sharedProj, editIdentifier, modelsFullPath, sharedRootPath, context.Document, c, preview, doc => BuildDocumentContent(typeDecl, doc))));
+                async (c, preview) => await SharedBuilder.CreateSharedModel(typeDecl, sharedProj, editIdentifier, modelsFullPath, sharedRootPath, context.Document,
+                    await context.Document.GetSemanticModelAsync(), c, preview, (doc, sem) => BuildDocumentContent(typeDecl, doc, sem))));
 
             context.RegisterRefactoring(PreviewedCodeAction.Create(
                 string.Format("Generate both request models for \"{0}\"", defaultIdentifier),
-                (c, preview) => BothGenerate(sharedProj, defaultIdentifier, modelsFullPath, sharedRootPath, context.Document, c, preview, typeDecl)));
+                async (c, preview) => await BothGenerate(sharedProj, defaultIdentifier, modelsFullPath, sharedRootPath, context.Document,
+                    await context.Document.GetSemanticModelAsync(), c, preview, typeDecl)));
         }
 
-        private async Task<Solution> BothGenerate(Project sharedProj, string defaultIdentifier, string modelsFullPath, string sharedRootPath, Document sourceDoc, CancellationToken cancellationToken, bool preview, ClassDeclarationSyntax rootNode)
+        private async Task<Solution> BothGenerate(Project sharedProj, string defaultIdentifier, string modelsFullPath, string sharedRootPath, Document sourceDoc, SemanticModel semanticModel, CancellationToken cancellationToken, bool preview, ClassDeclarationSyntax rootNode)
         {
             var createIdentifier = $"Create{defaultIdentifier}RequestModel";
 
-            var sol = await SharedBuilder.CreateSharedModel(rootNode,sharedProj, createIdentifier, modelsFullPath, sharedRootPath, sourceDoc, cancellationToken, preview, doc => BuildDocumentContent(rootNode, doc));
+            var sol = await SharedBuilder.CreateSharedModel(rootNode, sharedProj, createIdentifier, modelsFullPath, sharedRootPath, sourceDoc, semanticModel, cancellationToken, preview, (doc, sem) => BuildDocumentContent(rootNode, doc, sem));
 
             var editIdentifier = $"Edit{defaultIdentifier}RequestModel";
 
-            sol = await SharedBuilder.CreateSharedModel(rootNode,sharedProj, editIdentifier, modelsFullPath, sharedRootPath, sourceDoc, cancellationToken, preview, doc => BuildDocumentContent(rootNode, doc), sol);
+            sol = await SharedBuilder.CreateSharedModel(rootNode, sharedProj, editIdentifier, modelsFullPath, sharedRootPath, sourceDoc, semanticModel , cancellationToken, preview, (doc, sem) => BuildDocumentContent(rootNode, doc, sem), sol);
 
             return sol;
         }
 
-        private async Task<Document> BuildDocumentContent(ClassDeclarationSyntax srcRootNode, Document document)
+        private async Task<Document> BuildDocumentContent(ClassDeclarationSyntax srcRootNode, Document document, SemanticModel semanticModel)
         {
             if (!document.FilePath.EndsWith("Model.cs"))
-                return document;
-
-            if(!document.TryGetSemanticModel(out var semanticModel))
                 return document;
 
             var t = semanticModel.GetDeclaredSymbol(srcRootNode) as ITypeSymbol;
@@ -115,7 +115,7 @@ namespace NSL.Refactoring.Shared
 
             var c = ns.Members.First() as ClassDeclarationSyntax;
 
-            c = c.WithMembers(new SyntaxList<MemberDeclarationSyntax>(properties.Select(x=> SyntaxFactory.PropertyDeclaration(SyntaxFactory.ParseTypeName(x.Type.Name), x.Name)
+            c = c.WithMembers(new SyntaxList<MemberDeclarationSyntax>(properties.Select(x => SyntaxFactory.PropertyDeclaration(SyntaxFactory.ParseTypeName(x.Type.GetTypeFullName()), x.Name)
                 .AddModifiers(SyntaxFactory.Token(SyntaxKind.PublicKeyword))
                 .AddAccessorListAccessors(
                     SyntaxFactory.AccessorDeclaration(SyntaxKind.GetAccessorDeclaration)

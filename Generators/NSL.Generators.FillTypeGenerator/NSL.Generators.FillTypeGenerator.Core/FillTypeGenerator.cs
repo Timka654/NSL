@@ -33,7 +33,7 @@ namespace NSL.Generators.FillTypeGenerator
         private void ProcessFillTypes(SourceProductionContext context, ImmutableArray<GeneratorSyntaxContext> types)
         {
             //GenDebug.Break();
-            
+
             foreach (var item in types)
             {
                 var @class = (ClassDeclarationSyntax)item.Node;
@@ -326,6 +326,9 @@ namespace NSL.Generators.FillTypeGenerator
             typeof(int).Name,
             typeof(ulong).Name,
             typeof(long).Name,
+            typeof(double).Name,
+            typeof(float).Name,
+            typeof(decimal).Name,
             typeof(string).Name,
             typeof(Guid).Name
         };
@@ -342,7 +345,7 @@ namespace NSL.Generators.FillTypeGenerator
             return default;
         }
 
-        private void FillMembers(SourceProductionContext sourceContext, GeneratorSyntaxContext context, List<string> codeLines, ITypeSymbol fromType, ITypeSymbol toType, string model, string fillPath, string readPath, bool dir, int t)
+        private void FillMembers(SourceProductionContext sourceContext, GeneratorSyntaxContext context, List<string> codeLines, ITypeSymbol fromType, ITypeSymbol toType, string model, string fillPath, string readPath, bool dir, int t, bool newObject = false)
         {
             if (!dir)
             {
@@ -377,7 +380,7 @@ namespace NSL.Generators.FillTypeGenerator
                 if (memberFromType == null || memberToType == null)
                     continue;
 
-                string mFillPath = $"{tabPrefix}{string.Join(".", fillPath, fromItem.Name).TrimStart('.')} = ";
+                string mFillPath = $"{tabPrefix}{string.Join(".", fillPath, fromItem.Name).TrimStart('.')}";
 
                 string codeFragment = default;
 
@@ -405,7 +408,7 @@ namespace NSL.Generators.FillTypeGenerator
                     {
                         var amem = new List<string>();
 
-                        FillMembers(sourceContext, context, amem, arrayItemTypeFrom, arrayItemTypeTo, itemModel, null, p, dir, 1);
+                        FillMembers(sourceContext, context, amem, arrayItemTypeFrom, arrayItemTypeTo, itemModel, null, p, dir, 1, true);
 
                         if (!Equals(model, itemModel))
                             codeLines.Add($"// Proxy model merge from \"{model}\" to \"{itemModel}\"");
@@ -428,31 +431,70 @@ namespace NSL.Generators.FillTypeGenerator
                 {
                     var conversation = context.SemanticModel.Compilation.ClassifyCommonConversion(memberFromType, memberToType);
 
+                    bool mapTypes = false;
+
                     if (!conversation.Exists)
                     {
-                        var msg = $"Cannot fill \"{toItem.Name}\" value from {fromType.Name}, members types must be equals, or can be cast, or must be marked for ignore";
+                        if ((memberFromType.TypeKind == memberToType.TypeKind)
+                            && (memberFromType.TypeKind == TypeKind.Struct
+                                || memberFromType.TypeKind == TypeKind.Structure))
+                        {
+                            var msg = $"Cannot fill \"{toItem.Name}\" value from {fromType.Name}, members types must be equals, or can be cast, or must be marked for ignore";
 
-                        sourceContext.ShowFillTypeDiagnostics("NSLFT001"
-                            , msg
-                            , DiagnosticSeverity.Error
-                            , toItem.Locations.ToArray());
+                            sourceContext.ShowFillTypeDiagnostics("NSLFT001"
+                                , msg
+                                , DiagnosticSeverity.Error
+                                , toItem.Locations.ToArray());
 
-                        //GenDebug.Break();
+                            //GenDebug.Break();
 
-                        continue;
+                            continue;
+                        }
+                        else
+                        {
+                            mapTypes = true;
+                        }
                     }
 
                     codeFragment = string.Join(".", readPath, fromItem.Name).TrimStart('.');
 
-                    if (conversation.IsNumeric)
-                        codeFragment = $"({memberToType.GetTypeFullName()}){codeFragment}";
-                    else if (conversation.IsImplicit) { }
+                    if (mapTypes)
+                    {
+                        //GenDebug.Break(true);
+                        itemModel = GetProxyModel(fromItem, model);
 
+                        var amem = new List<string>();
+
+                        FillMembers(sourceContext, context, amem, memberFromType, memberToType, itemModel, null, codeFragment, dir, 1, true);
+
+                        if (!Equals(model, itemModel))
+                            codeLines.Add($"// Proxy model merge from \"{model}\" to \"{itemModel}\"");
+
+#pragma warning disable RS1035 // Не использовать API, запрещенные для анализаторов
+                        codeFragment = $"new {memberToType.GetTypeFullName(false)} {{{Environment.NewLine}" +
+                            string.Join($",{Environment.NewLine}", amem) +
+                            $"{Environment.NewLine}}}";
+#pragma warning restore RS1035 // Не использовать API, запрещенные для анализаторов
+                    }
+                    else
+                    {
+
+                        if ((memberFromType.TypeKind == TypeKind.Struct || memberFromType.TypeKind == TypeKind.Structure)
+                            && memberFromType.NullableAnnotation == NullableAnnotation.Annotated
+                            && memberToType.NullableAnnotation != NullableAnnotation.Annotated)
+                        {
+                            codeFragment = $"({codeFragment}.HasValue ? {codeFragment}.Value : {(newObject ? "default" : mFillPath)})";
+                        }
+
+                        if (conversation.IsNumeric)
+                            codeFragment = $"({memberToType.GetTypeFullName()}){codeFragment}";
+                        else if (conversation.IsImplicit) { }
+                    }
                 }
                 //else
                 //    GenDebug.Break();
 
-                var result = $"{mFillPath}{codeFragment}";
+                var result = $"{mFillPath} = {codeFragment}";
 
                 if (!codeLines.Contains(result))
                     codeLines.Add(result);

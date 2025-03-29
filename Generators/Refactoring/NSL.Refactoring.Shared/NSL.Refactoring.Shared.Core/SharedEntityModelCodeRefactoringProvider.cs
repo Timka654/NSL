@@ -69,13 +69,14 @@ namespace NSL.Refactoring.Shared
 
             context.RegisterRefactoring(PreviewedCodeAction.Create(
                 string.Format("Generate entity model \"{0}\"", createIdentifier),
-                (c, preview) => SharedBuilder.CreateSharedModel(
+                async (c, preview) => await SharedBuilder.CreateSharedModel(
                     typeDecl,
                     sharedProj,
                     createIdentifier,
                     modelsFullPath,
                     sharedRootPath,
                     context.Document,
+                    await context.Document.GetSemanticModelAsync(),
                     c,
                     preview,
                     templateRelPath: SharedBuilder.EntityTemplateRelativePath,
@@ -83,7 +84,7 @@ namespace NSL.Refactoring.Shared
                     {
                         return srcContent.Replace("$safesrcitemname$", typeDecl.Identifier.Text);
                     },
-                    onModelProcessing: async (endDocument) =>
+                    onModelProcessing: async (endDocument, sem) =>
                     {
                         var synRoot = await endDocument.GetSyntaxRootAsync(c);
 

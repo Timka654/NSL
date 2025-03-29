@@ -327,22 +327,50 @@ namespace NSL.Generators.SelectTypeGenerator
                 string p = string.Empty;
                 while (path.Contains(p = $"x{n++}")) { }
 
-                var amem = new List<string>();
-
-                ReadMembers(amembers, amem, itemModel, p, typed);
-
                 if (!Equals(model, itemModel))
                     sMembers.Add($"// Proxy model merge from \"{model}\" to \"{itemModel}\"");
 
                 var rType = typed ? itemType.GetTypeFullName() : string.Empty;
 
+
+
 #pragma warning disable RS1035 // Не использовать API, запрещенные для анализаторов
-                sMembers.Add($"{item.Name} = {path}.{item.Name} == null ? null : {path}.{item.Name}.Select({p} => new {rType} {{{Environment.NewLine}{CombineMembers(amem.Select(x => $"\t{x}"))}{Environment.NewLine}}}){toSegment}");
+                //GenDebug.Break(true);
+                string readSegment = default;
+                if (HaveModel(itemType, itemModel, typed))
+                {
+                    readSegment = $"{path}.{item.Name}.Select{(typed ? "Typed" : string.Empty)}{itemModel}()";
+                }
+                else
+                {
+                    var amem = new List<string>();
+
+                    ReadMembers(amembers, amem, itemModel, p, typed);
+
+                    readSegment = $"{path}.{item.Name}.Select({p} => new {rType} {{{Environment.NewLine}{CombineMembers(amem.Select(x => $"\t{x}"))}{Environment.NewLine}}})";
+                }
+
+                sMembers.Add($"{item.Name} = {path}.{item.Name} == null ? null : {readSegment}{toSegment}");
 #pragma warning restore RS1035 // Не использовать API, запрещенные для анализаторов
             }
             else
                 sMembers.Add($"{path}.{item.Name}");
         }
+
+        private bool HaveModel(ITypeSymbol typeSymbol, string model, bool typed)
+        {
+            return typeSymbol.GetAttributes().Where(x =>
+            {
+                if (!x.AttributeClass.Name.Equals(SelectGenerateAttributeFullName))
+                    return false;
+
+                if (x.ConstructorArguments.Where(a => a.Values.Any(v => v.Value == model)).Any() && Equals(x.GetNamedArgumentValue("Typed") ?? false, typed))
+                    return true;
+
+                return false;
+            }).Any();
+        }
+
 
         private void ReadMembers(IEnumerable<ISymbol> members, List<string> sMembers, string model, string path, bool typed)
         {
@@ -433,19 +461,33 @@ namespace NSL.Generators.SelectTypeGenerator
                 {
                     sMembers.Add($"// Join {itemModel} to [{string.Join(",", joined)}]");
 
-                    var nMembers = new List<string>();
-
-                    ReadMembers(memMembers, nMembers, itemModel, $"{path}.{item.Name}", typed);
-
                     if (!Equals(model, itemModel))
                         sMembers.Add($"// Proxy model merge from \"{model}\" to \"{itemModel}\"");
 
 
 #pragma warning disable RS1035 // Не использовать API, запрещенные для анализаторов
 
-                    var valueGetter = typed ? $"new {item.GetTypeSymbol().GetTypeFullName(false)}" : $"new ";
+                    //GenDebug.Break(true);
 
-                    sMembers.Add($"{item.Name} = {path}.{item.Name} == null ? null : {valueGetter} {{{Environment.NewLine}{CombineMembers(nMembers.Select(x => $"\t{x}"))}{Environment.NewLine}}}");
+                    string readSegment = default;
+
+                    if (HaveModel(memberType, itemModel, typed))
+                    {
+                        readSegment = $"{path}.{item.Name}.To{(typed ? "Typed" : string.Empty)}{itemModel}()";
+                    }
+                    else
+                    {
+
+                        var nMembers = new List<string>();
+
+                        ReadMembers(memMembers, nMembers, itemModel, $"{path}.{item.Name}", typed);
+
+                        var valueGetter = typed ? $"new {item.GetTypeSymbol().GetTypeFullName(false)}" : $"new ";
+                        readSegment = $"{valueGetter} {{{Environment.NewLine}{CombineMembers(nMembers.Select(x => $"\t{x}"))}{Environment.NewLine}}}";
+                    }
+
+
+                    sMembers.Add($"{item.Name} = {path}.{item.Name} == null ? null : {readSegment}");
 
 #pragma warning restore RS1035 // Не использовать API, запрещенные для анализаторов
                 }
