@@ -369,7 +369,7 @@ namespace NSL.Generators.SelectTypeGenerator
 
             var rType = genContext.Typed ? genContext.GetTypeIdentifier() : "dynamic";
 
-            methodBuilder.AppendLine($"public static {rType} To{(genContext.Typed ? "Typed" : string.Empty)}{genContext.Model}(this {genContext.GetTypeIdentifier()} ___x)");
+            methodBuilder.AppendLine($"public static {rType} To{(genContext.Typed ? "Typed" : string.Empty)}{genContext.Model}(this {genContext.Type.GetTypeFullName()} ___x)");
 
             methodBuilder.AppendLine("{");
 
@@ -404,7 +404,7 @@ namespace NSL.Generators.SelectTypeGenerator
 
             var rType = genContext.Typed ? genContext.GetTypeIdentifier() : "dynamic";
 
-            methodBuilder.AppendLine($"public static {collectionType}<{rType}> Select{(genContext.Typed ? "Typed" : string.Empty)}{genContext.Model}(this {collectionType}<{genContext.GetTypeIdentifier()}> ___toSelect)");
+            methodBuilder.AppendLine($"public static {collectionType}<{rType}> Select{(genContext.Typed ? "Typed" : string.Empty)}{genContext.Model}(this {collectionType}<{genContext.Type.GetTypeFullName()}> ___toSelect)");
 
             methodBuilder.AppendLine("{");
 

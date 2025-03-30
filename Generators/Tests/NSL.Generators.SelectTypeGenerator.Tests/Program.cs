@@ -8,8 +8,15 @@ namespace NSL.Generators.SelectTypeGenerator.Tests
         {
 #if DEVELOP
             IEnumerable<JoinProxyModel1> jplist = new List<JoinProxyModel1>();
-            DTOModel1Dtotemp1Model dto = new DTOModel1Dtotemp1Model();
+
             jplist.SelectTestGet();
+
+            IEnumerable<DTOTypedModel1> dtoTyped = new List<DTOTypedModel1>();
+
+            dtoTyped.SelectTypedtemp1();
+
+            
+
 #else
             List<JoiningModel1> jList = new List<JoiningModel1>();
 
