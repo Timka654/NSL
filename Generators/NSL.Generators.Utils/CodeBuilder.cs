@@ -127,7 +127,7 @@ namespace NSL.Generators.Utils
             AppendLine("}");
         }
 
-        public void CreateClass(Action<CodeBuilder> bodyBuild, string name, string @namespace = null, IEnumerable<string> requiredUsings = null)
+        public void CreateClass(Action<CodeBuilder> bodyBuild, string name, string @namespace = null, IEnumerable<string> requiredUsings = null, Action<CodeBuilder> beforeClassDef = null)
         {
             var body = new CodeBuilder();
 
@@ -167,7 +167,7 @@ namespace NSL.Generators.Utils
 
                 NextTab();
             }
-
+            beforeClassDef?.Invoke(this);
             AppendLine(declTypeLine);
 
             //NextTab();
@@ -199,7 +199,7 @@ namespace NSL.Generators.Utils
             }
         }
 
-        public void CreatePartialClass(ClassDeclarationSyntax classDecl, Action<CodeBuilder> bodyBuild, IEnumerable<string> requiredUsings = null)
+        public void CreatePartialClass(ClassDeclarationSyntax classDecl, Action<CodeBuilder> bodyBuild, IEnumerable<string> requiredUsings = null, Action<CodeBuilder> beforeClassDef = null)
         {
             var body = new CodeBuilder();
 
@@ -237,7 +237,7 @@ namespace NSL.Generators.Utils
 
                 NextTab();
             }
-
+            beforeClassDef?.Invoke(this);
             AppendLine(declTypeLine);
 
             NextTab();
@@ -269,7 +269,7 @@ namespace NSL.Generators.Utils
             }
         }
 
-        public void CreateStaticClass(ClassDeclarationSyntax classDecl, string className, Action bodyBuild, IEnumerable<string> requiredUsings = null, string @namespace = null)
+        public void CreateStaticClass(ClassDeclarationSyntax classDecl, string className, Action bodyBuild, IEnumerable<string> requiredUsings = null, string @namespace = null, Action<CodeBuilder> beforeClassDef = null)
         {
             if (@namespace == null)
                 @namespace = (classDecl.Parent as NamespaceDeclarationSyntax)?.Name.ToString();
@@ -304,6 +304,7 @@ namespace NSL.Generators.Utils
                 NextTab();
             }
 
+            beforeClassDef.Invoke(this);
             AppendLine(declTypeLine);
 
             NextTab();

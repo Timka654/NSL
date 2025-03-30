@@ -113,6 +113,9 @@ namespace NSL.Generators.BinaryTypeIOGenerator
             var typeClass = type as ClassDeclarationSyntax;
 
             var typeSem = context.SemanticModel;
+
+            var typeSymb = typeSem.GetDeclaredSymbol(type) as ITypeSymbol;
+
             var codeBuilder = new CodeBuilder();
 
             codeBuilder.AppendComment(() =>
@@ -233,7 +236,10 @@ namespace NSL.Generators.BinaryTypeIOGenerator
                     classBuilder.AppendLine(methodBuilder.ToString());
                 }
 
-            }, requiredUsings);
+            }, requiredUsings, beforeClassDef: builder => builder.AppendSummary(b =>
+            {
+                b.AppendSummaryLine($"Generate for <see cref=\"{typeSymb.GetTypeSeeCRef()}\"/>");
+            }));
 
             // Visual studio have lag(or ...) cannot show changes any time
             //#if DEVELOP

@@ -16,6 +16,9 @@ namespace NSL.Generators.SelectTypeGenerator
     {
         public override string GetTypeIdentifier(bool canNullable = true)
         {
+            if (!Symbols.Any())
+                return base.GetTypeIdentifier(canNullable);
+
             var className = Type.OriginalDefinition.ToString();
 
             if (className.EndsWith("Model"))
@@ -41,11 +44,15 @@ namespace NSL.Generators.SelectTypeGenerator
 
     public class SelectGenContext
     {
+        public ITypeSymbol OriginType { get; set; }
         public ITypeSymbol Type { get; set; }
 
         public IEnumerable<ISymbol> Symbols { get; set; }
 
         public string Model { get; set; }
+
+
+        public string GenericDefinition { get; set; }
 
         public bool Typed { get; set; }
 
@@ -135,11 +142,6 @@ namespace NSL.Generators.SelectTypeGenerator
                 namespaces.Add("System.Collections.Generic");
             }
 
-            classBuilder.AppendSummary(b =>
-            {
-                b.AppendSummaryLine($"Generate for <see cref=\"{typeSymb.GetTypeSeeCRef()}\"/>");
-            });
-
             List<SelectGenContext> genContexts = new List<SelectGenContext>();
 
             classBuilder.CreateStaticClass(typeClass, $"{typeClass.GetClassName()}_Selection", () =>
@@ -209,7 +211,11 @@ namespace NSL.Generators.SelectTypeGenerator
                 classBuilder.AppendLine(string.Join(Environment.NewLine + Environment.NewLine, methods));
 #pragma warning restore RS1035 // Do not use APIs banned for analyzers
 
-            }, namespaces, @namespace: "System.Linq");
+            }, namespaces, @namespace: "System.Linq", beforeClassDef: builder => builder.AppendSummary(b =>
+             {
+                 b.AppendSummaryLine($"Generate for <see cref=\"{typeSymb.GetTypeSeeCRef()}\"/>");
+
+             }));
 
 
             //GenDebug.Break();
@@ -224,9 +230,9 @@ namespace NSL.Generators.SelectTypeGenerator
             var fnames = new List<string>();
 
             var fname = $"{typeClass.GetTypeClassName()}.selectgen.cs";
-            
+
             fnames.Add(fname);
-            
+
             GenerateDtos(sourceContext, genContexts, typeSem, fnames);
 
             var code = classBuilder.ToString();
@@ -242,7 +248,7 @@ namespace NSL.Generators.SelectTypeGenerator
                 if (item.SubTypeList != null)
                     GenerateDtos(sourceContext, item.SubTypeList, typeSem, fnames);
 
-                if (item is SelectGenDTOContext dto)
+                if (item is SelectGenDTOContext dto && item.Symbols.Any())
                 {
                     CodeBuilder codeBuilder = new CodeBuilder();
                     //GenDebug.Break(true);
@@ -267,20 +273,37 @@ namespace NSL.Generators.SelectTypeGenerator
 
                         if (fnames.Contains(fname))
                             continue;
-                        
+
                         fnames.Add(fname);
 
                         var @namespace = classDecl.GetNamespace();
 
                         var usings = classDecls.SelectMany(x => x.GetTypeClassUsingDirectives()).ToArray();
 
+
+
                         codeBuilder.CreateClass(classBuilder =>
                         {
                             foreach (var member in dto.Symbols)
                             {
-                                classBuilder.AppendLine($"public {member.GetTypeSymbol().GetTypeFullName()} {member.GetName(default)} {{ get; set; }}");
+                                string typeDef = "";
+                                var typeSymb = member.GetTypeSymbol();
+                                var type = dto.SubTypeList?.FirstOrDefault(x => x.OriginType == typeSymb);
+
+                                if (type != null)
+                                {
+                                    typeDef = string.Format(type.GenericDefinition, type.GetTypeIdentifier());
+                                    //GenDebug.Break(true);
+                                }
+                                else
+                                    typeDef = typeSymb.GetTypeFullName();
+
+                                classBuilder.AppendLine($"public {typeDef} {member.GetName(default)} {{ get; set; }}");
                             }
-                        }, className, @namespace, usings);
+                        }, className, @namespace, usings, beforeClassDef: builder => builder.AppendSummary(b =>
+                        {
+                            b.AppendSummaryLine($"Generate for <see cref=\"{dto.Type.GetTypeSeeCRef()}\"/>");
+                        }));
 
                         //GenDebug.Break(true);
 
@@ -520,16 +543,21 @@ namespace NSL.Generators.SelectTypeGenerator
                     continue;
 
                 string collectionCastFragment = default;
+                string genericDefinition = "{0}";
+
+                ITypeSymbol originType = memberType;
 
                 if (memberType is IArrayTypeSymbol arrt)
                 {
                     memberType = arrt.ElementType;
                     collectionCastFragment = ".ToArray()";
+                    genericDefinition = "{0}[]";
                 }
                 else if ((memberType is INamedTypeSymbol namedType) && (memberType.MetadataName.Equals(typeof(List<>).Name) || memberType.MetadataName.Equals(typeof(IList<>).Name)))
                 {
                     memberType = namedType.TypeArguments.First();
                     collectionCastFragment = ".ToList()";
+                    genericDefinition = "List<{0}>";
                 }
 
                 SelectGenContext itemGenContext = genContext is SelectGenDTOContext ? new SelectGenDTOContext() : new SelectGenContext();
@@ -540,8 +568,10 @@ namespace NSL.Generators.SelectTypeGenerator
 
                 itemGenContext.Symbols = FilterSymbols(memberType.GetAllMembers(), joinedModels, genContext.Typed);
                 itemGenContext.Type = memberType;
+                itemGenContext.OriginType = originType;
                 itemGenContext.Typed = genContext.Typed;
                 itemGenContext.MemberName = item.Name;
+                itemGenContext.GenericDefinition = genericDefinition;
 
                 AddChildContext(genContext, itemGenContext);
 
@@ -618,6 +648,9 @@ namespace NSL.Generators.SelectTypeGenerator
 
         void AddChildContext(SelectGenContext genContext, SelectGenContext childGenContext)
         {
+            if (!childGenContext.Symbols.Any())
+                return;
+
             if (genContext.SubTypeList == null)
                 genContext.SubTypeList = new List<SelectGenContext>();
 
