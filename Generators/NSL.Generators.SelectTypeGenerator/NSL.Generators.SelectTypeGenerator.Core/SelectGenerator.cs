@@ -6,10 +6,57 @@ using NSL.Generators.Utils;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 
 namespace NSL.Generators.SelectTypeGenerator
 {
+    public class SelectGenDTOContext : SelectGenContext
+    {
+        public override string GetTypeIdentifier(bool canNullable = true)
+        {
+            var className = Type.OriginalDefinition.ToString();
+
+            if (className.EndsWith("Model"))
+                className = className.Substring(0, className.Length - "Model".Length);
+
+            className += $"Dto{Model}Model";
+
+            return className;
+        }
+
+        public string GetTypeName()
+        {
+            var className = Type.Name;
+
+            if (className.EndsWith("Model"))
+                className = className.Substring(0, className.Length - "Model".Length);
+
+            className += $"Dto{Model}Model";
+
+            return className;
+        }
+    }
+
+    public class SelectGenContext
+    {
+        public ITypeSymbol Type { get; set; }
+
+        public IEnumerable<ISymbol> Symbols { get; set; }
+
+        public string Model { get; set; }
+
+        public bool Typed { get; set; }
+
+        public string MemberName { get; set; }
+
+        public List<SelectGenContext> SubTypeList { get; set; }
+
+        public virtual string GetTypeIdentifier(bool canNullable = true)
+            => Type.GetTypeFullName(canNullable);
+    }
+
     [Generator]
     internal class SelectGenerator : IIncrementalGenerator
     {
@@ -93,6 +140,8 @@ namespace NSL.Generators.SelectTypeGenerator
                 b.AppendSummaryLine($"Generate for <see cref=\"{typeSymb.GetTypeSeeCRef()}\"/>");
             });
 
+            List<SelectGenContext> genContexts = new List<SelectGenContext>();
+
             classBuilder.CreateStaticClass(typeClass, $"{typeClass.GetClassName()}_Selection", () =>
             {
                 var attrbs = typeClass.AttributeLists
@@ -103,8 +152,13 @@ namespace NSL.Generators.SelectTypeGenerator
                 //GenDebug.Break(true);
 
                 var typeSelectTypesGroups = attrbs
-                .Select(x => new { models = x.ArgumentList.Arguments.Where(p => p.NameEquals == null).Select(n => n.GetAttributeParameterValue<string>(typeSem)), typed = x.ArgumentList.Arguments.FirstOrDefault(n => n.NameEquals != null && n.NameEquals.Name.ToString() == nameof(SelectGenerateAttribute.Typed))?.GetAttributeParameterValue<bool>(typeSem) == true })
-                .GroupBy(x => x.typed)
+                .Select(x => new
+                {
+                    models = x.ArgumentList.Arguments.Where(p => p.NameEquals == null).Select(n => n.GetAttributeParameterValue<string>(typeSem)),
+                    typed = x.ArgumentList.Arguments.FirstOrDefault(n => n.NameEquals != null && n.NameEquals.Name.ToString() == nameof(SelectGenerateAttribute.Typed))?.GetAttributeParameterValue<bool>(typeSem) == true,
+                    dto = x.ArgumentList.Arguments.FirstOrDefault(n => n.NameEquals != null && n.NameEquals.Name.ToString() == nameof(SelectGenerateAttribute.Dto))?.GetAttributeParameterValue<bool>(typeSem) == true
+                })
+                .GroupBy(x => (x.typed, x.dto))
                 .ToArray();
 
                 var joins = typeClass.AttributeLists
@@ -122,8 +176,8 @@ namespace NSL.Generators.SelectTypeGenerator
                 {
                     var typeSelectModels = typedModels
                     .SelectMany(x => x.models)
-                    .GroupBy(x=>x)
-                    .Select(x=>x.Key)
+                    .GroupBy(x => x)
+                    .Select(x => x.Key)
                     .ToArray();
 
                     foreach (var item in typeSelectModels)
@@ -136,7 +190,18 @@ namespace NSL.Generators.SelectTypeGenerator
                         .Append(item)
                         .ToArray();
 
-                        CreateMethods(methods, typeSymb, FilterSymbols(members, mjoins, typedModels.Key), item, typedModels.Key);
+                        SelectGenContext genContext = typedModels.Key.dto ? new SelectGenDTOContext() : new SelectGenContext();
+
+
+
+                        genContext.Type = typeSymb;
+                        genContext.Symbols = FilterSymbols(members, mjoins, typedModels.Key.typed);
+                        genContext.Typed = typedModels.Key.typed;
+                        genContext.Model = item;
+
+                        CreateMethods(methods, genContext);
+
+                        genContexts.Add(genContext);
                     }
                 }
 
@@ -145,6 +210,7 @@ namespace NSL.Generators.SelectTypeGenerator
 #pragma warning restore RS1035 // Do not use APIs banned for analyzers
 
             }, namespaces, @namespace: "System.Linq");
+
 
             //GenDebug.Break();
 
@@ -155,7 +221,76 @@ namespace NSL.Generators.SelectTypeGenerator
 #pragma warning restore RS1035 // Do not use APIs banned for analyzers
             //#endif
 
-            sourceContext.AddSource($"{typeClass.GetTypeClassName()}.selectgen.cs", classBuilder.ToString());
+            var fnames = new List<string>();
+
+            var fname = $"{typeClass.GetTypeClassName()}.selectgen.cs";
+            
+            fnames.Add(fname);
+            
+            GenerateDtos(sourceContext, genContexts, typeSem, fnames);
+
+            var code = classBuilder.ToString();
+
+
+            sourceContext.AddSource(fname, code);
+        }
+
+        void GenerateDtos(SourceProductionContext sourceContext, IEnumerable<SelectGenContext> items, SemanticModel typeSem, List<string> fnames)
+        {
+            foreach (var item in items)
+            {
+                if (item.SubTypeList != null)
+                    GenerateDtos(sourceContext, item.SubTypeList, typeSem, fnames);
+
+                if (item is SelectGenDTOContext dto)
+                {
+                    CodeBuilder codeBuilder = new CodeBuilder();
+                    //GenDebug.Break(true);
+
+                    var fileClassDecls = dto.Type.DeclaringSyntaxReferences
+                        .Select(x => x.SyntaxTree.GetRoot() as CompilationUnitSyntax)
+                        .SelectMany(x => x.DescendantNodes()
+                                          .OfType<ClassDeclarationSyntax>())
+                        .ToArray();
+
+                    var classDecls = fileClassDecls.Where(c => c.GetFullName() == dto.Type.GetTypeFullName(false))
+                        .ToArray();
+
+
+                    var classDecl = classDecls.FirstOrDefault();
+
+                    if (classDecl != null)
+                    {
+                        var className = dto.GetTypeName();
+
+                        var fname = $"{className}.dtogen.cs";
+
+                        if (fnames.Contains(fname))
+                            continue;
+                        
+                        fnames.Add(fname);
+
+                        var @namespace = classDecl.GetNamespace();
+
+                        var usings = classDecls.SelectMany(x => x.GetTypeClassUsingDirectives()).ToArray();
+
+                        codeBuilder.CreateClass(classBuilder =>
+                        {
+                            foreach (var member in dto.Symbols)
+                            {
+                                classBuilder.AppendLine($"public {member.GetTypeSymbol().GetTypeFullName()} {member.GetName(default)} {{ get; set; }}");
+                            }
+                        }, className, @namespace, usings);
+
+                        //GenDebug.Break(true);
+
+                        var code = codeBuilder.ToString();
+
+
+                        sourceContext.AddSource(fname, code);
+                    }
+                }
+            }
         }
 
         private IEnumerable<ISymbol> FilterSymbols(IEnumerable<ISymbol> symbols, IEnumerable<string> joinedArr, bool typed)
@@ -177,20 +312,20 @@ namespace NSL.Generators.SelectTypeGenerator
              return false;
          });
 
-        private void CreateMethods(List<string> methods, ITypeSymbol type, IEnumerable<ISymbol> members, string model, bool typed)
+        private void CreateMethods(List<string> methods, SelectGenContext genContext)
         {
 
             var sMembers = new List<string>();
 
-            ReadMembers(members, sMembers, model, "___x", typed);
+            ReadMembers(sMembers, "___x", genContext);
 
-            methods.Add(CreateMethod(type, sMembers, model, "IEnumerable", typed).ToString());
-            methods.Add(CreateMethod(type, sMembers, model, "IQueryable", typed).ToString());
-            methods.Add(CreateMethod(type, sMembers, model, typed).ToString());
+            methods.Add(CreateSelectMethod(sMembers, "IEnumerable", genContext).ToString());
+            methods.Add(CreateSelectMethod(sMembers, "IQueryable", genContext).ToString());
+            methods.Add(CreateCastMethod(sMembers, genContext).ToString());
 
         }
 
-        private CodeBuilder CreateMethod(ITypeSymbol type, IEnumerable<string> sMembers, string model, bool typed)
+        private CodeBuilder CreateCastMethod(IEnumerable<string> sMembers, SelectGenContext genContext)
         {
             CodeBuilder methodBuilder = new CodeBuilder();
 
@@ -209,15 +344,15 @@ namespace NSL.Generators.SelectTypeGenerator
             //methodBuilder.AppendLine();
 
 
-            var rType = typed ? type.GetTypeFullName() : "dynamic";
+            var rType = genContext.Typed ? genContext.GetTypeIdentifier() : "dynamic";
 
-            methodBuilder.AppendLine($"public static {rType} To{(typed ? "Typed" : string.Empty)}{model}(this {type.GetTypeFullName()} ___x)");
+            methodBuilder.AppendLine($"public static {rType} To{(genContext.Typed ? "Typed" : string.Empty)}{genContext.Model}(this {genContext.GetTypeIdentifier()} ___x)");
 
             methodBuilder.AppendLine("{");
 
             methodBuilder.NextTab();
 
-            if (typed)
+            if (genContext.Typed)
                 methodBuilder.AppendLine($"return new {rType} {{");
             else
                 methodBuilder.AppendLine("return new {");
@@ -240,20 +375,20 @@ namespace NSL.Generators.SelectTypeGenerator
             return methodBuilder;
         }
 
-        private CodeBuilder CreateMethod(ITypeSymbol type, IEnumerable<string> sMembers, string model, string collectionType, bool typed)
+        private CodeBuilder CreateSelectMethod(IEnumerable<string> sMembers, string collectionType, SelectGenContext genContext)
         {
             CodeBuilder methodBuilder = new CodeBuilder();
 
-            var rType = typed ? type.GetTypeFullName() : "dynamic";
+            var rType = genContext.Typed ? genContext.GetTypeIdentifier() : "dynamic";
 
-            methodBuilder.AppendLine($"public static {collectionType}<{rType}> Select{(typed ? "Typed" : string.Empty)}{model}(this {collectionType}<{type.GetTypeFullName()}> ___toSelect)");
+            methodBuilder.AppendLine($"public static {collectionType}<{rType}> Select{(genContext.Typed ? "Typed" : string.Empty)}{genContext.Model}(this {collectionType}<{genContext.GetTypeIdentifier()}> ___toSelect)");
 
             methodBuilder.AppendLine("{");
 
             methodBuilder.NextTab();
 
-            if (typed)
-                methodBuilder.AppendLine($"return ___toSelect.Select(___x=> new {type.GetTypeFullName()} {{");
+            if (genContext.Typed)
+                methodBuilder.AppendLine($"return ___toSelect.Select(___x=> new {genContext.GetTypeIdentifier()} {{");
             else
                 methodBuilder.AppendLine("return ___toSelect.Select(___x=> new {");
 
@@ -321,71 +456,57 @@ namespace NSL.Generators.SelectTypeGenerator
             return proxyModel ?? model;
         }
 
-        private void ReadCollection(List<string> sMembers, ISymbol item, IEnumerable<ISymbol> amembers, string model, string itemModel, string path, bool typed, ITypeSymbol itemType, string toSegment)
+        //private void ReadCollection(List<string> sMembers, ISymbol item, IEnumerable<ISymbol> amembers, string model, string itemModel, string path, bool typed, ITypeSymbol itemType, string toSegment)        
+        private void ReadCollection(List<string> sMembers, string path, SelectGenContext context, string toSegment)
         {
-            if (amembers.Any())
+            if (context.Symbols.Any())
             {
-
-                int n = 0;
-                string p = string.Empty;
-                while (path.Contains(p = $"x{n++}")) { }
-
-                if (!Equals(model, itemModel))
-                    sMembers.Add($"// Proxy model merge from \"{model}\" to \"{itemModel}\"");
-
-                var rType = typed ? itemType.GetTypeFullName() : string.Empty;
-
-
 
 #pragma warning disable RS1035 // Не использовать API, запрещенные для анализаторов
                 //GenDebug.Break(true);
                 string readSegment = default;
-                if (HaveModel(itemType, itemModel, typed))
+                if (HaveModel(context.Model, context))
                 {
-                    readSegment = $"{path}.{item.Name}.Select{(typed ? "Typed" : string.Empty)}{itemModel}()";
+                    readSegment = $"{path}.{context.MemberName}.Select{(context.Typed ? "Typed" : string.Empty)}{context.Model}()";
                 }
                 else
                 {
+                    string p = GetTempPathNode(path);
+
+                    var rType = context.Typed ? context.GetTypeIdentifier() : string.Empty;
+
                     var amem = new List<string>();
 
-                    ReadMembers(amembers, amem, itemModel, p, typed);
+                    ReadMembers(amem, p, context);
 
-                    readSegment = $"{path}.{item.Name}.Select({p} => new {rType} {{{Environment.NewLine}{CombineMembers(amem.Select(x => $"\t{x}"))}{Environment.NewLine}}})";
+                    readSegment = $"{path}.{context.MemberName}.Select({p} => new {rType} {{{Environment.NewLine}{CombineMembers(amem.Select(x => $"\t{x}"))}{Environment.NewLine}}})";
                 }
 
-                sMembers.Add($"{item.Name} = {path}.{item.Name} == null ? null : {readSegment}{toSegment}");
+                sMembers.Add($"{context.MemberName} = {path}.{context.MemberName} == null ? null : {readSegment}{toSegment}");
 #pragma warning restore RS1035 // Не использовать API, запрещенные для анализаторов
             }
             else
-                sMembers.Add($"{path}.{item.Name}");
+                sMembers.Add($"{context.MemberName} = {path}.{context.MemberName}");
         }
 
-        private bool HaveModel(ITypeSymbol typeSymbol, string model, bool typed)
+        private string GetTempPathNode(string path)
         {
-            return typeSymbol.GetAttributes().Where(x =>
-            {
-                if (!x.AttributeClass.Name.Equals(SelectGenerateAttributeFullName))
-                    return false;
+            int n = 0;
+            string p = string.Empty;
+            while (path.Contains(p = $"x{n++}")) { }
 
-                if (x.ConstructorArguments.Where(a => a.Values.Any(v => v.Value == model)).Any() && Equals(x.GetNamedArgumentValue("Typed") ?? false, typed))
-                    return true;
-
-                return false;
-            }).Any();
+            return p;
         }
 
 
-        private void ReadMembers(IEnumerable<ISymbol> members, List<string> sMembers, string model, string path, bool typed)
+        private void ReadMembers(List<string> sMembers, string path, SelectGenContext genContext)
         {
-            string itemModel;
-
-            foreach (var item in members)
+            foreach (var item in genContext.Symbols)
             {
                 ITypeSymbol memberType;
 
                 if (item is IPropertySymbol ps)
                 {
-
                     if (ps.GetMethod == null)
                         continue;
 
@@ -398,94 +519,68 @@ namespace NSL.Generators.SelectTypeGenerator
                 else
                     continue;
 
-                string typeName = default;
-
-                IEnumerable<string> joined;
-
-                INamedTypeSymbol type = memberType as INamedTypeSymbol;
-
-                if (type != null)
-                    typeName = type.MetadataName;
-                else
-                {
-                    var arrType = memberType as IArrayTypeSymbol;
-
-                    typeName = $"{arrType.ElementType.Name}[]";
-                }
-
-                //#if DEBUG
-                //   GenDebug.Break();
-                //#endif
-
-                //if (item.Name.StartsWith("JP"))
-                //{
-                //    GenDebug.Break();
-                //}
+                string collectionCastFragment = default;
 
                 if (memberType is IArrayTypeSymbol arrt)
                 {
-                    itemModel = GetProxyModel(item, model);
+                    memberType = arrt.ElementType;
+                    collectionCastFragment = ".ToArray()";
+                }
+                else if ((memberType is INamedTypeSymbol namedType) && (memberType.MetadataName.Equals(typeof(List<>).Name) || memberType.MetadataName.Equals(typeof(IList<>).Name)))
+                {
+                    memberType = namedType.TypeArguments.First();
+                    collectionCastFragment = ".ToList()";
+                }
 
-                    joined = GetJoinModels(arrt.ElementType, itemModel);
+                SelectGenContext itemGenContext = genContext is SelectGenDTOContext ? new SelectGenDTOContext() : new SelectGenContext();
 
-                    sMembers.Add($"// Join {itemModel} to [{string.Join(",", joined)}]");
+                itemGenContext.Model = GetProxyModel(item, genContext.Model);
 
-                    var amembers = FilterSymbols(arrt.ElementType.GetAllMembers(), joined, typed);
+                IEnumerable<string> joinedModels = GetJoinModels(memberType, itemGenContext.Model);
 
-                    ReadCollection(sMembers, item, amembers, model, itemModel, path, typed, arrt.ElementType, ".ToArray()");
+                itemGenContext.Symbols = FilterSymbols(memberType.GetAllMembers(), joinedModels, genContext.Typed);
+                itemGenContext.Type = memberType;
+                itemGenContext.Typed = genContext.Typed;
+                itemGenContext.MemberName = item.Name;
+
+                AddChildContext(genContext, itemGenContext);
+
+                if (collectionCastFragment != default)
+                {
+                    sMembers.Add($"// Join {itemGenContext.Model} to [{string.Join(",", joinedModels)}]");
+
+                    if (!Equals(genContext.Model, itemGenContext.Model))
+                        sMembers.Add($"// Proxy model merge from \"{genContext.Model}\" to \"{itemGenContext.Model}\"");
+
+                    ReadCollection(sMembers, path, itemGenContext, collectionCastFragment);
 
                     continue;
                 }
-                else if (type.MetadataName.Equals(typeof(List<>).Name) || type.MetadataName.Equals(typeof(IList<>).Name))
+
+                if (itemGenContext.Symbols.Any())
                 {
-                    var pType = type.TypeArguments.First();
+                    sMembers.Add($"// Join {itemGenContext.Model} to [{string.Join(",", joinedModels)}]");
 
-                    itemModel = GetProxyModel(item, model);
-
-                    joined = GetJoinModels(pType, itemModel);
-
-                    sMembers.Add($"// Join {itemModel} to [{string.Join(",", joined)}]");
-
-                    var amembers = FilterSymbols(pType.GetAllMembers(), joined, typed);
-
-                    ReadCollection(sMembers, item, amembers, model, itemModel, path, typed, pType, ".ToList()");
-
-                    continue;
-                }
-
-
-                itemModel = GetProxyModel(item, model);
-
-                joined = GetJoinModels(memberType, itemModel);
-
-                var memMembers = FilterSymbols(memberType.GetAllMembers(), joined, typed);
-
-                if (memMembers.Any())
-                {
-                    sMembers.Add($"// Join {itemModel} to [{string.Join(",", joined)}]");
-
-                    if (!Equals(model, itemModel))
-                        sMembers.Add($"// Proxy model merge from \"{model}\" to \"{itemModel}\"");
+                    if (!Equals(genContext.Model, itemGenContext.Model))
+                        sMembers.Add($"// Proxy Model merge from \"{genContext.Model}\" to \"{itemGenContext.Model}\"");
 
 
 #pragma warning disable RS1035 // Не использовать API, запрещенные для анализаторов
 
-                    //GenDebug.Break(true);
-
                     string readSegment = default;
 
-                    if (HaveModel(memberType, itemModel, typed))
+                    if (HaveModel(itemGenContext.Model, itemGenContext))
                     {
-                        readSegment = $"{path}.{item.Name}.To{(typed ? "Typed" : string.Empty)}{itemModel}()";
+                        readSegment = $"{path}.{item.Name}.To{(genContext.Typed ? "Typed" : string.Empty)}{itemGenContext.Model}()";
                     }
                     else
                     {
-
                         var nMembers = new List<string>();
 
-                        ReadMembers(memMembers, nMembers, itemModel, $"{path}.{item.Name}", typed);
+                        ReadMembers(nMembers, $"{path}.{item.Name}", itemGenContext);
 
-                        var valueGetter = typed ? $"new {item.GetTypeSymbol().GetTypeFullName(false)}" : $"new ";
+                        var valueGetter = genContext.Typed ? $"new {itemGenContext.GetTypeIdentifier(false)}" : $"new ";
+
                         readSegment = $"{valueGetter} {{{Environment.NewLine}{CombineMembers(nMembers.Select(x => $"\t{x}"))}{Environment.NewLine}}}";
                     }
 
@@ -493,12 +588,40 @@ namespace NSL.Generators.SelectTypeGenerator
                     sMembers.Add($"{item.Name} = {path}.{item.Name} == null ? null : {readSegment}");
 
 #pragma warning restore RS1035 // Не использовать API, запрещенные для анализаторов
+
+                    continue;
                 }
-                else if (typed)
+
+                if (genContext.Typed)
+                {
                     sMembers.Add($"{item.Name} = {path}.{item.Name}");
-                else
-                    sMembers.Add($"{path}.{item.Name}");
+                    continue;
+                }
+
+                sMembers.Add($"{path}.{item.Name}");
             }
+        }
+
+        private bool HaveModel(string model, SelectGenContext context)
+        {
+            return context.Type.GetAttributes().Where(x =>
+            {
+                if (!x.AttributeClass.Name.Equals(SelectGenerateAttributeFullName))
+                    return false;
+
+                if (x.ConstructorArguments.Where(a => a.Values.Any(v => v.Value == model)).Any() && Equals(x.GetNamedArgumentValue("Typed") ?? false, context.Typed))
+                    return true;
+
+                return false;
+            }).Any();
+        }
+
+        void AddChildContext(SelectGenContext genContext, SelectGenContext childGenContext)
+        {
+            if (genContext.SubTypeList == null)
+                genContext.SubTypeList = new List<SelectGenContext>();
+
+            genContext.SubTypeList.Add(childGenContext);
         }
 
         private readonly string SelectGenerateAttributeFullName = typeof(SelectGenerateAttribute).Name;

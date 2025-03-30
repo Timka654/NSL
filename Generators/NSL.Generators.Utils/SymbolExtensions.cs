@@ -1,4 +1,6 @@
 ﻿using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System.IO;
 using System.Linq;
 
 namespace NSL.Generators.Utils
@@ -43,5 +45,48 @@ namespace NSL.Generators.Utils
 
             return args.First(x => x.Key.Equals(name)).Value;
         }
+    }
+
+    public static class SyntaxExtensions
+    {
+        public static string GetNamespace(this ClassDeclarationSyntax classDecl)
+        {
+            var cparent = classDecl.Parent;
+
+            while (cparent != null)
+            {
+                if (cparent is NamespaceDeclarationSyntax nds)
+                {
+                    return nds.Name.ToString();
+                }
+                cparent = cparent.Parent;
+            }
+
+            return default;
+        }
+        public static string GetFullName(this ClassDeclarationSyntax classDecl)
+        {
+            string path = classDecl.Identifier.ToString();
+
+            var cparent = classDecl.Parent;
+
+            while (cparent != null)
+            {
+                if (cparent is NamespaceDeclarationSyntax nds)
+                {
+                    path = $"{nds.Name}.{path}";
+                    break;
+                }
+
+                if (cparent is ClassDeclarationSyntax cds)
+                {
+                    path = $"{cds.Identifier}.{path}";
+                }
+                cparent = cparent.Parent;
+            }
+
+            return path;
+        }
+
     }
 }

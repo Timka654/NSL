@@ -8,7 +8,7 @@ namespace NSL.Generators.SelectTypeGenerator.Tests
         {
 #if DEVELOP
             IEnumerable<JoinProxyModel1> jplist = new List<JoinProxyModel1>();
-
+            DTOModel1Dtotemp1Model dto = new DTOModel1Dtotemp1Model();
             jplist.SelectTestGet();
 #else
             List<JoiningModel1> jList = new List<JoiningModel1>();
@@ -39,15 +39,15 @@ namespace NSL.Generators.SelectTypeGenerator.Tests
         }
     }
 
-    [SelectGenerate("temp1")]
-    public partial class CollectionSelectorModel1
-    {
-        [SelectGenerateInclude("temp1")]
-        public CollectionSelectorModel1[] items { get; set; }
+    //[SelectGenerate("temp1")]
+    //public partial class CollectionSelectorModel1
+    //{
+    //    [SelectGenerateInclude("temp1")]
+    //    public CollectionSelectorModel1[] items { get; set; }
 
-        [SelectGenerateInclude("temp1")]
-        public CollectionSelectorModel1 item { get; set; }
-    }
+    //    [SelectGenerateInclude("temp1")]
+    //    public CollectionSelectorModel1 item { get; set; }
+    //}
 
     [SelectGenerate("temp1", Typed = true)]
     public partial class ReadOnlyTyped1
@@ -57,5 +57,60 @@ namespace NSL.Generators.SelectTypeGenerator.Tests
 
         [SelectGenerateInclude("temp1")]
         public int MyProperty2 { set { } }
+    }
+
+    public partial class DTOInnerTypeModel
+    {
+        [SelectGenerateInclude("temp1")]
+        public int MyProperty1 { get; set; }
+
+        [SelectGenerateInclude("temp1")]
+        public int MyProperty2 { get; set; }
+    }
+
+
+    [SelectGenerate("temp1", Typed = true, Dto = true)]
+    public partial class DTOTypedModel1
+    {
+        [SelectGenerateInclude("temp1")]
+        [SelectGenerateProxy("temp1")]
+        public ReadOnlyTyped1 Type { get; set; }
+
+        [SelectGenerateInclude("temp1")]
+        [SelectGenerateProxy("temp1")]
+        public ReadOnlyTyped1[] ArrayType { get; set; }
+
+        [SelectGenerateInclude("temp1")]
+        public DTOInnerTypeModel Type2 { get; set; }
+
+        [SelectGenerateInclude("temp1")]
+        public DTOInnerTypeModel[] ArrayType2 { get; set; }
+
+        [SelectGenerateInclude("temp1")]
+        public int BaseType { get; set; }
+
+        [SelectGenerateInclude("temp1")]
+        public int? BaseNulledType { get; set; }
+
+        [SelectGenerateInclude("temp1")]
+        public string? StringType { get; set; }
+    }
+
+
+    [SelectGenerate("temp1", Dto = true)]
+    public partial class DTOModel1
+    {
+        public ReadOnlyTyped1 Type { get; set; }
+
+        public ReadOnlyTyped1[] ArrayType { get; set; }
+
+        [SelectGenerateInclude("temp1")]
+        public int BaseType { get; set; }
+
+        [SelectGenerateInclude("temp1")]
+        public int? BaseNulledType { get; set; }
+
+        [SelectGenerateInclude("temp1")]
+        public string? StringType { get; set; }
     }
 }

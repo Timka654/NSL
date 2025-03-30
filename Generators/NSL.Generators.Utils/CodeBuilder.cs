@@ -127,7 +127,79 @@ namespace NSL.Generators.Utils
             AppendLine("}");
         }
 
-        public void CreatePartialClass(ClassDeclarationSyntax classDecl, Action<CodeBuilder> bodyBuild, IEnumerable<string> requiredDirectives = null)
+        public void CreateClass(Action<CodeBuilder> bodyBuild, string name, string @namespace = null, IEnumerable<string> requiredUsings = null)
+        {
+            var body = new CodeBuilder();
+
+            bodyBuild(body);
+
+            //var @namespace = classDecl.Parent as NamespaceDeclarationSyntax;
+
+            //var usings = classDecl.GetTypeClassUsingDirectives();
+
+            //AddUsings(usings);
+
+            if (requiredUsings != null)
+            {
+                //requiredUsings = requiredUsings.Except(usings);
+
+                AddUsings(requiredUsings);
+            }
+
+            AppendLine();
+
+            //var genericParams = classDecl.GetTypeGenericParameters();
+
+            //var declTypeLine = "";
+
+            //if (genericParams?.Any() == true)
+            //    declTypeLine = $"<{string.Join(",", genericParams)}>";
+
+            //declTypeLine = $"{classDecl.GetClassFullModifier()} class {classDecl.GetClassName()}{declTypeLine}";
+
+            var declTypeLine = $"public class {name}";
+
+
+            if (@namespace != null)
+            {
+                AppendLine($"namespace {@namespace}");
+                AppendLine("{");
+
+                NextTab();
+            }
+
+            AppendLine(declTypeLine);
+
+            //NextTab();
+
+            //foreach (var c in classDecl.ConstraintClauses)
+            //{
+            //    AppendLine(c.ToString());
+            //}
+
+            //PrevTab();
+
+            AppendLine("{");
+
+            NextTab();
+
+            AppendLine(body.ToString());
+
+            PrevTab();
+
+            AppendLine("}");
+
+            PrevTab();
+
+            if (@namespace != null)
+            {
+                PrevTab();
+
+                AppendLine("}");
+            }
+        }
+
+        public void CreatePartialClass(ClassDeclarationSyntax classDecl, Action<CodeBuilder> bodyBuild, IEnumerable<string> requiredUsings = null)
         {
             var body = new CodeBuilder();
 
@@ -139,11 +211,11 @@ namespace NSL.Generators.Utils
 
             AddUsings(usings);
 
-            if (requiredDirectives != null)
+            if (requiredUsings != null)
             {
-                requiredDirectives = requiredDirectives.Except(usings);
+                requiredUsings = requiredUsings.Except(usings);
 
-                AddUsings(requiredDirectives);
+                AddUsings(requiredUsings);
             }
 
             AppendLine();
@@ -197,7 +269,7 @@ namespace NSL.Generators.Utils
             }
         }
 
-        public void CreateStaticClass(ClassDeclarationSyntax classDecl, string className, Action bodyBuild, IEnumerable<string> requiredDirectives = null, string @namespace = null)
+        public void CreateStaticClass(ClassDeclarationSyntax classDecl, string className, Action bodyBuild, IEnumerable<string> requiredUsings = null, string @namespace = null)
         {
             if (@namespace == null)
                 @namespace = (classDecl.Parent as NamespaceDeclarationSyntax)?.Name.ToString();
@@ -206,11 +278,11 @@ namespace NSL.Generators.Utils
 
             AddUsings(usings);
 
-            if (requiredDirectives != null)
+            if (requiredUsings != null)
             {
-                requiredDirectives = requiredDirectives.Except(usings);
+                requiredUsings = requiredUsings.Except(usings);
 
-                AddUsings(requiredDirectives);
+                AddUsings(requiredUsings);
             }
 
             AppendLine();
