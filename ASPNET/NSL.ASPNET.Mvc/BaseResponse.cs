@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 
@@ -14,7 +15,7 @@ namespace NSL.ASPNET.Mvc
             return base.ExecuteResultAsync(context);
         }
 
-        public BaseResponse() : base(null)
+        public BaseResponse() : this(200, null)
         {
         }
 
@@ -42,13 +43,12 @@ namespace NSL.ASPNET.Mvc
             => new BaseResponse((int)HttpStatusCode.Forbidden, default);
 
         public static BaseResponse Forbid(string errorMessage)
-            => Error(HttpStatusCode.NotFound, errorMessage);
+            => Error(HttpStatusCode.Forbidden, errorMessage);
 
         public static BaseResponse Error(HttpStatusCode code, string errorMessage)
-            => new BaseResponse((int)code, new
+            => new BaseResponse((int)code, new Dictionary<string, string[]>
             {
-                Key = string.Empty,
-                Value = (string[])[errorMessage]
+                { string.Empty, [errorMessage]}
             });
 
         public static BaseResponse StatusCode(HttpStatusCode code)

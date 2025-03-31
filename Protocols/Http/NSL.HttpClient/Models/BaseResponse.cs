@@ -13,7 +13,7 @@ namespace NSL.HttpClient.Models
         public HttpStatusCode StatusCode { get; set; }
 
         [JsonIgnore]
-        public bool IsSuccess => StatusCode == HttpStatusCode.OK;
+        public bool IsSuccess => ((int)StatusCode >= 200) && ((int)StatusCode <= 299);
 
         [JsonIgnore]
         public bool IsBadRequest => StatusCode == HttpStatusCode.BadRequest;

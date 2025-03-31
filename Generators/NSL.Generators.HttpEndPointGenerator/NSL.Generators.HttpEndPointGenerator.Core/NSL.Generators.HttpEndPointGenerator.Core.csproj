@@ -57,10 +57,4 @@
 			<Link>NSL.Generators.Utils\%(RecursiveDir)%(FileName)%(Extension)</Link>
 		</Compile>
 	</ItemGroup>
-
-	<!--<ItemGroup>
-		<ProjectReference Include="..\NSL.Generators.HttpEndPointGenerator.Shared\NSL.Generators.HttpEndPointGenerator.Shared.csproj" PrivateAssets="all" />
-		<ProjectReference Include="..\..\NSL.Generators.Utils\NSL.Generators.Utils.csproj" PrivateAssets="all" />
-	</ItemGroup>-->
-
 </Project>

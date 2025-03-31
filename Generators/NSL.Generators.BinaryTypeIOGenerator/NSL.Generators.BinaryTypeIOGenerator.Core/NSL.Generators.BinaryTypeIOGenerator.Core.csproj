@@ -41,18 +41,6 @@
 	<ItemGroup Condition="'$(Configuration)'=='UnityDebug' Or '$(Configuration)'=='Unity'">
 		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.3.1" PrivateAssets="all" />
 	</ItemGroup>
-	<!--<ItemGroup>
-		<Compile Include="..\..\NSL.Generators.BinaryGenerator\**\*.cs">
-			<Link>.\BinaryGenerator</Link>
-		</Compile>
-	</ItemGroup>-->
-
-	<!--<ItemGroup>
-		<ProjectReference Include="..\..\..\Core\NSL.SocketCore\NSL.SocketCore.csproj"  />
-		<ProjectReference Include="..\NSL.Generators.BinaryTypeIOGenerator.Shared\NSL.Generators.BinaryTypeIOGenerator.Shared.csproj"  />
-		<ProjectReference Include="..\..\NSL.Generators.BinaryGenerator\NSL.Generators.BinaryGenerator.csproj"  />
-		<ProjectReference Include="..\..\NSL.Generators.Utils\NSL.Generators.Utils.csproj"  />
-	</ItemGroup>-->
 	<ItemGroup>
 		<Compile Include="..\..\..\Core\NSL.SocketCore\**\*.cs" Exclude="..\..\..\Core\NSL.SocketCore\**\bin\**;..\..\..\Core\NSL.SocketCore\**\obj\**">
 			<Link>NSL.SocketCore\%(RecursiveDir)%(FileName)%(Extension)</Link>

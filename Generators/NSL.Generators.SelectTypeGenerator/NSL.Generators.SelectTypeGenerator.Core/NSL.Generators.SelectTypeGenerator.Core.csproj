@@ -54,9 +54,5 @@
 			<Link>NSL.Generators.Utils\%(RecursiveDir)%(FileName)%(Extension)</Link>
 		</Compile>
 	</ItemGroup>
-	<!--<ItemGroup>
-		<ProjectReference Include="..\NSL.Generators.SelectTypeGenerator.Shared\NSL.Generators.SelectTypeGenerator.Shared.csproj" PrivateAssets="all" OutputItemType="Analyzer"/>
-		<ProjectReference Include="..\..\NSL.Generators.Utils\NSL.Generators.Utils.csproj" PrivateAssets="all" OutputItemType="Analyzer"/>
-	</ItemGroup>-->
 
 </Project>

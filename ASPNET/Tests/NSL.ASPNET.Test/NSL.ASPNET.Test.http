@@ -1,0 +1,6 @@
+@NSL.ASPNET.Test_HostAddress = http://localhost:5029
+
+POST {{NSL.ASPNET.Test_HostAddress}}/Home/Index
+Accept: application/json
+
+###
