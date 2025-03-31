@@ -41,35 +41,34 @@
 	<ItemGroup Condition="'$(Configuration)'=='UnityDebug' Or '$(Configuration)'=='Unity'">
 		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.3.1" PrivateAssets="all" />
 	</ItemGroup>
-	
 	<ItemGroup>
-		<Compile Include="..\NSL.Generators.PacketHandleGenerator.Shared\**\*.cs" Exclude="..\NSL.Generators.PacketHandleGenerator.Shared\**\bin\**;..\NSL.Generators.PacketHandleGenerator.Shared\**\obj\**">
+		<Compile Include="..\NSL.Generators.PacketHandleGenerator.Shared\**\*.cs" Exclude="..\NSL.Generators.PacketHandleGenerator.Shared\**\bin\**;..\NSL.Generators.PacketHandleGenerator.Shared\**\obj\**" >
 			<Link>NSL.Generators.PacketHandleGenerator.Shared\%(RecursiveDir)%(FileName)%(Extension)</Link>
-		</Compile>
-	</ItemGroup>
-	<ItemGroup>
-		<Compile Include="..\..\..\Core\NSL.SocketCore\**\*.cs" Exclude="..\..\..\Core\NSL.SocketCore\**\bin\**;..\..\..\Core\NSL.SocketCore\**\obj\**">
-			<Link>NSL.SocketCore\%(RecursiveDir)%(FileName)%(Extension)</Link>
-		</Compile>
-	</ItemGroup>
-	<ItemGroup>
-		<Compile Include="..\..\..\Core\Utils\NSL.Utils\**\*.cs" Exclude="..\..\..\Core\Utils\NSL.Utils\**\bin\**;..\..\..\Core\Utils\NSL.Utils\**\obj\**">
-			<Link>NSL.Utils\%(RecursiveDir)%(FileName)%(Extension)</Link>
-		</Compile>
-	</ItemGroup>
-	<ItemGroup>
-		<Compile Include="..\..\NSL.Generators.BinaryTypeIOGenerator\NSL.Generators.BinaryTypeIOGenerator.Shared\**\*.cs" Exclude="..\..\NSL.Generators.BinaryTypeIOGenerator\NSL.Generators.BinaryTypeIOGenerator.Shared\**\bin\**;..\..\NSL.Generators.BinaryTypeIOGenerator\NSL.Generators.BinaryTypeIOGenerator.Shared\**\obj\**">
-			<Link>NSL.Generators.BinaryTypeIOGenerator.Shared\%(RecursiveDir)%(FileName)%(Extension)</Link>
-		</Compile>
-	</ItemGroup>
-	<ItemGroup>
-		<Compile Include="..\..\NSL.Generators.BinaryGenerator\**\*.cs" Exclude="..\..\NSL.Generators.BinaryGenerator\**\bin\**;..\..\NSL.Generators.BinaryGenerator\**\obj\**">
-			<Link>NSL.Generators.BinaryGenerator\%(RecursiveDir)%(FileName)%(Extension)</Link>
-		</Compile>
-	</ItemGroup>
-	<ItemGroup>
-		<Compile Include="..\..\NSL.Generators.Utils\**\*.cs" Exclude="..\..\NSL.Generators.Utils\**\bin\**;..\..\NSL.Generators.Utils\**\obj\**">
-			<Link>NSL.Generators.Utils\%(RecursiveDir)%(FileName)%(Extension)</Link>
+			</Compile>
+				</ItemGroup>
+				<ItemGroup>
+					<Compile Include="..\..\..\Core\NSL.SocketCore\**\*.cs" Exclude="..\..\..\Core\NSL.SocketCore\**\bin\**;..\..\..\Core\NSL.SocketCore\**\obj\**">
+						<Link>NSL.SocketCore\%(RecursiveDir)%(FileName)%(Extension)</Link>
+			</Compile>
+				</ItemGroup>
+				<ItemGroup>
+					<Compile Include="..\..\..\Core\Utils\NSL.Utils\**\*.cs" Exclude="..\..\..\Core\Utils\NSL.Utils\**\bin\**;..\..\..\Core\Utils\NSL.Utils\**\obj\**">
+						<Link>NSL.Utils\%(RecursiveDir)%(FileName)%(Extension)</Link>
+			</Compile>
+				</ItemGroup>
+				<ItemGroup>
+					<Compile Include="..\..\NSL.Generators.BinaryTypeIOGenerator\NSL.Generators.BinaryTypeIOGenerator.Shared\**\*.cs" Exclude="..\..\NSL.Generators.BinaryTypeIOGenerator\NSL.Generators.BinaryTypeIOGenerator.Shared\**\bin\**;..\..\NSL.Generators.BinaryTypeIOGenerator\NSL.Generators.BinaryTypeIOGenerator.Shared\**\obj\**">
+						<Link>NSL.Generators.BinaryTypeIOGenerator.Shared\%(RecursiveDir)%(FileName)%(Extension)</Link>
+			</Compile>
+				</ItemGroup>
+				<ItemGroup>
+					<Compile Include="..\..\NSL.Generators.BinaryGenerator\**\*.cs" Exclude="..\..\NSL.Generators.BinaryGenerator\**\bin\**;..\..\NSL.Generators.BinaryGenerator\**\obj\**">
+						<Link>NSL.Generators.BinaryGenerator\%(RecursiveDir)%(FileName)%(Extension)</Link>
+			</Compile>
+				</ItemGroup>
+				<ItemGroup>
+					<Compile Include="..\..\NSL.Generators.Utils\**\*.cs" Exclude="..\..\NSL.Generators.Utils\**\bin\**;..\..\NSL.Generators.Utils\**\obj\**">
+						<Link>NSL.Generators.Utils\%(RecursiveDir)%(FileName)%(Extension)</Link>
 		</Compile>
 	</ItemGroup>
 	<ItemGroup>

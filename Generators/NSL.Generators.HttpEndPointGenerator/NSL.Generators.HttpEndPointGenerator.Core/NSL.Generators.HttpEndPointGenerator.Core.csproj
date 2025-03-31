@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<NSLProjectTypes>UnitySupport;Analyzer;AnalyzerCore</NSLProjectTypes>
@@ -44,17 +44,16 @@
 	<ItemGroup>
 		<PackageReference Include="Microsoft.Extensions.Primitives" Version="9.0.3" />
 	</ItemGroup>
-
 	<ItemGroup>
-		<Compile Include="..\NSL.Generators.HttpEndPointGenerator.Shared\**\*.cs"
-			  Exclude="..\NSL.Generators.HttpEndPointGenerator.Shared\**\bin\**;..\NSL.Generators.HttpEndPointGenerator.Shared\**\obj\**">
+		<Compile Include="..\NSL.Generators.HttpEndPointGenerator.Shared\**\*.cs" Exclude="..\NSL.Generators.HttpEndPointGenerator.Shared\**\bin\**;..\NSL.Generators.HttpEndPointGenerator.Shared\**\obj\**" >
 			<Link>NSL.Generators.HttpEndPointGenerator.Shared\%(RecursiveDir)%(FileName)%(Extension)</Link>
+			</Compile>
+				</ItemGroup>
+				<ItemGroup>
+					<Compile Include="..\..\NSL.Generators.Utils\**\*.cs"
+						  Exclude="..\..\NSL.Generators.Utils\**\bin\**;..\..\NSL.Generators.Utils\**\obj\**">
+						<Link>NSL.Generators.Utils\%(RecursiveDir)%(FileName)%(Extension)</Link>
 		</Compile>
 	</ItemGroup>
-	<ItemGroup>
-		<Compile Include="..\..\NSL.Generators.Utils\**\*.cs"
-			  Exclude="..\..\NSL.Generators.Utils\**\bin\**;..\..\NSL.Generators.Utils\**\obj\**">
-			<Link>NSL.Generators.Utils\%(RecursiveDir)%(FileName)%(Extension)</Link>
-		</Compile>
-	</ItemGroup>
+
 </Project>
