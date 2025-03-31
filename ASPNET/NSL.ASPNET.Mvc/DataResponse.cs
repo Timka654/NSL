@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Security.Cryptography;
@@ -28,13 +29,12 @@ namespace NSL.ASPNET.Mvc
             => new DataResponse<TData>((int)HttpStatusCode.Forbidden, default);
 
         public static DataResponse<TData> Forbid<TData>(string errorMessage)
-            => Error<TData>(HttpStatusCode.NotFound, errorMessage);
+            => Error<TData>(HttpStatusCode.Forbidden, errorMessage);
 
         public static DataResponse<TData> Error<TData>(HttpStatusCode code, string errorMessage)
-            => new DataResponse<TData>((int)code, new
+            => new DataResponse<TData>((int)code, new Dictionary<string, string[]>
             {
-                Key = string.Empty,
-                Value = (string[])[errorMessage]
+                { string.Empty, [errorMessage]}
             });
 
         public static DataResponse<TData> StatusCode<TData>(HttpStatusCode code)
@@ -58,7 +58,7 @@ namespace NSL.ASPNET.Mvc
         {
         }
 
-        public DataResponse(int statusCode, object value) : base(new { data = value })
+        public DataResponse(int statusCode, object value) : base(value)
         {
             this.StatusCode = statusCode;
         }

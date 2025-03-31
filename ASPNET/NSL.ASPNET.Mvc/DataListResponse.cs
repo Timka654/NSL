@@ -25,13 +25,12 @@ namespace NSL.ASPNET.Mvc
             => new DataListResponse<TData>((int)HttpStatusCode.Forbidden, default);
 
         public static DataListResponse<TData> Forbid<TData>(string errorMessage)
-            => Error<TData>(HttpStatusCode.NotFound, errorMessage);
+            => Error<TData>(HttpStatusCode.Forbidden, errorMessage);
 
         public static DataListResponse<TData> Error<TData>(HttpStatusCode code, string errorMessage)
-            => new DataListResponse<TData>((int)code, new
+            => new DataListResponse<TData>((int)code, new Dictionary<string, string[]>
             {
-                Key = string.Empty,
-                Value = (string[])[errorMessage]
+                { string.Empty, [errorMessage]}
             });
 
         public static DataListResponse<TData> StatusCode<TData>(HttpStatusCode code)
@@ -42,7 +41,7 @@ namespace NSL.ASPNET.Mvc
     }
     public class DataListResponse<TData> : DataResponse<object>
     {
-        public DataListResponse(IEnumerable<TData> value) : base(200, value) { }
+        public DataListResponse(IEnumerable<TData> data) : base(data) { }
 
         public DataListResponse(int statusCode, object value) : base(statusCode, value) { }
     }

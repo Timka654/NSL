@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
+using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 
@@ -11,36 +12,35 @@ namespace NSL.ASPNET.Mvc
         public static IdResponse<TId> Ok<TId>(TId id)
             => new IdResponse<TId>(id);
 
-        public static IdResponse<TData> NotFound<TData>()
-            => NotFound<TData>("{...no_found}");
+        public static IdResponse<TId> NotFound<TId>()
+            => NotFound<TId>("{...no_found}");
 
-        public static IdResponse<TData> NotFound<TData>(string errorMessage)
-            => Error<TData>(HttpStatusCode.NotFound, errorMessage);
+        public static IdResponse<TId> NotFound<TId>(string errorMessage)
+            => Error<TId>(HttpStatusCode.NotFound, errorMessage);
 
-        public static IdResponse<TData> InternalServerError<TData>()
-            => StatusCode<TData>(HttpStatusCode.InternalServerError);
+        public static IdResponse<TId> InternalServerError<TId>()
+            => StatusCode<TId>(HttpStatusCode.InternalServerError);
 
-        public static IdResponse<TData> InternalServerError<TData>(string errorMessage)
-            => Error<TData>(HttpStatusCode.InternalServerError, errorMessage);
+        public static IdResponse<TId> InternalServerError<TId>(string errorMessage)
+            => Error<TId>(HttpStatusCode.InternalServerError, errorMessage);
 
-        public static IdResponse<TData> Forbid<TData>()
-            => new IdResponse<TData>((int)HttpStatusCode.Forbidden, default);
+        public static IdResponse<TId> Forbid<TId>()
+            => new IdResponse<TId>((int)HttpStatusCode.Forbidden, default);
 
-        public static IdResponse<TData> Forbid<TData>(string errorMessage)
-            => Error<TData>(HttpStatusCode.NotFound, errorMessage);
+        public static IdResponse<TId> Forbid<TId>(string errorMessage)
+            => Error<TId>(HttpStatusCode.Forbidden, errorMessage);
 
-        public static IdResponse<TData> Error<TData>(HttpStatusCode code, string errorMessage)
-            => new IdResponse<TData>((int)code, new
+        public static IdResponse<TId> Error<TId>(HttpStatusCode code, string errorMessage)
+            => new IdResponse<TId>((int)code, new Dictionary<string, string[]>
             {
-                Key = string.Empty,
-                Value = (string[])[errorMessage]
+                { string.Empty, [errorMessage]}
             });
 
-        public static IdResponse<TData> StatusCode<TData>(HttpStatusCode code)
-            => new IdResponse<TData>((int)code, default);
+        public static IdResponse<TId> StatusCode<TId>(HttpStatusCode code)
+            => new IdResponse<TId>((int)code, default);
 
-        public static IdResponse<TData> ModelState<TData>(ControllerBase controller, HttpStatusCode code)
-            => new IdResponse<TData>((int)code, ControllerResults.formatModelState(controller.ModelState));
+        public static IdResponse<TId> ModelState<TId>(ControllerBase controller, HttpStatusCode code)
+            => new IdResponse<TId>((int)code, ControllerResults.formatModelState(controller.ModelState));
     }
 
     public class IdResponse<TId> : DataResponse<object>
@@ -49,7 +49,7 @@ namespace NSL.ASPNET.Mvc
         {
         }
 
-        public IdResponse(int statusCode, object value) : base(statusCode,value)
+        public IdResponse(int statusCode, object value) : base(statusCode, value)
         {
         }
 
