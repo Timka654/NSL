@@ -23,11 +23,5 @@
 		<EmbeddedResource Remove="Client\**" />
 		<None Remove="Client\**" />
 	</ItemGroup>
-	<!--Uncomment this for link appsettings in asp.net project-->
-	<!--<ItemGroup>
-		<Content Include="..\$BaseProject$\appsettings.Development.json" Link="appsettings.Development.json" Condition="'$(Configuration)'=='Debug'">
-			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</Content>
-	</ItemGroup>-->
 
 </Project>

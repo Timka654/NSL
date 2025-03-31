@@ -46,11 +46,5 @@
 		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
 	</ItemGroup>
-	<!--Uncomment this for link appsettings in asp.net project-->
-	<!--<ItemGroup>
-		<Content Include="..\$BaseProject$\appsettings.Development.json" Link="appsettings.Development.json" Condition="'$(Configuration)'=='Debug'">
-			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</Content>
-	</ItemGroup>-->
 
 </Project>

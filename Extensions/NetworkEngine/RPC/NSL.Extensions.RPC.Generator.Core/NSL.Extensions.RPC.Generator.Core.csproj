@@ -40,12 +40,6 @@
 		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.3.1" PrivateAssets="all" />
 	</ItemGroup>
 
-	<!--<ItemGroup>
-		<ProjectReference Include="..\..\..\..\Generators\NSL.Generators.BinaryGenerator\NSL.Generators.BinaryGenerator.csproj" PrivateAssets="all" />
-		<ProjectReference Include="..\..\..\..\Generators\NSL.Generators.Utils\NSL.Generators.Utils.csproj" PrivateAssets="all" />
-		<ProjectReference Include="..\NSL.Extensions.RPC\NSL.Extensions.RPC.csproj" PrivateAssets="all" />
-	</ItemGroup>-->
-
 	<ItemGroup>
 		<Compile Include="..\..\..\..\Core\NSL.SocketCore\**\*.cs" Exclude="..\..\..\..\Core\NSL.SocketCore\**\bin\**;..\..\..\..\Core\NSL.SocketCore\**\obj\**">
 			<Link>NSL.SocketCore\%(RecursiveDir)%(FileName)%(Extension)</Link>
