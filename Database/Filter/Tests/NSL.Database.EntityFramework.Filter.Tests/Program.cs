@@ -27,8 +27,8 @@ namespace NSL.Database.EntityFramework.Filter.Tests
 
             var builder = EntityFilterBuilder.Create()
                 .CreateFilterBlock(b => b
-                    .AddProperty(nameof(TestEntityModel.NullCheckDate), Enums.CompareType.NotEquals, null)
-                    //.AddFilter(nameof(TestEntityModel.Content), Enums.CompareType.ContainsCase, "bb")
+                    //.AddProperty(nameof(TestEntityModel.NullCheckDate), Enums.CompareType.NotEquals, null)
+                    .AddProperty(nameof(TestEntityModel.Content), Enums.CompareType.ContainsCase, "bb")
                 )
                 .AddOrderProperty(nameof(TestEntityModel.NullCheckDate));
 

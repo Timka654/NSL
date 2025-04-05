@@ -30,7 +30,7 @@ namespace NSL.Refactoring.Shared
         public delegate string DocumentContentPostProcessingDelegate(string fileName, string sourceCode);
 
         public static async Task<Solution> CreateSharedModel(
-            ClassDeclarationSyntax classDeclaration,
+            SyntaxNode classDeclaration,
             Project sharedProj,
             string newName,
             string modelsFullPath,
@@ -118,7 +118,9 @@ namespace NSL.Refactoring.Shared
                         var root = await tree.GetRootAsync();
 
                         var tsymb = semanticModel.GetDeclaredSymbol(classDeclaration) as ITypeSymbol;
-                        summary = $"Generate for <see cref=\"{tsymb.GetTypeSeeCRef()}\"/>";
+
+                        if (tsymb != null)
+                            summary = $"Generate for <see cref=\"{tsymb.GetTypeSeeCRef()}\"/>";
                     }
 
                     var srcContent = new StreamReader(stream).ReadToEnd();

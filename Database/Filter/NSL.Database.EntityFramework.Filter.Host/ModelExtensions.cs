@@ -17,11 +17,11 @@ namespace NSL.Database.EntityFramework.Filter.Host
 
                     var likePattern = new SqlBinaryExpression(
                     ExpressionType.Add,
-                    new SqlConstantExpression(Expression.Constant("%"), value.TypeMapping),
+                    new SqlConstantExpression("%", value.TypeMapping),
                     new SqlBinaryExpression(
                         ExpressionType.Add,
                         value,
-                        new SqlConstantExpression(Expression.Constant("%"), value.TypeMapping),
+                        new SqlConstantExpression("%", value.TypeMapping),
                         typeof(string),
                         value.TypeMapping),
                     typeof(string),
@@ -45,7 +45,7 @@ namespace NSL.Database.EntityFramework.Filter.Host
 
                     var likePattern = new SqlBinaryExpression(
                     ExpressionType.Add,
-                    new SqlConstantExpression(Expression.Constant("%"), value.TypeMapping),
+                    new SqlConstantExpression("%", value.TypeMapping),
                     new SqlBinaryExpression(
                         ExpressionType.Add,
                         new SqlFunctionExpression(
@@ -55,7 +55,7 @@ namespace NSL.Database.EntityFramework.Filter.Host
                         argumentsPropagateNullability: new[] { true },
                         type: typeof(string),
                         typeMapping: value.TypeMapping),
-                        new SqlConstantExpression(Expression.Constant("%"), value.TypeMapping),
+                        new SqlConstantExpression("%", value.TypeMapping),
                         typeof(string),
                         value.TypeMapping),
                     typeof(string),
@@ -88,7 +88,7 @@ namespace NSL.Database.EntityFramework.Filter.Host
                     new SqlBinaryExpression(
                         ExpressionType.Add,
                         value,
-                        new SqlConstantExpression(Expression.Constant("%"), value.TypeMapping),
+                        new SqlConstantExpression("%", value.TypeMapping),
                         typeof(string),
                         value.TypeMapping);
 
@@ -117,7 +117,7 @@ namespace NSL.Database.EntityFramework.Filter.Host
                         argumentsPropagateNullability: new[] { true },
                         type: typeof(string),
                         typeMapping: value.TypeMapping),
-                        new SqlConstantExpression(Expression.Constant("%"), value.TypeMapping),
+                        new SqlConstantExpression("%", value.TypeMapping),
                         typeof(string),
                         value.TypeMapping);
 
@@ -146,7 +146,7 @@ namespace NSL.Database.EntityFramework.Filter.Host
 
                     var likePattern = new SqlBinaryExpression(
                     ExpressionType.Add,
-                    new SqlConstantExpression(Expression.Constant("%"), value.TypeMapping),
+                    new SqlConstantExpression("%", value.TypeMapping),
                     value,
                     typeof(string),
                     value.TypeMapping);
@@ -169,7 +169,7 @@ namespace NSL.Database.EntityFramework.Filter.Host
 
                     var likePattern = new SqlBinaryExpression(
                     ExpressionType.Add,
-                    new SqlConstantExpression(Expression.Constant("%"), value.TypeMapping),
+                    new SqlConstantExpression("%", value.TypeMapping),
                         new SqlFunctionExpression(
                         functionName: "LOWER",
                         arguments: new[] { value },

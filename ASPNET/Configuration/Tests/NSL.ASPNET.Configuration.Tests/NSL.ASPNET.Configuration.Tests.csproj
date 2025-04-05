@@ -2,7 +2,7 @@
 
 	<PropertyGroup>
 		<NSLProjectTypes>Test</NSLProjectTypes>
-		<TargetFramework>net8.0</TargetFramework>
+		<TargetFramework>net9.0</TargetFramework>
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<IsPackable>false</IsPackable>
@@ -10,11 +10,11 @@
 		<Configurations>DebugExamples;Debug;Release;UnityDebug;Unity</Configurations>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.14">
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.3">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.11" />
+		<PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
 	</ItemGroup>
 
 	<ItemGroup>

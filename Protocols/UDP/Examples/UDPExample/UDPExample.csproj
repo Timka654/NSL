@@ -4,7 +4,7 @@
 		<NSLProjectTypes>Example</NSLProjectTypes>
 		<Configurations>DebugExamples;Debug;Release;UnityDebug;Unity</Configurations>
 		<OutputType>Library</OutputType>
-		<TargetFramework>net8.0</TargetFramework>
+		<TargetFramework>net9.0</TargetFramework>
 		<IsPackable>false</IsPackable>
 		<Version>$(VersionSuffix)</Version>
 		<Nullable>disable</Nullable>
