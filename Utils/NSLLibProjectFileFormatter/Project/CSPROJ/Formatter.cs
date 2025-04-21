@@ -150,7 +150,7 @@ namespace NSLLibProjectFileFormatter.Project.CSPROJ
                             NSLProjectTypes.Add("UnityReference");
                     }
 
-                    var tf = "net8.0";
+                    var tf = "net9.0";
 
                     if (HasUnityTarget(NSLProjectTypes))
                         configurations.Clear();
