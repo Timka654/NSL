@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "NSL.SMTP.ASPNET": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:46157;http://localhost:46158"
+    }
+  }
+}

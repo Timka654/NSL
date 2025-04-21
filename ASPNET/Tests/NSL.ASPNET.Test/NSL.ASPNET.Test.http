@@ -4,3 +4,11 @@ POST {{NSL.ASPNET.Test_HostAddress}}/Home/Index
 Accept: application/json
 
 ###
+POST {{NSL.ASPNET.Test_HostAddress}}/Home/Error400
+Content-Type: application/json
+Accept: application/json
+{
+  "A": "aaaa"
+}
+
+###

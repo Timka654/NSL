@@ -13,5 +13,27 @@ namespace NSL.ASPNET.Test.Controllers
         {
             return BaseResponse.Ok();
         }
+
+        [HttpPostAction]
+        public async Task<DataResponse<TestResponseModel>?> Error400([FromBody] TestRequestModel query)
+            => await this.ProcessRequestAsync(async () =>
+            {
+                return DataResponse.Ok(new TestResponseModel() { A = ""});
+            });
+
+
     }
+}
+
+
+public class TestResponseModel
+{
+    public string A { get; set; }
+    public string B { get; set; }
+}
+
+public class TestRequestModel
+{
+    public string A { get; set; }
+    public string B { get; set; }
 }

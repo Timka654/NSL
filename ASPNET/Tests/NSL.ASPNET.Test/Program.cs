@@ -1,3 +1,5 @@
+using NSL.ASPNET.Mvc.Route;
+
 namespace NSL.ASPNET.Test
 {
     public class Program
@@ -9,7 +11,9 @@ namespace NSL.ASPNET.Test
             // Add services to the container.
             builder.Services.AddAuthorization();
 
-            builder.Services.AddMvc();
+            builder.Services.AddMvc(o => { });
+
+            builder.AddNSLModelStateFilter();
 
 
             var app = builder.Build();

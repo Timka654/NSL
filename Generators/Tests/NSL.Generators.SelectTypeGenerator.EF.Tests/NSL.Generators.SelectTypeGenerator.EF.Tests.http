@@ -1,0 +1,6 @@
+@NSL.Generators.SelectTypeGenerator.EF.Tests_HostAddress = http://localhost:5223
+
+GET {{NSL.Generators.SelectTypeGenerator.EF.Tests_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
