@@ -41,7 +41,7 @@ namespace NSL.ASPNET.Mvc
     }
     public class DataListResponse<TData> : DataResponse<object>
     {
-        public DataListResponse(IEnumerable<TData> data) : base(data) { }
+        public DataListResponse(IEnumerable<TData> data) : this(200, new { data }) { }
 
         public DataListResponse(int statusCode, object value) : base(statusCode, value) { }
     }

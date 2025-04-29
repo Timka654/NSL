@@ -215,7 +215,11 @@ namespace NSL.Generators.HttpEndPointGenerator
 
                                 List<string> _p = new List<string>();
 
-                                _p.AddRange(GetParameter(mparams));
+                                var b_parameters = GetParameter(mparams);
+
+                                var n_parameters = string.Join(", ", b_parameters.Select(x => x.Split(' ').Last()));
+
+                                _p.AddRange(b_parameters);
 
                                 _p.Add($"{BaseHttpRequestOptionsFullName}? __options = null");
 
@@ -244,16 +248,17 @@ namespace NSL.Generators.HttpEndPointGenerator
                                     //    methodBuilder.AppendLine($".PostJsonAsync({_vname}Url, {mparams[0].Name})");
                                     else
                                     {
-                                        methodBuilder.AppendLine($".PostBuildAsync({_vname}Url, ()=>{{");
+                                        methodBuilder.AppendLine($".PostBuildAsync({_vname}Url, (client, message) => client.RequestBuildProcess(__options, message, async ()=> {{");
                                         methodBuilder.NextTab();
                                         methodBuilder.AppendLine("var ____content = ");
 
                                         BuildContent(mparams.Cast<ISymbol>().ToImmutableArray(), methodBuilder);
 
-                                        methodBuilder.AppendLine("return ____content;");
+                                        methodBuilder.AppendLine();
+                                        methodBuilder.AppendLine($"return await Task.FromResult(____content);");
                                         methodBuilder.PrevTab();
                                         //JsonHttpContent.Create(data)
-                                        methodBuilder.AppendLine("}, __options)");
+                                        methodBuilder.AppendLine($"}}{(string.IsNullOrEmpty(n_parameters) ? string.Empty : ", ")}{n_parameters}), __options)");
                                     }
                                 }
 

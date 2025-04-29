@@ -33,33 +33,61 @@ namespace NSL.HttpClient
         public static async Task<TResult> ProcessResponseAsync<TResult>(this Task<HttpResponseMessage> request, BaseHttpRequestOptions options = null)
             where TResult : BaseResponse, new()
         {
-            var response = await request;
-
-            TResult result;
-
-            if (!response.IsSuccessStatusCode)
+            try
             {
-                result = new TResult()
+                var response = await request;
+
+                TResult result;
+
+                if (!response.IsSuccessStatusCode)
                 {
-                    StatusCode = response.StatusCode,
-                    Errors = await response.ReadErrorsAsync(options)
-                };
+                    result = new TResult()
+                    {
+                        StatusCode = response.StatusCode,
+                        Errors = await response.ReadErrorsAsync(options)
+                    };
 
-                options?.Validator?.DisplayApiErrors(result);
-            }
-            else
-            {
-                var content = await response.Content.ReadAsStringAsync();
-
-                if (!string.IsNullOrWhiteSpace(content))
-                    result = JsonSerializer.Deserialize<TResult>(content, options?.JsonOptions ?? JsonHttpContent.BuildJsonOptions(null));
+                    options?.Validator?.DisplayApiErrors(result);
+                }
                 else
-                    result = new TResult();
+                {
+                    var content = await response.Content.ReadAsStringAsync();
 
-                result.StatusCode = response.StatusCode;
+                    if (!string.IsNullOrWhiteSpace(content))
+                        result = JsonSerializer.Deserialize<TResult>(content, options?.JsonOptions ?? JsonHttpContent.BuildJsonOptions(null));
+                    else
+                        result = new TResult();
+
+                    result.StatusCode = response.StatusCode;
+                }
+
+                await options.ResponsePostProcess(response, result);
+
+                return result;
             }
+            catch (Exception ex)
+            {
+                var exresp = new TResult();
 
-            return result;
+                var type = BaseHttpRequestOptions.BaseHttpExceptionHandleResult.Throw;
+
+                if (ex is OperationCanceledException && options == null)
+                {
+                    exresp.StatusCode = System.Net.HttpStatusCode.RequestTimeout;
+                    type = BaseHttpRequestOptions.BaseHttpExceptionHandleResult.Response;
+                }
+
+                if (options != null)
+                    type = options.ExceptionHandle(ex, options, exresp);
+
+                if (type == BaseHttpRequestOptions.BaseHttpExceptionHandleResult.Throw)
+                    throw;
+
+
+                await options.ResponsePostProcess(new HttpResponseMessage(System.Net.HttpStatusCode.RequestTimeout), exresp);
+
+                return exresp;
+            }
         }
 
         public static async Task<TResult> ProcessBaseHttpResponseAsync<TResult>(this Task<HttpResponseMessage> request, Func<TResult, Task> postProcessing = null)

@@ -120,7 +120,15 @@ namespace NSL.Generators.FillTypeGenerator
 
             //GenDebug.Break();
 
-            sourceContext.AddSource($"{typeClass.GetTypeClassName()}.filltype.cs", codeBuilder.ToString());
+            string name = typeClass.GetTypeClassName();
+
+            if (typeClass.TypeParameterList?.Parameters.Any() == true)
+            {
+                name += "_";
+                name +=  string.Join("_", typeClass.TypeParameterList.Parameters.Select(x => x.Identifier.Text));
+            
+            }
+            sourceContext.AddSource($"{name}.filltype.cs", codeBuilder.ToString());
         }
 
         private void ProcessAttribute(SourceProductionContext sourceContext, GeneratorSyntaxContext context, CodeBuilder classBuilder, IGrouping<ITypeSymbol, AttributeSyntax> attr, ITypeSymbol typeSymb, SemanticModel typeSem, bool dir)
@@ -352,8 +360,8 @@ namespace NSL.Generators.FillTypeGenerator
                 (toType, fromType) = (fromType, toType);
             }
 
-            var fromMembers = FilterSymbols(fromType.GetAllMembers(), model);
-            var toMembers = (IEnumerable<ISymbol>)toType.GetAllMembers();
+            var fromMembers = FilterSymbols(fromType.GetAllMembers().Where(x => !x.IsStatic), model).ToArray();
+            var toMembers = (IEnumerable<ISymbol>)toType.GetAllMembers().Where(x => !x.IsStatic).ToArray();
 
 
             var tabPrefix = string.Concat(Enumerable.Repeat("\t", t));

@@ -8,32 +8,38 @@ namespace NSL.HttpClient
 {
     public static class HttpRequestExtensions
     {
-        public static Task<HttpResponseMessage> PostEmptyAsync(this System.Net.Http.HttpClient httpClient, string url,
-            BaseHttpRequestOptions options = null)
+        public static Task<HttpResponseMessage> PostEmptyAsync(this System.Net.Http.HttpClient httpClient
+            , string url
+            , BaseHttpRequestOptions options = null)
             => httpClient.PostAsync(url, EmptyHttpContent.Instance, options?.CancellationToken ?? CancellationToken.None);
 
-        public static Task<HttpResponseMessage> PostJsonAsync<TData>(this System.Net.Http.HttpClient httpClient, string url, TData data,
-            BaseHttpRequestOptions options = null)
+        public static Task<HttpResponseMessage> PostJsonAsync<TData>(this System.Net.Http.HttpClient httpClient
+            , string url
+            , TData data
+            , BaseHttpRequestOptions options = null)
             => httpClient.PostAsync(url, JsonHttpContent.Create(data), options?.CancellationToken ?? CancellationToken.None);
 
-        public static Task<HttpResponseMessage> PostBuildAsync(this System.Net.Http.HttpClient httpClient, string url, Func<System.Net.Http.HttpContent> builder,
-            BaseHttpRequestOptions options = null)
-            => httpClient.PostAsync(url, builder(), options?.CancellationToken ?? CancellationToken.None);
+        public static async Task<HttpResponseMessage> PostBuildAsync(this System.Net.Http.HttpClient httpClient
+            , string url, Func<System.Net.Http.HttpClient, HttpRequestMessage, Task> builder
+            , BaseHttpRequestOptions options = null)
+        {
+            var httpMessage = new HttpRequestMessage(HttpMethod.Post, url);
 
-        //private static void abc()
-        //{
-        //    var h = new System.Net.Http.HttpClient();
+            await builder(httpClient, httpMessage);
 
-        //    h.PostBuildAsync("", () => {
-        //        var form = new FormHttpContent();
+            return await httpClient.SendAsync(httpMessage, options?.CancellationToken ?? CancellationToken.None);
+        }
 
-        //        form.Headers;
+        public static Task<HttpResponseMessage> PostBuildAsync(this System.Net.Http.HttpClient httpClient
+            , string url
+            , Action<System.Net.Http.HttpClient, HttpRequestMessage> builder
+            , BaseHttpRequestOptions options = null)
+        {
+            var httpMessage = new HttpRequestMessage(HttpMethod.Post, url);
 
-        //        form.
-        //    })
+            builder(httpClient, httpMessage);
 
-        //}
-
-
+            return httpClient.SendAsync(httpMessage, options?.CancellationToken ?? CancellationToken.None);
+        }
     }
 }

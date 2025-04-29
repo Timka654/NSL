@@ -1,4 +1,5 @@
-﻿
+﻿#if !DEVELOP
+
 namespace NSL.Generators.FillTypeGenerator.Tests
 {
     internal class ProxyModel2
@@ -8,3 +9,4 @@ namespace NSL.Generators.FillTypeGenerator.Tests
         public string q { get; set; }
     }
 }
+#endif

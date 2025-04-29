@@ -1,5 +1,10 @@
-﻿using NSL.HttpClient.Validators;
+﻿using NSL.HttpClient.HttpContent;
+using NSL.HttpClient.Models;
+using NSL.HttpClient.Validators;
 using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Net.Http;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
@@ -8,6 +13,14 @@ namespace NSL.HttpClient
 {
     public class BaseHttpRequestOptions
     {
+        public enum BaseHttpExceptionHandleResult
+        {
+            Throw,
+            Response
+        }
+
+        public delegate BaseHttpExceptionHandleResult ExceptionHandleDelegate(Exception ex, BaseHttpRequestOptions options, BaseResponse? response);
+
         public delegate System.Net.Http.HttpClient RequestClientBuildHandler(System.Net.Http.HttpClient client);
 
         /// <summary>
@@ -15,9 +28,13 @@ namespace NSL.HttpClient
         /// </summary>
         public IHttpResponseContentValidator Validator { get; set; }
 
-        public RequestClientBuildHandler ClientHandler { get; set; }
+        public RequestClientBuildHandler ClientBuilder { get; set; }
+
+        public IHttpIOProcessor IOProcessor { get; set; } = new DefaultHttpIOProcessor();
 
         public CancellationToken CancellationToken { get; set; } = CancellationToken.None;
+
+        public Dictionary<object, object> ObjectBag { get; set; } = [];
 
         /// <summary>
         /// 
@@ -28,8 +45,29 @@ namespace NSL.HttpClient
 
         public Func<string, Task<string>> ProcessMessage { get; set; } = v => Task.FromResult(v);
 
+        public ExceptionHandleDelegate ExceptionHandle { get; set; } = BaseExceptionHandle;
+
+        public static BaseHttpExceptionHandleResult BaseExceptionHandle(Exception ex, BaseHttpRequestOptions options, BaseResponse? response)
+        {
+            if (ex is OperationCanceledException)
+            {
+                response.StatusCode = System.Net.HttpStatusCode.RequestTimeout;
+
+                return BaseHttpExceptionHandleResult.Response;
+            }
+
+            return BaseHttpExceptionHandleResult.Throw;
+        }
+
         public BaseHttpRequestOptions Clone()
-            => MemberwiseClone() as BaseHttpRequestOptions;
+        {
+            var r = MemberwiseClone() as BaseHttpRequestOptions;
+            
+            r.ObjectBag = new Dictionary<object, object>(ObjectBag);
+
+            return r;
+        }
+
 
         public static BaseHttpRequestOptions Create(IHttpResponseContentValidator validator) => new BaseHttpRequestOptions() { Validator = validator };
 
@@ -37,54 +75,105 @@ namespace NSL.HttpClient
 
         public static BaseHttpRequestOptions Create(JsonSerializerOptions jsonOptions) => new BaseHttpRequestOptions() { JsonOptions = jsonOptions };
 
-        public static BaseHttpRequestOptions Create(RequestClientBuildHandler clientHandler) => new BaseHttpRequestOptions() { ClientHandler = clientHandler };
+        public static BaseHttpRequestOptions Create(RequestClientBuildHandler clientHandler) => new BaseHttpRequestOptions() { ClientBuilder = clientHandler };
 
         public static BaseHttpRequestOptions Create(CancellationToken cancellationToken) => new BaseHttpRequestOptions() { CancellationToken = cancellationToken };
 
+        public static BaseHttpRequestOptions Create(ExceptionHandleDelegate exceptionHandle) => new BaseHttpRequestOptions() { ExceptionHandle = exceptionHandle };
+
+        public static BaseHttpRequestOptions Create(IHttpIOProcessor ioProcessor) => new BaseHttpRequestOptions() { IOProcessor = ioProcessor };
+
         public static BaseHttpRequestOptions Create() => new BaseHttpRequestOptions();
 
-
-
-        public BaseHttpRequestOptions WithValidator(IHttpResponseContentValidator validator)
+        public BaseHttpRequestOptions WithValidator(IHttpResponseContentValidator validator, bool clone = false)
         {
+            if (clone)
+                return Clone().WithValidator(validator);
+
             Validator = validator;
             return this;
         }
 
-        public BaseHttpRequestOptions WithErrorPrefix(string errorPrefix)
+        public BaseHttpRequestOptions WithErrorPrefix(string errorPrefix, bool clone = false)
         {
+            if (clone)
+                return Clone().WithErrorPrefix(errorPrefix);
+
             ErrorPrefix = errorPrefix;
             return this;
         }
 
-        public BaseHttpRequestOptions WithJsonOptions(JsonSerializerOptions jsonOptions)
+        public BaseHttpRequestOptions WithJsonOptions(JsonSerializerOptions jsonOptions, bool clone = false)
         {
+            if (clone)
+                return Clone().WithJsonOptions(jsonOptions);
+
             JsonOptions = jsonOptions;
             return this;
         }
 
-        public BaseHttpRequestOptions WithClientHandler(RequestClientBuildHandler clientHandler)
+        public BaseHttpRequestOptions WithClientBuilder(RequestClientBuildHandler clientBuilder, bool clone = false)
         {
-            ClientHandler = clientHandler;
+            if (clone)
+                return Clone().WithClientBuilder(clientBuilder);
+
+            ClientBuilder = clientBuilder;
             return this;
         }
 
-        public BaseHttpRequestOptions WithCancellationToken(CancellationToken cancellationToken)
+        public BaseHttpRequestOptions WithCancellationToken(CancellationToken cancellationToken, bool clone = false)
         {
+            if (clone)
+                return Clone().WithCancellationToken(cancellationToken);
+
             CancellationToken = cancellationToken;
             return this;
         }
 
-    }
-
-    public static class RequestOptionsExtensions
-    {
-        public static System.Net.Http.HttpClient FillClientOptions(this System.Net.Http.HttpClient client, BaseHttpRequestOptions options)
+        public BaseHttpRequestOptions WithExceptionHandle(ExceptionHandleDelegate exceptionHandle, bool clone = false)
         {
-            if (options?.ClientHandler != null)
-                return options.ClientHandler(client);
+            if (clone)
+                return Clone().WithExceptionHandle(exceptionHandle);
 
-            return client;
+            ExceptionHandle = exceptionHandle;
+            return this;
+        }
+
+        public BaseHttpRequestOptions WithIOProcessor(IHttpIOProcessor ioProcessor, bool clone = false)
+        {
+            if (clone)
+                return Clone().WithIOProcessor(ioProcessor);
+
+            IOProcessor = ioProcessor;
+            return this;
+        }
+
+        public BaseHttpRequestOptions WithObjectValue(object key, object value, bool clone = false)
+        {
+            ArgumentNullException.ThrowIfNull(key, nameof(key));
+
+            if (clone)
+                return Clone().WithObjectValue(key, value);
+
+            ObjectBag[key] = value;
+            return this;
+        }
+
+        public bool TryGetObjectValue(string key, out object value)
+        {
+            return ObjectBag.TryGetValue(key, out value);
+        }
+
+        public bool TryGetObjectValue<TValue>(string key, out TValue? value)
+        {
+            if (ObjectBag.TryGetValue(key, out var _value))
+            {
+                value = (TValue?)_value;
+                return true;
+            }
+
+            value = default;
+            return false;
         }
     }
 }

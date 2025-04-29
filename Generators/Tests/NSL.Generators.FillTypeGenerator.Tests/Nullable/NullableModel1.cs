@@ -1,4 +1,5 @@
-﻿using NSL.Generators.FillTypeGenerator.Attributes;
+﻿#if !DEVELOP
+using NSL.Generators.FillTypeGenerator.Attributes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -69,3 +70,4 @@ namespace NSL.Generators.FillTypeGenerator.Tests.Develop.Nullable
         public int? b { get; set; }
     }
 }
+#endif

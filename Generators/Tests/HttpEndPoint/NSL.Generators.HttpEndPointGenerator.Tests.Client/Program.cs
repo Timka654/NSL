@@ -1,4 +1,5 @@
-﻿using NSL.HttpClient.HttpContent;
+﻿using NSL.HttpClient;
+using NSL.HttpClient.HttpContent;
 using NSL.HttpClient.Models;
 
 namespace NSL.Generators.HttpEndPointGenerator.Tests.Client
@@ -37,25 +38,56 @@ namespace NSL.Generators.HttpEndPointGenerator.Tests.Client
 
             BaseResponse response = default;
 
-            ThrowIfInvalid(response = await testService.TestTestPostPostRequest(GetModelN2(), GetFile1()));
+            var options = BaseHttpRequestOptions.Create(new TestHttpIOProcessor());
 
-            ThrowIfInvalid(response = await testService.TestTestPost2PostRequest(GetModelN3()));
+            ThrowIfInvalid(response = await testService.TestTestPostPostRequest(GetModelN2(), GetFile1(), options));
 
-            ThrowIfInvalid(response = await testService.TestTestPost3PostRequest(GetModelN3()));
+            ThrowIfInvalid(response = await testService.TestTestPost2PostRequest(GetModelN3(), options));
 
-            ThrowIfInvalid(response = await testService.TestTestPost4PostRequest(GetModelN3(), GetFile1()));
+            ThrowIfInvalid(response = await testService.TestTestPost3PostRequest(GetModelN3(), options));
 
-            ThrowIfInvalid(response = await testService.TestTestPost5PostRequest(GetModelN4(), [GetFile1(), GetFile2()]));
+            ThrowIfInvalid(response = await testService.TestTestPost4PostRequest(GetModelN3(), GetFile1(), options));
 
-            ThrowIfInvalid(response = await testService.TestTestPost6PostRequest(GetModelN3(), [GetFile1(), GetFile2()]));
+            ThrowIfInvalid(response = await testService.TestTestPost5PostRequest(GetModelN4(), [GetFile1(), GetFile2()], options));
 
-            ThrowIfInvalid(response = await testService.TestTestPost7PostRequest(GetModelN3(), [GetFile1(), GetFile2()], "h1Value", "abc2Value"));
+            ThrowIfInvalid(response = await testService.TestTestPost6PostRequest(GetModelN3(), [GetFile1(), GetFile2()], options));
+
+            ThrowIfInvalid(response = await testService.TestTestPost7PostRequest(GetModelN3(), [GetFile1(), GetFile2()], "h1Value", "abc2Value", options));
         }
 
         static void ThrowIfInvalid(BaseResponse response)
         {
             if (!response.IsSuccess)
                 throw new Exception();
+        }
+    }
+
+    public class TestHttpIOProcessor : IHttpIOProcessor
+    {
+        public async Task RequestBuildProcess(System.Net.Http.HttpClient client, BaseHttpRequestOptions options, HttpRequestMessage message, Func<Task<HttpContent>> defaultBuildAction, params object[] requestData)
+        {
+            Console.WriteLine($"{message.Method.ToString()} request to {message.RequestUri} args");
+
+            foreach (var item in requestData)
+            {
+                Console.WriteLine($"{item}");
+            }
+
+            message.Content = await defaultBuildAction();
+        }
+
+        public Task ResponsePostProcess(BaseHttpRequestOptions options, HttpResponseMessage httpResponse, BaseResponse response)
+        {
+            if (httpResponse.RequestMessage == null)
+            {
+                Console.WriteLine($"request timeout");
+            }
+
+            var message = httpResponse.RequestMessage;
+
+            Console.WriteLine($"{message.Method.ToString()} response from {message.RequestUri} - {httpResponse.StatusCode}");
+
+            return Task.CompletedTask;
         }
     }
 }

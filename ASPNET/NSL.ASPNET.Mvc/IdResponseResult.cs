@@ -45,7 +45,7 @@ namespace NSL.ASPNET.Mvc
 
     public class IdResponse<TId> : DataResponse<object>
     {
-        public IdResponse(TId id) : base(200, new { id })
+        public IdResponse(TId id) : this(200, new { id })
         {
         }
 

@@ -73,7 +73,7 @@ namespace NSL.FileStorage
 
             fi.MoveTo(destfi.FullName, true);
 
-            var url = string.Join("/", GetBaseProdUrl(), Path.GetRelativePath(GetBaseProdPath(), destPath).Replace('\\', '/'));
+            var url = string.Join("/", GetBaseProdUrl().TrimStart('/'), Path.GetRelativePath(GetBaseProdPath(), destPath).Replace('\\', '/'));
 
             return new FileSystemUploadResult()
             {

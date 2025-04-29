@@ -54,7 +54,7 @@ namespace NSL.ASPNET.Mvc
             return base.ExecuteResultAsync(context);
         }
 
-        public DataResponse(TData data) : base(new { data })
+        public DataResponse(TData data) : this(200, new { data })
         {
         }
 

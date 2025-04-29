@@ -1,4 +1,5 @@
-﻿using NSL.Generators.FillTypeGenerator.Attributes;
+﻿#if !DEVELOP
+using NSL.Generators.FillTypeGenerator.Attributes;
 
 namespace NSL.Generators.FillTypeGenerator.Tests
 {
@@ -10,3 +11,4 @@ namespace NSL.Generators.FillTypeGenerator.Tests
         public List<ProxyModel2> M2List { get; set; }
     }
 }
+#endif

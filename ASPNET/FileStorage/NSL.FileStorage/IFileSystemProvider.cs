@@ -38,8 +38,8 @@ namespace NSL.FileStorage
             => services.AddSingleton<AzureFileSystemProvider>()
             .AddSingleton(x => x.GetRequiredService<AzureFileSystemProvider>() as IFileSystemProvider);
 
-        public static IServiceCollection AddLocalFileSystem(this IServiceCollection services, string prodUrl = "", string prodPath = "wwwroot/", string tempUrl = "Temp", string tempPath= "wwwroot/Temp")
-            => services.AddSingleton<LocalFileSystemProvider>(x=> new LocalFileSystemProvider(prodUrl,prodPath,tempUrl, tempPath))
+        public static IServiceCollection AddLocalFileSystem(this IServiceCollection services, string prodUrl = "", string prodPath = "wwwroot/", string tempUrl = "Temp", string tempPath = "wwwroot/Temp")
+            => services.AddSingleton(x => new LocalFileSystemProvider(prodUrl, prodPath, tempUrl, tempPath))
             .AddSingleton(x => x.GetRequiredService<LocalFileSystemProvider>() as IFileSystemProvider);
 
     }
