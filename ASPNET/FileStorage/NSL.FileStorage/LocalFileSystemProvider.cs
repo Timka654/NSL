@@ -73,7 +73,7 @@ namespace NSL.FileStorage
 
             fi.MoveTo(destfi.FullName, true);
 
-            var url = string.Join("/", GetBaseProdUrl().TrimStart('/'), Path.GetRelativePath(GetBaseProdPath(), destPath).Replace('\\', '/'));
+            var url = string.Join("/", GetBaseProdUrl().Trim('/','\\'), Path.GetRelativePath(GetBaseProdPath(), destPath).Trim('/', '\\').Replace('\\', '/'));
 
             return new FileSystemUploadResult()
             {
@@ -96,7 +96,8 @@ namespace NSL.FileStorage
 
             stream.CopyTo(resultStream);
 
-            var url = "/" + string.Join("/", GetBaseTempUrl(), Path.GetRelativePath(GetBaseTempPath(), fi.FullName).Replace('\\', '/'));
+
+            var url = string.Join("/", GetBaseTempUrl().Trim('/', '\\'), Path.GetRelativePath(GetBaseTempPath(), fi.FullName).Trim('/', '\\').Replace('\\', '/'));
 
             return new FileSystemUploadResult()
             {
@@ -118,7 +119,7 @@ namespace NSL.FileStorage
 
             stream.CopyTo(resultStream);
 
-            var url = "/" + string.Join("/", GetBaseProdUrl(), Path.GetRelativePath(GetBaseProdPath(), fi.FullName).Replace('\\', '/'));
+            var url = string.Join("/", GetBaseProdUrl().Trim('/', '\\'), Path.GetRelativePath(GetBaseProdPath(), fi.FullName).Trim('/', '\\').Replace('\\', '/'));
 
             return new FileSystemUploadResult()
             {
