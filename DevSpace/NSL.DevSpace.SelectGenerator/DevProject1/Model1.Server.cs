@@ -14,3 +14,20 @@ namespace DevProject1
 }
 
 #endif
+
+#if CLIENT
+
+using NSL.Generators.SelectTypeGenerator.Attributes;
+
+namespace DevProject1
+{
+
+    [SelectGenerate("Get22")]
+    public partial class Model1
+    {
+        [SelectGenerateInclude("Get22")]
+        public int val4 { get; set; }
+    }
+}
+
+#endif

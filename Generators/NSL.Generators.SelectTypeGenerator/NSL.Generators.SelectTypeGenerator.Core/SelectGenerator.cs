@@ -9,9 +9,38 @@ using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Security.Claims;
 
 namespace NSL.Generators.SelectTypeGenerator
 {
+    internal class GenTypeGroup
+    {
+        public string Name { get; set; }
+
+        public string Namespace { get; set; }
+
+        public ITypeSymbol TypeSymbol { get; set; }
+
+        public TypeDeclarationSyntax TypeDeclaration { get; set; }
+
+        //public SemanticModel SemanticModel { get; set; }
+
+        public Dictionary<string, string[]> Joins { get; set; }
+
+        public GenAttribute[] Attributes { get; set; }
+
+        public ISymbol[] Members { get; set; }
+    }
+
+    internal class GenAttribute
+    {
+        public string[] Models { get; set; }
+
+        public bool Dto { get; set; }
+
+        public bool Typed { get; set; }
+    }
+
     [Generator]
     internal class SelectGenerator : IIncrementalGenerator
     {
@@ -47,31 +76,77 @@ namespace NSL.Generators.SelectTypeGenerator
         private void ProcessSelectTypes(SourceProductionContext context, ImmutableArray<GeneratorSyntaxContext> types)
         {
             //GenDebug.Break();
-
-
-            foreach (var item in types)
+            foreach (var group in types.GroupBy(x =>
             {
-                var @class = (TypeDeclarationSyntax)item.Node;
+                var type = x.Node as TypeDeclarationSyntax;
+
+                return $"{type.TryGetNamespace()}{type.GetClassName()}";
+            }))
+            {
+                var node = group.First();
+
+                var semanticModel = node.SemanticModel;
+                var typeDecl = node.Node as TypeDeclarationSyntax;
+                var typeSymbol = semanticModel.GetDeclaredSymbol(typeDecl) as ITypeSymbol;
+
+
+                List<GenAttribute> attributes = new List<GenAttribute>();
+
+                var typeAttributes = typeSymbol.GetAttributes();
+
+                foreach (var attr in typeAttributes.Where(x => x.AttributeClass.GetTypeFullName(false) == SelectGenerateAttributeFullName))
+                {
+                    var models = attr.ConstructorArguments.First().Values
+                        .Select(x => (string)x.Value)
+                        .ToArray();
+
+                    var dto = (bool?)((TypedConstant?)attr.GetNamedArgumentValue(nameof(SelectGenerateAttribute.Dto)))?.Value ?? false;
+
+                    var typed = (bool?)((TypedConstant?)attr.GetNamedArgumentValue(nameof(SelectGenerateAttribute.Typed)))?.Value ?? false;
+
+                    var a = new GenAttribute()
+                    {
+                        Models = models,
+                        Dto = dto,
+                        Typed = typed,
+                    };
+
+                    attributes.Add(a);
+                }
+
+                var gtype = new GenTypeGroup()
+                {
+                    TypeSymbol = typeSymbol,
+                    TypeDeclaration = typeDecl,
+                    Namespace = typeDecl.TryGetNamespace(),
+                    Name = group.Key.Replace('.', '_'),
+                    Members = typeSymbol.GetAllMembers(),
+                    Attributes = attributes.GroupBy(x => (x.Typed, x.Dto))
+                    .Select(x => new GenAttribute()
+                    {
+                        Dto = x.Key.Dto,
+                        Typed = x.Key.Typed,
+                        Models = x.SelectMany(i => i.Models).GroupBy(g => g).Select(k => k.Key).ToArray()
+                    })
+                    .ToArray(),
+                    Joins = typeAttributes.Where(x => x.AttributeClass.GetTypeFullName(false) == SelectGenerateModelJoinAttributeFullName)
+                    .GroupBy(x => (string)x.ConstructorArguments[0].Value, x => x.ConstructorArguments[1].Values.Select(n => (string)n.Value).ToArray())
+                    .ToDictionary(x => x.Key, x => x.SelectMany(n => n).GroupBy(g => g).Select(k => k.Key).ToArray())
+                };
 
                 try
                 {
-                    ProcessSelectToType(context, item, @class);
+                    ProcessSelectToType(context, gtype);
                 }
                 catch (Exception ex)
                 {
-                    context.ShowSelectDiagnostics($"NSLSELECT002", $"Error - {ex} on type {@class.Identifier.Text}", DiagnosticSeverity.Error, item.Node.GetLocation());
+                    context.ShowSelectDiagnostics($"NSLSELECT002", $"Error - {ex} on type {gtype.TypeDeclaration.Identifier.Text}", DiagnosticSeverity.Error, group.Select(x => x.Node.GetLocation()).ToArray());
                 }
             }
         }
 
-        private void ProcessSelectToType(SourceProductionContext sourceContext, GeneratorSyntaxContext context, TypeDeclarationSyntax typeClass)
+        private void ProcessSelectToType(SourceProductionContext sourceContext, GenTypeGroup gtype)
         {
-            var typeSem = context.SemanticModel;
-
-            var typeSymb = typeSem.GetDeclaredSymbol(typeClass) as ITypeSymbol;
-
-            var members = typeSymb.GetAllMembers();
-
             var classBuilder = new CodeBuilder();
 
             classBuilder.AppendComment(() =>
@@ -79,73 +154,35 @@ namespace NSL.Generators.SelectTypeGenerator
                 classBuilder.AppendLine($"Auto Generated by NSL Select. Please don't change this file");
             });
 
-            var originNamespace = (typeClass.Parent as NamespaceDeclarationSyntax)?.Name.ToString();
-
             List<string> namespaces = new List<string>();
 
-            if (originNamespace != null)
+            if (gtype.Namespace != default)
             {
-                namespaces.Add(originNamespace);
-                namespaces.Add("System.Collections.Generic");
+                namespaces.Add(gtype.Namespace);
             }
+
+            namespaces.Add("System.Collections.Generic");
 
             List<SelectGenContext> genContexts = new List<SelectGenContext>();
 
-            classBuilder.CreateStaticClass(typeClass, $"{typeClass.GetClassName()}_Selection", () =>
+            classBuilder.CreateStaticClass(gtype.TypeDeclaration, $"{gtype.Name}_Selection", () =>
             {
-                var attrbs = typeClass.AttributeLists
-                .SelectMany(x => x.Attributes)
-                .Where(x => x.GetAttributeFullName().Equals(SelectGenerateAttributeFullName))
-                .ToArray();
-
-                //GenDebug.Break(true);
-
-                var typeSelectTypesGroups = attrbs
-                .Select(x => new
-                {
-                    models = x.ArgumentList.Arguments.Where(p => p.NameEquals == null).Select(n => n.GetAttributeParameterValue<string>(typeSem)),
-                    typed = x.ArgumentList.Arguments.FirstOrDefault(n => n.NameEquals != null && n.NameEquals.Name.ToString() == nameof(SelectGenerateAttribute.Typed))?.GetAttributeParameterValue<bool>(typeSem) == true,
-                    dto = x.ArgumentList.Arguments.FirstOrDefault(n => n.NameEquals != null && n.NameEquals.Name.ToString() == nameof(SelectGenerateAttribute.Dto))?.GetAttributeParameterValue<bool>(typeSem) == true
-                })
-                .GroupBy(x => (x.typed, x.dto))
-                .ToArray();
-
-                var joins = typeClass.AttributeLists
-                .SelectMany(x => x.Attributes)
-                .Where(x => x.GetAttributeFullName().Equals(SelectGenerateModelJoinAttributeFullName))
-                .Select(x => x.ArgumentList)
-                .ToArray();
-#if DEBUG
-                //GenDebug.Break();
-#endif
-
                 var methods = new List<string>();
 
-                foreach (var typedModels in typeSelectTypesGroups)
+                foreach (var typedModels in gtype.Attributes)
                 {
-                    var typeSelectModels = typedModels
-                    .SelectMany(x => x.models)
-                    .GroupBy(x => x)
-                    .Select(x => x.Key)
-                    .ToArray();
-
-                    foreach (var item in typeSelectModels)
+                    foreach (var item in typedModels.Models)
                     {
-                        var mjoins = joins
-                        .Where(x => x.Arguments.First().GetAttributeParameterValue<string>(typeSem).Equals(item))
-                        .SelectMany(x => x.Arguments.Skip(1).Select(n => n.GetAttributeParameterValue<string>(typeSem)))
-                        .GroupBy(x => x)
-                        .Select(x => x.Key)
-                        .Append(item)
-                        .ToArray();
+                        if(!gtype.Joins.TryGetValue(item, out var mjoins))
+                            mjoins = new string[] {  };
 
-                        SelectGenContext genContext = typedModels.Key.dto ? new SelectGenDTOContext() : new SelectGenContext();
+                        SelectGenContext genContext = typedModels.Dto ? new SelectGenDTOContext() : new SelectGenContext();
 
 
 
-                        genContext.Type = typeSymb;
-                        genContext.Symbols = FilterSymbols(members, mjoins, typedModels.Key.typed);
-                        genContext.Typed = typedModels.Key.typed;
+                        genContext.Type = gtype.TypeSymbol;
+                        genContext.Symbols = FilterSymbols(gtype.Members, mjoins.Prepend(item), typedModels.Typed);
+                        genContext.Typed = typedModels.Typed;
                         genContext.Model = item;
 
                         CreateMethods(methods, genContext);
@@ -160,7 +197,7 @@ namespace NSL.Generators.SelectTypeGenerator
 
             }, namespaces, @namespace: "System.Linq", beforeClassDef: builder => builder.AppendSummary(b =>
              {
-                 b.AppendSummaryLine($"Generate for <see cref=\"{typeSymb.GetTypeSeeCRef()}\"/>");
+                 b.AppendSummaryLine($"Generate for <see cref=\"{gtype.TypeSymbol.GetTypeSeeCRef()}\"/>");
 
              }));
 
@@ -176,11 +213,11 @@ namespace NSL.Generators.SelectTypeGenerator
 
             var fnames = new List<string>();
 
-            var fname = $"{typeClass.GetTypeClassName()}.selectgen.cs";
+            var fname = $"{gtype.Name}.selectgen.cs";
 
             fnames.Add(fname);
 
-            GenerateDtos(sourceContext, genContexts, typeSem, fnames);
+            GenerateDtos(sourceContext, genContexts, fnames);
 
             var code = classBuilder.ToString();
 
@@ -188,12 +225,12 @@ namespace NSL.Generators.SelectTypeGenerator
             sourceContext.AddSource(fname, code);
         }
 
-        void GenerateDtos(SourceProductionContext sourceContext, IEnumerable<SelectGenContext> items, SemanticModel typeSem, List<string> fnames)
+        void GenerateDtos(SourceProductionContext sourceContext, IEnumerable<SelectGenContext> items, List<string> fnames)
         {
             foreach (var item in items)
             {
                 if (item.SubTypeList != null)
-                    GenerateDtos(sourceContext, item.SubTypeList, typeSem, fnames);
+                    GenerateDtos(sourceContext, item.SubTypeList, fnames);
 
                 if (item is SelectGenDTOContext dto && item.Symbols.Any())
                 {
@@ -393,7 +430,7 @@ namespace NSL.Generators.SelectTypeGenerator
             var attributes = item.GetAttributes();
 
             var joined = attributes
-                        .Where(x => x.AttributeClass.Name == SelectGenerateModelJoinAttributeFullName)
+                        .Where(x => x.AttributeClass.GetTypeFullName(false) == SelectGenerateModelJoinAttributeFullName)
                         .Where(x => (x.ConstructorArguments.First().Value as string).Equals(model))
                         .SelectMany(x => x.ConstructorArguments.ElementAt(1).Values.Select(q => q.Value as string))
                         .Append(model)
@@ -604,9 +641,9 @@ namespace NSL.Generators.SelectTypeGenerator
             genContext.SubTypeList.Add(childGenContext);
         }
 
-        private readonly string SelectGenerateAttributeFullName = typeof(SelectGenerateAttribute).Name;
+        private readonly string SelectGenerateAttributeFullName = typeof(SelectGenerateAttribute).FullName;
         private readonly string SelectGenerateIncludeAttributeFullName = typeof(SelectGenerateIncludeAttribute).Name;
         private readonly string SelectGenerateProxyAttributeFullName = typeof(SelectGenerateProxyAttribute).Name;
-        private readonly string SelectGenerateModelJoinAttributeFullName = typeof(SelectGenerateModelJoinAttribute).Name;
+        private readonly string SelectGenerateModelJoinAttributeFullName = typeof(SelectGenerateModelJoinAttribute).FullName;
     }
 }
