@@ -7,6 +7,9 @@ namespace NSL.Generators.SelectTypeGenerator.Tests
         static void Main(string[] args)
         {
 #if DEVELOP
+
+
+#else
             IEnumerable<JoinProxyModel1> jplist = new List<JoinProxyModel1>();
 
             jplist.SelectTestGet();
@@ -15,9 +18,7 @@ namespace NSL.Generators.SelectTypeGenerator.Tests
 
             dtoTyped.SelectTypedtemp1();
 
-            
 
-#else
             List<JoiningModel1> jList = new List<JoiningModel1>();
 
             var selectTest = jList.SelectGet2();

@@ -199,7 +199,7 @@ namespace NSL.Generators.Utils
             }
         }
 
-        public void CreatePartialClass(ClassDeclarationSyntax classDecl, Action<CodeBuilder> bodyBuild, IEnumerable<string> requiredUsings = null, Action<CodeBuilder> beforeClassDef = null)
+        public void CreatePartialClass(TypeDeclarationSyntax classDecl, Action<CodeBuilder> bodyBuild, IEnumerable<string> requiredUsings = null, Action<CodeBuilder> beforeClassDef = null)
         {
             var body = new CodeBuilder();
 
@@ -227,7 +227,17 @@ namespace NSL.Generators.Utils
             if (genericParams?.Any() == true)
                 declTypeLine = $"<{string.Join(",", genericParams)}>";
 
-            declTypeLine = $"{classDecl.GetClassFullModifier()} class {classDecl.GetClassName()}{declTypeLine}";
+
+            string type = string.Empty;
+
+            if(classDecl is ClassDeclarationSyntax)
+                type = "class";
+            else if(classDecl is InterfaceDeclarationSyntax)
+                type = "interface";
+            else if(classDecl is StructDeclarationSyntax)
+                type = "struct";
+
+            declTypeLine = $"{classDecl.GetClassFullModifier()} {type} {classDecl.GetClassName()}{declTypeLine}";
 
 
             if (@namespace != null)
@@ -269,10 +279,10 @@ namespace NSL.Generators.Utils
             }
         }
 
-        public void CreateStaticClass(ClassDeclarationSyntax classDecl, string className, Action bodyBuild, IEnumerable<string> requiredUsings = null, string @namespace = null, Action<CodeBuilder> beforeClassDef = null)
+        public void CreateStaticClass(TypeDeclarationSyntax classDecl, string className, Action bodyBuild, IEnumerable<string> requiredUsings = null, string @namespace = null, Action<CodeBuilder> beforeClassDef = null)
         {
             if (@namespace == null)
-                @namespace = (classDecl.Parent as NamespaceDeclarationSyntax)?.Name.ToString();
+                @namespace = classDecl.TryGetNamespace();
 
             var usings = classDecl.GetTypeClassUsingDirectives();
 
@@ -294,7 +304,16 @@ namespace NSL.Generators.Utils
             if (genericParams?.Any() == true)
                 declTypeLine = $"<{string.Join(",", genericParams)}>";
 
-            declTypeLine = $"{classDecl.GetClassFullModifier(new string[] { "static" }, new string[] { "partial" })} class {className}{declTypeLine}";
+            string type = string.Empty;
+
+            if (classDecl is ClassDeclarationSyntax)
+                type = "class";
+            else if (classDecl is InterfaceDeclarationSyntax)
+                type = "interface";
+            else if (classDecl is StructDeclarationSyntax)
+                type = "struct";
+
+            declTypeLine = $"{classDecl.GetClassFullModifier(new string[] { "static" }, new string[] { "partial" })} {type} {className}{declTypeLine}";
 
             if (@namespace != null)
             {

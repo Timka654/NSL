@@ -2,7 +2,7 @@
 
 namespace NSL.Generators.FillTypeGenerator.Attributes
 {
-    [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Interface | AttributeTargets.Struct, AllowMultiple = true)]
     public class FillTypeFromGenerateAttribute : Attribute
     {
         /// <summary>

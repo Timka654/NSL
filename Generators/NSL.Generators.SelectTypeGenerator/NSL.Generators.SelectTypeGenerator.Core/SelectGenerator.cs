@@ -12,58 +12,6 @@ using System.Reflection;
 
 namespace NSL.Generators.SelectTypeGenerator
 {
-    public class SelectGenDTOContext : SelectGenContext
-    {
-        public override string GetTypeIdentifier(bool canNullable = true)
-        {
-            if (!Symbols.Any())
-                return base.GetTypeIdentifier(canNullable);
-
-            var className = Type.OriginalDefinition.ToString();
-
-            if (className.EndsWith("Model"))
-                className = className.Substring(0, className.Length - "Model".Length);
-
-            className += $"Dto{Model}Model";
-
-            return className;
-        }
-
-        public string GetTypeName()
-        {
-            var className = Type.Name;
-
-            if (className.EndsWith("Model"))
-                className = className.Substring(0, className.Length - "Model".Length);
-
-            className += $"Dto{Model}Model";
-
-            return className;
-        }
-    }
-
-    public class SelectGenContext
-    {
-        public ITypeSymbol OriginType { get; set; }
-        public ITypeSymbol Type { get; set; }
-
-        public IEnumerable<ISymbol> Symbols { get; set; }
-
-        public string Model { get; set; }
-
-
-        public string GenericDefinition { get; set; }
-
-        public bool Typed { get; set; }
-
-        public string MemberName { get; set; }
-
-        public List<SelectGenContext> SubTypeList { get; set; }
-
-        public virtual string GetTypeIdentifier(bool canNullable = true)
-            => Type.GetTypeFullName(canNullable);
-    }
-
     [Generator]
     internal class SelectGenerator : IIncrementalGenerator
     {
@@ -100,9 +48,10 @@ namespace NSL.Generators.SelectTypeGenerator
         {
             //GenDebug.Break();
 
+
             foreach (var item in types)
             {
-                var @class = (ClassDeclarationSyntax)item.Node;
+                var @class = (TypeDeclarationSyntax)item.Node;
 
                 try
                 {
@@ -115,13 +64,11 @@ namespace NSL.Generators.SelectTypeGenerator
             }
         }
 
-        private void ProcessSelectToType(SourceProductionContext sourceContext, GeneratorSyntaxContext context, TypeDeclarationSyntax type)
+        private void ProcessSelectToType(SourceProductionContext sourceContext, GeneratorSyntaxContext context, TypeDeclarationSyntax typeClass)
         {
-            var typeClass = type as ClassDeclarationSyntax;
-
             var typeSem = context.SemanticModel;
 
-            var typeSymb = typeSem.GetDeclaredSymbol(type) as ITypeSymbol;
+            var typeSymb = typeSem.GetDeclaredSymbol(typeClass) as ITypeSymbol;
 
             var members = typeSymb.GetAllMembers();
 

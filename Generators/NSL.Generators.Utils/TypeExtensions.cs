@@ -22,7 +22,7 @@ namespace NSL.Generators.Utils
         public static string[] GetTypeClassUsingDirectives(this TypeDeclarationSyntax type)
             => (type.SyntaxTree.GetRoot() as CompilationUnitSyntax)?.Usings.Select(x => string.Join(" ", x.ToString().Split(' ').Skip(1)).TrimEnd(';')).ToArray();
 
-        public static string[] GetTypeGenericParameters(this ClassDeclarationSyntax c)
+        public static string[] GetTypeGenericParameters(this TypeDeclarationSyntax c)
             => c.TypeParameterList?.Parameters.Select(x => x.Identifier.Text).ToArray();
 
         public static string GetTypeFullName(this ITypeSymbol type, bool canNullable = true)

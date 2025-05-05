@@ -12,7 +12,8 @@ namespace NSL.Generators.FillTypeGenerator.Tests.Develop
         public TData Data { get; set; }
     }
 
-    public interface IDuplicateNameModel
+    [FillTypeFromGenerate(typeof(IDuplicateNameModel))]
+    public partial interface IDuplicateNameModel
     {
         string Id { get; set; }
     }

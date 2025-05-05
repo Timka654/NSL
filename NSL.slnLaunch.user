@@ -1,0 +1,17 @@
+[
+  {
+    "Name": "HttpEndPointGeneratorTests",
+    "Projects": [
+      {
+        "Path": "Generators\\Tests\\HttpEndPoint\\NSL.Generators.HttpEndPointGenerator.Tests.Client\\NSL.Generators.HttpEndPointGenerator.Tests.Client.csproj",
+        "Action": "Start",
+        "DebugTarget": "NSL.Generators.HttpEndPointGenerator.Tests.Client"
+      },
+      {
+        "Path": "Generators\\Tests\\HttpEndPoint\\NSL.Generators.HttpEndPointGenerator.Tests.Server\\NSL.Generators.HttpEndPointGenerator.Tests.Server.csproj",
+        "Action": "Start",
+        "DebugTarget": "NSL.Generators.HttpEndPointGenerator.Tests.Server"
+      }
+    ]
+  }
+]

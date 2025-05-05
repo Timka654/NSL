@@ -124,10 +124,19 @@ namespace NSL.HttpClient
 
             var content = await response.Content?.ReadAsStringAsync();
 
-            if (string.IsNullOrEmpty(content))
+            if (string.IsNullOrEmpty(content) || response.Content?.Headers.ContentType?.MediaType != "application/json")
                 return new Dictionary<string, List<string>>();
 
-            var result = JsonSerializer.Deserialize<Dictionary<string, List<string>>>(content, options?.JsonOptions ?? JsonHttpContent.DefaultJsonOptions);
+            Dictionary<string, List<string>>? result = default;
+
+            try
+            {
+                result = JsonSerializer.Deserialize<Dictionary<string, List<string>>>(content, options?.JsonOptions ?? JsonHttpContent.DefaultJsonOptions);
+            }
+            catch (JsonException)
+            {
+
+            }
 
             if (result == null)
                 return new Dictionary<string, List<string>>();
