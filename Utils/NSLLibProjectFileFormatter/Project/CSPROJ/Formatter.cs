@@ -315,7 +315,9 @@ namespace NSLLibProjectFileFormatter.Project.CSPROJ
 
                             var packageBodyProps = igroups[10].Captures;
 
-                            tb.AppendLine($"<Compile {string.Join(" ", packageProps.Select(x => x.Value.Replace("\t", string.Empty).Trim()).ToArray())} {(packageBodyProps.Any() ? ">" : "/>")}");
+                            var propsLine = string.Join(" ", packageProps.Select(x => x.Value.Trim()).ToArray());
+
+                            tb.AppendLine($"<Compile {propsLine} {(packageBodyProps.Any() ? ">" : "/>")}");
 
                             if (packageBodyProps.Any())
                             {

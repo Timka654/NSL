@@ -1,10 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<NSLProjectTypes>Test</NSLProjectTypes>
 		<OutputType>Exe</OutputType>
-		<TargetFramework>net8</TargetFramework>
-		<Platforms>AnyCPU;ARM32;x86;ARM64;x64</Platforms>
+		<NSLProjectTypes>Test</NSLProjectTypes>
+		<TargetFramework>net9.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<IsPackable>false</IsPackable>
+		<Version>$(VersionSuffix)</Version>
+		<Configurations>DebugExamples;Debug;Release;UnityDebug;Unity</Configurations>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

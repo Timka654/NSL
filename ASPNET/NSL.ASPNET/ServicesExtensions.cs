@@ -1,9 +1,15 @@
 ﻿using HtmlAgilityPack;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using NSL.ASPNET.Attributes;
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Text;
 using System.Threading.Tasks;
+using static NSL.ASPNET.registerServiceItemRecord;
 
 namespace NSL.ASPNET
 {
@@ -111,5 +117,180 @@ namespace NSL.ASPNET
                 ProcessIndexHtmlElement(item, ver);
             }
         }
+
+        public static IServiceCollection RegisterServices(this IServiceCollection services, params string[] models)
+            => services.RegisterServices(Assembly.GetCallingAssembly(), models);
+
+        public static IServiceCollection RegisterServices(this IServiceCollection services, Assembly assembly, params string[] models)
+        {
+            var register = new List<registerServiceItemRecord>();
+
+            var haveModels = models.Any();
+
+            foreach (var type in assembly.GetTypes())
+            {
+                var attrs = type.GetCustomAttributes<RegisterServiceAttribute>();
+
+                foreach (var attr in attrs)
+                {
+                    if (!haveModels || models.Any(m => attr.Models.Contains(m)))
+                    {
+                        var item = new registerServiceItemRecord(type, type.IsGenericType ? type.GetGenericTypeDefinition() : null, attr.Type, attr.Key);
+
+                        var constrs = type.GetConstructors();
+
+                        var constr = constrs
+                            .Where(x => x.GetCustomAttributes<RegisterServiceConstructorAttribute>().Count() > 0)
+                            .FirstOrDefault();
+
+                        if (constr == null && constrs.Length > 1)
+                        {
+                            throw new InvalidOperationException($"Cannot load type {type.FullName} - this type have multiple constructors. Mark type by {nameof(RegisterServiceConstructorAttribute)} attribute for set constructor for DI");
+                        }
+                        else
+                            constr = constrs.First();
+
+                        item.NeedTypes = constr.GetParameters()
+                            .Where(x => !registerServiceSkipped.Contains(x.ParameterType))
+                            .Select(p =>
+                        {
+                            var key = p.GetCustomAttribute<FromKeyedServicesAttribute>()?.Key;
+
+                            return new NeedTypeRecord(p.ParameterType, key == KeyedService.AnyKey ? default : key, p.ParameterType.IsGenericType ? p.ParameterType.GetGenericTypeDefinition() : null);
+
+                        }).ToArray();
+
+                        register.Add(item);
+                    }
+                }
+            }
+
+            string formatUnresolvedTypes(params registerServiceItemRecord[] items)
+            {
+                var sb = new StringBuilder();
+
+                foreach (var item in items)
+                {
+                    sb.AppendLine($"> {item.Type.FullName}[{item.Lifetime}] have unresolved dependency");
+                    var unresolved = item.NeedTypes.Where(nt =>
+                    !services.Any(x => (x.ServiceType == nt.type || x.ServiceType == nt.genericParent)
+                    && Equals(x.ServiceKey, nt.key)
+                    && x.Lifetime <= item.Lifetime));
+
+                    foreach (var u in unresolved)
+                    {
+                        var s = $"--> {u.type.FullName}";
+
+                        if (u.genericParent != default)
+                            s += $"/{u.genericParent.FullName}";
+
+                        if (u.key != default)
+                        {
+                            s += $"(key:{u.key})";
+
+                        }
+                        sb.AppendLine(s);
+                    }
+                }
+
+                return sb.ToString().Trim();
+            }
+
+
+            var registered = new List<registerServiceItemRecord>();
+
+            do
+            {
+                var s = registered.Count;
+
+                foreach (var type in register)
+                {
+                    if (!type.NeedTypes.All(nt =>
+                    services.Any(x => (x.ServiceType == nt.type || x.ServiceType == nt.genericParent)
+                    && Equals(x.ServiceKey, nt.key)
+                    && x.Lifetime <= type.Lifetime)))
+                        continue;
+
+                    if (registered.Contains(type))
+                        continue;
+
+                    switch (type.Lifetime)
+                    {
+                        case ServiceLifetime.Singleton:
+                            if (type.Key != default)
+                                services.AddKeyedSingleton(type.Type, type.Key);
+                            else
+                                services.AddSingleton(type.Type);
+                            break;
+                        case ServiceLifetime.Scoped:
+                            if (type.Key != default)
+                                services.AddKeyedScoped(type.Type, type.Key);
+                            else
+                                services.AddScoped(type.Type);
+                            break;
+                        case ServiceLifetime.Transient:
+                            if (type.Key != default)
+                                services.AddKeyedTransient(type.Type, type.Key);
+                            else
+                                services.AddTransient(type.Type);
+                            break;
+                        default:
+                            throw new InvalidOperationException($"Type \"{type.Type.FullName}\" have invalid lifetime cycle {type.Lifetime}");
+                    }
+
+                    registered.Add(type);
+                }
+
+                if (s == registered.Count)
+                {
+                    register.RemoveAll(registered.Contains);
+
+                    var unresolvedType = register.FirstOrDefault(x =>
+                        !register.Any(o =>
+                            x.NeedTypes.Any(nt => (nt.type == o.Type || nt.genericParent == o.GenericDeclarationType) && Equals(nt.key, o.Key))));
+
+                    if (unresolvedType != null)
+                        throw new InvalidOperationException($"Register services - have unresolved internal dependency\n{formatUnresolvedTypes(register.ToArray())}");
+
+                    var conflictType = register.FirstOrDefault(x =>
+                        services.Any(o =>
+                        x.NeedTypes.Any(nt => (nt.type == o.ServiceType || nt.genericParent == o.ServiceType) && Equals(nt.key, o.ServiceKey))));
+
+                    if (conflictType != null)
+                        throw new InvalidOperationException($"Register services - have unresolved external dependency conflict\n{formatUnresolvedTypes(register.ToArray())}");
+
+
+                    throw new InvalidOperationException($"Register services - cannot resolve types\n{formatUnresolvedTypes(register.ToArray())}");
+                }
+            } while (register.Count > registered.Count);
+
+
+            return services;
+        }
+
+        static readonly Type[] registerServiceSkipped = 
+        [
+            typeof(IServiceProvider),
+            typeof(IServiceScope),
+            typeof(IServiceScopeFactory),
+            typeof(IHostEnvironment),
+            typeof(IHostApplicationLifetime),
+        ];
+    }
+
+
+    internal class registerServiceItemRecord(Type type, Type? genericDeclarationType, ServiceLifetime lifetime, object? key)
+    {
+        public Type Type { get; } = type;
+
+        public Type GenericDeclarationType { get; } = genericDeclarationType;
+
+        public ServiceLifetime Lifetime { get; } = lifetime;
+
+        public object Key { get; } = key;
+
+        public NeedTypeRecord[] NeedTypes { get; set; }
+
+        public record NeedTypeRecord(Type type, object key, Type? genericParent);
     }
 }
