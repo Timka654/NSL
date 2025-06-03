@@ -35,9 +35,9 @@
 	</ItemGroup>
 	<ItemGroup>
 		<Compile Remove="Templates\Entity\EntityItemModel.cs" />
-		<Compile Remove="Templates\Shared\ItemModel.Client.cs" />
-		<Compile Remove="Templates\Shared\ItemModel.cs" />
-		<Compile Remove="Templates\Shared\ItemModel.Server.cs" />
+				<Compile Remove="Templates\Shared\ItemModel.Client.cs" />
+				<Compile Remove="Templates\Shared\ItemModel.cs" />
+				<Compile Remove="Templates\Shared\ItemModel.Server.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<EmbeddedResource Include="Templates\Entity\EntityItemModel.cs" />

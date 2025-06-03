@@ -9,6 +9,7 @@ using NSL.BlazorTemplate.Shared.Models;
 using NSL.BlazorTemplate.Shared.Server.Data;
 using NSL.BlazorTemplate.Shared.Server.Manages;
 using System.Net;
+using NSL.ASPNET.Mvc.Route;
 
 namespace NSL.BlazorTemplate
 {
@@ -23,6 +24,8 @@ namespace NSL.BlazorTemplate
             // Add services to the container.
             builder.Services.AddRazorComponents()
                 .AddInteractiveWebAssemblyComponents();
+
+            builder.AddNSLModelStateFilter();
 
             var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
             builder.Services.AddDbContext<ApplicationDbContext>(options =>

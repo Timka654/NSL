@@ -210,8 +210,11 @@ namespace NSL.Generators.HttpEndPointGenerator
                             {
                                 var _t = GetHttpRequestType(templ.Name);
                                 var _vname = $"{controllerName}{ms.Name}{_t}";
-
+#if UnityTarget
+                                urlDeclarations.Add($"protected static readonly string {_vname}Url = $\"{{{prefixVarName}}}/{templ.val.Replace("[action]", ms.Name)}\";");
+#else
                                 urlDeclarations.Add($"protected const string {_vname}Url = $\"{{{prefixVarName}}}/{templ.val.Replace("[action]", ms.Name)}\";");
+#endif
 
                                 List<string> _p = new List<string>();
 

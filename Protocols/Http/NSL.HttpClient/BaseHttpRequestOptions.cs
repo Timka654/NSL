@@ -3,7 +3,6 @@ using NSL.HttpClient.Models;
 using NSL.HttpClient.Validators;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading;
@@ -34,7 +33,7 @@ namespace NSL.HttpClient
 
         public CancellationToken CancellationToken { get; set; } = CancellationToken.None;
 
-        public Dictionary<object, object> ObjectBag { get; set; } = [];
+        public Dictionary<object, object> ObjectBag { get; set; } = new Dictionary<object, object>();
 
         /// <summary>
         /// 
@@ -150,7 +149,8 @@ namespace NSL.HttpClient
 
         public BaseHttpRequestOptions WithObjectValue(object key, object value, bool clone = false)
         {
-            ArgumentNullException.ThrowIfNull(key, nameof(key));
+            if(key == null)
+            throw new ArgumentNullException(nameof(key));
 
             if (clone)
                 return Clone().WithObjectValue(key, value);
@@ -164,11 +164,11 @@ namespace NSL.HttpClient
             return ObjectBag.TryGetValue(key, out value);
         }
 
-        public bool TryGetObjectValue<TValue>(string key, out TValue? value)
+        public bool TryGetObjectValue<TValue>(string key, out TValue value)
         {
             if (ObjectBag.TryGetValue(key, out var _value))
             {
-                value = (TValue?)_value;
+                value = (TValue)_value;
                 return true;
             }
 

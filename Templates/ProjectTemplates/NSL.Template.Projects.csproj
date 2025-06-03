@@ -35,7 +35,7 @@
 	</ItemGroup>
 	<ItemGroup>
 		<Compile Remove="content\**\*" />
-		<Content Include="content\**\*" />
+				<Content Include="content\**\*" />
 	</ItemGroup>
 
 </Project>

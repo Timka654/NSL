@@ -21,14 +21,23 @@ namespace NSL.ASPNET.Develop.Services
 
             while (true)
             {
-                string latestItem = null;
-
-                await foreach (var item in reader.ReadAllAsync())
+                try
                 {
-                    latestItem = item;
+                    await foreach(var item in reader.ReadAllAsync())
+                    {
+                        await SetLaunchUrlForRememberedProfiles(item);
+                    }
                 }
+                catch (Exception ex)
+                {
+                    if (ex is ChannelClosedException || ex is OperationCanceledException)
+                        return;
 
-                await SetLaunchUrlForRememberedProfiles(latestItem);
+                    if (skipExceptions)
+                        return;
+
+                    throw;
+                }
             }
         }
 

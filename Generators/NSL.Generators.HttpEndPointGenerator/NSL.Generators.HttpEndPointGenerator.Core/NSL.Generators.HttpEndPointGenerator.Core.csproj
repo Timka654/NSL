@@ -29,17 +29,18 @@
 
 	<PropertyGroup Condition="'$(Configuration)'=='UnityDebug'">
 		<AssemblyName>Unity.$(MSBuildProjectName)</AssemblyName>
-		<DefineConstants>DEBUG;TRACE</DefineConstants>
+		<DefineConstants>DEBUG;TRACE;UnityTarget</DefineConstants>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)'=='Unity'">
 		<AssemblyName>Unity.$(MSBuildProjectName)</AssemblyName>
+		<DefineConstants>RELEASE;UnityTarget</DefineConstants>
 	</PropertyGroup>
 	<ItemGroup Condition="'$(Configuration)'=='Debug' Or '$(Configuration)'=='Release' Or '$(Configuration)'=='DebugExamples'">
 		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.13.0" PrivateAssets="all" />
 	</ItemGroup>
 	<ItemGroup Condition="'$(Configuration)'=='UnityDebug' Or '$(Configuration)'=='Unity'">
-		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.3.1" PrivateAssets="all" />
+		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.3.0" PrivateAssets="all" />
 	</ItemGroup>
 	<ItemGroup>
 		<PackageReference Include="Microsoft.Extensions.Primitives" Version="9.0.3" />
@@ -48,11 +49,11 @@
 		<Compile Include="..\NSL.Generators.HttpEndPointGenerator.Shared\**\*.cs" Exclude="..\NSL.Generators.HttpEndPointGenerator.Shared\**\bin\**;..\NSL.Generators.HttpEndPointGenerator.Shared\**\obj\**" >
 			<Link>NSL.Generators.HttpEndPointGenerator.Shared\%(RecursiveDir)%(FileName)%(Extension)</Link>
 			</Compile>
-							</ItemGroup>
-							<ItemGroup>
-								<Compile Include="..\..\NSL.Generators.Utils\**\*.cs"
-									  Exclude="..\..\NSL.Generators.Utils\**\bin\**;..\..\NSL.Generators.Utils\**\obj\**">
-									<Link>NSL.Generators.Utils\%(RecursiveDir)%(FileName)%(Extension)</Link>
+										</ItemGroup>
+										<ItemGroup>
+											<Compile Include="..\..\NSL.Generators.Utils\**\*.cs"
+												  Exclude="..\..\NSL.Generators.Utils\**\bin\**;..\..\NSL.Generators.Utils\**\obj\**">
+												<Link>NSL.Generators.Utils\%(RecursiveDir)%(FileName)%(Extension)</Link>
 		</Compile>
 	</ItemGroup>
 

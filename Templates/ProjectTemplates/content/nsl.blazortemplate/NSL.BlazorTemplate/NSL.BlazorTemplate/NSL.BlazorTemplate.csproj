@@ -9,7 +9,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\NSL.BlazorTemplate.Shared\NSL.BlazorTemplate.Shared.Server.csproj" />
-    <ProjectReference Include="..\NSL.BlazorTemplate.Client\NSL.BlazorTemplate.Client.csproj" />
+    <ProjectReference Include="..\NSL.BlazorTemplate.Client\NSL.BlazorTemplate.Client.csproj" PrivateAssets="All" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="8.0.7" />
     <PackageReference Include="NSL.ASPNET.Identity.Host" Version="2025.3.26.451" />
     <PackageReference Include="NSL.ASPNET.Mvc" Version="2025.3.26.451" />
