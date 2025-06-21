@@ -45,11 +45,10 @@
 		<Compile Include="..\NSL.Generators.FillTypeGenerator.Shared\**\*.cs" Exclude="..\NSL.Generators.FillTypeGenerator.Shared\**\bin\**;..\NSL.Generators.FillTypeGenerator.Shared\**\obj\**" >
 			<Link>NSL.Generators.FillTypeGenerator.Shared\%(RecursiveDir)%(FileName)%(Extension)</Link>
 			</Compile>
-										</ItemGroup>
-										<ItemGroup>
-											<Compile Include="..\..\NSL.Generators.Utils\**\*.cs"
-												  Exclude="..\..\NSL.Generators.Utils\**\bin\**;..\..\NSL.Generators.Utils\**\obj\**">
-												<Link>NSL.Generators.Utils\%(RecursiveDir)%(FileName)%(Extension)</Link>
+																			</ItemGroup>
+																			<ItemGroup>
+																				<Compile Include="..\..\NSL.Generators.Utils\**\*.cs" Exclude="..\..\NSL.Generators.Utils\**\bin\**;..\..\NSL.Generators.Utils\**\obj\**">
+																					<Link>NSL.Generators.Utils\%(RecursiveDir)%(FileName)%(Extension)</Link>
 		</Compile>
 	</ItemGroup>
 

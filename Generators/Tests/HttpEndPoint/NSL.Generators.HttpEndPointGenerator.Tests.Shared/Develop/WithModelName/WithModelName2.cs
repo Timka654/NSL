@@ -1,6 +1,6 @@
-﻿#if SERVER
+﻿#if NSL_SERVER
 using Microsoft.AspNetCore.Mvc;
-#elif CLIENT
+#elif NSL_CLIENT
 using NSL.Generators.HttpEndPointGenerator.Shared.Fake.Interfaces;
 using NSL.Generators.HttpEndPointGenerator.Shared.Fake;
 #endif
@@ -12,7 +12,7 @@ namespace NSL.Generators.FillTypeGenerator.Tests.Develop.WithModelName
     {
         public IFormFile file { get; set; }
 
-#if SERVER
+#if NSL_SERVER
         [ModelBinder<FormDataJsonBinder>]
 #endif
         public WithModelName3 Abc3 { get; set; }
@@ -21,7 +21,7 @@ namespace NSL.Generators.FillTypeGenerator.Tests.Develop.WithModelName
     {
         public IFormFileCollection file { get; set; }
 
-#if SERVER
+#if NSL_SERVER
         [ModelBinder<FormDataJsonBinder>]
 #endif
         public WithModelName3 Abc3 { get; set; }

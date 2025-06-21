@@ -1,4 +1,4 @@
-﻿#if SERVER
+﻿#if NSL_SERVER
 
 namespace $rootnamespace$
 {

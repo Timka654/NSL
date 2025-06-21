@@ -13,33 +13,6 @@ using System.Security.Claims;
 
 namespace NSL.Generators.SelectTypeGenerator
 {
-    internal class GenTypeGroup
-    {
-        public string Name { get; set; }
-
-        public string Namespace { get; set; }
-
-        public ITypeSymbol TypeSymbol { get; set; }
-
-        public TypeDeclarationSyntax TypeDeclaration { get; set; }
-
-        //public SemanticModel SemanticModel { get; set; }
-
-        public Dictionary<string, string[]> Joins { get; set; }
-
-        public GenAttribute[] Attributes { get; set; }
-
-        public ISymbol[] Members { get; set; }
-    }
-
-    internal class GenAttribute
-    {
-        public string[] Models { get; set; }
-
-        public bool Dto { get; set; }
-
-        public bool Typed { get; set; }
-    }
 
     [Generator]
     internal class SelectGenerator : IIncrementalGenerator
@@ -75,6 +48,8 @@ namespace NSL.Generators.SelectTypeGenerator
 
         private void ProcessSelectTypes(SourceProductionContext context, ImmutableArray<GeneratorSyntaxContext> types)
         {
+            List<string> fnames = new List<string>();
+            //GenDebug.Break(true);
             //GenDebug.Break();
             foreach (var group in types.GroupBy(x =>
             {
@@ -136,7 +111,7 @@ namespace NSL.Generators.SelectTypeGenerator
 
                 try
                 {
-                    ProcessSelectToType(context, gtype);
+                    ProcessSelectToType(context, gtype, fnames);
                 }
                 catch (Exception ex)
                 {
@@ -145,7 +120,8 @@ namespace NSL.Generators.SelectTypeGenerator
             }
         }
 
-        private void ProcessSelectToType(SourceProductionContext sourceContext, GenTypeGroup gtype)
+        private void ProcessSelectToType(SourceProductionContext sourceContext, GenTypeGroup gtype,
+            List<string> fnames)
         {
             var classBuilder = new CodeBuilder();
 
@@ -173,8 +149,8 @@ namespace NSL.Generators.SelectTypeGenerator
                 {
                     foreach (var item in typedModels.Models)
                     {
-                        if(!gtype.Joins.TryGetValue(item, out var mjoins))
-                            mjoins = new string[] {  };
+                        if (!gtype.Joins.TryGetValue(item, out var mjoins))
+                            mjoins = new string[] { };
 
                         SelectGenContext genContext = typedModels.Dto ? new SelectGenDTOContext() : new SelectGenContext();
 
@@ -211,7 +187,6 @@ namespace NSL.Generators.SelectTypeGenerator
 #pragma warning restore RS1035 // Do not use APIs banned for analyzers
             //#endif
 
-            var fnames = new List<string>();
 
             var fname = $"{gtype.Name}.selectgen.cs";
 
@@ -256,7 +231,9 @@ namespace NSL.Generators.SelectTypeGenerator
                         var fname = $"{className}.dtogen.cs";
 
                         if (fnames.Contains(fname))
+                        {
                             continue;
+                        }
 
                         fnames.Add(fname);
 

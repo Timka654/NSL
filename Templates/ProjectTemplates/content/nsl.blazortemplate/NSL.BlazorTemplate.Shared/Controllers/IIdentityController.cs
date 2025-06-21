@@ -1,5 +1,5 @@
 ﻿//-:cnd:noEmit
-#if SERVER
+#if NSL_SERVER
 using Microsoft.AspNetCore.Mvc;
 #else
 using NSL.Generators.HttpEndPointGenerator.Shared.Fake.Attributes;

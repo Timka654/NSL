@@ -41,7 +41,7 @@ namespace NSL.RestExtensions.Unity
                 urequest.uploadHandler = new UploadHandlerRaw(await request.Content.ReadAsByteArrayAsync());
             }
 
-            var rresult = await urequest.SendWebRequest();
+            await urequest.SendWebRequest();
 
             var statusCode = (HttpStatusCode)urequest.responseCode;
 
@@ -73,20 +73,50 @@ namespace NSL.RestExtensions.Unity
                 RequestMessage = request
             };
 
-            var headers = rresult.webRequest.GetResponseHeaders();
+            var headers = urequest.GetResponseHeaders();
+
+            var contentHeaders = new Dictionary<string, string>();
 
             if (headers != null)
             {
                 foreach (var item in headers)
                 {
-                    result.Headers.TryAddWithoutValidation(item.Key, item.Value);
+                    if (!result.Headers.TryAddWithoutValidation(item.Key, item.Value))
+                        contentHeaders.TryAdd(item.Key, item.Value);
+
                 }
             }
 
-            if (rresult.webRequest.downloadHandler?.data != null)
-                result.Content = new StreamContent(new MemoryStream(rresult.webRequest.downloadHandler.data));
+            if (urequest.downloadHandler?.data != null)
+            {
+                result.Content = new StreamContent(new MemoryStream(urequest.downloadHandler.data));
+
+                foreach (var item in contentHeaders)
+                {
+                    result.Content.Headers.TryAddWithoutValidation(item.Key, item.Value);
+
+                }
+            }
+            else
+                result.Content = DefaultHttpContent.Instance;
 
             return result;
+        }
+    }
+
+    internal class DefaultHttpContent : HttpContent
+    {
+        public static DefaultHttpContent Instance { get; } = new DefaultHttpContent();
+
+        protected override Task SerializeToStreamAsync(Stream stream, TransportContext context)
+        {
+            return Task.CompletedTask;
+        }
+
+        protected override bool TryComputeLength(out long length)
+        {
+            length = 0;
+            return true;
         }
     }
 }

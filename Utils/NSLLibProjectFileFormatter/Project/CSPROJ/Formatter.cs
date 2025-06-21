@@ -1,4 +1,5 @@
 ﻿using NSLLibProjectFileFormatter.Solution;
+using System.Collections;
 using System.Text.RegularExpressions;
 
 namespace NSLLibProjectFileFormatter.Project.CSPROJ
@@ -10,6 +11,12 @@ namespace NSLLibProjectFileFormatter.Project.CSPROJ
         private readonly string slnPath;
 
         private string[] AvailableConfigurations = new string[] { "Debug", "Release", "DebugExamples", "Unity", "UnityDebug" };
+
+        private string[] ExcludeDirectories = new string[]
+        {
+            "Utils",
+            "DevSpace"
+        };
 
         public Formatter(string path)
         {
@@ -24,7 +31,7 @@ namespace NSLLibProjectFileFormatter.Project.CSPROJ
 
             foreach (var d in di.GetDirectories())
             {
-                if (d.Name == "Utils")
+                if (ExcludeDirectories.Contains(d.Name))
                     continue;
 
                 processDirectory(d);

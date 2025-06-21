@@ -1,5 +1,5 @@
 ﻿//-:cnd:noEmit
-#if CLIENT
+#if NSL_CLIENT
 using System.ComponentModel.DataAnnotations;
 
 namespace NSL.BlazorTemplate.Shared.Models.RequestModels

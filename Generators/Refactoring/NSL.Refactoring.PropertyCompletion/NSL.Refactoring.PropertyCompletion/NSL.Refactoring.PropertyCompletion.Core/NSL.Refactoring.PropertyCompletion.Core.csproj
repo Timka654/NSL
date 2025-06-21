@@ -31,11 +31,11 @@
 		<PackageReference Include="Microsoft.CodeAnalysis.CSharp.Features" Version="4.13.0" />
 		<PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.13.0" />
 		<!--<PackageReference Include="Microsoft.ML" Version="4.0.1" />-->
-		<PackageReference Include="System.Composition.AttributedModel" Version="9.0.3" />
+		<PackageReference Include="System.Composition.AttributedModel" Version="9.0.5" />
 	</ItemGroup>
 	<ItemGroup>
 		<Compile Update="Resources.Designer.cs" DesignTime="True" AutoGen="True" DependentUpon="Resources.resx" />
-				<EmbeddedResource Update="Resources.resx" Generator="ResXFileCodeGenerator" LastGenOutput="Resources.Designer.cs" />
+										<EmbeddedResource Update="Resources.resx" Generator="ResXFileCodeGenerator" LastGenOutput="Resources.Designer.cs" />
 	</ItemGroup>
 
 </Project>

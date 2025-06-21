@@ -1,5 +1,5 @@
 ﻿//-:cnd:noEmit
-#if CLIENT
+#if NSL_CLIENT
 
 namespace Shared.Combine.Library
 {

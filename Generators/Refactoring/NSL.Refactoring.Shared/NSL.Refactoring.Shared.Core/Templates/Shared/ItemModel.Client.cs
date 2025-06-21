@@ -1,4 +1,4 @@
-﻿#if CLIENT
+﻿#if NSL_CLIENT
 
 namespace $rootnamespace$
 {

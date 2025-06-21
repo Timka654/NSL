@@ -19,7 +19,7 @@
 		<DefineConstants>$(DefineConstants);DEVELOP</DefineConstants>
 	</PropertyGroup>
 
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugExamples|AnyCPU'">
 		<DefineConstants>$(DefineConstants);DEVELOP</DefineConstants>
 	</PropertyGroup>
 

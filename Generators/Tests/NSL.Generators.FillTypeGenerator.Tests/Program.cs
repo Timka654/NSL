@@ -16,7 +16,7 @@ namespace NSL.Generators.FillTypeGenerator.Tests
             dup_val1.FillTo(dup_valTo);
             dup_val2.FillTo(dup_valTo);
 #else
-             DevClass1 devClass1 = new DevClass1();
+            DevClass1 devClass1 = new DevClass1();
 
             DevClass2 devClass2 = new DevClass2();
 

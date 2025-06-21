@@ -76,5 +76,9 @@ namespace NSL.Refactoring.Shared
             }
         }
 
+        public sealed override FixAllProvider GetFixAllProvider()
+        {
+            return WellKnownFixAllProviders.BatchFixer;
+        }
     }
 }

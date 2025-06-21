@@ -9,7 +9,7 @@
 	</PropertyGroup>
 
 	<PropertyGroup>
-		<DefineConstants>$(DefineConstants);SERVER</DefineConstants>
+		<DefineConstants>$(DefineConstants);NSL_SERVER</DefineConstants>
 	</PropertyGroup>
 
 	<ItemGroup>

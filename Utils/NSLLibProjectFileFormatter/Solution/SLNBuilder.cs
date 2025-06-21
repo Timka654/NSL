@@ -38,6 +38,8 @@
 
         public static void BuildSln(string solutionPath, IEnumerable<ProjectFileInfo> projects, string[] availableProfiles)
         {
+            solutionPath = Path.GetFullPath(solutionPath);
+
             availableProfiles = availableProfiles.OrderBy(x => x).ToArray();
 
             var slnHeader = "Microsoft Visual Studio Solution File, Format Version 12.00\n# Visual Studio Version 17\nVisualStudioVersion = 17.12.35521.163\nMinimumVisualStudioVersion = 10.0.40219.1\n";

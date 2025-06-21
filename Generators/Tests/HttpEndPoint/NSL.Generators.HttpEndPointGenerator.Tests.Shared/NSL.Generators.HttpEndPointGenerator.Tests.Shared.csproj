@@ -9,7 +9,7 @@
 		<IsPackable>false</IsPackable>
 		<Version>$(VersionSuffix)</Version>
 		<Configurations>DebugExamples;Debug;Release;UnityDebug;Unity</Configurations>
-		<DefineConstants>$(DefineConstants);CLIENT</DefineConstants>
+		<DefineConstants>$(DefineConstants);NSL_CLIENT</DefineConstants>
 
 	</PropertyGroup>
 

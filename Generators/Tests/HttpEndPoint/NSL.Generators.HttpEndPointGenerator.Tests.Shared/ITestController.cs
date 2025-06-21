@@ -1,7 +1,7 @@
-﻿#if SERVER
+﻿#if NSL_SERVER
 using NSL.ASPNET.Mvc;
 using Microsoft.AspNetCore.Mvc;
-#elif CLIENT
+#elif NSL_CLIENT
 using NSL.Generators.HttpEndPointGenerator.Shared.Fake;
 using NSL.Generators.HttpEndPointGenerator.Shared.Fake.Attributes;
 using NSL.Generators.HttpEndPointGenerator.Shared.Fake.Interfaces;
