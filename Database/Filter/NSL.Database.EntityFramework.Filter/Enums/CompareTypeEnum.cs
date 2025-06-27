@@ -3,9 +3,7 @@
     public enum CompareType
     {
         Equals,
-        NotEquals,
         Contains,
-        NotContains,
         EqualsAMore,
         EqualsALess,
         More,
@@ -16,6 +14,7 @@
         StartsWithCase,
         StartsWithIgnoreCase,
         EndsWithCase,
-        EndsWithIgnoreCase
+        EndsWithIgnoreCase,
+        Where
     }
 }

@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<NSLProjectTypes>AnalyzerPackage</NSLProjectTypes>
@@ -28,6 +28,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\..\NSL.Refactoring.FastAction\NSL.Refactoring.FastAction.UI\NSL.Refactoring.FastAction.UI.csproj" />
 		<ProjectReference Include="..\NSL.Refactoring.Shared.Core\NSL.Refactoring.Shared.Core.csproj" />
 	</ItemGroup>
 

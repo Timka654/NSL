@@ -36,7 +36,14 @@ namespace NSL.Refactoring.FastAction
             return Action(cancellationToken, false);
         }
 
-        public static PreviewedCodeAction Create(string title, ActionDelegate action)
-            => new PreviewedCodeAction(title, action);
+        protected override CodeActionPriority ComputePriority()
+        {
+            return Priority;
+        }
+
+        public CodeActionPriority Priority { get; set; } = CodeActionPriority.Default;
+
+        public static PreviewedCodeAction Create(string title, ActionDelegate action, CodeActionPriority priority = CodeActionPriority.Default)
+            => new PreviewedCodeAction(title, action) { Priority = priority};
     }
 }

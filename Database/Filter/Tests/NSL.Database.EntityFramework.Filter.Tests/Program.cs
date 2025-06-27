@@ -28,12 +28,14 @@ namespace NSL.Database.EntityFramework.Filter.Tests
             var builder = EntityFilterBuilder.Create()
                 .CreateFilterBlock(b => b
                     //.AddProperty(nameof(TestEntityModel.NullCheckDate), Enums.CompareType.NotEquals, null)
-                    .AddProperty(nameof(TestEntityModel.Content), Enums.CompareType.ContainsCase, "bb")
+                    //.AddProperty(nameof(TestEntityModel.Content), Enums.CompareType.ContainsCase, "bb", false)
+                    .AddProperty(nameof(TestEntityModel.RelTests), Enums.CompareType.ContainsCollection, b2=> b2.AddProperty(nameof(RelTestEntityModel.Type), Enums.CompareType.Equals, 1))
                 )
                 .AddOrderProperty(nameof(TestEntityModel.NullCheckDate));
 
 
             var result = await context.Tests
+                .Include(x=>x.RelTests)
                 .Filter(builder.GetFilter())
                 .ToDataResultAsync();
         }

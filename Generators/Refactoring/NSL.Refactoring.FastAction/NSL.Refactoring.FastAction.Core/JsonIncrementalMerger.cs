@@ -113,7 +113,7 @@ namespace NSL.Refactoring.FastAction.Core
                 return Tuple.Create(key.Substring(0, key.Length - 2), "r");
             if (key.EndsWith("$a"))
                 return Tuple.Create(key.Substring(0, key.Length - 2), "a");
-            return Tuple.Create(key, "");
+            return Tuple.Create(key, "a");
         }
     }
 

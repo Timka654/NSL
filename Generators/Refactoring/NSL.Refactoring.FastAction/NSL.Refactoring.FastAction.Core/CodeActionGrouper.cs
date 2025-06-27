@@ -14,11 +14,14 @@ namespace NSL.Refactoring.FastAction.Core
         {
             var tree = new GroupNode(string.Empty);
 
-            foreach (var item in actions.GroupBy(x => string.Join(GroupSeparator[0], x.Path.Split(GroupSeparator, StringSplitOptions.RemoveEmptyEntries).SkipLast(1))))
+            var fgroups = actions.GroupBy(x => string.Join(GroupSeparator[0], x.Path.Split(GroupSeparator, StringSplitOptions.RemoveEmptyEntries).SkipLast(1)));
+
+            foreach (var item in fgroups)
             {
                 if (string.IsNullOrEmpty(item.Key))
                 {
-                    tree.Actions.AddRange(item.Select(x => PreviewedCodeAction.Create(x.Path, x.Action)).Cast<CodeAction>());
+                    tree.Actions.AddRange(item.Select(x => PreviewedCodeAction.Create(x.Path, x.Action, CodeActionPriority.High)).Cast<CodeAction>());
+
                     continue;
                 }
 
@@ -28,15 +31,15 @@ namespace NSL.Refactoring.FastAction.Core
 
                 var i = 0;
 
-                GroupNode n;
+                GroupNode n = tree;
 
                 do
                 {
                     s += $"{path[i]}{GroupSeparator[0]}";
-                    n = tree.Children.GetOrCreate(path[i++], () => new GroupNode(path[i - 1]));
+                    n = n.Children.GetOrCreate(path[i++], () => new GroupNode(path[i - 1]));
                 } while (path.Length > i);
 
-                n.Actions.AddRange(item.Select(x => PreviewedCodeAction.Create(x.Path.Substring(s.Length), x.Action)).Cast<CodeAction>());
+                n.Actions.AddRange(item.Select(x => PreviewedCodeAction.Create(x.Path.Substring(s.Length), x.Action, CodeActionPriority.High)).Cast<CodeAction>());
             }
 
             return BuildCodeActions(tree);

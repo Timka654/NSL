@@ -19,6 +19,8 @@ namespace NSL.Refactoring.FastAction.Core
 
         public TemplateData[] Template { get; set; }
 
+        public TemplateInputFieldData[] InputValues { get; set; }
+
         public string[] Types { get; set; }
 
         public ConditionData[] Conditions { get; set; } = Array.Empty<ConditionData>();

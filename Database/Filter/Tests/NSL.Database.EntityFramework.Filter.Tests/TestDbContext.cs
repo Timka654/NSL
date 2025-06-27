@@ -11,6 +11,8 @@ namespace NSL.Database.EntityFramework.Filter.Tests
 
         public DbSet<TestEntityModel> Tests { get; set; }
 
+        public DbSet<RelTestEntityModel> RelTests { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.HasDbFilter();

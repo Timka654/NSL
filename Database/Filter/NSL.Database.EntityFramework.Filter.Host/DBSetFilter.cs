@@ -73,17 +73,11 @@ namespace NSL.Database.EntityFramework.Filter.Host
                 case CompareType.Equals:
                     And(Equal(li, property), ref where);
                     break;
-                case CompareType.NotEquals:
-                    And(NotEqual(li, property), ref where);
-                    break;
                 case CompareType.Contains:
                     And(Contains(li, property), ref where);
                     break;
                 case CompareType.ContainsCollection:
                     And(ContainsCollection(li, property), ref where);
-                    break;
-                case CompareType.NotContains:
-                    And(NotContains(li, property), ref where);
                     break;
                 case CompareType.EqualsAMore:
                     And(EqualsAMore(li, property), ref where);
@@ -139,9 +133,13 @@ namespace NSL.Database.EntityFramework.Filter.Host
 
         private static Expression trueExpression = Expression.Constant(true, typeof(bool));
 
+        private static Expression falseExpression = Expression.Constant(false, typeof(bool));
+
         private static MethodInfo stringContainsMethodInfo = typeof(string).GetMethod("Contains", new[] { typeof(string) });
 
         private static MethodInfo arrayContainsMethodInfo = typeof(Enumerable).GetMethods().First(x => x.Name.Equals("Contains") && x.GetParameters().Count() == 2);
+
+        private static MethodInfo arrayAnyMethodInfo = typeof(Enumerable).GetMethods().First(x => x.Name.Equals("Any") && x.GetParameters().Count() == 2);
 
         private static MethodInfo stringContainsCaseMethodInfo = typeof(FilterExtensions).GetMethod("ContainsCase", BindingFlags.Public | BindingFlags.Static);
 
@@ -156,12 +154,40 @@ namespace NSL.Database.EntityFramework.Filter.Host
         private static MethodInfo stringEndsWithIgnoreCaseMethodInfo = typeof(FilterExtensions).GetMethod("EndsWithIgnoreCase", BindingFlags.Public | BindingFlags.Static);
 
         private static Expression ContainsCollection(Expression listOfNames, FilterPropertyViewModel property)
-            => BuildBinaryExpressions(listOfNames, property, (nameProperty, nameSearch) =>
+        {
+                    if (property.ValueBlock == null)
+                return BuildBinaryExpressions(listOfNames, property, (nameProperty, nameSearch) =>
+                {
+                        var startsWithMethod = arrayContainsMethodInfo.MakeGenericMethod(GetPropertyType(nameProperty));
+                        var startWithCall = Expression.Call(null, startsWithMethod, new Expression[] { nameProperty, nameSearch });
+                        return Expression.Equal(startWithCall, trueExpression);
+
+
+                });
+
+            var userIdParam = GetPropertyExp(listOfNames, property.PropertyPath, property.ValueNull);
+
+            var pt = GetPropertyType(userIdParam);
+
+            Expression whereBlock = null;
+
+            var li = Expression.Parameter(pt, "p");
+
+            Expression where = null;
+            foreach (var p in property.ValueBlock.Properties)
             {
-                var startsWithMethod = arrayContainsMethodInfo.MakeGenericMethod(GetPropertyType(nameProperty));
-                var startWithCall = Expression.Call(null, startsWithMethod, new Expression[] { nameProperty, nameSearch });
-                return Expression.Equal(startWithCall, trueExpression);
-            });
+                BuildPropertyFilter(li, p, ref whereBlock);
+            }
+
+            Or(whereBlock, ref where);
+
+            Expression anyExpression = Expression.Call(null, arrayAnyMethodInfo.MakeGenericMethod(pt), new Expression[] { userIdParam, Expression.Lambda(where, li) });
+
+            if (property.InvertCompare)
+                anyExpression = Expression.Not(anyExpression);
+
+            return anyExpression;
+        }
 
         private static Expression ContainsCase(Expression listOfNames, FilterPropertyViewModel property)
             => BuildBinaryExpressions(listOfNames, property, (nameProperty, nameSearch) =>
@@ -176,7 +202,6 @@ namespace NSL.Database.EntityFramework.Filter.Host
                 var startWithCall = Expression.Call(null, stringContainsIgnoreCaseMethodInfo, new Expression[] { nameProperty, nameSearch });
                 return Expression.Equal(startWithCall, trueExpression);
             });
-
 
 
         private static Expression StartsWithCase(Expression listOfNames, FilterPropertyViewModel property)
@@ -217,18 +242,8 @@ namespace NSL.Database.EntityFramework.Filter.Host
                 return Expression.Equal(startWithCall, trueExpression);
             });
 
-        private static Expression NotContains(Expression listOfNames, FilterPropertyViewModel property)
-            => BuildBinaryExpressions(listOfNames, property, (nameProperty, nameSearch) =>
-            {
-                var startWithCall = Expression.Call(nameProperty, stringContainsMethodInfo, new Expression[] { nameSearch });
-                return Expression.NotEqual(startWithCall, trueExpression);
-            });
-
         private static Expression Equal(Expression listOfNames, FilterPropertyViewModel property)
             => BuildBinaryExpressions(listOfNames, property, Expression.Equal);
-
-        private static Expression NotEqual(Expression listOfNames, FilterPropertyViewModel property)
-            => BuildBinaryExpressions(listOfNames, property, Expression.NotEqual);
 
         private static Expression EqualsAMore(Expression listOfNames, FilterPropertyViewModel property)
             => BuildBinaryExpressions(listOfNames, property, Expression.GreaterThanOrEqual);
@@ -242,11 +257,13 @@ namespace NSL.Database.EntityFramework.Filter.Host
         private static Expression Less(Expression listOfNames, FilterPropertyViewModel property)
             => BuildBinaryExpressions(listOfNames, property, Expression.LessThan);
 
-        private static BinaryExpression BuildBinaryExpressions(Expression listOfNames, FilterPropertyViewModel property, Func<MemberExpression, Expression, BinaryExpression> build)
+        private static Expression BuildBinaryExpressions(Expression listOfNames, FilterPropertyViewModel property, Func<MemberExpression, Expression, Expression> build)
         {
             var v = BuildConvertibleExpressions(listOfNames, property);
 
-            return build(v.member, v.value);
+            var b = build(v.member, v.value);
+
+            return property.InvertCompare ? Expression.Not(b) : b;
         }
 
         private static (MemberExpression member, ConstantExpression value) BuildConvertibleExpressions(Expression listOfNames, FilterPropertyViewModel property)

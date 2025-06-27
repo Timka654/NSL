@@ -4,9 +4,9 @@ using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Differencing;
-using Microsoft.CodeAnalysis.Editing;
 using Microsoft.CodeAnalysis.Text;
 using NSL.Generators.Utils;
+using NSL.Refactoring.FastAction.UI;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -20,6 +20,7 @@ using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace NSL.Refactoring.FastAction.Core
 {
@@ -84,6 +85,8 @@ namespace NSL.Refactoring.FastAction.Core
                                     {
                                         using (var za = new ZipArchive(s))
                                         {
+                                            Directory.Delete(baseCachePath, true);
+
                                             za.ExtractToDirectory(baseCachePath);
                                         }
                                     }
@@ -107,6 +110,62 @@ namespace NSL.Refactoring.FastAction.Core
             }
 
             return baseCache;
+        }
+
+        static string NormalizeName(string name)
+        {
+            var rchars = name
+                .Where(x => char.IsSymbol(x) && !char.IsDigit(x) && x != '_')
+                .ToArray();
+
+            foreach (var c in rchars)
+            {
+                name = name.Replace(c, '_');
+            }
+
+            return name;
+        }
+
+        static int getNodeDepth(SyntaxNode n)
+        {
+            if (n is IdentifierNameSyntax)
+                return 1;
+            if (n is PredefinedTypeSyntax)
+                return 1;
+            if (n is AccessorListSyntax)
+                return 1;
+            if (n is AccessorDeclarationSyntax)
+                return 2;
+            if (n is TypeArgumentListSyntax)
+                return 4;
+
+            return 0;
+        }
+
+        static TValue getTypedNode<TValue>(SyntaxNode node, int depth)
+            where TValue : SyntaxNode
+        {
+            var n = node;
+            while (true)
+            {
+                for (int i = 0; i < depth; i++)
+                {
+                    if (n is TValue)
+                        return n as TValue;
+
+                    n = n.Parent;
+                }
+
+                if (n != null && !(n is TValue))
+                {
+                    depth = getNodeDepth(n);
+                    if (depth == 0)
+                        break;
+                }
+                else
+                    break;
+            }
+            return n as TValue;
         }
 
         internal static async Task<IEnumerable<RefactoringAction>> BuildActions(Document document, TextSpan span, CancellationToken cancellationToken)
@@ -174,58 +233,37 @@ namespace NSL.Refactoring.FastAction.Core
             if (node == null)
                 return Array.Empty<RefactoringAction>();
 
-            int getNodeDepth()
-            {
-                if (node is IdentifierNameSyntax)
-                    return 1;
-                if (node is PredefinedTypeSyntax)
-                    return 1;
-                if (node is AccessorListSyntax)
-                    return 1;
-                if (node is AccessorDeclarationSyntax)
-                    return 2;
-
-                return 0;
-            }
-
-            TValue getTypedNode<TValue>(int depth)
-                where TValue : SyntaxNode
-            {
-                var n = node;
-                for (int i = 0; i < depth; i++)
-                {
-                    if (n is TValue)
-                        return n as TValue;
-
-                    n = n.Parent;
-                }
-
-                return n as TValue;
-            }
-
-            var typeDecl = getTypedNode<TypeDeclarationSyntax>(getNodeDepth());
+            var typeDecl = getTypedNode<TypeDeclarationSyntax>(node, getNodeDepth(node));
 
             var classDecl = typeDecl as ClassDeclarationSyntax;
 
             var structDecl = typeDecl as StructDeclarationSyntax;
 
 
-            var enumDecl = getTypedNode<EnumDeclarationSyntax>(getNodeDepth());
+            var enumDecl = getTypedNode<EnumDeclarationSyntax>(node, getNodeDepth(node));
 
-            var enumMemberDecl = getTypedNode<EnumMemberDeclarationSyntax>(getNodeDepth());
+            var enumMemberDecl = getTypedNode<EnumMemberDeclarationSyntax>(node, getNodeDepth(node));
 
-            var namespaceDecl = getTypedNode<NamespaceDeclarationSyntax>(getNodeDepth());
+            var namespaceDecl = getTypedNode<NamespaceDeclarationSyntax>(node, getNodeDepth(node));
 
 
-            var attributeNode = getTypedNode<AttributeSyntax>(getNodeDepth());
+            var parameterNode = getTypedNode<ParameterSyntax>(node, getNodeDepth(node));
 
-            var memberDecl = getTypedNode<MemberDeclarationSyntax>(getNodeDepth());
+            var attributeNode = getTypedNode<AttributeSyntax>(node, getNodeDepth(node));
+
+            var memberDecl = getTypedNode<MemberDeclarationSyntax>(node, getNodeDepth(node));
 
             var propertyDecl = memberDecl as PropertyDeclarationSyntax;
 
             var fieldDecl = memberDecl as FieldDeclarationSyntax;
 
             var methodDecl = memberDecl as MethodDeclarationSyntax;
+
+            string memberType = propertyDecl?.Type?.ToString()
+                ?? fieldDecl?.Declaration?.Type?.ToString()
+                ?? typeDecl?.Identifier.ToString()
+                ?? enumDecl?.Identifier.ToString()
+                ?? parameterNode?.Type.ToString();
 
             var baseType = node as SimpleBaseTypeSyntax;
 
@@ -235,6 +273,18 @@ namespace NSL.Refactoring.FastAction.Core
                 ?? enumDecl?.Identifier.ToString()
                 ?? attributeNode?.ToString()
                 ?? node.ToString();
+
+            node = attributeNode
+                ?? parameterNode
+                ?? (SyntaxNode)fieldDecl
+                ?? (SyntaxNode)methodDecl
+                ?? (SyntaxNode)propertyDecl
+                ?? (SyntaxNode)enumDecl
+                ?? (SyntaxNode)classDecl
+                ?? (SyntaxNode)enumDecl
+                ?? (SyntaxNode)namespaceDecl
+                ?? node;
+
 
 
             var actions = new List<RefactoringAction>();
@@ -292,6 +342,8 @@ namespace NSL.Refactoring.FastAction.Core
 
                     typeAllow = typeAllow || action.Types.Contains("attribute") && attributeNode != null;
 
+                    typeAllow = typeAllow || action.Types.Contains("parameter") && parameterNode != null;
+
                     typeAllow = typeAllow || action.Types.Contains("base_type") && baseType != null;
 
                     if (!typeAllow) continue;
@@ -300,17 +352,20 @@ namespace NSL.Refactoring.FastAction.Core
 
                     bool validateConditions()
                     {
-                        foreach (var condition in action.Conditions)
+                        bool validateNamespace(ConditionData condition)
                         {
                             if (condition.Namespace != default)
                             {
                                 var ns = node.GetParentNamespace()?.Name.ToString();
 
+                                if (condition.OptionalExists && ns == default)
+                                    return true;
+
                                 Dictionary<string, string> nnmatch = null;
 
                                 if (ns == default || !condition.IsMatch(condition.Namespace, ns, out nnmatch))
                                 {
-                                    if (!condition.Optional)
+                                    if (!condition.OptionalCondition)
                                         return false;
                                 }
 
@@ -320,14 +375,21 @@ namespace NSL.Refactoring.FastAction.Core
                                         matches[item.Key] = item.Value;
                                     }
                             }
+                            return true;
+                        }
 
+                        bool validateProperty(ConditionData condition)
+                        {
                             if (condition.PropertyDeclaration != default)
                             {
+                                if (condition.OptionalExists && propertyDecl == default)
+                                    return true;
+
                                 Dictionary<string, string> nnmatch = null;
 
                                 if (propertyDecl == default || !condition.IsMatch(condition.PropertyDeclaration, propertyDecl.ToString(), out nnmatch))
                                 {
-                                    if (!condition.Optional)
+                                    if (!condition.OptionalCondition)
                                         return false;
                                 }
 
@@ -337,14 +399,45 @@ namespace NSL.Refactoring.FastAction.Core
                                         matches[item.Key] = item.Value;
                                     }
                             }
+                            return true;
+                        }
 
+                        bool validateMemberType(ConditionData condition)
+                        {
+                            if (condition.MemberType != default)
+                            {
+                                if (condition.OptionalExists && memberType == default)
+                                    return true;
+
+                                Dictionary<string, string> nnmatch = null;
+
+                                if (memberType == default || !condition.IsMatch(condition.MemberType, memberType, out nnmatch))
+                                {
+                                    if (!condition.OptionalCondition)
+                                        return false;
+                                }
+
+                                if (nnmatch != null)
+                                    foreach (var item in nnmatch)
+                                    {
+                                        matches[item.Key] = item.Value;
+                                    }
+                            }
+                            return true;
+                        }
+
+                        bool validateField(ConditionData condition)
+                        {
                             if (condition.FieldDeclaration != default)
                             {
+                                if (condition.OptionalExists && fieldDecl == default)
+                                    return true;
+
                                 Dictionary<string, string> nnmatch = null;
 
                                 if (propertyDecl == default || !condition.IsMatch(condition.FieldDeclaration, fieldDecl.ToString(), out nnmatch))
                                 {
-                                    if (!condition.Optional)
+                                    if (!condition.OptionalCondition)
                                         return false;
                                 }
 
@@ -355,11 +448,20 @@ namespace NSL.Refactoring.FastAction.Core
                                     }
                             }
 
+                            return true;
+                        }
+
+                        bool validateFilePath(ConditionData condition)
+                        {
                             if (condition.FilePath != default)
                             {
+                                if (condition.OptionalExists && document.FilePath == default)
+                                    return true;
+
+
                                 if (!condition.IsMatch(condition.FilePath, document.FilePath, out var nnmatch))
                                 {
-                                    if (!condition.Optional)
+                                    if (!condition.OptionalCondition)
                                         return false;
                                 }
 
@@ -369,11 +471,19 @@ namespace NSL.Refactoring.FastAction.Core
                                 }
                             }
 
+                            return true;
+                        }
+
+                        bool validateNodeName(ConditionData condition)
+                        {
                             if (condition.NodeName != default)
                             {
+                                if (condition.OptionalExists && nodeName == default)
+                                    return true;
+
                                 if (!condition.IsMatch(condition.NodeName, nodeName, out var nnmatch))
                                 {
-                                    if (!condition.Optional)
+                                    if (!condition.OptionalCondition)
                                         return false;
                                 }
 
@@ -383,11 +493,19 @@ namespace NSL.Refactoring.FastAction.Core
                                 }
                             }
 
+                            return true;
+                        }
+
+                        bool validateProjectPath(ConditionData condition)
+                        {
                             if (condition.ProjectPath != default)
                             {
+                                if (condition.OptionalExists && document.Project.FilePath == default)
+                                    return true;
+
                                 if (!condition.IsMatch(condition.ProjectPath, document.Project.FilePath, out var nnmatch))
                                 {
-                                    if (!condition.Optional)
+                                    if (!condition.OptionalCondition)
                                         return false;
                                 }
 
@@ -397,11 +515,19 @@ namespace NSL.Refactoring.FastAction.Core
                                 }
                             }
 
+                            return true;
+                        }
+
+                        bool validateProjectName(ConditionData condition)
+                        {
                             if (condition.ProjectName != default)
                             {
+                                if (condition.OptionalExists && document.Project.Name == default)
+                                    return true;
+
                                 if (!condition.IsMatch(condition.ProjectName, document.Project.Name, out var nnmatch))
                                 {
-                                    if (!condition.Optional)
+                                    if (!condition.OptionalCondition)
                                         return false;
                                 }
 
@@ -411,11 +537,19 @@ namespace NSL.Refactoring.FastAction.Core
                                 }
                             }
 
+                            return true;
+                        }
+
+                        bool validateSolutionPath(ConditionData condition)
+                        {
                             if (condition.SolutionPath != default)
                             {
+                                if (condition.OptionalExists && document.Project.Solution.FilePath == default)
+                                    return true;
+
                                 if (!condition.IsMatch(condition.SolutionPath, document.Project.Solution.FilePath, out var nnmatch))
                                 {
-                                    if (!condition.Optional)
+                                    if (!condition.OptionalCondition)
                                         return false;
                                 }
 
@@ -425,13 +559,23 @@ namespace NSL.Refactoring.FastAction.Core
                                 }
                             }
 
+                            return true;
+                        }
+
+                        bool validateSolutionName(ConditionData condition)
+                        {
                             if (condition.SolutionName != default)
                             {
                                 var name = Path.GetFileName(document.Project.Solution.FilePath);
+
                                 name = name.Substring(0, name.LastIndexOf('.'));
+
+                                if (condition.OptionalExists && name == default)
+                                    return true;
+
                                 if (!condition.IsMatch(condition.SolutionName, name, out var nnmatch))
                                 {
-                                    if (!condition.Optional)
+                                    if (!condition.OptionalCondition)
                                         return false;
                                 }
 
@@ -440,6 +584,23 @@ namespace NSL.Refactoring.FastAction.Core
                                     matches[item.Key] = item.Value;
                                 }
                             }
+
+                            return true;
+                        }
+
+
+                        foreach (var condition in action.Conditions)
+                        {
+                            if (!validateNamespace(condition)) return false;
+                            if (!validateProperty(condition)) return false;
+                            if (!validateField(condition)) return false;
+                            if (!validateMemberType(condition)) return false;
+                            if (!validateFilePath(condition)) return false;
+                            if (!validateNodeName(condition)) return false;
+                            if (!validateProjectPath(condition)) return false;
+                            if (!validateProjectName(condition)) return false;
+                            if (!validateSolutionPath(condition)) return false;
+                            if (!validateSolutionName(condition)) return false;
                         }
 
                         return true;
@@ -523,7 +684,7 @@ namespace NSL.Refactoring.FastAction.Core
                         var templateOutputPath = outputDirPath;
 
                         if (templateValues.TryGetValue("name", out var outputName))
-                            templateValues["safeitemname"] = outputName;
+                            templateValues["safeitemname"] = NormalizeName(outputName);
 
                         if (action.OutputType.StartsWith("files"))
                         {
@@ -674,52 +835,89 @@ namespace NSL.Refactoring.FastAction.Core
                     {
                         Action = async (cts, isPreview) =>
                         {
-                            Solution cSol = default;
+                            var context = new ExecutionActionContext()
+                            {
+                            };
 
-                            var solEditor = new SolutionEditor(document.Project.Solution);
+                            context.SetSharedProjectId(group.Project.Id);
+                            await context.WithSourceDocumentAsync(document, cts);
 
-                            var docEditor = await solEditor.GetDocumentEditorAsync(document.Id);
+                            await context.SetSourceSyntaxAsync(memberDecl ?? typeDecl ?? namespaceDecl ?? attributeNode ?? enumMemberDecl ?? enumDecl ?? node, cancellationToken);
 
-                            //
+                            Dictionary<string, string> actionInputValues = new Dictionary<string, string>();
+                            if (action.InputValues?.Any() == true)
+                            {
+                                if (isPreview)
+                                {
+                                    actionInputValues = action.InputValues.ToDictionary(x => x.Name, x => x.DefaultValue);
+                                }
+                                else
+                                {
+                                    actionInputValues = RefactorUI.PromptUserForInputValues(action.InputValues);
+
+                                    if (actionInputValues == null)
+                                        return default;
+                                }
+                            }
 
                             foreach (var item in outputTemplates)
                             {
+                                await LoadTemplateCloneValues(context, item.Values, item.Template, cancellationToken);
+
+
+                                Dictionary<string, string> templateInputValues = new Dictionary<string, string>();
+                                if (item.Template.InputValues?.Any() == true)
+                                {
+                                    if (isPreview)
+                                    {
+                                        templateInputValues = item.Template.InputValues.ToDictionary(x => x.Name, x => x.DefaultValue);
+                                    }
+                                    else
+                                    {
+                                        templateInputValues = RefactorUI.PromptUserForInputValues(action.InputValues);
+
+                                        if (templateInputValues == null)
+                                            return default;
+                                    }
+                                }
+
+
+                                var values = new Dictionary<string, string>(item.Values);
+
+                                values = FillMap(values, actionInputValues);
+                                values = FillMap(values, templateInputValues);
+                                values = FillMap(values, item.Values);
+
                                 if (item.AppendCodeType == AppendCodeTypeEnum.Files)
-                                    cSol = await Files(node, group, action, item.Values, item.NameSpace, item.OutputPath, document, item.Template, cSol, cts);
+                                    await Files(group, action, values, item.NameSpace, item.OutputPath, item.Template, context, cts);
                                 else
-                                    cSol = await CodeFragment(memberDecl ?? typeDecl ?? node, item.AppendCodeType, group, action, item.Values, item.NameSpace, item.OutputPath, document, item.Template, cSol, cts);
+                                    await CodeFragment(item.AppendCodeType, group, action, values, item.NameSpace, item.OutputPath, item.Template, context, cts);
                             }
 
-                            return cSol;
+                            return context.Solution;
                         },
                         Path = actionPath
                     });
                 }
             }
 
-            return actions;
+            return actions
+                .OrderBy(x => x.Path)
+                .GroupBy(x => x.Path)
+                .Select(x => x.First())
+                .ToArray();
         }
 
-        static async Task<Solution> Files(
-            SyntaxNode forNode,
+        static async Task Files(
             GroupData groupData,
             ActionData actionData,
             Dictionary<string, string> valuesCollection,
             string ns,
             string outputPath,
-            Document sourceDoc,
             TemplateData template,
-            Solution solution,
+            ExecutionActionContext context,
             CancellationToken cancellationToken)
         {
-            await LoadTemplateCloneValues(forNode, valuesCollection, sourceDoc, template, cancellationToken);
-
-            valuesCollection = FillMap(valuesCollection, valuesCollection);
-
-            Solution s = solution ?? groupData.Project.Solution;
-
-            var sharedProj = s.GetProject(groupData.Project.Id);
-
             foreach (var file in template.Files)
             {
                 var fname = file.Name;
@@ -733,261 +931,66 @@ namespace NSL.Refactoring.FastAction.Core
 
                 var endPath = Path.Combine(outputPath, fname);
 
-                if (sharedProj.Documents.Any(x => Equals(x.FilePath, endPath)))
-                    continue;
-
-                //srcContent = srcContent.Replace("$gen_summary$", summary);
-
-                var doc = sharedProj.AddDocument(fname, fcontent, filePath: endPath);
-
-
-                try
-                {
-                    doc = await Microsoft.CodeAnalysis.Formatting.Formatter.FormatAsync(doc, doc.Project.Solution.Workspace.Options, cancellationToken);
-
-                }
-                catch (Exception)
-                {
-                }
-
-                sharedProj = doc.Project;
-
-                s = sharedProj.Solution;
+                await context.AddFileToSharedAsync(fname, fcontent, endPath, format: true, cancellationToken);
             }
 
+            // Привязка проекта и добавление using
             if (actionData.GenerateUsingRefLink)
             {
-                //link
-
-                var srcProj = s.GetProject(sourceDoc.Project.Id);
-
-                if (!srcProj.ProjectReferences.Any(x => x.ProjectId == sharedProj.Id)
-                    && !srcProj.Id.Equals(sharedProj.Id)
-                    && !sharedProj.AllProjectReferences.Any(x => x.ProjectId.Equals(srcProj.Id)))
-                    srcProj = srcProj.AddProjectReference(new ProjectReference(sharedProj.Id));
-
-                sourceDoc = srcProj.GetDocument(sourceDoc.Id);
-
-                var synRoot = await sourceDoc.GetSyntaxRootAsync(cancellationToken);
-
-                if (synRoot is CompilationUnitSyntax cus)
-                {
-                    if (cus.Members.FirstOrDefault() is NamespaceDeclarationSyntax cns && cns.Name.ToString() == ns)
-                    {
-
-                    }
-                    else if (!cus.Usings.Any(x => Equals(x.Name.ToString(), ns)))
-                    {
-                        var us = SyntaxFactory.UsingDirective(SyntaxFactory.ParseName(ns));
-
-                        cus = cus.AddUsings(us);
-
-                        srcProj = sourceDoc.WithSyntaxRoot(cus).Project;
-                    }
-                }
-
-                s = srcProj.Solution;
+                await context.AddProjectReferenceIfMissingAsync(cancellationToken);
+                await context.AddUsingDirectiveAsync(ns, cancellationToken);
             }
-
-            return s;
         }
 
-        static async Task<Solution> CodeFragment(
-            SyntaxNode forNode,
+        static async Task CodeFragment(
             AppendCodeTypeEnum type,
             GroupData groupData,
             ActionData actionData,
             Dictionary<string, string> valuesCollection,
             string ns,
             string outputPath,
-            Document sourceDoc,
             TemplateData template,
-            Solution solution,
+            ExecutionActionContext context,
             CancellationToken cancellationToken)
         {
-            await LoadTemplateCloneValues(forNode, valuesCollection, sourceDoc, template, cancellationToken);
-
-            valuesCollection = FillMap(valuesCollection, valuesCollection);
-
-            Solution s = solution ?? groupData.Project.Solution;
-
-            var p = s.GetProject(sourceDoc.Project.Id);
-
-            sourceDoc = p.GetDocument(sourceDoc.Id);
-
-
-            var sharedProj = s.GetProject(groupData.Project.Id);
-
-            var root = ((CompilationUnitSyntax)await sourceDoc.GetSyntaxRootAsync(cancellationToken));
-
-
-            for (int i = 0; i < template.ParentDepth; i++)
-            {
-                forNode = forNode.Parent;
-            }
-
-            var editor = new SyntaxEditor(root, sourceDoc.Project.Solution.Workspace.Services);
-
-            foreach (var file in template.Files)
-            {
-                var fcontent = file.Content;
-
-                foreach (var v in valuesCollection)
-                {
-                    fcontent = fcontent.Replace($"${v.Key}$", v.Value);
-                }
-
-                SyntaxNode insertContent = SyntaxFactory.ParseMemberDeclaration(fcontent);
-                insertContent = insertContent ?? SyntaxFactory.ParseCompilationUnit(fcontent);
-
-                var nodes = insertContent.ChildNodes().ToList();
-
-                var insertAttributes = nodes.OfType<AttributeListSyntax>();
-
-                var isAttributes = insertAttributes.Count() == nodes.Count;
-                if (isAttributes)
-                {
-                    editor.AddAttributes(forNode, insertAttributes);
-
-                    continue;
-                }
-
-                if (type == AppendCodeTypeEnum.OuterBefore
-                    || type == AppendCodeTypeEnum.Replace)
-                    editor.InsertBefore(forNode, nodes);
-                else if (type == AppendCodeTypeEnum.OuterAfter)
-                    editor.InsertAfter(forNode, nodes);
-                else if (type == AppendCodeTypeEnum.InnerBefore)
-                    editor.InsertMembers(forNode, 0, nodes);
-                else if (type == AppendCodeTypeEnum.InnerAfter)
-                    editor.InsertMembers(forNode, forNode.ChildNodes().Count() - 1, nodes);
-                else if (type == AppendCodeTypeEnum.BaseList)
-                {
-                    var t = forNode as TypeDeclarationSyntax;
-
-                    var btl = t?.BaseList;
-
-                    var baseTypes = btl?.Types.Select(x => x.Type.ToString()).ToArray();
-
-                    foreach (var n in nodes)
-                    {
-                        if (baseTypes?.Contains(n.ToString()) != true)
-                            editor.AddBaseType(forNode, n);
-                    }
-                }
-            }
-
-            if (type == AppendCodeTypeEnum.Replace)
-                editor.RemoveNode(forNode);
-
-
-            root = (CompilationUnitSyntax)editor.GetChangedRoot();
-
-            if (template.Usings.Any())
-            {
-                var rootChilds = root.ChildNodes();
-
-                var docUsings = rootChilds.OfType<UsingDirectiveSyntax>().ToImmutableArray();
-
-                SyntaxNode nsDeclarations = docUsings.FirstOrDefault();
-
-                nsDeclarations = nsDeclarations ?? rootChilds.OfType<NamespaceDeclarationSyntax>().FirstOrDefault();
-
-                nsDeclarations = nsDeclarations ?? rootChilds.OfType<TypeDeclarationSyntax>().FirstOrDefault();
-
-                if (nsDeclarations != null)
-                {
-                    var usings = template.Usings.ToImmutableArray();
-
-                    var dc = docUsings.Select(x => x.Name.ToString()).ToImmutableArray();
-
-                    root = root.AddUsings(
-                    usings.Except(dc).Select(u => SyntaxFactory.UsingDirective(SyntaxFactory.ParseName(u))
-                                        .WithTrailingTrivia(SyntaxFactory.ElasticCarriageReturnLineFeed)).ToArray()
-                    );
-                }
-
-            }
-
-            sourceDoc = sourceDoc.WithSyntaxRoot(root);
-
-            try
-            {
-                sourceDoc = await Microsoft.CodeAnalysis.Formatting.Formatter.FormatAsync(sourceDoc, sourceDoc.Project.Solution.Workspace.Options, cancellationToken);
-
-            }
-            catch (Exception)
-            {
-            }
-
-            sharedProj = sourceDoc.Project;
-
-            s = sharedProj.Solution;
-
-            return s;
+            await context.InsertTemplateCodeAsync(template, valuesCollection, type, cancellationToken);
         }
 
         static async Task LoadTemplateCloneValues(
-            SyntaxNode forNode,
+            ExecutionActionContext context,
             Dictionary<string, string> valuesCollection,
-            Document sourceDoc,
             TemplateData template,
             CancellationToken cancellationToken)
         {
+            SemanticModel semanticModel = context.SemanticModel;
 
-            SemanticModel semanticModel = default;
+            var td = context.SourceSyntax.GetParentOfType<TypeDeclarationSyntax>();
 
             var contentProperties = string.Empty;
+            var contentDeepProperties = string.Empty;
+            var contentMethods = string.Empty;
+            var contentDeepMethods = string.Empty;
 
-            if (template.Clone?.Contains("properties") == true)
+            if (template.Clone != null)
             {
-                semanticModel = semanticModel ?? await sourceDoc.GetSemanticModelAsync(cancellationToken);
-
-                var td = forNode.GetParentOfType<TypeDeclarationSyntax>();
-
-                contentProperties = await GetContentProperties(td, semanticModel, false);
+                if (context.SourceSyntax is TypeDeclarationSyntax)
+                {
+                    if (template.Clone.Contains("properties"))
+                        contentProperties = await GetContentProperties(td, semanticModel, false);
+                    if (template.Clone.Contains("method_declarations"))
+                        contentMethods = await GetContentMethodDeclarations(td, semanticModel, false);
+                    if (template.Clone.Contains("deep_properties"))
+                        contentDeepProperties = await GetContentProperties(td, semanticModel, true);
+                    if (template.Clone.Contains("deep_method_declarations"))
+                        contentDeepMethods = await GetContentMethodDeclarations(td, semanticModel, true);
+                }
             }
 
             valuesCollection["content_properties"] = contentProperties;
-
-            var contentMethods = string.Empty;
-
-            if (template.Clone?.Contains("method_declarations") == true)
-            {
-                semanticModel = semanticModel ?? await sourceDoc.GetSemanticModelAsync(cancellationToken);
-
-                var td = forNode.GetParentOfType<TypeDeclarationSyntax>();
-
-                contentMethods = await GetContentMethodDeclarations(td, semanticModel, false);
-            }
+            valuesCollection["content_deep_properties"] = contentDeepProperties;
 
             valuesCollection["content_methods"] = contentMethods;
-
-            contentProperties = string.Empty;
-
-            if (template.Clone?.Contains("deep_properties") == true)
-            {
-                semanticModel = semanticModel ?? await sourceDoc.GetSemanticModelAsync(cancellationToken);
-
-                var td = forNode.GetParentOfType<TypeDeclarationSyntax>();
-
-                contentProperties = await GetContentProperties(td, semanticModel, true);
-            }
-
-            valuesCollection["content_deep_properties"] = contentProperties;
-
-            contentMethods = string.Empty;
-
-            if (template.Clone?.Contains("deep_method_declarations") == true)
-            {
-                semanticModel = semanticModel ?? await sourceDoc.GetSemanticModelAsync(cancellationToken);
-
-                var td = forNode.GetParentOfType<TypeDeclarationSyntax>();
-
-                contentMethods = await GetContentMethodDeclarations(td, semanticModel, true);
-            }
-
-            valuesCollection["content_deep_methods"] = contentMethods;
+            valuesCollection["content_deep_methods"] = contentDeepMethods;
         }
 
         static async Task<string> GetContentMethodDeclarations(TypeDeclarationSyntax srcClassNode, SemanticModel semanticModel, bool deep)
@@ -1039,7 +1042,7 @@ namespace NSL.Refactoring.FastAction.Core
             {
                 foreach (var key in items.Keys.ToArray())
                 {
-                    items[key] = items[key].Replace($"${fitem.Key}$", fitem.Value);
+                    items[key] = items[key]?.Replace($"${fitem.Key}$", fitem.Value);
                 }
 
                 items.TryAdd(fitem.Key, fitem.Value);
@@ -1049,27 +1052,5 @@ namespace NSL.Refactoring.FastAction.Core
         }
 
         static Dictionary<Guid, FastActionCacheData> cache = new Dictionary<Guid, FastActionCacheData>();
-    }
-
-    internal enum AppendCodeTypeEnum
-    {
-        InnerBefore,
-        InnerAfter,
-        OuterBefore,
-        OuterAfter,
-        BaseList,
-        Replace,
-        Files
-    }
-
-    public static class EditorExtensions
-    {
-        public static void AddAttributes(this SyntaxEditor e, SyntaxNode n, IEnumerable<AttributeListSyntax> attributes)
-        {
-            foreach (var item in attributes)
-            {
-                e.AddAttribute(n, item);
-            }
-        }
     }
 }

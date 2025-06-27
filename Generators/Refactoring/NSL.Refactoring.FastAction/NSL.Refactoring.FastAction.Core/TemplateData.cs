@@ -11,6 +11,8 @@ namespace NSL.Refactoring.FastAction.Core
 
         public string[] Usings { get; set; } = Array.Empty<string>();
 
+        public TemplateInputFieldData[] InputValues { get; set; }
+
         public string[] Clone { get; set; }
 
         public TemplateFileData[] Files { get; set; }
