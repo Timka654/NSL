@@ -42,10 +42,10 @@
 		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.3.0" PrivateAssets="all" />
 	</ItemGroup>
 	<ItemGroup>
-		<PackageReference Include="Microsoft.Extensions.Primitives" Version="9.0.5" />
+		<PackageReference Include="Microsoft.Extensions.Primitives" Version="9.0.6" />
 	</ItemGroup>
 	<ItemGroup>
-		<Compile Include="..\NSL.Generators.HttpEndPointGenerator.Shared\**\*.cs" Exclude="..\NSL.Generators.HttpEndPointGenerator.Shared\**\bin\**;..\NSL.Generators.HttpEndPointGenerator.Shared\**\obj\**" >
+		<Compile Include="..\NSL.Generators.HttpEndPointGenerator.Shared\**\*.cs" Exclude="..\NSL.Generators.HttpEndPointGenerator.Shared\**\bin\**;..\NSL.Generators.HttpEndPointGenerator.Shared\**\obj\**">
 			<Link>NSL.Generators.HttpEndPointGenerator.Shared\%(RecursiveDir)%(FileName)%(Extension)</Link>
 			</Compile>
 																			</ItemGroup>

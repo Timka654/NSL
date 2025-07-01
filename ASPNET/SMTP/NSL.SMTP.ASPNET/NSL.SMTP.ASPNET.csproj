@@ -24,6 +24,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\..\..\Core\Utils\NSL.Utils\NSL.Utils.csproj" />
 		<ProjectReference Include="..\..\RestoreData\NSL.DataSource.ASPNET\NSL.DataSource.ASPNET.csproj" />
 	</ItemGroup>
 

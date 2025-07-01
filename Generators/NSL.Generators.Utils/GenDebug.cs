@@ -11,7 +11,7 @@ namespace NSL.Generators.Utils
         {
             if (!Debugger.IsAttached)
                 Debugger.Launch();
-            else if(!onlyAttach)
+            else if (!onlyAttach)
                 Debugger.Break();
         }
     }

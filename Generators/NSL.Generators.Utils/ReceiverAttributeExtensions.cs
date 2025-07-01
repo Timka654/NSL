@@ -54,7 +54,7 @@ namespace NSL.Generators.Utils
             {
                 if (c is NamespaceDeclarationSyntax d)
                     return d.Name.ToString();
-                
+
                 if (first)
                     return default;
 

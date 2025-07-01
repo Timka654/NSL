@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<NSLProjectTypes>UnitySupport;AnalyzerUtils</NSLProjectTypes>
@@ -15,6 +15,9 @@
 
 		<Version>$(VersionSuffix)</Version>
 		<Authors>Relife87</Authors>
+
+
+		<DefineConstants>$(DefineConstants);NSL_UTILS</DefineConstants>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)'=='Debug'">
@@ -32,6 +35,7 @@
 	<ItemGroup>
 		<PackageReference Include="Newtonsoft.Json" Version="*" />
 		<PackageReference Include="System.Security.Principal.Windows" Version="5.0.0" />
+		<PackageReference Include="System.Threading.Channels" Version="9.0.6" />
 	</ItemGroup>
 
 </Project>

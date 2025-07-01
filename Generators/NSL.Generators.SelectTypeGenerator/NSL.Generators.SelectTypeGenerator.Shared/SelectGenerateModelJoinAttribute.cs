@@ -12,6 +12,12 @@ namespace NSL.Generators.SelectTypeGenerator.Attributes
         }
 
         public string Model { get; }
+
         public string[] IncludeModels { get; }
+
+        /// <summary>
+        /// default is true
+        /// </summary>
+        public bool Recursive { get; set; } = true;
     }
 }

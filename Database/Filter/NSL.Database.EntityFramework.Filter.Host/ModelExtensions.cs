@@ -1,5 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
+using Microsoft.EntityFrameworkCore.Storage;
 using System.Linq;
 using System.Linq.Expressions;
 
@@ -7,45 +9,60 @@ namespace NSL.Database.EntityFramework.Filter.Host
 {
     public static class ModelExtensions
     {
-        public static ModelBuilder HasDbFilter(this ModelBuilder modelBuilder)
+        public static ModelBuilder HasDbFilter(this ModelBuilder modelBuilder, DbContext dbContext)
         {
+            var typeMappingSource = dbContext.GetService<IRelationalTypeMappingSource>();
+            var stringMapping = typeMappingSource.FindMapping(typeof(string));
+            var boolMapping = typeMappingSource.FindMapping(typeof(bool));
+
+            var escapeExpr = new SqlConstantExpression("\\", stringMapping);
+
+            var jokExpr = new SqlConstantExpression("%", stringMapping);
+
+
+
+            SqlExpression EscapeLikePattern(SqlExpression inputExpr, char escapeChar = '\\')
+            {
+                var input = (inputExpr as SqlConstantExpression)?.Value as string;
+
+                var s = input.Replace($"{escapeChar}", $"{escapeChar}{escapeChar}");
+                s = s.Replace("%", $"{escapeChar}%");
+                s = s.Replace("_", $"{escapeChar}_");
+
+                return new SqlConstantExpression(s, stringMapping);
+            }
+
             modelBuilder.HasDbFunction(() => FilterExtensions.ContainsCase(default, default))
-                .HasTranslation(args =>
-                {
-                    var source = args.ElementAt(0);
-                    var value = args.ElementAt(1);
+                    .HasTranslation(args =>
+                    {
+                        var source = args.ElementAt(0);
+                        var value = EscapeLikePattern(args.ElementAt(1));
 
-                    var likePattern = new SqlBinaryExpression(
-                    ExpressionType.Add,
-                    new SqlConstantExpression("%", value.TypeMapping),
-                    new SqlBinaryExpression(
+                        var likePattern = new SqlBinaryExpression(
                         ExpressionType.Add,
-                        value,
-                        new SqlConstantExpression("%", value.TypeMapping),
+                        jokExpr,
+                        new SqlBinaryExpression(
+                            ExpressionType.Add,
+                            value,
+                            jokExpr,
+                            typeof(string),
+                            value.TypeMapping),
                         typeof(string),
-                        value.TypeMapping),
-                    typeof(string),
-                    value.TypeMapping);
+                        value.TypeMapping);
 
-                    return new SqlFunctionExpression(
-                        functionName: "LIKE",
-                        arguments: new[] { source, likePattern },
-                        nullable: true,
-                        argumentsPropagateNullability: new[] { true, true },
-                        type: typeof(bool),
-                        typeMapping: null);
-                });
+                        return new LikeExpression(source, likePattern, escapeExpr, boolMapping);
+                    });
 
             modelBuilder
                 .HasDbFunction(() => FilterExtensions.ContainsIgnoreCase(default, default))
                 .HasTranslation(args =>
                 {
                     var source = args.ElementAt(0);
-                    var value = args.ElementAt(1);
+                    var value = EscapeLikePattern(args.ElementAt(1));
 
                     var likePattern = new SqlBinaryExpression(
                     ExpressionType.Add,
-                    new SqlConstantExpression("%", value.TypeMapping),
+                    jokExpr,
                     new SqlBinaryExpression(
                         ExpressionType.Add,
                         new SqlFunctionExpression(
@@ -55,7 +72,7 @@ namespace NSL.Database.EntityFramework.Filter.Host
                         argumentsPropagateNullability: new[] { true },
                         type: typeof(string),
                         typeMapping: value.TypeMapping),
-                        new SqlConstantExpression("%", value.TypeMapping),
+                        jokExpr,
                         typeof(string),
                         value.TypeMapping),
                     typeof(string),
@@ -69,36 +86,27 @@ namespace NSL.Database.EntityFramework.Filter.Host
                         type: typeof(string),
                         typeMapping: source.TypeMapping);
 
-                    return new SqlFunctionExpression(
-                        functionName: "LIKE",
-                        arguments: [lowerSource, likePattern],
-                        nullable: true,
-                        argumentsPropagateNullability: new[] { true, true },
-                        type: typeof(bool),
-                        typeMapping: null);
+
+                    return new LikeExpression(lowerSource, likePattern, escapeExpr, boolMapping);
                 });
 
             modelBuilder.HasDbFunction(() => FilterExtensions.StartsWithCase(default, default))
                 .HasTranslation(args =>
                 {
                     var source = args.ElementAt(0);
-                    var value = args.ElementAt(1);
+                    var value = EscapeLikePattern(args.ElementAt(1));
 
                     var likePattern =
                     new SqlBinaryExpression(
                         ExpressionType.Add,
                         value,
-                        new SqlConstantExpression("%", value.TypeMapping),
+                        jokExpr,
                         typeof(string),
                         value.TypeMapping);
 
-                    return new SqlFunctionExpression(
-                        functionName: "LIKE",
-                        arguments: new[] { source, likePattern },
-                        nullable: true,
-                        argumentsPropagateNullability: new[] { true, true },
-                        type: typeof(bool),
-                        typeMapping: null);
+
+
+                    return new LikeExpression(source, likePattern, escapeExpr, boolMapping);
                 });
 
             modelBuilder
@@ -106,7 +114,7 @@ namespace NSL.Database.EntityFramework.Filter.Host
                 .HasTranslation(args =>
                 {
                     var source = args.ElementAt(0);
-                    var value = args.ElementAt(1);
+                    var value = EscapeLikePattern(args.ElementAt(1));
 
                     var likePattern = new SqlBinaryExpression(
                         ExpressionType.Add,
@@ -117,7 +125,7 @@ namespace NSL.Database.EntityFramework.Filter.Host
                         argumentsPropagateNullability: new[] { true },
                         type: typeof(string),
                         typeMapping: value.TypeMapping),
-                        new SqlConstantExpression("%", value.TypeMapping),
+                        jokExpr,
                         typeof(string),
                         value.TypeMapping);
 
@@ -129,35 +137,24 @@ namespace NSL.Database.EntityFramework.Filter.Host
                         type: typeof(string),
                         typeMapping: source.TypeMapping);
 
-                    return new SqlFunctionExpression(
-                        functionName: "LIKE",
-                        arguments: [lowerSource, likePattern],
-                        nullable: true,
-                        argumentsPropagateNullability: new[] { true, true },
-                        type: typeof(bool),
-                        typeMapping: null);
+                    return new LikeExpression(lowerSource, likePattern, escapeExpr, boolMapping);
                 });
 
             modelBuilder.HasDbFunction(() => FilterExtensions.EndsWithCase(default, default))
                 .HasTranslation(args =>
                 {
                     var source = args.ElementAt(0);
-                    var value = args.ElementAt(1);
+                    var value = EscapeLikePattern(args.ElementAt(1));
 
                     var likePattern = new SqlBinaryExpression(
                     ExpressionType.Add,
-                    new SqlConstantExpression("%", value.TypeMapping),
+                    jokExpr,
                     value,
                     typeof(string),
                     value.TypeMapping);
 
-                    return new SqlFunctionExpression(
-                        functionName: "LIKE",
-                        arguments: new[] { source, likePattern },
-                        nullable: true,
-                        argumentsPropagateNullability: new[] { true, true },
-                        type: typeof(bool),
-                        typeMapping: null);
+
+                    return new LikeExpression(source, likePattern, escapeExpr, boolMapping);
                 });
 
             modelBuilder
@@ -165,11 +162,11 @@ namespace NSL.Database.EntityFramework.Filter.Host
                 .HasTranslation(args =>
                 {
                     var source = args.ElementAt(0);
-                    var value = args.ElementAt(1);
+                    var value = EscapeLikePattern(args.ElementAt(1));
 
                     var likePattern = new SqlBinaryExpression(
                     ExpressionType.Add,
-                    new SqlConstantExpression("%", value.TypeMapping),
+                    jokExpr,
                         new SqlFunctionExpression(
                         functionName: "LOWER",
                         arguments: new[] { value },
@@ -188,13 +185,8 @@ namespace NSL.Database.EntityFramework.Filter.Host
                         type: typeof(string),
                         typeMapping: source.TypeMapping);
 
-                    return new SqlFunctionExpression(
-                        functionName: "LIKE",
-                        arguments: [lowerSource, likePattern],
-                        nullable: true,
-                        argumentsPropagateNullability: new[] { true, true },
-                        type: typeof(bool),
-                        typeMapping: null);
+
+                    return new LikeExpression(lowerSource, likePattern, escapeExpr, boolMapping);
                 });
 
             modelBuilder
@@ -202,7 +194,7 @@ namespace NSL.Database.EntityFramework.Filter.Host
                 .HasTranslation(args =>
                 {
                     var source = args.ElementAt(0);
-                    var value = args.ElementAt(1);
+                    var value = EscapeLikePattern(args.ElementAt(1));
 
                     var likePattern = new SqlFunctionExpression(
                         functionName: "LOWER",
@@ -220,13 +212,8 @@ namespace NSL.Database.EntityFramework.Filter.Host
                         type: typeof(string),
                         typeMapping: source.TypeMapping);
 
-                    return new SqlFunctionExpression(
-                        functionName: "LIKE",
-                        arguments: [lowerSource, likePattern],
-                        nullable: true,
-                        argumentsPropagateNullability: new[] { true, true },
-                        type: typeof(bool),
-                        typeMapping: null);
+
+                    return new LikeExpression(lowerSource, likePattern, escapeExpr, boolMapping);
                 });
 
             return modelBuilder;

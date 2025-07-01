@@ -3,13 +3,17 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.VisualBasic;
 using NSL.DataSource.ASPNET;
+using NSL.Utils;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Mail;
+using System.Net.Sockets;
+using System.Reflection.PortableExecutable;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
@@ -38,17 +42,13 @@ namespace NSL.SMTP.ASPNET
 
         protected record SendMailRequest(string email, string subject, string htmlMessage, Guid? id, string uid, byte[] hash, TimeSpan? delay);
 
-        protected Channel<SendMailRequest> WaitChannel = Channel.CreateUnbounded<SendMailRequest>();
-
-
-        protected SemaphoreSlim Locked = new SemaphoreSlim(1);
         DateTime now = DateTime.UtcNow;
 
         protected void TryClearTrap()
             => trapCollection.Clear();
 
         protected bool TryRemoveTrap(byte[] hash)
-            => trapCollection.Remove(hash,out _);
+            => trapCollection.Remove(hash, out _);
 
         public byte[] GenerateTrapHash(string email
             , string subject
@@ -76,14 +76,14 @@ namespace NSL.SMTP.ASPNET
                         return false;
                 }
 
-                await WaitChannel.Writer.WriteAsync(new SendMailRequest(
+                await AddAction(new SendMailRequest(
                     email,
                     subject,
                     htmlMessage,
                     default,
                     uid,
                     hash,
-                    delay));
+                    delay), CancellationToken.None);
 
                 return true;
             }
@@ -94,85 +94,68 @@ namespace NSL.SMTP.ASPNET
         public async Task SendEmailAsync(string email, string subject, string htmlMessage)
         {
             if (Options.Enabled)
-                await WaitChannel.Writer.WriteAsync(new SendMailRequest(email, subject, htmlMessage, default, default, default, default));
+                await AddAction(new SendMailRequest(email, subject, htmlMessage, default, default, default, default), CancellationToken.None);
         }
 
-        private async void Process(CancellationToken cancellationToken)
+        protected ValueTask AddAction(SendMailRequest data, CancellationToken cancellationToken)
+        => channel.AddAsync(new DeferredSendMailAction(t => channelProcessing(data, t), data), cancellationToken);
+
+        DeferredChannel<DeferredSendMailAction> channel = new DeferredChannel<DeferredSendMailAction>();
+
+
+        async Task channelProcessing(SendMailRequest current, CancellationToken cancellationToken)
         {
-            var reader = WaitChannel.Reader;
+            now = DateTime.UtcNow;
 
-            while (!cancellationToken.IsCancellationRequested)
+            if ((now - lastTrapClear).TotalHours > 3)
             {
-                now = DateTime.UtcNow;
+                lastTrapClear = now;
+                var trapItems = trapCollection.ToArray();
 
-                if ((now - lastTrapClear).TotalHours > 3)
+                foreach (var trapItem in trapItems)
                 {
-                    lastTrapClear = now;
-                    var trapItems = trapCollection.ToArray();
-
-                    foreach (var trapItem in trapItems)
+                    if ((now - trapItem.Value).TotalHours > 6)
                     {
-                        if ((now - trapItem.Value).TotalHours > 6)
-                        {
-                            trapCollection.TryRemove(trapItem.Key, out _);
-                        }
+                        trapCollection.TryRemove(trapItem.Key, out _);
                     }
                 }
+            }
 
-                await Task.Delay(Options.IterDelayMSeconds, cancellationToken);
+            await Task.Delay(Options.IterDelayMSeconds, cancellationToken);
 
-                await Locked.WaitAsync();
+            using var cts_src = new CancellationTokenSource(TimeSpan.FromMilliseconds(250));
 
-                using var cts_src = new CancellationTokenSource(TimeSpan.FromMilliseconds(250));
+            using CancellationTokenSource cts = CancellationTokenSource.CreateLinkedTokenSource(
+                    cts_src.Token,
+                    cancellationToken
+                );
 
-                using CancellationTokenSource cts = CancellationTokenSource.CreateLinkedTokenSource(
-                        cts_src.Token,
-                        cancellationToken
-                    );
+            using var client = await ConfigureClient(current);
 
-                SendMailRequest current = default;
+            using var msg = await BuildMessageAsync(client, current, cancellationToken);
 
-                try
-                {
-                    current = await reader.ReadAsync(cts.Token);
-                }
-                catch (OperationCanceledException)
-                {
-                    Locked.Release();
-                    continue;
-                }
+            msg.IsBodyHtml = true;
 
-                using var client = await ConfigureClient(current);
+            try
+            {
+                using var scts_src = new CancellationTokenSource(TimeSpan.FromSeconds(Options.RequestDelaySeconds));
+                using var scts = CancellationTokenSource.CreateLinkedTokenSource(
+                    scts_src.Token,
+                    cancellationToken);
 
-                using var msg = await BuildMessageAsync(client, current, cancellationToken);
+                await client.SendMailAsync(msg, scts.Token);
+            }
+            catch (Exception ex)
+            {
+                await ExceptionHandleAsync(ex, current, cancellationToken);
 
-                msg.IsBodyHtml = true;
+                logger.LogError($"{current.email}, {current.subject} - {ex.ToString()}");
 
-                try
-                {
-                    using var scts_src = new CancellationTokenSource(TimeSpan.FromSeconds(Options.RequestDelaySeconds));
-                    using var scts = CancellationTokenSource.CreateLinkedTokenSource(
-                        scts_src.Token,
-                        cancellationToken);
+                if (await RepeatConditionAsync(ex, current, cancellationToken))
+                    await AddAction(current, cancellationToken);
 
-                    await client.SendMailAsync(msg, scts.Token);
-
-                    Locked.Release();
-                }
-                catch (Exception ex)
-                {
-                    await ExceptionHandleAsync(ex, current, cancellationToken);
-
-                    logger.LogError($"{current.email}, {current.subject} - {ex.ToString()}");
-
-                    if (await RepeatConditionAsync(ex, current, cancellationToken))
-                        await WaitChannel.Writer.WriteAsync(current);
-
-                    Locked.Release();
-
-                    if (await ThrowDelayConditionAsync(ex, current, cancellationToken))
-                        await Task.Delay(Options.ServerThrowDelayMSeconds, cancellationToken);
-                }
+                if (await ThrowDelayConditionAsync(ex, current, cancellationToken))
+                    await Task.Delay(Options.ServerThrowDelayMSeconds, cancellationToken);
             }
         }
 
@@ -233,29 +216,27 @@ namespace NSL.SMTP.ASPNET
                 {
                     foreach (var item in items)
                     {
-                        await WaitChannel.Writer.WriteAsync(item, cancellationToken);
+                        await AddAction(item, cancellationToken);
                     }
                 }
             }
 
-            Process(cancellationToken);
+            channel.RunProcessing();
         }
 
         public async Task StopAsync(CancellationToken cancellationToken)
         {
-            await Locked.WaitAsync();
+            await channel.DisposeAsync();
 
             var restoreDataSource = TryGetRestoreDataSource();
 
             if (restoreDataSource == null) return;
 
-            await Task.Delay(250);
-
             var items = new List<SendMailRequest>();
 
-            await foreach (var item in WaitChannel.Reader.ReadAllAsync())
+            await foreach (var item in channel.Channel.Reader.ReadAllAsync())
             {
-                items.Add(item);
+                items.Add(item.Data);
             }
 
             if (items.Any())
@@ -266,5 +247,15 @@ namespace NSL.SMTP.ASPNET
 
         protected virtual IRestoreDataSource? TryGetRestoreDataSource()
             => serviceProvider.GetService<IRestoreDataSource>();
+
+        class DeferredSendMailAction : DeferredAsyncAction
+        {
+            public DeferredSendMailAction(Func<CancellationToken, Task> action, BaseEmailSender.SendMailRequest data) : base(action)
+            {
+                Data = data;
+            }
+
+            public BaseEmailSender.SendMailRequest Data { get; }
+        }
     }
 }

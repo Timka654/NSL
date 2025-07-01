@@ -230,11 +230,11 @@ namespace NSL.Generators.Utils
 
             string type = string.Empty;
 
-            if(classDecl is ClassDeclarationSyntax)
+            if (classDecl is ClassDeclarationSyntax)
                 type = "class";
-            else if(classDecl is InterfaceDeclarationSyntax)
+            else if (classDecl is InterfaceDeclarationSyntax)
                 type = "interface";
-            else if(classDecl is StructDeclarationSyntax)
+            else if (classDecl is StructDeclarationSyntax)
                 type = "struct";
 
             declTypeLine = $"{classDecl.GetClassFullModifier()} {type} {classDecl.GetClassName()}{declTypeLine}";

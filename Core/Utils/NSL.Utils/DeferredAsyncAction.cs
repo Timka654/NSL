@@ -1,5 +1,8 @@
-﻿using System;
+﻿#if NSL_UTILS
+
+using System;
 using System.Threading;
+using System.Threading.Channels;
 using System.Threading.Tasks;
 
 namespace NSL.Utils
@@ -82,3 +85,6 @@ namespace NSL.Utils
         }
     }
 }
+
+
+#endif

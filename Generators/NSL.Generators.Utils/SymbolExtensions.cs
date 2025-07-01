@@ -1,6 +1,5 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using System.IO;
 using System.Linq;
 
 namespace NSL.Generators.Utils
@@ -40,7 +39,7 @@ namespace NSL.Generators.Utils
         {
             var args = attr.NamedArguments;
 
-            if (args.IsDefaultOrEmpty || !args.Any(x=>x.Key.Equals(name)))
+            if (args.IsDefaultOrEmpty || !args.Any(x => x.Key.Equals(name)))
                 return default;
 
             return args.First(x => x.Key.Equals(name)).Value;

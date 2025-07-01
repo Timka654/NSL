@@ -15,7 +15,7 @@ namespace NSL.Database.EntityFramework.Filter.Tests
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasDbFilter();
+            modelBuilder.HasDbFilter(this);
 
             base.OnModelCreating(modelBuilder);
         }

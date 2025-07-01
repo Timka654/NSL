@@ -1,6 +1,5 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using System.Collections.Generic;
 
 namespace NSL.Generators.SelectTypeGenerator
 {
@@ -15,8 +14,6 @@ namespace NSL.Generators.SelectTypeGenerator
         public TypeDeclarationSyntax TypeDeclaration { get; set; }
 
         //public SemanticModel SemanticModel { get; set; }
-
-        public Dictionary<string, string[]> Joins { get; set; }
 
         public GenAttribute[] Attributes { get; set; }
 

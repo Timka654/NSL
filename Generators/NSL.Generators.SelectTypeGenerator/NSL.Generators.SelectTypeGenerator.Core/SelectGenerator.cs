@@ -6,10 +6,7 @@ using NSL.Generators.Utils;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.IO;
 using System.Linq;
-using System.Reflection;
-using System.Security.Claims;
 
 namespace NSL.Generators.SelectTypeGenerator
 {
@@ -48,6 +45,9 @@ namespace NSL.Generators.SelectTypeGenerator
 
         private void ProcessSelectTypes(SourceProductionContext context, ImmutableArray<GeneratorSyntaxContext> types)
         {
+            joinAttributeModelsMap.Clear();
+            joinModelsMap.Clear();
+
             List<string> fnames = new List<string>();
             //GenDebug.Break(true);
             //GenDebug.Break();
@@ -68,6 +68,7 @@ namespace NSL.Generators.SelectTypeGenerator
                 List<GenAttribute> attributes = new List<GenAttribute>();
 
                 var typeAttributes = typeSymbol.GetAttributes();
+
 
                 foreach (var attr in typeAttributes.Where(x => x.AttributeClass.GetTypeFullName(false) == SelectGenerateAttributeFullName))
                 {
@@ -103,10 +104,7 @@ namespace NSL.Generators.SelectTypeGenerator
                         Typed = x.Key.Typed,
                         Models = x.SelectMany(i => i.Models).GroupBy(g => g).Select(k => k.Key).ToArray()
                     })
-                    .ToArray(),
-                    Joins = typeAttributes.Where(x => x.AttributeClass.GetTypeFullName(false) == SelectGenerateModelJoinAttributeFullName)
-                    .GroupBy(x => (string)x.ConstructorArguments[0].Value, x => x.ConstructorArguments[1].Values.Select(n => (string)n.Value).ToArray())
-                    .ToDictionary(x => x.Key, x => x.SelectMany(n => n).GroupBy(g => g).Select(k => k.Key).ToArray())
+                    .ToArray()
                 };
 
                 try
@@ -149,15 +147,12 @@ namespace NSL.Generators.SelectTypeGenerator
                 {
                     foreach (var item in typedModels.Models)
                     {
-                        if (!gtype.Joins.TryGetValue(item, out var mjoins))
-                            mjoins = new string[] { };
+                        var mjoins = GetJoinModels(gtype.TypeSymbol, item).Prepend(item);
 
                         SelectGenContext genContext = typedModels.Dto ? new SelectGenDTOContext() : new SelectGenContext();
 
-
-
                         genContext.Type = gtype.TypeSymbol;
-                        genContext.Symbols = FilterSymbols(gtype.Members, mjoins.Prepend(item), typedModels.Typed);
+                        genContext.Symbols = FilterSymbols(gtype.Members, mjoins, typedModels.Typed);
                         genContext.Typed = typedModels.Typed;
                         genContext.Model = item;
 
@@ -402,19 +397,61 @@ namespace NSL.Generators.SelectTypeGenerator
 #pragma warning restore RS1035 // Не использовать API, запрещенные для анализаторов
         }
 
+        Dictionary<ISymbol, Dictionary<string, JoinAttributeData>> joinAttributeModelsMap = new Dictionary<ISymbol, Dictionary<string, JoinAttributeData>>(SymbolEqualityComparer.Default);
+
+        Dictionary<ISymbol, Dictionary<string, string[]>> joinModelsMap = new Dictionary<ISymbol, Dictionary<string, string[]>>(SymbolEqualityComparer.Default);
+
         private string[] GetJoinModels(ISymbol item, string model)
         {
-            var attributes = item.GetAttributes();
+            //GenDebug.Break(true);
 
-            var joined = attributes
-                        .Where(x => x.AttributeClass.GetTypeFullName(false) == SelectGenerateModelJoinAttributeFullName)
-                        .Where(x => (x.ConstructorArguments.First().Value as string).Equals(model))
-                        .SelectMany(x => x.ConstructorArguments.ElementAt(1).Values.Select(q => q.Value as string))
-                        .Append(model)
-                        .ToArray();
+            if (!joinModelsMap.TryGetValue(item, out var modelsMap))
+                joinModelsMap[item] = modelsMap = new Dictionary<string, string[]>(StringComparer.OrdinalIgnoreCase);
 
-            return joined;
+            if (!modelsMap.TryGetValue(model, out var result))
+            {
+                if (!joinAttributeModelsMap.TryGetValue(item, out var joined))
+                {
+                    var attributes = item.GetAttributes();
+                    joined = attributes
+                            .Where(x => x.AttributeClass.GetTypeFullName(false) == SelectGenerateModelJoinAttributeFullName)
+                            .ToDictionary(x => (x.ConstructorArguments.First().Value as string), x => new JoinAttributeData
+                            {
+                                Models = x.ConstructorArguments.ElementAt(1).Values.Select(q => q.Value as string).ToArray(),
+                                Recursive = x.NamedArguments
+                                .Where(n => n.Key == nameof(SelectGenerateModelJoinAttribute.Recursive))
+                                .Select(n => (bool)n.Value.Value)
+                                .DefaultIfEmpty(true)
+                                .FirstOrDefault()
+                            });
+
+                    joinAttributeModelsMap[item] = joined;
+                }
+
+                modelsMap[model] = result = GetJoinModels(joined, model)
+                .GroupBy(x => x)
+                .Select(x => x.Key)
+                .ToArray();
+            }
+
+            return result;
         }
+
+        private IEnumerable<string> GetJoinModels(Dictionary<string, JoinAttributeData> map, string model)
+        {
+            if (!map.TryGetValue(model, out var joined)) return Enumerable.Empty<string>();
+
+            IEnumerable<string> result = joined.Models;
+
+            if (joined.Recursive)
+                foreach (var item in joined.Models)
+                {
+                    result = result.Concat(GetJoinModels(map, item));
+                }
+
+            return result;
+        }
+
         private string GetProxyModel(ISymbol item, string model)
         {
             //GenDebug.Break();
@@ -525,7 +562,7 @@ namespace NSL.Generators.SelectTypeGenerator
 
                 itemGenContext.Model = GetProxyModel(item, genContext.Model);
 
-                IEnumerable<string> joinedModels = GetJoinModels(memberType, itemGenContext.Model);
+                IEnumerable<string> joinedModels = GetJoinModels(memberType, itemGenContext.Model).Prepend(itemGenContext.Model);
 
                 itemGenContext.Symbols = FilterSymbols(memberType.GetAllMembers(), joinedModels, genContext.Typed);
                 itemGenContext.Type = memberType;
@@ -622,5 +659,12 @@ namespace NSL.Generators.SelectTypeGenerator
         private readonly string SelectGenerateIncludeAttributeFullName = typeof(SelectGenerateIncludeAttribute).Name;
         private readonly string SelectGenerateProxyAttributeFullName = typeof(SelectGenerateProxyAttribute).Name;
         private readonly string SelectGenerateModelJoinAttributeFullName = typeof(SelectGenerateModelJoinAttribute).FullName;
+    }
+
+    internal struct JoinAttributeData
+    {
+        public string[] Models { get; set; }
+
+        public bool Recursive { get; set; }
     }
 }

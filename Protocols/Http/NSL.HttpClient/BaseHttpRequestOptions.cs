@@ -54,6 +54,12 @@ namespace NSL.HttpClient
 
                 return BaseHttpExceptionHandleResult.Response;
             }
+            if (ex is HttpRequestException)
+            {
+                response.StatusCode = System.Net.HttpStatusCode.BadGateway;
+
+                return BaseHttpExceptionHandleResult.Response;
+            }
 
             return BaseHttpExceptionHandleResult.Throw;
         }
