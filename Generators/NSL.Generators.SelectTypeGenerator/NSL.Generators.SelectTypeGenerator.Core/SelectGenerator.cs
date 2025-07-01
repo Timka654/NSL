@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace NSL.Generators.SelectTypeGenerator
 {
@@ -269,20 +270,20 @@ namespace NSL.Generators.SelectTypeGenerator
             }
         }
 
-        private IEnumerable<ISymbol> FilterSymbols(IEnumerable<ISymbol> symbols, IEnumerable<string> joinedArr, bool typed)
-            => symbols.Where(x =>
+        private IEnumerable<ISymbol> FilterSymbols(IEnumerable<ISymbol> symbols, IEnumerable<string> models, bool typed)
+            => symbols.Where(symbol =>
          {
-             if (typed && x is IPropertySymbol ps && (ps.SetMethod == null || ps.GetMethod == null))
+             if (typed && symbol is IPropertySymbol ps && (ps.SetMethod == null || ps.GetMethod == null))
                  return false;
 
-             var a = x
+             var attributes = symbol
              .GetAttributes()
              .Where(n => n.AttributeClass.Name == SelectGenerateIncludeAttributeFullName)
              .SelectMany(b => b.ConstructorArguments)
              .SelectMany(b => b.Values)
              .ToArray();
 
-             if (a.Any(n => joinedArr.Contains(n.Value as string)))
+             if (attributes.Any(attr => models.Any(model => string.Equals(attr.Value as string, model))))
                  return true;
 
              return false;
@@ -443,7 +444,8 @@ namespace NSL.Generators.SelectTypeGenerator
 
             var proxyAttribs = attributes.Where(x => x.AttributeClass.Name == SelectGenerateProxyAttributeFullName).ToArray();
 
-            var fromModel = proxyAttribs.FirstOrDefault(x => x.ConstructorArguments.Length == 2 && x.ConstructorArguments.First().Value == model);
+            var fromModel = proxyAttribs.FirstOrDefault(x => x.ConstructorArguments.Length == 2
+            && Regex.IsMatch(model, ((string)x.ConstructorArguments.First().Value)));
 
             if (fromModel != null)
                 proxyModel = (string)fromModel.ConstructorArguments[1].Value;
