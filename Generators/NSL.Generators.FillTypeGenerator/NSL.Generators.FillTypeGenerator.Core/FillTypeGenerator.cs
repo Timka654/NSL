@@ -358,9 +358,10 @@ namespace NSL.Generators.FillTypeGenerator
                 (toType, fromType) = (fromType, toType);
             }
 
-            var fromMembers = FilterSymbols(fromType.GetAllMembers().Where(x => !x.IsStatic), model).ToArray();
-            var toMembers = (IEnumerable<ISymbol>)toType.GetAllMembers().Where(x => !x.IsStatic).ToArray();
+            var fromMembers = FilterSymbols(fromType.GetAllMembers().Where(x => !x.IsStatic && (x as IPropertySymbol)?.IsIndexer != true), model).ToArray();
+            var toMembers = (IEnumerable<ISymbol>)toType.GetAllMembers().Where(x => !x.IsStatic && (x as IPropertySymbol)?.IsIndexer != true).ToArray();
 
+            //GenDebug.Break(true);
 
             var tabPrefix = string.Concat(Enumerable.Repeat("\t", t));
 

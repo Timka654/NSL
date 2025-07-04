@@ -221,6 +221,10 @@ namespace NSL.ASPNET
                                 services.AddKeyedSingleton(type.Type, type.Key);
                             else
                                 services.AddSingleton(type.Type);
+
+                            if (type.Type.IsAssignableTo(typeof(IHostedService)))
+                                services.AddHostedService(x => (IHostedService)x.GetRequiredService(type.Type));
+
                             break;
                         case ServiceLifetime.Scoped:
                             if (type.Key != default)
@@ -268,7 +272,7 @@ namespace NSL.ASPNET
             return services;
         }
 
-        static readonly Type[] registerServiceSkipped = 
+        static readonly Type[] registerServiceSkipped =
         [
             typeof(IServiceProvider),
             typeof(IServiceScope),

@@ -79,6 +79,16 @@ namespace NSL.Utils
             if (processTask != null)
                 await processTask;
         }
+
+        public async ValueTask DisposeAsync(bool completeInput)
+        {
+            if (completeInput)
+            {
+                Channel.Writer.Complete();
+            }
+
+            await DisposeAsync();
+        }
     }
 }
 

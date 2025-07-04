@@ -8,6 +8,9 @@ namespace NSL.Generators.FillTypeGenerator.Tests
         static void Main(string[] args)
         {
 #if DEVELOP
+
+
+#else
             var dup_val1 = new DuplicateNameModel() { Id = "val1" };
             var dup_val2 = new DuplicateNameModel<int>() { Id = "val2" };
 
@@ -15,7 +18,7 @@ namespace NSL.Generators.FillTypeGenerator.Tests
 
             dup_val1.FillTo(dup_valTo);
             dup_val2.FillTo(dup_valTo);
-#else
+
             DevClass1 devClass1 = new DevClass1();
 
             DevClass2 devClass2 = new DevClass2();

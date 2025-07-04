@@ -123,27 +123,28 @@ namespace NSL.SMTP.ASPNET
 
             await Task.Delay(Options.IterDelayMSeconds, cancellationToken);
 
-            using var cts_src = new CancellationTokenSource(TimeSpan.FromMilliseconds(250));
-
-            using CancellationTokenSource cts = CancellationTokenSource.CreateLinkedTokenSource(
-                    cts_src.Token,
-                    cancellationToken
-                );
-
-            using var client = await ConfigureClient(current);
-
-            using var msg = await BuildMessageAsync(client, current, cancellationToken);
-
-            msg.IsBodyHtml = true;
-
             try
             {
-                using var scts_src = new CancellationTokenSource(TimeSpan.FromSeconds(Options.RequestDelaySeconds));
+                using var delayRequestTS = new CancellationTokenSource(TimeSpan.FromSeconds(Options.RequestDelaySeconds));
+
                 using var scts = CancellationTokenSource.CreateLinkedTokenSource(
-                    scts_src.Token,
+                    delayRequestTS.Token,
                     cancellationToken);
 
+                using var client = await ConfigureClient(current, cancellationToken);
+
+                using var msg = await BuildMessageAsync(client, current, cancellationToken);
+
+                msg.IsBodyHtml = true;
+
                 await client.SendMailAsync(msg, scts.Token);
+
+                if (haveStored && channel.Channel.Reader.Count == 0)
+                {
+                    haveStored = false;
+
+                    await restoreDataSource.RemoveDataAsync(StoreDataName, cancellationToken);
+                }
             }
             catch (Exception ex)
             {
@@ -162,7 +163,7 @@ namespace NSL.SMTP.ASPNET
         protected virtual Task<MailMessage> BuildMessageAsync(SmtpClient client, SendMailRequest mail, CancellationToken cancellationToken)
             => Task.FromResult(new MailMessage(Options.DisplayName ?? Options.UserName, mail.email, mail.subject, mail.htmlMessage));
 
-        protected virtual async Task<SmtpClient> ConfigureClient(SendMailRequest mail)
+        protected virtual async Task<SmtpClient> ConfigureClient(SendMailRequest mail, CancellationToken cancellationToken)
         {
             return new SmtpClient(Options.Host, Options.Port)
             {
@@ -204,9 +205,12 @@ namespace NSL.SMTP.ASPNET
             return (ex is SmtpException || ex is OperationCanceledException) && !cancellationToken.IsCancellationRequested;
         }
 
+        bool haveStored = false;
+        IRestoreDataSource? restoreDataSource = default;
+
         public async Task StartAsync(CancellationToken cancellationToken)
         {
-            var restoreDataSource = TryGetRestoreDataSource();
+            restoreDataSource = TryGetRestoreDataSource();
 
             if (restoreDataSource != null)
             {
@@ -216,6 +220,8 @@ namespace NSL.SMTP.ASPNET
                 {
                     foreach (var item in items)
                     {
+                        haveStored = true;
+
                         await AddAction(item, cancellationToken);
                     }
                 }
@@ -226,23 +232,25 @@ namespace NSL.SMTP.ASPNET
 
         public async Task StopAsync(CancellationToken cancellationToken)
         {
-            await channel.DisposeAsync();
-
-            var restoreDataSource = TryGetRestoreDataSource();
+            await channel.DisposeAsync(true);
 
             if (restoreDataSource == null) return;
 
             var items = new List<SendMailRequest>();
 
-            await foreach (var item in channel.Channel.Reader.ReadAllAsync())
+            while (channel.Channel.Reader.TryRead(out var item))
             {
                 items.Add(item.Data);
             }
 
             if (items.Any())
+            {
                 await restoreDataSource.SetDataAsync(StoreDataName, items, cancellationToken);
+            }
             else
+            {
                 await restoreDataSource.RemoveDataAsync(StoreDataName, cancellationToken);
+            }
         }
 
         protected virtual IRestoreDataSource? TryGetRestoreDataSource()
