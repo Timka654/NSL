@@ -56,7 +56,11 @@ namespace NSL.HttpClient
             }
             if (ex is HttpRequestException hre)
             {
+#if UNITY
+                response.StatusCode = 0;
+#else
                 response.StatusCode = hre.StatusCode ?? 0;
+#endif
 
                 return BaseHttpExceptionHandleResult.Response;
             }

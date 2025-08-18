@@ -75,7 +75,11 @@ namespace NSL.HttpClient
                     type = options.ExceptionHandle(ex, options, exresp);
                 else if (ex is HttpRequestException hre)
                 {
+#if UNITY
+                    exresp.StatusCode = 0;
+#else
                     exresp.StatusCode = hre.StatusCode ?? 0;
+#endif
                     type = BaseHttpRequestOptions.BaseHttpExceptionHandleResult.Response;
                 }
                 else if (ex is OperationCanceledException)
