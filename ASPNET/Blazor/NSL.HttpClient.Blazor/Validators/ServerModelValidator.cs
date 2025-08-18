@@ -13,7 +13,11 @@ namespace NSL.HttpClient.Blazor.Validators
     {
         private ValidationMessageStore _messageStore;
 
+        private int _messageCount = 0;
+
         [CascadingParameter] EditContext CurrentEditContext { get; set; }
+
+        [Parameter] public bool AlwaysReset { get; set; }
 
         /// <inheritdoc />
         protected override void OnInitialized()
@@ -30,32 +34,51 @@ namespace NSL.HttpClient.Blazor.Validators
             CurrentEditContext.OnFieldChanged += (s, e) => _messageStore.Clear(e.FieldIdentifier);
         }
 
-        public void DisplayErrors(Dictionary<string, List<string>> errors)
+        public void DisplayErrors(Dictionary<string, List<string>> errors, bool reset = false)
         {
+            if (reset || AlwaysReset)
+            {
+                _messageStore.Clear();
+                _messageCount = 0;
+            }
+
             foreach (var err in errors)
             {
                 _messageStore.Add(CurrentEditContext.Field(err.Key.Split('.').Last()), err.Value);
+                ++_messageCount;
             }
+
             CurrentEditContext.NotifyValidationStateChanged();
         }
 
-        public void DisplayApiErrors(BaseResponse apiResult)
+        public void DisplayApiErrors(BaseResponse apiResult, bool reset = false)
         {
             if (apiResult != null && apiResult.Errors != null && apiResult.Errors.Any())
             {
-                DisplayErrors(apiResult.Errors);
+                DisplayErrors(apiResult.Errors, reset);
             }
         }
 
 
-        public void DisplayError(string field, string validationMessage)
+        public void DisplayError(string field, string validationMessage, bool reset = false)
         {
             var dictionary = new Dictionary<string, List<string>>
             {
                 { field, new List<string> { validationMessage } }
             };
 
-            DisplayErrors(dictionary);
+            DisplayErrors(dictionary, reset);
+        }
+
+        public bool HasErrors()
+            => _messageStore != null && _messageCount > 0;
+
+        public void Reset()
+        {
+            _messageStore.Clear();
+            _messageCount = 0;
+
+            CurrentEditContext.NotifyValidationStateChanged();
         }
 
         private KeyValuePair<string, string> GetErrorKeyValuePair(string error)

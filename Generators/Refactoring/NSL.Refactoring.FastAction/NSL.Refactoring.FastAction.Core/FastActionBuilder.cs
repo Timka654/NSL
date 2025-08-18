@@ -8,6 +8,7 @@ using Microsoft.CodeAnalysis.Text;
 using NSL.Generators.Utils;
 using NSL.Refactoring.FastAction.UI;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
@@ -200,20 +201,21 @@ namespace NSL.Refactoring.FastAction.Core
 
                 try
                 {
-                    var actionsContent = JsonIncrementalMerger.MergeJsonFiles(pathes);
-
-                    actionData = new FastActionCacheData
+                    actionData = cache.GetOrAdd(pid, (id) =>
                     {
-                        SolutionPath = solutionPath,
-                        ProjectPath = projectPath,
-                        Data = actionsContent.Deserialize<FastActionData>(new JsonSerializerOptions()
-                        {
-                            ReadCommentHandling = JsonCommentHandling.Skip,
-                            AllowTrailingCommas = true
-                        })
-                    };
+                        var actionsContent = JsonIncrementalMerger.MergeJsonFiles(pathes);
 
-                    cache[pid] = actionData;
+                        return new FastActionCacheData
+                        {
+                            SolutionPath = solutionPath,
+                            ProjectPath = projectPath,
+                            Data = actionsContent.Deserialize<FastActionData>(new JsonSerializerOptions()
+                            {
+                                ReadCommentHandling = JsonCommentHandling.Skip,
+                                AllowTrailingCommas = true
+                            })
+                        };
+                    });
 
                 }
                 catch (Exception ex)
@@ -696,7 +698,13 @@ namespace NSL.Refactoring.FastAction.Core
                                 string getNextPath(string path)
                                 {
                                     var di = new DirectoryInfo(path);
-                                    foreach (var item in di.GetDirectories().OrderByDescending(x => x.Name.Length))
+                                    foreach (var item in di.GetDirectories()
+                                        .OrderByDescending(x => x.Name.Contains("Models") 
+                                        || x.Name.Contains("Controllers")
+                                        || x.Name.Contains("Managers")
+                                        || x.Name.Contains("Services")
+                                        || x.Name.Contains("Enums"))
+                                        .ThenByDescending(x => x.Name.Length))
                                     {
                                         if (outputName.Contains(item.Name))
                                             return getNextPath(item.FullName);
@@ -1051,6 +1059,6 @@ namespace NSL.Refactoring.FastAction.Core
             return items;
         }
 
-        static Dictionary<Guid, FastActionCacheData> cache = new Dictionary<Guid, FastActionCacheData>();
+        static ConcurrentDictionary<Guid, FastActionCacheData> cache = new ConcurrentDictionary<Guid, FastActionCacheData>();
     }
 }

@@ -4,6 +4,6 @@ namespace NSL.HttpClient.Validators
 {
     public interface IHttpResponseContentValidator
     {
-        void DisplayApiErrors(BaseResponse response);
+        void DisplayApiErrors(BaseResponse response, bool reset = false);
     }
 }

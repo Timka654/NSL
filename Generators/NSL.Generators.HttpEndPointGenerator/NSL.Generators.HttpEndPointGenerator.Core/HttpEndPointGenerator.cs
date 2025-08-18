@@ -8,6 +8,7 @@ using NSL.Generators.Utils;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Linq;
 
 namespace NSL.Generators.HttpEndPointGenerator
@@ -29,8 +30,7 @@ namespace NSL.Generators.HttpEndPointGenerator
         {
             var pip = context.SyntaxProvider.CreateSyntaxProvider(
                 HttpEndPointImplementAttributeSyntaxReceiver.OnVisitSyntaxNode,
-                (syntax, _) => syntax)
-                .Collect();
+                (syntax, _) => syntax);
 
             context.RegisterSourceOutput(pip, ProcessHttpEndPoints);
         }
@@ -43,14 +43,16 @@ namespace NSL.Generators.HttpEndPointGenerator
 
         #endregion
 
-        private void ProcessHttpEndPoints(SourceProductionContext context, ImmutableArray<GeneratorSyntaxContext> types)
+        private void ProcessHttpEndPoints(SourceProductionContext context, GeneratorSyntaxContext item)
         {
 #if DEBUG
             //GenDebug.Break();
 
 #endif
-            foreach (var item in types)
-            {
+            //var stopwatch = Stopwatch.StartNew();   
+
+            //foreach (var item in types)
+            //{
                 var @class = (ClassDeclarationSyntax)item.Node;
                 try
                 {
@@ -61,7 +63,19 @@ namespace NSL.Generators.HttpEndPointGenerator
 
                     context.ShowHttpEndPointDiagnostics($"NSLHTTPEP002", $"Error - {ex} on type {@class.Identifier.Text}", DiagnosticSeverity.Error, @class.GetLocation());
                 }
-            }
+            //}
+
+            //stopwatch.Stop();
+
+            //context.ReportDiagnostic(Diagnostic.Create(
+            //    new DiagnosticDescriptor(
+            //        id: "NSLHTTPEP666",
+            //        title: "Generator Performance",
+            //        messageFormat: $"[{nameof(HttpEndPointGenerator)}] executed in {stopwatch.ElapsedMilliseconds} ms.",
+            //        category: "Performance",
+            //        DiagnosticSeverity.Info,
+            //        isEnabledByDefault: true),
+            //    Location.None));
         }
 
         private void ProcessHttpEndPoint(SourceProductionContext sourceContext, GeneratorSyntaxContext context, TypeDeclarationSyntax type)

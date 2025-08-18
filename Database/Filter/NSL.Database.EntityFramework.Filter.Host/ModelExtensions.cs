@@ -25,6 +25,9 @@ namespace NSL.Database.EntityFramework.Filter.Host
             {
                 var input = (inputExpr as SqlConstantExpression)?.Value as string;
 
+                if (input == default)
+                    return inputExpr;
+
                 var s = input.Replace($"{escapeChar}", $"{escapeChar}{escapeChar}");
                 s = s.Replace("%", $"{escapeChar}%");
                 s = s.Replace("_", $"{escapeChar}_");

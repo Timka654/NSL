@@ -14,6 +14,7 @@ using NSL.Extensions.RPC.Generator.Utils;
 using NSL.Generators.Utils;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Linq;
 
 namespace NSL.Extensions.RPC.Generator
@@ -51,6 +52,7 @@ namespace NSL.Extensions.RPC.Generator
 #if DEBUG
             //GenDebug.Break();
 #endif
+            //var stopwatch = Stopwatch.StartNew();
 
             var data = items
                 .Select(x =>
@@ -91,6 +93,18 @@ namespace NSL.Extensions.RPC.Generator
                     context.ShowRPCGenDiagnostics($"NSLRPC000", $"Error - {ex} on type {classDecl.Class.Identifier.Text}", DiagnosticSeverity.Error, classDecl.Class.GetLocation());
                 }
             }
+
+            //stopwatch.Stop();
+
+            //context.ReportDiagnostic(Diagnostic.Create(
+            //    new DiagnosticDescriptor(
+            //        id: "NSLRPC666",
+            //        title: "Generator Performance",
+            //        messageFormat: $"[{nameof(RPCGenerator)}] executed in {stopwatch.ElapsedMilliseconds} ms. (count: {items.Length})",
+            //        category: "Performance",
+            //        DiagnosticSeverity.Info,
+            //        isEnabledByDefault: true),
+            //    Location.None));
         }
 
         private SyntaxList<UsingDirectiveSyntax> UpdateUsingDirectives(SyntaxTree originalTree)

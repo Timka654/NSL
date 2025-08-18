@@ -6,7 +6,9 @@ using NSL.Generators.Utils;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace NSL.Generators.SelectTypeGenerator
@@ -30,8 +32,7 @@ namespace NSL.Generators.SelectTypeGenerator
         {
             var pip = context.SyntaxProvider.CreateSyntaxProvider(
                 SelectAttributeSyntaxReceiver.OnVisitSyntaxNode,
-                (syntax, _) => syntax)
-                .Collect();
+                (syntax, _) => syntax);
 
             context.RegisterSourceOutput(pip, ProcessSelectTypes);
         }
@@ -44,21 +45,26 @@ namespace NSL.Generators.SelectTypeGenerator
 
         #endregion
 
-        private void ProcessSelectTypes(SourceProductionContext context, ImmutableArray<GeneratorSyntaxContext> types)
+        private void ProcessSelectTypes(SourceProductionContext context, GeneratorSyntaxContext node)
         {
+            //var stopwatch = Stopwatch.StartNew();
+
             List<string> fnames = new List<string>();
             //GenDebug.Break(true);
             //GenDebug.Break();
-            foreach (var group in types.GroupBy(x =>
-            {
-                var type = x.Node as TypeDeclarationSyntax;
+            //foreach (var group in types.GroupBy(x =>
+            //{
+            //    var type = x.Node as TypeDeclarationSyntax;
 
-                return $"{type.TryGetNamespace()}{type.GetClassName()}";
-            }))
-            {
-                var node = group.First();
+            //    return $"{type.TryGetNamespace()}{type.GetClassName()}";
+            //}))
+            //{
+            //var node = group.First();
 
-                var semanticModel = node.SemanticModel;
+            //var key = group.Key;
+            var type = node.Node as TypeDeclarationSyntax;
+            var key = $"{type.TryGetNamespace()}{type.GetClassName()}";
+            var semanticModel = node.SemanticModel;
                 var typeDecl = node.Node as TypeDeclarationSyntax;
                 var typeSymbol = semanticModel.GetDeclaredSymbol(typeDecl) as ITypeSymbol;
 
@@ -93,7 +99,7 @@ namespace NSL.Generators.SelectTypeGenerator
                     TypeSymbol = typeSymbol,
                     TypeDeclaration = typeDecl,
                     Namespace = typeDecl.TryGetNamespace(),
-                    Name = group.Key.Replace('.', '_'),
+                    Name = key.Replace('.', '_'),
                     Members = typeSymbol.GetAllMembers(),
                     Attributes = attributes.GroupBy(x => (x.Typed, x.Dto))
                     .Select(x => new GenAttribute()
@@ -111,9 +117,21 @@ namespace NSL.Generators.SelectTypeGenerator
                 }
                 catch (Exception ex)
                 {
-                    context.ShowSelectDiagnostics($"NSLSELECT002", $"Error - {ex} on type {gtype.TypeDeclaration.Identifier.Text}", DiagnosticSeverity.Error, group.Select(x => x.Node.GetLocation()).ToArray());
+                    context.ShowSelectDiagnostics($"NSLSELECT002", $"Error - {ex} on type {gtype.TypeDeclaration.Identifier.Text}", DiagnosticSeverity.Error, node.Node.GetLocation());
                 }
-            }
+            //}
+
+            //stopwatch.Stop();
+
+            //context.ReportDiagnostic(Diagnostic.Create(
+            //    new DiagnosticDescriptor(
+            //        id: "NSLSELECT666",
+            //        title: "Generator Performance",
+            //        messageFormat: $"[{nameof(SelectGenerator)}] executed in {stopwatch.ElapsedMilliseconds} ms.",
+            //        category: "Performance",
+            //        DiagnosticSeverity.Info,
+            //        isEnabledByDefault: true),
+            //    Location.None));
         }
 
         private void ProcessSelectToType(SourceProductionContext sourceContext, GenTypeGroup gtype,
@@ -547,6 +565,7 @@ namespace NSL.Generators.SelectTypeGenerator
 
                 IEnumerable<string> joinedModels = GetJoinModels(memberType, itemGenContext.Model).Prepend(itemGenContext.Model);
 
+                itemGenContext.Parent = genContext;
                 itemGenContext.Symbols = FilterSymbols(memberType.GetAllMembers(), joinedModels, genContext.Typed);
                 itemGenContext.Type = memberType;
                 itemGenContext.OriginType = originType;
@@ -606,6 +625,7 @@ namespace NSL.Generators.SelectTypeGenerator
                 if (genContext.Typed)
                 {
                     sMembers.Add($"{item.Name} = {path}.{item.Name}");
+
                     continue;
                 }
 
@@ -629,6 +649,30 @@ namespace NSL.Generators.SelectTypeGenerator
 
         void AddChildContext(SelectGenContext genContext, SelectGenContext childGenContext)
         {
+            var curContext = childGenContext.Parent;
+
+            while (curContext != null)
+            {
+                if (curContext.Model == childGenContext.Model && SymbolEqualityComparer.Default.Equals(curContext.Type, childGenContext.Type))
+                {
+                    string pathBuilder = $"({childGenContext.Type.Name}){childGenContext.Model}@{childGenContext.MemberName}";
+
+                    curContext = childGenContext.Parent;
+
+
+                    while (curContext != null)
+                    {
+                        pathBuilder = $"({curContext.Type.Name}){curContext.Model}@{curContext.MemberName} -> {pathBuilder}";
+
+                        curContext = curContext.Parent;
+                    }
+
+                    throw new Exception($"Found cycle on generate {pathBuilder}");
+                }
+
+                curContext = curContext.Parent;
+            }
+
             if (!childGenContext.Symbols.Any())
                 return;
 

@@ -24,5 +24,7 @@ namespace NSL.Generators.SelectTypeGenerator
 
         public virtual string GetTypeIdentifier(bool canNullable = true)
             => Type.GetTypeFullName(canNullable);
+
+        public SelectGenContext Parent { get; internal set; }
     }
 }

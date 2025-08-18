@@ -45,22 +45,23 @@ namespace NSL.Generators.PacketHandleGenerator
         {
             var pip = context.SyntaxProvider.CreateSyntaxProvider(
                 NSLPHAttributeSyntaxReceiver.OnVisitSyntaxNode,
-                (syntax, _) => syntax)
-                .Collect();
+                (syntax, _) => syntax);
 
             context.RegisterSourceOutput(pip, ProcessNSLPHTypes);
         }
 
         #endregion
 
-        private void ProcessNSLPHTypes(SourceProductionContext context, ImmutableArray<GeneratorSyntaxContext> types)
+        private void ProcessNSLPHTypes(SourceProductionContext context, GeneratorSyntaxContext item)
         {
 #if DEBUG
             //GenDebug.Break();
 #endif
 
-            foreach (var item in types)
-            {
+            //var stopwatch = Stopwatch.StartNew();
+
+            //foreach (var item in types)
+            //{
                 var @class = (ClassDeclarationSyntax)item.Node;
                 try
                 {
@@ -70,7 +71,19 @@ namespace NSL.Generators.PacketHandleGenerator
                 {
                     context.ShowPHDiagnostics("NSLHP999", $"Error on build {ex.ToString()}", DiagnosticSeverity.Error, @class.GetLocation());
                 }
-            }
+            //}
+
+            //stopwatch.Stop();
+
+            //context.ReportDiagnostic(Diagnostic.Create(
+            //    new DiagnosticDescriptor(
+            //        id: "NSLHP666",
+            //        title: "Generator Performance",
+            //        messageFormat: $"[{nameof(NSLPHTypeGenerator)}] executed in {stopwatch.ElapsedMilliseconds} ms.",
+            //        category: "Performance",
+            //        DiagnosticSeverity.Info,
+            //        isEnabledByDefault: true),
+            //    Location.None));
         }
 
         private void ProcessNSLPHType(SourceProductionContext sourceContext, GeneratorSyntaxContext context, TypeDeclarationSyntax type)

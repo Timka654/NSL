@@ -10,6 +10,7 @@ using NSL.SocketCore.Utils.Buffer;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Linq;
 
 namespace NSL.Generators.BinaryTypeIOGenerator
@@ -75,20 +76,21 @@ namespace NSL.Generators.BinaryTypeIOGenerator
         {
             var pip = context.SyntaxProvider.CreateSyntaxProvider(
                 NSLBIOAttributeSyntaxReceiver.OnVisitSyntaxNode,
-                (syntax, _) => syntax)
-                .Collect();
+                (syntax, _) => syntax);
 
             context.RegisterSourceOutput(pip, ProcessNSLBIOTypes);
         }
 
         #endregion
-        private void ProcessNSLBIOTypes(SourceProductionContext context, ImmutableArray<GeneratorSyntaxContext> types)
+        private void ProcessNSLBIOTypes(SourceProductionContext context, GeneratorSyntaxContext item)
         {
 #if DEBUG
             //GenDebug.Break();
 #endif
-            foreach (var item in types)
-            {
+            //var stopwatch = Stopwatch.StartNew();
+
+            //foreach (var item in types)
+            //{
                 var @class = (ClassDeclarationSyntax)item.Node;
 
                 try
@@ -99,7 +101,19 @@ namespace NSL.Generators.BinaryTypeIOGenerator
                 {
                     context.ShowBIODiagnostics($"NSLBIO002", $"Error - {ex} on type {@class.Identifier.Text}", DiagnosticSeverity.Error, @class.GetLocation());
                 }
-            }
+            //}
+
+            //stopwatch.Stop();
+
+            //context.ReportDiagnostic(Diagnostic.Create(
+            //    new DiagnosticDescriptor(
+            //        id: "NSLBIO666",
+            //        title: "Generator Performance",
+            //        messageFormat: $"[{nameof(NSLBIOTypeGenerator)}] executed in {stopwatch.ElapsedMilliseconds} ms.",
+            //        category: "Performance",
+            //        DiagnosticSeverity.Info,
+            //        isEnabledByDefault: true),
+            //    Location.None));
         }
 
         private void ProcessNSLBIOType(SourceProductionContext sourceContext, GeneratorSyntaxContext context, TypeDeclarationSyntax type)

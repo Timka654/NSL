@@ -10,6 +10,7 @@ using NSL.SocketCore.Utils.Buffer;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Linq;
 
 namespace NSL.Generators.BinaryTypeIOGenerator
@@ -23,21 +24,21 @@ namespace NSL.Generators.BinaryTypeIOGenerator
         {
             var pip = context.SyntaxProvider.CreateSyntaxProvider(
                 BinaryIOAttributeSyntaxReceiver.OnVisitSyntaxNode,
-                (syntax, _) => syntax)
-                .Collect();
+                (syntax, _) => syntax);
 
             context.RegisterSourceOutput(pip, ProcessBinaryIOTypes);
         }
 
         #endregion
-        private void ProcessBinaryIOTypes(SourceProductionContext context, ImmutableArray<GeneratorSyntaxContext> types)
+        private void ProcessBinaryIOTypes(SourceProductionContext context, GeneratorSyntaxContext item)
         {
 #if DEBUG
             //GenDebug.Break();
 #endif
+            //var stopwatch = Stopwatch.StartNew();   
 
-            foreach (var item in types)
-            {
+            //foreach (var item in types)
+            //{
                 var @class = (ClassDeclarationSyntax)item.Node;
 
                 try
@@ -48,7 +49,19 @@ namespace NSL.Generators.BinaryTypeIOGenerator
                 {
                     context.ShowBIODiagnostics($"NSLBIO002", $"Error - {ex} on type {@class.Identifier.Text}", DiagnosticSeverity.Error, @class.GetLocation());
                 }
-            }
+            //}
+
+            //stopwatch.Stop();
+
+            //context.ReportDiagnostic(Diagnostic.Create(
+            //    new DiagnosticDescriptor(
+            //        id: "NSLBIO666",
+            //        title: "Generator Performance",
+            //        messageFormat: $"[{nameof(BinaryIOTypeGenerator)}] executed in {stopwatch.ElapsedMilliseconds} ms.",
+            //        category: "Performance",
+            //        DiagnosticSeverity.Info,
+            //        isEnabledByDefault: true),
+            //    Location.None));
         }
 
 

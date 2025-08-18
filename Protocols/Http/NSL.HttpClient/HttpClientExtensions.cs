@@ -71,14 +71,19 @@ namespace NSL.HttpClient
 
                 var type = BaseHttpRequestOptions.BaseHttpExceptionHandleResult.Throw;
 
-                if (ex is OperationCanceledException && options == null)
+                if (options != null)
+                    type = options.ExceptionHandle(ex, options, exresp);
+                else if (ex is HttpRequestException hre)
+                {
+                    exresp.StatusCode = hre.StatusCode ?? 0;
+                    type = BaseHttpRequestOptions.BaseHttpExceptionHandleResult.Response;
+                }
+                else if (ex is OperationCanceledException)
                 {
                     exresp.StatusCode = System.Net.HttpStatusCode.RequestTimeout;
                     type = BaseHttpRequestOptions.BaseHttpExceptionHandleResult.Response;
                 }
 
-                if (options != null)
-                    type = options.ExceptionHandle(ex, options, exresp);
 
                 if (type == BaseHttpRequestOptions.BaseHttpExceptionHandleResult.Throw)
                     throw;

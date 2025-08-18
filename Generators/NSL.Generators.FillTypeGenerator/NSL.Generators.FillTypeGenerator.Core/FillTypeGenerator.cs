@@ -8,6 +8,7 @@ using NSL.Generators.Utils;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
@@ -22,20 +23,20 @@ namespace NSL.Generators.FillTypeGenerator
         {
             var pip = context.SyntaxProvider.CreateSyntaxProvider(
                 FillTypeAttributeSyntaxReceiver.OnVisitSyntaxNode,
-                (syntax, _) => syntax)
-                .Collect();
+                (syntax, _) => syntax);
 
             context.RegisterSourceOutput(pip, ProcessFillTypes);
         }
 
         #endregion
 
-        private void ProcessFillTypes(SourceProductionContext context, ImmutableArray<GeneratorSyntaxContext> types)
+        private void ProcessFillTypes(SourceProductionContext context, GeneratorSyntaxContext item)
         {
             //GenDebug.Break();
+            //var stopwatch = Stopwatch.StartNew();
 
-            foreach (var item in types)
-            {
+            //foreach (var item in types)
+            //{
                 var @class = (TypeDeclarationSyntax)item.Node;
 
                 try
@@ -46,7 +47,19 @@ namespace NSL.Generators.FillTypeGenerator
                 {
                     context.ShowFillTypeDiagnostics($"NSLFT002", $"Error - {ex} on type {@class.Identifier.Text}", DiagnosticSeverity.Error, @class.GetLocation());
                 }
-            }
+            //}
+
+            //stopwatch.Stop();
+
+            //context.ReportDiagnostic(Diagnostic.Create(
+            //    new DiagnosticDescriptor(
+            //        id: "NSLFT666",
+            //        title: "Generator Performance",
+            //        messageFormat: $"[{nameof(FillTypeGenerator)}] executed in {stopwatch.ElapsedMilliseconds} ms.",
+            //        category: "Performance",
+            //        DiagnosticSeverity.Info,
+            //        isEnabledByDefault: true),
+            //    Location.None));
         }
 
         private static string[] requiredUsings = new string[] { "System.Linq" };
