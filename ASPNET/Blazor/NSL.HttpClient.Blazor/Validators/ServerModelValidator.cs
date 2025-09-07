@@ -34,7 +34,7 @@ namespace NSL.HttpClient.Blazor.Validators
             CurrentEditContext.OnFieldChanged += (s, e) => _messageStore.Clear(e.FieldIdentifier);
         }
 
-        public void DisplayErrors(Dictionary<string, List<string>> errors, bool reset = false)
+        public void DisplayErrors(Dictionary<string, List<HttpResponseErrorModel>> errors, bool reset = false)
         {
             if (reset || AlwaysReset)
             {
@@ -44,7 +44,7 @@ namespace NSL.HttpClient.Blazor.Validators
 
             foreach (var err in errors)
             {
-                _messageStore.Add(CurrentEditContext.Field(err.Key.Split('.').Last()), err.Value);
+                _messageStore.Add(CurrentEditContext.Field(err.Key.Split('.').Last()), err.Value.Select(x => x.Message));
                 ++_messageCount;
             }
 
@@ -62,9 +62,13 @@ namespace NSL.HttpClient.Blazor.Validators
 
         public void DisplayError(string field, string validationMessage, bool reset = false)
         {
-            var dictionary = new Dictionary<string, List<string>>
+            var dictionary = new Dictionary<string, List<HttpResponseErrorModel>>
             {
-                { field, new List<string> { validationMessage } }
+                { field, new List<HttpResponseErrorModel>
+                            {
+                                new HttpResponseErrorModel(validationMessage,default)
+                            }
+                }
             };
 
             DisplayErrors(dictionary, reset);

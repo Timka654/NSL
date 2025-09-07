@@ -1,10 +1,11 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using NSL.BlazorTemplate.Shared.Models;
 
 namespace NSL.BlazorTemplate.Shared.Server.Data
 {
-    public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : IdentityDbContext<UserModel>(options)
+    public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : IdentityDbContext<UserModel,IdentityRole<Guid>, Guid>(options)
     {
         protected override void OnModelCreating(ModelBuilder builder)
         {

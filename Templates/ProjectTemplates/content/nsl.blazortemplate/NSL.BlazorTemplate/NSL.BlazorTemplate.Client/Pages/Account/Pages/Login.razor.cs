@@ -41,7 +41,7 @@ namespace NSL.BlazorTemplate.Client.Pages.Account.Pages
                 NavigationManager.NavigateTo(ReturnUrl ?? string.Empty);
             }
             else if (response.IsBadRequest)
-                errorMessage = response.Errors.SelectMany(x => x.Value).FirstOrDefault() ?? "Login error....";
+                errorMessage = response.Errors.SelectMany(x => x.Value.Select(y=>y.Message)).FirstOrDefault() ?? "Login error....";
 
             //// This doesn't count login failures towards account lockout
             //// To enable password failures to trigger account lockout, set lockoutOnFailure: true

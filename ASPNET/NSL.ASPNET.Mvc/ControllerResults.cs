@@ -153,6 +153,9 @@ namespace NSL.ASPNET.Mvc
             => BadRequest(formatModelState(modelState));
 
         internal static object formatModelState(ModelStateDictionary modelState)
-            => modelState.ToDictionary(x => x.Key, x => x.Value.Errors.Select(b => b.ErrorMessage).ToArray());
+            => modelState.ToDictionary(
+                x => x.Key, 
+                x => x.Value.Errors.Select(b => new { Message = b.ErrorMessage }).ToArray()
+                );
     }
 }

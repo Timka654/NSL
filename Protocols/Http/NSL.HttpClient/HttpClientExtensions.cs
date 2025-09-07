@@ -2,6 +2,7 @@
 using NSL.HttpClient.Models;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -44,7 +45,9 @@ namespace NSL.HttpClient
                     result = new TResult()
                     {
                         StatusCode = response.StatusCode,
-                        Errors = await response.ReadErrorsAsync(options)
+                        Errors = await response.ReadErrorsAsync(options) ??
+                        await response.ReadErrorsAsync(options, v2: false) ??
+                        new Dictionary<string, List<HttpResponseErrorModel>>()
                     };
 
                     options?.Validator?.DisplayApiErrors(result);
@@ -124,31 +127,47 @@ namespace NSL.HttpClient
             return result;
         }
 
-        public static async Task<Dictionary<string, List<string>>> ReadErrorsAsync(
+        public static async Task<Dictionary<string, List<HttpResponseErrorModel>>> ReadErrorsAsync(
             this HttpResponseMessage response,
-            BaseHttpRequestOptions options = null)
+            BaseHttpRequestOptions options = null,
+            bool v2 = true)
         {
-            //if (response.StatusCode != System.Net.HttpStatusCode.BadRequest)
-            //    return default;
+            Dictionary<string, List<HttpResponseErrorModel>>? result = default;
+
+            if (response.Content?.Headers.ContentType?.MediaType != "application/json")
+                return result;
 
             var content = await response.Content?.ReadAsStringAsync();
 
-            if (string.IsNullOrEmpty(content) || response.Content?.Headers.ContentType?.MediaType != "application/json")
-                return new Dictionary<string, List<string>>();
-
-            Dictionary<string, List<string>>? result = default;
+            if (string.IsNullOrEmpty(content))
+                return result;
 
             try
             {
-                result = JsonSerializer.Deserialize<Dictionary<string, List<string>>>(content, options?.JsonOptions ?? JsonHttpContent.DefaultJsonOptions);
+                if (v2)
+                {
+                    result = JsonSerializer.Deserialize<Dictionary<string, List<HttpResponseErrorModel>>>(content, options?.JsonOptions ?? JsonHttpContent.DefaultJsonOptions);
+                }
+                else
+                {
+                    var _result = JsonSerializer.Deserialize<Dictionary<string, List<string>>>(content, options?.JsonOptions ?? JsonHttpContent.DefaultJsonOptions);
+
+                    if (_result != null)
+                        result = _result.ToDictionary(
+                            x => x.Key,
+                            x => new List<HttpResponseErrorModel>(
+                                x.Value.Select(v => new HttpResponseErrorModel(v, Array.Empty<string>()))
+                                )
+                            );
+                }
+
             }
             catch (JsonException)
             {
-
             }
 
-            if (result == null)
-                return new Dictionary<string, List<string>>();
+            if (result == default)
+                return result;
 
             foreach (var key in result)
             {
@@ -156,17 +175,17 @@ namespace NSL.HttpClient
                 {
                     var val = key.Value[i];
 
-                    if (val.StartsWith('{') && val.EndsWith('}') && val.IndexOf("...") == 1)
+                    if (val.Message.StartsWith('{') && val.Message.EndsWith('}') && val.Message.IndexOf("...") == 1)
                     {
-                        if (options?.ErrorPrefix == default)
-                        {
-                            val = $"{{{val.Substring(4)}";
-                        }
-                        else
-                            val = $"{{{string.Join('_', options.ErrorPrefix, val.Substring(4))}";
+                        val.Message = val.Message.Substring(4);
+
+                        if (options?.ErrorPrefix != default)
+                            val.Message = string.Join('_', options.ErrorPrefix, val.Message);
+
+                        val.Message = $"{{{val.Message}}}";
 
                         if (options != null)
-                            key.Value[i] = await options.ProcessMessage(val);
+                            await options.ProcessMessageAsync(val);
                     }
                 }
             }

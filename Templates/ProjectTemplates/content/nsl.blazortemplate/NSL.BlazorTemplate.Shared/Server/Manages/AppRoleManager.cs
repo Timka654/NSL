@@ -2,9 +2,9 @@
 
 namespace NSL.BlazorTemplate.Shared.Server.Manages
 {
-    public class AppRoleManager : RoleManager<IdentityRole>
+    public class AppRoleManager : RoleManager<IdentityRole<Guid>>
     {
-        public AppRoleManager(IRoleStore<IdentityRole> store, IEnumerable<IRoleValidator<IdentityRole>> roleValidators, ILookupNormalizer keyNormalizer, IdentityErrorDescriber errors, ILogger<RoleManager<IdentityRole>> logger) : base(store, roleValidators, keyNormalizer, errors, logger)
+        public AppRoleManager(IRoleStore<IdentityRole<Guid>> store, IEnumerable<IRoleValidator<IdentityRole<Guid>>> roleValidators, ILookupNormalizer keyNormalizer, IdentityErrorDescriber errors, ILogger<RoleManager<IdentityRole<Guid>>> logger) : base(store, roleValidators, keyNormalizer, errors, logger)
         {
         }
     }

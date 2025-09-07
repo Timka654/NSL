@@ -8,6 +8,7 @@ using NSL.BlazorTemplate.Shared.Controllers;
 namespace NSL.BlazorTemplate.Client.Services
 {
     [HttpEndPointImplementGenerate(typeof(IIdentityController))]
+    [HttpEndPointImplementGenerate(typeof(IUserController))]
     public partial class HubIdentityService(IdentityStateProvider identityStateProvider
         , IHttpClientFactory httpClientFactory
         , ILocalStorageService localStorage) : IdentityJWTService(identityStateProvider)

@@ -24,12 +24,15 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <PackageReference Include="NSL.Generators.FillTypeGenerator" Version="2025.3.26.451" />
-	  <PackageReference Include="NSL.Generators.FillTypeGenerator.Shared" Version="2025.3.26.451" />
-	  <PackageReference Include="NSL.Generators.HttpEndPointGenerator.Shared" Version="2025.3.26.451" />
-	  <PackageReference Include="NSL.Generators.SelectTypeGenerator.Shared" Version="2025.3.26.451" />
-	  <PackageReference Include="NSL.HttpClient" Version="2025.3.26.451" />
-	  <PackageReference Include="NSL.Refactoring.Shared" Version="2025.3.26.451">
+	  <PackageReference Include="NSL.Generators.FillTypeGenerator" Version="2025.8.29.1912">
+	    <PrivateAssets>all</PrivateAssets>
+	    <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+	  </PackageReference>
+	  <PackageReference Include="NSL.Generators.FillTypeGenerator.Shared" Version="2025.8.29.1912" />
+	  <PackageReference Include="NSL.Generators.HttpEndPointGenerator.Shared" Version="2025.8.29.1912" />
+	  <PackageReference Include="NSL.Generators.SelectTypeGenerator.Shared" Version="2025.8.29.1912" />
+	  <PackageReference Include="NSL.HttpClient" Version="2025.8.29.1912" />
+	  <PackageReference Include="NSL.Refactoring.FastAction" Version="2025.8.29.1912">
 	    <PrivateAssets>all</PrivateAssets>
 	    <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 	  </PackageReference>

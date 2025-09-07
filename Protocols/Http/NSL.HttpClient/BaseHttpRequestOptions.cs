@@ -42,7 +42,7 @@ namespace NSL.HttpClient
 
         public JsonSerializerOptions JsonOptions { get; set; }
 
-        public Func<string, Task<string>> ProcessMessage { get; set; } = v => Task.FromResult(v);
+        public Func<HttpResponseErrorModel, Task> ProcessMessageAsync { get; set; } = v => Task.CompletedTask;
 
         public ExceptionHandleDelegate ExceptionHandle { get; set; } = BaseExceptionHandle;
 

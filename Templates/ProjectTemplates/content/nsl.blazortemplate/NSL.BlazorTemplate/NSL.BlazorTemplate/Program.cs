@@ -13,7 +13,7 @@ using NSL.ASPNET.Mvc.Route;
 
 namespace NSL.BlazorTemplate
 {
-    public class Program
+    public partial class Program
     {
         public static async Task Main(string[] args)
         {
@@ -27,40 +27,9 @@ namespace NSL.BlazorTemplate
 
             builder.AddNSLModelStateFilter();
 
-            var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
-            builder.Services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseNpgsql(connectionString));
-            builder.Services.AddDatabaseDeveloperPageExceptionFilter();
-            
+            AddDatabase(builder.Services, builder.Configuration);
 
-            builder.Services.AddAPIBaseIdentity<UserModel, IdentityRole>()
-                .AddEntityFrameworkStores<ApplicationDbContext>()
-                .AddSignInManager<AppSignInManager>()
-                .AddUserManager<AppUserManager>()
-                .AddRoleManager<AppRoleManager>();
-
-            builder.Services.AddDefaultAuthenticationForAPIBaseJWT()
-                .AddAPIBaseJWTBearer(builder.Configuration);
-
-            builder.Services.ConfigureApplicationCookie(c =>
-            {
-                c.Events = new Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationEvents()
-                {
-                    OnRedirectToAccessDenied = c =>
-                    {
-                        c.Response.StatusCode = (int)HttpStatusCode.Forbidden;
-
-                        return Task.CompletedTask;
-                    },
-                    OnRedirectToLogin = c =>
-                    {
-                        c.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
-
-                        return Task.CompletedTask;
-                    }
-                };
-            });
-
+            AddIdentity(builder.Services, builder.Configuration);
 
             var app = builder.Build();
 
@@ -78,8 +47,9 @@ namespace NSL.BlazorTemplate
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
-
+#if DEBUG
             app.UseHttpsRedirection();
+#endif
 
             app.UseAuth();
 

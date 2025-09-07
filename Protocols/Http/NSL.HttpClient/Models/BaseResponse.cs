@@ -7,7 +7,7 @@ namespace NSL.HttpClient.Models
     public class BaseResponse
     {
         [JsonIgnore]
-        public Dictionary<string, List<string>> Errors { get; set; } = new Dictionary<string, List<string>>();
+        public Dictionary<string, List<HttpResponseErrorModel>> Errors { get; set; } = new Dictionary<string, List<HttpResponseErrorModel>>();
 
         [JsonIgnore]
         public HttpStatusCode StatusCode { get; set; }

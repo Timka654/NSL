@@ -155,12 +155,12 @@ namespace NSL.Database.EntityFramework.Filter.Host
 
         private static Expression ContainsCollection(Expression listOfNames, FilterPropertyViewModel property)
         {
-                    if (property.ValueBlock == null)
+            if (property.ValueBlock == null)
                 return BuildBinaryExpressions(listOfNames, property, (nameProperty, nameSearch) =>
                 {
-                        var startsWithMethod = arrayContainsMethodInfo.MakeGenericMethod(GetPropertyType(nameProperty));
-                        var startWithCall = Expression.Call(null, startsWithMethod, new Expression[] { nameProperty, nameSearch });
-                        return Expression.Equal(startWithCall, trueExpression);
+                    var startsWithMethod = arrayContainsMethodInfo.MakeGenericMethod(GetPropertyType(nameProperty));
+                    var startWithCall = Expression.Call(null, startsWithMethod, new Expression[] { nameProperty, nameSearch });
+                    return Expression.Equal(startWithCall, trueExpression);
 
 
                 });
@@ -298,22 +298,29 @@ namespace NSL.Database.EntityFramework.Filter.Host
 
         public static MemberExpression GetPropertyExp(Expression t, string path, bool @null)
         {
-            var props = path.Split('.');
-
-            var exp = Expression.Property(t, props[0]);
-
-            if (props.Length > 1)
+            try
             {
-                for (int i = 1; i < props.Length; i++)
+                var props = path.Split('.');
+
+                var exp = Expression.Property(t, props[0]);
+
+                if (props.Length > 1)
                 {
-                    exp = Expression.Property(exp, props[i]);
+                    for (int i = 1; i < props.Length; i++)
+                    {
+                        exp = Expression.Property(exp, props[i]);
+                    }
                 }
+
+                if (IsNullable(exp.Type) && !@null)
+                    exp = Expression.Property(exp, "Value");
+
+                return exp;
             }
-
-            if (IsNullable(exp.Type) && !@null)
-                exp = Expression.Property(exp, "Value");
-
-            return exp;
+            catch (ArgumentException)
+            {
+                throw new InvalidPropertyPathException(path, typeof(T));
+            }
         }
 
         private static object NormalizePropertyValue(Type type, FilterPropertyViewModel property)
@@ -323,14 +330,21 @@ namespace NSL.Database.EntityFramework.Filter.Host
 
             if (type == typeof(string))
                 return property.Value;
+            try
+            {
 
-            if (type.BaseType?.IsAssignableTo(typeof(Enum)) == true)
-                return Enum.Parse(type, property.Value);
+                if (type.BaseType?.IsAssignableTo(typeof(Enum)) == true)
+                    return Enum.Parse(type, property.Value);
 
-            if (type.IsAssignableTo(typeof(Guid)))
-                return Guid.Parse(property.Value);
+                if (type.IsAssignableTo(typeof(Guid)))
+                    return Guid.Parse(property.Value);
 
-            return Convert.ChangeType(property.Value, type);
+                return Convert.ChangeType(property.Value, type);
+            }
+            catch (Exception)
+            {
+                throw new InvalidPropertyTypeException(property.PropertyPath, type, property.Value);
+            }
         }
 
         private static Type GetPropertyType(MemberExpression p)
@@ -354,6 +368,27 @@ namespace NSL.Database.EntityFramework.Filter.Host
             return t.IsGenericType
                 && t.GetGenericTypeDefinition() == typeof(Nullable<>);
         }
+    }
+
+    public class DbSetFilterException : Exception
+    {
+
+    }
+
+    public class InvalidPropertyPathException(string path, Type type) : DbSetFilterException
+    {
+        public string Path { get; } = path;
+
+        public Type Type { get; } = type;
+    }
+
+    public class InvalidPropertyTypeException(string path, Type type, string value) : DbSetFilterException
+    {
+        public string Path { get; } = path;
+
+        public Type Type { get; } = type;
+
+        public string Value { get; } = value;
     }
 
 }

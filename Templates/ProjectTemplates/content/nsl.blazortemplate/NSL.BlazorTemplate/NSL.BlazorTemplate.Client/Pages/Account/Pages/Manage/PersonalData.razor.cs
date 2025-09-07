@@ -1,5 +1,3 @@
-using Microsoft.AspNetCore.Components;
-
 namespace NSL.BlazorTemplate.Client.Pages.Account.Pages.Manage
 {
     public partial class PersonalData

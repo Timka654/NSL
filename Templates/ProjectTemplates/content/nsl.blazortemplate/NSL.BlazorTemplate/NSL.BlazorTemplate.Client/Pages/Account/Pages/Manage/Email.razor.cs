@@ -1,8 +1,7 @@
 using Microsoft.AspNetCore.Components;
+using NSL.BlazorTemplate.Client.Services;
 using NSL.BlazorTemplate.Shared.Models;
 using NSL.BlazorTemplate.Shared.Models.RequestModels;
-using System.Text;
-using System.Text.Encodings.Web;
 
 namespace NSL.BlazorTemplate.Client.Pages.Account.Pages.Manage
 {
@@ -10,41 +9,41 @@ namespace NSL.BlazorTemplate.Client.Pages.Account.Pages.Manage
     {
         private string? message;
         private UserModel user = default!;
-        private string? email;
-        private bool isEmailConfirmed;
-
-        //[CascadingParameter]
-        //private HttpContext HttpContext { get; set; } = default!;
 
         private IdentityEmailRequestModel Input { get; set; } = new();
 
-        //protected override async Task OnInitializedAsync()
-        //{
-        //    user = await UserAccessor.GetRequiredUserAsync(HttpContext);
-        //    email = await UserManager.GetEmailAsync(user);
-        //    isEmailConfirmed = await UserManager.IsEmailConfirmedAsync(user);
+        [Inject] HubIdentityService IdentityService { get; set; } = default!;
 
-        //    Input.NewEmail ??= email;
-        //}
+        protected override async Task OnInitializedAsync()
+        {
+            var response = await IdentityService.UserDetailsPostRequest();
+
+            if (!response.IsSuccess)
+                return;
+
+            user = response.Data;
+        }
 
         private async Task OnValidSubmitAsync()
         {
-            //if (Input.NewEmail is null || Input.NewEmail == email)
-            //{
-            //    message = "Your email is unchanged.";
-            //    return;
-            //}
+            if (Input.NewEmail is null || Input.NewEmail == user.Email)
+            {
+                message = "Your email is unchanged.";
+                return;
+            }
 
-            //var userId = await UserManager.GetUserIdAsync(user);
-            //var code = await UserManager.GenerateChangeEmailTokenAsync(user, Input.NewEmail);
-            //code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
-            //var callbackUrl = NavigationManager.GetUriWithQueryParameters(
-            //    NavigationManager.ToAbsoluteUri("Account/ConfirmEmailChange").AbsoluteUri,
-            //    new Dictionary<string, object?> { ["userId"] = userId, ["email"] = Input.NewEmail, ["code"] = code });
+            var response = await IdentityService.UserChangeEmailPostRequest(Input);
 
-            //await EmailSender.SendConfirmationLinkAsync(user, Input.NewEmail, HtmlEncoder.Default.Encode(callbackUrl));
+            if (!response.IsSuccess)
+                return;
 
-            //message = "Confirmation link to change email sent. Please check your email.";
+            user.Email = Input.NewEmail;
+
+            Input = new IdentityEmailRequestModel();
+
+            message = "Confirmation link to change email sent. Please check your email.";
+
+            StateHasChanged();
         }
 
         private async Task OnSendEmailVerificationAsync()

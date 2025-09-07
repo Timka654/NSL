@@ -1,0 +1,9 @@
+.vs/
+bin/
+obj/
+*.pubxml.user
+/publish/*
+*.csproj.user
+*.html.update
+appsettings.Development.json
+launchSettings.json

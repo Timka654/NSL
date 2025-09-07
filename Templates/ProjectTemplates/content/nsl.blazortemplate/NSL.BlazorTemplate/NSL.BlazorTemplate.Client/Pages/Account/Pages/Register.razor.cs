@@ -32,7 +32,7 @@ namespace NSL.BlazorTemplate.Client.Pages.Account.Pages
                 NavigationManager.NavigateTo(ReturnUrl ?? string.Empty);
             }
             else if (response.IsBadRequest)
-                identityErrors = response.Errors.SelectMany(x => x.Value).Select(x => new IdentityError() { Description = x }).ToArray();
+                identityErrors = response.Errors.SelectMany(x => x.Value.Select(y => y.Message)).Select(x => new IdentityError() { Description = x }).ToArray();
 
 
             //var user = CreateUser();
