@@ -237,7 +237,7 @@ namespace NSL.Generators.Utils
             else if (classDecl is StructDeclarationSyntax)
                 type = "struct";
 
-            declTypeLine = $"{classDecl.GetClassFullModifier()} {type} {classDecl.GetClassName()}{declTypeLine}";
+            declTypeLine = $"{classDecl.GetClassFullModifier().Replace("abstract ", string.Empty)} {type} {classDecl.GetClassName()}{declTypeLine}";
 
 
             if (@namespace != null)
@@ -313,7 +313,7 @@ namespace NSL.Generators.Utils
             else if (classDecl is StructDeclarationSyntax)
                 type = "struct";
 
-            declTypeLine = $"{classDecl.GetClassFullModifier(new string[] { "static" }, new string[] { "partial" })} {type} {className}{declTypeLine}";
+            declTypeLine = $"{classDecl.GetClassFullModifier(new string[] { "static" }, new string[] { "partial", "abstract" })} {type} {className}{declTypeLine}";
 
             if (@namespace != null)
             {

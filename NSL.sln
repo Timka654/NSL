@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.12.35521.163
+VisualStudioVersion = 17.14.36511.14 d17.14
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NSL.ASPNET", "ASPNET\NSL.ASPNET\NSL.ASPNET.csproj", "{01E1ECBB-0FC6-47B5-8F20-D4FC73EE06C7}"
 EndProject
@@ -499,6 +499,10 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Templates", "Templates", "{523AF364-BFC7-45B7-B21A-A7925C5028F8}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NSL.Refactoring.FastAction.UI", "Generators\Refactoring\NSL.Refactoring.FastAction\NSL.Refactoring.FastAction.UI\NSL.Refactoring.FastAction.UI.csproj", "{5638A57F-F8A6-434E-BB95-6222E8202651}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NSL.Generators.SelectTypeGenerator.Vsix", "Generators\NSL.Generators.SelectTypeGenerator\NSL.Generators.SelectTypeGenerator.Vsix\NSL.Generators.SelectTypeGenerator.Vsix.csproj", "{20090068-9BE5-4DEA-9285-E1BD7288B5D6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NSL.Generators.FillTypeGenerator.Vsix", "Generators\NSL.Generators.FillTypeGenerator\NSL.Generators.FillTypeGenerator.Vsix\NSL.Generators.FillTypeGenerator.Vsix.csproj", "{94B9671B-DA6E-41DB-B810-1B381B382B74}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -4959,6 +4963,62 @@ Global
 		{5638A57F-F8A6-434E-BB95-6222E8202651}.UnityDebug|x64.Build.0 = Release|Any CPU
 		{5638A57F-F8A6-434E-BB95-6222E8202651}.UnityDebug|x86.ActiveCfg = Release|Any CPU
 		{5638A57F-F8A6-434E-BB95-6222E8202651}.UnityDebug|x86.Build.0 = Release|Any CPU
+		{20090068-9BE5-4DEA-9285-E1BD7288B5D6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{20090068-9BE5-4DEA-9285-E1BD7288B5D6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{20090068-9BE5-4DEA-9285-E1BD7288B5D6}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{20090068-9BE5-4DEA-9285-E1BD7288B5D6}.Debug|x64.Build.0 = Debug|Any CPU
+		{20090068-9BE5-4DEA-9285-E1BD7288B5D6}.Debug|x86.ActiveCfg = Debug|x86
+		{20090068-9BE5-4DEA-9285-E1BD7288B5D6}.Debug|x86.Build.0 = Debug|x86
+		{20090068-9BE5-4DEA-9285-E1BD7288B5D6}.DebugExamples|Any CPU.ActiveCfg = UnityDebug|Any CPU
+		{20090068-9BE5-4DEA-9285-E1BD7288B5D6}.DebugExamples|Any CPU.Build.0 = UnityDebug|Any CPU
+		{20090068-9BE5-4DEA-9285-E1BD7288B5D6}.DebugExamples|x64.ActiveCfg = UnityDebug|Any CPU
+		{20090068-9BE5-4DEA-9285-E1BD7288B5D6}.DebugExamples|x64.Build.0 = UnityDebug|Any CPU
+		{20090068-9BE5-4DEA-9285-E1BD7288B5D6}.DebugExamples|x86.ActiveCfg = UnityDebug|x86
+		{20090068-9BE5-4DEA-9285-E1BD7288B5D6}.DebugExamples|x86.Build.0 = UnityDebug|x86
+		{20090068-9BE5-4DEA-9285-E1BD7288B5D6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{20090068-9BE5-4DEA-9285-E1BD7288B5D6}.Release|x64.ActiveCfg = Release|Any CPU
+		{20090068-9BE5-4DEA-9285-E1BD7288B5D6}.Release|x64.Build.0 = Release|Any CPU
+		{20090068-9BE5-4DEA-9285-E1BD7288B5D6}.Release|x86.ActiveCfg = Release|x86
+		{20090068-9BE5-4DEA-9285-E1BD7288B5D6}.Release|x86.Build.0 = Release|x86
+		{20090068-9BE5-4DEA-9285-E1BD7288B5D6}.Unity|Any CPU.ActiveCfg = UnityDebug|Any CPU
+		{20090068-9BE5-4DEA-9285-E1BD7288B5D6}.Unity|x64.ActiveCfg = UnityDebug|Any CPU
+		{20090068-9BE5-4DEA-9285-E1BD7288B5D6}.Unity|x64.Build.0 = UnityDebug|Any CPU
+		{20090068-9BE5-4DEA-9285-E1BD7288B5D6}.Unity|x86.ActiveCfg = UnityDebug|x86
+		{20090068-9BE5-4DEA-9285-E1BD7288B5D6}.Unity|x86.Build.0 = UnityDebug|x86
+		{20090068-9BE5-4DEA-9285-E1BD7288B5D6}.UnityDebug|Any CPU.ActiveCfg = UnityDebug|Any CPU
+		{20090068-9BE5-4DEA-9285-E1BD7288B5D6}.UnityDebug|Any CPU.Build.0 = UnityDebug|Any CPU
+		{20090068-9BE5-4DEA-9285-E1BD7288B5D6}.UnityDebug|x64.ActiveCfg = UnityDebug|Any CPU
+		{20090068-9BE5-4DEA-9285-E1BD7288B5D6}.UnityDebug|x64.Build.0 = UnityDebug|Any CPU
+		{20090068-9BE5-4DEA-9285-E1BD7288B5D6}.UnityDebug|x86.ActiveCfg = UnityDebug|x86
+		{20090068-9BE5-4DEA-9285-E1BD7288B5D6}.UnityDebug|x86.Build.0 = UnityDebug|x86
+		{94B9671B-DA6E-41DB-B810-1B381B382B74}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{94B9671B-DA6E-41DB-B810-1B381B382B74}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{94B9671B-DA6E-41DB-B810-1B381B382B74}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{94B9671B-DA6E-41DB-B810-1B381B382B74}.Debug|x64.Build.0 = Debug|Any CPU
+		{94B9671B-DA6E-41DB-B810-1B381B382B74}.Debug|x86.ActiveCfg = Debug|x86
+		{94B9671B-DA6E-41DB-B810-1B381B382B74}.Debug|x86.Build.0 = Debug|x86
+		{94B9671B-DA6E-41DB-B810-1B381B382B74}.DebugExamples|Any CPU.ActiveCfg = UnityDebug|Any CPU
+		{94B9671B-DA6E-41DB-B810-1B381B382B74}.DebugExamples|Any CPU.Build.0 = UnityDebug|Any CPU
+		{94B9671B-DA6E-41DB-B810-1B381B382B74}.DebugExamples|x64.ActiveCfg = UnityDebug|Any CPU
+		{94B9671B-DA6E-41DB-B810-1B381B382B74}.DebugExamples|x64.Build.0 = UnityDebug|Any CPU
+		{94B9671B-DA6E-41DB-B810-1B381B382B74}.DebugExamples|x86.ActiveCfg = UnityDebug|x86
+		{94B9671B-DA6E-41DB-B810-1B381B382B74}.DebugExamples|x86.Build.0 = UnityDebug|x86
+		{94B9671B-DA6E-41DB-B810-1B381B382B74}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{94B9671B-DA6E-41DB-B810-1B381B382B74}.Release|x64.ActiveCfg = Release|Any CPU
+		{94B9671B-DA6E-41DB-B810-1B381B382B74}.Release|x64.Build.0 = Release|Any CPU
+		{94B9671B-DA6E-41DB-B810-1B381B382B74}.Release|x86.ActiveCfg = Release|x86
+		{94B9671B-DA6E-41DB-B810-1B381B382B74}.Release|x86.Build.0 = Release|x86
+		{94B9671B-DA6E-41DB-B810-1B381B382B74}.Unity|Any CPU.ActiveCfg = UnityDebug|Any CPU
+		{94B9671B-DA6E-41DB-B810-1B381B382B74}.Unity|x64.ActiveCfg = UnityDebug|Any CPU
+		{94B9671B-DA6E-41DB-B810-1B381B382B74}.Unity|x64.Build.0 = UnityDebug|Any CPU
+		{94B9671B-DA6E-41DB-B810-1B381B382B74}.Unity|x86.ActiveCfg = UnityDebug|x86
+		{94B9671B-DA6E-41DB-B810-1B381B382B74}.Unity|x86.Build.0 = UnityDebug|x86
+		{94B9671B-DA6E-41DB-B810-1B381B382B74}.UnityDebug|Any CPU.ActiveCfg = UnityDebug|Any CPU
+		{94B9671B-DA6E-41DB-B810-1B381B382B74}.UnityDebug|Any CPU.Build.0 = UnityDebug|Any CPU
+		{94B9671B-DA6E-41DB-B810-1B381B382B74}.UnityDebug|x64.ActiveCfg = UnityDebug|Any CPU
+		{94B9671B-DA6E-41DB-B810-1B381B382B74}.UnityDebug|x64.Build.0 = UnityDebug|Any CPU
+		{94B9671B-DA6E-41DB-B810-1B381B382B74}.UnityDebug|x86.ActiveCfg = UnityDebug|x86
+		{94B9671B-DA6E-41DB-B810-1B381B382B74}.UnityDebug|x86.Build.0 = UnityDebug|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -5204,6 +5264,8 @@ Global
 		{03D1BA23-7D84-432F-975E-842EE9D3CB98} = {CCF7D008-E5CF-4FFD-A547-F2C8DE3662D6}
 		{1447BD15-0D7C-4B84-A1C9-E84A71AB3344} = {CCF7D008-E5CF-4FFD-A547-F2C8DE3662D6}
 		{5638A57F-F8A6-434E-BB95-6222E8202651} = {8B9A18EF-9BC7-4780-9ADD-7BFF7D239341}
+		{20090068-9BE5-4DEA-9285-E1BD7288B5D6} = {38E2FD4B-82A6-43CD-B34E-273E4830C928}
+		{94B9671B-DA6E-41DB-B810-1B381B382B74} = {E1E6BC5D-CDF2-4A46-893A-CC49C5A7A748}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B748320C-B80D-4741-93CA-694BAC6BABE4}

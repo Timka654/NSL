@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<NSLProjectTypes>ASPTarget</NSLProjectTypes>
@@ -25,6 +25,11 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\..\..\..\Database\Filter\NSL.Database.EntityFramework.Filter.Host\NSL.Database.EntityFramework.Filter.Host.csproj" />
+		<ProjectReference Include="..\..\..\NSL.ASPNET.Mvc\NSL.ASPNET.Mvc.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<FrameworkReference Include="Microsoft.AspNetCore.App" />
 	</ItemGroup>
 
 </Project>

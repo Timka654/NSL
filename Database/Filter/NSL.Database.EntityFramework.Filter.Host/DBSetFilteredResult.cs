@@ -19,10 +19,18 @@ namespace NSL.Database.EntityFramework.Filter.Host
             => new EntityFilterResultModel<T> { Data = Data.ToArray(), Count = Count };
 
         public async Task<EntityFilterResultModel<T>> GetDataResultAsync(CancellationToken cancellationToken = default)
-            => new EntityFilterResultModel<T> { Data = await Data.ToArrayAsync(cancellationToken), Count = await CountQuery.LongCountAsync(cancellationToken) };
+            => new EntityFilterResultModel<T>
+            {
+                Data = await Data.ToArrayAsync(cancellationToken),
+                Count = await CountQuery.LongCountAsync(cancellationToken)
+            };
 
         public async Task<EntityFilterResultModel<TType>> GetDataResultAsync<TType>(IQueryable<TType> dataQuery, CancellationToken cancellationToken = default)
-            => new EntityFilterResultModel<TType> { Data = await dataQuery.ToArrayAsync(cancellationToken), Count = await CountQuery.LongCountAsync(cancellationToken) };
+            => new EntityFilterResultModel<TType>
+            {
+                Data = await dataQuery.ToArrayAsync(cancellationToken),
+                Count = await CountQuery.LongCountAsync(cancellationToken)
+            };
     }
 
 }

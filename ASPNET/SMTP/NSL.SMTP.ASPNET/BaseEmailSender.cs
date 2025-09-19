@@ -22,7 +22,16 @@ using System.Threading.Tasks;
 
 namespace NSL.SMTP.ASPNET
 {
-    public abstract class BaseEmailSender(IOptions<SMTPConfigurationModel> options, ILogger logger, IServiceProvider serviceProvider) : IEmailSender, IHostedService
+    public abstract class BaseEmailSender : IEmailSender, IHostedService
+    {
+        public abstract Task SendEmailAsync(string email, string subject, string htmlMessage);
+
+        public abstract Task StartAsync(CancellationToken cancellationToken);
+
+        public abstract Task StopAsync(CancellationToken cancellationToken);
+    }
+
+    public abstract class BaseEmailSender<TData>(IOptions<SMTPConfigurationModel> options, ILogger logger, IServiceProvider serviceProvider) : BaseEmailSender
     {
         static SMTPByteArrayComparer trapComparer = new SMTPByteArrayComparer();
 
@@ -40,7 +49,7 @@ namespace NSL.SMTP.ASPNET
         ConcurrentDictionary<byte[], DateTime> trapCollection = new(trapComparer);
         DateTime lastTrapClear = DateTime.UtcNow;
 
-        protected record SendMailRequest(string email, string subject, string htmlMessage, Guid? id, string uid, byte[] hash, TimeSpan? delay);
+        protected record SendMailRequest(string email, string subject, string htmlMessage, Guid? id, string uid, byte[] hash, TimeSpan? delay, TData data);
 
         DateTime now = DateTime.UtcNow;
 
@@ -60,7 +69,8 @@ namespace NSL.SMTP.ASPNET
             , string htmlMessage
             , string uid
             , TimeSpan? delay = null
-            , byte[] hash = default)
+            , byte[] hash = default
+            , TData data = default(TData))
         {
             if (Options.Enabled)
             {
@@ -83,7 +93,8 @@ namespace NSL.SMTP.ASPNET
                     default,
                     uid,
                     hash,
-                    delay), CancellationToken.None);
+                    delay,
+                    data), CancellationToken.None);
 
                 return true;
             }
@@ -91,16 +102,16 @@ namespace NSL.SMTP.ASPNET
             return false;
         }
 
-        public async Task SendEmailAsync(string email, string subject, string htmlMessage)
+        public override async Task SendEmailAsync(string email, string subject, string htmlMessage)
         {
             if (Options.Enabled)
-                await AddAction(new SendMailRequest(email, subject, htmlMessage, default, default, default, default), CancellationToken.None);
+                await AddAction(new SendMailRequest(email, subject, htmlMessage, default, default, default, default, default), CancellationToken.None);
         }
 
         protected ValueTask AddAction(SendMailRequest data, CancellationToken cancellationToken)
-        => channel.AddAsync(new DeferredSendMailAction(t => channelProcessing(data, t), data), cancellationToken);
+        => channel.AddAsync(new DeferredSendMailAction<TData>(t => channelProcessing(data, t), data), cancellationToken);
 
-        DeferredChannel<DeferredSendMailAction> channel = new DeferredChannel<DeferredSendMailAction>();
+        DeferredChannel<DeferredSendMailAction<TData>> channel = new DeferredChannel<DeferredSendMailAction<TData>>();
 
 
         async Task channelProcessing(SendMailRequest current, CancellationToken cancellationToken)
@@ -208,7 +219,7 @@ namespace NSL.SMTP.ASPNET
         bool haveStored = false;
         IRestoreDataSource? restoreDataSource = default;
 
-        public async Task StartAsync(CancellationToken cancellationToken)
+        public override async Task StartAsync(CancellationToken cancellationToken)
         {
             restoreDataSource = TryGetRestoreDataSource();
 
@@ -230,7 +241,7 @@ namespace NSL.SMTP.ASPNET
             channel.RunProcessing();
         }
 
-        public async Task StopAsync(CancellationToken cancellationToken)
+        public override async Task StopAsync(CancellationToken cancellationToken)
         {
             await channel.DisposeAsync(true);
 
@@ -256,14 +267,14 @@ namespace NSL.SMTP.ASPNET
         protected virtual IRestoreDataSource? TryGetRestoreDataSource()
             => serviceProvider.GetService<IRestoreDataSource>();
 
-        class DeferredSendMailAction : DeferredAsyncAction
+        class DeferredSendMailAction<TData> : DeferredAsyncAction
         {
-            public DeferredSendMailAction(Func<CancellationToken, Task> action, BaseEmailSender.SendMailRequest data) : base(action)
+            public DeferredSendMailAction(Func<CancellationToken, Task> action, BaseEmailSender<TData>.SendMailRequest data) : base(action)
             {
                 Data = data;
             }
 
-            public BaseEmailSender.SendMailRequest Data { get; }
+            public BaseEmailSender<TData>.SendMailRequest Data { get; }
         }
     }
 }

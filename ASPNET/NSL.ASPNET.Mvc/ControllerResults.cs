@@ -18,6 +18,9 @@ namespace NSL.ASPNET.Mvc
         public static IActionResult Ok<TResult>(TResult value)
             => new OkObjectResult(value);
 
+        public static IActionResult Ok<TResult>(object value)
+            => new OkObjectResult(value);
+
         public static IActionResult NotFound()
             => new NotFoundResult();
 
@@ -100,10 +103,10 @@ namespace NSL.ASPNET.Mvc
 
 
         public static IActionResult IdResponse(object id)
-            => Ok(new { id });
+            => Mvc.IdResponse.Ok(id);
 
         public static IActionResult DataResponse(object data)
-            => Ok(new { Data = data });
+            => Mvc.DataResponse.Ok(data);
 
         public static IActionResult NotFoundResponse(ModelStateDictionary modelState, string errorMessage)
         {

@@ -10,6 +10,8 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
+using System.Security.Claims;
 using System.Text;
 
 namespace NSL.Generators.FillTypeGenerator
@@ -32,39 +34,21 @@ namespace NSL.Generators.FillTypeGenerator
 
         private void ProcessFillTypes(SourceProductionContext context, GeneratorSyntaxContext item)
         {
-            //GenDebug.Break();
-            //var stopwatch = Stopwatch.StartNew();
+            var @class = (TypeDeclarationSyntax)item.Node;
 
-            //foreach (var item in types)
-            //{
-                var @class = (TypeDeclarationSyntax)item.Node;
-
-                try
-                {
-                    ProcessFillToType(context, item, @class);
-                }
-                catch (Exception ex)
-                {
-                    context.ShowFillTypeDiagnostics($"NSLFT002", $"Error - {ex} on type {@class.Identifier.Text}", DiagnosticSeverity.Error, @class.GetLocation());
-                }
-            //}
-
-            //stopwatch.Stop();
-
-            //context.ReportDiagnostic(Diagnostic.Create(
-            //    new DiagnosticDescriptor(
-            //        id: "NSLFT666",
-            //        title: "Generator Performance",
-            //        messageFormat: $"[{nameof(FillTypeGenerator)}] executed in {stopwatch.ElapsedMilliseconds} ms.",
-            //        category: "Performance",
-            //        DiagnosticSeverity.Info,
-            //        isEnabledByDefault: true),
-            //    Location.None));
+            try
+            {
+                ProcessFillType(context, item, @class);
+            }
+            catch (Exception ex)
+            {
+                context.ShowFillTypeDiagnostics($"NSLFT002", $"Error - {ex} on type {@class.Identifier.Text}", DiagnosticSeverity.Error, @class.GetLocation());
+            }
         }
 
         private static string[] requiredUsings = new string[] { "System.Linq" };
 
-        private void ProcessFillToType(SourceProductionContext sourceContext, GeneratorSyntaxContext context, TypeDeclarationSyntax type)
+        private void ProcessFillType(SourceProductionContext sourceContext, GeneratorSyntaxContext context, TypeDeclarationSyntax type)
         {
             if (!type.HasPartialModifier())
             {
@@ -72,9 +56,6 @@ namespace NSL.Generators.FillTypeGenerator
 
                 return;
             }
-            //GenDebug.Break();
-
-            //Debug.WriteLine($"FillTypeGenerator -> {typeClass.Identifier.Text}");
 
             var typeSem = context.SemanticModel;
 
@@ -94,9 +75,6 @@ namespace NSL.Generators.FillTypeGenerator
                 .Where(x => x.GetAttributeFullName().Equals(FillTypeGenerateAttributeFullName))
                 .ToArray();
 
-                //if (attrbs.Any(x => !x.ArgumentList.Arguments.Any()))
-                //    GenDebug.Break();
-
                 var attrbsGrouped = attrbs.GroupBy(x => x.ArgumentList.Arguments.First().GetAttributeTypeParameterValueSymbol(typeSem), TypeSymbolEqualityComparer.Instance);
 
                 foreach (var attr in attrbsGrouped)
@@ -109,9 +87,6 @@ namespace NSL.Generators.FillTypeGenerator
                 .Where(x => x.GetAttributeFullName().Equals(FillTypeFromGenerateAttributeFullName))
                 .ToArray();
 
-                //if (attrbs.Any(x => !x.ArgumentList.Arguments.Any()))
-                //    GenDebug.Break();
-
                 attrbsGrouped = attrbs.GroupBy(x => x.ArgumentList.Arguments.First().GetAttributeTypeParameterValueSymbol(typeSem), TypeSymbolEqualityComparer.Instance);
 
 
@@ -122,30 +97,19 @@ namespace NSL.Generators.FillTypeGenerator
 
             }, requiredUsings);
 
-            // Visual studio have lag(or ...) cannot show changes sometime
-            //#if DEVELOP
-#pragma warning disable RS1035 // Do not use APIs banned for analyzers
-            //System.IO.File.WriteAllText($@"C:\Work\temp\{typeClass.GetTypeClassName()}.filltype.cs", classBuilder.ToString());
-#pragma warning restore RS1035 // Do not use APIs banned for analyzers
-            //#endif
-
-            //GenDebug.Break();
-
             string name = type.GetTypeClassName();
 
             if (type.TypeParameterList?.Parameters.Any() == true)
             {
                 name += "_";
-                name +=  string.Join("_", type.TypeParameterList.Parameters.Select(x => x.Identifier.Text));
-            
+                name += string.Join("_", type.TypeParameterList.Parameters.Select(x => x.Identifier.Text));
+
             }
             sourceContext.AddSource($"{name}.filltype.cs", codeBuilder.ToString());
         }
 
-        private void ProcessAttribute(SourceProductionContext sourceContext, GeneratorSyntaxContext context, CodeBuilder classBuilder, IGrouping<ITypeSymbol, AttributeSyntax> attr, ITypeSymbol typeSymb, SemanticModel typeSem, bool dir)
+        private void ProcessAttribute(SourceProductionContext sourceContext, GeneratorSyntaxContext context, CodeBuilder classBuilder, IGrouping<ITypeSymbol, AttributeSyntax> attr, ITypeSymbol typeSymb, SemanticModel typeSem, bool to)
         {
-            var haveAll = attr.Any(x => x.ArgumentList.Arguments.Count() == 1);
-
             var models = attr.SelectMany(x => x.ArgumentList.Arguments
                 .Skip(1)
                 .Select(n => n.GetAttributeParameterValue<string>(typeSem)))
@@ -153,56 +117,72 @@ namespace NSL.Generators.FillTypeGenerator
             .Select(x => x.Key)
             .ToArray();
 
-            if (models.Contains(null))
-                haveAll = false;
+            if (!models.Any()) models = new string[] { null };
 
             var toType = attr.Key;
 
-            //if (!toType.DeclaringSyntaxReferences.Any())
-            //    GenDebug.Break();
+            bool isInternal = (toType.DeclaringSyntaxReferences.Any(x => (x?.GetSyntax() as TypeDeclarationSyntax)?.HasInternalModifier() == true));
 
-            bool isInternal = (toType.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax() as TypeDeclarationSyntax)?.HasInternalModifier() ?? false;
+            var methods = new List<string>();
 
-            if (haveAll)
-                classBuilder.AppendLine(CreateMethod(sourceContext, context, isInternal, typeSymb, toType, null, dir).ToString());
-
-            if (models.Any())
+            foreach (var item in models)
             {
-                var methods = new List<string>();
-
-                foreach (var item in models)
+                FillTypeGenerateContext fillcontext = new FillTypeGenerateContext()
                 {
-                    methods.Add(CreateMethod(sourceContext, context, isInternal, typeSymb, toType, item, dir).ToString());
-                }
+                    SourceContext = sourceContext,
+                    Context = context
+                };
+
+                fillcontext.Next(new FillTypeGenerateItemContext()
+                {
+                    FromType = to ? typeSymb : toType,
+                    ToType = to ? toType : typeSymb,
+                    Model = item,
+                    To = to,
+                    SetPath = to ? "fillTo" : null,
+                    GetPath = to ? null : "fillFrom"
+                });
+
+                methods.Add(CreateMethod(fillcontext, isInternal).ToString());
+            }
 
 #pragma warning disable RS1035 // Do not use APIs banned for analyzers
-                classBuilder.AppendLine(string.Join(Environment.NewLine + Environment.NewLine, methods));
+            classBuilder.AppendLine(string.Join(Environment.NewLine + Environment.NewLine, methods));
 #pragma warning restore RS1035 // Do not use APIs banned for analyzers declaration.HasInternalModifier()
-            }
+
         }
 
-        private CodeBuilder CreateMethod(SourceProductionContext sourceContext, GeneratorSyntaxContext context, bool @internal, ITypeSymbol fromType, ITypeSymbol toType, string model, bool dir)
+        private CodeBuilder CreateMethod(FillTypeGenerateContext context, bool @internal)
         {
+            var citem = context.Current;
+
             CodeBuilder methodBuilder = new CodeBuilder();
 
-
-            methodBuilder.AppendSummary(b =>
+            if (citem.To)
             {
-                b.AppendSummaryLine($"Generate for fill <see cref=\"{fromType.GetTypeSeeCRef()}\"/> to  <see cref=\"{toType.GetTypeSeeCRef()}\"/>");
-            });
+                methodBuilder.AppendSummary(b =>
+                {
+                    b.AppendSummaryLine($"Generate for fill <see cref=\"{citem.FromType.GetTypeSeeCRef()}\"/> to  <see cref=\"{citem.ToType.GetTypeSeeCRef()}\"/>");
+                });
 
-            methodBuilder.AppendLine($"{(@internal ? "internal" : "public")} void Fill{model}{(dir ? "To" : "From")}({toType.Name} {(dir ? "to" : "from")}Fill)");
+                methodBuilder.AppendLine($"{(@internal ? "internal" : "public")} void Fill{citem.Model}To({citem.ToType.Name} fillTo)");
+            }
+            else
+            {
+                methodBuilder.AppendSummary(b =>
+                {
+                    b.AppendSummaryLine($"Generate for fill <see cref=\"{citem.ToType.GetTypeSeeCRef()}\"/> from <see cref=\"{citem.FromType.GetTypeSeeCRef()}\"/>");
+                });
 
+                methodBuilder.AppendLine($"{(@internal ? "internal" : "public")} void Fill{citem.Model}From({citem.FromType.Name} fillFrom)");
+            }
             methodBuilder.AppendLine("{");
 
             methodBuilder.NextTab();
 
             List<string> memberLines = new List<string>();
 
-            if (dir)
-                FillMembers(sourceContext, context, memberLines, fromType, toType, model, "toFill", null, dir, 0);
-            else
-                FillMembers(sourceContext, context, memberLines, fromType, toType, model, null, "fromFill", dir, 0);
+            FillMembers(context, memberLines);
 
             foreach (var ml in memberLines)
             {
@@ -215,6 +195,226 @@ namespace NSL.Generators.FillTypeGenerator
 
             return methodBuilder;
         }
+
+        private void FillMembers(FillTypeGenerateContext context, List<string> codeLines, bool newObject = false)
+        {
+            var citem = context.Current;
+
+            var fromMembers = FilterSymbols(citem.FromType.GetAllMembers().Where(x => !x.IsStatic && (x as IPropertySymbol)?.IsIndexer != true), citem.Model).ToArray();
+            var toMembers = citem.ToType.GetAllMembers().Where(x => !x.IsStatic && (x as IPropertySymbol)?.IsIndexer != true).ToArray();
+
+            //GenDebug.Break(true);
+
+            var tabPrefix = string.Concat(Enumerable.Repeat("\t", context.Tab));
+
+            string itemModel;
+
+            foreach (var fromItem in fromMembers)
+            {
+                if (fromItem is IPropertySymbol fprop && fprop.GetMethod == null)
+                    continue;
+
+                var toItem = toMembers.FirstOrDefault(x => x.Name.Equals(fromItem.Name) && x.DeclaredAccessibility == Accessibility.Public);
+
+                if (toItem == default)
+                    continue;
+
+                if (toItem is IPropertySymbol tprop && tprop.SetMethod == null)
+                    continue;
+
+                ITypeSymbol memberFromType = GetFromTypeForFill(fromItem, citem.ToType, citem.To);
+
+                ITypeSymbol memberToType = GetToTypeForFill(toItem, citem.FromType, citem.To);
+
+                if (memberFromType == null || memberToType == null)
+                    continue;
+
+                string mFillPath = $"{tabPrefix}{string.Join(".", citem.SetPath, fromItem.Name).TrimStart('.')}";
+                string codeFragment = default;
+
+                var customFillConvert = fromItem.GetAttributes()
+                    .Concat(toItem.GetAttributes())
+                    .Where(x => x.AttributeClass.Name.Equals(FillTypeGenerateConvertAttributeFullName))
+                    .Select(x => x.ConstructorArguments[0].Value)
+                    .Cast<ITypeSymbol>()
+                    .ToArray();
+
+                if (customFillConvert.Length > 0)
+                {
+                    Func<ISymbol, bool> methodSearch = m => m is IMethodSymbol ms
+                                && ms.Name == "Convert"
+                                && ms.IsStatic
+                                && ms.Parameters.Length == 1
+                                && SymbolEqualityComparer.Default.Equals(ms.Parameters[0].Type, memberFromType)
+                                && SymbolEqualityComparer.Default.Equals(ms.ReturnType, memberToType);
+
+                    var methods = customFillConvert.SelectMany(x => x.GetAllMembers().Where(m => m is IMethodSymbol))
+                        .Where(methodSearch)
+                        .Cast<IMethodSymbol>()
+                        .GroupBy(x=>x, SymbolEqualityComparer.Default)
+                        .Select(x => x.First())
+                        .ToArray();
+
+                    if (methods.Length == 1)
+                    {
+                        codeFragment = string.Join(".", citem.GetPath, fromItem.Name).TrimStart('.');
+
+                        codeFragment = $"{methods[0].ContainingType.GetTypeFullName(false)}.Convert({codeFragment})";
+
+                        var cresult = $"{mFillPath} = {codeFragment}";
+
+                        if (!codeLines.Contains(cresult))
+                            codeLines.Add(cresult);
+
+                        continue;
+                    }
+                    else if (methods.Length > 1)
+                    {
+#pragma warning disable RS1035 // Не использовать API, запрещенные для анализаторов
+                        context.SourceContext.ShowFillTypeDiagnostics($"NSLFT050", $"Members fill have multiple convertors for cast type {memberFromType.Name} to {memberToType.Name}. Save single of it {string.Join(Environment.NewLine, methods.Select(x=>$"{x.ContainingType}.{x.Name}"))}", DiagnosticSeverity.Error, fromItem.Locations.Concat(toItem.Locations).ToArray());
+#pragma warning restore RS1035 // Не использовать API, запрещенные для анализаторов
+                        continue;
+                    }
+                }
+
+                var arrayItemTypeFrom = GetCollectionItemType(memberFromType);
+                var arrayItemTypeTo = GetCollectionItemType(memberToType);
+
+                if (arrayItemTypeFrom != default)
+                {
+                    itemModel = GetProxyModel(fromItem, citem.Model);
+
+                    int n = 0;
+
+                    string p = string.Empty;
+
+                    if (citem.GetPath == null)
+                        p = $"x{n}";
+                    else
+                        while (citem.GetPath.Contains(p = $"x{n++}")) { }
+
+                    if (basicArrayTypes.Contains(arrayItemTypeFrom.Name) || arrayItemTypeFrom.TypeKind == TypeKind.Enum)
+                    {
+                        codeFragment = $"{string.Join(".", citem.GetPath, fromItem.Name).TrimStart('.')}?.Select({p} => {p}).{GetCollectionLinqConvertMethod(memberToType)}()";
+                    }
+                    else
+                    {
+                        if (!Equals(citem.Model, itemModel))
+                            codeLines.Add($"// Proxy model merge from \"{citem.Model ?? "<null>"}\" to \"{itemModel}\"");
+
+                        var nitem = context.Next(new FillTypeGenerateItemContext()
+                        {
+                            FromType = arrayItemTypeFrom,
+                            ToType = arrayItemTypeTo,
+                            Model = itemModel,
+                            FieldName = toItem.Name,
+                            GetPath = p,
+                            SetPath = null,
+                            To = citem.To
+                        });
+
+                        var amem = new List<string>();
+
+                        FillMembers(context, amem, true);
+
+                        context.Prev();
+
+#pragma warning disable RS1035 // Не использовать API, запрещенные для анализаторов
+
+                        codeFragment = $"{string.Join(".", citem.GetPath, fromItem.Name).TrimStart('.')}?.Select({p} => new {arrayItemTypeTo} {{{Environment.NewLine}" +
+                            string.Join($",{Environment.NewLine}", amem) +
+                            $"{Environment.NewLine}}}).{GetCollectionLinqConvertMethod(memberToType)}()";
+
+#pragma warning restore RS1035 // Не использовать API, запрещенные для анализаторов
+
+                    }
+                }
+                else
+                {
+                    var conversation = context.Context.SemanticModel.Compilation.ClassifyCommonConversion(memberFromType, memberToType);
+
+                    bool mapTypes = false;
+
+                    if (!conversation.Exists)
+                    {
+                        if ((memberFromType.TypeKind == memberToType.TypeKind)
+                            && (memberFromType.TypeKind == TypeKind.Struct
+                                || memberFromType.TypeKind == TypeKind.Structure))
+                        {
+                            var msg = $"Cannot fill \"{toItem.Name}\" value from {citem.FromType.Name}, members types must be equals, or can be cast, or marked for ignore";
+
+                            context.SourceContext.ShowFillTypeDiagnostics("NSLFT001"
+                                , msg
+                                , DiagnosticSeverity.Error
+                                , toItem.Locations.ToArray());
+
+                            //GenDebug.Break();
+
+                            continue;
+                        }
+                        else
+                        {
+                            mapTypes = true;
+                        }
+                    }
+
+                    codeFragment = string.Join(".", citem.GetPath, fromItem.Name).TrimStart('.');
+
+                    if (mapTypes)
+                    {
+                        itemModel = GetProxyModel(fromItem, citem.Model);
+
+                        if (!Equals(citem.Model, itemModel))
+                            codeLines.Add($"// Proxy model merge from \"{citem.Model ?? "<null>"}\" to \"{itemModel}\"");
+
+                        var amem = new List<string>();
+
+                        var nitem = context.Next(new FillTypeGenerateItemContext()
+                        {
+                            FromType = memberFromType,
+                            ToType = memberToType,
+                            Model = itemModel,
+                            FieldName = toItem.Name,
+                            GetPath = null,
+                            SetPath = null,
+                            To = citem.To
+                        });
+
+                        FillMembers(context, amem, true);
+
+                        context.Prev();
+
+#pragma warning disable RS1035 // Не использовать API, запрещенные для анализаторов
+                        codeFragment = $"new {memberToType.GetTypeFullName(false)} {{{Environment.NewLine}" +
+                            string.Join($",{Environment.NewLine}", amem) +
+                            $"{Environment.NewLine}}}";
+#pragma warning restore RS1035 // Не использовать API, запрещенные для анализаторов
+                    }
+                    else
+                    {
+
+                        if ((memberFromType.TypeKind == TypeKind.Struct || memberFromType.TypeKind == TypeKind.Structure)
+                            && memberFromType.NullableAnnotation == NullableAnnotation.Annotated
+                            && memberToType.NullableAnnotation != NullableAnnotation.Annotated)
+                        {
+                            codeFragment = $"({codeFragment}.HasValue ? {codeFragment}.Value : {(newObject ? "default" : mFillPath)})";
+                        }
+
+                        if (conversation.IsNumeric)
+                            codeFragment = $"({memberToType.GetTypeFullName()}){codeFragment}";
+                        else if (conversation.IsImplicit) { }
+                    }
+                }
+
+
+                var result = $"{mFillPath} = {codeFragment}";
+
+                if (!codeLines.Contains(result))
+                    codeLines.Add(result);
+            }
+        }
+
+
 
         private IEnumerable<ISymbol> FilterSymbols(IEnumerable<ISymbol> symbols, string model)
         {
@@ -237,8 +437,6 @@ namespace NSL.Generators.FillTypeGenerator
 
         private string GetProxyModel(ISymbol item, string model)
         {
-            //GenDebug.Break();
-
             var attributes = item.GetAttributes();
 
             var proxyAttribs = attributes.Where(x => x.AttributeClass.Name == FillTypeGenerateProxyAttributeFullName).ToArray();
@@ -249,8 +447,6 @@ namespace NSL.Generators.FillTypeGenerator
                 return (string)fromModel.ConstructorArguments[1].Value;
             else
             {
-                //GenDebug.Break();
-
                 var toModel = proxyAttribs.FirstOrDefault(x => x.ConstructorArguments.Length == 1);
 
                 if (toModel != null)
@@ -301,8 +497,6 @@ namespace NSL.Generators.FillTypeGenerator
 
                 if (!ignore)
                 {
-                    //GenDebug.Break();
-
                     if (ps.GetMethod != null)
                         return ps.Type;
                 }
@@ -364,171 +558,64 @@ namespace NSL.Generators.FillTypeGenerator
             return default;
         }
 
-        private void FillMembers(SourceProductionContext sourceContext, GeneratorSyntaxContext context, List<string> codeLines, ITypeSymbol fromType, ITypeSymbol toType, string model, string fillPath, string readPath, bool dir, int t, bool newObject = false)
-        {
-            if (!dir)
-            {
-                (toType, fromType) = (fromType, toType);
-            }
-
-            var fromMembers = FilterSymbols(fromType.GetAllMembers().Where(x => !x.IsStatic && (x as IPropertySymbol)?.IsIndexer != true), model).ToArray();
-            var toMembers = (IEnumerable<ISymbol>)toType.GetAllMembers().Where(x => !x.IsStatic && (x as IPropertySymbol)?.IsIndexer != true).ToArray();
-
-            //GenDebug.Break(true);
-
-            var tabPrefix = string.Concat(Enumerable.Repeat("\t", t));
-
-            string itemModel;
-
-            foreach (var fromItem in fromMembers)
-            {
-                if (fromItem is IPropertySymbol fprop && fprop.GetMethod == null)
-                    continue;
-
-                var toItem = toMembers.FirstOrDefault(x => x.Name.Equals(fromItem.Name) && x.DeclaredAccessibility == Accessibility.Public);
-
-                if (toItem == default)
-                    continue;
-
-                if (toItem is IPropertySymbol tprop && tprop.SetMethod == null)
-                    continue;
-
-                ITypeSymbol memberFromType = GetFromTypeForFill(fromItem, toType, dir);
-
-                ITypeSymbol memberToType = GetToTypeForFill(toItem, fromType, dir);
-
-                if (memberFromType == null || memberToType == null)
-                    continue;
-
-                string mFillPath = $"{tabPrefix}{string.Join(".", fillPath, fromItem.Name).TrimStart('.')}";
-
-                string codeFragment = default;
-
-                var arrayItemTypeFrom = GetCollectionItemType(memberFromType);
-                var arrayItemTypeTo = GetCollectionItemType(memberToType);
-
-                if (arrayItemTypeFrom != default)
-                {
-                    itemModel = GetProxyModel(fromItem, model);
-
-                    int n = 0;
-
-                    string p = string.Empty;
-
-                    if (readPath == null)
-                        p = $"x{n}";
-                    else
-                        while (readPath.Contains(p = $"x{n++}")) { }
-
-                    if (basicArrayTypes.Contains(arrayItemTypeFrom.Name) || arrayItemTypeFrom.TypeKind == TypeKind.Enum)
-                    {
-                        codeFragment = $"{string.Join(".", readPath, fromItem.Name).TrimStart('.')}?.Select({p} => {p}).{GetCollectionLinqConvertMethod(memberToType)}()";
-                    }
-                    else
-                    {
-                        var amem = new List<string>();
-
-                        FillMembers(sourceContext, context, amem, arrayItemTypeFrom, arrayItemTypeTo, itemModel, null, p, dir, 1, true);
-
-                        if (!Equals(model, itemModel))
-                            codeLines.Add($"// Proxy model merge from \"{model}\" to \"{itemModel}\"");
-
-                        //GenDebug.Break();
-
-#pragma warning disable RS1035 // Не использовать API, запрещенные для анализаторов
-
-                        codeFragment = $"{string.Join(".", readPath, fromItem.Name).TrimStart('.')}?.Select({p} => new {arrayItemTypeTo} {{{Environment.NewLine}" +
-                            string.Join($",{Environment.NewLine}", amem) +
-                            $"{Environment.NewLine}}}).{GetCollectionLinqConvertMethod(memberToType)}()";
-
-#pragma warning restore RS1035 // Не использовать API, запрещенные для анализаторов
-
-                        //                        codeLines.Add($"{item.Name} = {path}.{item.Name} == null ? null : {path}.{item.Name}.Select({p} => new {{{Environment.NewLine}{CombineMembers(amem.Select(x => $"\t{x}"))}{Environment.NewLine}}})");
-
-                    }
-                }
-                else
-                {
-                    var conversation = context.SemanticModel.Compilation.ClassifyCommonConversion(memberFromType, memberToType);
-
-                    bool mapTypes = false;
-
-                    if (!conversation.Exists)
-                    {
-                        if ((memberFromType.TypeKind == memberToType.TypeKind)
-                            && (memberFromType.TypeKind == TypeKind.Struct
-                                || memberFromType.TypeKind == TypeKind.Structure))
-                        {
-                            var msg = $"Cannot fill \"{toItem.Name}\" value from {fromType.Name}, members types must be equals, or can be cast, or must be marked for ignore";
-
-                            sourceContext.ShowFillTypeDiagnostics("NSLFT001"
-                                , msg
-                                , DiagnosticSeverity.Error
-                                , toItem.Locations.ToArray());
-
-                            //GenDebug.Break();
-
-                            continue;
-                        }
-                        else
-                        {
-                            mapTypes = true;
-                        }
-                    }
-
-                    codeFragment = string.Join(".", readPath, fromItem.Name).TrimStart('.');
-
-                    if (mapTypes)
-                    {
-                        //GenDebug.Break(true);
-                        itemModel = GetProxyModel(fromItem, model);
-
-                        var amem = new List<string>();
-
-                        FillMembers(sourceContext, context, amem, memberFromType, memberToType, itemModel, null, codeFragment, dir, 1, true);
-
-                        if (!Equals(model, itemModel))
-                            codeLines.Add($"// Proxy model merge from \"{model}\" to \"{itemModel}\"");
-
-#pragma warning disable RS1035 // Не использовать API, запрещенные для анализаторов
-                        codeFragment = $"new {memberToType.GetTypeFullName(false)} {{{Environment.NewLine}" +
-                            string.Join($",{Environment.NewLine}", amem) +
-                            $"{Environment.NewLine}}}";
-#pragma warning restore RS1035 // Не использовать API, запрещенные для анализаторов
-                    }
-                    else
-                    {
-
-                        if ((memberFromType.TypeKind == TypeKind.Struct || memberFromType.TypeKind == TypeKind.Structure)
-                            && memberFromType.NullableAnnotation == NullableAnnotation.Annotated
-                            && memberToType.NullableAnnotation != NullableAnnotation.Annotated)
-                        {
-                            codeFragment = $"({codeFragment}.HasValue ? {codeFragment}.Value : {(newObject ? "default" : mFillPath)})";
-                        }
-
-                        if (conversation.IsNumeric)
-                            codeFragment = $"({memberToType.GetTypeFullName()}){codeFragment}";
-                        else if (conversation.IsImplicit) { }
-                    }
-                }
-                //else
-                //    GenDebug.Break();
-
-                var result = $"{mFillPath} = {codeFragment}";
-
-                if (!codeLines.Contains(result))
-                    codeLines.Add(result);
-            }
-        }
-
 
         internal static readonly string FillTypeGenerateAttributeFullName = typeof(FillTypeGenerateAttribute).Name;
         internal static readonly string FillTypeFromGenerateAttributeFullName = typeof(FillTypeFromGenerateAttribute).Name;
         internal static readonly string FillTypeGenerateIgnoreAttributeFullName = typeof(FillTypeGenerateIgnoreAttribute).Name;
         internal static readonly string FillTypeGenerateIncludeAttributeFullName = typeof(FillTypeGenerateIncludeAttribute).Name;
         internal static readonly string FillTypeGenerateProxyAttributeFullName = typeof(FillTypeGenerateProxyAttribute).Name;
+        internal static readonly string FillTypeGenerateConvertAttributeFullName = typeof(FillTypeGenerateConvertAttribute).Name;
         internal static readonly string stringFullName = typeof(string).Name;
     }
 
+    public class FillTypeGenerateContext
+    {
+        public FillTypeGenerateItemContext Current { get; set; }
+        public SourceProductionContext SourceContext { get; internal set; }
+        public GeneratorSyntaxContext Context { get; internal set; }
 
+        private Queue<FillTypeGenerateItemContext> Queue = new Queue<FillTypeGenerateItemContext>();
+
+        public FillTypeGenerateItemContext Next(FillTypeGenerateItemContext item)
+        {
+            if (Queue.Count(x => x.FromType == item.FromType
+                            && x.ToType == item.ToType
+                            && x.Model == item.Model) > 9)
+            {
+                var startType = Queue.FirstOrDefault();
+
+                throw new InvalidOperationException($"Fill recursion detected for type {item.FromType.Name} to {item.ToType.Name} with model \"{item.Model}\", in path = '<{startType?.FromType} => {startType?.ToType}>{string.Join(" => ", Queue.Select(x => $"{x.FieldName ?? "<null>"}({x.Model ?? "<null>"})"))}'");
+            }
+
+            Current = item;
+            Queue.Enqueue(item);
+
+            return Current;
+        }
+
+        public void Prev()
+        {
+            Current = Queue.Dequeue();
+        }
+
+        public int Tab => Queue.Count - 1;
+
+    }
+
+    public class FillTypeGenerateItemContext
+    {
+        public ITypeSymbol FromType { get; set; }
+
+        public ITypeSymbol ToType { get; set; }
+
+        public string Model { get; set; }
+
+        public string GetPath { get; set; }
+
+        public string SetPath { get; set; }
+
+        public string FieldName { get; set; }
+
+        public bool To { get; set; }
+    }
 }

@@ -57,6 +57,42 @@ namespace NSL.ASPNET.Test.Services
     {
     }
 
+    [RegisterService(ServiceLifetime.Singleton, "hostedServiceModel", HostedService = true)]
+    [RegisterServiceInherits(ServiceLifetime.Singleton, typeof(inheritService))]
+    public class hostedService1(IServiceProvider serviceProvider) : IHostedService, inheritService
+    {
+        public Task StartAsync(CancellationToken cancellationToken)
+        {
+            return Task.CompletedTask;
+        }
+
+        public Task StopAsync(CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    [RegisterService(ServiceLifetime.Singleton, "hostedServiceModel", HostedService = true)]
+    [RegisterServiceInherits(ServiceLifetime.Singleton, typeof(inheritService))]
+    public class hostedService2(IServiceProvider serviceProvider) : IHostedService, inheritService
+    {
+        public Task StartAsync(CancellationToken cancellationToken)
+        {
+            return Task.CompletedTask;
+        }
+
+        public Task StopAsync(CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public interface inheritService
+    {
+
+    }
+
+
     public class testOptions
     {
         public string Test { get; set; } = string.Empty;

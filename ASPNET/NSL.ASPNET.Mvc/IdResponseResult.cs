@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 
@@ -12,40 +13,57 @@ namespace NSL.ASPNET.Mvc
         public static IdResponse<TId> Ok<TId>(TId id)
             => new IdResponse<TId>(id);
 
-        public static IdResponse<TId> NotFound<TId>()
-            => NotFound<TId>("{...no_found}");
+        public static IdResponse<TId> Ok<TId>(object id)
+            => new IdResponse<TId>(id);
 
-        public static IdResponse<TId> NotFound<TId>(string errorMessage)
-            => Error<TId>(HttpStatusCode.NotFound, errorMessage);
+        public static IdResponse<TData> NotFound<TData>(params string[] args)
+            => NotFound<TData>("{...no_found}", args);
 
-        public static IdResponse<TId> InternalServerError<TId>()
-            => StatusCode<TId>(HttpStatusCode.InternalServerError);
+        public static IdResponse<TData> NotFound<TData>(string errorMessage, params string[] args)
+            => Error<TData>(HttpStatusCode.NotFound, errorMessage, args);
 
-        public static IdResponse<TId> InternalServerError<TId>(string errorMessage)
-            => Error<TId>(HttpStatusCode.InternalServerError, errorMessage);
+        public static IdResponse<TData> InternalServerError<TData>()
+            => StatusCode<TData>(HttpStatusCode.InternalServerError);
 
-        public static IdResponse<TId> Forbid<TId>()
-            => new IdResponse<TId>((int)HttpStatusCode.Forbidden, default);
+        public static IdResponse<TData> InternalServerError<TData>(string errorMessage, params string[] args)
+            => Error<TData>(HttpStatusCode.InternalServerError, errorMessage, args);
 
-        public static IdResponse<TId> Forbid<TId>(string errorMessage)
-            => Error<TId>(HttpStatusCode.Forbidden, errorMessage);
+        public static IdResponse<TData> Forbid<TData>()
+            => new IdResponse<TData>((int)HttpStatusCode.Forbidden, default);
 
-        public static IdResponse<TId> Error<TId>(HttpStatusCode code, string errorMessage)
-            => new IdResponse<TId>((int)code, new Dictionary<string, string[]>
+        public static IdResponse<TData> Forbid<TData>(string errorMessage, params string[] args)
+            => Error<TData>(HttpStatusCode.Forbidden, errorMessage, args);
+
+        public static IdResponse<TData> Error<TData>(HttpStatusCode code, string errorMessage, params string[] args)
+            => new IdResponse<TData>((int)code, new Dictionary<string, HttpResponseErrorModel[]>
             {
-                { string.Empty, [errorMessage]}
+                { string.Empty, [new HttpResponseErrorModel(errorMessage, args)]}
             });
 
-        public static IdResponse<TId> StatusCode<TId>(HttpStatusCode code)
-            => new IdResponse<TId>((int)code, default);
+        public static IdResponse<TData> Error<TData>(HttpStatusCode code, params IEnumerable<(string key, string errorMessage, string[] args)> errors)
+            => new IdResponse<TData>((int)code, errors
+                .GroupBy(x => x.key)
+                .ToDictionary(
+                x => x.Key,
+                x => x.Select(x => new HttpResponseErrorModel(x.errorMessage, x.args)).ToArray()));
 
-        public static IdResponse<TId> ModelState<TId>(ControllerBase controller, HttpStatusCode code)
-            => new IdResponse<TId>((int)code, ControllerResults.formatModelState(controller.ModelState));
+        public static IdResponse<TData> BadRequest<TData>(params IEnumerable<(string key, string errorMessage, string[] args)> errors)
+            => Error<TData>(HttpStatusCode.BadRequest, errors);
+
+        public new static IdResponse<TData> StatusCode<TData>(HttpStatusCode code)
+            => new IdResponse<TData>((int)code, default);
+
+        public static IdResponse<TData> ModelState<TData>(ControllerBase controller, HttpStatusCode code)
+            => new IdResponse<TData>((int)code, ControllerResults.formatModelState(controller.ModelState));
     }
 
     public class IdResponse<TId> : DataResponse<object>
     {
         public IdResponse(TId id) : this(200, new { id })
+        {
+        }
+
+        public IdResponse(object id) : this(200, new { id })
         {
         }
 

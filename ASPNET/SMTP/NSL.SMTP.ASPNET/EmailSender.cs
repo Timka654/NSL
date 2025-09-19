@@ -5,5 +5,5 @@ using System.Runtime.Intrinsics.Arm;
 
 namespace NSL.SMTP.ASPNET
 {
-    public class EmailSender(IOptions<SMTPConfigurationModel> options, ILogger<EmailSender> logger, IServiceProvider serviceProvider) : BaseEmailSender(options, logger, serviceProvider) { }
+    public class EmailSender(IOptions<SMTPConfigurationModel> options, ILogger<EmailSender> logger, IServiceProvider serviceProvider) : BaseEmailSender<object?>(options, logger, serviceProvider) { }
 }

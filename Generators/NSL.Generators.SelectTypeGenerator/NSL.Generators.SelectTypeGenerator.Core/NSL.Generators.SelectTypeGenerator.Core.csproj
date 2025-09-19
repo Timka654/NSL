@@ -42,7 +42,7 @@
 		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.3.0" PrivateAssets="all" />
 	</ItemGroup>
 	<ItemGroup>
-		<Compile Include="..\NSL.Generators.SelectTypeGenerator.Shared\**\*.cs" Exclude="..\NSL.Generators.SelectTypeGenerator.Shared\**\bin\**;..\NSL.Generators.SelectTypeGenerator.Shared\**\obj\**" >
+		<Compile Include="..\NSL.Generators.SelectTypeGenerator.Shared\**\*.cs" Exclude="..\NSL.Generators.SelectTypeGenerator.Shared\**\bin\**;..\NSL.Generators.SelectTypeGenerator.Shared\**\obj\**">
 			<Link>NSL.Generators.SelectTypeGenerator.Shared\%(RecursiveDir)%(FileName)%(Extension)</Link>
 			</Compile>
 																			</ItemGroup>

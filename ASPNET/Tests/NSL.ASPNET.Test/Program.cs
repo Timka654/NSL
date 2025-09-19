@@ -22,7 +22,7 @@ namespace NSL.ASPNET.Test
             {
                 builder.Services.RegisterServices("errorKeyModel");
 
-                throw new Exception();
+                throw new Exception(); // throw if work not correct
             }
             catch (InvalidOperationException ex)
             {
@@ -35,7 +35,7 @@ namespace NSL.ASPNET.Test
             {
                 builder.Services.RegisterServices("lifeTimeConflictModel");
 
-                throw new Exception();
+                throw new Exception(); // throw if work not correct
             }
             catch (InvalidOperationException ex)
             {
@@ -46,6 +46,8 @@ namespace NSL.ASPNET.Test
             builder.Services.RegisterServices("optionsRequiredModel");
 
             builder.Services.RegisterServices("serviceProviderRequiredModel");
+
+            builder.Services.RegisterServices("hostedServiceModel");
 
             var app = builder.Build();
 
@@ -59,7 +61,11 @@ namespace NSL.ASPNET.Test
 
             var bs1 = app.Services.GetRequiredService<basicService1>();
             var bs2 = app.Services.GetRequiredService<basicService2>();
-            //var ks3 = app.Services.GetRequiredService<keyService3>();
+            var ks3 = app.Services.GetService<keyService3>();
+
+            if (ks3 != null) throw new Exception();
+
+            if (app.Services.GetServices<inheritService>().Count() != 2) throw new Exception();
 
             app.UseHttpsRedirection();
 

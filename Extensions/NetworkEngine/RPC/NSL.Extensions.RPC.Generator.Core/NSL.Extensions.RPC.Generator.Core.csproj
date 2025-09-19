@@ -40,7 +40,7 @@
 		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.3.0" PrivateAssets="all" />
 	</ItemGroup>
 	<ItemGroup>
-		<Compile Include="..\..\..\..\Core\NSL.SocketCore\**\*.cs" Exclude="..\..\..\..\Core\NSL.SocketCore\**\bin\**;..\..\..\..\Core\NSL.SocketCore\**\obj\**" >
+		<Compile Include="..\..\..\..\Core\NSL.SocketCore\**\*.cs" Exclude="..\..\..\..\Core\NSL.SocketCore\**\bin\**;..\..\..\..\Core\NSL.SocketCore\**\obj\**">
 			<Link>NSL.SocketCore\%(RecursiveDir)%(FileName)%(Extension)</Link>
 			</Compile>
 													</ItemGroup>

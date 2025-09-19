@@ -11,10 +11,10 @@ namespace NSL.HttpClient
 {
     public static class HttpResponseExtensions
     {
-        public static async Task<BaseResponse> ProcessResponseAsync(
+        public static Task<BaseResponse> ProcessResponseAsync(
             this Task<HttpResponseMessage> request,
             BaseHttpRequestOptions options = null)
-            => await request.ProcessResponseAsync<BaseResponse>(options);
+            => request.ProcessResponseAsync<BaseResponse>(options);
 
         public static Task<DataResponse<TData>> ProcessDataResponseAsync<TData>(
             this Task<HttpResponseMessage> request,

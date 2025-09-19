@@ -1,4 +1,5 @@
 ﻿using HtmlAgilityPack;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using NSL.ASPNET.Attributes;
@@ -131,11 +132,13 @@ namespace NSL.ASPNET
             {
                 var attrs = type.GetCustomAttributes<RegisterServiceAttribute>();
 
+                var inherits = type.GetCustomAttributes<RegisterServiceInheritsAttribute>();
+
                 foreach (var attr in attrs)
                 {
                     if (!haveModels || models.Any(m => attr.Models.Contains(m)))
                     {
-                        var item = new registerServiceItemRecord(type, type.IsGenericType ? type.GetGenericTypeDefinition() : null, attr.Type, attr.Key);
+                        var item = new registerServiceItemRecord(type, type.IsGenericType ? type.GetGenericTypeDefinition() : null, attr.Type, attr.Key, attr.HostedService, inherits.ToArray());
 
                         var constrs = type.GetConstructors();
 
@@ -154,7 +157,7 @@ namespace NSL.ASPNET
                             .Where(x => !registerServiceSkipped.Contains(x.ParameterType))
                             .Select(p =>
                         {
-                            var key = p.GetCustomAttribute<FromKeyedServicesAttribute>()?.Key;
+                            var key = p.GetCustomAttribute<FromKeyedServicesAttribute>()?.Key ?? KeyedService.AnyKey;
 
                             return new NeedTypeRecord(p.ParameterType, key == KeyedService.AnyKey ? default : key, p.ParameterType.IsGenericType ? p.ParameterType.GetGenericTypeDefinition() : null);
 
@@ -214,32 +217,80 @@ namespace NSL.ASPNET
                     if (registered.Contains(type))
                         continue;
 
-                    switch (type.Lifetime)
+
+                    void registerService(ServiceLifetime lifeTime, Type type, object? key, Type? baseType = default)
                     {
-                        case ServiceLifetime.Singleton:
-                            if (type.Key != default)
-                                services.AddKeyedSingleton(type.Type, type.Key);
-                            else
-                                services.AddSingleton(type.Type);
+                        switch (lifeTime)
+                        {
+                            case ServiceLifetime.Singleton:
+                                if (key != default)
+                                {
+                                    if (baseType != default)
+                                        services.AddKeyedSingleton(baseType, key, type);
+                                    else
+                                        services.AddKeyedSingleton(type, key);
+                                }
+                                else
+                                {
+                                    if (baseType != default)
+                                        services.AddSingleton(baseType, type);
+                                    else
+                                        services.AddSingleton(type);
+                                }
+                                break;
+                            case ServiceLifetime.Scoped:
+                                if (key != default)
+                                {
+                                    if (baseType != default)
+                                        services.AddKeyedScoped(baseType, key, type);
+                                    else
+                                        services.AddKeyedScoped(type, key);
+                                }
+                                else
+                                {
+                                    if (baseType != default)
+                                        services.AddScoped(baseType, type);
+                                    else
+                                        services.AddScoped(type);
+                                }
+                                break;
+                            case ServiceLifetime.Transient:
+                                if (key != default)
+                                {
+                                    if (baseType != default)
+                                        services.AddKeyedTransient(baseType, key, type);
+                                    else
+                                        services.AddKeyedTransient(type, key);
+                                }
+                                else
+                                {
+                                    if (baseType != default)
+                                        services.AddTransient(baseType, type);
+                                    else
+                                        services.AddTransient(type);
+                                }
+                                break;
+                            default:
+                                throw new InvalidOperationException($"Type \"{type.FullName}\" have invalid lifetime cycle {lifeTime}");
+                        }
+                    }
 
-                            if (type.Type.IsAssignableTo(typeof(IHostedService)))
-                                services.AddHostedService(x => (IHostedService)x.GetRequiredService(type.Type));
+                    registerService(type.Lifetime, type.Type, type.Key);
 
-                            break;
-                        case ServiceLifetime.Scoped:
-                            if (type.Key != default)
-                                services.AddKeyedScoped(type.Type, type.Key);
-                            else
-                                services.AddScoped(type.Type);
-                            break;
-                        case ServiceLifetime.Transient:
-                            if (type.Key != default)
-                                services.AddKeyedTransient(type.Type, type.Key);
-                            else
-                                services.AddTransient(type.Type);
-                            break;
-                        default:
-                            throw new InvalidOperationException($"Type \"{type.Type.FullName}\" have invalid lifetime cycle {type.Lifetime}");
+                    foreach (var inh in type.Inherits)
+                    {
+                        registerService(inh.Type, type.Type, inh.Key, inh.Inherit);
+                    }
+
+                    if (type.HostedService)
+                    {
+                        if (type.Lifetime != ServiceLifetime.Singleton)
+                            throw new InvalidOperationException($"Type \"{type.Type.FullName}\" have invalid lifetime cycle {type.Lifetime} for register as HostedService");
+
+                        if (!type.Type.IsAssignableTo(typeof(IHostedService)))
+                            throw new InvalidOperationException($"Type \"{type.Type.FullName}\" is not assignable to {typeof(IHostedService).FullName} for register as HostedService");
+
+                        services.AddSingleton<IHostedService>(x => x.GetRequiredService(type.Type) is IHostedService hs ? hs : null);
                     }
 
                     registered.Add(type);
@@ -283,7 +334,7 @@ namespace NSL.ASPNET
     }
 
 
-    internal class registerServiceItemRecord(Type type, Type? genericDeclarationType, ServiceLifetime lifetime, object? key)
+    internal class registerServiceItemRecord(Type type, Type? genericDeclarationType, ServiceLifetime lifetime, object? key, bool hostedService, RegisterServiceInheritsAttribute[] inherits)
     {
         public Type Type { get; } = type;
 
@@ -291,7 +342,11 @@ namespace NSL.ASPNET
 
         public ServiceLifetime Lifetime { get; } = lifetime;
 
+        public RegisterServiceInheritsAttribute[] Inherits { get; } = inherits;
+
         public object Key { get; } = key;
+
+        public bool HostedService { get; } = hostedService;
 
         public NeedTypeRecord[] NeedTypes { get; set; }
 

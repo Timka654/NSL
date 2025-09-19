@@ -42,7 +42,7 @@
 		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.3.0" PrivateAssets="all" />
 	</ItemGroup>
 	<ItemGroup>
-		<Compile Include="..\NSL.Generators.PacketHandleGenerator.Shared\**\*.cs" Exclude="..\NSL.Generators.PacketHandleGenerator.Shared\**\bin\**;..\NSL.Generators.PacketHandleGenerator.Shared\**\obj\**" >
+		<Compile Include="..\NSL.Generators.PacketHandleGenerator.Shared\**\*.cs" Exclude="..\NSL.Generators.PacketHandleGenerator.Shared\**\bin\**;..\NSL.Generators.PacketHandleGenerator.Shared\**\obj\**">
 			<Link>NSL.Generators.PacketHandleGenerator.Shared\%(RecursiveDir)%(FileName)%(Extension)</Link>
 			</Compile>
 																			</ItemGroup>
