@@ -4,6 +4,7 @@ using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Differencing;
+using Microsoft.CodeAnalysis.Elfie.Model.Tree;
 using Microsoft.CodeAnalysis.Text;
 using NSL.Generators.Utils;
 using NSL.Refactoring.FastAction.UI;
@@ -33,84 +34,108 @@ namespace NSL.Refactoring.FastAction.Core
 
         static DateTime latestBaseCache = default;
 
+        static JsonSerializerOptions jsonOptions = new JsonSerializerOptions(JsonSerializerDefaults.Web);
+
         static string baseCachePath = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-        "mr_mtv",
-        "nsl_fa",
-        "RoslynTemplatesCache");
+        "NSL",
+        "NSL.Refactoring.FastAction");
 
-        static List<string> baseCache = new List<string>();
+        static Dictionary<string, string> sourcePaths = new Dictionary<string, string>();
 
-        static async Task<List<string>> GetBasePathes()
+        static async Task<IEnumerable<string>> TryLoadSources(string[] sources)
         {
             if (latestBaseCache < DateTime.UtcNow.AddMinutes(-5))
             {
-                Directory.CreateDirectory(baseCachePath);
+                var sourcesCachePath = Path.Combine(FastActionBuilder.baseCachePath, "sources.json");
 
-                var versionPath = Path.Combine(baseCachePath, "version.json");
-
-
-                latestBaseCache = DateTime.UtcNow;
-
-                using (var httpClient = new HttpClient())
+                if (File.Exists(sourcesCachePath))
                 {
-                    httpClient.Timeout = TimeSpan.FromSeconds(4);
+                    sourcePaths = JsonSerializer.Deserialize<Dictionary<string, string>>(File.ReadAllText(sourcesCachePath), jsonOptions) ?? new Dictionary<string, string>();
+                }
 
-                    try
+                bool any = false;
+
+                foreach (var _source in sources)
+                {
+                    if (!sourcePaths.TryGetValue(_source, out var path))
                     {
-                        var response = await httpClient.GetAsync(templatesUrl + "version.json").ConfigureAwait(false);
+                        any = true;
 
-                        var remoteVersionContent = response.IsSuccessStatusCode ? await response.Content.ReadAsStringAsync() : default;
+                        path = sourcePaths[_source] = Guid.NewGuid().ToString("N");
+                    }
 
-                        if (remoteVersionContent != default)
+
+                    path = Path.Combine(baseCachePath, path);
+
+                    Directory.CreateDirectory(path);
+
+                    var versionPath = Path.Combine(path, "version.json");
+
+                    path = Path.Combine(path, "RoslynTemplatesCache");
+
+
+                    latestBaseCache = DateTime.UtcNow;
+
+                    using (var httpClient = new HttpClient())
+                    {
+                        httpClient.Timeout = TimeSpan.FromSeconds(4);
+
+                        try
                         {
-                            var remoteVersion = string.Empty;
-                            var localVersion = string.Empty;
+                            var response = await httpClient.GetAsync(templatesUrl + "version.json").ConfigureAwait(false);
 
-                            if ((JsonNode.Parse(remoteVersionContent) as JsonObject).TryGetPropertyValue("version", out var remoteVersionJ))
-                                remoteVersion = remoteVersionJ.GetValue<string>();
+                            var remoteVersionContent = response.IsSuccessStatusCode ? await response.Content.ReadAsStringAsync() : default;
 
-                            if (File.Exists(versionPath))
+                            if (remoteVersionContent != default)
                             {
-                                if ((JsonNode.Parse(File.ReadAllText(versionPath)) as JsonObject).TryGetPropertyValue("version", out var localVersionJ))
-                                    localVersion = localVersionJ.GetValue<string>();
-                            }
+                                var remoteVersion = string.Empty;
+                                var localVersion = string.Empty;
 
-                            if (remoteVersion != localVersion)
-                            {
-                                response = await httpClient.GetAsync(templatesUrl + "templates.zip").ConfigureAwait(false);
+                                if ((JsonNode.Parse(remoteVersionContent) as JsonObject).TryGetPropertyValue("version", out var remoteVersionJ))
+                                    remoteVersion = remoteVersionJ.GetValue<string>();
 
-                                if (response.IsSuccessStatusCode)
+                                if (File.Exists(versionPath))
                                 {
-                                    using (var s = await response.Content.ReadAsStreamAsync())
+                                    if ((JsonNode.Parse(File.ReadAllText(versionPath)) as JsonObject).TryGetPropertyValue("version", out var localVersionJ))
+                                        localVersion = localVersionJ.GetValue<string>();
+                                }
+
+                                if (remoteVersion != localVersion)
+                                {
+                                    response = await httpClient.GetAsync(templatesUrl + "templates.zip").ConfigureAwait(false);
+
+                                    if (response.IsSuccessStatusCode)
                                     {
-                                        using (var za = new ZipArchive(s))
+                                        using (var s = await response.Content.ReadAsStreamAsync())
                                         {
-                                            Directory.Delete(baseCachePath, true);
+                                            using (var za = new ZipArchive(s))
+                                            {
+                                                if (Directory.Exists(path))
+                                                    Directory.Delete(path, true);
 
-                                            za.ExtractToDirectory(baseCachePath);
+                                                za.ExtractToDirectory(path);
+                                            }
                                         }
-                                    }
 
-                                    File.WriteAllText(versionPath, remoteVersionContent);
+                                        File.WriteAllText(versionPath, remoteVersionContent);
+                                    }
                                 }
                             }
                         }
-                    }
-                    catch (HttpRequestException)
-                    {
+                        catch (HttpRequestException)
+                        {
 
+                        }
                     }
                 }
 
-                var epath = Path.Combine(baseCachePath, settingsFileName);
-
-                if (File.Exists(epath))
-                    baseCache = new List<string>() { epath };
-
+                if (any)
+                    File.WriteAllText(sourcesCachePath, JsonSerializer.Serialize(sourcePaths));
             }
 
-            return baseCache;
+
+            return sourcePaths.Select(x => Path.Combine(baseCachePath, x.Value, "RoslynTemplatesCache", settingsFileName));
         }
 
         static string NormalizeName(string name)
@@ -183,8 +208,16 @@ namespace NSL.Refactoring.FastAction.Core
 
                 string path = default;
 
-                pathes.AddRange(await GetBasePathes().ConfigureAwait(false));
+                var packagesSource = Path.Combine(solutionPath, "NSL.Refactoring.FastAction.Sources.json");
 
+                if (File.Exists(packagesSource))
+                {
+                    var packages = JsonSerializer.Deserialize<string[]>(File.ReadAllText(packagesSource), jsonOptions);
+
+                    pathes.AddRange((await TryLoadSources(packages).ConfigureAwait(false)));
+                }
+                else
+                    pathes.AddRange((await TryLoadSources(new[] { templatesUrl }).ConfigureAwait(false)));
 
                 path = Path.Combine(solutionPath, settingsFileName);
 
@@ -230,30 +263,30 @@ namespace NSL.Refactoring.FastAction.Core
 
             var root = await document.GetSyntaxRootAsync(cancellationToken).ConfigureAwait(false);
 
-            var node = root.FindNode(span);
+            var node2 = root.FindNode(span);
 
-            if (node == null)
+            if (node2 == null)
                 return Array.Empty<RefactoringAction>();
 
-            var typeDecl = getTypedNode<TypeDeclarationSyntax>(node, getNodeDepth(node));
+            var typeDecl = getTypedNode<TypeDeclarationSyntax>(node2, getNodeDepth(node2));
 
             var classDecl = typeDecl as ClassDeclarationSyntax;
 
             var structDecl = typeDecl as StructDeclarationSyntax;
 
 
-            var enumDecl = getTypedNode<EnumDeclarationSyntax>(node, getNodeDepth(node));
+            var enumDecl = getTypedNode<EnumDeclarationSyntax>(node2, getNodeDepth(node2));
 
-            var enumMemberDecl = getTypedNode<EnumMemberDeclarationSyntax>(node, getNodeDepth(node));
+            var enumMemberDecl = getTypedNode<EnumMemberDeclarationSyntax>(node2, getNodeDepth(node2));
 
-            var namespaceDecl = getTypedNode<NamespaceDeclarationSyntax>(node, getNodeDepth(node));
+            var namespaceDecl = getTypedNode<NamespaceDeclarationSyntax>(node2, getNodeDepth(node2));
 
 
-            var parameterNode = getTypedNode<ParameterSyntax>(node, getNodeDepth(node));
+            var parameterNode = getTypedNode<ParameterSyntax>(node2, getNodeDepth(node2));
 
-            var attributeNode = getTypedNode<AttributeSyntax>(node, getNodeDepth(node));
+            var attributeNode = getTypedNode<AttributeSyntax>(node2, getNodeDepth(node2));
 
-            var memberDecl = getTypedNode<MemberDeclarationSyntax>(node, getNodeDepth(node));
+            var memberDecl = getTypedNode<MemberDeclarationSyntax>(node2, getNodeDepth(node2));
 
             var propertyDecl = memberDecl as PropertyDeclarationSyntax;
 
@@ -261,31 +294,64 @@ namespace NSL.Refactoring.FastAction.Core
 
             var methodDecl = memberDecl as MethodDeclarationSyntax;
 
-            string memberType = propertyDecl?.Type?.ToString()
+            string memberType2 = propertyDecl?.Type?.ToString()
                 ?? fieldDecl?.Declaration?.Type?.ToString()
                 ?? typeDecl?.Identifier.ToString()
                 ?? enumDecl?.Identifier.ToString()
                 ?? parameterNode?.Type.ToString();
 
-            var baseType = node as SimpleBaseTypeSyntax;
+            var baseType2 = node2 as SimpleBaseTypeSyntax;
 
-            var nodeName = baseType?.ToString()
+            var nodeName2 = baseType2?.ToString()
                 ?? typeDecl?.GetClassName()
                 ?? namespaceDecl?.Name.ToString()
                 ?? enumDecl?.Identifier.ToString()
                 ?? attributeNode?.ToString()
-                ?? node.ToString();
+                ?? node2.ToString();
 
-            node = attributeNode
+            var node3 = attributeNode
                 ?? parameterNode
                 ?? (SyntaxNode)fieldDecl
                 ?? (SyntaxNode)methodDecl
                 ?? (SyntaxNode)propertyDecl
                 ?? (SyntaxNode)enumDecl
+                ?? (SyntaxNode)structDecl
                 ?? (SyntaxNode)classDecl
-                ?? (SyntaxNode)enumDecl
                 ?? (SyntaxNode)namespaceDecl
-                ?? node;
+                ?? node2;
+
+            FASessionData data = new FASessionData(new (FastActionDataTypeEnum, object)[]
+            {
+                (FastActionDataTypeEnum.MemberType, memberType2 ),
+                (FastActionDataTypeEnum.PropertyMemberType, propertyDecl?.Type?.ToString() ),
+                (FastActionDataTypeEnum.FieldMemberType, fieldDecl?.Declaration?.Type?.ToString() ),
+                (FastActionDataTypeEnum.Type, typeDecl?.Identifier.ToString() ),
+                (FastActionDataTypeEnum.EnumType, enumDecl?.Identifier.ToString() ),
+                (FastActionDataTypeEnum.ParameterType, parameterNode?.Type.ToString() ),
+
+                (FastActionDataTypeEnum.BaseNodeName, nodeName2 ),
+                (FastActionDataTypeEnum.TypeName, typeDecl?.GetClassName() ),
+                (FastActionDataTypeEnum.NamespaceName, namespaceDecl?.Name.ToString() ),
+                (FastActionDataTypeEnum.EnumName, enumDecl?.Identifier.ToString() ),
+                (FastActionDataTypeEnum.AttributeName, attributeNode?.ToString() ),
+                (FastActionDataTypeEnum.NodeName, node3.ToString() ),
+
+
+                (FastActionDataTypeEnum.Attribute, attributeNode ),
+                (FastActionDataTypeEnum.Parameter, parameterNode ),
+                (FastActionDataTypeEnum.EnumMember, enumMemberDecl ),
+                (FastActionDataTypeEnum.Field, fieldDecl ),
+                (FastActionDataTypeEnum.Method, methodDecl ),
+                (FastActionDataTypeEnum.Property, propertyDecl ),
+                (FastActionDataTypeEnum.Enum, enumDecl ),
+                (FastActionDataTypeEnum.Class, classDecl ),
+                (FastActionDataTypeEnum.Struct, structDecl ),
+                (FastActionDataTypeEnum.Namespace, namespaceDecl ),
+                (FastActionDataTypeEnum.Node, node2 ),
+                (FastActionDataTypeEnum.Member, memberDecl),
+                (FastActionDataTypeEnum.BaseType, baseType2),
+
+            });
 
 
 
@@ -318,299 +384,11 @@ namespace NSL.Refactoring.FastAction.Core
                             continue;
                     }
 
-                    var typeAllow = action.Types == null || action.Types.Contains("*");
-
-
-                    typeAllow = typeAllow || action.Types.Contains("namespace_decl") && namespaceDecl != null;
-
-                    typeAllow = typeAllow || action.Types.Contains("type_decl") && typeDecl != null;
-
-                    typeAllow = typeAllow || action.Types.Contains("class_decl") && classDecl != null;
-
-                    typeAllow = typeAllow || action.Types.Contains("struct_decl") && structDecl != null;
-
-                    typeAllow = typeAllow || action.Types.Contains("method_decl") && methodDecl != null;
-
-
-                    typeAllow = typeAllow || action.Types.Contains("enum_member") && enumMemberDecl != null;
-
-                    typeAllow = typeAllow || action.Types.Contains("enum_decl") && enumDecl != null;
-
-                    typeAllow = typeAllow || action.Types.Contains("member_decl") && memberDecl != null;
-
-                    typeAllow = typeAllow || action.Types.Contains("property_decl") && propertyDecl != null;
-
-                    typeAllow = typeAllow || action.Types.Contains("field_decl") && fieldDecl != null;
-
-                    typeAllow = typeAllow || action.Types.Contains("attribute") && attributeNode != null;
-
-                    typeAllow = typeAllow || action.Types.Contains("parameter") && parameterNode != null;
-
-                    typeAllow = typeAllow || action.Types.Contains("base_type") && baseType != null;
-
-                    if (!typeAllow) continue;
-
-                    var matches = new Dictionary<string, string>();
-
-                    bool validateConditions()
-                    {
-                        bool validateNamespace(ConditionData condition)
-                        {
-                            if (condition.Namespace != default)
-                            {
-                                var ns = node.GetParentNamespace()?.Name.ToString();
-
-                                if (condition.OptionalExists && ns == default)
-                                    return true;
-
-                                Dictionary<string, string> nnmatch = null;
-
-                                if (ns == default || !condition.IsMatch(condition.Namespace, ns, out nnmatch))
-                                {
-                                    if (!condition.OptionalCondition)
-                                        return false;
-                                }
-
-                                if (nnmatch != null)
-                                    foreach (var item in nnmatch)
-                                    {
-                                        matches[item.Key] = item.Value;
-                                    }
-                            }
-                            return true;
-                        }
-
-                        bool validateProperty(ConditionData condition)
-                        {
-                            if (condition.PropertyDeclaration != default)
-                            {
-                                if (condition.OptionalExists && propertyDecl == default)
-                                    return true;
-
-                                Dictionary<string, string> nnmatch = null;
-
-                                if (propertyDecl == default || !condition.IsMatch(condition.PropertyDeclaration, propertyDecl.ToString(), out nnmatch))
-                                {
-                                    if (!condition.OptionalCondition)
-                                        return false;
-                                }
-
-                                if (nnmatch != null)
-                                    foreach (var item in nnmatch)
-                                    {
-                                        matches[item.Key] = item.Value;
-                                    }
-                            }
-                            return true;
-                        }
-
-                        bool validateMemberType(ConditionData condition)
-                        {
-                            if (condition.MemberType != default)
-                            {
-                                if (condition.OptionalExists && memberType == default)
-                                    return true;
-
-                                Dictionary<string, string> nnmatch = null;
-
-                                if (memberType == default || !condition.IsMatch(condition.MemberType, memberType, out nnmatch))
-                                {
-                                    if (!condition.OptionalCondition)
-                                        return false;
-                                }
-
-                                if (nnmatch != null)
-                                    foreach (var item in nnmatch)
-                                    {
-                                        matches[item.Key] = item.Value;
-                                    }
-                            }
-                            return true;
-                        }
-
-                        bool validateField(ConditionData condition)
-                        {
-                            if (condition.FieldDeclaration != default)
-                            {
-                                if (condition.OptionalExists && fieldDecl == default)
-                                    return true;
-
-                                Dictionary<string, string> nnmatch = null;
-
-                                if (propertyDecl == default || !condition.IsMatch(condition.FieldDeclaration, fieldDecl.ToString(), out nnmatch))
-                                {
-                                    if (!condition.OptionalCondition)
-                                        return false;
-                                }
-
-                                if (nnmatch != null)
-                                    foreach (var item in nnmatch)
-                                    {
-                                        matches[item.Key] = item.Value;
-                                    }
-                            }
-
-                            return true;
-                        }
-
-                        bool validateFilePath(ConditionData condition)
-                        {
-                            if (condition.FilePath != default)
-                            {
-                                if (condition.OptionalExists && document.FilePath == default)
-                                    return true;
-
-
-                                if (!condition.IsMatch(condition.FilePath, document.FilePath, out var nnmatch))
-                                {
-                                    if (!condition.OptionalCondition)
-                                        return false;
-                                }
-
-                                foreach (var item in nnmatch)
-                                {
-                                    matches[item.Key] = item.Value;
-                                }
-                            }
-
-                            return true;
-                        }
-
-                        bool validateNodeName(ConditionData condition)
-                        {
-                            if (condition.NodeName != default)
-                            {
-                                if (condition.OptionalExists && nodeName == default)
-                                    return true;
-
-                                if (!condition.IsMatch(condition.NodeName, nodeName, out var nnmatch))
-                                {
-                                    if (!condition.OptionalCondition)
-                                        return false;
-                                }
-
-                                foreach (var item in nnmatch)
-                                {
-                                    matches[item.Key] = item.Value;
-                                }
-                            }
-
-                            return true;
-                        }
-
-                        bool validateProjectPath(ConditionData condition)
-                        {
-                            if (condition.ProjectPath != default)
-                            {
-                                if (condition.OptionalExists && document.Project.FilePath == default)
-                                    return true;
-
-                                if (!condition.IsMatch(condition.ProjectPath, document.Project.FilePath, out var nnmatch))
-                                {
-                                    if (!condition.OptionalCondition)
-                                        return false;
-                                }
-
-                                foreach (var item in nnmatch)
-                                {
-                                    matches[item.Key] = item.Value;
-                                }
-                            }
-
-                            return true;
-                        }
-
-                        bool validateProjectName(ConditionData condition)
-                        {
-                            if (condition.ProjectName != default)
-                            {
-                                if (condition.OptionalExists && document.Project.Name == default)
-                                    return true;
-
-                                if (!condition.IsMatch(condition.ProjectName, document.Project.Name, out var nnmatch))
-                                {
-                                    if (!condition.OptionalCondition)
-                                        return false;
-                                }
-
-                                foreach (var item in nnmatch)
-                                {
-                                    matches[item.Key] = item.Value;
-                                }
-                            }
-
-                            return true;
-                        }
-
-                        bool validateSolutionPath(ConditionData condition)
-                        {
-                            if (condition.SolutionPath != default)
-                            {
-                                if (condition.OptionalExists && document.Project.Solution.FilePath == default)
-                                    return true;
-
-                                if (!condition.IsMatch(condition.SolutionPath, document.Project.Solution.FilePath, out var nnmatch))
-                                {
-                                    if (!condition.OptionalCondition)
-                                        return false;
-                                }
-
-                                foreach (var item in nnmatch)
-                                {
-                                    matches[item.Key] = item.Value;
-                                }
-                            }
-
-                            return true;
-                        }
-
-                        bool validateSolutionName(ConditionData condition)
-                        {
-                            if (condition.SolutionName != default)
-                            {
-                                var name = Path.GetFileName(document.Project.Solution.FilePath);
-
-                                name = name.Substring(0, name.LastIndexOf('.'));
-
-                                if (condition.OptionalExists && name == default)
-                                    return true;
-
-                                if (!condition.IsMatch(condition.SolutionName, name, out var nnmatch))
-                                {
-                                    if (!condition.OptionalCondition)
-                                        return false;
-                                }
-
-                                foreach (var item in nnmatch)
-                                {
-                                    matches[item.Key] = item.Value;
-                                }
-                            }
-
-                            return true;
-                        }
-
-
-                        foreach (var condition in action.Conditions)
-                        {
-                            if (!validateNamespace(condition)) return false;
-                            if (!validateProperty(condition)) return false;
-                            if (!validateField(condition)) return false;
-                            if (!validateMemberType(condition)) return false;
-                            if (!validateFilePath(condition)) return false;
-                            if (!validateNodeName(condition)) return false;
-                            if (!validateProjectPath(condition)) return false;
-                            if (!validateProjectName(condition)) return false;
-                            if (!validateSolutionPath(condition)) return false;
-                            if (!validateSolutionName(condition)) return false;
-                        }
-
-                        return true;
-                    }
-
-                    if (!validateConditions())
+                    if (!data.ValidateTypeCondition(action)) 
                         continue;
 
+                    if (!data.ValidateConditions(document, action, out var matches))
+                        continue;
 
                     var actionValuesCollection = new Dictionary<string, string>(action.Values);
 
@@ -698,13 +476,42 @@ namespace NSL.Refactoring.FastAction.Core
                                 string getNextPath(string path)
                                 {
                                     var di = new DirectoryInfo(path);
-                                    foreach (var item in di.GetDirectories()
-                                        .OrderByDescending(x => x.Name.Contains("Models") 
-                                        || x.Name.Contains("Controllers")
-                                        || x.Name.Contains("Managers")
-                                        || x.Name.Contains("Services")
-                                        || x.Name.Contains("Enums"))
-                                        .ThenByDescending(x => x.Name.Length))
+
+                                    IEnumerable<DirectoryInfo> directions = di.GetDirectories();
+
+                                    foreach (var _pp in action.PathPriority)
+                                    {
+                                        var pp = _pp;
+
+                                        Func<DirectoryInfo, bool> ppf = (di2) => true;
+
+                                        if (pp.StartsWith("*") && pp.EndsWith("*"))
+                                        {
+                                            pp = pp.Trim('*');
+                                            ppf = x => x.Name.Contains(pp);
+                                        }
+                                        else if (pp.StartsWith("*"))
+                                        {
+                                            pp = pp.Trim('*');
+                                            ppf = x => x.Name.EndsWith(pp);
+                                        }
+                                        else if (pp.EndsWith("*"))
+                                        {
+                                            pp = pp.Trim('*');
+                                            ppf = x => x.Name.StartsWith(pp);
+                                        }
+                                        else
+                                        {
+                                            ppf = x => x.Name == pp;
+                                        }
+
+                                        if (directions is IOrderedEnumerable<DirectoryInfo> o)
+                                            directions = o.ThenByDescending(ppf);
+                                        else
+                                            directions = directions.OrderByDescending(ppf);
+                                    }
+
+                                    foreach (var item in directions)
                                     {
                                         if (outputName.Contains(item.Name))
                                             return getNextPath(item.FullName);

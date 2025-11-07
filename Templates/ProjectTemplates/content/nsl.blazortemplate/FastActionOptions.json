@@ -1,0 +1,24 @@
+{
+  "PreventCache": true,
+  "Actions": [
+    {
+      "Id": "shared_nsl_model_basic",
+      "OutputRelativePath": "Models/"
+    }
+  ],
+
+  "Groups": [
+    {
+      "ProjectName": "NSL.BlazorTemplate.Shared.Server",
+      "Id": "shared_server_project",
+      "Name": "Shared Server",
+      "Actions": [ "*" ]
+    },
+    {
+      "ProjectName": "NSL.BlazorTemplate.Shared",
+      "Id": "shared_project",
+      "Name": "Shared",
+      "Actions": [ "*" ]
+    }
+  ]
+}

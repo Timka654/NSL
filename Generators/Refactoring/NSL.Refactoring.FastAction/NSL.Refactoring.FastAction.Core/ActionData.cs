@@ -23,6 +23,8 @@ namespace NSL.Refactoring.FastAction.Core
 
         public string[] Types { get; set; }
 
+        public string[] PathPriority { get; set; } = Array.Empty<string>()
+
         public ConditionData[] Conditions { get; set; } = Array.Empty<ConditionData>();
 
         public string[] Errors { get; set; }
