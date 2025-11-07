@@ -226,14 +226,14 @@ namespace NSL.ASPNET
                                 if (key != default)
                                 {
                                     if (baseType != default)
-                                        services.AddKeyedSingleton(baseType, key, type);
+                                        services.AddKeyedSingleton(baseType, key, (x, o)=>x.GetRequiredKeyedService(type, key));
                                     else
                                         services.AddKeyedSingleton(type, key);
                                 }
                                 else
                                 {
                                     if (baseType != default)
-                                        services.AddSingleton(baseType, type);
+                                        services.AddSingleton(baseType, (x) => x.GetRequiredService(type));
                                     else
                                         services.AddSingleton(type);
                                 }
@@ -242,14 +242,14 @@ namespace NSL.ASPNET
                                 if (key != default)
                                 {
                                     if (baseType != default)
-                                        services.AddKeyedScoped(baseType, key, type);
+                                        services.AddKeyedScoped(baseType, key, (x, o) => x.GetRequiredKeyedService(type, key));
                                     else
                                         services.AddKeyedScoped(type, key);
                                 }
                                 else
                                 {
                                     if (baseType != default)
-                                        services.AddScoped(baseType, type);
+                                        services.AddScoped(baseType, (x) => x.GetRequiredService(type));
                                     else
                                         services.AddScoped(type);
                                 }
@@ -258,14 +258,14 @@ namespace NSL.ASPNET
                                 if (key != default)
                                 {
                                     if (baseType != default)
-                                        services.AddKeyedTransient(baseType, key, type);
+                                        services.AddKeyedTransient(baseType, key, (x, o) => x.GetRequiredKeyedService(type, key));
                                     else
                                         services.AddKeyedTransient(type, key);
                                 }
                                 else
                                 {
                                     if (baseType != default)
-                                        services.AddTransient(baseType, type);
+                                        services.AddTransient(baseType, (x) => x.GetRequiredService(type));
                                     else
                                         services.AddTransient(type);
                                 }

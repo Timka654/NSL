@@ -59,8 +59,9 @@ namespace NSL.SMTP.ASPNET
         protected bool TryRemoveTrap(byte[] hash)
             => trapCollection.Remove(hash, out _);
 
-        public byte[] GenerateTrapHash(string email
+        public virtual byte[] GenerateTrapHash(string email
             , string subject
+            , string content
             , string uid)
             => SHA256.HashData(Encoding.UTF8.GetBytes(string.Join("__", subject, email, uid)));
 
@@ -74,9 +75,9 @@ namespace NSL.SMTP.ASPNET
         {
             if (Options.Enabled)
             {
-                if (delay.HasValue)
+                if (delay.HasValue && !options.Value.DisableTrap)
                 {
-                    hash ??= GenerateTrapHash(email, subject, uid);
+                    hash ??= GenerateTrapHash(email, subject, htmlMessage, uid);
 
                     var trapped = trapCollection.TryGetValue(hash, out var trapDate) && now - trapDate < delay.Value;
 
@@ -104,12 +105,11 @@ namespace NSL.SMTP.ASPNET
 
         public override async Task SendEmailAsync(string email, string subject, string htmlMessage)
         {
-            if (Options.Enabled)
-                await AddAction(new SendMailRequest(email, subject, htmlMessage, default, default, default, default, default), CancellationToken.None);
+            await AddAction(new SendMailRequest(email, subject, htmlMessage, default, default, default, default, default), CancellationToken.None);
         }
 
         protected ValueTask AddAction(SendMailRequest data, CancellationToken cancellationToken)
-        => channel.AddAsync(new DeferredSendMailAction<TData>(t => channelProcessing(data, t), data), cancellationToken);
+            => channel.AddAsync(new DeferredSendMailAction<TData>(t => channelProcessing(data, t), data), cancellationToken);
 
         DeferredChannel<DeferredSendMailAction<TData>> channel = new DeferredChannel<DeferredSendMailAction<TData>>();
 
@@ -118,7 +118,7 @@ namespace NSL.SMTP.ASPNET
         {
             now = DateTime.UtcNow;
 
-            if ((now - lastTrapClear).TotalHours > 3)
+            if (!options.Value.DisableTrap && (now - lastTrapClear).TotalHours > 3)
             {
                 lastTrapClear = now;
                 var trapItems = trapCollection.ToArray();
@@ -161,9 +161,9 @@ namespace NSL.SMTP.ASPNET
             {
                 await ExceptionHandleAsync(ex, current, cancellationToken);
 
-                logger.LogError($"{current.email}, {current.subject} - {ex.ToString()}");
+                var rcResult = await RepeatConditionAsync(ex, current, cancellationToken);
 
-                if (await RepeatConditionAsync(ex, current, cancellationToken))
+                if (rcResult)
                     await AddAction(current, cancellationToken);
 
                 if (await ThrowDelayConditionAsync(ex, current, cancellationToken))
@@ -186,6 +186,7 @@ namespace NSL.SMTP.ASPNET
 
         protected virtual Task ExceptionHandleAsync(Exception? ex, SendMailRequest mail, CancellationToken cancellationToken)
         {
+            logger.LogError($"{mail.email}, {mail.subject} - {ex.ToString()}");
             return Task.CompletedTask;
         }
 
@@ -223,7 +224,11 @@ namespace NSL.SMTP.ASPNET
         {
             restoreDataSource = TryGetRestoreDataSource();
 
-            if (restoreDataSource != null)
+            if (restoreDataSource == null)
+            {
+                logger.LogWarning($"Cannot found restore data source. Skipping restore process. If application shutdown - processing data be lost");
+            }
+            else
             {
                 var items = await restoreDataSource.TryGetDataAsync<SendMailRequest[]>(StoreDataName, cancellationToken);
 
@@ -237,6 +242,9 @@ namespace NSL.SMTP.ASPNET
                     }
                 }
             }
+
+            //if (debug)
+            //    await AddAction(new SendMailRequest(null, null, null, null, null, null, null, default), CancellationToken.None);
 
             channel.RunProcessing();
         }

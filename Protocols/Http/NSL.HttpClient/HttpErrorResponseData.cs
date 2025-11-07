@@ -2,7 +2,7 @@
 
 namespace NSL.HttpClient
 {
-    public class HttpErrorResponseData : Dictionary<string, HttpResponseErrorModel>
+    public class HttpErrorResponseData : Dictionary<string, List<HttpResponseErrorModel>>
     {
 
     }

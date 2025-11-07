@@ -13,18 +13,22 @@ namespace NSL.HttpClient
             , Func<Task<System.Net.Http.HttpContent>> defaultBuildAction
             , params object[] requestData)
         {
-            if (options?.IOProcessor != null)
-                await options.IOProcessor.RequestBuildProcess(client, options, message, defaultBuildAction, requestData);
-            else
-                message.Content = await defaultBuildAction();
+            var processor = options?.IOProcessor ?? DefaultHttpIOProcessor.Instance;
+
+            if (processor == null) throw new InvalidOperationException("IOProcessor not set in options and no default(BaseHttpRequestOptions?.IOProcessor == null && DefaultHttpIOProcessor.Instance == null)");
+
+            await processor.RequestBuildProcess(client, options, message, defaultBuildAction, requestData);
         }
 
         public static async Task ResponsePostProcess(this BaseHttpRequestOptions options
             , HttpResponseMessage httpResponse
             , BaseResponse response)
         {
-            if (options?.IOProcessor != null)
-              await options.IOProcessor.ResponsePostProcess(options, httpResponse, response);
+            var processor = options?.IOProcessor ?? DefaultHttpIOProcessor.Instance;
+
+            if (processor == null) throw new InvalidOperationException("IOProcessor not set in options and no default(BaseHttpRequestOptions?.IOProcessor == null && DefaultHttpIOProcessor.Instance == null)");
+
+            await processor.ResponsePostProcess(options, httpResponse, response);
         }
 
         public static System.Net.Http.HttpClient FillClientOptions(this System.Net.Http.HttpClient client

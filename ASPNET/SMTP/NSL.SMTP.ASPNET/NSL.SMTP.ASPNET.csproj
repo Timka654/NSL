@@ -23,6 +23,11 @@
 		<PackageId>$(MSBuildProjectName)_Debug</PackageId>
 	</PropertyGroup>
 
+	<!--<ItemGroup>
+	  <PackageReference Include="NSL.DataSource.ASPNET" Version="2025.9.20.2127" />
+	  <PackageReference Include="NSL.Utils" Version="2025.9.20.2127" />
+	</ItemGroup>-->
+
 	<ItemGroup>
 		<ProjectReference Include="..\..\..\Core\Utils\NSL.Utils\NSL.Utils.csproj" />
 		<ProjectReference Include="..\..\RestoreData\NSL.DataSource.ASPNET\NSL.DataSource.ASPNET.csproj" />

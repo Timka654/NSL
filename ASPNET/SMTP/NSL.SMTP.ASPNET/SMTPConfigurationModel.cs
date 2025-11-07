@@ -3,6 +3,7 @@
     public class SMTPConfigurationModel : SMTPClientConfigurationModel
     {
         public bool Enabled { get; set; }
+        public bool DisableTrap { get; set; }
 
         public int RequestDelaySeconds { get; set; } = 120;
 

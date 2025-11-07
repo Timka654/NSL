@@ -25,5 +25,8 @@
 	<ItemGroup>
 		<PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="9.0.6" />
 	</ItemGroup>
+	<ItemGroup>
+	  <Folder Include="Modal\" />
+	</ItemGroup>
 
 </Project>

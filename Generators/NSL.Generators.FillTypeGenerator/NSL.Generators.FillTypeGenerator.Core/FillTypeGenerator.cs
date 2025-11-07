@@ -375,20 +375,23 @@ namespace NSL.Generators.FillTypeGenerator
                             ToType = memberToType,
                             Model = itemModel,
                             FieldName = toItem.Name,
-                            GetPath = null,
-                            SetPath = null,
+                            GetPath = codeFragment,
+                            SetPath = null,//$"{context.Current.SetPath}.{fromItem.Name}",
                             To = citem.To
                         });
 
                         FillMembers(context, amem, true);
 
-                        context.Prev();
-
 #pragma warning disable RS1035 // Не использовать API, запрещенные для анализаторов
-                        codeFragment = $"new {memberToType.GetTypeFullName(false)} {{{Environment.NewLine}" +
+
+                        context.Prev();
+                        var t = string.Concat(Enumerable.Repeat("\t", context.Tab));
+
+                        codeFragment = $"{codeFragment} == null ? null : new {memberToType.GetTypeFullName(false)}(){Environment.NewLine}{t}{{{Environment.NewLine}" +
                             string.Join($",{Environment.NewLine}", amem) +
-                            $"{Environment.NewLine}}}";
+                            $"{Environment.NewLine}{t}}}";
 #pragma warning restore RS1035 // Не использовать API, запрещенные для анализаторов
+
                     }
                     else
                     {

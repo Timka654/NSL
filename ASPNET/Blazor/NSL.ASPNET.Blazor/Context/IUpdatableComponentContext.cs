@@ -2,7 +2,7 @@
 
 namespace NSL.ASPNET.Blazor.Context
 {
-    public interface IComponentUpdatableContext : IComponentContext
+    public interface IUpdatableComponentContext : IComponentContext
     {
         event Action OnUpdate;
 

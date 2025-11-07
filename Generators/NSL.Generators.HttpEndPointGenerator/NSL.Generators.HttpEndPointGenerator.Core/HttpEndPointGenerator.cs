@@ -107,7 +107,7 @@ namespace NSL.Generators.HttpEndPointGenerator
 
             codeBuilder.CreatePartialClass(typeClass, classBuilder =>
             {
-                classBuilder.AppendLine($"protected partial System.Net.Http.HttpClient CreateEndPointClient(string url);");
+                classBuilder.AppendLine($"protected partial Task<System.Net.Http.HttpClient> CreateEndPointClient(string url);");
 
                 classBuilder.AppendLine();
 
@@ -160,7 +160,7 @@ namespace NSL.Generators.HttpEndPointGenerator
 
                     classBuilder.AppendLine();
 
-                    var members = containerType.GetAllMembers();
+                    var members = containerType.GetAllMembers(true);
 
                     foreach (var item in members)
                     {
@@ -255,7 +255,7 @@ namespace NSL.Generators.HttpEndPointGenerator
 
                                 methodBuilder.AppendLine($"public async Task<{returnType}> {requestMethodName}({string.Join(", ", _p)})");
                                 methodBuilder.NextTab();
-                                methodBuilder.AppendLine($"=> await CreateEndPointClient({_vname}Url)");
+                                methodBuilder.AppendLine($"=> await (await CreateEndPointClient({_vname}Url))");
                                 methodBuilder.AppendLine($".FillClientOptions(__options)");
                                 if (_t == "Post")
                                 {

@@ -2,7 +2,7 @@
 
 namespace NSL.Generators.HttpEndPointGenerator.Shared.Attributes
 {
-    [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
+    [AttributeUsage(AttributeTargets.Method, AllowMultiple = true, Inherited = true)]
     public class HttpEndPointGenerateAttribute : Attribute
     {
         public HttpEndPointGenerateAttribute(Type returnType)

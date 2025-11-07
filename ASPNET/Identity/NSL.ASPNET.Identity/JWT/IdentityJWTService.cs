@@ -28,18 +28,18 @@ namespace NSL.ASPNET.Identity.JWT
                     return;
 
                 identity = value;
-
-                UpdateIdentity(value);
             }
         }
 
-        protected virtual void UpdateIdentity(JwtSecurityToken identity)
+        protected virtual Task UpdateIdentity(JwtSecurityToken identity)
         {
             _Email = base.Email;
             _UserName = base.UserName;
             _Id = base.Id;
             _PhoneNumber = base.PhoneNumber;
             _Roles = base.Roles;
+
+            return Task.CompletedTask;
         }
 
         private string _Email;
@@ -63,6 +63,8 @@ namespace NSL.ASPNET.Identity.JWT
             if (!IsAuthenticated)
             {
                 Identity = default;
+
+                await UpdateIdentity(Identity);
                 return;
             }
 
@@ -75,6 +77,8 @@ namespace NSL.ASPNET.Identity.JWT
                 ReadingClaimsErrorHandle(AuthorizationToken, ex);
                 await ClearIdentityAsync(cancellationToken);
             }
+
+            await UpdateIdentity(Identity);
         }
 
         public override IEnumerable<Claim>? GetClaims()

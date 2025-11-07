@@ -29,11 +29,11 @@ namespace NSL.HttpClient
 
         public RequestClientBuildHandler ClientBuilder { get; set; }
 
-        public IHttpIOProcessor IOProcessor { get; set; } = new DefaultHttpIOProcessor();
+        public IHttpIOProcessor IOProcessor { get; set; } = DefaultHttpIOProcessor.Instance;
 
         public CancellationToken CancellationToken { get; set; } = CancellationToken.None;
 
-        public Dictionary<object, object> ObjectBag { get; set; } = new Dictionary<object, object>();
+        public Dictionary<string, object> ObjectBag { get; set; } = new Dictionary<string, object>();
 
         /// <summary>
         /// 
@@ -71,8 +71,8 @@ namespace NSL.HttpClient
         public BaseHttpRequestOptions Clone()
         {
             var r = MemberwiseClone() as BaseHttpRequestOptions;
-            
-            r.ObjectBag = new Dictionary<object, object>(ObjectBag);
+
+            r.ObjectBag = new Dictionary<string, object>(ObjectBag);
 
             return r;
         }
@@ -157,10 +157,10 @@ namespace NSL.HttpClient
             return this;
         }
 
-        public BaseHttpRequestOptions WithObjectValue(object key, object value, bool clone = false)
+        public BaseHttpRequestOptions WithObjectValue(string key, object value, bool clone = false)
         {
-            if(key == null)
-            throw new ArgumentNullException(nameof(key));
+            if (key == null)
+                throw new ArgumentNullException(nameof(key));
 
             if (clone)
                 return Clone().WithObjectValue(key, value);

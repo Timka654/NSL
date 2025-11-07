@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace NSL.ASPNET.Blazor.Context
 {
-    public class ContextComponent<TContext> : ComponentBase, IDisposable
+    public class ContexableComponent<TContext> : ComponentBase, IDisposable
         where TContext : IComponentContext
     {
         private TContext? context;
@@ -18,18 +18,18 @@ namespace NSL.ASPNET.Blazor.Context
         {
             var context = Context;
 
-            if (context != null && context is IComponentUpdatableContext ou)
+            if (context != null && context is IUpdatableComponentContext ou)
                 ou.OnUpdate -= Context_OnUpdate;
         }
 
-        protected virtual void ChangeContext(TContext? oldContext, TContext newContext)
+        protected virtual void ChangeContext(TContext? oldContext, TContext? newContext)
         {
-            if (newContext != null && newContext is IComponentUpdatableContext nu)
+            if (newContext != null && newContext is IUpdatableComponentContext nu)
                 nu.OnUpdate += Context_OnUpdate;
 
             context = newContext;
 
-            if (oldContext != null && oldContext is IComponentUpdatableContext ou)
+            if (oldContext != null && oldContext is IUpdatableComponentContext ou)
                 ou.OnUpdate -= Context_OnUpdate;
 
         }
