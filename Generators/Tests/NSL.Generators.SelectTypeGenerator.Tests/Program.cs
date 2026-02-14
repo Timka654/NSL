@@ -1,4 +1,5 @@
 ﻿using NSL.Generators.SelectTypeGenerator.Attributes;
+using NSL.Generators.SelectTypeGenerator.Tests.Develop;
 
 namespace NSL.Generators.SelectTypeGenerator.Tests
 {
@@ -7,6 +8,7 @@ namespace NSL.Generators.SelectTypeGenerator.Tests
         static void Main(string[] args)
         {
 #if DEVELOP
+            var t = new List<Typed_Dto1_Model>();
 
 
 #else

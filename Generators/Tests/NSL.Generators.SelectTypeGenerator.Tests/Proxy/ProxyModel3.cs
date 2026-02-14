@@ -1,4 +1,4 @@
-﻿#if !DEVELOP
+﻿#if DEVELOP
 using NSL.Generators.SelectTypeGenerator.Attributes;
 using System;
 using System.Collections.Generic;
@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace NSL.Generators.SelectTypeGenerator.Tests
 {
+    [SelectGenerate("Get")]
     public partial class ProxyModel3
     {
         [SelectGenerateInclude("Get")] public Guid Id { get; set; }

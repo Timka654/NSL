@@ -11,7 +11,10 @@ namespace NSL.Database.EntityFramework
 {
     public static class CloneExtensions
     {
-        private static async Task LoadUnattachedAsync(DbContext dbContext, object value, IReadOnlyList<RuntimeProperty> p = null, CancellationToken cancellationToken = default)
+        public static async Task LoadUnattachedAsync<TSet>(this DbContext dbContext, TSet value, CancellationToken cancellationToken = default)
+            => await LoadUnattachedAsync(dbContext, (object)value, null, cancellationToken);
+
+        public static async Task LoadUnattachedAsync(DbContext dbContext, object value, IReadOnlyList<RuntimeProperty> p = null, CancellationToken cancellationToken = default)
         {
             var entry = dbContext.Entry(value);
 

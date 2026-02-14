@@ -10,15 +10,16 @@ using NSL.HttpClient.Models;
 
 using NSL.Generators.FillTypeGenerator.Tests.Develop.WithModelName;
 using NSL.Generators.HttpEndPointGenerator.Shared.Attributes;
+using static NSL.Generators.HttpEndPointGenerator.Tests.Shared.ITestController;
 
 namespace NSL.Generators.HttpEndPointGenerator.Tests.Shared
 {
     [HttpEndPointContainerGenerate("api/[controller]")]
-    public interface ITestController
+    public interface ITestController : ITest2Controller
     {
-        Task<DataResponse<TestBaseModel1>> NewPost1([FromForm] WithModelName2 query);
-
         [HttpEndPointGenerate(typeof(IdResponse<Guid>))] public Task<IActionResult> TestPost([FromForm, HttpEndPointParameter(GenHttpParameterEnum.Particle)] WithModelName2 query);
+
+        Task<DataResponse<TestBaseModel1>> NewPost1([FromForm] WithModelName2 query);
 
         [HttpEndPointGenerate(typeof(DataResponse<Guid>))] public Task<IActionResult> TestPost2([FromForm] WithModelName3 query);
 
@@ -32,5 +33,23 @@ namespace NSL.Generators.HttpEndPointGenerator.Tests.Shared
         [HttpEndPointGenerate(typeof(IdResponse<Guid>))] public Task<IActionResult> TestPost6([FromForm] WithModelName3 query, [FromForm] IFormFileCollection file);
 
         [HttpEndPointGenerate(typeof(IdResponse<Guid>))] public Task<IActionResult> TestPost7([FromForm] WithModelName3 query, [FromForm] IFormFileCollection file, [FromHeader(Name = "abc"), HttpEndPointParameter] string h1, [FromHeader, HttpEndPointParameter] string abc2);
+    }
+
+
+    [HttpEndPointContainerGenerate("api/[controller]")]
+    public interface ITest1Controller : ITest2Controller
+    {
+    }
+
+        public interface ITest2Controller : ITest3Controller
+    {
+        [HttpEndPointGenerate(typeof(IdResponse<Guid>))] public Task<IActionResult> TestPost8([FromForm, HttpEndPointParameter(GenHttpParameterEnum.Particle)] WithModelName4 query);
+        [HttpEndPointGenerate(typeof(IdResponse<Guid>))] public Task<IActionResult> TestPost9([FromForm] WithModelName3 query, [FromForm] IFormFileCollection file, [FromHeader(Name = "abc"), HttpEndPointParameter] string h1, [FromHeader, HttpEndPointParameter] string abc2);
+    }
+
+    public interface ITest3Controller
+    {
+        [HttpEndPointGenerate(typeof(IdResponse<Guid>))] public Task<IActionResult> TestPost10([FromForm, HttpEndPointParameter(GenHttpParameterEnum.Particle)] WithModelName4 query);
+        [HttpEndPointGenerate(typeof(IdResponse<Guid>))] public Task<IActionResult> TestPost11([FromForm] WithModelName3 query, [FromForm] IFormFileCollection file, [FromHeader(Name = "abc"), HttpEndPointParameter] string h1, [FromHeader, HttpEndPointParameter] string abc2);
     }
 }

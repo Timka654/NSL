@@ -1,5 +1,6 @@
 ﻿using Microsoft.CodeAnalysis;
 using NSL.Generators.Utils;
+using System;
 using System.Collections.Generic;
 
 namespace NSL.Generators.SelectTypeGenerator
@@ -20,11 +21,16 @@ namespace NSL.Generators.SelectTypeGenerator
 
         public string MemberName { get; set; }
 
+
+
         public List<SelectGenContext> SubTypeList { get; set; }
 
         public virtual string GetTypeIdentifier(bool canNullable = true)
             => Type.GetTypeFullName(canNullable);
 
         public SelectGenContext Parent { get; internal set; }
+    }
+    internal class SelectCodeCollector : List<string> {
+
     }
 }

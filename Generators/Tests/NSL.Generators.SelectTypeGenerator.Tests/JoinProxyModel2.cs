@@ -1,4 +1,6 @@
-﻿using NSL.Generators.SelectTypeGenerator.Attributes;
+﻿#if !DEVELOP
+
+using NSL.Generators.SelectTypeGenerator.Attributes;
 
 namespace NSL.Generators.SelectTypeGenerator.Tests
 {
@@ -22,3 +24,5 @@ namespace NSL.Generators.SelectTypeGenerator.Tests
         public string v5 { get; set; }
     }
 }
+
+#endif

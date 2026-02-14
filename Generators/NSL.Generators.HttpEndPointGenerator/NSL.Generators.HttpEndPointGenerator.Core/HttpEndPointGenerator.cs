@@ -160,7 +160,10 @@ namespace NSL.Generators.HttpEndPointGenerator
 
                     classBuilder.AppendLine();
 
-                    var members = containerType.GetAllMembers(true);
+                    //GenDebug.Break();
+
+                    var members = containerType.GetAllMembers();
+
 
                     foreach (var item in members)
                     {

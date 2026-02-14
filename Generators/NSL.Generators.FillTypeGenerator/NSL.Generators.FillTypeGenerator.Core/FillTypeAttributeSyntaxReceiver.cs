@@ -1,5 +1,6 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using NSL.Generators.FillTypeGenerator.Attributes;
 using NSL.Generators.Utils;
 using System;
 using System.Collections.Generic;
@@ -12,8 +13,8 @@ namespace NSL.Generators.FillTypeGenerator
     {
         //public IList<TypeDeclarationSyntax> FillTypeTypes { get; } = new List<TypeDeclarationSyntax>();
 
-        internal static readonly string FillTypeGenerateAttributeFullName = FillTypeGenerator.FillTypeGenerateAttributeFullName;
-        internal static readonly string FillTypeFromGenerateAttributeFullName = FillTypeGenerator.FillTypeFromGenerateAttributeFullName;
+        internal static readonly string FillTypeGenerateAttributeFullName = typeof(FillTypeGenerateAttribute).Name;
+        internal static readonly string FillTypeFromGenerateAttributeFullName = typeof(FillTypeFromGenerateAttribute).Name;
 
         //public void OnVisitSyntaxNode(SyntaxNode syntaxNode)
         //{

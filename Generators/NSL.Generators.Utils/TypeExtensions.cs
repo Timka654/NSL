@@ -35,28 +35,29 @@ namespace NSL.Generators.Utils
             return t;
         }
 
-        public static ISymbol[] GetAllMembers(this ITypeSymbol type, bool @interface = false)
+        public static ISymbol[] GetAllMembers(this ITypeSymbol type)
         {
             var cType = type;
 
-            List<ISymbol> toMembers = new List<ISymbol>();
+            HashSet<ISymbol> toMembers = new HashSet<ISymbol>(SymbolEqualityComparer.Default);
 
-            GetAllMembers(new[] { type }, toMembers, @interface);
+
+            GetAllMembers(new[] { type }, toMembers);
 
             return toMembers.ToArray();
         }
 
-        private static void GetAllMembers(this IEnumerable<ITypeSymbol> types, List<ISymbol> items, bool @interface = false)
+        private static void GetAllMembers(this IEnumerable<ITypeSymbol> types, HashSet<ISymbol> items)
         {
             foreach (var cType in types)
             {
-                items.AddRange(cType.GetMembers());
+                foreach (var m in cType.GetMembers())
+                    items.Add(m);
 
-                var a = (@interface ? cType.AllInterfaces.Cast<ITypeSymbol>() : new[] { cType.BaseType })
-                    .Where(x => x != null);
-
-                if (a.Any())
-                    GetAllMembers(a, items, @interface);
+                if (cType.TypeKind == TypeKind.Interface)
+                    GetAllMembers(cType.Interfaces, items);
+                else if (cType.BaseType != null)
+                    GetAllMembers(new[] { cType.BaseType }, items);
             }
         }
 

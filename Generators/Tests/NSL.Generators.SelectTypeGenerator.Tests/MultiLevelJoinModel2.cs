@@ -1,4 +1,6 @@
-﻿using NSL.Generators.SelectTypeGenerator.Attributes;
+﻿#if !DEVELOP
+
+using NSL.Generators.SelectTypeGenerator.Attributes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,3 +23,5 @@ namespace NSL.Generators.SelectTypeGenerator.Tests.Develop
         public string NameLevel3 { get; set; }
     }
 }
+
+#endif

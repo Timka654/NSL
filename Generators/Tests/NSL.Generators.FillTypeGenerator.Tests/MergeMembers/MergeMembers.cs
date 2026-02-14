@@ -1,11 +1,13 @@
-﻿using NSL.Generators.FillTypeGenerator.Attributes;
+﻿#if !DEVELOP
+
+using NSL.Generators.FillTypeGenerator.Attributes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NSL.Generators.FillTypeGenerator.Tests.Develop
+namespace NSL.Generators.FillTypeGenerator.Tests.MergeMembers
 {
     internal partial class MergeMembers1
     {
@@ -20,9 +22,9 @@ namespace NSL.Generators.FillTypeGenerator.Tests.Develop
         /// </summary>
         internal void FillFrom2(MergeMembers1 fillFrom)
         {
-            inner = fillFrom.inner == null ? null : new NSL.Generators.FillTypeGenerator.Tests.Develop.MergeMembersInner2
+            inner = fillFrom.inner == null ? null : new Tests.MergeMembers.MergeMembersInner2
             {
-                inner = fillFrom.inner.inner == null ? null : new NSL.Generators.FillTypeGenerator.Tests.Develop.MergeMembersIInner2
+                inner = fillFrom.inner.inner == null ? null : new Tests.MergeMembers.MergeMembersIInner2
                 {
                     a = fillFrom.inner.inner.a
                 },
@@ -68,3 +70,6 @@ namespace NSL.Generators.FillTypeGenerator.Tests.Develop
         public int a { get; set; }
     }
 }
+
+
+#endif

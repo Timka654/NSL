@@ -38,6 +38,7 @@ namespace NSL.ASPNET.Blazor.Context
             ItemsPage = page;
             Items = result.Value.Items;
             ItemsCount = result.Value.ItemsCount;
+            Update();
         }
 
         protected abstract Task<(List<TEntity> Items, long ItemsCount)?> LoadItemsInternal(int page);

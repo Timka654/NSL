@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+	  <NSLProjectTypes>Test</NSLProjectTypes>
+	  <OutputType>Exe</OutputType>
+	  <TargetFramework>net10.0</TargetFramework>
+	  <ImplicitUsings>enable</ImplicitUsings>
+	  <Nullable>enable</Nullable>
+	  <IsPackable>false</IsPackable>
+	  <Version>$(VersionSuffix)</Version>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="BenchmarkDotNet" Version="0.15.8" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\NSL.Database.EntityFramework.Filter.V2.Host\NSL.Database.EntityFramework.Filter.V2.Host.csproj" />
+    <ProjectReference Include="..\..\NSL.Database.EntityFramework.Filter.V2\NSL.Database.EntityFramework.Filter.V2.csproj" />
+    <ProjectReference Include="..\NSL.Database.EntityFramework.Filter.V2.Tests\NSL.Database.EntityFramework.Filter.V2.Tests.csproj" />
+  </ItemGroup>
+
+</Project>

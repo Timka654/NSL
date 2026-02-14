@@ -10,6 +10,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Xml.Linq;
 
 namespace NSL.Generators.SelectTypeGenerator
 {
@@ -19,106 +20,93 @@ namespace NSL.Generators.SelectTypeGenerator
     {
         #region ISourceGenerator
 
-        //public void Execute(GeneratorExecutionContext context)
-        //{
-        //    if (context.SyntaxReceiver is SelectAttributeSyntaxReceiver methodSyntaxReceiver)
-        //    {
-        //        ProcessFillTypes(context, methodSyntaxReceiver);
-        //    }
-        //}
-
-
         public void Initialize(IncrementalGeneratorInitializationContext context)
         {
             var pip = context.SyntaxProvider.CreateSyntaxProvider(
                 SelectAttributeSyntaxReceiver.OnVisitSyntaxNode,
                 (syntax, _) => syntax);
 
-            context.RegisterSourceOutput(pip, ProcessSelectTypes);
-        }
+            var filesProvider = pip.Collect();
+            //GenDebug.Break(true);
 
-        //public void Initialize(GeneratorInitializationContext context)
-        //{
-        //    context.RegisterForSyntaxNotifications(() =>
-        //        new SelectAttributeSyntaxReceiver());
-        //}
+            context.RegisterSourceOutput(filesProvider, (spc, files) =>
+            {
+                List<OutputFile> bFiles = new List<OutputFile>();
+
+                foreach (var file in files)
+                {
+                    ProcessSelectTypes(spc, file, bFiles);
+                }
+
+                foreach (var item in bFiles.GroupBy(x => x.FileName).Select(x => x.First()))
+                {
+                    spc.AddSource(item.FileName, item.CodeBuilder());
+                }
+            });
+        }
 
         #endregion
 
-        private void ProcessSelectTypes(SourceProductionContext context, GeneratorSyntaxContext node)
+        private void ProcessSelectTypes(SourceProductionContext context, GeneratorSyntaxContext node, List<OutputFile> bFiles)
         {
-            //var stopwatch = Stopwatch.StartNew();
-
-            List<string> fnames = new List<string>();
-            //GenDebug.Break(true);
-            //GenDebug.Break();
-            //foreach (var group in types.GroupBy(x =>
-            //{
-            //    var type = x.Node as TypeDeclarationSyntax;
-
-            //    return $"{type.TryGetNamespace()}{type.GetClassName()}";
-            //}))
-            //{
-            //var node = group.First();
-
-            //var key = group.Key;
             var type = node.Node as TypeDeclarationSyntax;
             var key = $"{type.TryGetNamespace()}{type.GetClassName()}";
+
             var semanticModel = node.SemanticModel;
-                var typeDecl = node.Node as TypeDeclarationSyntax;
-                var typeSymbol = semanticModel.GetDeclaredSymbol(typeDecl) as ITypeSymbol;
+            var typeDecl = node.Node as TypeDeclarationSyntax;
+            var typeSymbol = semanticModel.GetDeclaredSymbol(typeDecl) as ITypeSymbol;
 
 
-                List<GenAttribute> attributes = new List<GenAttribute>();
+            List<GenAttribute> attributes = new List<GenAttribute>();
 
-                var typeAttributes = typeSymbol.GetAttributes();
+            var typeAttributes = typeSymbol.GetAttributes();
 
 
-                foreach (var attr in typeAttributes.Where(x => x.AttributeClass.GetTypeFullName(false) == SelectGenerateAttributeFullName))
+            foreach (var attr in typeAttributes.Where(x => x.AttributeClass.GetTypeFullName(false) == SelectGenerateAttributeFullName))
+            {
+                var models = attr.ConstructorArguments.First().Values
+                    .Select(x => (string)x.Value)
+                    .ToArray();
+
+                var dto = (bool?)((TypedConstant?)attr.GetNamedArgumentValue(nameof(SelectGenerateAttribute.Dto)))?.Value ?? false;
+
+                var typed = (bool?)((TypedConstant?)attr.GetNamedArgumentValue(nameof(SelectGenerateAttribute.Typed)))?.Value ?? false;
+
+                var a = new GenAttribute()
                 {
-                    var models = attr.ConstructorArguments.First().Values
-                        .Select(x => (string)x.Value)
-                        .ToArray();
-
-                    var dto = (bool?)((TypedConstant?)attr.GetNamedArgumentValue(nameof(SelectGenerateAttribute.Dto)))?.Value ?? false;
-
-                    var typed = (bool?)((TypedConstant?)attr.GetNamedArgumentValue(nameof(SelectGenerateAttribute.Typed)))?.Value ?? false;
-
-                    var a = new GenAttribute()
-                    {
-                        Models = models,
-                        Dto = dto,
-                        Typed = typed,
-                    };
-
-                    attributes.Add(a);
-                }
-
-                var gtype = new GenTypeGroup()
-                {
-                    TypeSymbol = typeSymbol,
-                    TypeDeclaration = typeDecl,
-                    Namespace = typeDecl.TryGetNamespace(),
-                    Name = key.Replace('.', '_'),
-                    Members = typeSymbol.GetAllMembers(),
-                    Attributes = attributes.GroupBy(x => (x.Typed, x.Dto))
-                    .Select(x => new GenAttribute()
-                    {
-                        Dto = x.Key.Dto,
-                        Typed = x.Key.Typed,
-                        Models = x.SelectMany(i => i.Models).GroupBy(g => g).Select(k => k.Key).ToArray()
-                    })
-                    .ToArray()
+                    Models = models,
+                    Dto = dto,
+                    Typed = typed,
                 };
 
-                try
+                attributes.Add(a);
+            }
+
+            var gtype = new GenTypeGroup()
+            {
+                TypeSymbol = typeSymbol,
+                TypeDeclaration = typeDecl,
+                Namespace = typeDecl.TryGetNamespace(),
+                Name = key.Replace('.', '_'),
+                Members = typeSymbol.GetAllMembers(),
+                Attributes = attributes.GroupBy(x => (x.Typed, x.Dto))
+                .Select(x => new GenAttribute()
                 {
-                    ProcessSelectToType(context, gtype, fnames);
-                }
-                catch (Exception ex)
-                {
-                    context.ShowSelectDiagnostics($"NSLSELECT002", $"Error - {ex} on type {gtype.TypeDeclaration.Identifier.Text}", DiagnosticSeverity.Error, node.Node.GetLocation());
-                }
+                    Dto = x.Key.Dto,
+                    Typed = x.Key.Typed,
+                    Models = x.SelectMany(i => i.Models).GroupBy(g => g).Select(k => k.Key).ToArray()
+                })
+                .ToArray()
+            };
+
+            try
+            {
+                ProcessSelectToType(context, gtype, bFiles);
+            }
+            catch (Exception ex)
+            {
+                context.ShowSelectDiagnostics($"NSLSELECT002", $"Error - {ex} on type {gtype.TypeDeclaration.Identifier.Text}", DiagnosticSeverity.Error, node.Node.GetLocation());
+            }
             //}
 
             //stopwatch.Stop();
@@ -135,58 +123,71 @@ namespace NSL.Generators.SelectTypeGenerator
         }
 
         private void ProcessSelectToType(SourceProductionContext sourceContext, GenTypeGroup gtype,
-            List<string> fnames)
+            List<OutputFile> bFiles)
         {
-            var classBuilder = new CodeBuilder();
-
-            classBuilder.AppendComment(() =>
-            {
-                classBuilder.AppendLine($"Auto Generated by NSL Select. Please don't change this file");
-            });
-
-            List<string> namespaces = new List<string>();
-
-            if (gtype.Namespace != default)
-            {
-                namespaces.Add(gtype.Namespace);
-            }
-
-            namespaces.Add("System.Collections.Generic");
-
             List<SelectGenContext> genContexts = new List<SelectGenContext>();
 
-            classBuilder.CreateStaticClass(gtype.TypeDeclaration, $"{gtype.Name}_Selection", () =>
+            var methods = new SelectCodeCollector();
+
+            foreach (var typedModels in gtype.Attributes)
             {
-                var methods = new List<string>();
-
-                foreach (var typedModels in gtype.Attributes)
+                foreach (var item in typedModels.Models)
                 {
-                    foreach (var item in typedModels.Models)
-                    {
-                        var mjoins = GetJoinModels(gtype.TypeSymbol, item).Prepend(item);
+                    var mjoins = GetJoinModels(gtype.TypeSymbol, item).Prepend(item);
 
-                        SelectGenContext genContext = typedModels.Dto ? new SelectGenDTOContext() : new SelectGenContext();
+                    SelectGenContext genContext = typedModels.Dto ? new SelectGenDTOContext() : new SelectGenContext();
 
-                        genContext.Type = gtype.TypeSymbol;
-                        genContext.Symbols = FilterSymbols(gtype.Members, mjoins, typedModels.Typed);
-                        genContext.Typed = typedModels.Typed;
-                        genContext.Model = item;
+                    genContext.Type = gtype.TypeSymbol;
+                    genContext.Symbols = FilterSymbols(gtype.Members, mjoins, typedModels.Typed);
+                    genContext.Typed = typedModels.Typed;
+                    genContext.Model = item;
 
-                        CreateMethods(methods, genContext);
+                    CreateMethods(methods, genContext);
 
-                        genContexts.Add(genContext);
-                    }
+                    genContexts.Add(genContext);
                 }
+            }
 
+            var fname = $"{gtype.Name}.selectgen.cs";
+
+            bFiles.Add(new OutputFile()
+            {
+                FileName = fname,
+                CodeBuilder = () =>
+                {
+
+                    List<string> namespaces = new List<string>();
+
+                    if (gtype.Namespace != default)
+                    {
+                        namespaces.Add(gtype.Namespace);
+                    }
+
+                    namespaces.Add("System.Collections.Generic");
+
+                    var classBuilder = new CodeBuilder();
+
+                    classBuilder.AppendComment(() =>
+                    {
+                        classBuilder.AppendLine($"Auto Generated by NSL Select. Please don't change this file");
+                        classBuilder.AppendLine($"Generated at - {DateTime.UtcNow}");
+                    });
+
+                    classBuilder.CreateStaticClass(gtype.TypeDeclaration, $"{gtype.Name}_Selection", () =>
+                    {
 #pragma warning disable RS1035 // Do not use APIs banned for analyzers
-                classBuilder.AppendLine(string.Join(Environment.NewLine + Environment.NewLine, methods));
+                        classBuilder.AppendLine(string.Join(Environment.NewLine + Environment.NewLine, methods));
 #pragma warning restore RS1035 // Do not use APIs banned for analyzers
 
-            }, namespaces, @namespace: "System.Linq", beforeClassDef: builder => builder.AppendSummary(b =>
-             {
-                 b.AppendSummaryLine($"Generate for <see cref=\"{gtype.TypeSymbol.GetTypeSeeCRef()}\"/>");
+                    }, namespaces, @namespace: "System.Linq", beforeClassDef: builder => builder.AppendSummary(b =>
+                     {
+                         b.AppendSummaryLine($"Generate for <see cref=\"{gtype.TypeSymbol.GetTypeSeeCRef()}\"/>");
 
-             }));
+                     }));
+
+                    return classBuilder.ToString();
+                }
+            });
 
 
             //GenDebug.Break();
@@ -199,24 +200,18 @@ namespace NSL.Generators.SelectTypeGenerator
             //#endif
 
 
-            var fname = $"{gtype.Name}.selectgen.cs";
 
-            fnames.Add(fname);
+            //fnames.Add(fname);
 
-            GenerateDtos(sourceContext, genContexts, fnames);
-
-            var code = classBuilder.ToString();
-
-
-            sourceContext.AddSource(fname, code);
+            GenerateDtos(sourceContext, genContexts, bFiles);
         }
 
-        void GenerateDtos(SourceProductionContext sourceContext, IEnumerable<SelectGenContext> items, List<string> fnames)
+        void GenerateDtos(SourceProductionContext sourceContext, IEnumerable<SelectGenContext> items, List<OutputFile> bfiles)
         {
             foreach (var item in items)
             {
                 if (item.SubTypeList != null)
-                    GenerateDtos(sourceContext, item.SubTypeList, fnames);
+                    GenerateDtos(sourceContext, item.SubTypeList, bfiles);
 
                 if (item is SelectGenDTOContext dto && item.Symbols.Any())
                 {
@@ -240,13 +235,6 @@ namespace NSL.Generators.SelectTypeGenerator
                         var className = dto.GetTypeName();
 
                         var fname = $"{className}.dtogen.cs";
-
-                        if (fnames.Contains(fname))
-                        {
-                            continue;
-                        }
-
-                        fnames.Add(fname);
 
                         var @namespace = classDecl.GetNamespace();
 
@@ -280,9 +268,8 @@ namespace NSL.Generators.SelectTypeGenerator
                         //GenDebug.Break(true);
 
                         var code = codeBuilder.ToString();
-
-
-                        sourceContext.AddSource(fname, code);
+                        bfiles.Add(new OutputFile() { FileName = fname, CodeBuilder = () => code });
+                        //---------sourceContext.AddSource(fname, code);
                     }
                 }
             }
@@ -307,10 +294,10 @@ namespace NSL.Generators.SelectTypeGenerator
              return false;
          });
 
-        private void CreateMethods(List<string> methods, SelectGenContext genContext)
+        private void CreateMethods(SelectCodeCollector methods, SelectGenContext genContext)
         {
 
-            var sMembers = new List<string>();
+            var sMembers = new SelectCodeCollector();
 
             ReadMembers(sMembers, "___x", genContext);
 
@@ -479,7 +466,7 @@ namespace NSL.Generators.SelectTypeGenerator
         }
 
         //private void ReadCollection(List<string> sMembers, ISymbol item, IEnumerable<ISymbol> amembers, string model, string itemModel, string path, bool typed, ITypeSymbol itemType, string toSegment)        
-        private void ReadCollection(List<string> sMembers, string path, SelectGenContext context, string toSegment)
+        private void ReadCollection(SelectCodeCollector sMembers, string path, SelectGenContext context, string toSegment)
         {
             if (context.Symbols.Any())
             {
@@ -497,7 +484,7 @@ namespace NSL.Generators.SelectTypeGenerator
 
                     var rType = context.Typed ? context.GetTypeIdentifier() : string.Empty;
 
-                    var amem = new List<string>();
+                    var amem = new SelectCodeCollector();
 
                     ReadMembers(amem, p, context);
 
@@ -521,7 +508,7 @@ namespace NSL.Generators.SelectTypeGenerator
         }
 
 
-        private void ReadMembers(List<string> sMembers, string path, SelectGenContext genContext)
+        private void ReadMembers(SelectCodeCollector sMembers, string path, SelectGenContext genContext)
         {
             foreach (var item in genContext.Symbols)
             {
@@ -605,7 +592,7 @@ namespace NSL.Generators.SelectTypeGenerator
                     }
                     else
                     {
-                        var nMembers = new List<string>();
+                        var nMembers = new SelectCodeCollector();
 
                         ReadMembers(nMembers, $"{path}.{item.Name}", itemGenContext);
 
@@ -693,5 +680,12 @@ namespace NSL.Generators.SelectTypeGenerator
         public string[] Models { get; set; }
 
         public bool Recursive { get; set; }
+    }
+
+    internal struct OutputFile
+    {
+        public string FileName { get; set; }
+
+        public Func<string> CodeBuilder { get; set; }
     }
 }

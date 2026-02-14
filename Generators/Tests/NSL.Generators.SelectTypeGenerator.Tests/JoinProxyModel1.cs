@@ -1,4 +1,6 @@
-﻿using NSL.Generators.SelectTypeGenerator.Attributes;
+﻿#if !DEVELOP
+
+using NSL.Generators.SelectTypeGenerator.Attributes;
 
 namespace NSL.Generators.SelectTypeGenerator.Tests
 {
@@ -45,3 +47,5 @@ namespace NSL.Generators.SelectTypeGenerator.Tests
         //    public virtual JoinProxyModel2 JP6 { get; set; }
         }
     }
+
+#endif

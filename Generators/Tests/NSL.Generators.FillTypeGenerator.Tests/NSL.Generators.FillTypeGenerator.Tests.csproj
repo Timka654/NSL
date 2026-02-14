@@ -29,4 +29,8 @@
 		<ProjectReference Include="..\NSL.Generators.FillTypeGenerator.Tests.From\NSL.Generators.FillTypeGenerator.Tests.From.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="Partial\" />
+	</ItemGroup>
+
 </Project>

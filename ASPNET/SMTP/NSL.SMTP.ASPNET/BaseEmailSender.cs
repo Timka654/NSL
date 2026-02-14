@@ -202,6 +202,11 @@ namespace NSL.SMTP.ASPNET
             if (ex != null && ex is SmtpException smtpEx)
                 return !UserInputRelatedCodes.Contains(smtpEx.StatusCode);
 
+            if(ex is FormatException formatEx)
+            {
+                return false;
+            }
+
             return true;
         }
 

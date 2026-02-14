@@ -1,5 +1,6 @@
 ﻿
-using NSL.Generators.FillTypeGenerator.Tests.Develop;
+//using NSL.Generators.FillTypeGenerator.Tests.Develop;
+//using NSL.Generators.FillTypeGenerator.Tests.Partial;
 
 namespace NSL.Generators.FillTypeGenerator.Tests
 {
@@ -9,8 +10,13 @@ namespace NSL.Generators.FillTypeGenerator.Tests
         {
 #if DEVELOP
 
-
 #else
+            PartialModel1 model1 = new PartialModel1() { Id1 = 1, Id2 = 2, Id3 = 3, Id4 = 4 };
+            PartialModel2 model2 = new PartialModel2();
+
+            model1.FillTo(model2);
+            model1.FillFrom(model2);
+
             var dup_val1 = new DuplicateNameModel() { Id = "val1" };
             var dup_val2 = new DuplicateNameModel<int>() { Id = "val2" };
 

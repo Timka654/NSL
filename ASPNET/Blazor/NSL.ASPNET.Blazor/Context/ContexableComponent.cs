@@ -10,6 +10,8 @@ namespace NSL.ASPNET.Blazor.Context
     public class ContexableComponent<TContext> : ComponentBase, IDisposable
         where TContext : IComponentContext
     {
+        protected virtual bool InitializeOnSet { get; } = false;
+
         private TContext? context;
 
         [Parameter] public TContext? Context { get => context; set => ChangeContext(context, value); }
@@ -22,7 +24,7 @@ namespace NSL.ASPNET.Blazor.Context
                 ou.OnUpdate -= Context_OnUpdate;
         }
 
-        protected virtual void ChangeContext(TContext? oldContext, TContext? newContext)
+        protected virtual async void ChangeContext(TContext? oldContext, TContext? newContext)
         {
             if (newContext != null && newContext is IUpdatableComponentContext nu)
                 nu.OnUpdate += Context_OnUpdate;
@@ -31,6 +33,9 @@ namespace NSL.ASPNET.Blazor.Context
 
             if (oldContext != null && oldContext is IUpdatableComponentContext ou)
                 ou.OnUpdate -= Context_OnUpdate;
+
+            if(InitializeOnSet && (newContext != null && newContext is IInitializingComponentContext icc))
+                await icc.InitializeAsync();
 
         }
 
