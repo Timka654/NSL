@@ -235,6 +235,9 @@ namespace NSLLibProjectFileFormatter.Project.CSPROJ
 
             List<string> configurations = new List<string> { "DebugExamples" };
 
+            var sdk = doc.Root.Attribute("Sdk")?.Value;
+            var isClassic = string.IsNullOrEmpty(sdk);
+
             if (Equals(outputType, "Exe")
                 || HasTest(NSLProjectTypes)
                 || HasExternal(NSLProjectTypes)
@@ -249,16 +252,14 @@ namespace NSLLibProjectFileFormatter.Project.CSPROJ
                         configurations.AddRange(new[] { "UnityDebug", "Unity" });
                 }
 
-                projects.Add(new ProjectFileInfo(path, configurations.ToArray(), Path.GetRelativePath(this.path, Path.GetDirectoryName(path) + "/.."), NSLProjectTypes));
+                projects.Add(new ProjectFileInfo(path, configurations.ToArray(), Path.GetRelativePath(this.path, Path.GetDirectoryName(path) + "/.."), NSLProjectTypes, isClassic));
 
                 return;
             }
 
             configurations.AddRange(new string[] { "Debug", "Release" });
 
-            var sdk = doc.Root.Attribute("Sdk")?.Value;
-
-            if (sdk != null)
+            if (!isClassic)
             {
                 bool unityOnly = hasUnityInProjectName(path);
                 bool aspNetOnly = isOnlyAspNetProject(path, sdk);
@@ -546,7 +547,7 @@ namespace NSLLibProjectFileFormatter.Project.CSPROJ
                 File.WriteAllText(path, v);
             }
 
-            projects.Add(new ProjectFileInfo(path, configurations.ToArray(), Path.GetRelativePath(this.path, Path.GetDirectoryName(path) + "/.."), NSLProjectTypes));
+            projects.Add(new ProjectFileInfo(path, configurations.ToArray(), Path.GetRelativePath(this.path, Path.GetDirectoryName(path) + "/.."), NSLProjectTypes, isClassic));
         }
 
         public bool HasUnitySupport(List<string> types)

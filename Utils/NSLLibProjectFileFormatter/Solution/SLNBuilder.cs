@@ -75,8 +75,15 @@
             foreach (var projectPath in pathes.SelectMany(x => x.Value.Projects))
             {
                 var isVsix = projectPath.Name.Contains(".Vsix");
+                var isClassic = projectPath.Info.IsClassic;
 
-                slnProjects.Add($@"Project(""{{{(isVsix ? VsixProjectTypeId : BasicProjectTypeId)}}}"") = ""{projectPath.Name}"", ""{projectPath.Path}"", ""{{{projectPath.UppedId}}}""
+                string projTypeId = BasicProjectTypeId;
+                if (isVsix || isClassic)
+                {
+                    projTypeId = VsixProjectTypeId;
+                }
+
+                slnProjects.Add($@"Project(""{{{projTypeId}}}"") = ""{projectPath.Name}"", ""{projectPath.Path}"", ""{{{projectPath.UppedId}}}""
 EndProject");
 
                 foreach (var profile in availableProfiles)
@@ -90,9 +97,15 @@ EndProject");
 
                     foreach (var arch in Archs)
                     {
-                        slnProjectConfigs.Add($@"{{{projectPath.UppedId}}}.{profile}|{arch}.ActiveCfg = {targetProfile}|Any CPU");
+                        var targetArch = arch;
+                        if (isClassic && arch == "Any CPU")
+                        {
+                            targetArch = "AnyCPU";
+                        }
+
+                        slnProjectConfigs.Add($@"{{{projectPath.UppedId}}}.{profile}|{arch}.ActiveCfg = {targetProfile}|{targetArch}");
                         if (projectPath.Info.Profiles.Contains(profile))
-                            slnProjectConfigs.Add($@"{{{projectPath.UppedId}}}.{profile}|{arch}.Build.0 = {targetProfile}|Any CPU");
+                            slnProjectConfigs.Add($@"{{{projectPath.UppedId}}}.{profile}|{arch}.Build.0 = {targetProfile}|{targetArch}");
                     }
                 }
             }
