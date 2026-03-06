@@ -504,7 +504,7 @@ namespace NSLLibProjectFileFormatter.Project.CSPROJ
 
                         foreach (var dc in definedConstants)
                         {
-                            tb.AppendLine(dc.ToString());
+                            tb.WritePropertyItem("DefineConstants", dc.ToString());
                         }
                     });
 

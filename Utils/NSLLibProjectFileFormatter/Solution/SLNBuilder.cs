@@ -97,15 +97,9 @@ EndProject");
 
                     foreach (var arch in Archs)
                     {
-                        var targetArch = arch;
-                        if (isClassic && arch == "Any CPU")
-                        {
-                            targetArch = "AnyCPU";
-                        }
-
-                        slnProjectConfigs.Add($@"{{{projectPath.UppedId}}}.{profile}|{arch}.ActiveCfg = {targetProfile}|{targetArch}");
+                        slnProjectConfigs.Add($@"{{{projectPath.UppedId}}}.{profile}|{arch}.ActiveCfg = {targetProfile}|{arch}");
                         if (projectPath.Info.Profiles.Contains(profile))
-                            slnProjectConfigs.Add($@"{{{projectPath.UppedId}}}.{profile}|{arch}.Build.0 = {targetProfile}|{targetArch}");
+                            slnProjectConfigs.Add($@"{{{projectPath.UppedId}}}.{profile}|{arch}.Build.0 = {targetProfile}|{arch}");
                     }
                 }
             }

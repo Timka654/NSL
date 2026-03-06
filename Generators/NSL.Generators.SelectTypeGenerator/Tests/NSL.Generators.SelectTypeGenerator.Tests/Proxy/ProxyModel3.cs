@@ -1,4 +1,4 @@
-﻿#if DEVELOP
+﻿#if !DEVELOP
 using NSL.Generators.SelectTypeGenerator.Attributes;
 using System;
 using System.Collections.Generic;
