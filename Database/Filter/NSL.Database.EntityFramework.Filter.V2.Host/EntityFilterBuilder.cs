@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using NSL.Database.EntityFramework.Filter.V2.Enums;
 using NSL.Database.EntityFramework.Filter.V2.Enums.NSL.Database.EntityFramework.Filter.V2.Enums;
 using NSL.Database.EntityFramework.Filter.V2.Models;
@@ -105,7 +106,7 @@ namespace NSL.Database.EntityFramework.Filter.V2.Host
             else
             {
                 if (!_filterHandlers.TryGetValue(item.Type, out var handler))
-                    throw new NotSupportedException($"Filter type '{item.Type}' is not supported.");
+                    throw new EntityFilterInvalidOperationException(item.Type);
 
                 expression = handler(parameter, item);
             }
@@ -154,7 +155,8 @@ namespace NSL.Database.EntityFramework.Filter.V2.Host
                 var (member, value) = GetMemberAndValue(parameter, item);
 
                 if (member.Type != typeof(string))
-                    throw new InvalidOperationException($"Operator '{item.Type}' can only be applied to string properties.");
+                    throw new EntityFilterInvalidOperatorException(member.Type, item.Property, item.Type);
+                //throw new InvalidOperationException($"Operator '{item.Type}' can only be applied to string properties.");
 
                 return Expression.Call(null, method, member, value, Expression.Constant(item.CaseSensitive));
             };
@@ -165,7 +167,7 @@ namespace NSL.Database.EntityFramework.Filter.V2.Host
             var collectionProperty = GetPropertyExpression(parameter, item.Property);
 
             if (!typeof(IEnumerable).IsAssignableFrom(collectionProperty.Type) || collectionProperty.Type == typeof(string))
-                throw new InvalidOperationException($"Property '{item.Property}' must be a collection to use the 'Any' operator.");
+                throw new EntityFilterInvalidOperatorException(collectionProperty.Type, item.Property, item.Type);
 
             var itemType = GetCollectionItemType(collectionProperty.Type);
 
@@ -213,7 +215,7 @@ namespace NSL.Database.EntityFramework.Filter.V2.Host
         {
             if (!typeof(IEnumerable).IsAssignableFrom(collectionProperty.Type) || collectionProperty.Type == typeof(string))
             {
-                throw new InvalidOperationException($"Modifier '{PropertyModifier.Count}' can only be applied to collection properties. Property is not a collection.");
+                throw new EntityFilterInvalidModifierException(collectionProperty.Type, item.Property, PropertyModifier.Count);
             }
 
             var itemType = GetCollectionItemType(collectionProperty.Type);
@@ -248,7 +250,7 @@ namespace NSL.Database.EntityFramework.Filter.V2.Host
             }
             catch (ArgumentException ex)
             {
-                throw new InvalidOperationException($"Invalid property path: '{path}' on type '{typeof(T).Name}'.", ex);
+                throw new EntityFilterInvalidPropertyPathException(typeof(T), path);
             }
         }
 
@@ -279,4 +281,31 @@ namespace NSL.Database.EntityFramework.Filter.V2.Host
             return collectionType.GetElementType() ?? collectionType.GetGenericArguments().FirstOrDefault();
         }
     }
+
+    public class EntityFilterInvalidOperatorException(Type type, string path, FilterOperator @operator) : EntityFilterException
+    {
+        public Type Type { get; } = type;
+        public string Path { get; } = path;
+        public FilterOperator Operator { get; } = @operator;
+    }
+
+    public class EntityFilterInvalidModifierException(Type type, string path, PropertyModifier modifier) : EntityFilterException
+    {
+        public Type Type { get; } = type;
+        public string Path { get; } = path;
+        public PropertyModifier Modifier { get; } = modifier;
+    }
+
+    public class EntityFilterInvalidPropertyPathException(Type type, string path) : EntityFilterException
+    {
+        public Type Type { get; } = type;
+        public string Path { get; } = path;
+    }
+
+    public class EntityFilterInvalidOperationException(FilterOperator @operator) : EntityFilterException
+    {
+        public FilterOperator Operator { get; } = @operator;
+    }
+
+    public class EntityFilterException() : Exception { }
 }

@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.AspNetCore.Components" Version="10.0.3" />
+		<!--<PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="10.0.3" />-->
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\..\Localization\NSL.ASPNET.Localization.Shared\NSL.ASPNET.Localization.Shared.csproj" />
+	</ItemGroup>
+
+</Project>

@@ -3,7 +3,7 @@
 	<PropertyGroup>
 		<NSLProjectTypes>ASPTarget</NSLProjectTypes>
 
-		<TargetFramework>net9.0</TargetFramework>
+		<TargetFramework>net10.0</TargetFramework>
 		<Configurations>Debug;Release;DebugExamples;Unity;UnityDebug</Configurations>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<Nullable>disable</Nullable>
@@ -24,7 +24,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\..\..\Database\Filter\NSL.Database.EntityFramework.Filter.Host\NSL.Database.EntityFramework.Filter.Host.csproj" />
+		<ProjectReference Include="..\..\..\..\Database\Filter\NSL.Database.EntityFramework.Filter.V2.Host\NSL.Database.EntityFramework.Filter.V2.Host.csproj" />
 		<ProjectReference Include="..\..\..\NSL.ASPNET.Mvc\NSL.ASPNET.Mvc.csproj" />
 	</ItemGroup>
 

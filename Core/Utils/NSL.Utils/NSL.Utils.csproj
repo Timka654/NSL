@@ -33,9 +33,9 @@
 		<AssemblyName>Unity.$(MSBuildProjectName)</AssemblyName>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include="Newtonsoft.Json" Version="*" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
 		<PackageReference Include="System.Security.Principal.Windows" Version="5.0.0" />
-		<PackageReference Include="System.Threading.Channels" Version="9.0.6" />
+		<PackageReference Include="System.Threading.Channels" Version="10.0.3" />
 	</ItemGroup>
 
 </Project>
