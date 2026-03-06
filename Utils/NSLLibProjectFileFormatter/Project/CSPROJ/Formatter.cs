@@ -479,17 +479,6 @@ namespace NSLLibProjectFileFormatter.Project.CSPROJ
                         });
                     }
 
-                    foreach (var group in contentItems.GroupBy(x => x.Parent))
-                    {
-                        tb.AppendLine().WriteItemGroup(group.Key, () =>
-                        {
-                            foreach (var item in group)
-                            {
-                                tb.AppendLine(item.ToString());
-                            }
-                        });
-                    }
-
                     foreach (var group in frameworkRefs.GroupBy(x => x.Parent))
                     {
                         tb.AppendLine().WriteItemGroup(group.Key, () =>
