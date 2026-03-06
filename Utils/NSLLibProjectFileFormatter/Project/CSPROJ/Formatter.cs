@@ -30,15 +30,16 @@ namespace NSLLibProjectFileFormatter.Project.CSPROJ
         {
             var di = new DirectoryInfo(path);
 
-            foreach (var d in di.GetDirectories())
-            {
-                if (ExcludeDirectories.Contains(d.Name))
-                    continue;
+            processDirectory(di);
+            //foreach (var d in di.GetDirectories())
+            //{
+            //    if (ExcludeDirectories.Contains(d.Name))
+            //        continue;
 
-                processDirectory(d);
-            }
+            //    processDirectory(d);
+            //}
 
-            //SLNBuilder.BuildSln(slnPath, projects, AvailableConfigurations);
+            SLNBuilder.BuildSln(slnPath, projects, AvailableConfigurations);
         }
 
         private List<ProjectFileInfo> projects = new List<ProjectFileInfo>();
@@ -90,7 +91,11 @@ namespace NSLLibProjectFileFormatter.Project.CSPROJ
 
             foreach (var item in di.GetFiles("*.csproj", SearchOption.AllDirectories))
             {
+
                 var relPath = Path.GetRelativePath(di.FullName, item.FullName);
+
+                if (ExcludeDirectories.Any(relPath.StartsWith))
+                    continue;
 
                 if (relPath.Contains("Templates") && relPath.Contains("content"))
                     continue;
@@ -108,7 +113,7 @@ namespace NSLLibProjectFileFormatter.Project.CSPROJ
 
                     if (r != QuestionResultEnum.N)
                     {
-                        allincorrectrename = r == QuestionResultEnum.A;
+                        allincorrectrename = allincorrectrename || r == QuestionResultEnum.A;
 
                         var mpath = Path.Combine(item.DirectoryName, fixfname);
 
@@ -124,16 +129,21 @@ namespace NSLLibProjectFileFormatter.Project.CSPROJ
 
                 var epath = Path.Combine(vdname, fname);
 
-                string[] validateSuffixes = [".Server", ".Client"];
+                string fileName = Path.GetFileName(relPath);
+                string projectName = Path.GetFileNameWithoutExtension(fileName);
 
-                var validNames = new string[] {
-                    epath,
-                    epath.Substring(0, epath.Length - ".Server.csproj".Length) + ".csproj",
-                    epath.Substring(0, epath.Length - ".Client.csproj".Length) + ".csproj"
-                };
+                string parentDirectory = Path.GetFileName(Path.GetDirectoryName(relPath));
 
+                string[] validSuffixes = [".Server", ".Client"];
 
-                if (!validNames.Any(relPath.EndsWith))
+                bool isExactMatch = string.Equals(parentDirectory, projectName, StringComparison.OrdinalIgnoreCase);
+
+                bool isSharedFolderMatch = validSuffixes.Any(suffix =>
+                    projectName.EndsWith(suffix, StringComparison.OrdinalIgnoreCase) &&
+                    string.Equals(parentDirectory, projectName[..^suffix.Length], StringComparison.OrdinalIgnoreCase)
+                );
+
+                if (!isExactMatch && !isSharedFolderMatch)
                 {
                     var seppath = relPath.Count(x => x == Path.DirectorySeparatorChar) > 1 ? relPath.Substring(relPath.IndexOf(Path.DirectorySeparatorChar) + 1) : relPath;
 
@@ -144,7 +154,7 @@ namespace NSLLibProjectFileFormatter.Project.CSPROJ
 
                     if (r != QuestionResultEnum.N)
                     {
-                        allincorrectdir = r == QuestionResultEnum.A;
+                        allincorrectdir = allincorrectdir || r == QuestionResultEnum.A;
 
                         var mpath = Path.Combine(item.Directory.Parent.FullName, vdname);
                         relPath = Path.GetRelativePath(di.FullName, Path.Combine(mpath, fname));
@@ -153,6 +163,9 @@ namespace NSLLibProjectFileFormatter.Project.CSPROJ
                     }
 
                 }
+
+                //if (fname.Contains("NSL.Refactoring") && fname.Contains(".UI"))
+                //    continue;
 
                 clearProjectList.Add(Path.Combine(di.FullName, relPath));
             }
@@ -165,23 +178,17 @@ namespace NSLLibProjectFileFormatter.Project.CSPROJ
 
         void BuildNewProjectFile(string path)
         {
-            var doc = XDocument.Load(path);
+            var doc = XDocument.Load(path); 
+            
+            XNamespace ns = doc.Root.GetDefaultNamespace();
 
-            var NSLTypes = doc.Descendants("NSLProjectTypes").SingleOrDefault();
+            var NSLTypes = doc.Descendants(ns + "NSLProjectTypes").SingleOrDefault();
 
             if (NSLTypes == null) throw new Exception($"<NSLProjectTypes> is not defined in project '{path}'");
 
-            var outputType = doc.Descendants("OutputType").SingleOrDefault()?.Value;
-
-            //if(outputType == null && NSLTypes.) throw new Exception($"<OutputType> is not defined in project '{path}'");
-
-            //var outputType = GetGroupValue(FindGroupsByRegex(currentContent, CSProjRegex.GetProjectOutputTypeRegex()));
-
-            //var NSLTypes = FindAllLinesByRegex(currentContent, CSProjRegex.GetProjectNSLTypes()).FirstOrDefault();
+            var outputType = doc.Descendants(ns + "OutputType").SingleOrDefault()?.Value;
 
             List<string> NSLProjectTypes = NSLTypes.Value.Split(';').Select(x => x.Trim()).ToList();
-
-            //List<string> NSLProjectTypes = NSLTypes == null ? new List<string>() : NSLTypes[2].Captures.Select(x => x.Value).ToList();
 
             List<string> configurations = new List<string> { "DebugExamples" };
 
@@ -206,308 +213,288 @@ namespace NSLLibProjectFileFormatter.Project.CSPROJ
 
             configurations.AddRange(new string[] { "Debug", "Release" });
 
-            var sdk = doc.Root.Attribute("Sdk").Value;
+            var sdk = doc.Root.Attribute("Sdk")?.Value;
 
-            //var sdk = GetGroupValue(FindGroupsByRegex(currentContent, CSProjRegex.GetProjectSdkRegex()));
-
-            bool unityOnly = hasUnityInProjectName(path);
-            bool aspNetOnly = isOnlyAspNetProject(path, sdk);
-
-
-            var description = doc.Descendants("Description").SingleOrDefault()?.Value;
-            var rootNamespace = doc.Descendants("RootNamespace").SingleOrDefault()?.Value;
-            //var description = GetGroupValue(FindGroupsByRegex(currentContent, CSProjRegex.GetProjectDescriptionRegex()));
-            //var rootNamespace = GetGroupValue(FindGroupsByRegex(currentContent, CSProjRegex.GetProjectRootNamespaceRegex()));
-
-            var authors = doc.Descendants("Authors").SingleOrDefault()?.Value;
-            var suppressDependenciesWhenPacking = doc.Descendants("SuppressDependenciesWhenPacking").SingleOrDefault()?.Value;
-            //var authors = GetGroupValue(FindGroupsByRegex(currentContent, CSProjRegex.GetProjectAuthorsRegex()));
-            //var suppressDependenciesWhenPacking = GetGroupValue(FindGroupsByRegex(currentContent, CSProjRegex.GetProjectSuppressDependenciesWhenPackingRegex()));
-
-            var isRoslyn = bool.TryParse(doc.Descendants("IsRoslynComponent").SingleOrDefault()?.Value, out var rv) && rv;
-            //var isRoslyn = bool.TryParse(GetGroupValue(FindGroupsByRegex(currentContent, CSProjRegex.GetProjectIsRoslynRegex())), out var rv) && rv;
-
-            var isTemplate = HasTemplateType(NSLProjectTypes);
-
-            //var fileContent = string.Join(Environment.NewLine, currentContent);
-
-            var projectRefs = doc.Descendants("ItemGroup")
-                .Descendants("ProjectReference")
-                .ToArray();
-
-            var frameworkRefs = doc.Descendants("ItemGroup")
-                .Descendants("FrameworkReference")
-                .ToArray();
-
-
-            //var projectRefs = FindAllByRegex(fileContent, CSProjRegex.GetProjectReferenceRegex());
-
-            //var projectRefsWithConditions = FindAllByRegex(fileContent, GetItemGroupWithConditionRegex());
-
-            var unityRef = doc.Descendants("ItemGroup")
-                .Descendants("Reference")
-                .Where(x => x.Attribute("Include")?.Value == "UnityEngine")
-                .SingleOrDefault();
-            //var unityRef = FindAllByRegex(fileContent, CSProjRegex.GetProjectUnityRefRegex()).FirstOrDefault();
-
-
-            var contentItems = doc.Descendants("ItemGroup")
-                .Descendants("Content")
-                .Where(x => x.Descendants("CopyToOutputDirectory").Any())
-                .ToArray();
-
-            //var contentItems = FindAllByRegex(fileContent, CSProjRegex.GetProjectContentItemGroupRegex());
-
-            var packagesRefs = doc.Descendants("ItemGroup")
-                .Descendants("PackageReference")
-                .ToArray();
-
-            //var packagesRefs = FindAllByRegex(fileContent, CSProjRegex.GetPackageReferenceRegex());
-
-            var compileItems = doc.Descendants("ItemGroup")
-                .Descendants("Compile")
-                .ToArray();
-
-            //var compileItems = FindAllByRegex(fileContent, CSProjRegex.GetCompileRegex());
-
-            var embeddedResourceItems = doc.Descendants("ItemGroup")
-                .Descendants("EmbeddedResource")
-                .ToArray();
-
-            //var embeddedResourceItems = FindAllByRegex(fileContent, CSProjRegex.GetEmbeddedResourceRegex());
-
-            bool analyzerPackage = false;
-
-            bool analyzerUtils = false;
-
-            CSProjBuilder tb = new CSProjBuilder();
-
-            tb.WriteProjectRoot(sdk, () =>
+            if (sdk != null)
             {
-                tb.WritePropertyGroup(() =>
+                bool unityOnly = hasUnityInProjectName(path);
+                bool aspNetOnly = isOnlyAspNetProject(path, sdk);
+
+
+                var description = doc.Descendants(ns + "Description").SingleOrDefault()?.Value;
+                var rootNamespace = doc.Descendants(ns + "RootNamespace").SingleOrDefault()?.Value;
+
+                var authors = doc.Descendants(ns + "Authors").SingleOrDefault()?.Value;
+                var suppressDependenciesWhenPacking = doc.Descendants(ns + "SuppressDependenciesWhenPacking").SingleOrDefault()?.Value;
+
+                var isRoslyn = bool.TryParse(doc.Descendants(ns + "IsRoslynComponent").SingleOrDefault()?.Value, out var rv) && rv;
+
+                var isTemplate = HasTemplateType(NSLProjectTypes);
+
+                var projectRefs = doc.Descendants(ns + "ItemGroup")
+                    .Descendants(ns + "ProjectReference")
+                    .ToArray();
+
+                var frameworkRefs = doc.Descendants(ns + "ItemGroup")
+                    .Descendants(ns + "FrameworkReference")
+                    .ToArray();
+
+                var unityRef = doc.Descendants(ns + "ItemGroup")
+                    .Descendants(ns + "Reference")
+                    .Where(x => x.Attribute("Include")?.Value == "UnityEngine")
+                    .SingleOrDefault();
+
+
+                var contentItems = doc.Descendants(ns + "ItemGroup")
+                    .Descendants(ns + "Content")
+                    .Where(x => x.Descendants(ns + "CopyToOutputDirectory").Any())
+                    .ToArray();
+
+                var packagesRefs = doc.Descendants(ns + "ItemGroup")
+                    .Descendants(ns + "PackageReference")
+                    .ToArray();
+
+                var compileItems = doc.Descendants(ns + "ItemGroup")
+                    .Descendants(ns + "Compile")
+                    .ToArray();
+
+                var embeddedResourceItems = doc.Descendants(ns + "ItemGroup")
+                    .Descendants(ns + "EmbeddedResource")
+                    .ToArray();
+
+                bool analyzerPackage = false;
+
+                bool analyzerUtils = false;
+
+                CSProjBuilder tb = new CSProjBuilder();
+
+                tb.WriteProjectRoot(sdk, () =>
                 {
-                    if (!NSLProjectTypes.Any())
+                    tb.WritePropertyGroup(() =>
                     {
-                        if (unityOnly && aspNetOnly)
-                            throw new Exception($"{path} cannot contains multiple '*Only' types");
-
-                        if (unityOnly)
+                        if (!NSLProjectTypes.Any())
                         {
-                            NSLProjectTypes.Add("UnityTarget");
-                            NSLProjectTypes.Add("UnitySupport");
+                            if (unityOnly && aspNetOnly)
+                                throw new Exception($"{path} cannot contains multiple '*Only' types");
+
+                            if (unityOnly)
+                            {
+                                NSLProjectTypes.Add("UnityTarget");
+                                NSLProjectTypes.Add("UnitySupport");
+                            }
+                            else if (aspNetOnly)
+                            {
+                                NSLProjectTypes.Add("ASPTarget");
+                            }
+                            else
+                            {
+                                NSLProjectTypes.Add("UnitySupport");
+                            }
+
+                            if (isRoslyn)
+                            {
+                                NSLProjectTypes.Add("Analyzer");
+                            }
+
+                            if (unityRef != null)
+                                NSLProjectTypes.Add("UnityReference");
                         }
-                        else if (aspNetOnly)
+
+                        var tf = "net10.0";
+
+                        if (HasUnityTarget(NSLProjectTypes))
+                            configurations.Clear();
+
+                        if (HasUnitySupport(NSLProjectTypes))
+                            configurations.AddRange(new[] { "UnityDebug", "Unity" });
+
+
+                        analyzerPackage = HasAnalyzerPackageTarget(NSLProjectTypes);
+                        analyzerUtils = HasAnalyzerUtils(NSLProjectTypes);
+                        var analyzerCore = HasAnalyzerCoreTarget(NSLProjectTypes);
+
+                        if (analyzerUtils)
+                            tf = "netstandard2.0";
+
+                        tb.WritePropertyItem("NSLProjectTypes", string.Join(';', NSLProjectTypes))
+                        .AppendLine();
+
+
+                        tb.WritePropertyItem("TargetFramework", tf)
+                          .WritePropertyItem("Configurations", string.Join(';', AvailableConfigurations))
+                          .WritePropertyItem("AllowUnsafeBlocks", true)
+                          .WritePropertyItem("Nullable", "disable")
+                          .WritePropertyItem("RootNamespace", rootNamespace, rootNamespace != null);
+
+
+                        tb.AppendLine(analyzerPackage)
+                        //.WritePropertyItem("IncludeBuildOutput", false, analyzerPackage)
+                        .WritePropertyItem("DevelopmentDependency", true, analyzerPackage)
+                        .WritePropertyItem("NoPackageAnalysis", true, analyzerPackage)
+                        /*.WritePropertyItem("TargetsForTfmSpecificContentInPackage", "$(TargetsForTfmSpecificContentInPackage);_AddAnalyzersToOutput", analyzerPackage)*/;
+
+
+                        tb.WritePropertyItem("IsPackable", true, aspNetOnly)
+                        .WritePropertyItem("OutputType", "Library", aspNetOnly);
+
+                        tb.AppendLine();
+
+                        tb.WritePropertyItem("PublishRepositoryUrl", true)
+                          .WritePropertyItem("EmbedUntrackedSources", true)
+                          .WritePropertyItem("AutoGenerateBindingRedirects", true)
+                          .WritePropertyItem("GenerateBindingRedirectsOutputType", true);
+
+                        tb.AppendLine(isRoslyn)
+                          .WritePropertyItem("EnforceExtendedAnalyzerRules", true, isRoslyn)
+                          .WritePropertyItem("IsRoslynComponent", true, isRoslyn)
+                          .WritePropertyItem("IncludeBuildOutput", false, analyzerPackage);
+
+                        tb.WritePropertyItem("SuppressDependenciesWhenPacking", suppressDependenciesWhenPacking, suppressDependenciesWhenPacking != null);
+
+
+                        if (isTemplate)
                         {
-                            NSLProjectTypes.Add("ASPTarget");
-                        }
-                        else
-                        {
-                            NSLProjectTypes.Add("UnitySupport");
-                        }
-
-                        if (isRoslyn)
-                        {
-                            NSLProjectTypes.Add("Analyzer");
+                            tb.WritePropertyItem("PackageType", "Template")
+                                .WritePropertyItem("IncludeContentInPack", true)
+                                .WritePropertyItem("IncludeBuildOutput", false)
+                                .WritePropertyItem("ContentTargetFolders", "content")
+                                .WritePropertyItem("NoWarn", "$(NoWarn);NU5128")
+                                .WritePropertyItem("NoDefaultExcludes", true)
+                                .WritePropertyItem("LocalizeTemplates", false);
                         }
 
-                        if (unityRef != null)
-                            NSLProjectTypes.Add("UnityReference");
-                    }
-
-                    var tf = "net10.0";
-
-                    if (HasUnityTarget(NSLProjectTypes))
-                        configurations.Clear();
-
-                    if (HasUnitySupport(NSLProjectTypes))
-                        configurations.AddRange(new[] { "UnityDebug", "Unity" });
-
-
-                    analyzerPackage = HasAnalyzerPackageTarget(NSLProjectTypes);
-                    analyzerUtils = HasAnalyzerUtils(NSLProjectTypes);
-                    var analyzerCore = HasAnalyzerCoreTarget(NSLProjectTypes);
-
-                    if (analyzerUtils)
-                        tf = "netstandard2.0";
-
-                    tb.WritePropertyItem("NSLProjectTypes", string.Join(';', NSLProjectTypes))
-                    .AppendLine();
-
-
-                    tb.WritePropertyItem("TargetFramework", tf)
-                      .WritePropertyItem("Configurations", string.Join(';', AvailableConfigurations))
-                      .WritePropertyItem("AllowUnsafeBlocks", true)
-                      .WritePropertyItem("Nullable", "disable")
-                      .WritePropertyItem("RootNamespace", rootNamespace, rootNamespace != null);
-
-
-                    tb.AppendLine(analyzerPackage)
-                    //.WritePropertyItem("IncludeBuildOutput", false, analyzerPackage)
-                    .WritePropertyItem("DevelopmentDependency", true, analyzerPackage)
-                    .WritePropertyItem("NoPackageAnalysis", true, analyzerPackage)
-                    /*.WritePropertyItem("TargetsForTfmSpecificContentInPackage", "$(TargetsForTfmSpecificContentInPackage);_AddAnalyzersToOutput", analyzerPackage)*/;
-
-
-                    tb.WritePropertyItem("IsPackable", true, aspNetOnly)
-                    .WritePropertyItem("OutputType", "Library", aspNetOnly);
-
-                    tb.AppendLine();
-
-                    tb.WritePropertyItem("PublishRepositoryUrl", true)
-                      .WritePropertyItem("EmbedUntrackedSources", true)
-                      .WritePropertyItem("AutoGenerateBindingRedirects", true)
-                      .WritePropertyItem("GenerateBindingRedirectsOutputType", true);
-
-                    tb.AppendLine(isRoslyn)
-                      .WritePropertyItem("EnforceExtendedAnalyzerRules", true, isRoslyn)
-                      .WritePropertyItem("IsRoslynComponent", true, isRoslyn)
-                      .WritePropertyItem("IncludeBuildOutput", false, analyzerPackage);
-
-                    tb.WritePropertyItem("SuppressDependenciesWhenPacking", suppressDependenciesWhenPacking, suppressDependenciesWhenPacking != null);
-
-
-                    if (isTemplate)
-                    {
-                        tb.WritePropertyItem("PackageType", "Template")
-                            .WritePropertyItem("IncludeContentInPack", true)
-                            .WritePropertyItem("IncludeBuildOutput", false)
-                            .WritePropertyItem("ContentTargetFolders", "content")
-                            .WritePropertyItem("NoWarn", "$(NoWarn);NU5128")
-                            .WritePropertyItem("NoDefaultExcludes", true)
-                            .WritePropertyItem("LocalizeTemplates", false);
-                    }
-
-                    tb.AppendLine()
-                    .WritePropertyItem("PackageId", Path.GetFileName(path).Replace(".Package.csproj", ""), analyzerPackage)
-                    .WritePropertyItem("Version", "$(VersionSuffix)")
-
-                    .WritePropertyItem("Authors", authors, authors != null)
-                    .WritePropertyItem("Authors", "Relife87", authors == null)
-
-                    .WritePropertyItem($"Description", description, description != null);
-
-
-                    if (analyzerUtils && analyzerCore)
-                    {
                         tb.AppendLine()
-                            .WritePropertyItem("IsPackable", false);
-                    }
-                    else if (HasUnpacking(NSLProjectTypes))
-                        tb.AppendLine()
-                            .WritePropertyItem("IsPackable", false);
-                });
+                        .WritePropertyItem("PackageId", Path.GetFileName(path).Replace(".Package.csproj", ""), analyzerPackage)
+                        .WritePropertyItem("Version", "$(VersionSuffix)")
+
+                        .WritePropertyItem("Authors", authors, authors != null)
+                        .WritePropertyItem("Authors", "Relife87", authors == null)
+
+                        .WritePropertyItem($"Description", description, description != null);
 
 
-                tb.WriteItemGroup(() => tb.AppendLine("<Content Include=\"**\\*\\.template.config\\template.json\" />"), isTemplate)
-                .AppendLine()
-                .WritePropertyGroup("'$(Configuration)'=='Debug'", () =>
-                    tb.WritePropertyItem("PackageId", "$(MSBuildProjectName)_Debug")
-                );
+                        if (analyzerUtils && analyzerCore)
+                        {
+                            tb.AppendLine()
+                                .WritePropertyItem("IsPackable", false);
+                        }
+                        else if (HasUnpacking(NSLProjectTypes))
+                            tb.AppendLine()
+                                .WritePropertyItem("IsPackable", false);
+                    });
 
-                if (HasUnitySupport(NSLProjectTypes))
-                {
-                    tb.AppendLine()
-                    .WritePropertyGroup("'$(Configuration)'=='UnityDebug'", () => tb
-                        .WritePropertyItem("AssemblyName", "Unity.$(MSBuildProjectName)", !HasUnityTarget(NSLProjectTypes))
-                        .WritePropertyItem("TargetFramework", "netstandard2.1", !HasAnalyzerUtils(NSLProjectTypes))
-                        .WritePropertyItem("DefineConstants", "DEBUG;TRACE")
+
+                    tb.WriteItemGroup(() => tb.AppendLine("<Content Include=\"**\\*\\.template.config\\template.json\" />"), isTemplate)
+                    .AppendLine()
+                    .WritePropertyGroup("'$(Configuration)'=='Debug'", () =>
+                        tb.WritePropertyItem("PackageId", "$(MSBuildProjectName)_Debug")
                     );
 
-                    if (!HasUnityTarget(NSLProjectTypes) || !HasAnalyzerUtils(NSLProjectTypes))
+                    if (HasUnitySupport(NSLProjectTypes))
+                    {
                         tb.AppendLine()
-                        .WritePropertyGroup("'$(Configuration)'=='Unity'", () => tb
+                        .WritePropertyGroup("'$(Configuration)'=='UnityDebug'", () => tb
                             .WritePropertyItem("AssemblyName", "Unity.$(MSBuildProjectName)", !HasUnityTarget(NSLProjectTypes))
                             .WritePropertyItem("TargetFramework", "netstandard2.1", !HasAnalyzerUtils(NSLProjectTypes))
+                            .WritePropertyItem("DefineConstants", "DEBUG;TRACE")
                         );
 
-                }
+                        if (!HasUnityTarget(NSLProjectTypes) || !HasAnalyzerUtils(NSLProjectTypes))
+                            tb.AppendLine()
+                            .WritePropertyGroup("'$(Configuration)'=='Unity'", () => tb
+                                .WritePropertyItem("AssemblyName", "Unity.$(MSBuildProjectName)", !HasUnityTarget(NSLProjectTypes))
+                                .WritePropertyItem("TargetFramework", "netstandard2.1", !HasAnalyzerUtils(NSLProjectTypes))
+                            );
 
-                foreach (var group in frameworkRefs.GroupBy(x => x.Parent))
-                {
-                    tb.AppendLine().WriteItemGroup(group.Key, () =>
+                    }
+
+                    foreach (var group in frameworkRefs.GroupBy(x => x.Parent))
                     {
-                        foreach (var item in group)
+                        tb.AppendLine().WriteItemGroup(group.Key, () =>
                         {
-                            tb.AppendLine(item.ToString());
-                        }
-                    });
-                }
+                            foreach (var item in group)
+                            {
+                                tb.AppendLine(item.ToString());
+                            }
+                        });
+                    }
 
-                foreach (var group in packagesRefs.GroupBy(x => x.Parent))
-                {
-                    tb.AppendLine().WriteItemGroup(group.Key, () =>
+                    foreach (var group in packagesRefs.GroupBy(x => x.Parent))
                     {
-                        foreach (var item in group)
+                        tb.AppendLine().WriteItemGroup(group.Key, () =>
                         {
-                            tb.AppendLine(item.ToString());
-                        }
-                    });
-                }
+                            foreach (var item in group)
+                            {
+                                tb.AppendLine(item.ToString());
+                            }
+                        });
+                    }
 
-                foreach (var group in projectRefs.GroupBy(x => x.Parent))
-                {
-                    tb.AppendLine()
-                      .WriteItemGroup(group.Key, () =>
+                    foreach (var group in projectRefs.GroupBy(x => x.Parent))
                     {
-                        foreach (var item in group)
+                        tb.AppendLine()
+                          .WriteItemGroup(group.Key, () =>
                         {
-                            tb.AppendLine(item.ToString());
-                        }
-                    });
-                }
+                            foreach (var item in group)
+                            {
+                                tb.AppendLine(item.ToString());
+                            }
+                        });
+                    }
 
-                foreach (var group in compileItems.GroupBy(x => x.Parent))
-                {
-                    tb.AppendLine()
-                      .WriteItemGroup(group.Key, () =>
+                    foreach (var group in compileItems.GroupBy(x => x.Parent))
                     {
-                        foreach (var item in group)
+                        tb.AppendLine()
+                          .WriteItemGroup(group.Key, () =>
                         {
-                            tb.AppendLine(item.ToString());
-                        }
-                    });
-                }
+                            foreach (var item in group)
+                            {
+                                tb.AppendLine(item.ToString());
+                            }
+                        });
+                    }
 
 
-                foreach (var group in embeddedResourceItems.GroupBy(x => x.Parent))
-                {
-                    tb.AppendLine()
-                      .WriteItemGroup(group.Key, () =>
+                    foreach (var group in embeddedResourceItems.GroupBy(x => x.Parent))
                     {
-                        foreach (var item in group)
+                        tb.AppendLine()
+                          .WriteItemGroup(group.Key, () =>
                         {
-                            tb.AppendLine(item.ToString());
-                        }
-                    });
-                }
+                            foreach (var item in group)
+                            {
+                                tb.AppendLine(item.ToString());
+                            }
+                        });
+                    }
 
-                if (analyzerPackage)
-                    tb.AppendLine()
-                    .WriteItemGroup(() =>
-                        tb.AppendLine("<None Include=\"$(OutputPath)\\*NSL.*.dll\" Pack=\"true\" PackagePath=\"analyzers/dotnet/cs\" />"));
+                    if (analyzerPackage)
+                        tb.AppendLine()
+                        .WriteItemGroup(() =>
+                            tb.AppendLine("<None Include=\"$(OutputPath)\\*NSL.*.dll\" Pack=\"true\" PackagePath=\"analyzers/dotnet/cs\" />"));
 
-                if (unityRef != null)
-                    tb.AppendLine()
-                    .WriteItemGroup(() =>
-                    {
-                        tb.AppendLine(unityRef.ToString());
-                    });
-
-                foreach (var group in contentItems.GroupBy(x=>x.Parent))
-                    tb.AppendLine()
-                    .WriteItemGroup(group.Key, () =>
-                    {
-                        foreach (var item in group)
+                    if (unityRef != null)
+                        tb.AppendLine()
+                        .WriteItemGroup(() =>
                         {
-                            tb.AppendLine(item.ToString());
-                        }
-                    });
+                            tb.AppendLine(unityRef.ToString());
+                        });
 
-            });
+                    foreach (var group in contentItems.GroupBy(x => x.Parent))
+                        tb.AppendLine()
+                        .WriteItemGroup(group.Key, () =>
+                        {
+                            foreach (var item in group)
+                            {
+                                tb.AppendLine(item.ToString());
+                            }
+                        });
 
-            string v = tb.ToString();
+                });
 
-            File.WriteAllText(path, v);
+                string v = tb.ToString();
+
+                File.WriteAllText(path, v);
+            }
 
             projects.Add(new ProjectFileInfo(path, configurations.ToArray(), Path.GetRelativePath(this.path, Path.GetDirectoryName(path) + "/.."), NSLProjectTypes));
         }
