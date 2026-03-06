@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using System.Xml.Linq;
 
 namespace NSLLibProjectFileFormatter.Project.CSPROJ
 {
@@ -112,6 +113,10 @@ namespace NSLLibProjectFileFormatter.Project.CSPROJ
 
             return this;
         }
+
+        public CSProjBuilder WriteItemGroup(XElement element, Action body)
+            => WriteItemGroup(element.Attributes().Select(x => x.ToString()), body);
+
 
         public CSProjBuilder WriteItemGroup(IEnumerable<string> props, Action body)
         {
