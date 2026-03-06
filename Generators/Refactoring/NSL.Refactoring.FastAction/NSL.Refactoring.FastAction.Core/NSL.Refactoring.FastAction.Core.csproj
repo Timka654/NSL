@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<NSLProjectTypes>AnalyzerUtils;Unpacking</NSLProjectTypes>
@@ -24,14 +24,13 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <Compile Remove="Templates\**" />
-	  <EmbeddedResource Remove="Templates\**" />
-	  <None Remove="Templates\**" />
+		<None Remove="Templates\**" />
 	</ItemGroup>
+
 	<ItemGroup>
 		<PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.11.0">
-		<PrivateAssets>all</PrivateAssets>
-		<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		  <PrivateAssets>all</PrivateAssets>
+		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
 		<PackageReference Include="Microsoft.CodeAnalysis.CSharp.Features" Version="5.0.0" />
 		<PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="5.0.0" />
@@ -40,6 +39,14 @@
 	<ItemGroup>
 		<ProjectReference Include="..\..\..\NSL.Generators.Utils\NSL.Generators.Utils.csproj" />
 		<ProjectReference Include="..\NSL.Refactoring.FastAction.UI\NSL.Refactoring.FastAction.UI.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Compile Remove="Templates\**" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<EmbeddedResource Remove="Templates\**" />
 	</ItemGroup>
 
 </Project>

@@ -221,8 +221,8 @@ namespace NSLLibProjectFileFormatter.Project.CSPROJ
 
         void BuildNewProjectFile(string path)
         {
-            var doc = XDocument.Load(path); 
-            
+            var doc = XDocument.Load(path);
+
             XNamespace ns = doc.Root.GetDefaultNamespace();
 
             var NSLTypes = doc.Descendants(ns + "NSLProjectTypes").SingleOrDefault();
@@ -538,7 +538,9 @@ namespace NSLLibProjectFileFormatter.Project.CSPROJ
                         });
                     }
 
-                    if (analyzerPackage)
+                    if (analyzerPackage && !noneItems.Any(x =>
+                    x.Attribute("Include")?.Value == "$(OutputPath)\\*NSL.*.dll"
+                    && x.Attribute("PackagePath")?.Value == "analyzers/dotnet/cs"))
                         tb.AppendLine()
                         .WriteItemGroup(() =>
                             tb.AppendLine("<None Include=\"$(OutputPath)\\*NSL.*.dll\" Pack=\"true\" PackagePath=\"analyzers/dotnet/cs\" />"));

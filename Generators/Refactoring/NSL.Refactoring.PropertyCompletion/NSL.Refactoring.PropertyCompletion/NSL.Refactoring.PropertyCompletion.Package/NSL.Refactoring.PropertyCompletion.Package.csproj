@@ -28,11 +28,11 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\NSL.Refactoring.PropertyCompletion.Core\NSL.Refactoring.PropertyCompletion.Core.csproj" />
+		<None Include="$(OutputPath)\*NSL.*.dll" Pack="true" PackagePath="analyzers/dotnet/cs" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<None Include="$(OutputPath)\*NSL.*.dll" Pack="true" PackagePath="analyzers/dotnet/cs" />
+		<ProjectReference Include="..\NSL.Refactoring.PropertyCompletion.Core\NSL.Refactoring.PropertyCompletion.Core.csproj" />
 	</ItemGroup>
 
 </Project>
