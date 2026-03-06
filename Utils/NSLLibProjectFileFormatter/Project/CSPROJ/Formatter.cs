@@ -110,17 +110,30 @@ namespace NSLLibProjectFileFormatter.Project.CSPROJ
                     {
                         allincorrectrename = r == QuestionResultEnum.A;
 
-                        File.Move(item.FullName, Path.Combine(item.DirectoryName, fixfname));
+                        var mpath = Path.Combine(item.DirectoryName, fixfname);
+
+                        File.Move(item.FullName, mpath);
+                        relPath = Path.GetRelativePath(di.FullName, mpath);
                         fname = fixfname;
                     }
                 }
+
 
 
                 var vdname = Path.GetFileNameWithoutExtension(fname);
 
                 var epath = Path.Combine(vdname, fname);
 
-                if (!relPath.EndsWith(epath))
+                string[] validateSuffixes = [".Server", ".Client"];
+
+                var validNames = new string[] {
+                    epath,
+                    epath.Substring(0, epath.Length - ".Server.csproj".Length) + ".csproj",
+                    epath.Substring(0, epath.Length - ".Client.csproj".Length) + ".csproj"
+                };
+
+
+                if (!validNames.Any(relPath.EndsWith))
                 {
                     var seppath = relPath.Count(x => x == Path.DirectorySeparatorChar) > 1 ? relPath.Substring(relPath.IndexOf(Path.DirectorySeparatorChar) + 1) : relPath;
 
@@ -150,18 +163,17 @@ namespace NSLLibProjectFileFormatter.Project.CSPROJ
             }
         }
 
-
         void BuildNewProjectFile(string path)
         {
             var doc = XDocument.Load(path);
 
-            var outputType = doc.Descendants("OutputType").SingleOrDefault()?.Value;
-
-            if(outputType == null) throw new Exception($"<OutputType> is not defined in project '{path}'");
-
             var NSLTypes = doc.Descendants("NSLProjectTypes").SingleOrDefault();
 
             if (NSLTypes == null) throw new Exception($"<NSLProjectTypes> is not defined in project '{path}'");
+
+            var outputType = doc.Descendants("OutputType").SingleOrDefault()?.Value;
+
+            //if(outputType == null && NSLTypes.) throw new Exception($"<OutputType> is not defined in project '{path}'");
 
             //var outputType = GetGroupValue(FindGroupsByRegex(currentContent, CSProjRegex.GetProjectOutputTypeRegex()));
 
@@ -219,7 +231,15 @@ namespace NSLLibProjectFileFormatter.Project.CSPROJ
 
             //var fileContent = string.Join(Environment.NewLine, currentContent);
 
-            var projectRefs = doc.Descendants("ItemGroup").Descendants("ProjectReference").ToArray();
+            var projectRefs = doc.Descendants("ItemGroup")
+                .Descendants("ProjectReference")
+                .ToArray();
+
+            var frameworkRefs = doc.Descendants("ItemGroup")
+                .Descendants("FrameworkReference")
+                .ToArray();
+
+
             //var projectRefs = FindAllByRegex(fileContent, CSProjRegex.GetProjectReferenceRegex());
 
             //var projectRefsWithConditions = FindAllByRegex(fileContent, GetItemGroupWithConditionRegex());
@@ -227,7 +247,7 @@ namespace NSLLibProjectFileFormatter.Project.CSPROJ
             var unityRef = doc.Descendants("ItemGroup")
                 .Descendants("Reference")
                 .Where(x => x.Attribute("Include")?.Value == "UnityEngine")
-                .ToArray();
+                .SingleOrDefault();
             //var unityRef = FindAllByRegex(fileContent, CSProjRegex.GetProjectUnityRefRegex()).FirstOrDefault();
 
 
@@ -402,9 +422,20 @@ namespace NSLLibProjectFileFormatter.Project.CSPROJ
 
                 }
 
+                foreach (var group in frameworkRefs.GroupBy(x => x.Parent))
+                {
+                    tb.AppendLine().WriteItemGroup(group.Key, () =>
+                    {
+                        foreach (var item in group)
+                        {
+                            tb.AppendLine(item.ToString());
+                        }
+                    });
+                }
+
                 foreach (var group in packagesRefs.GroupBy(x => x.Parent))
                 {
-                    tb.WriteItemGroup(group.Key, () =>
+                    tb.AppendLine().WriteItemGroup(group.Key, () =>
                     {
                         foreach (var item in group)
                         {
