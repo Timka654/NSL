@@ -238,18 +238,76 @@ namespace NSLLibProjectFileFormatter.Project.CSPROJ
             var sdk = doc.Root.Attribute("Sdk")?.Value;
             var isClassic = string.IsNullOrEmpty(sdk);
 
+            var projectRefs = doc.Descendants(ns + "ItemGroup")
+                .Descendants(ns + "ProjectReference")
+                .ToArray();
+
+            List<string> unresolvableProjects = new List<string>();
+            bool refsChanged = false;
+
+            foreach (var pref in projectRefs)
+            {
+                var includeAttr = pref.Attribute("Include");
+                if (includeAttr != null)
+                {
+                    var refPath = includeAttr.Value;
+                    var refFileName = Path.GetFileName(refPath.Replace('\\', Path.DirectorySeparatorChar).Replace('/', Path.DirectorySeparatorChar));
+
+                    var matchedProject = clearProjectList.FirstOrDefault(p => Path.GetFileName(p).Equals(refFileName, StringComparison.OrdinalIgnoreCase));
+
+                    if (matchedProject != null)
+                    {
+                        var newRelPath = Path.GetRelativePath(Path.GetDirectoryName(path), matchedProject);
+                        if (includeAttr.Value != newRelPath)
+                        {
+                            includeAttr.Value = newRelPath;
+                            refsChanged = true;
+                        }
+                    }
+                    else
+                    {
+                        unresolvableProjects.Add(refPath);
+                    }
+                }
+            }
+
+            if (unresolvableProjects.Any())
+            {
+                var oldColor = Console.ForegroundColor;
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"In project '{Path.GetFileName(path)}', the following ProjectReferences could not be resolved:");
+                foreach (var up in unresolvableProjects)
+                {
+                    Console.WriteLine($" - {up}");
+                }
+                Console.ForegroundColor = oldColor;
+            }
+
             if (Equals(outputType, "Exe")
                 || HasTest(NSLProjectTypes)
                 || HasExternal(NSLProjectTypes)
                 || hasVsixInProjectName(path)
                 || IsTestOExample(path))
             {
-                if (HasExternal(NSLProjectTypes))
+                var explicitConfigs = doc.Descendants(ns + "Configurations").SingleOrDefault()?.Value;
+                if (!string.IsNullOrEmpty(explicitConfigs))
+                {
+                    configurations = explicitConfigs.Split(';').Select(x => x.Trim()).Distinct().ToList();
+                }
+                else if (HasExternal(NSLProjectTypes))
                 {
                     configurations.AddRange(new string[] { "Debug", "Release" });
 
                     if (HasUnitySupport(NSLProjectTypes))
                         configurations.AddRange(new[] { "UnityDebug", "Unity" });
+                }
+
+                if (refsChanged)
+                {
+                    if (isClassic)
+                        doc.Save(path);
+                    else
+                        File.WriteAllText(path, doc.ToString());
                 }
 
                 projects.Add(new ProjectFileInfo(path, configurations.ToArray(), Path.GetRelativePath(this.path, Path.GetDirectoryName(path) + "/.."), NSLProjectTypes, isClassic));
@@ -275,49 +333,23 @@ namespace NSLLibProjectFileFormatter.Project.CSPROJ
 
                 var isTemplate = HasTemplateType(NSLProjectTypes);
 
-                var projectRefs = doc.Descendants(ns + "ItemGroup")
-                    .Descendants(ns + "ProjectReference")
-                    .ToArray();
 
-                List<string> unresolvableProjects = new List<string>();
+                List<string> definedConstants = new List<string>();
 
-                foreach (var pref in projectRefs)
-                {
-                    var includeAttr = pref.Attribute("Include");
-                    if (includeAttr != null)
-                    {
-                        var refPath = includeAttr.Value;
-                        var refFileName = Path.GetFileName(refPath.Replace('\\', Path.DirectorySeparatorChar).Replace('/', Path.DirectorySeparatorChar));
-
-                        var matchedProject = clearProjectList.FirstOrDefault(p => Path.GetFileName(p).Equals(refFileName, StringComparison.OrdinalIgnoreCase));
-
-                        if (matchedProject != null)
-                        {
-                            var newRelPath = Path.GetRelativePath(Path.GetDirectoryName(path), matchedProject);
-                            includeAttr.Value = newRelPath;
-                        }
-                        else
-                        {
-                            unresolvableProjects.Add(refPath);
-                        }
-                    }
-                }
-
-                if (unresolvableProjects.Any())
-                {
-                    var oldColor = Console.ForegroundColor;
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine($"In project '{Path.GetFileName(path)}', the following ProjectReferences could not be resolved:");
-                    foreach (var up in unresolvableProjects)
-                    {
-                        Console.WriteLine($" - {up}");
-                    }
-                    Console.ForegroundColor = oldColor;
-                }
-
-                var defineConstants = doc.Descendants(ns + "PropertyGroup")
+                foreach (var dc in doc.Descendants(ns + "PropertyGroup")
                     .Descendants(ns + "DefineConstants")
-                    .Where(x => x.Parent.Attribute("Condition") == null)
+                    .ToArray())
+                {
+                    var val = dc.Value;
+
+                    if (dc.Parent.Attribute("Condition") == null)
+                    {
+                        definedConstants.Add(val);
+                    }
+                }
+
+                var noneItems = doc.Descendants(ns + "ItemGroup")
+                    .Descendants(ns + "None")
                     .ToArray();
 
                 var contentItems = doc.Descendants(ns + "ItemGroup")
@@ -328,10 +360,6 @@ namespace NSLLibProjectFileFormatter.Project.CSPROJ
                 {
                     contentItems = contentItems.Where(x => x.Attribute("Include")?.Value != "**\\*\\.template.config\\template.json").ToArray();
                 }
-
-                var noneItems = doc.Descendants(ns + "ItemGroup")
-                    .Descendants(ns + "None")
-                    .ToArray();
 
                 var frameworkRefs = doc.Descendants(ns + "ItemGroup")
                     .Descendants(ns + "FrameworkReference")
@@ -474,7 +502,7 @@ namespace NSLLibProjectFileFormatter.Project.CSPROJ
                             tb.AppendLine()
                                 .WritePropertyItem("IsPackable", false);
 
-                        foreach (var dc in defineConstants)
+                        foreach (var dc in definedConstants)
                         {
                             tb.AppendLine(dc.ToString());
                         }

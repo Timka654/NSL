@@ -13,7 +13,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\..\..\..\Base\NSL.Logger\NSL.Logger.csproj" />
-		<ProjectReference Include="..\UDPExample\UDPExample.csproj" />
+		<ProjectReference Include="..\NSL.UDPExample\NSL.UDPExample.csproj" />
 	</ItemGroup>
 
 </Project>
