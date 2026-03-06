@@ -1,14 +1,12 @@
-<Project Sdk="Microsoft.NET.Sdk.Razor">
+<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<NSLProjectTypes>ASPTarget</NSLProjectTypes>
+		<NSLProjectTypes>External UnitySupport</NSLProjectTypes>
 
 		<TargetFramework>net10.0</TargetFramework>
 		<Configurations>Debug;Release;DebugExamples;Unity;UnityDebug</Configurations>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<Nullable>disable</Nullable>
-		<IsPackable>true</IsPackable>
-		<OutputType>Library</OutputType>
 
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
 		<EmbedUntrackedSources>true</EmbedUntrackedSources>
@@ -17,6 +15,7 @@
 
 		<Version>$(VersionSuffix)</Version>
 		<Authors>Relife87</Authors>
+		<Description>.NET Library for automatic network address translation. Original Authors Alan McGovern, Ben Motmans, Lucas Ontivero, this only for NSL collection clear package implementation</Description>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)'=='Debug'">
@@ -24,11 +23,8 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.AspNetCore.Components" Version="10.0.3" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<ProjectReference Include="..\..\Localization\NSL.ASPNET.Localization.Shared\NSL.ASPNET.Localization.Shared.csproj" />
+		<Compile Remove="Upnp\Messages\Responses\AddPortMappingResponseMessage.cs" />
+		<Compile Remove="Upnp\Messages\Responses\DeletePortMappingResponseMessage.cs" />
 	</ItemGroup>
 
 </Project>

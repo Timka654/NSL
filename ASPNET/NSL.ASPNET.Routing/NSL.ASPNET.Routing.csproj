@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<NSLProjectTypes>ASPTarget</NSLProjectTypes>
@@ -28,8 +28,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\..\Protocols\Http\NSL.HttpClient\NSL.HttpClient.csproj" />
-	  <ProjectReference Include="..\NSL.ASPNET\NSL.ASPNET.csproj" />
+		<ProjectReference Include="..\..\Protocols\Http\NSL.HttpClient\NSL.HttpClient.csproj" />
+		<ProjectReference Include="..\NSL.ASPNET\NSL.ASPNET.csproj" />
 	</ItemGroup>
 
 </Project>

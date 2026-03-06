@@ -91,7 +91,39 @@ namespace NSLLibProjectFileFormatter.Project.CSPROJ
 
             foreach (var item in di.GetFiles("*.csproj", SearchOption.AllDirectories))
             {
+                var dname = item.Directory.FullName;
+                var rpath = Path.GetRelativePath(di.FullName, item.Directory.FullName);
 
+                if (ExcludeDirectories.Any(rpath.StartsWith))
+                    continue;
+
+                var binDir = Path.Combine(dname, "bin");
+
+                if (Directory.Exists(binDir))
+                    Directory.Delete(binDir, true);
+
+                var objDir = Path.Combine(dname, "obj");
+
+                if (Directory.Exists(objDir))
+                    Directory.Delete(objDir, true);
+            }
+
+            void recurseEmptyClear(DirectoryInfo d)
+            {
+                foreach (var item in d.GetDirectories())
+                {
+                    recurseEmptyClear(item);
+
+                    if (item.GetFiles("*", SearchOption.AllDirectories).Any()) continue;
+
+                    item.Delete(true);
+                }
+            }
+
+            recurseEmptyClear(di);
+
+            foreach (var item in di.GetFiles("*.csproj", SearchOption.AllDirectories))
+            {
                 var relPath = Path.GetRelativePath(di.FullName, item.FullName);
 
                 if (ExcludeDirectories.Any(relPath.StartsWith))
@@ -158,6 +190,17 @@ namespace NSLLibProjectFileFormatter.Project.CSPROJ
 
                         var mpath = Path.Combine(item.Directory.Parent.FullName, vdname);
                         relPath = Path.GetRelativePath(di.FullName, Path.Combine(mpath, fname));
+
+                        var exdir = new DirectoryInfo(mpath);
+
+                        if (exdir.Exists)
+                        {
+                            if (exdir.GetFiles("*", SearchOption.AllDirectories).Any())
+                                throw new Exception("New directory path for rename is not free");
+                            else
+                                exdir.Delete();
+                        }
+
                         Directory.Move(item.Directory.FullName, mpath);
 
                     }
@@ -235,6 +278,18 @@ namespace NSLLibProjectFileFormatter.Project.CSPROJ
                     .Descendants(ns + "ProjectReference")
                     .ToArray();
 
+                var defineConstants = doc.Descendants(ns + "ItemGroup")
+                    .Descendants(ns + "DefineConstants")
+                    .ToArray();
+
+                var contentItems = doc.Descendants(ns + "ItemGroup")
+                    .Descendants(ns + "Content")
+                    .ToArray();
+
+                var noneItems = doc.Descendants(ns + "ItemGroup")
+                    .Descendants(ns + "None")
+                    .ToArray();
+
                 var frameworkRefs = doc.Descendants(ns + "ItemGroup")
                     .Descendants(ns + "FrameworkReference")
                     .ToArray();
@@ -243,12 +298,6 @@ namespace NSLLibProjectFileFormatter.Project.CSPROJ
                     .Descendants(ns + "Reference")
                     .Where(x => x.Attribute("Include")?.Value == "UnityEngine")
                     .SingleOrDefault();
-
-
-                var contentItems = doc.Descendants(ns + "ItemGroup")
-                    .Descendants(ns + "Content")
-                    .Where(x => x.Descendants(ns + "CopyToOutputDirectory").Any())
-                    .ToArray();
 
                 var packagesRefs = doc.Descendants(ns + "ItemGroup")
                     .Descendants(ns + "PackageReference")
@@ -406,6 +455,39 @@ namespace NSLLibProjectFileFormatter.Project.CSPROJ
                                 .WritePropertyItem("TargetFramework", "netstandard2.1", !HasAnalyzerUtils(NSLProjectTypes))
                             );
 
+                    }
+
+                    foreach (var group in defineConstants.GroupBy(x => x.Parent))
+                    {
+                        tb.AppendLine().WriteItemGroup(group.Key, () =>
+                        {
+                            foreach (var item in group)
+                            {
+                                tb.AppendLine(item.ToString());
+                            }
+                        });
+                    }
+
+                    foreach (var group in noneItems.GroupBy(x => x.Parent))
+                    {
+                        tb.AppendLine().WriteItemGroup(group.Key, () =>
+                        {
+                            foreach (var item in group)
+                            {
+                                tb.AppendLine(item.ToString());
+                            }
+                        });
+                    }
+
+                    foreach (var group in contentItems.GroupBy(x => x.Parent))
+                    {
+                        tb.AppendLine().WriteItemGroup(group.Key, () =>
+                        {
+                            foreach (var item in group)
+                            {
+                                tb.AppendLine(item.ToString());
+                            }
+                        });
                     }
 
                     foreach (var group in frameworkRefs.GroupBy(x => x.Parent))

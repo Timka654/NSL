@@ -40,13 +40,13 @@
 
 	<ItemGroup>
 		<Reference Include="UnityEngine">
-			<HintPath>..\..\..\Reference\UnityEngine.dll</HintPath>
+		  <HintPath>..\..\..\Reference\UnityEngine.dll</HintPath>
 		</Reference>
 	</ItemGroup>
 
 	<ItemGroup>
 		<Content Include="Content\WGLWSWrapper.jslib">
-			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</Content>
 	</ItemGroup>
 

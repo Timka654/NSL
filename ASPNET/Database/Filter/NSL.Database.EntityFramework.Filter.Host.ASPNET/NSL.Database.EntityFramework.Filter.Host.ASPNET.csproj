@@ -24,12 +24,12 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\..\..\Database\Filter\NSL.Database.EntityFramework.Filter.V2.Host\NSL.Database.EntityFramework.Filter.V2.Host.csproj" />
-		<ProjectReference Include="..\..\..\NSL.ASPNET.Mvc\NSL.ASPNET.Mvc.csproj" />
+		<FrameworkReference Include="Microsoft.AspNetCore.App" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<FrameworkReference Include="Microsoft.AspNetCore.App" />
+		<ProjectReference Include="..\..\..\..\Database\Filter\NSL.Database.EntityFramework.Filter.V2.Host\NSL.Database.EntityFramework.Filter.V2.Host.csproj" />
+		<ProjectReference Include="..\..\..\NSL.ASPNET.Mvc\NSL.ASPNET.Mvc.csproj" />
 	</ItemGroup>
 
 </Project>

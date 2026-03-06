@@ -30,7 +30,7 @@
 	<ItemGroup>
 		<ProjectReference Include="..\NSL.Refactoring.FastAction.Core\NSL.Refactoring.FastAction.Core.csproj" />
 	</ItemGroup>
-	
+
 	<ItemGroup>
 		<None Include="$(OutputPath)\*NSL.*.dll" Pack="true" PackagePath="analyzers/dotnet/cs" />
 	</ItemGroup>
