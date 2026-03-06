@@ -24,7 +24,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\Bridge\NSL.Node.BridgeServer\NSL.Node.BridgeServer.csproj" />
+		<ProjectReference Include="..\..\..\Extensions\Node\Bridge\NSL.Node.BridgeServer\NSL.Node.BridgeServer.csproj" />
 	</ItemGroup>
 
 </Project>

@@ -28,7 +28,7 @@
 		<ProjectReference Include="..\..\..\..\Protocols\UDP\NSL.UDP.Client\NSL.UDP.Client.csproj" />
 		<ProjectReference Include="..\..\..\..\Protocols\WebSockets\BuilderExtensions\NSL.BuilderExtensions.WebSocketsClient\NSL.BuilderExtensions.WebSocketsClient.csproj" />
 		<ProjectReference Include="..\..\..\..\Protocols\WebSockets\BuilderExtensions\NSL.BuilderExtensions.WebSocketsServer\NSL.BuilderExtensions.WebSocketsServer.csproj" />
-		<ProjectReference Include="..\..\..\..\Protocols\WebSockets\NSL.WebSockets.Server.AspNetPoint\NSL.WebSockets.Server.AspNetPoint.csproj" />
+		<ProjectReference Include="..\..\..\..\ASPNET\WebSockets\NSL.WebSockets.Server.AspNetPoint\NSL.WebSockets.Server.AspNetPoint.csproj" />
 		<ProjectReference Include="..\..\..\Session\NSL.Extensions.Session.Server\NSL.Extensions.Session.Server.csproj" />
 		<ProjectReference Include="..\..\Bridge\NSL.Node.BridgeServer.Shared\NSL.Node.BridgeServer.Shared.csproj" />
 		<ProjectReference Include="..\..\NSL.Node.Core\NSL.Node.Core.csproj" />

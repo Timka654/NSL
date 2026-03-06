@@ -33,7 +33,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\DBEngine\NSL.Extensions.DBEngine.csproj" />
+		<ProjectReference Include="..\NSL.Extensions.DBEngine\NSL.Extensions.DBEngine.csproj" />
 	</ItemGroup>
 
 </Project>

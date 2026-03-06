@@ -34,7 +34,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\..\..\ConfigurationEngine\NSL.ConfigurationEngine\NSL.ConfigurationEngine.csproj" />
-		<ProjectReference Include="..\DBEngine\NSL.Extensions.DBEngine.csproj" />
+		<ProjectReference Include="..\NSL.Extensions.DBEngine\NSL.Extensions.DBEngine.csproj" />
 	</ItemGroup>
 
 </Project>

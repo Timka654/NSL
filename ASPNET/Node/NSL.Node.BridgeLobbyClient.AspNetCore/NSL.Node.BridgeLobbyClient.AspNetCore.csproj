@@ -24,8 +24,8 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\..\..\ASPNET\Logging\NSL.Logger.AspNet\NSL.Logger.AspNet.csproj" />
-		<ProjectReference Include="..\..\Bridge\NSL.Node.BridgeLobbyClient\NSL.Node.BridgeLobbyClient.csproj" />
+		<ProjectReference Include="..\..\Logging\NSL.Logger.AspNet\NSL.Logger.AspNet.csproj" />
+		<ProjectReference Include="..\..\..\Extensions\Node\Bridge\NSL.Node.BridgeLobbyClient\NSL.Node.BridgeLobbyClient.csproj" />
 	</ItemGroup>
 
 </Project>

@@ -31,7 +31,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\Extensions\SocketCore.Extensions.Packet\NSL.SocketCore.Extensions.Packet.csproj" />
+		<ProjectReference Include="..\..\Extensions\NSL.SocketCore.Extensions.Packet\NSL.SocketCore.Extensions.Packet.csproj" />
 		<ProjectReference Include="..\..\NSL.SocketClient\NSL.SocketClient.csproj" />
 		<ProjectReference Include="..\..\Utils\NSL.Utils.Unity\NSL.Utils.Unity.csproj" />
 	</ItemGroup>

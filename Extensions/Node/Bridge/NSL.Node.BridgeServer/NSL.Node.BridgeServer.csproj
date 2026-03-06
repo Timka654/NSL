@@ -25,7 +25,7 @@
 		<ProjectReference Include="..\..\..\..\ASPNET\Logging\NSL.Logger.AspNet\NSL.Logger.AspNet.csproj" />
 		<ProjectReference Include="..\..\..\..\Core\BuilderExtensions\NSL.BuilderExtensions.SocketCore\NSL.BuilderExtensions.SocketCore.csproj" />
 		<ProjectReference Include="..\..\..\..\Protocols\LocalBridge\BuilderExtensions\NSL.BuilderExtensions.LocalBridge\NSL.BuilderExtensions.LocalBridge.csproj" />
-		<ProjectReference Include="..\..\..\..\Protocols\WebSockets\BuilderExtensions\NSL.BuilderExtensions.WebSocketsServer.AspNet\NSL.BuilderExtensions.WebSocketsServer.AspNet.csproj" />
+		<ProjectReference Include="..\..\..\..\ASPNET\WebSockets\NSL.BuilderExtensions.WebSocketsServer.AspNet\NSL.BuilderExtensions.WebSocketsServer.AspNet.csproj" />
 		<ProjectReference Include="..\..\Room\NSL.Node.RoomServer\NSL.Node.RoomServer.csproj" />
 		<ProjectReference Include="..\NSL.Node.BridgeServer.Shared\NSL.Node.BridgeServer.Shared.csproj" />
 	</ItemGroup>

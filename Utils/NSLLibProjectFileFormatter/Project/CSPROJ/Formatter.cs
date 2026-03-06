@@ -278,6 +278,42 @@ namespace NSLLibProjectFileFormatter.Project.CSPROJ
                     .Descendants(ns + "ProjectReference")
                     .ToArray();
 
+                List<string> unresolvableProjects = new List<string>();
+
+                foreach (var pref in projectRefs)
+                {
+                    var includeAttr = pref.Attribute("Include");
+                    if (includeAttr != null)
+                    {
+                        var refPath = includeAttr.Value;
+                        var refFileName = Path.GetFileName(refPath.Replace('\\', Path.DirectorySeparatorChar).Replace('/', Path.DirectorySeparatorChar));
+
+                        var matchedProject = clearProjectList.FirstOrDefault(p => Path.GetFileName(p).Equals(refFileName, StringComparison.OrdinalIgnoreCase));
+
+                        if (matchedProject != null)
+                        {
+                            var newRelPath = Path.GetRelativePath(Path.GetDirectoryName(path), matchedProject);
+                            includeAttr.Value = newRelPath;
+                        }
+                        else
+                        {
+                            unresolvableProjects.Add(refPath);
+                        }
+                    }
+                }
+
+                if (unresolvableProjects.Any())
+                {
+                    var oldColor = Console.ForegroundColor;
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine($"In project '{Path.GetFileName(path)}', the following ProjectReferences could not be resolved:");
+                    foreach (var up in unresolvableProjects)
+                    {
+                        Console.WriteLine($" - {up}");
+                    }
+                    Console.ForegroundColor = oldColor;
+                }
+
                 var defineConstants = doc.Descendants(ns + "PropertyGroup")
                     .Descendants(ns + "DefineConstants")
                     .Where(x => x.Parent.Attribute("Condition") == null)

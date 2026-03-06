@@ -34,7 +34,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\..\NSL.SocketServer\NSL.SocketServer.csproj" />
-		<ProjectReference Include="..\SocketCore.Extensions.Packet\NSL.SocketCore.Extensions.Packet.csproj" />
+		<ProjectReference Include="..\NSL.SocketCore.Extensions.Packet\NSL.SocketCore.Extensions.Packet.csproj" />
 	</ItemGroup>
 
 </Project>
