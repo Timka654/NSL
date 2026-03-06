@@ -84,10 +84,10 @@ namespace NSLLibProjectFileFormatter.Project.CSPROJ
 
         bool allincorrectrename = false;
         bool allincorrectdir = false;
+        List<string> clearProjectList = new List<string>();
 
         void processDirectory(DirectoryInfo di)
         {
-            List<string> clearProjectList = new List<string>();
 
             foreach (var item in di.GetFiles("*.csproj", SearchOption.AllDirectories))
             {
@@ -278,13 +278,19 @@ namespace NSLLibProjectFileFormatter.Project.CSPROJ
                     .Descendants(ns + "ProjectReference")
                     .ToArray();
 
-                var defineConstants = doc.Descendants(ns + "ItemGroup")
+                var defineConstants = doc.Descendants(ns + "PropertyGroup")
                     .Descendants(ns + "DefineConstants")
+                    .Where(x => x.Parent.Attribute("Condition") == null)
                     .ToArray();
 
                 var contentItems = doc.Descendants(ns + "ItemGroup")
                     .Descendants(ns + "Content")
                     .ToArray();
+
+                if (isTemplate)
+                {
+                    contentItems = contentItems.Where(x => x.Attribute("Include")?.Value != "**\\*\\.template.config\\template.json").ToArray();
+                }
 
                 var noneItems = doc.Descendants(ns + "ItemGroup")
                     .Descendants(ns + "None")
@@ -430,6 +436,11 @@ namespace NSLLibProjectFileFormatter.Project.CSPROJ
                         else if (HasUnpacking(NSLProjectTypes))
                             tb.AppendLine()
                                 .WritePropertyItem("IsPackable", false);
+
+                        foreach (var dc in defineConstants)
+                        {
+                            tb.AppendLine(dc.ToString());
+                        }
                     });
 
 
@@ -457,79 +468,19 @@ namespace NSLLibProjectFileFormatter.Project.CSPROJ
 
                     }
 
-                    foreach (var group in defineConstants.GroupBy(x => x.Parent))
+                    var allItemsGrouped = noneItems
+                        .Concat(frameworkRefs)
+                        .Concat(packagesRefs)
+                        .Concat(projectRefs)
+                        .Concat(compileItems)
+                        .Concat(embeddedResourceItems)
+                        .Concat(contentItems)
+                        .Where(x => x != null)
+                        .GroupBy(x => x.Parent);
+
+                    foreach (var group in allItemsGrouped)
                     {
                         tb.AppendLine().WriteItemGroup(group.Key, () =>
-                        {
-                            foreach (var item in group)
-                            {
-                                tb.AppendLine(item.ToString());
-                            }
-                        });
-                    }
-
-                    foreach (var group in noneItems.GroupBy(x => x.Parent))
-                    {
-                        tb.AppendLine().WriteItemGroup(group.Key, () =>
-                        {
-                            foreach (var item in group)
-                            {
-                                tb.AppendLine(item.ToString());
-                            }
-                        });
-                    }
-
-                    foreach (var group in frameworkRefs.GroupBy(x => x.Parent))
-                    {
-                        tb.AppendLine().WriteItemGroup(group.Key, () =>
-                        {
-                            foreach (var item in group)
-                            {
-                                tb.AppendLine(item.ToString());
-                            }
-                        });
-                    }
-
-                    foreach (var group in packagesRefs.GroupBy(x => x.Parent))
-                    {
-                        tb.AppendLine().WriteItemGroup(group.Key, () =>
-                        {
-                            foreach (var item in group)
-                            {
-                                tb.AppendLine(item.ToString());
-                            }
-                        });
-                    }
-
-                    foreach (var group in projectRefs.GroupBy(x => x.Parent))
-                    {
-                        tb.AppendLine()
-                          .WriteItemGroup(group.Key, () =>
-                        {
-                            foreach (var item in group)
-                            {
-                                tb.AppendLine(item.ToString());
-                            }
-                        });
-                    }
-
-                    foreach (var group in compileItems.GroupBy(x => x.Parent))
-                    {
-                        tb.AppendLine()
-                          .WriteItemGroup(group.Key, () =>
-                        {
-                            foreach (var item in group)
-                            {
-                                tb.AppendLine(item.ToString());
-                            }
-                        });
-                    }
-
-
-                    foreach (var group in embeddedResourceItems.GroupBy(x => x.Parent))
-                    {
-                        tb.AppendLine()
-                          .WriteItemGroup(group.Key, () =>
                         {
                             foreach (var item in group)
                             {
@@ -550,16 +501,6 @@ namespace NSLLibProjectFileFormatter.Project.CSPROJ
                         .WriteItemGroup(() =>
                         {
                             tb.AppendLine(unityRef.ToString());
-                        });
-
-                    foreach (var group in contentItems.GroupBy(x => x.Parent))
-                        tb.AppendLine()
-                        .WriteItemGroup(group.Key, () =>
-                        {
-                            foreach (var item in group)
-                            {
-                                tb.AppendLine(item.ToString());
-                            }
                         });
 
                 });

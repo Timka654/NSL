@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<NSLProjectTypes>UnitySupport;AnalyzerUtils</NSLProjectTypes>
@@ -15,8 +15,6 @@
 
 		<Version>$(VersionSuffix)</Version>
 		<Authors>Relife87</Authors>
-
-
 		<DefineConstants>$(DefineConstants);NSL_UTILS</DefineConstants>
 	</PropertyGroup>
 
@@ -32,6 +30,7 @@
 	<PropertyGroup Condition="'$(Configuration)'=='Unity'">
 		<AssemblyName>Unity.$(MSBuildProjectName)</AssemblyName>
 	</PropertyGroup>
+
 	<ItemGroup>
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
 		<PackageReference Include="System.Security.Principal.Windows" Version="5.0.0" />
