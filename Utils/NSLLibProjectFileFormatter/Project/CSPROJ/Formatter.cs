@@ -306,10 +306,10 @@ namespace NSLLibProjectFileFormatter.Project.CSPROJ
             }
 
             if (Equals(outputType, "Exe")
-                || HasTest(NSLProjectTypes)
+                //|| HasTest(NSLProjectTypes)
                 || HasExternal(NSLProjectTypes)
                 || hasVsixInProjectName(path)
-                || IsTestOExample(path))
+                /*|| IsTestOExample(path)*/)
             {
                 var explicitConfigs = doc.Descendants(ns + "Configurations").SingleOrDefault();
                 if (explicitConfigs != null && !string.IsNullOrEmpty(explicitConfigs.Value))
