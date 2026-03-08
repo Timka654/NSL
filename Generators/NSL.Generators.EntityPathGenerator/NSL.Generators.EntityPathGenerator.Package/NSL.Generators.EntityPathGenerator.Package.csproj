@@ -1,0 +1,39 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<NSLProjectTypes>AnalyzerPackage</NSLProjectTypes>
+
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<Configurations>DebugExamples;Debug;Release</Configurations>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<Nullable>disable</Nullable>
+
+		<DevelopmentDependency>true</DevelopmentDependency>
+		<NoPackageAnalysis>true</NoPackageAnalysis>
+
+		<PublishRepositoryUrl>true</PublishRepositoryUrl>
+		<EmbedUntrackedSources>true</EmbedUntrackedSources>
+		<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+		<GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
+		<IncludeBuildOutput>false</IncludeBuildOutput>
+		<SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
+
+		<PackageId>NSL.Generators.EntityPathGenerator</PackageId>
+		<Version>$(VersionSuffix)</Version>
+		<Authors>Relife87</Authors>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)'=='Debug'">
+		<PackageId>$(MSBuildProjectName)_Debug</PackageId>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Include="$(OutputPath)\*NSL.*.dll" Pack="true" PackagePath="analyzers/dotnet/cs" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\NSL.Generators.EntityPathGenerator.Shared\NSL.Generators.EntityPathGenerator.Shared.csproj" />
+		<ProjectReference Include="..\NSL.Generators.EntityPathGenerator.Core\NSL.Generators.EntityPathGenerator.Core.csproj" />
+	</ItemGroup>
+
+</Project>

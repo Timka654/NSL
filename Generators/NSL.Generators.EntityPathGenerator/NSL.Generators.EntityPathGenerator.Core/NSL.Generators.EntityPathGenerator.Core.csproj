@@ -1,29 +1,50 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<NSLProjectTypes>UnitySupport;AnalyzerUtils;AnalyzerCore;Unpacking</NSLProjectTypes>
 
 		<TargetFramework>netstandard2.0</TargetFramework>
+		<Configurations>DebugExamples;Debug;Release;UnityDebug;Unity</Configurations>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<Nullable>disable</Nullable>
+
+		<PublishRepositoryUrl>true</PublishRepositoryUrl>
+		<EmbedUntrackedSources>true</EmbedUntrackedSources>
+		<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+		<GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
 		<SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
-		<EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+
+		<Version>$(VersionSuffix)</Version>
+		<Authors>Relife87</Authors>
+
+		<IsPackable>false</IsPackable>
 	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)'=='Debug'">
+		<PackageId>$(MSBuildProjectName)_Debug</PackageId>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)'=='UnityDebug'">
+		<AssemblyName>Unity.$(MSBuildProjectName)</AssemblyName>
+		<DefineConstants>DEBUG;TRACE</DefineConstants>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)'=='Unity'">
+		<AssemblyName>Unity.$(MSBuildProjectName)</AssemblyName>
+	</PropertyGroup>
+
+	<ItemGroup Condition="'$(Configuration)'=='Debug' Or '$(Configuration)'=='Release' Or '$(Configuration)'=='DebugExamples'">
+		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="5.0.0" PrivateAssets="all" />
+	</ItemGroup>
+
+	<ItemGroup Condition="'$(Configuration)'=='UnityDebug' Or '$(Configuration)'=='Unity'">
+		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.3.0" PrivateAssets="all" />
+	</ItemGroup>
 
 	<ItemGroup>
 		<Compile Include="..\NSL.Generators.EntityPathGenerator.Shared\**\*.cs" Exclude="..\NSL.Generators.EntityPathGenerator.Shared\**\bin\**;..\NSL.Generators.EntityPathGenerator.Shared\**\obj\**">
-			<Link>NSL.Generators.EntityPathGenerator.Shared\%(RecursiveDir)%(FileName)%(Extension)</Link>
+		  <Link>NSL.Generators.EntityPathGenerator.Shared\%(RecursiveDir)%(FileName)%(Extension)</Link>
 		</Compile>
-	</ItemGroup>
-	<ItemGroup>
-		<PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.11.0">
-			<PrivateAssets>all</PrivateAssets>
-			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-		</PackageReference>
-		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="5.0.0" />
-		<!--<PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="5.0.0" />-->
-	</ItemGroup>
-
-	<ItemGroup>
-	  <ProjectReference Include="..\NSL.Generators.EntityPath.Shared\NSL.Generators.EntityPath.Shared.csproj" />
 	</ItemGroup>
 
 </Project>
