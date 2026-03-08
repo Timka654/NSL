@@ -27,4 +27,10 @@
 		<PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="10.0.3" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <ProjectReference Include="..\..\..\Database\Filter\NSL.Database.EntityFramework.Filter.V2\NSL.Database.EntityFramework.Filter.V2.csproj" />
+	  <ProjectReference Include="..\..\..\Generators\NSL.Generators.EntityPathGenerator\NSL.Generators.EntityPathGenerator.Shared\NSL.Generators.EntityPathGenerator.Shared.csproj" />
+	  <ProjectReference Include="..\..\Localization\NSL.ASPNET.Localization.Shared\NSL.ASPNET.Localization.Shared.csproj" />
+	</ItemGroup>
+
 </Project>
