@@ -1,4 +1,8 @@
-﻿namespace NSL.BuilderExtensions.WebSocketsClient.Unity
+﻿using NSL.SocketClient;
+using NSL.WebSockets.Client;
+using NSL.WebSockets.UnityClient;
+
+namespace NSL.BuilderExtensions.WebSocketsClient.Unity
 {
     public static class WebSocketsClientBuilderExtensions
     {

@@ -1,4 +1,13 @@
-﻿namespace NSL.WebSockets.UnityClient
+﻿using AOT;
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Net.WebSockets;
+using System.Runtime.InteropServices;
+using System.Threading;
+using System.Threading.Tasks;
+
+namespace NSL.WebSockets.UnityClient
 {
     internal class WGLWebSocket : WebSocket
     {

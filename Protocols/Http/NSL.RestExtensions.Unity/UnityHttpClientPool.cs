@@ -1,4 +1,7 @@
-﻿namespace NSL.RestExtensions.Unity
+﻿using System;
+using System.Net.Http;
+
+namespace NSL.RestExtensions.Unity
 {
     public class UnityHttpClientPool : HttpClientPool<UnityHttpClient>
     {

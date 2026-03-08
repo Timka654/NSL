@@ -1,4 +1,11 @@
-﻿namespace NSL.WebSockets.UnityClient
+﻿using NSL.SocketClient;
+using NSL.WebSockets.Client;
+using System;
+using System.Net.WebSockets;
+using System.Threading;
+using System.Threading.Tasks;
+
+namespace NSL.WebSockets.UnityClient
 {
     public class WGLWSNetworkClient<T, TOptions> : WSNetworkClient<T, TOptions>
         where T : BaseSocketNetworkClient, new()
