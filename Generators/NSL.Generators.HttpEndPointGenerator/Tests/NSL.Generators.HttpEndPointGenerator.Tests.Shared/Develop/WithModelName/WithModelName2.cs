@@ -1,4 +1,5 @@
 ﻿#if NSL_SERVER
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 #elif NSL_CLIENT
 using NSL.Generators.HttpEndPointGenerator.Shared.Fake.Interfaces;

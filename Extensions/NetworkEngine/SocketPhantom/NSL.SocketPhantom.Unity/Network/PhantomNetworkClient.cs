@@ -1,13 +1,4 @@
-﻿using NSL.BuilderExtensions.SocketCore;
-using NSL.BuilderExtensions.WebSocketsClient;
-using NSL.BuilderExtensions.WebSocketsClient.Unity;
-using NSL.SocketPhantom.Unity.Network.Packets;
-using NSL.WebSockets.Client;
-using System;
-using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
-using UnityEngine;
+﻿using NSL.SocketPhantom.Unity.Network.Packets;
 using static NSL.SocketPhantom.Unity.PhantomHubConnection;
 
 namespace NSL.SocketPhantom.Unity.Network

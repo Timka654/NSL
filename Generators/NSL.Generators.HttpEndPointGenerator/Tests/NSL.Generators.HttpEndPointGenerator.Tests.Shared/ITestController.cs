@@ -1,6 +1,7 @@
 ﻿#if NSL_SERVER
 using NSL.ASPNET.Mvc;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
 #elif NSL_CLIENT
 using NSL.Generators.HttpEndPointGenerator.Shared.Fake;
 using NSL.Generators.HttpEndPointGenerator.Shared.Fake.Attributes;
@@ -10,7 +11,8 @@ using NSL.HttpClient.Models;
 
 using NSL.Generators.FillTypeGenerator.Tests.Develop.WithModelName;
 using NSL.Generators.HttpEndPointGenerator.Shared.Attributes;
-using static NSL.Generators.HttpEndPointGenerator.Tests.Shared.ITestController;
+using System;
+using System.Threading.Tasks;
 
 namespace NSL.Generators.HttpEndPointGenerator.Tests.Shared
 {

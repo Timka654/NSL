@@ -1,7 +1,5 @@
 using System.Linq;
-using HtmlDocumentDev;
 using NUnit.Framework;
-using NSL.HTMLProcessor;
 
 namespace NSL.HTMLProcessor.Tests
 {

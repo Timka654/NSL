@@ -1,4 +1,5 @@
 ﻿using NSL.Snapshotter;
+using System.Collections.Generic;
 
 namespace Nsl.Snapshotter.Enum
 {

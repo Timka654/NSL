@@ -3,6 +3,7 @@ using NSL.Node.BridgeServer.Shared.Response;
 using NSL.Node.BridgeServer.Shared;
 using NSL.Node.RoomServer.Client.Data;
 using NSL.Node.RoomServer.Data;
+using System.Threading.Tasks;
 
 namespace NSL.Node.LocalRoomServerExample
 {

@@ -1,4 +1,6 @@
-﻿namespace NSL.Snapshotter
+﻿using System;
+
+namespace NSL.Snapshotter
 {
     // ==========================================================
     // Snapshotter v0 (working baseline) — .NET 8/9, ASP.NET Core

@@ -3,8 +3,6 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
-using Npgsql;
-using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace NSL.Database.EntityFramework.ASPNET
 {

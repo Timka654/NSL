@@ -1,7 +1,5 @@
 ﻿using NSL.HttpClient;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace NSL.ASPNET.Routing
 {

@@ -2,7 +2,6 @@
 using Microsoft.EntityFrameworkCore;
 using NSL.Database.EntityFramework;
 using NSL.Database.EntityFramework.ASPNET;
-using System.Threading.Tasks;
 
 namespace NSL.Generators.SelectTypeGenerator.EF.Tests
 {

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace NSL.SocketPhantom.Unity
+﻿namespace NSL.SocketPhantom.Unity
 {
     public class WSRetryPolicy : IRetryPolicy
     {

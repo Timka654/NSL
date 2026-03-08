@@ -1,5 +1,4 @@
 ﻿using NSL.BuilderExtensions.TCPClient;
-using NSL.BuilderExtensions.TCPServer;
 using NSL.Generators.BinaryTypeIOGenerator.Attributes;
 using NSL.SocketClient;
 using NSL.SocketServer.Utils;

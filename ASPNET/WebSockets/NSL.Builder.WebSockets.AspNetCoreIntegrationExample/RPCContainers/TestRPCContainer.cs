@@ -1,8 +1,4 @@
-﻿using NSL.Extensions.RPC;
-using NSL.Extensions.RPC.Generator.Attributes;
-using NSL.SocketCore.Utils;
-
-namespace Builder.WebSockets.AspNetCoreIntegrationExample.RPCContainers
+﻿namespace Builder.WebSockets.AspNetCoreIntegrationExample.RPCContainers
 {
     //public class TestRPCContainer<TClient> : RPCHandleContainer<TClient>
     //    where TClient : INetworkClient

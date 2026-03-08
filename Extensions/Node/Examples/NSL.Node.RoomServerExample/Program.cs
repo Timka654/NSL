@@ -4,7 +4,6 @@ using NSL.Node.RoomServer;
 using NSL.Node.RoomServer.Bridge;
 using NSL.Node.RoomServer.Client;
 using NSL.Node.RoomServer.Client.Data;
-using NSL.Node.RoomServer.Data;
 using NSL.SocketCore.Utils.Exceptions;
 
 namespace NSL.Node.BridgeTransportExample

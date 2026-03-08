@@ -1,4 +1,6 @@
-﻿namespace NSL.Snapshotter
+﻿using System;
+
+namespace NSL.Snapshotter
 {
     // =============================
     // 3) DTO: current.meta.json

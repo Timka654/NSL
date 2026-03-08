@@ -1,14 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Net.Sockets;
-using System.Threading;
-using System.Threading.Tasks;
-using Newtonsoft.Json;
-using NSL.RestExtensions.Unity;
-using NSL.SocketCore.Extensions.Buffer;
-using NSL.SocketCore.Utils;
-using NSL.SocketCore.Utils.Buffer;
 using NSL.SocketPhantom.Unity.Network;
 
 namespace NSL.SocketPhantom.Unity

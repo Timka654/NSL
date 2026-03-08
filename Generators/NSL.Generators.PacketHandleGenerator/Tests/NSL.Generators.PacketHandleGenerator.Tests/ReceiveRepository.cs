@@ -1,8 +1,5 @@
 ﻿using NSL.Generators.PacketHandleGenerator.Shared;
-using NSL.Generators.PacketHandleGenerator.Tests;
 using NSL.SocketCore;
-using NSL.SocketCore.Extensions.Buffer;
-using NSL.SocketCore.Utils.Buffer;
 using NSL.SocketServer.Utils;
 
 namespace NSL.Generators.PacketHandleGenerator.Tests

@@ -1,6 +1,4 @@
-﻿using HtmlDocumentDev;
-
-namespace NSL.HTMLProcessor
+﻿namespace NSL.HTMLProcessor
 {
     public class HtmlScriptNode : HtmlBaseNode
     {

@@ -1,15 +1,4 @@
-﻿using NSL.RestExtensions.RESTContentProcessors;
-using NSL.Utils.Unity;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine;
-
-namespace NSL.RestExtensions.Unity
+﻿namespace NSL.RestExtensions.Unity
 {
     public class UnityWebRequestRepository : UnityWebRequestRepository<DefaultRestContentProcessor>
     {

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace NSL.Generators.PacketHandleGenerator.Shared
+﻿namespace NSL.Generators.PacketHandleGenerator.Shared
 {
     public enum NSLPacketTypeEnum
     {

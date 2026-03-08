@@ -1,6 +1,5 @@
 ﻿using Microsoft.CodeAnalysis;
 using NSL.Generators.Utils;
-using System;
 using System.Collections.Generic;
 
 namespace NSL.Generators.SelectTypeGenerator

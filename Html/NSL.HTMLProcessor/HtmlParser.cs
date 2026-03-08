@@ -1,5 +1,5 @@
-﻿using HtmlDocumentDev;
-using System;
+﻿using System;
+using System.Collections.Generic;
 
 namespace NSL.HTMLProcessor
 {

@@ -3,7 +3,6 @@ using NSL.BuilderExtensions.WebSocketsClient;
 using NSL.LocalBridge;
 using NSL.Node.BridgeServer.Shared;
 using NSL.SocketCore.Utils;
-using NSL.WebSockets.Client;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;

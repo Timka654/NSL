@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using NSL.ASPNET.Configuration;
+using System;
 
 namespace NSL.ASPNET.MemoryLogger.Tests
 {

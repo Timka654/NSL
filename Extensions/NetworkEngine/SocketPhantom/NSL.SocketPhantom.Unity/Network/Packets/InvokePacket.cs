@@ -1,7 +1,4 @@
-﻿using NSL.SocketCore.Utils;
-using NSL.SocketCore.Utils.Buffer;
-
-namespace NSL.SocketPhantom.Unity.Network.Packets
+﻿namespace NSL.SocketPhantom.Unity.Network.Packets
 {
     internal class InvokePacket : IPacket<PhantomSocketNetworkClient>
     {

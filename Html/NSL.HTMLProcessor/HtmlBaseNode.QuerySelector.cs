@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Buffers;
 using System.Collections.Generic;
-using System.Text;
-using System.Text.RegularExpressions;
+using System.Linq;
 
-namespace HtmlDocumentDev
+namespace NSL.HTMLProcessor
 {
     // ============================================================
     // BASE HTML NODE INTERFACE (адаптируй под свой HtmlBaseNode)

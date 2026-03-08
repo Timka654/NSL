@@ -1,5 +1,4 @@
-﻿using NSL.Utils;
-using NSL.Utils.CommandLine;
+﻿using NSL.Utils.CommandLine;
 
 namespace NSL.ConfigurationEngine.Providers
 {

@@ -9,8 +9,6 @@ using NSL.Generators.Utils;
 using NSL.SocketCore.Utils.Buffer;
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.Diagnostics;
 using System.Linq;
 
 namespace NSL.Generators.BinaryTypeIOGenerator

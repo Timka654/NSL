@@ -1,5 +1,4 @@
-﻿using NSL.HttpClient.HttpContent;
-using NSL.HttpClient.Models;
+﻿using NSL.HttpClient.Models;
 using NSL.HttpClient.Validators;
 using System;
 using System.Collections.Generic;

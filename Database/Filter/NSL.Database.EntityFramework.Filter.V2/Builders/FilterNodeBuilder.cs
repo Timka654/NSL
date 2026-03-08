@@ -2,7 +2,6 @@ using NSL.Database.EntityFramework.Filter.V2.Enums;
 using NSL.Database.EntityFramework.Filter.V2.Models;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
 
 namespace NSL.Database.EntityFramework.Filter.V2.Builders

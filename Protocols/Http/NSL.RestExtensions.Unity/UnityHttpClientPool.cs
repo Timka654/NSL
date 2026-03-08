@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Text;
-
-namespace NSL.RestExtensions.Unity
+﻿namespace NSL.RestExtensions.Unity
 {
     public class UnityHttpClientPool : HttpClientPool<UnityHttpClient>
     {

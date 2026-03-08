@@ -1,15 +1,4 @@
-﻿using NSL.SocketClient;
-using NSL.SocketCore.Utils;
-using NSL.WebSockets.Client;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.WebSockets;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-
-namespace NSL.WebSockets.UnityClient
+﻿namespace NSL.WebSockets.UnityClient
 {
     public class WGLWSNetworkClient<T, TOptions> : WSNetworkClient<T, TOptions>
         where T : BaseSocketNetworkClient, new()

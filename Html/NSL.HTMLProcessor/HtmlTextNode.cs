@@ -1,4 +1,4 @@
-﻿using HtmlDocumentDev;
+﻿using System;
 
 namespace NSL.HTMLProcessor
 {

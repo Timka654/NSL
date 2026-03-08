@@ -1,6 +1,4 @@
-﻿using NSL.Node.P2Proxy;
-
-namespace NSL.Node.P2ProxyExample
+﻿namespace NSL.Node.P2ProxyExample
 {
     internal class Program
     {

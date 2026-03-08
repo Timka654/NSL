@@ -1,4 +1,6 @@
-﻿namespace NSL.Snapshotter
+﻿using System.Collections.Generic;
+
+namespace NSL.Snapshotter
 {
     public interface ISnapshotterRegistry
     {

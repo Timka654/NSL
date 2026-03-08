@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using NSL.ASPNET.Mvc;
 using NSL.ASPNET.Mvc.Route.Attributes;
 

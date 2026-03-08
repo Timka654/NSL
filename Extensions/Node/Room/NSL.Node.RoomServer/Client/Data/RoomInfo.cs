@@ -14,7 +14,6 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Xml.Linq;
 using static NSL.Node.RoomServer.Shared.Client.Core.IRoomInfo;
 
 namespace NSL.Node.RoomServer.Client.Data

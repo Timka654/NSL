@@ -1,7 +1,6 @@
 ﻿using NSL.Utils.CommandLine;
 using NSL.Utils.CommandLine.CLHandles;
 using NSL.Utils.CommandLine.CLHandles.Arguments;
-using System.Xml.Linq;
 
 namespace TCPExample.Client
 {

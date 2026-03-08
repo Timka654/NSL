@@ -1,9 +1,7 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeActions;
-using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using System.Collections.Immutable;
 using System.Composition;
 using System.Linq;
 using System.Threading.Tasks;
@@ -11,7 +9,6 @@ using System.Threading;
 using Microsoft.CodeAnalysis.CodeRefactorings;
 using System.Collections.Generic;
 using Microsoft.CodeAnalysis.Formatting;
-using NSL.Generators.Utils;
 
 namespace NSL.Refactoring.PartialImpl
 {

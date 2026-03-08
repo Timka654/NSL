@@ -1,6 +1,4 @@
-﻿using NSL.Snapshotter;
-
-namespace NSL.Snapshotter.ASPNET.Http
+﻿namespace NSL.Snapshotter.ASPNET.Http
 {
     [SnapshotKind("route")]
     public sealed record RouteSnapshotItem(

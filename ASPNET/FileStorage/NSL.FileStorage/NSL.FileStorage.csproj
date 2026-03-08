@@ -7,6 +7,8 @@
 		<Configurations>DebugExamples;Debug;Release</Configurations>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<Nullable>disable</Nullable>
+		<IsPackable>true</IsPackable>
+		<OutputType>Library</OutputType>
 
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
 		<EmbedUntrackedSources>true</EmbedUntrackedSources>

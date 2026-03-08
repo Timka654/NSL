@@ -1,5 +1,4 @@
 ﻿using NSL.Node.BridgeServer;
-using NSL.Node.BridgeServer.LS;
 
 namespace NSL.Node.BridgeServerExample
 {

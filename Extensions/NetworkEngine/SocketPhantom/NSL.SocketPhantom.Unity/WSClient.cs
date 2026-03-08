@@ -1,9 +1,4 @@
-﻿using NSL.Utils.Unity;
-using System;
-using System.Threading.Tasks;
-using UnityEngine;
-
-namespace NSL.SocketPhantom.Unity
+﻿namespace NSL.SocketPhantom.Unity
 {
     public class WSClient : IDisposable
     {

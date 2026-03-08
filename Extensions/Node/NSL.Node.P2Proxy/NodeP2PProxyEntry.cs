@@ -1,11 +1,6 @@
 ﻿using NSL.Logger;
 using NSL.Logger.Interface;
 using NSL.Node.P2Proxy.Client;
-using NSL.UDP.Info;
-using STUN;
-using System;
-using System.Linq;
-using System.Net;
 
 namespace NSL.Node.P2Proxy
 {

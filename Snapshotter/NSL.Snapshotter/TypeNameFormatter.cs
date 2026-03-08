@@ -1,4 +1,8 @@
-﻿namespace NSL.Snapshotter
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace NSL.Snapshotter
 {
     public static class TypeNameFormatter
     {

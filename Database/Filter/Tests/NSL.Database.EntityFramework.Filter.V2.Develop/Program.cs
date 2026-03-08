@@ -1,9 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Diagnostics;
-using Microsoft.EntityFrameworkCore.Query;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.Options;
 using NSL.Database.EntityFramework.Filter.V2.Builders;
 using NSL.Database.EntityFramework.Filter.V2.Develop.Data;
 using NSL.Database.EntityFramework.Filter.V2.Host;

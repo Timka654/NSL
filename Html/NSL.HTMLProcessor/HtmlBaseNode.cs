@@ -1,12 +1,9 @@
-﻿using NSL.HTMLProcessor;
-using System;
-using System.Diagnostics.Metrics;
-using System.Numerics;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
-using System.Xml.Linq;
 
-namespace HtmlDocumentDev
+namespace NSL.HTMLProcessor
 {
     internal delegate void ModifyHtmlBaseNodeDelegate(HtmlBaseNode node, int? oldPos, NodeSize oldSize);
 

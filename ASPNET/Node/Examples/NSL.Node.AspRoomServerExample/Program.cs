@@ -1,8 +1,13 @@
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using NSL.Node.BridgeServer.Shared;
 using NSL.Node.RoomServer.AspNetCore;
 using NSL.Node.RoomServer.Bridge;
 using NSL.Node.RoomServer.Client.Data;
 using NSL.SocketCore.Utils.Exceptions;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace NSL.Node.AspRoomServerExample
 {

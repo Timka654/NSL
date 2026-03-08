@@ -1,4 +1,9 @@
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Logging;
 using NSL.ASPNET.MemoryLogger;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 var builder = WebApplication.CreateBuilder(args);
 

@@ -3,7 +3,6 @@ using NSL.Database.EntityFramework.Filter.V2.Enums;
 using NSL.Database.EntityFramework.Filter.V2.Host;
 using NSL.Database.EntityFramework.Filter.V2.Models;
 using NSL.Database.EntityFramework.Filter.V2.Tests.Data;
-using System.Globalization;
 
 namespace NSL.Database.EntityFramework.Filter.V2.Tests
 {

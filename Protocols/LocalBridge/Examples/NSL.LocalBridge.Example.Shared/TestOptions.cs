@@ -2,6 +2,7 @@
 using NSL.SocketClient;
 using NSL.SocketCore.Utils.Buffer;
 using NSL.SocketServer;
+using System;
 
 namespace LocalBridge.Example.Shared
 {

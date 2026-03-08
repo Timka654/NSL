@@ -338,7 +338,7 @@ namespace NSLLibProjectFileFormatter.Project.CSPROJ
             if (!isClassic)
             {
                 bool unityOnly = hasUnityInProjectName(path);
-                bool aspNetOnly = isOnlyAspNetProject(path, sdk);
+                bool aspNetOnly = HasASPTarget(NSLProjectTypes);
 
 
                 var description = doc.Descendants(ns + "Description").SingleOrDefault()?.Value;
@@ -469,7 +469,6 @@ namespace NSLLibProjectFileFormatter.Project.CSPROJ
                         .WritePropertyItem("NoPackageAnalysis", true, analyzerPackage)
                         /*.WritePropertyItem("TargetsForTfmSpecificContentInPackage", "$(TargetsForTfmSpecificContentInPackage);_AddAnalyzersToOutput", analyzerPackage)*/;
 
-
                         tb.WritePropertyItem("IsPackable", true, aspNetOnly)
                         .WritePropertyItem("OutputType", "Library", aspNetOnly);
 
@@ -509,12 +508,9 @@ namespace NSLLibProjectFileFormatter.Project.CSPROJ
                         .WritePropertyItem($"Description", description, description != null);
 
 
-                        if (analyzerUtils && analyzerCore)
-                        {
-                            tb.AppendLine()
-                                .WritePropertyItem("IsPackable", false);
-                        }
-                        else if (HasUnpacking(NSLProjectTypes))
+                        if ((analyzerUtils && analyzerCore)
+                        || HasUnpacking(NSLProjectTypes)
+                        || HasTestOrExample(NSLProjectTypes))
                             tb.AppendLine()
                                 .WritePropertyItem("IsPackable", false);
 
@@ -667,6 +663,11 @@ namespace NSLLibProjectFileFormatter.Project.CSPROJ
             var name = new FileInfo(path).Name;
 
             return name.Contains(".Vsix", StringComparison.OrdinalIgnoreCase);
+        }
+
+        bool HasTestOrExample(List<string> types)
+        {
+            return HasTest(types) || types.Contains("Example");
         }
 
         private bool IsTestOExample(string path)

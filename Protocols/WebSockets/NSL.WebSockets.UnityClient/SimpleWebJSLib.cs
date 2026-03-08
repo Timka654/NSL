@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Runtime.InteropServices;
-using System.Text;
-
-namespace NSL.WebSockets.UnityClient
+﻿namespace NSL.WebSockets.UnityClient
 {
     internal static class SimpleWebJSLib
     {

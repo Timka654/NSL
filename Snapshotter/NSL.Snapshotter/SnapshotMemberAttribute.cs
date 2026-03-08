@@ -1,4 +1,6 @@
-﻿namespace NSL.Snapshotter
+﻿using System;
+
+namespace NSL.Snapshotter
 {
     [AttributeUsage(AttributeTargets.Property)]
     public sealed class SnapshotMemberAttribute : Attribute { }

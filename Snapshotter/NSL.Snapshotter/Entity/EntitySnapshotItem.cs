@@ -1,4 +1,6 @@
-﻿namespace NSL.Snapshotter.Entity
+﻿using System.Collections.Generic;
+
+namespace NSL.Snapshotter.Entity
 {
     [SnapshotKind("entity")]
     public sealed record EntitySnapshotItem(
