@@ -231,9 +231,31 @@ namespace NSLLibProjectFileFormatter.Project.CSPROJ
 
             var outputType = doc.Descendants(ns + "OutputType").SingleOrDefault()?.Value;
 
-            List<string> NSLProjectTypes = NSLTypes.Value.Split(';').Select(x => x.Trim()).ToList();
+            List<string> NSLProjectTypes = NSLTypes.Value.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries).Select(x => x.Trim()).ToList();
 
-            List<string> configurations = new List<string> { "DebugExamples" };
+            List<string> configurations = new List<string>();
+
+            if (HasUnityTarget(NSLProjectTypes))
+            {
+                configurations.Add("UnityDebug");
+                configurations.Add("Unity");
+            }
+            else if (HasTest(NSLProjectTypes) || NSLProjectTypes.Contains("Example") || IsTestOExample(path))
+            {
+                configurations.Add("DebugExamples");
+            }
+            else
+            {
+                configurations.Add("DebugExamples");
+                configurations.Add("Debug");
+                configurations.Add("Release");
+
+                if (HasUnitySupport(NSLProjectTypes))
+                {
+                    configurations.Add("UnityDebug");
+                    configurations.Add("Unity");
+                }
+            }
 
             var sdk = doc.Root.Attribute("Sdk")?.Value;
             var isClassic = string.IsNullOrEmpty(sdk);
@@ -289,17 +311,15 @@ namespace NSLLibProjectFileFormatter.Project.CSPROJ
                 || hasVsixInProjectName(path)
                 || IsTestOExample(path))
             {
-                var explicitConfigs = doc.Descendants(ns + "Configurations").SingleOrDefault()?.Value;
-                if (!string.IsNullOrEmpty(explicitConfigs))
+                var explicitConfigs = doc.Descendants(ns + "Configurations").SingleOrDefault();
+                if (explicitConfigs != null && !string.IsNullOrEmpty(explicitConfigs.Value))
                 {
-                    configurations = explicitConfigs.Split(';').Select(x => x.Trim()).Distinct().ToList();
-                }
-                else if (HasExternal(NSLProjectTypes))
-                {
-                    configurations.AddRange(new string[] { "Debug", "Release" });
-
-                    if (HasUnitySupport(NSLProjectTypes))
-                        configurations.AddRange(new[] { "UnityDebug", "Unity" });
+                    var newConfigsStr = string.Join(";", configurations);
+                    if (explicitConfigs.Value != newConfigsStr)
+                    {
+                        explicitConfigs.Value = newConfigsStr;
+                        refsChanged = true;
+                    }
                 }
 
                 if (refsChanged)
@@ -314,8 +334,6 @@ namespace NSLLibProjectFileFormatter.Project.CSPROJ
 
                 return;
             }
-
-            configurations.AddRange(new string[] { "Debug", "Release" });
 
             if (!isClassic)
             {
@@ -423,11 +441,9 @@ namespace NSLLibProjectFileFormatter.Project.CSPROJ
                         var tf = "net10.0";
 
                         if (HasUnityTarget(NSLProjectTypes))
-                            configurations.Clear();
-
-                        if (HasUnitySupport(NSLProjectTypes))
-                            configurations.AddRange(new[] { "UnityDebug", "Unity" });
-
+                        {
+                            tf = "netstandard2.1";
+                        }
 
                         analyzerPackage = HasAnalyzerPackageTarget(NSLProjectTypes);
                         analyzerUtils = HasAnalyzerUtils(NSLProjectTypes);
@@ -441,7 +457,7 @@ namespace NSLLibProjectFileFormatter.Project.CSPROJ
 
 
                         tb.WritePropertyItem("TargetFramework", tf)
-                          .WritePropertyItem("Configurations", string.Join(';', AvailableConfigurations))
+                          .WritePropertyItem("Configurations", string.Join(';', configurations.Distinct()))
                           .WritePropertyItem("AllowUnsafeBlocks", true)
                           .WritePropertyItem("Nullable", "disable")
                           .WritePropertyItem("RootNamespace", rootNamespace, rootNamespace != null);

@@ -30,11 +30,11 @@ namespace TCPExample.Client
         [CLArgumentExists("optional")] private bool optional_ex { get; set; }
 
 
-        public override Task<CommandReadStateEnum> ProcessCommand(CommandLineArgsReader reader, CLArgumentValues values)
+        public override Task<CommandReadResult> ProcessCommand(CommandLineArgsReader reader, CLArgumentValues values)
         {
             ProcessingAutoArgs(values);
             Console.WriteLine($"Command '{Command}' Echo {echo} Echo2 {echo_private} Optional {optional} Optional-exists {optional_ex}");
-            return Task.FromResult(CommandReadStateEnum.Success);
+            return Task.FromResult<CommandReadResult>(CommandReadStateEnum.Success);
         }
     }
     [CLHandleSelect("query")]
@@ -47,10 +47,10 @@ namespace TCPExample.Client
             AddArguments(SelectArguments());
         }
 
-        public override Task<CommandReadStateEnum> ProcessCommand(CommandLineArgsReader reader, CLArgumentValues values)
+        public override Task<CommandReadResult> ProcessCommand(CommandLineArgsReader reader, CLArgumentValues values)
         {
             Console.WriteLine($"Command '{Command}'");
-            return Task.FromResult(CommandReadStateEnum.Success);
+            return Task.FromResult<CommandReadResult>(new CommandReadResult(CommandReadStateEnum.Success, description: "Successfully executed test2"));
         }
     }
 
@@ -64,7 +64,7 @@ namespace TCPExample.Client
             //AddCommands(CLHandler<TestCommandProcessor>.Instance);
         }
 
-        public override Task<CommandReadStateEnum> ProcessCommand(CommandLineArgsReader reader)
+        public override Task<CommandReadResult> ProcessCommand(CommandLineArgsReader reader)
         {
             return base.ProcessCommand(reader);
         }
@@ -82,7 +82,7 @@ namespace TCPExample.Client
     {
         public static async Task Run()
         {
-            var result = await CLHandler<CommandsProcessor>.Instance.ProcessCommand(new CommandLineArgs().CreateReader());
+            var result = await CLHandler<CommandsProcessor>.Instance.ProcessRootCommand(new CommandLineArgs().CreateReader());
         }
     }
 }

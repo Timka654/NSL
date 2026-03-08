@@ -3,8 +3,8 @@
 	<PropertyGroup>
 		<NSLProjectTypes>UnityTarget;UnitySupport;UnityReference</NSLProjectTypes>
 
-		<TargetFramework>net10.0</TargetFramework>
-		<Configurations>Debug;Release;DebugExamples;Unity;UnityDebug</Configurations>
+		<TargetFramework>netstandard2.1</TargetFramework>
+		<Configurations>UnityDebug;Unity</Configurations>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<Nullable>disable</Nullable>
 

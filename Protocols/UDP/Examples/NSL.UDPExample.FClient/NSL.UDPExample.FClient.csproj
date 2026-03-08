@@ -1,19 +1,16 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
-	<PropertyGroup>
-		<NSLProjectTypes>Example</NSLProjectTypes>
-		<Configurations>DebugExamples;Debug;Release;UnityDebug;Unity</Configurations>
-		<OutputType>Exe</OutputType>
-		<TargetFramework>net10.0</TargetFramework>
-		<ImplicitUsings>enable</ImplicitUsings>
-		<Nullable>disable</Nullable>
-		<IsPackable>false</IsPackable>
-		<Version>$(VersionSuffix)</Version>
-	</PropertyGroup>
-
-	<ItemGroup>
-		<ProjectReference Include="..\..\..\..\Base\NSL.Logger\NSL.Logger.csproj" />
-		<ProjectReference Include="..\NSL.UDPExample\NSL.UDPExample.csproj" />
-	</ItemGroup>
-
+  <PropertyGroup>
+    <NSLProjectTypes>Example</NSLProjectTypes>
+    <Configurations>DebugExamples</Configurations>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <IsPackable>false</IsPackable>
+    <Version>$(VersionSuffix)</Version>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\Base\NSL.Logger\NSL.Logger.csproj" />
+    <ProjectReference Include="..\NSL.UDPExample\NSL.UDPExample.csproj" />
+  </ItemGroup>
 </Project>

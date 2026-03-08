@@ -1,37 +1,30 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
-	<PropertyGroup>
-		<NSLProjectTypes>Test</NSLProjectTypes>
-		<TargetFramework>net10.0</TargetFramework>
-		<Nullable>enable</Nullable>
-
-		<IsPackable>false</IsPackable>
-		<Version>$(VersionSuffix)</Version>
-		<Nullable>disable</Nullable>
-		<Configurations>DebugExamples;Debug;Release;UnityDebug;Unity</Configurations>
-	</PropertyGroup>
-
-	<ItemGroup>
-		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.3.0" />
-		<PackageReference Include="NUnit" Version="4.5.0" />
-		<PackageReference Include="NUnit3TestAdapter" Version="6.1.0" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<ProjectReference Include="..\NSL.ConfigurationEngine\NSL.ConfigurationEngine.csproj" />
-		<ProjectReference Include="..\Providers\NSL.ConfigurationEngine.Providers.Json\NSL.ConfigurationEngine.Providers.Json.csproj" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<None Update="Data\jsonConfig.json">
-			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</None>
-	</ItemGroup>
-
-	<ProjectExtensions>
-		<VisualStudio>
-			<UserProperties data_4jsonconfig_1json__JsonSchema="" />
-		</VisualStudio>
-	</ProjectExtensions>
-
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <NSLProjectTypes>Test</NSLProjectTypes>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+    <Version>$(VersionSuffix)</Version>
+    <Nullable>disable</Nullable>
+    <Configurations>DebugExamples</Configurations>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.3.0" />
+    <PackageReference Include="NUnit" Version="4.5.0" />
+    <PackageReference Include="NUnit3TestAdapter" Version="6.1.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\NSL.ConfigurationEngine\NSL.ConfigurationEngine.csproj" />
+    <ProjectReference Include="..\Providers\NSL.ConfigurationEngine.Providers.Json\NSL.ConfigurationEngine.Providers.Json.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="Data\jsonConfig.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties data_4jsonconfig_1json__JsonSchema="" />
+    </VisualStudio>
+  </ProjectExtensions>
 </Project>

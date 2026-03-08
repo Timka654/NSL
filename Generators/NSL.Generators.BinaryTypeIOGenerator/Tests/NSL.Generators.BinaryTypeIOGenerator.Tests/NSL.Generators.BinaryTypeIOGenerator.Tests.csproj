@@ -7,7 +7,7 @@
     <Nullable>disable</Nullable>
     <IsPackable>false</IsPackable>
     <Version>$(VersionSuffix)</Version>
-    <Configurations>DebugExamples;Debug;Release;UnityDebug;Unity</Configurations>
+    <Configurations>DebugExamples</Configurations>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DefineConstants>$(DefineConstants);BACKEND_ENGINE</DefineConstants>

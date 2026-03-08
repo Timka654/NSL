@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<NSLProjectTypes>UnitySupport;AnalyzerUtils;AnalyzerCore;Unpacking</NSLProjectTypes>
+
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
+		<EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<Compile Include="..\NSL.Generators.EntityPathGenerator.Shared\**\*.cs" Exclude="..\NSL.Generators.EntityPathGenerator.Shared\**\bin\**;..\NSL.Generators.EntityPathGenerator.Shared\**\obj\**">
+			<Link>NSL.Generators.EntityPathGenerator.Shared\%(RecursiveDir)%(FileName)%(Extension)</Link>
+		</Compile>
+	</ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.11.0">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="5.0.0" />
+		<!--<PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="5.0.0" />-->
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\NSL.Generators.EntityPath.Shared\NSL.Generators.EntityPath.Shared.csproj" />
+	</ItemGroup>
+
+</Project>

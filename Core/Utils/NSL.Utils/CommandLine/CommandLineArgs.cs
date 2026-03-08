@@ -14,14 +14,8 @@ namespace NSL.Utils.CommandLine
     /// </summary>
     public class CommandLineArgs
     {
-        private const string Pattern = @"([\/-]?)((\w+)(?:[=:](""[^""]+""|[^\s""]+))?)(?:\s+|$)";
-
-        private readonly Regex _regex = new Regex(
-            Pattern,
-            RegexOptions.IgnoreCase | RegexOptions.Compiled);
-
-        private readonly Dictionary<string, CommandArgStruct> _args =
-            new Dictionary<string, CommandArgStruct>();
+        private readonly List<KeyValuePair<string, CommandArgStruct>> _args = new List<KeyValuePair<string, CommandArgStruct>>();
+        private readonly Dictionary<string, CommandArgStruct> _argsDict = new Dictionary<string, CommandArgStruct>(StringComparer.OrdinalIgnoreCase);
 
         public CommandLineArgs()
         {
@@ -42,18 +36,18 @@ namespace NSL.Utils.CommandLine
         {
             get
             {
-                return _args.ContainsKey(key) ? _args[key].Value : null;
+                return _argsDict.ContainsKey(key) ? _argsDict[key].Value : null;
             }
         }
 
         public bool ContainsKey(string key)
         {
-            return _args.ContainsKey(key);
+            return _argsDict.ContainsKey(key);
         }
 
         public string GetValue(string key, string defaultValue = null)
         {
-            if (_args.TryGetValue(key, out var text))
+            if (_argsDict.TryGetValue(key, out var text))
                 return text.Value;
 
             return defaultValue;
@@ -61,7 +55,7 @@ namespace NSL.Utils.CommandLine
 
         public T GetValue<T>(string key, T defaultValue = default)
         {
-            if (_args.TryGetValue(key, out var text))
+            if (_argsDict.TryGetValue(key, out var text))
                 return (T)Convert.ChangeType(text.Value, typeof(T));
 
             return defaultValue;
@@ -69,10 +63,17 @@ namespace NSL.Utils.CommandLine
 
         public bool TryGetValue<T>(string key, ref T result)
         {
-            if (_args.TryGetValue(key, out var text))
+            if (_argsDict.TryGetValue(key, out var text))
             {
+                try
+                {
                     result = (T)Convert.ChangeType(text.Value, typeof(T));
-                return true;
+                    return true;
+                }
+                catch
+                {
+                    return false;
+                }
             }
 
             return false;
@@ -96,22 +97,47 @@ namespace NSL.Utils.CommandLine
             if (haveExecutablePath)
                 arguments = arguments.Skip(1);
 
-            var regexArgs = arguments.Select(arg =>
-                        _regex.Match(arg))
-                .Where(m => m.Success)
-                .ToArray();
-
-            foreach (var match in regexArgs)
+            foreach (var arg in arguments)
             {
-                try
+                if (string.IsNullOrWhiteSpace(arg)) continue;
+
+                string prefix = string.Empty;
+                string key = arg;
+                string value = null;
+
+                if (key.StartsWith("--"))
                 {
-                    _args.Add(
-                         match.Groups[3].Value,
-                         (match.Groups[1].Value,
-                         match.Groups[4].Value));
+                    prefix = "--";
+                    key = key.Substring(2);
                 }
-                // Ignore any duplicate args
-                catch (Exception) { }
+                else if (key.StartsWith("-"))
+                {
+                    prefix = "-";
+                    key = key.Substring(1);
+                }
+                else if (key.StartsWith("/"))
+                {
+                    prefix = "/";
+                    key = key.Substring(1);
+                }
+
+                int sepIdx = key.IndexOfAny(new[] { ':', '=' });
+                if (sepIdx >= 0)
+                {
+                    value = key.Substring(sepIdx + 1);
+                    if (value.StartsWith("\"") && value.EndsWith("\"") && value.Length >= 2)
+                        value = value.Substring(1, value.Length - 2);
+                    key = key.Substring(0, sepIdx);
+                }
+
+                var argStruct = new CommandArgStruct(prefix, value);
+
+                if (!_argsDict.ContainsKey(key))
+                {
+                    _argsDict.Add(key, argStruct);
+                }
+
+                _args.Add(new KeyValuePair<string, CommandArgStruct>(key, argStruct));
             }
         }
 
@@ -129,7 +155,7 @@ namespace NSL.Utils.CommandLine
             if (index < 0 || index >= Count)
                 throw new IndexOutOfRangeException();
 
-            return _args.ElementAt(index);
+            return _args[index];
         }
 
         public CommandLineArgsReader CreateReader()
@@ -162,7 +188,7 @@ namespace NSL.Utils.CommandLine
             return hashCode;
         }
 
-        public bool IsArgument() => Prefix == "/" || Prefix == "-";
+        public bool IsArgument() => Prefix == "/" || Prefix == "-" || Prefix == "--";
 
         public void Deconstruct(out string prefix, out string value)
         {

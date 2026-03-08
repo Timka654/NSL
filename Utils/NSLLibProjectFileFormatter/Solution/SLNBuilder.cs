@@ -89,16 +89,30 @@ EndProject");
                 foreach (var profile in availableProfiles)
                 {
                     var targetProfile = profile;
+                    bool shouldBuild = true;
 
-                    if (isVsix || projectPath.Info.nSLProjectTypes?.Contains("Test") == true)
+                    if (!projectPath.Info.Profiles.Contains(profile))
                     {
-                        targetProfile =  profile.Contains("Debug") ? $"Debug" : "Release";
+                        shouldBuild = false;
+
+                        var isDebug = profile.Contains("Debug");
+                        if (isDebug)
+                        {
+                            targetProfile = projectPath.Info.Profiles.Contains("Debug") ? "Debug" : 
+                                            (projectPath.Info.Profiles.Contains("DebugExamples") ? "DebugExamples" : 
+                                            (projectPath.Info.Profiles.Contains("UnityDebug") ? "UnityDebug" : projectPath.Info.Profiles.FirstOrDefault() ?? profile));
+                        }
+                        else 
+                        {
+                            targetProfile = projectPath.Info.Profiles.Contains("Release") ? "Release" : 
+                                            (projectPath.Info.Profiles.Contains("Unity") ? "Unity" : projectPath.Info.Profiles.FirstOrDefault() ?? profile);
+                        }
                     }
 
                     foreach (var arch in Archs)
                     {
                         slnProjectConfigs.Add($@"{{{projectPath.UppedId}}}.{profile}|{arch}.ActiveCfg = {targetProfile}|{arch}");
-                        if (projectPath.Info.Profiles.Contains(profile))
+                        if (shouldBuild)
                             slnProjectConfigs.Add($@"{{{projectPath.UppedId}}}.{profile}|{arch}.Build.0 = {targetProfile}|{arch}");
                     }
                 }

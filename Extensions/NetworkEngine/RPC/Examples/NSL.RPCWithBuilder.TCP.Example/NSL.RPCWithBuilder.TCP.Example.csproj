@@ -1,23 +1,20 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
-	<PropertyGroup>
-		<NSLProjectTypes>Example</NSLProjectTypes>
-		<OutputType>Exe</OutputType>
-		<TargetFramework>net10.0</TargetFramework>
-		<ImplicitUsings>enable</ImplicitUsings>
-		<Nullable>disable</Nullable>
-		<IsPackable>false</IsPackable>
-		<Version>$(VersionSuffix)</Version>
-		<Configurations>DebugExamples;Debug;Release;UnityDebug;Unity</Configurations>
-	</PropertyGroup>
-
-	<ItemGroup>
-		<ProjectReference Include="..\..\..\..\..\Base\NSL.Logger\NSL.Logger.csproj" />
-		<ProjectReference Include="..\..\..\..\..\Protocols\TCP\BuilderExtensions\NSL.BuilderExtensions.TCPClient\NSL.BuilderExtensions.TCPClient.csproj" />
-		<ProjectReference Include="..\..\..\..\..\Protocols\TCP\BuilderExtensions\NSL.BuilderExtensions.TCPServer\NSL.BuilderExtensions.TCPServer.csproj" />
-		<ProjectReference Include="..\..\NSL.Extensions.RPC.EndPointBuilder\NSL.Extensions.RPC.EndPointBuilder.csproj" />
-		<ProjectReference Include="..\..\NSL.Extensions.RPC.Generator.Core\NSL.Extensions.RPC.Generator.Core.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
-		<ProjectReference Include="..\..\NSL.Extensions.RPC\NSL.Extensions.RPC.csproj" />
-	</ItemGroup>
-
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <NSLProjectTypes>Example</NSLProjectTypes>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <IsPackable>false</IsPackable>
+    <Version>$(VersionSuffix)</Version>
+    <Configurations>DebugExamples</Configurations>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\..\Base\NSL.Logger\NSL.Logger.csproj" />
+    <ProjectReference Include="..\..\..\..\..\Protocols\TCP\BuilderExtensions\NSL.BuilderExtensions.TCPClient\NSL.BuilderExtensions.TCPClient.csproj" />
+    <ProjectReference Include="..\..\..\..\..\Protocols\TCP\BuilderExtensions\NSL.BuilderExtensions.TCPServer\NSL.BuilderExtensions.TCPServer.csproj" />
+    <ProjectReference Include="..\..\NSL.Extensions.RPC.EndPointBuilder\NSL.Extensions.RPC.EndPointBuilder.csproj" />
+    <ProjectReference Include="..\..\NSL.Extensions.RPC.Generator.Core\NSL.Extensions.RPC.Generator.Core.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\..\NSL.Extensions.RPC\NSL.Extensions.RPC.csproj" />
+  </ItemGroup>
 </Project>

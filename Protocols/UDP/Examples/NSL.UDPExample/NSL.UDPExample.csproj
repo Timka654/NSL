@@ -1,17 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
-	<PropertyGroup>
-		<NSLProjectTypes>Example</NSLProjectTypes>
-		<Configurations>DebugExamples;Debug;Release;UnityDebug;Unity</Configurations>
-		<OutputType>Library</OutputType>
-		<TargetFramework>net10.0</TargetFramework>
-		<IsPackable>false</IsPackable>
-		<Version>$(VersionSuffix)</Version>
-		<Nullable>disable</Nullable>
-	</PropertyGroup>
-
-	<ItemGroup>
-		<ProjectReference Include="..\..\NSL.UDP.Client\NSL.UDP.Client.csproj" />
-	</ItemGroup>
-
+  <PropertyGroup>
+    <NSLProjectTypes>Example</NSLProjectTypes>
+    <Configurations>DebugExamples</Configurations>
+    <OutputType>Library</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <IsPackable>false</IsPackable>
+    <Version>$(VersionSuffix)</Version>
+    <Nullable>disable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\NSL.UDP.Client\NSL.UDP.Client.csproj" />
+  </ItemGroup>
 </Project>

@@ -42,7 +42,7 @@ namespace NSL.HttpClient
         {
             message.Content = await defaultBuildAction();
 
-#if UNITY
+#if UNITY || UNITYDEBUG
             message.Properties.TryAdd(HttpClientKey, client);
             message.Properties.TryAdd(HttpOptionsKey, options);
 #else
@@ -51,7 +51,7 @@ namespace NSL.HttpClient
 #endif
             if (options == null) return;
 
-#if UNITY
+#if UNITY || UNITYDEBUG
             foreach (var item in options.ObjectBag)
             {
                 message.Properties.TryAdd(item.Key, item.Value);

@@ -7,4 +7,8 @@
     <Nullable>disable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <None Include="Generators\Refactoring\NSL.Refactoring.FastAction\NSL.Refactoring.FastAction.UI\NSL.Refactoring.FastAction.UI.csproj" />
+  </ItemGroup>
+
 </Project>

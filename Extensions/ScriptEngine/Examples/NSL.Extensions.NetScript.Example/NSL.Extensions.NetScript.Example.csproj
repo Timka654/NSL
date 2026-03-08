@@ -1,43 +1,38 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
-	<PropertyGroup>
-		<NSLProjectTypes>Example</NSLProjectTypes>
-		<OutputType>Exe</OutputType>
-		<TargetFramework>net10.0</TargetFramework>
-		<IsPackable>false</IsPackable>
-		<Version>$(VersionSuffix)</Version>
-		<Configurations>DebugExamples;Debug;Release;UnityDebug;Unity</Configurations>
-		<Nullable>disable</Nullable>
-	</PropertyGroup>
-
-	<ItemGroup>
-		<Compile Remove="scripts\Globals.cs" />
-		<Compile Remove="scripts\ScriptCore.cs" />
-		<Compile Remove="scripts\test1.cs" />
-		<Compile Remove="scripts\test2.cs" />
-		<Compile Remove="scripts\test2Partial.cs" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<None Include="scripts\ScriptCore.cs">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</None>
-		<None Include="scripts\Globals.cs">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</None>
-		<None Include="scripts\test1.cs">
-			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</None>
-		<None Include="scripts\test2.cs">
-			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</None>
-		<None Include="scripts\test2Partial.cs">
-			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</None>
-	</ItemGroup>
-
-	<ItemGroup>
-		<ProjectReference Include="..\..\NSL.Extensions.NetScript\NSL.Extensions.NetScript.csproj" />
-	</ItemGroup>
-
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <NSLProjectTypes>Example</NSLProjectTypes>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <IsPackable>false</IsPackable>
+    <Version>$(VersionSuffix)</Version>
+    <Configurations>DebugExamples</Configurations>
+    <Nullable>disable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="scripts\Globals.cs" />
+    <Compile Remove="scripts\ScriptCore.cs" />
+    <Compile Remove="scripts\test1.cs" />
+    <Compile Remove="scripts\test2.cs" />
+    <Compile Remove="scripts\test2Partial.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="scripts\ScriptCore.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="scripts\Globals.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="scripts\test1.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="scripts\test2.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="scripts\test2Partial.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\NSL.Extensions.NetScript\NSL.Extensions.NetScript.csproj" />
+  </ItemGroup>
 </Project>

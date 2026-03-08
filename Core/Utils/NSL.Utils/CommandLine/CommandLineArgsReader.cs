@@ -37,7 +37,7 @@ namespace NSL.Utils.CommandLine
 
             --Index;
 
-            return false;
+            return true;
         }
 
         private void _setIndex(int value)
@@ -84,7 +84,7 @@ namespace NSL.Utils.CommandLine
         /// <param name="index"></param>
         /// <returns></returns>
         public bool HaveValue(int? index = null)
-            => getCurrent(index).Value.Value == default;
+            => getCurrent(index).Value.Value != null;
 
         public T GetValue<T>(T defaultValue = default, int? index = null)
             => Args.GetValue(getCurrent(index).Key, defaultValue);

@@ -68,7 +68,28 @@ namespace NSL.Utils.CommandLine.CLHandles
             return (true, result, null);
         }
 
-        public virtual async Task<CommandReadStateEnum> ProcessCommand(CommandLineArgsReader reader)
+        public virtual async Task<CommandReadResult> ProcessRootCommand(CommandLineArgsReader reader, CommandReadResultDelegate resultDelegate = null)
+        {
+            var result = await ProcessCommand(reader);
+
+            result.Callback?.Invoke();
+
+            if (result.RootExecutorDelegate != null)
+                result.RootExecutorDelegate.Invoke(result);
+            else if (resultDelegate != null)
+                resultDelegate.Invoke(result);
+            else if (!string.IsNullOrEmpty(result.Description))
+            {
+                if (result.State == CommandReadStateEnum.Success)
+                    WriteToConsoleWithColor(() => Console.WriteLine($"[Success] {result.Description}"), ConsoleColor.Green);
+                else if (result.State != CommandReadStateEnum.HelpInvoked && result.State != CommandReadStateEnum.InvalidArgumentHelpInvoked && result.State != CommandReadStateEnum.InvalidPathHelpInvoked)
+                    WriteToConsoleWithColor(() => Console.WriteLine($"[Failed] {result.Description}"), ConsoleColor.Red);
+            }
+
+            return result;
+        }
+
+        public virtual async Task<CommandReadResult> ProcessCommand(CommandLineArgsReader reader)
         {
             bool haveNext = reader.TryNext();
 
@@ -93,7 +114,7 @@ namespace NSL.Utils.CommandLine.CLHandles
             return result.ResultState ?? result.CurrentState;
         }
 
-        private async Task<CommandReadStateEnum> invokeProcessCommand(CommandLineArgsReader reader)
+        private async Task<CommandReadResult> invokeProcessCommand(CommandLineArgsReader reader)
         {
             var args = await ReadArguments(reader);
 
@@ -103,12 +124,12 @@ namespace NSL.Utils.CommandLine.CLHandles
             return await ProcessCommand(reader, args.Values);
         }
 
-        public virtual Task<CommandReadStateEnum> ProcessCommand(CommandLineArgsReader reader, CLArgumentValues values)
+        public virtual Task<CommandReadResult> ProcessCommand(CommandLineArgsReader reader, CLArgumentValues values)
         {
-            return Task.FromResult(CommandReadStateEnum.Success);
+            return Task.FromResult<CommandReadResult>(CommandReadStateEnum.Success);
         }
 
-        protected async Task<(CommandReadStateEnum CurrentState, CommandReadStateEnum? ResultState)> TryRunNext(CommandLineArgsReader reader)
+        protected async Task<(CommandReadStateEnum CurrentState, CommandReadResult? ResultState)> TryRunNext(CommandLineArgsReader reader)
         {
             var getResult = TryGetNext(reader);
 
@@ -178,7 +199,7 @@ namespace NSL.Utils.CommandLine.CLHandles
         }
 
 
-        protected virtual async Task<CommandReadStateEnum> InvalidArgsHandle(CommandLineArgsReader reader, CLReadException exception)
+        protected virtual async Task<CommandReadResult> InvalidArgsHandle(CommandLineArgsReader reader, CLReadException exception)
         {
             if (await ProcessHelp(reader, CommandReadStateEnum.InvalidArgument, exception))
                 return CommandReadStateEnum.InvalidArgumentHelpInvoked;
@@ -186,7 +207,7 @@ namespace NSL.Utils.CommandLine.CLHandles
             return CommandReadStateEnum.InvalidArgument;
         }
 
-        protected virtual async Task<CommandReadStateEnum> InvalidPathHandle(CommandLineArgsReader reader)
+        protected virtual async Task<CommandReadResult> InvalidPathHandle(CommandLineArgsReader reader)
         {
             if (await ProcessHelp(reader, CommandReadStateEnum.InvalidPath, null))
                 return CommandReadStateEnum.InvalidPathHelpInvoked;
@@ -249,6 +270,8 @@ namespace NSL.Utils.CommandLine.CLHandles
             Console.ForegroundColor = ConsoleColor.Gray;
         }
 
+        private static ConcurrentDictionary<Type, CLArgument[]> _selectArgumentsCache = new ConcurrentDictionary<Type, CLArgument[]>();
+
         /// <summary>
         /// Generate arguments for command from <see cref="NSL.Utils.CommandLine.CLHandles.Arguments.CLArgumentAttribute"/> attached to this class type
         /// </summary>
@@ -257,8 +280,12 @@ namespace NSL.Utils.CommandLine.CLHandles
         {
             var thisType = this.GetType();
 
-            var argType = typeof(CLArgument<>);
+            if (_selectArgumentsCache.TryGetValue(thisType, out var cachedArgs))
+            {
+                return cachedArgs;
+            }
 
+            var argType = typeof(CLArgument<>);
             var delegateType = typeof(CLArgument<>.CommandArgumentHandler);
 
             var readMethod = typeof(CLHandler).GetMethod(nameof(__readArg), BindingFlags.Static | BindingFlags.NonPublic);
@@ -269,7 +296,6 @@ namespace NSL.Utils.CommandLine.CLHandles
             foreach (var item in thisType.GetCustomAttributes<CLArgumentAttribute>())
             {
                 var type = item.Type;
-
                 Delegate itemReadMethod;
 
                 if (Equals(type, typeof(CLContainsType)))
@@ -280,19 +306,14 @@ namespace NSL.Utils.CommandLine.CLHandles
                 }
                 else
                 {
-
                     var itemDelegateType = delegateType.MakeGenericType(type);
                     itemReadMethod = readMethod.MakeGenericMethod(type).CreateDelegate(itemDelegateType);
-
                 }
 
-
                 var itemArg = argType.MakeGenericType(type);
-
-
                 var arg = (CLArgument)Activator.CreateInstance(itemArg, new object[] { item.Name, itemReadMethod });
 
-                if (item.Optional)
+                if (item.Optional || Equals(item.Type, typeof(CLContainsType)))
                     arg.WithOptional();
 
                 arg.Description = item.Description;
@@ -300,7 +321,9 @@ namespace NSL.Utils.CommandLine.CLHandles
                 args.Add(arg);
             }
 
-            return args.ToArray();
+            var result = args.ToArray();
+            _selectArgumentsCache.TryAdd(thisType, result);
+            return result;
         }
 
         private static ConcurrentDictionary<Type, Action<CLHandler, CLArgumentValues>> setActions = new ConcurrentDictionary<Type, Action<CLHandler, CLArgumentValues>>();
@@ -325,32 +348,74 @@ namespace NSL.Utils.CommandLine.CLHandles
                     .Where(x => x.ExistsSet != null || x.ValueSet != null)
                     .ToArray();
 
-                setAction = (i, v) => { };
+                var handlerParam = System.Linq.Expressions.Expression.Parameter(typeof(CLHandler), "handler");
+                var valuesParam = System.Linq.Expressions.Expression.Parameter(typeof(CLArgumentValues), "values");
 
+                var castedHandler = System.Linq.Expressions.Expression.Convert(handlerParam, thisType);
                 var getAction = typeof(CLArgumentValues).GetMethod(nameof(CLArgumentValues.GetValue));
+                var containsAction = typeof(CLArgumentValues).GetMethod(nameof(CLArgumentValues.ContainsArg));
 
-                foreach (var _item in props)
+                var expressions = new List<System.Linq.Expressions.Expression>();
+
+                foreach (var item in props)
                 {
-                    var item = _item;
-
                     if (item.ValueSet != null)
                     {
                         var pGetAction = getAction.MakeGenericMethod(item.property.PropertyType);
-                        setAction += (i, args) =>
+
+                        object defValueStr = item.ValueSet.DefaultValue;
+                        System.Linq.Expressions.Expression defExpr;
+                        if (defValueStr == null)
                         {
-                            var v = pGetAction.Invoke(args, new object[] { item.ValueSet.Name, item.ValueSet.DefaultValue });
-                            item.property.SetValue(i, v);
-                        };
+                            defExpr = System.Linq.Expressions.Expression.Default(item.property.PropertyType);
+                        }
+                        else
+                        {
+                            try { defExpr = System.Linq.Expressions.Expression.Constant(Convert.ChangeType(defValueStr, item.property.PropertyType), item.property.PropertyType); }
+                            catch { defExpr = System.Linq.Expressions.Expression.Default(item.property.PropertyType); }
+                        }
+
+                        var getValueCall = System.Linq.Expressions.Expression.Call(
+                            valuesParam, 
+                            pGetAction, 
+                            System.Linq.Expressions.Expression.Constant(item.ValueSet.Name), 
+                            defExpr
+                        );
+
+                        var assign = System.Linq.Expressions.Expression.Assign(
+                            System.Linq.Expressions.Expression.Property(castedHandler, item.property),
+                            getValueCall
+                        );
+
+                        expressions.Add(assign);
                     }
                     else if (item.ExistsSet != null)
                     {
-                        setAction += (i, args) =>
-                        {
-                            item.property.SetValue(i, args.ContainsArg(item.ExistsSet.Name));
-                        };
-                    }
+                        var containsCall = System.Linq.Expressions.Expression.Call(
+                            valuesParam, 
+                            containsAction, 
+                            System.Linq.Expressions.Expression.Constant(item.ExistsSet.Name)
+                        );
 
+                        var assign = System.Linq.Expressions.Expression.Assign(
+                            System.Linq.Expressions.Expression.Property(castedHandler, item.property),
+                            containsCall
+                        );
+
+                        expressions.Add(assign);
+                    }
                 }
+
+                if (expressions.Count == 0)
+                {
+                    setAction = (i, v) => { };
+                }
+                else
+                {
+                    var block = System.Linq.Expressions.Expression.Block(expressions);
+                    setAction = System.Linq.Expressions.Expression.Lambda<Action<CLHandler, CLArgumentValues>>(block, handlerParam, valuesParam).Compile();
+                }
+
                 setActions[thisType] = setAction;
             }
 

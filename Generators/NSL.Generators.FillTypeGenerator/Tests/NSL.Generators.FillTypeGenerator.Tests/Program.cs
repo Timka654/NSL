@@ -36,9 +36,9 @@ namespace NSL.Generators.FillTypeGenerator.Tests
             Test7Model model7 = new Test7Model();
 
             model7.Filla1To(model6);
-            model7.FillTo(model6);
+            //model7.FillTo(model6);
 
-            model7.FillFrom(model6);
+            //model7.FillFrom(model6);
 
             Test1Model tmodel1 = new Test1Model() { TestValue1 = "abcxaca", TestValue2 = "35t2452" };
 

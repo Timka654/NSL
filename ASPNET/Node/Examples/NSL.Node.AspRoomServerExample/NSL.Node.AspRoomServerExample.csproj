@@ -4,7 +4,7 @@
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <Configurations>DebugExamples;Debug;Release;UnityDebug;Unity</Configurations>
+    <Configurations>DebugExamples</Configurations>
   </PropertyGroup>
   <ItemGroup>
     <Content Remove="configuration.json" />

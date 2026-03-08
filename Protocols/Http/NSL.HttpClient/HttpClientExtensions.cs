@@ -78,7 +78,7 @@ namespace NSL.HttpClient
                     type = options.ExceptionHandle(ex, options, exresp);
                 else if (ex is HttpRequestException hre)
                 {
-#if UNITY
+#if UNITY || UNITYDEBUG
                     exresp.StatusCode = 0;
 #else
                     exresp.StatusCode = hre.StatusCode ?? 0;

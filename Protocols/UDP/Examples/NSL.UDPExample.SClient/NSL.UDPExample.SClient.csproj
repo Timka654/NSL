@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <NSLProjectTypes>Example</NSLProjectTypes>
-    <Configurations>DebugExamples;Debug;Release;UnityDebug;Unity</Configurations>
+    <Configurations>DebugExamples</Configurations>
     <OutputType>Exe</OutputType>
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>

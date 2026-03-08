@@ -1,4 +1,6 @@
-﻿namespace NSL.Utils.CommandLine.CLHandles
+﻿using System;
+
+namespace NSL.Utils.CommandLine.CLHandles
 {
     public enum CommandReadStateEnum
     {
@@ -43,5 +45,31 @@
         /// Status for return from a command that was cancelled
         /// </summary>
         Cancelled
+    }
+
+    public delegate void CommandReadResultDelegate(CommandReadResult result);
+
+    public struct CommandReadResult
+    {
+        public CommandReadStateEnum State { get; set; }
+        public string Description { get; set; }
+        public Action Callback { get; set; }
+        public CommandReadResultDelegate RootExecutorDelegate { get; set; }
+
+        public CommandReadResult(CommandReadStateEnum state, string description = null, Action callback = null, CommandReadResultDelegate rootExecutorDelegate = null)
+        {
+            State = state;
+            Description = description;
+            Callback = callback;
+            RootExecutorDelegate = rootExecutorDelegate;
+        }
+
+        public void FinalizeLogic()
+        {
+            Callback?.Invoke();
+            RootExecutorDelegate?.Invoke(this);
+        }
+
+        public static implicit operator CommandReadResult(CommandReadStateEnum state) => new CommandReadResult(state);
     }
 }

@@ -9,7 +9,7 @@ namespace NSL.Generators.FillTypeGenerator.Tests
     [FillTypeFromGenerate(typeof(Test6Model))]
     //[FillTypeGenerate(typeof(Test6Model), null, "a1")]
     [FillTypeGenerate(typeof(Test6Model), "a1")]
-    [FillTypeGenerate(typeof(Test6Model), "a1")]
+    //[FillTypeGenerate(typeof(Test6Model), "a1")]
     [FillTypeGenerate(typeof(Test6Model), "a2")]
     [FillTypeFromGenerate(typeof(Test6Model), "a2")]
     [FillTypeGenerate(typeof(Test6Model), "a3")]
