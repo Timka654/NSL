@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NSL.ASPNET.Blazor.Pagination
+namespace NSL.ASPNET.Blazor.Components.Pagination
 {
     public abstract class PaginatorBaseComponent : ComponentBase
     {
