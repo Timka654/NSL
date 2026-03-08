@@ -6,7 +6,7 @@ using NSL.Node.RoomServer.Client;
 using NSL.Node.RoomServer.Client.Data;
 using NSL.SocketCore.Utils.Exceptions;
 
-namespace NSL.Node.BridgeTransportExample
+namespace NSL.Node.RoomServerExample
 {
     public class Program
     {

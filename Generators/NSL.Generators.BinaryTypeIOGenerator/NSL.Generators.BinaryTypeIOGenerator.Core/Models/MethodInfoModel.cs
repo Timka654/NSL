@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace NSL.Generators.BinaryTypeIOGenerator.Models
+namespace NSL.Generators.BinaryTypeIOGenerator.Core.Models
 {
     internal class MethodInfoModel
     {

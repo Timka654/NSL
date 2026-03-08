@@ -3,7 +3,7 @@ using NSL.Generators.BinaryGenerator;
 using System;
 using System.Linq;
 
-namespace NSL.Extensions.RPC.Generator
+namespace NSL.Extensions.RPC.Generator.Core
 {
     internal class RPCBinaryGeneratorContext : BinaryGeneratorContext
     {

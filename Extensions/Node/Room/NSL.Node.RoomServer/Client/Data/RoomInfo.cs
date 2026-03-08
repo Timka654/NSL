@@ -1,7 +1,7 @@
 ﻿using NSL.Node.BridgeServer.Shared;
+using NSL.Node.Core;
+using NSL.Node.Core.Enums;
 using NSL.Node.Core.Models.Message;
-using NSL.Node.RoomServer.Shared.Client.Core;
-using NSL.Node.RoomServer.Shared.Client.Core.Enums;
 using NSL.SocketCore.Utils.Buffer;
 using NSL.UDP;
 using NSL.UDP.Enums;
@@ -14,7 +14,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
-using static NSL.Node.RoomServer.Shared.Client.Core.IRoomInfo;
+using static NSL.Node.Core.IRoomInfo;
 
 namespace NSL.Node.RoomServer.Client.Data
 {

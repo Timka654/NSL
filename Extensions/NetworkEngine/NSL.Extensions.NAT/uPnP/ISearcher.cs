@@ -1,7 +1,8 @@
+using NSL.Extensions.NAT.uPnP.EventArgs;
 using System;
 using System.Net;
 
-namespace Mono.Nat
+namespace NSL.Extensions.NAT.uPnP
 {
     public delegate void NatDeviceCallback(INatDevice device);
 

@@ -6,7 +6,7 @@ using NSL.UDP.Interface;
 using NSL.UDP.Packet;
 using System;
 
-namespace UDPExample
+namespace NSL.UDPExample
 {
     public class Example<TOptions>
         where TOptions : UDPClientOptions<NetworkClient>, IBindingUDPOptions, new()

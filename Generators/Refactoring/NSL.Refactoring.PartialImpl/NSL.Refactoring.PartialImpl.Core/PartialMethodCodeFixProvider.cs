@@ -10,7 +10,7 @@ using Microsoft.CodeAnalysis.CodeRefactorings;
 using System.Collections.Generic;
 using Microsoft.CodeAnalysis.Formatting;
 
-namespace NSL.Refactoring.PartialImpl
+namespace NSL.Refactoring.PartialImpl.Core
 {
     [ExportCodeRefactoringProvider(LanguageNames.CSharp, Name = nameof(PartialMethodsRefactoringProvider))]
     [Shared]

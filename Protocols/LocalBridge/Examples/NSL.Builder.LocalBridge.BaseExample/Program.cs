@@ -1,11 +1,11 @@
-﻿using LocalBridge.Example.Shared;
-using NSL.BuilderExtensions.LocalBridge;
+﻿using NSL.BuilderExtensions.LocalBridge;
 using NSL.BuilderExtensions.TCPClient;
 using NSL.BuilderExtensions.TCPServer;
+using NSL.LocalBridge.Example.Shared;
 using NSL.SocketClient;
 using NSL.SocketServer;
 
-namespace Builder.LocalBridge.BaseExample
+namespace NSL.Builder.LocalBridge.BaseExample
 {
     internal class Program
     {

@@ -3,7 +3,7 @@ using NSL.UDP;
 using NSL.UDP.Enums;
 using System;
 
-namespace NSL.Node.RoomServer.Shared.Client.Core
+namespace NSL.Node.Core
 {
     public interface INodeClientNetwork : IDisposable
     {

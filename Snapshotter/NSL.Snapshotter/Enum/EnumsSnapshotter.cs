@@ -1,7 +1,8 @@
-﻿using System;
+﻿using NSL.Snapshotter.Enum;
+using System;
 using System.Reflection;
 
-namespace Nsl.Snapshotter.Enum
+namespace NSL.Snapshotter.Enum
 {
     public sealed class EnumsSnapshotter(string basePath, string type = "enums", params Assembly[] assemblies) : BaseEnumsSnapshotter(basePath, type, assemblies)
     {

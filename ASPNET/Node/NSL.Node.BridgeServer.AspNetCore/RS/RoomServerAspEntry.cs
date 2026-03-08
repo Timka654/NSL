@@ -8,8 +8,9 @@ using Microsoft.AspNetCore.Routing;
 using System.Threading.Tasks;
 using System;
 using NSL.BuilderExtensions.WebSocketsServer.AspNet;
+using NSL.Node.BridgeServer.RS;
 
-namespace NSL.Node.BridgeServer.RS
+namespace NSL.Node.BridgeServer.AspNetCore.RS
 {
     public class RoomServerAspEntry : RoomServerBaseEntry
     {

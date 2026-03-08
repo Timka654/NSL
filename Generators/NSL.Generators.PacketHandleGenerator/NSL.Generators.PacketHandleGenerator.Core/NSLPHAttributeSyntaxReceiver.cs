@@ -6,7 +6,7 @@ using System;
 using System.Linq;
 using System.Threading;
 
-namespace NSL.Generators.PacketHandleGenerator
+namespace NSL.Generators.PacketHandleGenerator.Core
 {
     internal class NSLPHAttributeSyntaxReceiver /*: ISyntaxReceiver*/
     {

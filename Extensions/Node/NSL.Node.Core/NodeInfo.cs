@@ -1,6 +1,6 @@
 ﻿using NSL.SocketCore.Utils;
 
-namespace NSL.Node.RoomServer.Shared.Client.Core
+namespace NSL.Node.Core
 {
     public partial class NodeInfo
     {

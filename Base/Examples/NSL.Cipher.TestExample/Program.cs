@@ -1,6 +1,6 @@
 ﻿using NSL.Cipher.RC.RC4;
 
-namespace Cipher.TestExample
+namespace NSL.Cipher.TestExample
 {
     internal class Program
     {

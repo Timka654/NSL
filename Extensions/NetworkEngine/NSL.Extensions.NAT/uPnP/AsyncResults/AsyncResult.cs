@@ -1,7 +1,7 @@
 using System;
 using System.Threading;
 
-namespace Mono.Nat
+namespace NSL.Extensions.NAT.uPnP.AsyncResults
 {
     internal class AsyncResult : IAsyncResult
     {

@@ -1,4 +1,6 @@
-﻿using Mono.Nat;
+﻿using NSL.Extensions.NAT.uPnP;
+using NSL.Extensions.NAT.uPnP.Enums;
+using NSL.Extensions.NAT.uPnP.EventArgs;
 using System;
 using System.Collections.Generic;
 using System.Linq;

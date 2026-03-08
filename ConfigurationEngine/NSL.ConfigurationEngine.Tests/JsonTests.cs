@@ -1,8 +1,9 @@
+using ConfigurationEngine.Tests;
 using NSL.ConfigurationEngine.Providers.Json;
 using NUnit.Framework;
 using System.IO;
 
-namespace ConfigurationEngine.Tests
+namespace NSL.ConfigurationEngine.Tests
 {
     public class Tests
     {

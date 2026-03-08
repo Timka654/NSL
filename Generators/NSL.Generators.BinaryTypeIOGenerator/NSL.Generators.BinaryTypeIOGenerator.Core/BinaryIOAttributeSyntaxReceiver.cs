@@ -6,7 +6,7 @@ using System;
 using System.Linq;
 using System.Threading;
 
-namespace NSL.Generators.BinaryTypeIOGenerator
+namespace NSL.Generators.BinaryTypeIOGenerator.Core
 {
     internal class BinaryIOAttributeSyntaxReceiver /* : ISyntaxReceiver*/
     {

@@ -1,16 +1,16 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using NSL.Generators.HttpEndPointGenerator.Core.Utils;
 using NSL.Generators.HttpEndPointGenerator.Shared.Attributes;
 using NSL.Generators.HttpEndPointGenerator.Shared.Fake.Attributes;
 using NSL.Generators.HttpEndPointGenerator.Shared.Fake.Interfaces;
-using NSL.Generators.HttpEndPointGenerator.Utils;
 using NSL.Generators.Utils;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 
-namespace NSL.Generators.HttpEndPointGenerator
+namespace NSL.Generators.HttpEndPointGenerator.Core
 {
     [Generator]
     internal class HttpEndPointGenerator : IIncrementalGenerator

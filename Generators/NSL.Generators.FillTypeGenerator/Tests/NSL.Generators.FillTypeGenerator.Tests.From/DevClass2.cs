@@ -1,4 +1,4 @@
-﻿namespace NSL.Generators.FillTypeGenerator.Tests
+﻿namespace NSL.Generators.FillTypeGenerator.Tests.From
 {
     public partial class DevClass2
     {

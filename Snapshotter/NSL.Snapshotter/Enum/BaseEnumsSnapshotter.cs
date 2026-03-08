@@ -1,12 +1,11 @@
-﻿using NSL.Snapshotter;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Nsl.Snapshotter.Enum
+namespace NSL.Snapshotter.Enum
 {
     public abstract class BaseEnumsSnapshotter : BaseSnapshotter
     {

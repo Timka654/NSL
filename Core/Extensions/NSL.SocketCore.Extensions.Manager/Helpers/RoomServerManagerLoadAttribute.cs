@@ -1,4 +1,6 @@
-﻿namespace NSL.ServerOptions.Extensions.Manager.Manager
+﻿using NSL.SocketCore.Extensions.Manager;
+
+namespace NSL.SocketCore.Extensions.Manager.Helpers
 {
     public class RoomServerManagerLoadAttribute : ManagerLoadAttribute
     {

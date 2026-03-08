@@ -1,6 +1,6 @@
 ﻿using NSL.SocketCore.Extensions.Packet;
 
-namespace Builder.WebSockets.BaseExample.Client
+namespace NSL.Builder.WebSockets.BaseExample.Client
 {
     public class PacketTestLoadAttribute : PacketAttribute
     {

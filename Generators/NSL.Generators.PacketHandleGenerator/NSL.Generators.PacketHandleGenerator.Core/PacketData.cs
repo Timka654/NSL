@@ -1,7 +1,7 @@
 ﻿using Microsoft.CodeAnalysis;
 using NSL.Generators.PacketHandleGenerator.Shared;
 
-namespace NSL.Generators.PacketHandleGenerator
+namespace NSL.Generators.PacketHandleGenerator.Core
 {
     internal class PacketData
     {

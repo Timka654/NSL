@@ -4,7 +4,7 @@ using NSL.SocketCore.Utils.Buffer;
 using NSL.SocketServer;
 using System;
 
-namespace LocalBridge.Example.Shared
+namespace NSL.LocalBridge.Example.Shared
 {
     public class TestOptions
     {

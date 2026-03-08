@@ -1,4 +1,4 @@
-﻿namespace NSL.Generators.SelectTypeGenerator
+﻿namespace NSL.Generators.SelectTypeGenerator.Core
 {
     internal class GenAttribute
     {

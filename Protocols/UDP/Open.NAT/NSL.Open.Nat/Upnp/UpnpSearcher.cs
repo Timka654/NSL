@@ -35,8 +35,12 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using System.Xml;
+using NSL.Open.Nat;
+using NSL.Open.Nat.Utils;
+using NSL.Open.Nat.Discovery;
+using NSL.Open.Nat.Upnp.Messages;
 
-namespace Open.Nat
+namespace NSL.Open.Nat.Upnp
 {
     internal class UpnpSearcher : Searcher
 	{

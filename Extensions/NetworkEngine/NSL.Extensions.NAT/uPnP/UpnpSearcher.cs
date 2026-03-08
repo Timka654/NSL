@@ -2,12 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Net;
-using Mono.Nat.Upnp;
 using System.Diagnostics;
 using System.Net.Sockets;
 using System.Net.NetworkInformation;
+using NSL.Extensions.NAT.uPnP.Upnp.Messages;
+using NSL.Extensions.NAT.uPnP.EventArgs;
+using NSL.Extensions.NAT.uPnP.Upnp;
 
-namespace Mono.Nat
+namespace NSL.Extensions.NAT.uPnP
 {
     internal class UpnpSearcher : ISearcher
     {

@@ -1,6 +1,6 @@
 ﻿using NSL.SocketServer.Utils;
 
-namespace Builder.WebSockets.BaseExample.Server
+namespace NSL.Builder.WebSockets.BaseExample.Server
 {
     public class WebSocketsServerNetworkClient : IServerNetworkClient
     {

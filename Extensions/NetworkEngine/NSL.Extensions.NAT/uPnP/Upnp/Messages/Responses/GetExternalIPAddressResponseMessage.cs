@@ -27,7 +27,7 @@
 using System;
 using System.Net;
 
-namespace Mono.Nat.Upnp
+namespace NSL.Extensions.NAT.uPnP.Upnp.Messages.Responses
 {
     internal class GetExternalIPAddressResponseMessage : MessageBase
     {

@@ -2,7 +2,7 @@
 using NSL.SocketCore.Utils.Buffer;
 using System;
 
-namespace UDPExample
+namespace NSL.UDPExample
 {
     public class TestPacket : IPacket<NetworkClient>
     {

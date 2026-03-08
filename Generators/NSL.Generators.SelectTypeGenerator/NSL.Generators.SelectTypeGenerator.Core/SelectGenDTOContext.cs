@@ -1,7 +1,7 @@
 ﻿using Microsoft.CodeAnalysis;
 using System.Linq;
 
-namespace NSL.Generators.SelectTypeGenerator
+namespace NSL.Generators.SelectTypeGenerator.Core
 {
     public class SelectGenDTOContext : SelectGenContext
     {

@@ -1,7 +1,8 @@
 ﻿using NSL.SocketClient;
 using NSL.SocketServer.Utils;
+using RPCWithBuilder.TCP.Example;
 
-namespace RPCWithBuilder.TCP.Example
+namespace NSL.RPCWithBuilder.TCP.Example
 {
     public class NetworkClient : BaseSocketNetworkClient
     {

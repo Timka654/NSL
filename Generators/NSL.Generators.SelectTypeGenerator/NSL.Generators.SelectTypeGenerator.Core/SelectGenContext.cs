@@ -2,7 +2,7 @@
 using NSL.Generators.Utils;
 using System.Collections.Generic;
 
-namespace NSL.Generators.SelectTypeGenerator
+namespace NSL.Generators.SelectTypeGenerator.Core
 {
     public class SelectGenContext
     {

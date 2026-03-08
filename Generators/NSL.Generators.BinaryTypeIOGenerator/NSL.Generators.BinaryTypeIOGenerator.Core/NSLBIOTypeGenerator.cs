@@ -4,7 +4,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using NSL.Generators.BinaryGenerator;
 using NSL.Generators.BinaryGenerator.Utils;
 using NSL.Generators.BinaryTypeIOGenerator.Attributes;
-using NSL.Generators.BinaryTypeIOGenerator.Models;
+using NSL.Generators.BinaryTypeIOGenerator.Core.Models;
 using NSL.Generators.Utils;
 using NSL.SocketCore.Utils.Buffer;
 using System;
@@ -12,7 +12,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 
-namespace NSL.Generators.BinaryTypeIOGenerator
+namespace NSL.Generators.BinaryTypeIOGenerator.Core
 {
     [Generator]
     internal class NSLBIOTypeGenerator : IIncrementalGenerator

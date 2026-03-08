@@ -30,7 +30,7 @@ using System;
 using System.Runtime.Serialization;
 using System.Security.Permissions;
 
-namespace Open.Nat
+namespace NSL.Open.Nat.Exceptions
 {
 	/// <summary>
 	/// 

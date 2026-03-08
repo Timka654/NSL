@@ -1,9 +1,10 @@
-﻿using NSL.BuilderExtensions.SocketCore;
+﻿using Builder.UDP.BaseExample.Client;
+using NSL.BuilderExtensions.SocketCore;
 using NSL.BuilderExtensions.UDPClient;
 using NSL.UDP;
 using NSL.UDP.Client;
 
-namespace Builder.UDP.BaseExample.Client
+namespace NSL.Builder.UDP.BaseExample.Client
 {
     internal class TestUDPClient
     {
@@ -80,7 +81,7 @@ namespace Builder.UDP.BaseExample.Client
 
             Console.WriteLine("write any text and press <Enter>:");
 
-            var forpacket1 = new NSL.UDP.DgramOutputPacketBuffer();
+            var forpacket1 = new DgramOutputPacketBuffer();
 
             forpacket1.PacketId = 1;
 

@@ -7,7 +7,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
 
-namespace NSL.Entity.PathGenerator
+namespace NSL.Generators.EntityPathGenerator.Core
 {
     [Generator]
     public class PathTableGenerator : IIncrementalGenerator

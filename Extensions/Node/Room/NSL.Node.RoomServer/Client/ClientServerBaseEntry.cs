@@ -3,7 +3,6 @@ using NSL.Logger;
 using NSL.Node.RoomServer.Client.Data;
 using System;
 using System.Collections.Concurrent;
-using NSL.Node.RoomServer.Shared.Client.Core.Enums;
 using NSL.EndPointBuilder;
 using NSL.SocketServer.Utils;
 using System.Threading.Tasks;
@@ -13,6 +12,7 @@ using NSL.Extensions.Session.Server;
 using NSL.SocketCore.Utils.Logger;
 using NSL.SocketCore.Extensions.Buffer;
 using NSL.Utils;
+using NSL.Node.Core.Enums;
 
 namespace NSL.Node.RoomServer.Client
 {

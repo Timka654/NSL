@@ -1,6 +1,6 @@
 ﻿using NSL.SocketCore.Extensions.Packet;
 
-namespace Builder.UDP.BaseExample.Client
+namespace NSL.Builder.UDP.BaseExample.Client
 {
     public class PacketTestLoadAttribute : PacketAttribute
     {

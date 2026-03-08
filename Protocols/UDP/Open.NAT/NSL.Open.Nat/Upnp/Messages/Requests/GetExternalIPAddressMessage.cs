@@ -28,7 +28,7 @@
 
 using System.Collections.Generic;
 
-namespace Open.Nat
+namespace NSL.Open.Nat.Upnp.Messages.Requests
 {
 	internal class GetExternalIPAddressRequestMessage : RequestMessageBase
 	{

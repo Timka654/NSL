@@ -1,14 +1,14 @@
-﻿using NSL.Extensions.RPC.Generator.Declarations;
-using NSL.Generators.Utils;
+﻿using NSL.Generators.Utils;
 using System;
 using System.Linq;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis;
-using NSL.Extensions.RPC.Generator.Models;
 using NSL.Generators.BinaryGenerator;
 using NSL.Extensions.RPC.Generator.Attributes;
+using NSL.Extensions.RPC.Generator.Core.Models;
+using NSL.Extensions.RPC.Generator.Core;
 
-namespace NSL.Extensions.RPC.Generator.Generators
+namespace NSL.Extensions.RPC.Generator.Core.Generators
 {
     internal class WriteMethodsGenerator
     {

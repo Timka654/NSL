@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace NSL.Refactoring.FastAction
+namespace NSL.Refactoring.FastAction.Core
 {
     internal class PreviewedCodeAction : CodeAction
     {

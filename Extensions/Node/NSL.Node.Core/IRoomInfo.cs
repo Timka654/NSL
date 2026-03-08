@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace NSL.Node.RoomServer.Shared.Client.Core
+namespace NSL.Node.Core
 {
     public interface IRoomInfo
     {

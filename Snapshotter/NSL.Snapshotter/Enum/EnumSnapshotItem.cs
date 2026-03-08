@@ -1,7 +1,7 @@
 ﻿using NSL.Snapshotter;
 using System.Collections.Generic;
 
-namespace Nsl.Snapshotter.Enum
+namespace NSL.Snapshotter.Enum
 {
     [SnapshotKind("enum")]
     public sealed record EnumSnapshotItem(

@@ -26,6 +26,9 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
+using NSL.Open.Nat;
+using NSL.Open.Nat.Discovery;
+using NSL.Open.Nat.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -33,7 +36,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 
-namespace Open.Nat
+namespace NSL.Open.Nat.Pmp
 {
 	internal class PmpSearcher : Searcher
 	{

@@ -1,9 +1,9 @@
 ﻿using NSL.Extensions.RPC;
 using NSL.Extensions.RPC.Generator.Attributes;
+using NSL.RPCWithBuilder.TCP.Example.Models;
 using NSL.SocketCore.Utils;
-using RPCWithBuilder.TCP.Example.Models;
 
-namespace RPCWithBuilder.TCP.Example
+namespace NSL.RPCWithBuilder.TCP.Example
 {
     internal class TestRPCClientContainer<TClient> : RPCHandleContainer<TClient>
         where TClient : INetworkClient

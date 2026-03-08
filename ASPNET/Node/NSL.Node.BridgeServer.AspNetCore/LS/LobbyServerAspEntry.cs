@@ -8,8 +8,9 @@ using NSL.BuilderExtensions.WebSocketsServer.AspNet;
 using NetworkClient = NSL.Node.BridgeServer.LS.LobbyServerNetworkClient;
 using NetworkOptions = NSL.WebSockets.Server.WSServerOptions<NSL.Node.BridgeServer.LS.LobbyServerNetworkClient>;
 using NSL.Node.BridgeServer.Shared;
+using NSL.Node.BridgeServer.LS;
 
-namespace NSL.Node.BridgeServer.LS
+namespace NSL.Node.BridgeServer.AspNetCore.LS
 {
     public class LobbyServerAspEntry : LobbyServerBaseEntry
     {

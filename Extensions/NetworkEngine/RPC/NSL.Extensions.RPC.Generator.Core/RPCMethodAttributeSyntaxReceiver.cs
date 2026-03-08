@@ -6,7 +6,7 @@ using System;
 using System.Linq;
 using System.Threading;
 
-namespace NSL.Extensions.RPC.Generator
+namespace NSL.Extensions.RPC.Generator.Core
 {
     internal class RPCMethodAttributeSyntaxReceiver
     {

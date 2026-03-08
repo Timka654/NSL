@@ -1,8 +1,7 @@
 ﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis;
-using NSL.Extensions.RPC.Generator.Declarations;
 
-namespace NSL.Extensions.RPC.Generator.Models
+namespace NSL.Extensions.RPC.Generator.Core.Models
 {
     internal class MethodContextModel
     {

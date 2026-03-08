@@ -1,7 +1,7 @@
 ﻿using Microsoft.CodeAnalysis;
 using System.Linq;
 
-namespace NSL.Extensions.RPC.Generator.Utils
+namespace NSL.Extensions.RPC.Generator.Core.Utils
 {
     public static class GeneratorExecutionContextExtensions
     {

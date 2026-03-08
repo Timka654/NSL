@@ -2,14 +2,14 @@
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using NSL.Generators.FillTypeGenerator.Attributes;
-using NSL.Generators.FillTypeGenerator.Utils;
+using NSL.Generators.FillTypeGenerator.Core.Utils;
 using NSL.Generators.Utils;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 
-namespace NSL.Generators.FillTypeGenerator
+namespace NSL.Generators.FillTypeGenerator.Core
 {
     [Generator]
     internal class FillTypeGenerator : IIncrementalGenerator

@@ -1,10 +1,14 @@
+using NSL.Open.Nat.Exceptions;
+using NSL.Open.Nat.Pmp;
+using NSL.Open.Nat.Upnp;
+using NSL.Open.Nat.Utils;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Open.Nat
+namespace NSL.Open.Nat
 {
 	/// <summary>
 	/// 

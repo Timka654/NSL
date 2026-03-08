@@ -2,7 +2,7 @@
 using NSL.BuilderExtensions.WebSocketsServer;
 using NSL.WebSockets.Server;
 
-namespace Builder.WebSockets.BaseExample.Server
+namespace NSL.Builder.WebSockets.BaseExample.Server
 {
     internal class TestWebSocketsServer
     {

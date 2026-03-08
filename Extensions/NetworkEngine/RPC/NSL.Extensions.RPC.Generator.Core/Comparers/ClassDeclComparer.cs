@@ -1,7 +1,7 @@
-﻿using NSL.Extensions.RPC.Generator.Declarations;
+﻿using NSL.Extensions.RPC.Generator.Core.Models;
 using System.Collections.Generic;
 
-namespace NSL.Extensions.RPC.Generator.Comparers
+namespace NSL.Extensions.RPC.Generator.Core.Comparers
 {
     internal class ClassDeclComparer : EqualityComparer<ClassDeclModel>
     {

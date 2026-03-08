@@ -1,7 +1,7 @@
 ﻿using Microsoft.CodeAnalysis;
 using System.Linq;
 
-namespace NSL.Generators.PacketHandleGenerator.Utils
+namespace NSL.Generators.PacketHandleGenerator.Core.Utils
 {
     public static class GeneratorExecutionContextExtensions
     {

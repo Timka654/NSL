@@ -26,10 +26,12 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
+using NSL.Open.Nat.Upnp;
+using NSL.Open.Nat.Utils;
 using System.Net;
 using System.Xml;
 
-namespace Open.Nat
+namespace NSL.Open.Nat.Upnp.Messages.Responses
 {
     internal class GetExternalIPAddressResponseMessage : ResponseMessageBase
     {

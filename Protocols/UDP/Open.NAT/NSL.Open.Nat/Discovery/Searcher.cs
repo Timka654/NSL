@@ -26,6 +26,9 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
+using NSL.Open.Nat;
+using NSL.Open.Nat.EventArgs;
+using NSL.Open.Nat.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,7 +37,7 @@ using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Open.Nat
+namespace NSL.Open.Nat.Discovery
 {
 	internal abstract class Searcher
 	{

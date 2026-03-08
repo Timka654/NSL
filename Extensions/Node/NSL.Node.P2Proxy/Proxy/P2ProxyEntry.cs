@@ -3,10 +3,10 @@ using System;
 using System.Collections.Concurrent;
 using NSL.EndPointBuilder;
 using NSL.SocketServer.Utils;
-using NSL.Node.RoomServer.Shared.Client.Core.Enums;
 using NSL.SocketCore.Utils.Logger;
 using NSL.Node.P2Proxy.Proxy.Data;
 using NSL.BuilderExtensions.SocketCore;
+using NSL.Node.Core.Enums;
 
 namespace NSL.Node.P2Proxy.Client
 {

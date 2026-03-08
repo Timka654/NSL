@@ -6,7 +6,7 @@ using System;
 using System.Linq;
 using System.Threading;
 
-namespace NSL.Generators.FillTypeGenerator
+namespace NSL.Generators.FillTypeGenerator.Core
 {
     internal class FillTypeAttributeSyntaxReceiver/* : ISyntaxReceiver*/
     {

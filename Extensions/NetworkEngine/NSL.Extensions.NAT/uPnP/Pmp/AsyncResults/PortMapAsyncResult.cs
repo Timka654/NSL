@@ -24,9 +24,11 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
+using NSL.Extensions.NAT.uPnP.AsyncResults;
+using NSL.Extensions.NAT.uPnP.Enums;
 using System;
 
-namespace Mono.Nat.Pmp
+namespace NSL.Extensions.NAT.uPnP.Pmp.AsyncResults
 {
 	internal class PortMapAsyncResult : AsyncResult
 	{

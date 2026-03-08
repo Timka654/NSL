@@ -1,6 +1,6 @@
 ﻿using NSL.SocketClient;
 
-namespace Builder.WebSockets.AspNetCoreIntegrationExample.NetworkClient
+namespace NSL.Builder.WebSockets.AspNetCoreIntegrationExample.NetworkClient
 {
     public class WSNetworkClientInfo : BaseSocketNetworkClient
     {

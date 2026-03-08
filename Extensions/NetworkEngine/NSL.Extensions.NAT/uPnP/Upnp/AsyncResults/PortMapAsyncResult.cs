@@ -26,10 +26,13 @@
 
 
 
+using NSL.Extensions.NAT.uPnP.AsyncResults;
+using NSL.Extensions.NAT.uPnP.Upnp.Messages;
+using NSL.Extensions.NAT.uPnP.Upnp.Messages.Requests;
 using System;
 using System.Net;
 
-namespace Mono.Nat.Upnp
+namespace NSL.Extensions.NAT.uPnP.Upnp.AsyncResults
 {
     internal class PortMapAsyncResult : AsyncResult
 	{

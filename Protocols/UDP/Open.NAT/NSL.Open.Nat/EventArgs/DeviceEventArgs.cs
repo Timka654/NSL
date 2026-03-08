@@ -26,7 +26,9 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-namespace Open.Nat
+using NSL.Open.Nat;
+
+namespace NSL.Open.Nat.EventArgs
 {
 	internal class DeviceEventArgs : System.EventArgs
 	{

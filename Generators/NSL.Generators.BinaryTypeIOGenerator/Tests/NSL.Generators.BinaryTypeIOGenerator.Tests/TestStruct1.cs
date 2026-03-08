@@ -1,7 +1,7 @@
 ﻿using NSL.Generators.BinaryTypeIOGenerator.Attributes;
 //using ZergRush.ReactiveCore;
 
-namespace NSL.Generators.BinaryTypeIOGenerator.Tests.abserb.erge.ergeg.erg
+namespace NSL.Generators.BinaryTypeIOGenerator.Tests
 {
     public enum abcEn
     {
@@ -30,13 +30,13 @@ namespace NSL.Generators.BinaryTypeIOGenerator.Tests
         //public ReactiveCollection<byte> data { get; set; }
 
         [NSLBIOInclude("en")]
-        public NSL.Generators.BinaryTypeIOGenerator.Tests.abserb.erge.ergeg.erg.abcEn en1 { get; set; }
+        public abcEn en1 { get; set; }
 
         [NSLBIOInclude("en")]
         public TestStruct2 en2 { get; set; }
 
         [NSLBIOInclude("en")]
-        public NSL.Generators.BinaryTypeIOGenerator.Tests.abserb.erge.ergeg.erg.abcEn? en3 { get; set; }
+        public abcEn? en3 { get; set; }
 
         //[NSLBIOInclude("en")]
         //public abcfff en4 { get; set; }

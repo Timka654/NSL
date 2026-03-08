@@ -2,7 +2,7 @@
 using NSL.Utils.CommandLine.CLHandles;
 using NSL.Utils.CommandLine.CLHandles.Arguments;
 
-namespace TCPExample.Client
+namespace NSL.CommandLineHandler.Tests
 {
 
     [CLArgument("echo", typeof(CLContainsType))]

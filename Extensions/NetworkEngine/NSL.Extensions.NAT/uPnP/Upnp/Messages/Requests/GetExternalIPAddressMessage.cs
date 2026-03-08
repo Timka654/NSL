@@ -24,9 +24,11 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
+using NSL.Extensions.NAT.uPnP.Upnp;
+using NSL.Extensions.NAT.uPnP.Upnp.Messages;
 using System.Net;
 
-namespace Mono.Nat.Upnp
+namespace NSL.Extensions.NAT.uPnP.Upnp.Messages.Requests
 {
     internal class GetExternalIPAddressMessage : MessageBase
     {

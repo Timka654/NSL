@@ -1,4 +1,4 @@
-﻿namespace RPCWithBuilder.TCP.Example.Models
+﻿namespace NSL.RPCWithBuilder.TCP.Example.Models
 {
     public struct TestStruct2Model
     {

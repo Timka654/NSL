@@ -3,13 +3,15 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using NSL.Logger.AspNet;
+using NSL.Node.BridgeServer.AspNetCore.LS;
+using NSL.Node.BridgeServer.AspNetCore.RS;
 using NSL.Node.BridgeServer.LS;
 using NSL.Node.BridgeServer.RS;
 using NSL.Node.BridgeServer.Shared;
 using System;
 using System.Threading.Tasks;
 
-namespace NSL.Node.BridgeServer
+namespace NSL.Node.BridgeServer.AspNetCore
 {
     public static class ASPNETStartupExtensions
     {

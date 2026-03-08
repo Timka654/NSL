@@ -1,7 +1,7 @@
-﻿using Builder.UDP.BaseExample.Server;
-using Builder.UDP.BaseExample.Client;
+﻿using NSL.Builder.UDP.BaseExample.Client;
+using NSL.Builder.UDP.BaseExample.Server;
 
-namespace Builder.UDP.BaseExample
+namespace NSL.Builder.UDP.BaseExample
 {
     internal class Program
     {

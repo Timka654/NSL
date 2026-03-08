@@ -28,12 +28,18 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
+using NSL.Open.Nat;
+using NSL.Open.Nat.Enums;
+using NSL.Open.Nat.Exceptions;
+using NSL.Open.Nat.Upnp.Messages.Requests;
+using NSL.Open.Nat.Upnp.Messages.Responses;
+using NSL.Open.Nat.Utils;
 using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 
-namespace Open.Nat
+namespace NSL.Open.Nat.Upnp
 {
     internal sealed class UpnpNatDevice : NatDevice
 	{

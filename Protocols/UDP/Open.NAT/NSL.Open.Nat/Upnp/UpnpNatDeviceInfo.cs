@@ -24,10 +24,12 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
+using NSL.Open.Nat;
+using NSL.Open.Nat.Utils;
 using System;
 using System.Net;
 
-namespace Open.Nat
+namespace NSL.Open.Nat.Upnp
 {
 	internal class UpnpNatDeviceInfo
 	{

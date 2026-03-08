@@ -6,7 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace NSL.Generators.BinaryTypeIOGenerator
+namespace NSL.Generators.BinaryTypeIOGenerator.Core
 {
     internal class NSLBIOGeneratorContext : BinaryTypeIOGeneratorContext
     {

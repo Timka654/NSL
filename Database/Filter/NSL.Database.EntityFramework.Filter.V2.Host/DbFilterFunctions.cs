@@ -1,6 +1,6 @@
 using System;
 
-namespace NSL.Database.EntityFramework.Filter.V2
+namespace NSL.Database.EntityFramework.Filter.V2.Host
 {
     /// <summary>
     /// Contains placeholder methods for EF Core query translation.

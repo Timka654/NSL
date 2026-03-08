@@ -26,7 +26,7 @@
 
 using System;
 
-namespace Mono.Nat.Upnp
+namespace NSL.Extensions.NAT.uPnP.Upnp.Messages
 {
     internal class ErrorMessage : MessageBase
     {

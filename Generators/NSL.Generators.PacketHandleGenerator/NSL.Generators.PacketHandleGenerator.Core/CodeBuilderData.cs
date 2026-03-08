@@ -1,6 +1,6 @@
 ﻿using NSL.Generators.Utils;
 
-namespace NSL.Generators.PacketHandleGenerator
+namespace NSL.Generators.PacketHandleGenerator.Core
 {
     internal class CodeBuilderData
     {

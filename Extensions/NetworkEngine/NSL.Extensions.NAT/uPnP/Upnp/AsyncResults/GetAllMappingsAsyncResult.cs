@@ -28,7 +28,7 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 
-namespace Mono.Nat.Upnp
+namespace NSL.Extensions.NAT.uPnP.Upnp.AsyncResults
 {
     internal class GetAllMappingsAsyncResult : PortMapAsyncResult
 	{

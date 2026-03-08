@@ -1,4 +1,3 @@
-using NSL.ASPNET.MemoryLogger.Tests;
 using NSL.ASPNET.Configuration;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -6,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
+using NSL.ASPNET.Configuration.Tests;
 
 var builder = WebApplication.CreateBuilder(args);
 

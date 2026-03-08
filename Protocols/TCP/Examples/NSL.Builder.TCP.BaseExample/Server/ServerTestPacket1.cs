@@ -1,7 +1,7 @@
 ﻿using NSL.SocketCore.Utils.Buffer;
 using NSL.SocketCore.Utils;
 
-namespace Builder.TCP.BaseExample.Server
+namespace NSL.Builder.TCP.BaseExample.Server
 {
     public class ServerTestPacket1 : IPacket<TCPServerNetworkClient>
     {

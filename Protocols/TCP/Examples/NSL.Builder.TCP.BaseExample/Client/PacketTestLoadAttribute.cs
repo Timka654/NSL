@@ -1,6 +1,6 @@
 ﻿using NSL.SocketCore.Extensions.Packet;
 
-namespace Builder.TCP.BaseExample.Client
+namespace NSL.Builder.TCP.BaseExample.Client
 {
     public class PacketTestLoadAttribute : PacketAttribute
     {

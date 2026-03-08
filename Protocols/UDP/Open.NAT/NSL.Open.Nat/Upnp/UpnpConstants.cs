@@ -24,7 +24,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-namespace Open.Nat
+namespace NSL.Open.Nat.Upnp
 {
 	internal static class UpnpConstants
 	{

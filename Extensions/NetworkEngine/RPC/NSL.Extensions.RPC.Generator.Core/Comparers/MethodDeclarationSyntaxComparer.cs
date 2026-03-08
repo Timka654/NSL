@@ -1,7 +1,7 @@
 ﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Collections.Generic;
 
-namespace NSL.Extensions.RPC.Generator.Comparers
+namespace NSL.Extensions.RPC.Generator.Core.Comparers
 {
     internal class MethodDeclarationSyntaxComparer : EqualityComparer<MethodDeclarationSyntax>
     {

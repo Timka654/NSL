@@ -1,6 +1,6 @@
-using Builder.WebSockets.AspNetCoreIntegrationExample.NetworkClient;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Logging;
+using NSL.Builder.WebSockets.AspNetCoreIntegrationExample.NetworkClient;
 using NSL.BuilderExtensions.SocketCore;
 using NSL.BuilderExtensions.WebSocketsClient;
 using NSL.BuilderExtensions.WebSocketsServer.AspNet;
@@ -9,7 +9,7 @@ using NSL.WebSockets.Client;
 using System;
 using System.Threading.Tasks;
 
-namespace Builder.WebSockets.AspNetCoreIntegrationExample
+namespace NSL.Builder.WebSockets.AspNetCoreIntegrationExample
 {
     public class Program
     {

@@ -1,7 +1,7 @@
 ﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Collections.Generic;
 
-namespace NSL.Extensions.RPC.Generator.Declarations
+namespace NSL.Extensions.RPC.Generator.Core.Models
 {
     internal class MethodDeclModel
     {

@@ -1,11 +1,11 @@
 ﻿using NSL.SocketCore.Utils.Buffer;
 using System;
-using NSL.Node.RoomServer.Shared.Client.Core;
-using NSL.Node.RoomServer.Shared.Client.Core.Enums;
 using NSL.WebSockets.Server.AspNetPoint;
 using NSL.UDP.Enums;
 using NSL.UDP;
 using NSL.SocketServer.Utils;
+using NSL.Node.Core.Enums;
+using NSL.Node.Core;
 
 namespace NSL.Node.RoomServer.Client.Data
 {

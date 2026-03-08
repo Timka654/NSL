@@ -7,8 +7,8 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using NSL.Generators.BinaryGenerator;
 using NSL.Generators.BinaryTypeIOGenerator.Attributes;
+using NSL.Generators.PacketHandleGenerator.Core.Utils;
 using NSL.Generators.PacketHandleGenerator.Shared;
-using NSL.Generators.PacketHandleGenerator.Utils;
 using NSL.Generators.Utils;
 using NSL.SocketCore;
 using NSL.SocketCore.Utils;
@@ -18,7 +18,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 
-namespace NSL.Generators.PacketHandleGenerator
+namespace NSL.Generators.PacketHandleGenerator.Core
 {
     [Generator]
     internal class NSLPHTypeGenerator : IIncrementalGenerator /* : ISourceGenerator*/

@@ -6,7 +6,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
 
-namespace NSL.Entity.SelectCycleGenerator
+namespace NSL.Generators.SelectTypeCycleGenerator.Core
 {
     [Generator(LanguageNames.CSharp)]
     internal class NSLEntitySelectCycleGeneratorCodeRefactoringProvider : IIncrementalGenerator

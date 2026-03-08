@@ -28,13 +28,16 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
+using NSL.Open.Nat.Enums;
+using NSL.Open.Nat.Exceptions;
+using NSL.Open.Nat.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 
-namespace Open.Nat
+namespace NSL.Open.Nat
 {
 	/// <summary>
 	/// Represents a NAT device and provides access to the operation set that allows

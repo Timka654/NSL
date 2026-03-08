@@ -30,8 +30,9 @@ using System.Net.Sockets;
 using System.Threading;
 using System.Collections.Generic;
 using System.IO;
+using NSL.Extensions.NAT.uPnP.EventArgs;
 
-namespace Mono.Nat
+namespace NSL.Extensions.NAT.uPnP
 {
     public static class NatUtility
 	{

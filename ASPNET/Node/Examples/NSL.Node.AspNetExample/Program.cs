@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 using NSL.LocalBridge;
 using NSL.Node.BridgeLobbyClient;
 using NSL.Node.BridgeLobbyClient.AspNetCore;
-using NSL.Node.BridgeServer;
+using NSL.Node.BridgeServer.AspNetCore;
 using NSL.Node.BridgeServer.LS;
 using NSL.Node.BridgeServer.Shared;
 

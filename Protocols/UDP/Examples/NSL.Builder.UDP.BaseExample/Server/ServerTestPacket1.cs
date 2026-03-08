@@ -1,7 +1,7 @@
 ﻿using NSL.SocketCore.Utils.Buffer;
 using NSL.SocketCore.Utils;
 
-namespace Builder.UDP.BaseExample.Server
+namespace NSL.Builder.UDP.BaseExample.Server
 {
     public class ServerTestPacket1 : IPacket<UDPServerNetworkClient>
     {

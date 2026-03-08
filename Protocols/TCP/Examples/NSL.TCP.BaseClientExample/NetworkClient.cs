@@ -1,6 +1,6 @@
 ﻿using NSL.SocketClient;
 
-namespace TCPExample.Client
+namespace NSL.TCP.BaseClientExample
 {
     internal class NetworkClient : BaseSocketNetworkClient
     {

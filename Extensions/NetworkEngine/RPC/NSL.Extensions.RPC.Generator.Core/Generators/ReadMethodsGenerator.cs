@@ -4,15 +4,14 @@ using System;
 using System.Collections.Generic;
 using Microsoft.CodeAnalysis;
 using System.Linq;
-using NSL.Extensions.RPC.Generator.Declarations;
-using NSL.Extensions.RPC.Generator.Models;
 using NSL.Generators.Utils;
 using System.Reflection;
 using NSL.Generators.BinaryGenerator;
 using NSL.SocketCore.Utils.Buffer;
 using NSL.Extensions.RPC.Generator.Attributes;
+using NSL.Extensions.RPC.Generator.Core.Models;
 
-namespace NSL.Extensions.RPC.Generator.Generators
+namespace NSL.Extensions.RPC.Generator.Core.Generators
 {
     internal class ReadMethodsGenerator
     {

@@ -1,7 +1,7 @@
 ﻿using Microsoft.CodeAnalysis;
 using System.Linq;
 
-namespace NSL.Generators.FillTypeGenerator.Utils
+namespace NSL.Generators.FillTypeGenerator.Core.Utils
 {
     public static class GeneratorExecutionContextExtensions
     {

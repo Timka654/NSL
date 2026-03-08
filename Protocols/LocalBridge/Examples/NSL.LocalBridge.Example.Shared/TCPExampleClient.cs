@@ -1,6 +1,6 @@
 ﻿using NSL.SocketClient;
 
-namespace LocalBridge.Example.Shared
+namespace NSL.LocalBridge.Example.Shared
 {
     public class TCPExampleClient : BaseSocketNetworkClient
     {

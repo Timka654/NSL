@@ -1,4 +1,5 @@
 ﻿using NSL.ConfigurationEngine;
+using NSL.ConfigurationEngine.Extensions.Network;
 using NSL.SocketServer;
 using NSL.SocketServer.Utils;
 

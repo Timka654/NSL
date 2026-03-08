@@ -29,8 +29,10 @@ using System.Xml;
 using System.Net;
 using System.Text;
 using System.Globalization;
+using NSL.Extensions.NAT.uPnP;
+using NSL.Extensions.NAT.uPnP.Upnp.Messages.Responses;
 
-namespace Mono.Nat.Upnp
+namespace NSL.Extensions.NAT.uPnP.Upnp.Messages
 {
     internal abstract class MessageBase
     {

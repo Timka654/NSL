@@ -6,12 +6,12 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 
-namespace NSL.ServerOptions.Extensions.Manager
+namespace NSL.SocketCore.Extensions.Manager
 {
     public static class ManagerHelper
     {
         /// <summary>
-        /// Инициализация менеджеров по аттрибуту наследуемому от аттрибута <see cref="Manager.ManagerLoadAttribute"/>
+        /// Инициализация менеджеров по аттрибуту наследуемому от аттрибута <see cref="ManagerLoadAttribute"/>
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="serverOptions"></param>
@@ -54,7 +54,7 @@ namespace NSL.ServerOptions.Extensions.Manager
         }
 
         /// <summary>
-        /// Инициализация менеджеров по аттрибуту наследуемому от аттрибута <see cref="Manager.ManagerLoadAttribute"/> из сборки с которой был произведен вызов функции
+        /// Инициализация менеджеров по аттрибуту наследуемому от аттрибута <see cref="ManagerLoadAttribute"/> из сборки с которой был произведен вызов функции
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="serverOptions"></param>

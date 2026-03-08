@@ -26,11 +26,12 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
+using NSL.Extensions.NAT.uPnP.Enums;
 using System;
 using System.Net;
 using System.Threading.Tasks;
 
-namespace Mono.Nat
+namespace NSL.Extensions.NAT.uPnP
 {
     public interface INatDevice
 	{

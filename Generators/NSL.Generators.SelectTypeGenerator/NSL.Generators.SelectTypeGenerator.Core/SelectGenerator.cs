@@ -1,14 +1,14 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using NSL.Generators.SelectGenerator.Utils;
 using NSL.Generators.SelectTypeGenerator.Attributes;
+using NSL.Generators.SelectTypeGenerator.Core.Utils;
 using NSL.Generators.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 
-namespace NSL.Generators.SelectTypeGenerator
+namespace NSL.Generators.SelectTypeGenerator.Core
 {
 
     [Generator]

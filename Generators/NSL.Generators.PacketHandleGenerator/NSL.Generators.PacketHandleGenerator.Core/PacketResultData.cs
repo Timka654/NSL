@@ -1,6 +1,6 @@
 ﻿using Microsoft.CodeAnalysis;
 
-namespace NSL.Generators.PacketHandleGenerator
+namespace NSL.Generators.PacketHandleGenerator.Core
 {
     internal class PacketResultData
     {

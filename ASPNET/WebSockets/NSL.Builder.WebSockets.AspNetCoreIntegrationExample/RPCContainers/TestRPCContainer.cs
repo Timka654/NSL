@@ -1,4 +1,4 @@
-﻿namespace Builder.WebSockets.AspNetCoreIntegrationExample.RPCContainers
+﻿namespace NSL.Builder.WebSockets.AspNetCoreIntegrationExample.RPCContainers
 {
     //public class TestRPCContainer<TClient> : RPCHandleContainer<TClient>
     //    where TClient : INetworkClient

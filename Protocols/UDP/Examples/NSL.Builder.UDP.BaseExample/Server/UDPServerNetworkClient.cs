@@ -1,6 +1,6 @@
 ﻿using NSL.SocketServer.Utils;
 
-namespace Builder.UDP.BaseExample.Server
+namespace NSL.Builder.UDP.BaseExample.Server
 {
     public class UDPServerNetworkClient : IServerNetworkClient
     {

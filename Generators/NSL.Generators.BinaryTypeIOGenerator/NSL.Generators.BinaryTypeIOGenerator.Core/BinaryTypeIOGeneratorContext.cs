@@ -5,7 +5,7 @@ using NSL.Generators.Utils;
 using System;
 using System.Linq;
 
-namespace NSL.Generators.BinaryTypeIOGenerator
+namespace NSL.Generators.BinaryTypeIOGenerator.Core
 {
     internal class BinaryTypeIOGeneratorContext : BinaryGeneratorContext
     {

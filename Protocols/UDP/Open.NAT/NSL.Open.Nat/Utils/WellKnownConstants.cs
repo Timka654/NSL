@@ -26,7 +26,7 @@
 
 using System.Net;
 
-namespace Open.Nat
+namespace NSL.Open.Nat.Utils
 {
 	internal static class WellKnownConstants
 	{

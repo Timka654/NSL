@@ -24,10 +24,12 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
+using NSL.Extensions.NAT.uPnP.Enums;
+using NSL.Extensions.NAT.uPnP.Upnp.Messages;
 using System;
 using System.Xml;
 
-namespace Mono.Nat.Upnp
+namespace NSL.Extensions.NAT.uPnP.Upnp.Messages.Responses
 {
     internal class GetGenericPortMappingEntryResponseMessage : MessageBase
     {

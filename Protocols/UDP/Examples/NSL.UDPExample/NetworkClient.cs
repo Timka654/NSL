@@ -1,7 +1,7 @@
 ﻿using NSL.SocketServer.Utils;
 using NSL.UDP.Packet;
 
-namespace UDPExample
+namespace NSL.UDPExample
 {
     public class NetworkClient : IServerNetworkClient, IUDPClientWithPing<NetworkClient>
     {

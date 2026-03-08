@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace NSL.ServerOptions.Extensions.Manager
+namespace NSL.SocketCore.Extensions.Manager
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, AllowMultiple = false, Inherited = false)]
     public class ManagerLoadAttribute : Attribute

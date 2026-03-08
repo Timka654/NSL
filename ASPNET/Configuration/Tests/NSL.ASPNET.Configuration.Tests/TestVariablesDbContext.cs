@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Design;
 using NSL.ASPNET.Configuration;
 using System;
 
-namespace NSL.ASPNET.MemoryLogger.Tests
+namespace NSL.ASPNET.Configuration.Tests
 {
     public class TestVariablesDbContext : DbContext
     {

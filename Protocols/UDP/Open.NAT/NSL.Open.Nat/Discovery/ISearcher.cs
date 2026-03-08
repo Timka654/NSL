@@ -24,11 +24,12 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
+using NSL.Open.Nat;
 using System.Collections.Generic;
 using System.Net;
 using System.Threading;
 
-namespace Open.Nat
+namespace NSL.Open.Nat.Discovery
 {
 	internal interface ISearcher
 	{

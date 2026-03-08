@@ -1,10 +1,11 @@
-﻿using NSL.BuilderExtensions.SocketCore;
+﻿using Builder.TCP.BaseExample.Client;
+using NSL.BuilderExtensions.SocketCore;
 using NSL.BuilderExtensions.TCPClient;
 using NSL.SocketClient;
 using NSL.SocketCore.Utils.Buffer;
 using NSL.TCP.Client;
 
-namespace Builder.TCP.BaseExample.Client
+namespace NSL.Builder.TCP.BaseExample.Client
 {
     internal class TestTcpClient
     {

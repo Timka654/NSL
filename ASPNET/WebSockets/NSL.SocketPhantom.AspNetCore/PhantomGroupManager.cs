@@ -1,9 +1,10 @@
 ﻿using Microsoft.AspNetCore.SignalR;
+using NSL.SocketPhantom.AspNetCore.Network;
 using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace NSL.SocketPhantom.AspNetCore.Network
+namespace NSL.SocketPhantom.AspNetCore
 {
     public class PhantomGroupManager : IGroupManager
     {

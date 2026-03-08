@@ -1,9 +1,10 @@
-﻿using NSL.BuilderExtensions.SocketCore;
+﻿using Builder.WebSockets.BaseExample.Client;
+using NSL.BuilderExtensions.SocketCore;
 using NSL.BuilderExtensions.WebSocketsClient;
 using NSL.SocketCore.Utils.Buffer;
 using NSL.WebSockets.Client;
 
-namespace Builder.WebSockets.BaseExample.Client
+namespace NSL.Builder.WebSockets.BaseExample.Client
 {
     internal class TestWebSocketsClient
     {

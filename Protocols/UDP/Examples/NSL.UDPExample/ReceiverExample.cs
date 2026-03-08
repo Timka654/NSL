@@ -2,7 +2,7 @@
 using NSL.UDP;
 using NSL.UDP.Client;
 
-namespace UDPExample
+namespace NSL.UDPExample
 {
     public class ReceiverExample : Example<UDPClientOptions<NetworkClient>>
     {

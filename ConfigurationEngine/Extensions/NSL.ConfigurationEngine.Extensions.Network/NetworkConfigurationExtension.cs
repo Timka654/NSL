@@ -3,7 +3,7 @@ using NSL.SocketCore;
 using NSL.SocketCore.Utils;
 using System.Net.Sockets;
 
-namespace NSL.ServerOptions.Extensions.ConfigurationEngine
+namespace NSL.ConfigurationEngine.Extensions.Network
 {
     public static class NetworkConfigurationExtension
     {

@@ -26,7 +26,7 @@
 
 using System.Text;
 
-namespace Mono.Nat.Upnp
+namespace NSL.Extensions.NAT.uPnP.Upnp.Messages
 {
     internal static class DiscoverDeviceMessage
     {

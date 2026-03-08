@@ -1,6 +1,6 @@
 ﻿using NSL.SocketServer.Utils;
 
-namespace TCP.BaseServerExample
+namespace NSL.TCP.BaseServerExample
 {
     internal class ServerNetworkClient : IServerNetworkClient
     {

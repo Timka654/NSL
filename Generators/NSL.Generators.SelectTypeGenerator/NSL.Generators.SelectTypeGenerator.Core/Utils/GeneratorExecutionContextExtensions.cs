@@ -1,7 +1,7 @@
 ﻿using Microsoft.CodeAnalysis;
 using System.Linq;
 
-namespace NSL.Generators.SelectGenerator.Utils
+namespace NSL.Generators.SelectTypeGenerator.Core.Utils
 {
     public static class GeneratorExecutionContextExtensions
     {

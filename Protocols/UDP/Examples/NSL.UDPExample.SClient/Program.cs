@@ -1,5 +1,7 @@
 ﻿using NSL.Logger;
-using Open.Nat;
+using NSL.Open.Nat;
+using NSL.Open.Nat.Enums;
+using NSL.Open.Nat.Exceptions;
 using UDPExample;
 
 

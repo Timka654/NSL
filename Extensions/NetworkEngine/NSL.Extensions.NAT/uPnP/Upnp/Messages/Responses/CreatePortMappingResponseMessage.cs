@@ -26,8 +26,9 @@
 
 
 
+using NSL.Extensions.NAT.uPnP.Upnp.Messages;
 using System;
-namespace Mono.Nat.Upnp
+namespace NSL.Extensions.NAT.uPnP.Upnp.Messages.Responses
 {
     internal class CreatePortMappingResponseMessage : MessageBase
     {

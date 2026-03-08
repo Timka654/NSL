@@ -1,7 +1,7 @@
 ﻿using NSL.BuilderExtensions.SocketCore;
 using NSL.BuilderExtensions.TCPServer;
 
-namespace Builder.TCP.BaseExample.Server
+namespace NSL.Builder.TCP.BaseExample.Server
 {
     internal class TestTcpServer
     {

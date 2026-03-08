@@ -6,7 +6,7 @@ using System;
 using System.Linq;
 using System.Threading;
 
-namespace NSL.Generators.HttpEndPointGenerator
+namespace NSL.Generators.HttpEndPointGenerator.Core
 {
     internal class HttpEndPointImplementAttributeSyntaxReceiver/* : ISyntaxReceiver*/
     {

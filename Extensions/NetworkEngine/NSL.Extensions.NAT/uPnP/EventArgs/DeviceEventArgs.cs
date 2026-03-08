@@ -24,11 +24,12 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
+using NSL.Extensions.NAT.uPnP;
 using System;
 
-namespace Mono.Nat
+namespace NSL.Extensions.NAT.uPnP.EventArgs
 {
-	public class DeviceEventArgs : EventArgs
+	public class DeviceEventArgs : System.EventArgs
 	{
 		private INatDevice device;
 		

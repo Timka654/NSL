@@ -27,8 +27,10 @@
 using System.Text;
 using System.Xml;
 using System.Net;
+using NSL.Extensions.NAT.uPnP.Upnp.Messages;
+using NSL.Extensions.NAT.uPnP.Enums;
 
-namespace Mono.Nat.Upnp
+namespace NSL.Extensions.NAT.uPnP.Upnp.Messages.Requests
 {
     internal class GetSpecificPortMappingEntryMessage : MessageBase
 	{

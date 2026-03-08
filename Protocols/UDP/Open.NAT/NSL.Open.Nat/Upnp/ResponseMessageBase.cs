@@ -27,7 +27,7 @@
 using System;
 using System.Xml;
 
-namespace Open.Nat
+namespace NSL.Open.Nat.Upnp
 {
 	internal abstract class ResponseMessageBase
 	{

@@ -27,7 +27,7 @@
 using System;
 using System.Runtime.Serialization;
 
-namespace Open.Nat
+namespace NSL.Open.Nat.Exceptions
 {
 	/// <summary>
 	/// 

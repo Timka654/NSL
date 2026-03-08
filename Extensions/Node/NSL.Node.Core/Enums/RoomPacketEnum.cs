@@ -1,4 +1,4 @@
-﻿namespace NSL.Node.RoomServer.Shared.Client.Core.Enums
+﻿namespace NSL.Node.Core.Enums
 {
     public enum RoomPacketEnum
     {

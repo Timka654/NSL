@@ -6,7 +6,7 @@ using System;
 using System.Linq;
 using System.Threading;
 
-namespace NSL.Generators.SelectTypeGenerator
+namespace NSL.Generators.SelectTypeGenerator.Core
 {
     internal class SelectAttributeSyntaxReceiver /*: ISyntaxReceiver*/
     {

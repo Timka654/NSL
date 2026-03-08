@@ -1,7 +1,7 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace NSL.Generators.SelectTypeGenerator
+namespace NSL.Generators.SelectTypeGenerator.Core
 {
     internal class GenTypeGroup
     {

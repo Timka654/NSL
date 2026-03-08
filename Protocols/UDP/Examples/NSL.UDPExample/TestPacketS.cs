@@ -2,7 +2,7 @@
 using NSL.SocketCore.Utils.Buffer;
 using System;
 
-namespace UDPExample
+namespace NSL.UDPExample
 {
     public class TestPacketS : IPacket<NetworkClient>
     {
@@ -12,7 +12,7 @@ namespace UDPExample
 
 
 
-            using (var packet = new NSL.UDP.DgramOutputPacketBuffer() { PacketId = 1 })
+            using (var packet = new UDP.DgramOutputPacketBuffer() { PacketId = 1 })
             {
                 packet.WriteInt32(1);
                 packet.WriteInt32(2);

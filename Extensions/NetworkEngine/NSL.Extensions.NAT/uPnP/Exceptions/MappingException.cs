@@ -27,7 +27,7 @@
 using System;
 using System.Security.Permissions;
 
-namespace Mono.Nat
+namespace NSL.Extensions.NAT.uPnP.Exceptions
 {
 	[Serializable]
 	public class MappingException : Exception

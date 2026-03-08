@@ -1,4 +1,4 @@
-﻿namespace NSL.ServerOptions.Extensions.Manager.Manager
+﻿namespace NSL.SocketCore.Extensions.Manager.Helpers
 {
     public class LobbyServerManagerLoadAttribute : ManagerLoadAttribute
     {

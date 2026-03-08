@@ -24,7 +24,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-namespace Mono.Nat.Pmp
+namespace NSL.Extensions.NAT.uPnP.Pmp
 {
     internal static class PmpConstants
 	{

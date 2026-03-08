@@ -1,11 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Net;
-using Mono.Nat.Pmp;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
+using NSL.Extensions.NAT.uPnP.Pmp;
+using NSL.Extensions.NAT.uPnP.EventArgs;
 
-namespace Mono.Nat
+namespace NSL.Extensions.NAT.uPnP
 {
     internal class PmpSearcher : ISearcher
     {

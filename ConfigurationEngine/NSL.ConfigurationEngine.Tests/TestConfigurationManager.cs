@@ -3,7 +3,7 @@ using NSL.ConfigurationEngine.Info;
 using NSL.ConfigurationEngine.Providers;
 using System.Collections.Generic;
 
-namespace ConfigurationEngine.Tests
+namespace NSL.ConfigurationEngine.Tests
 {
     internal class TestConfigurationManager : BaseConfigurationManager
     {

@@ -33,8 +33,15 @@ using System.Xml;
 using System.Text;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using NSL.Extensions.NAT.uPnP.Upnp.Messages.Responses;
+using NSL.Extensions.NAT.uPnP;
+using NSL.Extensions.NAT.uPnP.Upnp.Messages.Requests;
+using NSL.Extensions.NAT.uPnP.Upnp.AsyncResults;
+using NSL.Extensions.NAT.uPnP.Upnp.Messages;
+using NSL.Extensions.NAT.uPnP.Enums;
+using NSL.Extensions.NAT.uPnP.Exceptions;
 
-namespace Mono.Nat.Upnp
+namespace NSL.Extensions.NAT.uPnP.Upnp
 {
 	public sealed class UpnpNatDevice : AbstractNatDevice, IEquatable<UpnpNatDevice> 
 	{

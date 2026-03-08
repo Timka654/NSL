@@ -1,7 +1,7 @@
 ﻿using NSL.SocketCore.Utils.Buffer;
 using NSL.SocketCore.Utils;
 
-namespace Builder.WebSockets.BaseExample.Client
+namespace NSL.Builder.WebSockets.BaseExample.Client
 {
     public class ClientTestPacket1 : IPacket<WebSocketsNetworkClient>
     {

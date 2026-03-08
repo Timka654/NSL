@@ -26,9 +26,10 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
+using NSL.Extensions.NAT.uPnP.Enums;
 using System;
 
-namespace Mono.Nat
+namespace NSL.Extensions.NAT.uPnP
 {
 	public class Mapping
 	{

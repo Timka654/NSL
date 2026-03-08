@@ -1,6 +1,4 @@
-﻿using TCPExample.Client;
-
-namespace CommandLineHandler.Tests
+﻿namespace NSL.CommandLineHandler.Tests
 {
     internal class Program
     {

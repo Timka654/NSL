@@ -1,7 +1,7 @@
-﻿using Builder.WebSockets.BaseExample.Server;
-using Builder.WebSockets.BaseExample.Client;
+﻿using NSL.Builder.WebSockets.BaseExample.Client;
+using NSL.Builder.WebSockets.BaseExample.Server;
 
-namespace Builder.WebSockets.BaseExample
+namespace NSL.Builder.WebSockets.BaseExample
 {
     internal class Program
     {

@@ -1,7 +1,7 @@
-﻿using Builder.TCP.BaseExample.Server;
-using Builder.TCP.BaseExample.Client;
+﻿using NSL.Builder.TCP.BaseExample.Client;
+using NSL.Builder.TCP.BaseExample.Server;
 
-namespace Builder.TCP.BaseExample
+namespace NSL.Builder.TCP.BaseExample
 {
     internal class Program
     {

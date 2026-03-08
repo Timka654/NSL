@@ -27,7 +27,7 @@
 using System.Diagnostics;
 using System.Net;
 
-namespace Mono.Nat.Upnp
+namespace NSL.Extensions.NAT.uPnP.Upnp.Messages
 {
     internal class GetServicesMessage : MessageBase
     {

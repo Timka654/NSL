@@ -2,7 +2,7 @@
 using NSL.BuilderExtensions.UDPServer;
 using NSL.UDP;
 
-namespace Builder.UDP.BaseExample.Server
+namespace NSL.Builder.UDP.BaseExample.Server
 {
     internal class TestUDPServer
     {

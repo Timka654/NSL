@@ -30,8 +30,12 @@ using System.Net.Sockets;
 using System.Threading;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using NSL.Extensions.NAT.uPnP.Pmp.AsyncResults;
+using NSL.Extensions.NAT.uPnP.Enums;
+using NSL.Extensions.NAT.uPnP.AsyncResults;
+using NSL.Extensions.NAT.uPnP.Exceptions;
 
-namespace Mono.Nat.Pmp
+namespace NSL.Extensions.NAT.uPnP.Pmp
 {
     internal sealed class PmpNatDevice : AbstractNatDevice, IEquatable<PmpNatDevice> 
 	{

@@ -1,4 +1,4 @@
-﻿namespace NSL.Node.RoomServer.Shared.Client.Core
+﻿namespace NSL.Node.Core
 {
     public interface IRoomSession
     {

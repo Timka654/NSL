@@ -3,7 +3,7 @@ using NSL.Generators.PacketHandleGenerator.Shared;
 using System;
 using System.Linq;
 
-namespace NSL.Generators.PacketHandleGenerator
+namespace NSL.Generators.PacketHandleGenerator.Core
 {
     internal class HandlesData
     {

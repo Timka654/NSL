@@ -1,7 +1,7 @@
 ﻿using Microsoft.CodeAnalysis;
 using System.Linq;
 
-namespace NSL.Generators.HttpEndPointGenerator.Utils
+namespace NSL.Generators.HttpEndPointGenerator.Core.Utils
 {
     public static class GeneratorExecutionContextExtensions
     {
