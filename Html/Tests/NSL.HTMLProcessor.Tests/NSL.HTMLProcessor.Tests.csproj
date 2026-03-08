@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<NSLProjectTypes>Test</NSLProjectTypes>
@@ -35,7 +35,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\..\NSL.HTMLProcessor\NSL.HTMLProcessor.csproj" />
+		<ProjectReference Include="..\..\NSL.HTMLProcessor\NSL.HTMLProcessor.csproj" />
 	</ItemGroup>
 
 </Project>

@@ -1,3 +1,7 @@
+using NSL.SocketPhantom.Cipher;
+using System;
+using System.Threading.Tasks;
+
 namespace NSL.SocketPhantom.Unity
 {
     public class PhantomConnectionOptions

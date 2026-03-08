@@ -1,4 +1,8 @@
-﻿namespace NSL.SocketPhantom.Unity.Network.Packets
+﻿using NSL.SocketCore.Utils;
+using NSL.SocketCore.Utils.Buffer;
+using System;
+
+namespace NSL.SocketPhantom.Unity.Network.Packets
 {
     internal class SessionPacket : IPacket<PhantomSocketNetworkClient>
     {

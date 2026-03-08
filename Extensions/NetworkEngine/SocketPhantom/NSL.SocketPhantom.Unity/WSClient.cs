@@ -1,4 +1,9 @@
-﻿namespace NSL.SocketPhantom.Unity
+﻿using NSL.Utils.Unity;
+using System;
+using System.Threading.Tasks;
+using UnityEngine;
+
+namespace NSL.SocketPhantom.Unity
 {
     public class WSClient : IDisposable
     {
@@ -20,8 +25,8 @@
         protected WSClient(Action<WSClient,PhantomConnectionOptions> optionsAction)
         {
             Build(new PhantomHubConnectionBuilder()
-                .WithUrl(GetUrl, o => { o.AccessTokenProvider = () => Task.FromResult(GetAccessToken()); })
-                .WithAutomaticReconnect(GetReconnectPolicy)
+                .WithUrl(GetUrl(), o => { o.AccessTokenProvider = () => Task.FromResult(GetAccessToken()); })
+                .WithAutomaticReconnect(GetReconnectPolicy())
                 .WithOptions(options => optionsAction(this, options)));
         }
 
