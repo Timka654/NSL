@@ -693,13 +693,9 @@ namespace NSLLibProjectFileFormatter.Project.CSPROJ
             return name.Contains(".Test");
         }
 
-        private bool isOnlyAspNetProject(string path, string sdk)
+        private bool isOnlyAspNetProject(string sdk)
         {
-            var name = new FileInfo(path).Name;
-
-            return name.Contains("AspNet", StringComparison.OrdinalIgnoreCase)
-                || name.Contains("Blazor", StringComparison.OrdinalIgnoreCase)
-                || sdk.Equals("Microsoft.NET.Sdk.Web", StringComparison.OrdinalIgnoreCase)
+            return sdk.Equals("Microsoft.NET.Sdk.Web", StringComparison.OrdinalIgnoreCase)
                 || sdk.Equals("Microsoft.NET.Sdk.Razor", StringComparison.OrdinalIgnoreCase);
         }
 
