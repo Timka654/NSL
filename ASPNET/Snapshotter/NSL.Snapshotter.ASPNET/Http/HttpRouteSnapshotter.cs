@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
+using System;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace NSL.Snapshotter.ASPNET.Http
 {
