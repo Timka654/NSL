@@ -1,4 +1,7 @@
-﻿namespace NSL.Generators.HttpEndPointGenerator.Tests.Server
+﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
+
+namespace NSL.Generators.HttpEndPointGenerator.Tests.Server
 {
     internal class Program
     {

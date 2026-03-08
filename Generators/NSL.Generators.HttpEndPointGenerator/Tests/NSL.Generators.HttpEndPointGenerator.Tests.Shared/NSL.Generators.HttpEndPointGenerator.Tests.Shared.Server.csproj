@@ -12,6 +12,7 @@
 		<EmbedUntrackedSources>true</EmbedUntrackedSources>
 		<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
 		<GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
+		<OutputType>Library</OutputType>
 
 		<Version>$(VersionSuffix)</Version>
 		<Authors>Relife87</Authors>
