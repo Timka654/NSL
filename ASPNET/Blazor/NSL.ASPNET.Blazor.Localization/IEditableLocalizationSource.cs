@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using NSL.ASPNET.Blazor.Localization;
 using NSL.ASPNET.Localization.Shared;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -11,9 +12,7 @@ public interface IEditableLocalizationSource : ILocalizationSource
 
     string NameKey { get; }
 
-    bool PresetAllowed { get; }
-
-    Task<bool> UpdateLocalizationItemAsync(string currentLanguage, string key, string value);
+    Task<bool> UpdateLocalizationItemAsync(BaseCreateLocalizationItemRequestModel data);
 
     Task<IEnumerable<BaseStaticLocalizationItemModel>> GetLocalizationValuesAsync(string key);
 }

@@ -14,9 +14,13 @@ namespace NSL.ASPNET.Localization.Shared
         event Action OnUpdateLibrary;
 
         string GetLocalizationValue(string key, Dictionary<string, object> args = null, bool isRequired = false, string codeFragment = null, string defaultValue = null);
+
         IEnumerable<ILocalizationSource> GetSources();
+
         string[] GetSupportingLanguages();
+
         string LocalizationFormatting(string input);
+
         CachedLocalizationEntityModel TryGetRequestCache(string key);
     }
 
@@ -134,11 +138,6 @@ namespace NSL.ASPNET.Localization.Shared
 
             return v.Split(';');
         }
-
-        private static readonly string[] emptyLanguageKeys = ["__support_languages"];
-
-        public bool IsEmptyLanguageKey(string key)
-            => emptyLanguageKeys.Contains(key);
 
         /// <summary>
         /// Init localization sources and other things. This method will be called before any localization source is used, so you can do some preparations here.

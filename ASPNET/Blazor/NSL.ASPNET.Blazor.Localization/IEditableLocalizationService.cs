@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using NSL.ASPNET.Blazor.Localization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,13 +11,22 @@ namespace NSL.ASPNET.Localization.Shared
     public delegate void EditableLocalizationSearchCallbackDelegate(string key);
     public delegate void EditableLocalizationBeginEditDelegate(string key, RenderFragment defaultFragment, Dictionary<string, object>? args);
 
-    public interface IEditableLocalizationService
+    public interface IEditableLocalizationService : ILocalizationService
     {
         bool EditMode { get; set; }
 
         event EditableLocalizationChangeEditModeDelegate OnChangeEditMode;
         event EditableLocalizationSearchCallbackDelegate OnEditorSearchCallback;
         event EditableLocalizationBeginEditDelegate OnBeginEdit;
+        event EditableLocalizationSearchCallbackDelegate OnBeginCreate;
+
+        IEnumerable<IEditableLocalizationSource> GetEditableSources();
+
+        void LocalizationSearchCallback(string key);
+
+        Task<bool> UpdateLocalizationItem(IEditableLocalizationSource source, BaseCreateLocalizationItemRequestModel requestModel);
+
+        bool IsSystemKey(string key);
 
         Task ShowEditorFor(string key, RenderFragment defaultFragment, Dictionary<string, object> args = null);
     }
@@ -40,11 +50,20 @@ namespace NSL.ASPNET.Localization.Shared
             }
         }
 
-        public event EditableLocalizationChangeEditModeDelegate OnChangeEditMode = (mode) => { };
+        public IEnumerable<IEditableLocalizationSource> GetEditableSources() => GetSources()
+            .OfType<IEditableLocalizationSource>()
+            .ToArray()!;
 
         public event EditableLocalizationSearchCallbackDelegate OnEditorSearchCallback = (key) => { };
 
+        public void LocalizationSearchCallback(string key)
+            => OnEditorSearchCallback(key);
+
+        public event EditableLocalizationChangeEditModeDelegate OnChangeEditMode = (mode) => { };
+
         public event EditableLocalizationBeginEditDelegate OnBeginEdit = (key, defaultFragment, args) => { };
+
+        public event EditableLocalizationSearchCallbackDelegate OnBeginCreate = (key) => { };
 
         public async Task ShowEditorFor(string key, RenderFragment defaultFragment, Dictionary<string, object>? args = null)
         {
@@ -53,11 +72,21 @@ namespace NSL.ASPNET.Localization.Shared
             OnBeginEdit(key, defaultFragment, args);
         }
 
-        public IEditableLocalizationSource[] GetEditableSources()
-            => GetSources()
-                .Where(x => x is IEditableLocalizationSource els && els.HaveLocalizationPermission())
-                .Select(x => x as IEditableLocalizationSource)
-                .OrderByDescending(x => x.Order)
-                .ToArray()!;
+
+        public async Task<bool> UpdateLocalizationItem(IEditableLocalizationSource source, BaseCreateLocalizationItemRequestModel e)
+        {
+            if (!await source.UpdateLocalizationItemAsync(e))
+                return false;
+
+            if (CurrentLanguage == e.Language)
+            {
+                await UpdateLibrary();
+            }
+
+            return true;
+        }
+
+        public bool IsSystemKey(string key)
+            => "__support_languages" == key;
     }
 }

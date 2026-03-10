@@ -4,9 +4,12 @@ using System.Text;
 
 namespace NSL.ASPNET.Blazor.Components
 {
+    public delegate void EditStateChangedDelegate(bool editState);
+
     public interface IFormComponent
     {
         public bool EditState { get; }
-        public event Action<bool> OnEditStateChanged;
+
+        public event EditStateChangedDelegate OnEditStateChanged;
     }
 }

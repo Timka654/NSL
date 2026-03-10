@@ -2,6 +2,11 @@
 
 namespace NSL.ASPNET.Localization.Shared
 {
+    public abstract class BaseClientStaticLocalizationItemModel : BaseStaticLocalizationItemModel
+    {
+        public bool ClientValue { get; set; }
+    }
+
     public abstract class BaseStaticLocalizationItemModel : StaticLocalizationIdentityModel
     {
         /*[SelectGenerateInclude("Get")] */
@@ -10,6 +15,5 @@ namespace NSL.ASPNET.Localization.Shared
         /*[SelectGenerateInclude("Get")] */
         public string Value { get; set; }
 
-        public bool ClientValue { get; set; }
     }
 }
