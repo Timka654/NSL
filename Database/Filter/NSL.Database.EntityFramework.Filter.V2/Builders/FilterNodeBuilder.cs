@@ -15,24 +15,27 @@ namespace NSL.Database.EntityFramework.Filter.V2.Builders
             this.node = node;
         }
 
-        private FilterNodeBuilder<TEntity> AddFilter(string property, FilterOperator op, string value, bool caseSensitive = false, bool not = false)
+        public FilterNodeBuilder<TEntity> AddFilter(EntityFilterBlockModel block)
         {
             node.Filters ??= new List<EntityFilterBlockModel>();
-            node.Filters.Add(new EntityFilterBlockModel
+            node.Filters.Add(block);
+
+            return this;
+        }
+        private FilterNodeBuilder<TEntity> AddFilter(string property, FilterOperator op, object value, bool caseSensitive = false, bool not = false)
+            => AddFilter(new EntityFilterBlockModel
             {
                 Property = property,
                 Type = op,
-                Value = value,
+                Value = value.ToString(),
                 CaseSensitive = caseSensitive,
                 Not = not
             });
-            return this;
-        }
 
-        public FilterNodeBuilder<TEntity> Where(string property, FilterOperator op, string value, bool caseSensitive = false, bool not = false)
+        public FilterNodeBuilder<TEntity> Where(string property, FilterOperator op, object value, bool caseSensitive = false, bool not = false)
             => AddFilter(property, op, value, caseSensitive, not);
 
-        public FilterNodeBuilder<TEntity> Where(Expression<Func<TEntity, object>> propertyExpression, FilterOperator op, string value, bool caseSensitive = false, bool not = false)
+        public FilterNodeBuilder<TEntity> Where(Expression<Func<TEntity, object>> propertyExpression, FilterOperator op, object value, bool caseSensitive = false, bool not = false)
             => AddFilter(FilterUtils.GetPath<TEntity>(propertyExpression), op, value, caseSensitive, not);
 
         private FilterNodeBuilder<TEntity> AddNode(FilterLogic logic, Action<FilterNodeBuilder<TEntity>> configure)

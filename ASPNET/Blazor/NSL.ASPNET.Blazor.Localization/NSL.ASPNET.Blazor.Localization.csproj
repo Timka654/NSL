@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Razor">
+<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<NSLProjectTypes>ASPTarget</NSLProjectTypes>
@@ -19,12 +19,19 @@
 		<Authors>Relife87</Authors>
 	</PropertyGroup>
 
+	<ItemGroup>
+		<SupportedPlatform Include="browser" />
+	</ItemGroup>
+
 	<PropertyGroup Condition="'$(Configuration)'=='Debug'">
 		<PackageId>$(MSBuildProjectName)_Debug</PackageId>
 	</PropertyGroup>
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.AspNetCore.Components" Version="10.0.3" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="10.0.3" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="10.0.3" />
+		<PackageReference Include="Microsoft.JSInterop.WebAssembly" Version="10.0.3" />
 	</ItemGroup>
 
 	<ItemGroup>

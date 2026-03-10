@@ -128,13 +128,6 @@ namespace NSL.ASPNET.Localization.Shared
             return v;
         }
 
-        public IEditableLocalizationSource[] GetEditableSources()
-            => GetSources()
-                .Where(x => x is IEditableLocalizationSource els && els.HaveLocalizationPermission())
-                .Select(x => x as IEditableLocalizationSource)
-                .OrderByDescending(x => x.Order)
-                .ToArray()!;
-
         public string[] GetSupportingLanguages()
         {
             var v = GetLocalizationValue("__support_languages");

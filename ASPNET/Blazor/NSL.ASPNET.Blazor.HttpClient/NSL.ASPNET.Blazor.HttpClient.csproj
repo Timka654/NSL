@@ -18,6 +18,10 @@
 		<Version>$(VersionSuffix)</Version>
 		<Authors>Relife87</Authors>
 	</PropertyGroup>
+	
+	<ItemGroup>
+		<SupportedPlatform Include="browser" />
+	</ItemGroup>
 
 	<PropertyGroup Condition="'$(Configuration)'=='Debug'">
 		<PackageId>$(MSBuildProjectName)_Debug</PackageId>

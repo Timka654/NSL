@@ -83,6 +83,29 @@ namespace NSL.Database.EntityFramework.Filter.V2.Builders
             return this;
         }
 
+
+        public  FilteredQueryBuilder<TModel, TEntity> SetPagePaging(int page, int pageSize)
+        {
+            Skip((page - 1) * pageSize);
+            Take(pageSize);
+
+            return this;
+        }
+
+        public  FilteredQueryBuilder<TModel, TEntity> FillConditions( IEnumerable<EntityFilterBlockModel>? filters)
+        {
+            if (filters?.Any() == true)
+                WithFilter(c =>
+                {
+                    foreach (var filter in filters)
+                    {
+                        c.AddFilter(filter);
+                    }
+                });
+
+            return this;
+        }
+
         public FilteredQueryBuilder<TModel, TEntity> Include(params string[] paths)
         {
             if (model is not IIncludeFilteringQueryModel i) throw new InvalidOperationException("Model does not support includes");

@@ -14,11 +14,6 @@ namespace NSL.ASPNET.Localization.Shared
         {
             services.AddSingleton<ILocalizationService, TType>();
 
-            if(typeof(IEditableLocalizationService).IsAssignableFrom(typeof(TType)))
-            {
-                services.AddSingleton(typeof(IEditableLocalizationService), typeof(TType));
-            }
-
             return services;
         }
     }

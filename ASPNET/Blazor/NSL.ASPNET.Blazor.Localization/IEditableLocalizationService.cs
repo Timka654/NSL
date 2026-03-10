@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace NSL.ASPNET.Localization.Shared
@@ -51,5 +52,12 @@ namespace NSL.ASPNET.Localization.Shared
 
             OnBeginEdit(key, defaultFragment, args);
         }
+
+        public IEditableLocalizationSource[] GetEditableSources()
+            => GetSources()
+                .Where(x => x is IEditableLocalizationSource els && els.HaveLocalizationPermission())
+                .Select(x => x as IEditableLocalizationSource)
+                .OrderByDescending(x => x.Order)
+                .ToArray()!;
     }
 }
