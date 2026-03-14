@@ -10,7 +10,7 @@ namespace NSL.ASPNET.Blazor.Localization
 {
     public partial class LocalizationEditorComponent<TElement> : ComponentBase, IDisposable where TElement : BaseStaticLocalizationItemModel, new()
     {
-        private class NewKeyFormModel
+        public class NewKeyFormModel
         {
             public string Key { get; set; }
         }
@@ -23,7 +23,7 @@ namespace NSL.ASPNET.Blazor.Localization
         protected LocalizationEditContext Context = new LocalizationEditContext();
 
 
-        private NewKeyFormModel NewKeyForm { get; set; }
+        protected NewKeyFormModel NewKeyForm { get; set; }
 
         protected override void OnInitialized()
         {
@@ -38,9 +38,9 @@ namespace NSL.ASPNET.Blazor.Localization
             base.OnInitialized();
         }
 
-        protected virtual async void LocalizationService_OnBeginСreate(string key)
+        protected virtual async void LocalizationService_OnBeginСreate()
         {
-            NewKeyForm = new NewKeyFormModel() { Key = key };
+            NewKeyForm = new NewKeyFormModel() {  };
 
             StateHasChanged();
         }
@@ -180,13 +180,6 @@ namespace NSL.ASPNET.Blazor.Localization
         }
 
         IEditableLocalizationSource SelectedSource;
-    }
-
-    public class BaseCreateLocalizationItemRequestModel
-    {
-        public string Key { get; set; }
-        public string? Language { get; set; }
-        public string Value { get; set; }
     }
 
     public class LocalizationEditContext

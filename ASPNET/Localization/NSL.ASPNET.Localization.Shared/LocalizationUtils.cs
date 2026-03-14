@@ -12,7 +12,8 @@ namespace NSL.ASPNET.Localization.Shared
         public static IServiceCollection AddLocalizationService<TType>(this IServiceCollection services)
             where TType : class, ILocalizationService
         {
-            services.AddSingleton<ILocalizationService, TType>();
+            services.AddSingleton<TType>();
+            services.AddSingleton<ILocalizationService, TType>(s => s.GetRequiredService<TType>());
 
             return services;
         }

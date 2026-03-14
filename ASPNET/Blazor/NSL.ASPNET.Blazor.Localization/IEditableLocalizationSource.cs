@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using NSL.ASPNET.Blazor.Localization;
 using NSL.ASPNET.Localization.Shared;
 using System.Collections.Generic;
 using System.Threading.Tasks;

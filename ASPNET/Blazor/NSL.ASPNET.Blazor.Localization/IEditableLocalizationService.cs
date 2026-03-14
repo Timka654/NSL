@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Components;
-using NSL.ASPNET.Blazor.Localization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,7 +17,9 @@ namespace NSL.ASPNET.Localization.Shared
         event EditableLocalizationChangeEditModeDelegate OnChangeEditMode;
         event EditableLocalizationSearchCallbackDelegate OnEditorSearchCallback;
         event EditableLocalizationBeginEditDelegate OnBeginEdit;
-        event EditableLocalizationSearchCallbackDelegate OnBeginCreate;
+        event Action OnBeginCreate;
+
+        void BeginCreate();
 
         IEnumerable<IEditableLocalizationSource> GetEditableSources();
 
@@ -63,7 +64,10 @@ namespace NSL.ASPNET.Localization.Shared
 
         public event EditableLocalizationBeginEditDelegate OnBeginEdit = (key, defaultFragment, args) => { };
 
-        public event EditableLocalizationSearchCallbackDelegate OnBeginCreate = (key) => { };
+        public event Action OnBeginCreate = () => { };
+
+        public void BeginCreate()
+    => OnBeginCreate();
 
         public async Task ShowEditorFor(string key, RenderFragment defaultFragment, Dictionary<string, object>? args = null)
         {
