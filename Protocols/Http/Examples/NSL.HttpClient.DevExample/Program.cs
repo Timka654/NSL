@@ -1,7 +1,13 @@
-﻿internal class Program
+﻿using NSL.HttpClient;
+using System.Text;
+
+internal class Program
 {
-    private static void Main(string[] args)
+    private static async Task Main(string[] args)
     {
-        //NSL.HttpClient.HttpErrorResponseData
+        HttpResponseMessage r = new HttpResponseMessage(System.Net.HttpStatusCode.BadRequest) {  Content = new StringContent("{\"\":[{\"message\":\"{profile_not_found}\",\"args\":[]}]}", Encoding.UTF8, "application/json") };
+
+        var t = await r.ReadErrorsAsync();
+
     }
 }

@@ -74,8 +74,6 @@ namespace NSL.ASPNET.Blazor.Components
             CurrentContext.ErrorBoundary?.Recover();
         }
 
-
-        protected abstract Task SendReport();
         //=> PreloadService.ProcessRequest(async () =>
         //{
         //    var response = await IdentityService.SystemReportClientErrorPostRequest(new Shared.Models.RequestModels.ReportClientErrorRequestModel()

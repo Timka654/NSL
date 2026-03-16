@@ -10,7 +10,7 @@ namespace NSL.ASPNET.Blazor.Components
     {
         [Inject] NSLTabsService TabsService { get; set; }
 
-        internal BaseNSLTabButtonComponent? SelectedTab { get; set; }
+        public BaseNSLTabButtonComponent? SelectedTab { get; protected set; }
 
         /// <summary>
         /// name of component
@@ -29,7 +29,7 @@ namespace NSL.ASPNET.Blazor.Components
         public event Action<string?> TabNameChanged = name => { };
 
 
-        internal event Action<string?> tabButtonChanged = name => { };
+        public event Action<string?> TabButtonChanged = name => { };
 
         protected override async Task OnInitializedAsync()
         {
@@ -43,7 +43,7 @@ namespace NSL.ASPNET.Blazor.Components
                 }
             }
         }
-        internal void ShowTab(BaseNSLTabButtonComponent selectedTab, bool buttonSrc = false)
+        public void ShowTab(BaseNSLTabButtonComponent selectedTab, bool buttonSrc = false)
         {
             if (selectedTab == SelectedTab)
                 return;
@@ -57,32 +57,23 @@ namespace NSL.ASPNET.Blazor.Components
 
             TabNameChanged(TabName);
 
-            if (!buttonSrc) tabButtonChanged(TabName);
+            if (!buttonSrc) TabButtonChanged(TabName);
 
             StateHasChanged();
-        }
-
-        private async void TabLoad()
-        {
-            await Task.Delay(400);
-            if (TabName == default)
-            {
-
-            }
         }
 
         public void ShowTab(string name)
         {
             TabName = name;
             TabNameChanged(name);
-            tabButtonChanged(name);
+            TabButtonChanged(name);
 
             StateHasChanged();
         }
 
-        internal bool Disposed { get; private set; }
+        public bool Disposed { get; protected set; }
 
-        public void Dispose()
+        public virtual void Dispose()
         {
             Disposed = true;
 
@@ -92,7 +83,7 @@ namespace NSL.ASPNET.Blazor.Components
 
         int frst = 0;
 
-        internal void RegisterButton(BaseNSLTabButtonComponent newTab)
+        public virtual void RegisterButton(BaseNSLTabButtonComponent newTab)
         {
             if (TabName == default)
             {

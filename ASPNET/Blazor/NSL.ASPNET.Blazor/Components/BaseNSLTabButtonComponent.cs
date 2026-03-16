@@ -17,7 +17,7 @@ namespace NSL.ASPNET.Blazor.Components
             {
                 TabsComponent.RegisterButton(this);
 
-                TabsComponent.tabButtonChanged += TabsComponent_OnTabNameChanged;
+                TabsComponent.TabButtonChanged += TabsComponent_OnTabNameChanged;
             }
         }
         private async void TabsComponent_OnTabNameChanged(string obj)
@@ -40,7 +40,7 @@ namespace NSL.ASPNET.Blazor.Components
         public void Dispose()
         {
             if (TabsComponent != null)
-                TabsComponent.tabButtonChanged -= TabsComponent_OnTabNameChanged;
+                TabsComponent.TabButtonChanged -= TabsComponent_OnTabNameChanged;
         }
     }
 }

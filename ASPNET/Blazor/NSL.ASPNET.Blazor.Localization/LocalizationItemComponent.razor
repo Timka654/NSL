@@ -1,4 +1,5 @@
-﻿@if (EditMode && _key != default)
+﻿@using Microsoft.AspNetCore.Components.Web
+@if (EditMode && _key != default)
 {
     <span class="loc_edit_btn" @onclick="ShowEdit" @onclick:stopPropagation="true" @onclick:preventDefault="true">{@_key}</span>
 }
