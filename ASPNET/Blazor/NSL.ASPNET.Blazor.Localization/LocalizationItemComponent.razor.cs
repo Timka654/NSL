@@ -33,7 +33,7 @@ namespace NSL.ASPNET.Blazor.Localization
         {
             LocalizationService.OnUpdateLibrary += LocalizationService_OnUpdateLibrary;
 
-            if(LocalizationService is IEditableLocalizationService els)
+            if (LocalizationService is IEditableLocalizationService els)
                 EditingLocalizationService = els;
 
             if (EditingLocalizationService != null)
@@ -89,7 +89,7 @@ namespace NSL.ASPNET.Blazor.Localization
         private async Task ShowEdit()
         {
             if (EditingLocalizationService != null)
-            await EditingLocalizationService.ShowEditorFor(_key, ChildContent, Parameters);
+                await EditingLocalizationService.ShowEditorFor(_key, ChildContent, Parameters);
         }
 
         public void Dispose()

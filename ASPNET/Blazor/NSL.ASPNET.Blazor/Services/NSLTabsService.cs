@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
-using NSL.ASPNET.Blazor.Components;
+using NSL.ASPNET.Blazor.Components.Tab;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,10 +19,9 @@ namespace NSL.ASPNET.Blazor.Services
             navigationManager.LocationChanged += NavigationManager_LocationChanged;
         }
 
-        private void NavigationManager_LocationChanged(object? sender, Microsoft.AspNetCore.Components.Routing.LocationChangedEventArgs e)
+        private async void NavigationManager_LocationChanged(object? sender, Microsoft.AspNetCore.Components.Routing.LocationChangedEventArgs e)
         {
             var parameters = HttpUtility.ParseQueryString(new Uri(navigationManager.Uri).Query);
-
 
             foreach (var item in tabs)
             {
@@ -35,12 +34,12 @@ namespace NSL.ASPNET.Blazor.Services
                 if (iv == default) continue;
 
                 if (iv.TabName != tn)
-                    iv.ShowTab(tn);
+                    await iv.ShowTabAsync(tn);
             }
             //UpdateNSLTabUrl();
         }
 
-        internal (string? tabName, bool exists) RegisterNSLTab(BaseNSLTabsComponent component)
+        public (string? tabName, bool exists) RegisterNSLTab(BaseNSLTabsComponent component)
         {
             //if (component.Name == default)
             //    return default;
@@ -53,7 +52,7 @@ namespace NSL.ASPNET.Blazor.Services
             return (vals?.FirstOrDefault(), component.Name != default && tabs.TryGetValue(component.Name, out var o) && o != default);
         }
 
-        internal string? GetNSLTabName(BaseNSLTabsComponent component)
+        public string? GetNSLTabName(BaseNSLTabsComponent component)
         {
             var parameters = HttpUtility.ParseQueryString(new Uri(navigationManager.Uri).Query);
             var vals = parameters.GetValues(component.Name);
@@ -61,7 +60,7 @@ namespace NSL.ASPNET.Blazor.Services
             return vals?.FirstOrDefault();
         }
 
-        internal async void UnregisterNSLTab(BaseNSLTabsComponent component)
+        public async void UnregisterNSLTab(BaseNSLTabsComponent component)
         {
             if (component.Name == default)
                 return;

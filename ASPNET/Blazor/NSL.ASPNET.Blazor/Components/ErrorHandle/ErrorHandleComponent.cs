@@ -8,7 +8,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NSL.ASPNET.Blazor.Components
+namespace NSL.ASPNET.Blazor.Components.ErrorHandle
 {
     public abstract partial class ErrorHandleComponent : ComponentBase, IDisposable
     {
@@ -16,9 +16,7 @@ namespace NSL.ASPNET.Blazor.Components
 
         [Inject] NSLErrorsService ErrorsService { get; set; }
 
-        [Inject] IJSRuntime js { get; set; }
-
-        public void Dispose()
+        public virtual void Dispose()
         {
             ErrorsService.OnError -= TeachingReportErrorModalComponent_onExceptionCatch;
         }
@@ -28,9 +26,9 @@ namespace NSL.ASPNET.Blazor.Components
             ErrorsService.OnError += TeachingReportErrorModalComponent_onExceptionCatch;
         }
 
-        protected ErrorHandleContext? CurrentContext { get; set; }
+        protected ErrorHandleContext? CurrentContext { get; set; } = new ErrorHandleContext();
 
-        bool reported = false;
+        protected bool Reported { get; set; } = false;
 
         protected virtual Task<string> GenerateHash(Exception obj, ErrorBoundary errorBoundary)
             => Task.FromResult(string.Join('-', SHA1.HashData(Encoding.UTF8.GetBytes(obj.ToString() + NavigationManager.Uri)).Select(x => x.ToString("x2"))));
@@ -45,9 +43,9 @@ namespace NSL.ASPNET.Blazor.Components
         {
             var hash = await GenerateHash(obj, errorBoundary);
 
-            reported = !await SkipError(obj, hash);
+            Reported = await SkipError(obj, hash);
 
-            CurrentContext = reported ? null : new ErrorHandleContext()
+            CurrentContext = new ErrorHandleContext()
             {
                 Exception = obj,
                 Url = NavigationManager.Uri,
@@ -58,11 +56,6 @@ namespace NSL.ASPNET.Blazor.Components
             return true;
         }
 
-        protected virtual async Task HideWindow()
-        {
-            await ReloadPage();
-            //await modalRef.HideAsync();
-        }
 
         protected virtual async Task ToHome()
         {
@@ -73,35 +66,5 @@ namespace NSL.ASPNET.Blazor.Components
         {
             CurrentContext.ErrorBoundary?.Recover();
         }
-
-        //=> PreloadService.ProcessRequest(async () =>
-        //{
-        //    var response = await IdentityService.SystemReportClientErrorPostRequest(new Shared.Models.RequestModels.ReportClientErrorRequestModel()
-        //    {
-        //        Error = currentException.ToString(),
-        //        Url = currentUrl,
-        //        AdditionalInformation = additionalInformation,
-        //        CompanyBranchId = CompanyBranchService.CurrentBranchId,
-        //        CompanyId = CompanyService.CurrentCompanyId
-        //    });
-
-        //    if (!response.IsSuccess) return;
-
-        //    await LocalStorageService.SetItemAsStringAsync($"err_{currentHash}", string.Empty);
-        //    await HideWindow();
-        //});
-    }
-
-    public class ErrorHandleContext
-    {
-        public Exception Exception { get; set; }
-
-        public string? Url { get; set; }
-
-        public string? AdditionalInformation { get; set; }
-
-        public string? Hash { get; set; }
-
-        public ErrorBoundary ErrorBoundary { get; set; }
     }
 }

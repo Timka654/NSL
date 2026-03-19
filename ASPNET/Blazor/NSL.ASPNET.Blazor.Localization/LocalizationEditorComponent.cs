@@ -15,9 +15,9 @@ namespace NSL.ASPNET.Blazor.Localization
             public string Key { get; set; }
         }
 
-        [Inject] ILocalizationService LocalizationService { get; set; }
+        [Inject] protected ILocalizationService LocalizationService { get; set; }
 
-        IEditableLocalizationService EditableLocalizationService { get; set; }
+        protected IEditableLocalizationService EditableLocalizationService { get; set; }
 
 
         protected LocalizationEditContext Context = new LocalizationEditContext();
@@ -32,20 +32,20 @@ namespace NSL.ASPNET.Blazor.Localization
                 EditableLocalizationService = editable;
 
                 EditableLocalizationService.OnBeginEdit += LocalizationService_OnEdit;
-                EditableLocalizationService.OnBeginCreate += LocalizationService_OnBeginСreate;
+                EditableLocalizationService.OnBeginCreate += LocalizationService_OnBeginCreate;
             }
 
             base.OnInitialized();
         }
 
-        protected virtual async void LocalizationService_OnBeginСreate()
+        protected virtual async void LocalizationService_OnBeginCreate()
         {
             NewKeyForm = new NewKeyFormModel() {  };
 
             StateHasChanged();
         }
 
-        private string SelectedLang { get => Context.RequestModel.Language; set => SelectLanguage(value); }
+        protected string SelectedLang { get => Context.RequestModel.Language; set => SelectLanguage(value); }
 
         protected virtual void SelectLanguage(string language)
         {
@@ -89,16 +89,6 @@ namespace NSL.ASPNET.Blazor.Localization
             }
 
             Context.Values = values;
-
-            //if (Context.Values == null || !Context.Values.Any())
-            //{
-            //    var vals = LocalizationService.GetLocalizationValue(Context.Key);
-
-            //    if (vals != Context.Key)
-            //        Context.Values = [new() { Key = Context.Key, Language = "<Default>", Value = vals }];
-            //}
-
-
         }
 
         protected virtual async Task ShowEdit()
@@ -113,11 +103,6 @@ namespace NSL.ASPNET.Blazor.Localization
                 SelectLanguage(string.Empty);
             else
                 SelectLanguage(LocalizationService.CurrentLanguage);
-            //Console.WriteLine("sssssssssssssssssssssssssss1"); // 1
-
-            //await modalRef.ShowAsync();
-
-            //StateHasChanged();
         }
 
         protected virtual async Task NewLocalization()
@@ -141,9 +126,17 @@ namespace NSL.ASPNET.Blazor.Localization
 
             Context.RequestModel.Value = Context.RequestModel.Value.Trim();
 
-            if (await EditableLocalizationService.UpdateLocalizationItem(SelectedSource, Context.RequestModel))
+            var updateResult = await UpdateLocalization(Context.RequestModel);
+
+            if (updateResult)
+                StateHasChanged();
+        }
+
+        protected virtual async Task<bool> UpdateLocalization(BaseCreateLocalizationItemRequestModel item)
+        {
+            if (await EditableLocalizationService.UpdateLocalizationItem(SelectedSource, item))
             {
-                var e = Context.Values.FirstOrDefault(x => x.Language == Context.RequestModel.Language);
+                var e = Context.Values.FirstOrDefault(x => x.Language == item.Language);
 
                 if (e == null)
                 {
@@ -152,17 +145,19 @@ namespace NSL.ASPNET.Blazor.Localization
                     Context.Values.Add(e);
                 }
 
-                e.Key = Context.RequestModel.Key;
-                e.Value = Context.RequestModel.Value;
-                e.Language = Context.RequestModel.Language;
+                e.Key = item.Key;
+                e.Value = item.Value;
+                e.Language = item.Language;
+
+                return true;
             }
 
-            StateHasChanged();
+            return false;
         }
 
         IEnumerable<IEditableLocalizationSource> Sources = Enumerable.Empty<IEditableLocalizationSource>();
 
-        private async Task SelectSource(IEditableLocalizationSource source)
+        protected async Task SelectSource(IEditableLocalizationSource source)
         {
             if (SelectedSource == source) return;
 
@@ -175,7 +170,7 @@ namespace NSL.ASPNET.Blazor.Localization
             if (EditableLocalizationService != null)
             {
                 EditableLocalizationService.OnBeginEdit -= LocalizationService_OnEdit;
-                EditableLocalizationService.OnBeginCreate -= LocalizationService_OnBeginСreate;
+                EditableLocalizationService.OnBeginCreate -= LocalizationService_OnBeginCreate;
             }
         }
 

@@ -15,7 +15,7 @@ namespace NSL.Database.EntityFramework.Filter.V2.Develop
 
             var f = FilteredQueryBuilder.Create<FullFilteredQueryModel, TestEntityModel>()
                 .WithFilter(fb => fb
-                    .Or(fn => fn.Where(b => b.Number, V2.Enums.FilterOperator.GreaterThan, 1.ToString()))
+                    .Or(fn => fn.Where(b => b.Content, V2.Enums.FilterOperator.Equal, "aabb"))
                 )
                 .Select(
                     "Id",

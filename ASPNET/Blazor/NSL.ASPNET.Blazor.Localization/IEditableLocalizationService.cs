@@ -90,7 +90,7 @@ namespace NSL.ASPNET.Localization.Shared
             return true;
         }
 
-        public bool IsSystemKey(string key)
+        public virtual bool IsSystemKey(string key)
             => "__support_languages" == key;
     }
 }

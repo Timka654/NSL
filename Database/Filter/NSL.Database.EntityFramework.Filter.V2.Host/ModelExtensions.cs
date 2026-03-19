@@ -9,13 +9,12 @@ namespace NSL.Database.EntityFramework.Filter.V2.Host
 {
     public static class ModelExtensions
     {
-        public static ModelBuilder HasDbFilterV2(this ModelBuilder modelBuilder, DbContext dbContext)
+        public static ModelBuilder HasDbFilterV2(this ModelBuilder modelBuilder, DbContext dbContext, char escapeChar = '\\')
         {
             var typeMappingSource = dbContext.GetService<IRelationalTypeMappingSource>();
             var stringMapping = typeMappingSource.FindMapping(typeof(string));
             var boolMapping = typeMappingSource.FindMapping(typeof(bool));
 
-            var escapeChar = '\\';
             var escapeExpr = new SqlConstantExpression(escapeChar.ToString(), stringMapping);
             var jokExpr = new SqlConstantExpression("%", stringMapping);
 
@@ -73,9 +72,9 @@ namespace NSL.Database.EntityFramework.Filter.V2.Host
                 .HasTranslation(args =>
                 {
                     var source = args.ElementAt(0);
-                    var value = EscapeLikePattern(args.ElementAt(1));
+                    var value = args.ElementAt(1);
 
-                var caseSensitive = (bool)(args[2] as SqlConstantExpression).Value;
+                    var caseSensitive = (bool)(args[2] as SqlConstantExpression).Value;
 
                     if (caseSensitive)
                     {
@@ -87,27 +86,28 @@ namespace NSL.Database.EntityFramework.Filter.V2.Host
                             typeof(bool),
                             source.TypeMapping);
                     }
-                    else
-                    {
-                        var likePattern = new SqlFunctionExpression(
-                            functionName: "LOWER",
-                            arguments: new[] { value },
-                            nullable: true,
-                            argumentsPropagateNullability: new[] { true },
-                            type: typeof(string),
-                            typeMapping: value.TypeMapping);
 
-                        var lowerSource = new SqlFunctionExpression(
-                            functionName: "LOWER",
-                            arguments: new[] { source },
-                            nullable: true,
-                            argumentsPropagateNullability: new[] { true },
-                            type: typeof(string),
-                            typeMapping: source.TypeMapping);
+                    value = EscapeLikePattern(args.ElementAt(1));
+
+                    var likePattern = new SqlFunctionExpression(
+                        functionName: "LOWER",
+                        arguments: new[] { value },
+                        nullable: true,
+                        argumentsPropagateNullability: new[] { true },
+                        type: typeof(string),
+                        typeMapping: value.TypeMapping);
+
+                    var lowerSource = new SqlFunctionExpression(
+                        functionName: "LOWER",
+                        arguments: new[] { source },
+                        nullable: true,
+                        argumentsPropagateNullability: new[] { true },
+                        type: typeof(string),
+                        typeMapping: source.TypeMapping);
 
 
-                        return new LikeExpression(lowerSource, likePattern, escapeExpr, boolMapping);
-                    }
+                    return new LikeExpression(lowerSource, likePattern, escapeExpr, boolMapping);
+
                 });
 
             return modelBuilder;
