@@ -23,13 +23,14 @@ namespace NSL.Utils
         private readonly SemaphoreSlim _syncLock = new SemaphoreSlim(1, 1);
         private readonly string _ntpServer;
 
-        /// <param name="syncReloadTime">Как часто этот таймер будет "просить" обновить NTP</param>
+        /// <param name="syncReloadTime">Как часто будет происходить синхронизация времени с NTP сервером</param>
         public NtpTimeProvider(
             TimeSpan syncReloadTime,
             string ntpServer = "pool.ntp.org")
         {
             _syncReloadTime = syncReloadTime;
             _ntpServer = ntpServer;
+            _ = ForceRefreshAsync();
         }
 
         // Отдает текущее синхронизированное время
