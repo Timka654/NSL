@@ -24,7 +24,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\..\..\Database\Filter\NSL.Database.EntityFramework.Filter.V2.Host\NSL.Database.EntityFramework.Filter.V2.Host.csproj" />
+		<ProjectReference Include="..\..\..\..\Database\Filter\NSL.Database.EntityFramework.Filter.V2\NSL.Database.EntityFramework.Filter.V2.csproj" />
 		<ProjectReference Include="..\..\..\..\Protocols\Http\NSL.HttpClient\NSL.HttpClient.csproj" />
 	</ItemGroup>
 
