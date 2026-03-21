@@ -2,7 +2,7 @@
 using NSL.Open.Nat;
 using NSL.Open.Nat.Enums;
 using NSL.Open.Nat.Exceptions;
-using UDPExample;
+using NSL.UDPExample;
 
 
 ConsoleLogger logger = new ConsoleLogger();

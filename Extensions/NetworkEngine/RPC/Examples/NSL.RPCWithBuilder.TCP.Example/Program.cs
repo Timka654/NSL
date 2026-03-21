@@ -5,10 +5,9 @@ using NSL.Extensions.RPC;
 using NSL.Extensions.RPC.EndPointBuilder;
 using NSL.Logger;
 using NSL.RPCWithBuilder.TCP.Example;
+using NSL.RPCWithBuilder.TCP.Example.Models;
 using NSL.SocketClient;
 using NSL.SocketServer;
-using RPCWithBuilder.TCP.Example;
-using RPCWithBuilder.TCP.Example.Models;
 
 internal class Program
 {

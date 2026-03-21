@@ -1,4 +1,4 @@
-﻿using Builder.UDP.BaseExample.Client;
+﻿using NSL.Builder.UDP.BaseExample.Client;
 using NSL.BuilderExtensions.SocketCore;
 using NSL.BuilderExtensions.UDPClient;
 using NSL.UDP;

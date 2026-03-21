@@ -1,12 +1,14 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<NSLProjectTypes>None</NSLProjectTypes>
+		<NSLProjectTypes>ASPTarget</NSLProjectTypes>
 
 		<TargetFramework>net10.0</TargetFramework>
 		<Configurations>DebugExamples;Debug;Release</Configurations>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<Nullable>disable</Nullable>
+		<IsPackable>true</IsPackable>
+		<OutputType>Library</OutputType>
 
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
 		<EmbedUntrackedSources>true</EmbedUntrackedSources>
@@ -20,5 +22,10 @@
 	<PropertyGroup Condition="'$(Configuration)'=='Debug'">
 		<PackageId>$(MSBuildProjectName)_Debug</PackageId>
 	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\..\..\Database\Filter\NSL.Database.EntityFramework.Filter.V2.Host\NSL.Database.EntityFramework.Filter.V2.Host.csproj" />
+		<ProjectReference Include="..\..\..\..\Protocols\Http\NSL.HttpClient\NSL.HttpClient.csproj" />
+	</ItemGroup>
 
 </Project>

@@ -20,7 +20,7 @@ namespace NSL.Generators.Utils
             => type.Identifier.Text;
 
         public static string[] GetTypeClassUsingDirectives(this TypeDeclarationSyntax type)
-            => (type.SyntaxTree.GetRoot() as CompilationUnitSyntax)?.Usings.Select(x => string.Join(" ", x.ToString().Split(' ').Skip(1)).TrimEnd(';')).ToArray();
+            => (type.SyntaxTree.GetRoot() as CompilationUnitSyntax)?.Usings.Select(x => string.Join(" ", x.ToString().Split(' ').Skip(1)).TrimEnd(';').Trim()).ToArray();
 
         public static string[] GetTypeGenericParameters(this TypeDeclarationSyntax c)
             => c.TypeParameterList?.Parameters.Select(x => x.Identifier.Text).ToArray();

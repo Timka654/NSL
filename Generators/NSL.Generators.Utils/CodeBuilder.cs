@@ -199,21 +199,38 @@ namespace NSL.Generators.Utils
             }
         }
 
-        public void CreatePartialClass(TypeDeclarationSyntax classDecl, Action<CodeBuilder> bodyBuild, IEnumerable<string> requiredUsings = null, Action<CodeBuilder> beforeClassDef = null)
+        public void CreatePartialClass(TypeDeclarationSyntax classDecl, Action<CodeBuilder> bodyBuild, IEnumerable<string> requiredUsings = null, Action<CodeBuilder> beforeClassDef = null, IEnumerable<string> exceptUsings = null)
         {
             var body = new CodeBuilder();
 
             bodyBuild(body);
 
-            var @namespace = classDecl.Parent as NamespaceDeclarationSyntax;
+            var @namespace = (classDecl.Parent as NamespaceDeclarationSyntax)?.Name.ToString();
+
+            if (@namespace == null)
+            {
+                var namespaces = classDecl.Ancestors().OfType<BaseNamespaceDeclarationSyntax>().Select(x=>x.Name.ToString()); 
+                
+                string fullNamespace = string.Join(".", namespaces);
+
+                @namespace = string.IsNullOrEmpty(fullNamespace) ? null : $"{fullNamespace}";
+            }
 
             var usings = classDecl.GetTypeClassUsingDirectives();
+
+            if (exceptUsings != null)
+            {
+                usings = usings.Except(exceptUsings).ToArray();
+            }
 
             AddUsings(usings);
 
             if (requiredUsings != null)
             {
                 requiredUsings = requiredUsings.Except(usings);
+
+                if (exceptUsings != null)
+                    requiredUsings = requiredUsings.Except(exceptUsings);
 
                 AddUsings(requiredUsings);
             }
@@ -242,7 +259,7 @@ namespace NSL.Generators.Utils
 
             if (@namespace != null)
             {
-                AppendLine($"namespace {@namespace.Name.ToString()}");
+                AppendLine($"namespace {@namespace}");
                 AppendLine("{");
 
                 NextTab();

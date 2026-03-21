@@ -1,5 +1,5 @@
 ﻿using NSL.Logger;
-using UDPExample;
+using NSL.UDPExample;
 
 ConsoleLogger logger = new ConsoleLogger();
 

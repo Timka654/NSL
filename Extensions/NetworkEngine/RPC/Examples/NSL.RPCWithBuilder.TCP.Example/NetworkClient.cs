@@ -1,6 +1,6 @@
 ﻿using NSL.SocketClient;
 using NSL.SocketServer.Utils;
-using RPCWithBuilder.TCP.Example;
+using NSL.RPCWithBuilder.TCP.Example;
 
 namespace NSL.RPCWithBuilder.TCP.Example
 {

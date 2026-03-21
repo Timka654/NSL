@@ -1,4 +1,4 @@
-﻿using Builder.TCP.BaseExample.Client;
+﻿using NSL.Builder.TCP.BaseExample.Client;
 using NSL.BuilderExtensions.SocketCore;
 using NSL.BuilderExtensions.TCPClient;
 using NSL.SocketClient;
