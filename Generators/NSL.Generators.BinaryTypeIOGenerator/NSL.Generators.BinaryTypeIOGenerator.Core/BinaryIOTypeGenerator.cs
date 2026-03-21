@@ -92,7 +92,7 @@ namespace NSL.Generators.BinaryTypeIOGenerator.Core
                 "System"
             };
 
-            codeBuilder.CreatePartialClass(typeClass, classBuilder =>
+            codeBuilder.CreatePartialClass((CSharpCompilation)context.SemanticModel.Compilation, typeClass, classBuilder =>
                 {
                     var ioMethodsAttributes = typeClass.AttributeLists
                         .SelectMany(x => x.Attributes)

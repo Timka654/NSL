@@ -119,7 +119,7 @@ namespace NSL.Generators.PacketHandleGenerator.Core
                 .Select(x => x.Identifier.Text)
                 .ToList();
 
-            codeBuilder.CreatePartialClass(typeClass, classBuilder =>
+            codeBuilder.CreatePartialClass((CSharpCompilation)context.SemanticModel.Compilation, typeClass, classBuilder =>
             {
                 var typeAttributes = typeClass.AttributeLists
                     .SelectMany(x => x.Attributes)

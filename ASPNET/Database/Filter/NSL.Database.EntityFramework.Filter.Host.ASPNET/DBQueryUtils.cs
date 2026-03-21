@@ -44,7 +44,7 @@ namespace NSL.Database.EntityFramework.Filter.Host.ASPNET
             return new EntityFilterQueryModel<T>(query, pagging);
         }
 
-        public static async Task<FilterResultModel<TResult>> GetResponse<T, TResult>(this EntityFilterQueryModel<T> query, Func<IQueryable<T>, IQueryable<TResult>> builder, CancellationToken cancellationToken = default(CancellationToken))
+        public static async Task<FilterResultModel<TResult>> GetData<T, TResult>(this EntityFilterQueryModel<T> query, Func<IQueryable<T>, IQueryable<TResult>> builder, CancellationToken cancellationToken = default(CancellationToken))
         {
 
             FilterResultModel<TResult> entityFilterResultModel = new FilterResultModel<TResult>();

@@ -1,4 +1,5 @@
-﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
+﻿using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -199,7 +200,7 @@ namespace NSL.Generators.Utils
             }
         }
 
-        public void CreatePartialClass(TypeDeclarationSyntax classDecl, Action<CodeBuilder> bodyBuild, IEnumerable<string> requiredUsings = null, Action<CodeBuilder> beforeClassDef = null, IEnumerable<string> exceptUsings = null)
+        public void CreatePartialClass(CSharpCompilation compilation, TypeDeclarationSyntax classDecl, Action<CodeBuilder> bodyBuild, IEnumerable<string> requiredUsings = null, Action<CodeBuilder> beforeClassDef = null, IEnumerable<string> exceptUsings = null)
         {
             var body = new CodeBuilder();
 
@@ -209,8 +210,8 @@ namespace NSL.Generators.Utils
 
             if (@namespace == null)
             {
-                var namespaces = classDecl.Ancestors().OfType<BaseNamespaceDeclarationSyntax>().Select(x=>x.Name.ToString()); 
-                
+                var namespaces = classDecl.Ancestors().OfType<BaseNamespaceDeclarationSyntax>().Select(x => x.Name.ToString());
+
                 string fullNamespace = string.Join(".", namespaces);
 
                 @namespace = string.IsNullOrEmpty(fullNamespace) ? null : $"{fullNamespace}";
@@ -218,22 +219,16 @@ namespace NSL.Generators.Utils
 
             var usings = classDecl.GetTypeClassUsingDirectives();
 
-            if (exceptUsings != null)
-            {
-                usings = usings.Except(exceptUsings).ToArray();
-            }
+            //usings = usings.Union(compilation.Options.Usings).ToArray();
 
-            AddUsings(usings);
 
             if (requiredUsings != null)
-            {
-                requiredUsings = requiredUsings.Except(usings);
+                usings = usings.Union(requiredUsings).ToArray();
 
-                if (exceptUsings != null)
-                    requiredUsings = requiredUsings.Except(exceptUsings);
+            if (exceptUsings != null)
+                usings = usings.Except(exceptUsings).ToArray();
 
-                AddUsings(requiredUsings);
-            }
+            AddUsings(usings.GroupBy(x => x).Select(x => x.Key));
 
             AppendLine();
 

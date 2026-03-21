@@ -1,4 +1,5 @@
 ﻿using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using NSL.Generators.HttpEndPointGenerator.Core.Utils;
 using NSL.Generators.HttpEndPointGenerator.Shared.Attributes;
@@ -9,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Reflection;
 
 namespace NSL.Generators.HttpEndPointGenerator.Core
 {
@@ -119,7 +121,7 @@ namespace NSL.Generators.HttpEndPointGenerator.Core
             });
 
 
-            codeBuilder.CreatePartialClass(typeClass, classBuilder =>
+            codeBuilder.CreatePartialClass((CSharpCompilation)context.SemanticModel.Compilation, typeClass, classBuilder =>
             {
                 classBuilder.AppendLine($"protected partial Task<System.Net.Http.HttpClient> CreateEndPointClient(string url);");
 
@@ -142,6 +144,24 @@ namespace NSL.Generators.HttpEndPointGenerator.Core
                     var fillArgs = attr.ArgumentList.Arguments;
 
                     var containerType = fillArgs.First().GetAttributeTypeParameterValueSymbol(typeSem);
+
+                    var syntaxReference = containerType.DeclaringSyntaxReferences.FirstOrDefault();
+
+                    if (syntaxReference != null)
+                    {
+                        // 2. Get the root of the file where the type is defined
+                        var root = syntaxReference.SyntaxTree.GetRoot();
+
+                        // 3. Extract all using directives from that specific file
+                        var usings2 = root.DescendantNodes()
+                            .OfType<UsingDirectiveSyntax>()
+                            .Select(u => u.ToString().Trim()) // Returns "using System;" etc.
+                            .ToList();
+
+                        usings.AddRange(usings2);
+
+                        // Now 'usings' contains every using line exactly as written in that file
+                    }
 
                     var saveNames = fillArgs.ElementAtOrDefault(1)?.GetAttributeParameterValue<bool>(typeSem) ?? false;
 

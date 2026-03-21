@@ -96,7 +96,7 @@ namespace NSL.Generators.FillTypeGenerator.Core
                 .ToArray();
             }
 
-            codeBuilder.CreatePartialClass(type, classBuilder =>
+            codeBuilder.CreatePartialClass((CSharpCompilation)context.SemanticModel.Compilation, type, classBuilder =>
             {
                 //GenDebug.Break();
                 var attrbs = typeAttributes.Where(x => x.AttributeClass.GetTypeFullName(false) == FillTypeGenerateAttributeFullName)
