@@ -141,8 +141,13 @@ namespace NSL.TCP.Server
             {
                 serverOptions.CallExceptionEvent(ex, null);
             }
+
             //продолжаем принимать запросы
-            listener.BeginAccept(Accept, listener);
+            if (state)
+            {
+                try { listener.BeginAccept(Accept, listener); }
+                catch (Exception ex) { serverOptions.CallExceptionEvent(ex, null); }
+            }
         }
 
         public int GetListenerPort() => serverOptions.Port;

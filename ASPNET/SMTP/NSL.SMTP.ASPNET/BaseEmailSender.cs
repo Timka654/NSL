@@ -112,6 +112,9 @@ namespace NSL.SMTP.ASPNET
 
         async Task channelProcessing(SendMailRequest current, CancellationToken cancellationToken)
         {
+            if(options.Value == null || !options.Value.Enabled)
+                return;
+
             now = DateTime.UtcNow;
 
             if (!options.Value.DisableTrap && (now - lastTrapClear).TotalHours > 3)

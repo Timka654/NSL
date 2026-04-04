@@ -192,6 +192,18 @@ namespace NSL.SocketCore.Utils.Buffer
             return BinaryPrimitives.ReadInt64LittleEndian(data.AsSpan(DataPosition - 8));
         }
 
+
+        /// <summary>
+        /// Read long value (int128, 16 bytes)
+        /// </summary>
+        /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public long ReadInt128()
+        {
+            DataPosition += 16;
+            return BinaryPrimitives.ReadInt128LittleEndian(data.AsSpan(DataPosition - 16));
+        }
+
         /// <summary>
         /// Read ulong value (uint64, 8 bytes)
         /// </summary>
@@ -201,6 +213,18 @@ namespace NSL.SocketCore.Utils.Buffer
         {
             DataPosition += 8;
             return BinaryPrimitives.ReadUInt64LittleEndian(data.AsSpan(DataPosition - 8));
+        }
+
+
+        /// <summary>
+        /// Read ulong value (uint128, 16 bytes)
+        /// </summary>
+        /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public long ReadUInt128()
+        {
+            DataPosition += 16;
+            return BinaryPrimitives.ReadUInt128LittleEndian(data.AsSpan(DataPosition - 16));
         }
 
         /// <summary>
@@ -299,6 +323,20 @@ namespace NSL.SocketCore.Utils.Buffer
             return null;
         }
 
+        /// <summary>
+        /// Read nullable type value with bool(hasValue) header.
+        /// Prefer this overload over <see cref="ReadNullable{T}(Func{T})"/> — allows passing a static lambda to avoid closure allocation.
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public T? ReadNullable<T>(Func<InputPacketBuffer, T> hasValueAction)
+            where T : struct
+        {
+            if (ReadBool())
+                return hasValueAction(this);
+
+            return null;
+        }
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static unsafe float Int32BitsToSingle(int value)
         {
@@ -319,6 +357,20 @@ namespace NSL.SocketCore.Utils.Buffer
             {
                 return hasValueAction();
             }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Read nullable class type value with bool(not null) header.
+        /// Prefer this overload over <see cref="ReadNullableClass{T}(Func{T})"/> — allows passing a static lambda to avoid closure allocation.
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public T ReadNullableClass<T>(Func<InputPacketBuffer, T> hasValueAction)
+            where T : class
+        {
+            if (ReadBool())
+                return hasValueAction(this);
 
             return null;
         }

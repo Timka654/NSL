@@ -13,6 +13,7 @@ using NSL.Generators.FillTypeGenerator.Tests.Develop.WithModelName;
 using NSL.Generators.HttpEndPointGenerator.Shared.Attributes;
 using System;
 using System.Threading.Tasks;
+using ddd = NSL.Generators.HttpEndPointGenerator.Shared.Attributes.GenHttpParameterEnum;
 
 namespace NSL.Generators.HttpEndPointGenerator.Tests.Shared
 {

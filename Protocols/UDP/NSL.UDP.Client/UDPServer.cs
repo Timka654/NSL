@@ -51,18 +51,24 @@ namespace NSL.UDP.Client
 
         private UDPClient<TClient> GetClient(IPEndPoint endPoint)
         {
-            var c = clients.GetOrAdd(endPoint, ipep =>
-            {
-                return new Lazy<UDPClient<TClient>>(() =>
+            var lazy = clients.GetOrAdd(endPoint, ipep =>
+                new Lazy<UDPClient<TClient>>(() =>
                 {
                     var client = new UDPClient<TClient>(ipep, listener, options);
                     client.OnReceivePacket += OnReceivePacket;
                     client.OnSendPacket += OnSendPacket;
                     return client;
-                });
-            });
+                }));
 
-            return c.Value;
+            try
+            {
+                return lazy.Value;
+            }
+            catch
+            {
+                clients.TryRemove(endPoint, out _);
+                throw;
+            }
         }
 
         public UDPClient<TClient> CreateClientConnection(IPEndPoint endPoint)

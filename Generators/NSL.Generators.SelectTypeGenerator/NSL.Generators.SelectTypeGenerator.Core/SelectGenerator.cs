@@ -68,11 +68,14 @@ namespace NSL.Generators.SelectTypeGenerator.Core
 
                 var typed = (bool?)((TypedConstant?)attr.GetNamedArgumentValue(nameof(SelectGenerateAttribute.Typed)))?.Value ?? false;
 
+                var dtoSuffix = (string)((TypedConstant?)attr.GetNamedArgumentValue(nameof(SelectGenerateAttribute.DtoSuffix)))?.Value ?? "";
+
                 var a = new GenAttribute()
                 {
                     Models = models,
                     Dto = dto,
                     Typed = typed,
+                    DtoSuffix = dtoSuffix,
                 };
 
                 attributes.Add(a);
@@ -85,11 +88,12 @@ namespace NSL.Generators.SelectTypeGenerator.Core
                 Namespace = typeDecl.TryGetNamespace(),
                 Name = key.Replace('.', '_'),
                 Members = typeSymbol.GetAllMembers(),
-                Attributes = attributes.GroupBy(x => (x.Typed, x.Dto))
+                Attributes = attributes.GroupBy(x => (x.Typed, x.Dto, x.DtoSuffix))
                 .Select(x => new GenAttribute()
                 {
                     Dto = x.Key.Dto,
                     Typed = x.Key.Typed,
+                    DtoSuffix = x.Key.DtoSuffix,
                     Models = x.SelectMany(i => i.Models).GroupBy(g => g).Select(k => k.Key).ToArray()
                 })
                 .ToArray()
@@ -131,7 +135,7 @@ namespace NSL.Generators.SelectTypeGenerator.Core
                 {
                     var mjoins = GetJoinModels(gtype.TypeSymbol, item).Prepend(item);
 
-                    SelectGenContext genContext = typedModels.Dto ? new SelectGenDTOContext() : new SelectGenContext();
+                    SelectGenContext genContext = typedModels.Dto ? new SelectGenDTOContext() { DtoSuffix = typedModels.DtoSuffix ?? "" } : new SelectGenContext();
 
                     genContext.Type = gtype.TypeSymbol;
                     genContext.Symbols = FilterSymbols(gtype.Members, mjoins, typedModels.Typed);
@@ -244,7 +248,7 @@ namespace NSL.Generators.SelectTypeGenerator.Core
                             {
                                 string typeDef = "";
                                 var typeSymb = member.GetTypeSymbol();
-                                var type = dto.SubTypeList?.FirstOrDefault(x => x.OriginType == typeSymb);
+                                var type = dto.SubTypeList?.FirstOrDefault(x => SymbolEqualityComparer.Default.Equals(x.OriginType, typeSymb));
 
                                 if (type != null)
                                 {
@@ -542,7 +546,9 @@ namespace NSL.Generators.SelectTypeGenerator.Core
                     genericDefinition = "List<{0}>";
                 }
 
-                SelectGenContext itemGenContext = genContext is SelectGenDTOContext ? new SelectGenDTOContext() : new SelectGenContext();
+                SelectGenContext itemGenContext = genContext is SelectGenDTOContext parentDto
+                    ? new SelectGenDTOContext() { DtoSuffix = parentDto.DtoSuffix }
+                    : new SelectGenContext();
 
                 itemGenContext.Model = GetProxyModel(item, genContext.Model);
 

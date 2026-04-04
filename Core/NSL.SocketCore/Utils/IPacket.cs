@@ -8,3 +8,7 @@ namespace NSL.SocketCore.Utils
        public abstract void Receive(TClient client, InputPacketBuffer data);
     }
 }
+
+#if NETSTANDARD
+
+#endif

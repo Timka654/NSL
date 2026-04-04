@@ -245,6 +245,58 @@ namespace NSL.SocketCore.Utils.Buffer
         }
 
         /// <summary>
+        /// Write long value (int128, 16 bytes)
+        /// </summary>
+        /// <param name="value">value</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void WriteInt128(Int128 value)
+        {
+            _buffer[0] = (byte)value;
+            _buffer[1] = (byte)(value >> 8);
+            _buffer[2] = (byte)(value >> 16);
+            _buffer[3] = (byte)(value >> 24);
+            _buffer[4] = (byte)(value >> 32);
+            _buffer[5] = (byte)(value >> 40);
+            _buffer[6] = (byte)(value >> 48);
+            _buffer[7] = (byte)(value >> 56);
+            _buffer[8] = (byte)(value >> 64);
+            _buffer[9] = (byte)(value >> 72);
+            _buffer[10] = (byte)(value >> 80);
+            _buffer[11] = (byte)(value >> 88);
+            _buffer[12] = (byte)(value >> 96);
+            _buffer[13] = (byte)(value >> 104);
+            _buffer[14] = (byte)(value >> 112);
+            _buffer[15] = (byte)(value >> 120);
+            Write(_buffer, 0, 16);
+        }
+
+        /// <summary>
+        /// Write ulong value (uint128, 16 bytes)
+        /// </summary>
+        /// <param name="value">value</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void WriteUInt128(UInt128 value)
+        {
+            _buffer[0] = (byte)value;
+            _buffer[1] = (byte)(value >> 8);
+            _buffer[2] = (byte)(value >> 16);
+            _buffer[3] = (byte)(value >> 24);
+            _buffer[4] = (byte)(value >> 32);
+            _buffer[5] = (byte)(value >> 40);
+            _buffer[6] = (byte)(value >> 48);
+            _buffer[7] = (byte)(value >> 56);
+            _buffer[8] = (byte)(value >> 64);
+            _buffer[9] = (byte)(value >> 72);
+            _buffer[10] = (byte)(value >> 80);
+            _buffer[11] = (byte)(value >> 88);
+            _buffer[12] = (byte)(value >> 96);
+            _buffer[13] = (byte)(value >> 104);
+            _buffer[14] = (byte)(value >> 112);
+            _buffer[15] = (byte)(value >> 120);
+            Write(_buffer, 0, 16);
+        }
+
+        /// <summary>
         /// Write bool value (1 bytes)
         /// </summary>
         /// <param name="value">value</param>
@@ -377,6 +429,24 @@ namespace NSL.SocketCore.Utils.Buffer
         }
 
         /// <summary>
+        /// Write nullable type value with bool(hasValue) header.
+        /// Prefer this overload over <see cref="WriteNullable{T}(Nullable{T}, Action)"/> — the unwrapped value and buffer are passed as
+        /// parameters, which allows the caller to use a static lambda and avoid closure allocation.
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void WriteNullable<T>(T? value, Action<OutputPacketBuffer, T> writeAction)
+            where T : struct
+        {
+            if (value.HasValue)
+            {
+                WriteBool(true);
+                writeAction(this, value.Value);
+                return;
+            }
+            WriteBool(false);
+        }
+
+        /// <summary>
         /// Write nullable class type value with bool(not null) header
         /// </summary>
         /// <param name="value">value</param>
@@ -388,6 +458,24 @@ namespace NSL.SocketCore.Utils.Buffer
             {
                 WriteBool(true);
                 hasValueAction();
+                return;
+            }
+            WriteBool(false);
+        }
+
+        /// <summary>
+        /// Write nullable class type value with bool(not null) header.
+        /// Prefer this overload over <see cref="WriteNullableClass{T}(T, Action)"/> — the value and buffer are passed as
+        /// parameters, which allows the caller to use a static lambda and avoid closure allocation.
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void WriteNullableClass<T>(T value, Action<OutputPacketBuffer, T> writeAction)
+            where T : class
+        {
+            if (value != null)
+            {
+                WriteBool(true);
+                writeAction(this, value);
                 return;
             }
             WriteBool(false);

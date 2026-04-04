@@ -169,6 +169,18 @@ namespace NSL.UDP.Channels
             }
         }
 
+        private const int StalePacketTimeoutSeconds = 10;
+
+        public virtual void CleanupStalePackets()
+        {
+            var cutoff = DateTime.UtcNow.AddSeconds(-StalePacketTimeoutSeconds);
+            foreach (var kvp in packetReceiveBuffer)
+            {
+                if (kvp.Value.CreatedAt < cutoff)
+                    packetReceiveBuffer.TryRemove(kvp.Key, out _);
+            }
+        }
+
         uint currentPID = uint.MaxValue;
 
         private uint CreatePID()
@@ -184,7 +196,9 @@ namespace NSL.UDP.Channels
 
             public uint PID;
 
-            public ushort Length;
+            public volatile ushort Length;
+
+            public DateTime CreatedAt;
 
             public ConcurrentBag<Memory<byte>> Parts;
 
@@ -199,6 +213,7 @@ namespace NSL.UDP.Channels
             {
                 this.PID = PID;
                 this.Length = 0;
+                this.CreatedAt = DateTime.UtcNow;
                 Parts = new ConcurrentBag<Memory<byte>>();
                 ContainsParts = new ConcurrentBag<ushort>();
             }

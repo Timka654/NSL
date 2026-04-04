@@ -1,0 +1,40 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<NSLProjectTypes>AnalyzerPackage</NSLProjectTypes>
+
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<Configurations>DebugExamples;Debug;Release</Configurations>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<Nullable>disable</Nullable>
+
+		<DevelopmentDependency>true</DevelopmentDependency>
+		<NoPackageAnalysis>true</NoPackageAnalysis>
+
+		<PublishRepositoryUrl>true</PublishRepositoryUrl>
+		<EmbedUntrackedSources>true</EmbedUntrackedSources>
+		<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+		<GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
+		<IncludeBuildOutput>false</IncludeBuildOutput>
+		<SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
+
+		<PackageId>NSL.Generators.RpcGenerator</PackageId>
+		<Version>$(VersionSuffix)</Version>
+		<Authors>Relife87</Authors>
+		<Description>Interface-based RPC source generator for NSL socket protocols</Description>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)'=='Debug'">
+		<PackageId>$(MSBuildProjectName)_Debug</PackageId>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Include="$(OutputPath)\*NSL.*.dll" Pack="true" PackagePath="analyzers/dotnet/cs" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\NSL.Generators.RpcGenerator.Shared\NSL.Generators.RpcGenerator.Shared.csproj" />
+		<ProjectReference Include="..\NSL.Generators.RpcGenerator.Core\NSL.Generators.RpcGenerator.Core.csproj" />
+	</ItemGroup>
+
+</Project>

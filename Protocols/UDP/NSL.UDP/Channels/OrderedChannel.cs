@@ -19,7 +19,8 @@ namespace NSL.UDP.Channels
         public OrderedChannel(BaseUDPClient<TClient, TParent> udpClient) : base(udpClient) { }
         public OrderedChannel(BaseUDPClient<TClient, TParent> udpClient, BaseChannel<TClient, TParent> parent) : this(udpClient)
         {
-            receivePidBuffer.Enqueue(uint.MaxValue);
+            receivedPidSet.TryAdd(uint.MaxValue, true);
+            receivedPidOrder.Enqueue(uint.MaxValue);
 
             this.parent = parent;
         }
@@ -28,7 +29,7 @@ namespace NSL.UDP.Channels
         {
             var pid = UDPPacket.ReadPID(data);
 
-            if (receivePidBuffer.Contains(pid))
+            if (receivedPidSet.ContainsKey(pid))
                 return;
 
             base.Receive(channel, data);
@@ -46,7 +47,7 @@ namespace NSL.UDP.Channels
                 //    Debug.Log($"received {packet.PID} - prev {packet.PID - 1} - next {packet.PID + 1}");
                 //} //ok
 
-                if (!receivePidBuffer.Contains(packet.PID - 1))
+                if (!receivedPidSet.ContainsKey(packet.PID - 1))
                 {
                     //Debug.Log($"recovery order dropped {packet.PID - 1}"); // ok
                     Action<uint> rcvHandle = default;
@@ -68,21 +69,24 @@ namespace NSL.UDP.Channels
                 }
             }
 
-            if (receivePidBuffer.Contains(packet.PID))
+            if (receivedPidSet.ContainsKey(packet.PID))
             {
                 packetReceiveBuffer.TryRemove(packet.PID, out _);
                 return;
             }
 
-            receivePidBuffer.Enqueue(packet.PID);
+            receivedPidSet.TryAdd(packet.PID, true);
+            receivedPidOrder.Enqueue(packet.PID);
 
-            if (receivePidBuffer.Count > 1000) // 5k max, next - freeze 
-                receivePidBuffer.TryDequeue(out _);
+            if (receivedPidOrder.Count > 1000) // 5k max, next - freeze
+                if (receivedPidOrder.TryDequeue(out var evicted))
+                    receivedPidSet.TryRemove(evicted, out _);
 
             base.ProcessPacket(channel, packet);
         }
 
 
-        private ConcurrentQueue<uint> receivePidBuffer = new ConcurrentQueue<uint>();
+        private readonly ConcurrentDictionary<uint, bool> receivedPidSet = new ConcurrentDictionary<uint, bool>();
+        private readonly ConcurrentQueue<uint> receivedPidOrder = new ConcurrentQueue<uint>();
     }
 }

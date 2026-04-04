@@ -27,5 +27,16 @@ namespace NSL.Generators.FillTypeGenerator.Attributes
 
         public Type FillType { get; }
         public string[] Models { get; }
+
+        /// <summary>
+        /// When true, generates a standalone DTO class containing all members included for each configured model.
+        /// </summary>
+        public bool Dto { get; set; }
+
+        /// <summary>
+        /// Suffix for the generated DTO class name to avoid conflicts when multiple generators produce DTOs
+        /// for the same type and model. Default is "Fill".
+        /// </summary>
+        public string DtoSuffix { get; set; } = "Fill";
     }
 }

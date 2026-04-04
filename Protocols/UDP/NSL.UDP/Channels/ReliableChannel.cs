@@ -86,7 +86,7 @@ namespace NSL.UDP.Channels
 
         private void ReceiveHandle(UDPChannelEnum channel, uint pid)
         {
-            var packet = ArrayPool<byte>.Shared.Rent(6);
+            var packet = ArrayPool<byte>.Shared.Rent(8);
 
             packet[0] = (byte)DgramHeadTypeEnum.ACK;
 
@@ -160,5 +160,12 @@ namespace NSL.UDP.Channels
         }
 
         private ConcurrentQueue<int> pings = new ConcurrentQueue<int>();
+
+        public override void CleanupStalePackets()
+        {
+            base.CleanupStalePackets();
+            orderedChannel?.CleanupStalePackets();
+            unorderedChannel?.CleanupStalePackets();
+        }
     }
 }

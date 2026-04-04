@@ -1,8 +1,6 @@
 ﻿using NSL.UDP.Enums;
 using System;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Security.Cryptography;
 
 namespace NSL.UDP.Packet
 {
@@ -23,14 +21,20 @@ namespace NSL.UDP.Packet
 		public static ushort GetChecksum(Span<byte> buffer)
 		{
 			emptySumBytes.CopyTo(buffer[2..]);
+			return ComputeCRC16(buffer);
+		}
 
-#if NET5_0_OR_GREATER
-			return (ushort)(SHA256.HashData(buffer.ToArray()).Sum(x => x) % ushort.MaxValue);
-#endif
-			using (var hasher = SHA256.Create())
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		private static ushort ComputeCRC16(Span<byte> buffer)
+		{
+			ushort crc = 0xFFFF;
+			foreach (var b in buffer)
 			{
-				return (ushort)(hasher.ComputeHash(buffer.ToArray()).Sum(x => x) % ushort.MaxValue);
+				crc ^= (ushort)(b << 8);
+				for (int i = 0; i < 8; i++)
+					crc = (crc & 0x8000) != 0 ? (ushort)((crc << 1) ^ 0x1021) : (ushort)(crc << 1);
 			}
+			return crc;
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]

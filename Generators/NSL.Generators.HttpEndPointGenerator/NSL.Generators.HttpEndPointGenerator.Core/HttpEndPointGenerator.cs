@@ -155,7 +155,7 @@ namespace NSL.Generators.HttpEndPointGenerator.Core
                         // 3. Extract all using directives from that specific file
                         var usings2 = root.DescendantNodes()
                             .OfType<UsingDirectiveSyntax>()
-                            .Select(u => u.ToString().Trim()) // Returns "using System;" etc.
+                            .Select(u => string.Join(" ", u.ToString().Split(' ').Skip(1)).TrimEnd(';').Trim()) // Returns "using System;" etc.
                             .ToList();
 
                         usings.AddRange(usings2);

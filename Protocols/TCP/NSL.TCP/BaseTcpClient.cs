@@ -365,6 +365,9 @@ namespace NSL.TCP
             rBuff = null;
             length = InputPacketBuffer.DefaultHeaderLength;
             offset = 0;
+            soffset = 0;
+            poffset = 0;
+            hSkip = 0;
         }
 
 
@@ -432,7 +435,7 @@ namespace NSL.TCP
 
                 rBuff.OnDispose += (rBuff) =>
                 {
-                    if (rBuff.ManualDisposing)
+                    if (!rBuff.ManualDisposing)
                         byteArrayPool.Return(rBuff.Data);
                 };
 
@@ -666,10 +669,8 @@ namespace NSL.TCP
 
             int s = (int)(buf.Length % segmentSize);
 
-            s = (int)(segmentSize - s);
-
             if (s > 0)
-                args.BufferList.Add(new ArraySegment<byte>(emptyArray, 0, s));
+                args.BufferList.Add(new ArraySegment<byte>(emptyArray, 0, (int)(segmentSize - s)));
 
             args.BufferList = args.BufferList;
 
@@ -697,7 +698,12 @@ namespace NSL.TCP
             return sclient.Connected;
         }
 
-        protected bool disconnected = true;
+        private int _disconnectedFlag = 1;
+        protected bool disconnected
+        {
+            get => _disconnectedFlag == 1;
+            set => Interlocked.Exchange(ref _disconnectedFlag, value ? 1 : 0);
+        }
 
         public void Disconnect(Exception ex)
         {
@@ -708,10 +714,8 @@ namespace NSL.TCP
 
         public void Disconnect()
         {
-            if (disconnected == true)
+            if (Interlocked.CompareExchange(ref _disconnectedFlag, 1, 0) != 0)
                 return;
-
-            disconnected = true;
 
             if (rBuff != null)
             {

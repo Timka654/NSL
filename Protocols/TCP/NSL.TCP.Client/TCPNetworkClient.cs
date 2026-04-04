@@ -88,10 +88,9 @@ namespace NSL.TCP.Client
 
                 CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
 
-                //await client.ConnectAsync(ConnectionOptions.IpAddress, ConnectionOptions.Port);
                 cancellationTokenSource.CancelAfter(connectionTimeOut);
 
-                await Task.Run(() => client.ConnectAsync(ip, ConnectionOptions.Port), cancellationTokenSource.Token);
+                await client.ConnectAsync(ip, ConnectionOptions.Port, cancellationTokenSource.Token);
 
                 Reconnect(client);
 

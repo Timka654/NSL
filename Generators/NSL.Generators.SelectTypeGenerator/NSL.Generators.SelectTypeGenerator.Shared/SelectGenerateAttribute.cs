@@ -19,5 +19,11 @@ namespace NSL.Generators.SelectTypeGenerator.Attributes
         public bool Typed { get; set; }
 
         public bool Dto { get; set; }
+
+        /// <summary>
+        /// Suffix appended to generated DTO class name to avoid conflicts when multiple generators produce DTOs for the same type and model.
+        /// Default is empty (no suffix). Example: "Select" → "MyTypeDtoMyModelSelectModel".
+        /// </summary>
+        public string DtoSuffix { get; set; } = "";
     }
 }

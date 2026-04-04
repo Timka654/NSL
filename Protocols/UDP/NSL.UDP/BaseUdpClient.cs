@@ -117,6 +117,9 @@ namespace NSL.UDP
 
                 currentReceiveRate = 0;
 
+                reliableChannel?.CleanupStalePackets();
+                unreliableChannel?.CleanupStalePackets();
+
                 if (Data != null && Data.AliveState == false)
                     Disconnect();
             });
@@ -322,15 +325,20 @@ namespace NSL.UDP
 
         private void PacketFailProd(PacketWaitTemp packet)
         {
-            var dataArray = new byte[packet.Head.Length + packet.Parts.Sum(x => x.Length)];
+            var parts = packet.Parts?.ToArray() ?? Array.Empty<Memory<byte>>();
 
-            Memory<byte> data = new Memory<byte>(dataArray);
+            var dataArray = new byte[packet.Head.Length + parts.Sum(x => x.Length)];
+
+            var data = new Memory<byte>(dataArray);
 
             packet.Head.CopyTo(data);
 
-            foreach (var item in packet.Parts)
+            var offset = packet.Head.Length;
+
+            foreach (var item in parts)
             {
-                item.CopyTo(data);
+                item.CopyTo(data[offset..]);
+                offset += item.Length;
             }
 
             Data?.OnPacketSendFail(dataArray, 0, dataArray.Length);

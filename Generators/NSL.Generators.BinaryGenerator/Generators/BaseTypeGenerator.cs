@@ -52,6 +52,10 @@ namespace NSL.Generators.BinaryGenerator.Generators
                 nameof(InputPacketBuffer.ReadInt64)
             },
             {
+                typeof(Int128).Name,
+                nameof(InputPacketBuffer.ReadInt128)
+            },
+            {
                 typeof(ushort).Name,
                 nameof(InputPacketBuffer.ReadUInt16)
             },
@@ -62,6 +66,10 @@ namespace NSL.Generators.BinaryGenerator.Generators
             {
                 typeof(ulong).Name,
                 nameof(InputPacketBuffer.ReadUInt64)
+            },
+            {
+                typeof(UInt128).Name,
+                nameof(InputPacketBuffer.ReadUInt128)
             },
             {
                 typeof(float).Name,
@@ -112,6 +120,10 @@ namespace NSL.Generators.BinaryGenerator.Generators
                 nameof(OutputPacketBuffer.WriteInt64)
             },
             {
+                typeof(Int128).Name,
+                nameof(OutputPacketBuffer.WriteInt128)
+            },
+            {
                 typeof(ushort).Name,
                 nameof(OutputPacketBuffer.WriteUInt16)
             },
@@ -122,6 +134,10 @@ namespace NSL.Generators.BinaryGenerator.Generators
             {
                 typeof(ulong).Name,
                 nameof(OutputPacketBuffer.WriteUInt64)
+            },
+            {
+                typeof(UInt128).Name,
+                nameof(OutputPacketBuffer.WriteUInt128)
             },
             {
                 typeof(float).Name,

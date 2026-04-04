@@ -5,7 +5,7 @@ using System.Net;
 using System.Net.Sockets;
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Threading;
 
 namespace NSL.LocalBridge
 {
@@ -98,12 +98,10 @@ namespace NSL.LocalBridge
 
         public void Disconnect()
         {
-            var c = otherClient;
+            var c = Interlocked.Exchange(ref otherClient, null);
 
             if (c == null)
                 return;
-
-            otherClient = null;
 
             normalOptions.CallClientDisconnectEvent(clientData);
 
@@ -114,7 +112,7 @@ namespace NSL.LocalBridge
             => connectionEndPoint;
 
         public Socket GetSocket()
-            => new Socket(SocketType.Unknown, ProtocolType.Unknown);
+            => null;
 
         public bool GetState()
             => otherClient != null;
@@ -133,15 +131,20 @@ namespace NSL.LocalBridge
             OnSend(packet, "");
 #endif
 
-            Send(packet.CompilePacket());
-
-            if (disposeOnSend)
-                packet.Dispose();
+            try
+            {
+                Send(packet.CompilePacket());
+            }
+            finally
+            {
+                if (disposeOnSend)
+                    packet.Dispose();
+            }
         }
 
         public void Send(byte[] buf)
         {
-            otherClient.Receive(buf);
+            otherClient?.Receive(buf);
         }
 
         public void Send(byte[] buf, int offset, int length)
@@ -172,7 +175,7 @@ namespace NSL.LocalBridge
         {
             var pbuff = new InputPacketBuffer(buf);
 
-            pbuff.SetData(buf[InputPacketBuffer.DefaultHeaderLength..].ToArray());
+            pbuff.SetData(buf[InputPacketBuffer.DefaultHeaderLength..]);
 
             OnReceive(pbuff.PacketId, pbuff.PacketLength);
 
@@ -180,7 +183,10 @@ namespace NSL.LocalBridge
             try
             {
                 //ищем пакет и выполняем его, передаем ему данные сессии, полученные данные
-                PacketHandles[pbuff.PacketId](clientData, pbuff);
+                if (!PacketHandles.TryGetValue(pbuff.PacketId, out var handle))
+                    return;
+
+                handle(clientData, pbuff);
             }
             catch (Exception ex)
             {
