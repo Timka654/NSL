@@ -4,6 +4,7 @@ using System.Buffers.Binary;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace NSL.SocketCore.Utils.Buffer
@@ -198,10 +199,10 @@ namespace NSL.SocketCore.Utils.Buffer
         /// </summary>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public long ReadInt128()
+        public Int128 ReadInt128()
         {
             DataPosition += 16;
-            return BinaryPrimitives.ReadInt128LittleEndian(data.AsSpan(DataPosition - 16));
+            return MemoryMarshal.Read<Int128>(data.AsSpan(DataPosition - 16));
         }
 
         /// <summary>
@@ -221,10 +222,10 @@ namespace NSL.SocketCore.Utils.Buffer
         /// </summary>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public long ReadUInt128()
+        public UInt128 ReadUInt128()
         {
             DataPosition += 16;
-            return BinaryPrimitives.ReadUInt128LittleEndian(data.AsSpan(DataPosition - 16));
+            return MemoryMarshal.Read<UInt128>(data.AsSpan(DataPosition - 16));
         }
 
         /// <summary>

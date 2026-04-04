@@ -2,19 +2,32 @@
 
 	<PropertyGroup>
 		<NSLProjectTypes>Test</NSLProjectTypes>
+
 		<TargetFramework>net10.0</TargetFramework>
-		<Nullable>disable</Nullable>
-		<IsPackable>false</IsPackable>
-		<Version>$(VersionSuffix)</Version>
 		<Configurations>DebugExamples</Configurations>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<Nullable>disable</Nullable>
+
+		<PublishRepositoryUrl>true</PublishRepositoryUrl>
+		<EmbedUntrackedSources>true</EmbedUntrackedSources>
+		<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+		<GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
+
+		<Version>$(VersionSuffix)</Version>
+		<Authors>Relife87</Authors>
+
+		<IsPackable>false</IsPackable>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)'=='Debug'">
+		<PackageId>$(MSBuildProjectName)_Debug</PackageId>
 	</PropertyGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\\..\\..\\..\\Core\\NSL.SocketCore\\NSL.SocketCore.csproj" />
+		<ProjectReference Include="..\..\..\..\Core\NSL.SocketCore\NSL.SocketCore.csproj" />
 		<ProjectReference Include="..\..\NSL.Generators.RpcGenerator.Shared\NSL.Generators.RpcGenerator.Shared.csproj" />
 		<ProjectReference Include="..\..\..\NSL.Generators.BinaryTypeIOGenerator\NSL.Generators.BinaryTypeIOGenerator.Shared\NSL.Generators.BinaryTypeIOGenerator.Shared.csproj" />
-		<ProjectReference Include="..\..\..\NSL.Generators.BinaryTypeIOGenerator\NSL.Generators.BinaryTypeIOGenerator.Core\NSL.Generators.BinaryTypeIOGenerator.Core.csproj"
-		                  ReferenceOutputAssembly="false" PrivateAssets="all" OutputItemType="Analyzer" />
+		<ProjectReference Include="..\..\..\NSL.Generators.BinaryTypeIOGenerator\NSL.Generators.BinaryTypeIOGenerator.Core\NSL.Generators.BinaryTypeIOGenerator.Core.csproj" ReferenceOutputAssembly="false" PrivateAssets="all" OutputItemType="Analyzer" />
 	</ItemGroup>
 
 </Project>
