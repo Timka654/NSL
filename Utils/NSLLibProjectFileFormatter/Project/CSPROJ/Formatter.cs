@@ -450,13 +450,18 @@ namespace NSLLibProjectFileFormatter.Project.CSPROJ
                         var analyzerCore = HasAnalyzerCoreTarget(NSLProjectTypes);
 
                         if (analyzerUtils)
+                        {
                             tf = "netstandard2.0";
+                            if(NSLProjectTypes.Contains("Core", StringComparer.OrdinalIgnoreCase))
+                                tf += ";net10.0";
 
+                        }
                         tb.WritePropertyItem("NSLProjectTypes", string.Join(';', NSLProjectTypes))
                         .AppendLine();
 
 
-                        tb.WritePropertyItem("TargetFramework", tf)
+                        tb.WritePropertyItem("TargetFramework", tf, tf.IndexOf(';') == -1)
+                          .WritePropertyItem("TargetFrameworks", tf, tf.IndexOf(';') != -1)
                           .WritePropertyItem("Configurations", string.Join(';', configurations.Distinct()))
                           .WritePropertyItem("AllowUnsafeBlocks", true)
                           .WritePropertyItem("Nullable", "disable")
