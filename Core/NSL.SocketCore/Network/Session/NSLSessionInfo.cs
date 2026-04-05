@@ -1,7 +1,7 @@
 ﻿using NSL.Generators.BinaryTypeIOGenerator.Shared;
 using System;
 
-namespace NSL.SocketCore.Utils.Session
+namespace NSL.SocketCore.Network.Session
 {
     [NSLBIOType]
     public partial class NSLSessionInfo

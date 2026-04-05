@@ -1,7 +1,7 @@
-using NSL.SocketCore.Utils;
+﻿using NSL.SocketCore.Utils;
 using NSL.SocketCore.Utils.Buffer;
 using NSL.SocketCore.Utils.Request;
-using NSL.SocketCore.Utils.Version;
+using NSL.SocketCore.Network.Version;
 
 namespace NSL.SocketServer.Utils.Version.Packets
 {

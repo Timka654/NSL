@@ -1,4 +1,4 @@
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using NSL.BuilderExtensions.SocketCore;
 using NSL.BuilderExtensions.TCPClient;
 using NSL.BuilderExtensions.TCPServer;
@@ -11,7 +11,7 @@ using NSL.SocketCore.Utils.Buffer;
 using NSL.SocketCore.Utils.Logger;
 using NSL.SocketServer.Utils;
 using NSL.TCP.Client;
-using NSL.SocketCore.Utils.Session;
+using NSL.SocketCore.Network.Session;
 using NSL.SocketCore.Utils.Request;
 using NSL.SocketClient.Utils.Session.Packets;
 using NSL.SocketCore;

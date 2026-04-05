@@ -1,10 +1,10 @@
-using NSL.SocketClient;
+﻿using NSL.SocketClient;
 using NSL.SocketClient.Utils.Session.Packets;
 using NSL.SocketCore;
 using NSL.SocketCore.Utils;
 using NSL.SocketCore.Utils.Buffer;
 using NSL.SocketCore.Utils.Request;
-using NSL.SocketCore.Utils.Session;
+using NSL.SocketCore.Network.Session;
 using System;
 
 namespace NSL.SocketClient.Utils.Session

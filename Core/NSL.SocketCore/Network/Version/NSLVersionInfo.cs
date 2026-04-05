@@ -1,6 +1,7 @@
 ﻿using NSL.Generators.BinaryTypeIOGenerator.Shared;
+using NSL.SocketCore.Utils;
 
-namespace NSL.SocketCore.Utils.Version
+namespace NSL.SocketCore.Network.Version
 {
     [NSLBIOType]
     public partial class NSLVersionInfo

@@ -1,4 +1,4 @@
-﻿using NSL.SocketCore.Utils.Session;
+﻿using NSL.SocketCore.Network.Session;
 using NSL.Generators.BinaryTypeIOGenerator.Shared;
 using System.Collections.Generic;
 

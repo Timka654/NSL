@@ -1,7 +1,7 @@
-using NSL.SocketCore;
+﻿using NSL.SocketCore;
 using NSL.SocketCore.Utils;
 using NSL.SocketCore.Utils.Logger.Enums;
-using NSL.SocketCore.Utils.Session;
+using NSL.SocketCore.Network.Session;
 using NSL.SocketServer;
 using NSL.SocketServer.Utils;
 using NSL.SocketServer.Utils.Session.Packets;

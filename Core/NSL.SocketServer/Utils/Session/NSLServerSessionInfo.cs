@@ -1,4 +1,4 @@
-using NSL.SocketCore.Utils.Session;
+﻿using NSL.SocketCore.Network.Session;
 using NSL.SocketServer.Utils;
 using System;
 

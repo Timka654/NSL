@@ -1,6 +1,6 @@
 ﻿using NSL.Generators.BinaryTypeIOGenerator.Shared;
 
-namespace NSL.SocketCore.Utils.Session
+namespace NSL.SocketCore.Network.Session
 {
     [NSLBIOType]
     public partial class NSLRecoverySessionResult

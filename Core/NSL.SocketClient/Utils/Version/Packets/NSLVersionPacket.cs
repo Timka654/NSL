@@ -1,8 +1,8 @@
-using NSL.SocketCore;
+﻿using NSL.SocketCore;
 using NSL.SocketCore.Utils;
 using NSL.SocketCore.Utils.Buffer;
 using NSL.SocketCore.Utils.Request;
-using NSL.SocketCore.Utils.Version;
+using NSL.SocketCore.Network.Version;
 using System;
 using System.Threading;
 using System.Threading.Tasks;

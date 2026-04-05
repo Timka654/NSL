@@ -1,4 +1,4 @@
-using NSL.SocketCore.Utils.Version;
+﻿using NSL.SocketCore.Network.Version;
 
 namespace NSL.SocketServer.Utils.Version
 {

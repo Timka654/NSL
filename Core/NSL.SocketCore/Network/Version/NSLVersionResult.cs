@@ -1,6 +1,6 @@
 ﻿using NSL.Generators.BinaryTypeIOGenerator.Shared;
 
-namespace NSL.SocketCore.Utils.Version
+namespace NSL.SocketCore.Network.Version
 {
     [NSLBIOType("Response")]
     public partial class NSLVersionResult

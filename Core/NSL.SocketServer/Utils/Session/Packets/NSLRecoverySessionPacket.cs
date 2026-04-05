@@ -1,7 +1,7 @@
-using NSL.SocketCore.Utils;
+﻿using NSL.SocketCore.Utils;
 using NSL.SocketCore.Utils.Buffer;
 using NSL.SocketCore.Utils.Request;
-using NSL.SocketCore.Utils.Session;
+using NSL.SocketCore.Network.Session;
 using System.Threading.Tasks;
 
 namespace NSL.SocketServer.Utils.Session.Packets
