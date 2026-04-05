@@ -1,5 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
+using NSL.SocketCore;
 using NSL.SocketCore.Utils.Logger.Enums;
+
 
 namespace NSL.Logger.AspNet
 {

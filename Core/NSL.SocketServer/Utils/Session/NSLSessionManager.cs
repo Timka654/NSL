@@ -1,5 +1,6 @@
 using NSL.SocketCore;
 using NSL.SocketCore.Utils;
+using NSL.SocketCore.Utils.Logger.Enums;
 using NSL.SocketCore.Utils.Session;
 using NSL.SocketServer;
 using NSL.SocketServer.Utils;
@@ -64,7 +65,7 @@ namespace NSL.SocketServer.Utils.Session
                     await options.OnExpiredSession(waitClose.Client, waitClose);
                 }
                 catch (TaskCanceledException) { return; }
-                catch (Exception ex) { networkOptions.HelperLogger?.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Error, ex.ToString()); }
+                catch (Exception ex) { networkOptions.HelperLogger?.Append(LoggerLevel.Error, ex.ToString()); }
             }
         }
 

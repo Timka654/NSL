@@ -1,5 +1,7 @@
 ﻿using NSL.BuilderExtensions.WebSocketsClient;
 using NSL.Node.BridgeLobbyClient.Models;
+using NSL.SocketCore;
+using NSL.SocketCore.Utils.Logger.Enums;
 using NSL.WebSockets.Client;
 using System;
 using System.Threading.Tasks;
@@ -32,7 +34,7 @@ namespace NSL.Node.BridgeLobbyClient
 
             if (!await wsNetwork.ConnectAsync(3000))
             {
-                network.Network.Options.HelperLogger?.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Error, "Cannot connect");
+                network.Network.Options.HelperLogger?.Append(LoggerLevel.Error, "Cannot connect");
 
                 return false;
             }

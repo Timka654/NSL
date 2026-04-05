@@ -14,6 +14,8 @@ using NSL.SocketCore.Utils.Buffer;
 using NSL.SocketCore.Utils.Request;
 using NSL.Utils;
 using NSL.Node.Core.Enums;
+using NSL.SocketCore;
+using NSL.SocketCore.Utils.Logger.Enums;
 
 namespace NSL.Node.RoomServer.Client
 {
@@ -101,7 +103,7 @@ namespace NSL.Node.RoomServer.Client
                     {
                         var sSession = session as NSLServerSessionInfo<TransportNetworkClient>;
 
-                        options.HelperLogger?.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Info, $"Try recovery session {sSession.Session} from {client.Network?.GetRemotePoint()}");
+                        options.HelperLogger?.Append(LoggerLevel.Info, $"Try recovery session {sSession.Session} from {client.Network?.GetRemotePoint()}");
 
                         //client.Network.ChangeUserData(sSession.Client);
 
@@ -129,7 +131,7 @@ namespace NSL.Node.RoomServer.Client
 
                         if (sSession != null)
                         {
-                            options.HelperLogger?.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Info, $"Session expired {sSession.Session}");
+                            options.HelperLogger?.Append(LoggerLevel.Info, $"Session expired {sSession.Session}");
                         }
 
                         network.Room?.DisconnectNode(network);

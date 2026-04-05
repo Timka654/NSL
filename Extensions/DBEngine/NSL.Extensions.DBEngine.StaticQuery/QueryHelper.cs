@@ -1,4 +1,6 @@
-﻿using NSL.SocketCore.Utils.Logger.Enums;
+﻿
+using NSL.SocketCore;
+using NSL.SocketCore.Utils.Logger.Enums;
 using NSL.SocketServer;
 using NSL.SocketServer.Utils;
 using System;

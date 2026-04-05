@@ -45,7 +45,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Compile Include="..\..\..\Core\NSL.SocketCore\**\*.cs" Exclude="..\..\..\Core\NSL.SocketCore\**\bin\**;..\..\..\Core\NSL.SocketCore\**\obj\**">
+		<Compile Include="..\..\..\Core\NSL.SocketCore\**\*.cs" Exclude="..\..\..\Core\NSL.SocketCore\**\bin\**;..\..\..\Core\NSL.SocketCore\**\obj\**;..\..\..\Core\NSL.SocketCore\**\Modules\**">
 		  <Link>NSL.SocketCore\%(RecursiveDir)%(FileName)%(Extension)</Link>
 		</Compile>
 	</ItemGroup>

@@ -1,5 +1,7 @@
-﻿using NSL.SocketCore.Utils.Logger;
+﻿using NSL.SocketCore;
+using NSL.SocketCore.Utils.Logger;
 using NSL.SocketCore.Utils.Logger.Enums;
+
 
 namespace NSL.Logger
 {

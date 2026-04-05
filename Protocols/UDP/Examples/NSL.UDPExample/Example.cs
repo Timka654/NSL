@@ -1,5 +1,7 @@
-﻿using NSL.SocketCore.Utils.Cipher;
+﻿using NSL.SocketCore;
+using NSL.SocketCore.Utils.Cipher;
 using NSL.SocketCore.Utils.Logger;
+using NSL.SocketCore.Utils.Logger.Enums;
 using NSL.UDP;
 using NSL.UDP.Info;
 using NSL.UDP.Interface;
@@ -60,17 +62,17 @@ namespace NSL.UDPExample
 
         private void Options_OnExceptionEvent(Exception ex, NetworkClient client)
         {
-            options.HelperLogger.Append(NSL.SocketCore.Utils.Logger.Enums.LoggerLevel.Error, ex.ToString());
+            options.HelperLogger.Append(LoggerLevel.Error, ex.ToString());
         }
 
         private void Options_OnClientConnectEvent(NetworkClient client)
         {
-            options.HelperLogger.Append(NSL.SocketCore.Utils.Logger.Enums.LoggerLevel.Info, $"Client Connected");
+            options.HelperLogger.Append(LoggerLevel.Info, $"Client Connected");
         }
 
         private void Options_OnClientDisconnectEvent(NetworkClient client)
         {
-            options.HelperLogger.Append(NSL.SocketCore.Utils.Logger.Enums.LoggerLevel.Info, $"Client disconnected");
+            options.HelperLogger.Append(LoggerLevel.Info, $"Client disconnected");
         }
     }
 }

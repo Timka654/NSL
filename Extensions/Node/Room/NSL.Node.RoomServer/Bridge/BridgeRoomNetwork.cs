@@ -1,5 +1,7 @@
 ﻿using NSL.BuilderExtensions.WebSocketsClient;
 using NSL.Logger;
+using NSL.SocketCore;
+using NSL.SocketCore.Utils.Logger.Enums;
 using NSL.WebSockets.Client;
 using System;
 using System.Collections.Generic;
@@ -31,7 +33,7 @@ namespace NSL.Node.RoomServer.Bridge
 
             if (!await wsNetwork.ConnectAsync(3000))
             {
-                Logger?.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Error, "Cannot connect");
+                Logger?.Append(LoggerLevel.Error, "Cannot connect");
 
                 Reconnect();
 

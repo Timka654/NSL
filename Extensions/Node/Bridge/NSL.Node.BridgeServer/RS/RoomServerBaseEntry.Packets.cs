@@ -3,7 +3,9 @@ using NSL.Logger;
 using NSL.Node.BridgeServer.Shared.Message;
 using NSL.Node.BridgeServer.Shared.Requests;
 using NSL.Node.BridgeServer.Shared.Response;
+using NSL.SocketCore;
 using NSL.SocketCore.Utils.Buffer;
+using NSL.SocketCore.Utils.Logger.Enums;
 using NSL.SocketCore.Utils.Request;
 
 using System.Threading.Tasks;
@@ -79,7 +81,7 @@ namespace NSL.Node.BridgeServer.RS
 
             result.WriteFullTo(response);
 
-            client.ServerOptions.HelperLogger?.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Info, JsonConvert.SerializeObject(result));
+            client.ServerOptions.HelperLogger?.Append(LoggerLevel.Info, JsonConvert.SerializeObject(result));
 
             client.Network?.Send(response);
         }

@@ -7,6 +7,7 @@ using NSL.SocketCore.Utils.Logger;
 using NSL.Node.P2Proxy.Proxy.Data;
 using NSL.BuilderExtensions.SocketCore;
 using NSL.Node.Core.Enums;
+using NSL.SocketCore;
 
 namespace NSL.Node.P2Proxy.Proxy
 {

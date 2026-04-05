@@ -2,7 +2,9 @@ using NSL.Node.Core.Enums;
 using NSL.Node.Core.Models.Requests;
 using NSL.Node.Core.Models.Response;
 using NSL.Node.RoomServer.Client.Data;
+using NSL.SocketCore;
 using NSL.SocketCore.Utils.Buffer;
+using NSL.SocketCore.Utils.Logger.Enums;
 using NSL.SocketCore.Utils.Request;
 using System;
 using System.Diagnostics;
@@ -50,7 +52,7 @@ namespace NSL.Node.RoomServer.Client
 
             client.EndPoint = request.ConnectionEndPoint;
 
-            Logger?.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Info, $"RoomId {request.RoomId}, Token {request.Token} connect");
+            Logger?.Append(LoggerLevel.Info, $"RoomId {request.RoomId}, Token {request.Token} connect");
 
             var test = Stopwatch.StartNew();
 
@@ -70,11 +72,11 @@ namespace NSL.Node.RoomServer.Client
 
                 if (!validatePlayer.ExistsSession)
                 {
-                    Logger?.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Error, $"RoomId {request.RoomId}, Token {request.Token} - not found session!!");
+                    Logger?.Append(LoggerLevel.Error, $"RoomId {request.RoomId}, Token {request.Token} - not found session!!");
 
                     if (roomMap.TryRemove(request.SessionId, out var expiredSession))
                     {
-                        client.Network?.Options.HelperLogger?.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Info, $" - [SignIn] Remove session {request.SessionId} by no exists information on Bridge");
+                        client.Network?.Options.HelperLogger?.Append(LoggerLevel.Info, $" - [SignIn] Remove session {request.SessionId} by no exists information on Bridge");
                         expiredSession.Value.Dispose();
                     }
                 }
@@ -97,18 +99,18 @@ namespace NSL.Node.RoomServer.Client
                         result.SessionInfo = session;
                     }
                     else
-                        Logger?.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Error, $"RoomId {request.RoomId}, Token {request.Token} - cannot add to room");
+                        Logger?.Append(LoggerLevel.Error, $"RoomId {request.RoomId}, Token {request.Token} - cannot add to room");
                 }
                 else
-                    Logger?.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Error, $"RoomId {request.RoomId}, Token {request.Token} - not exists player!!");
+                    Logger?.Append(LoggerLevel.Error, $"RoomId {request.RoomId}, Token {request.Token} - not exists player!!");
             }
             else
-                Logger?.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Error, $"RoomId {request.RoomId}, Token {request.Token} - room info not found!!");
+                Logger?.Append(LoggerLevel.Error, $"RoomId {request.RoomId}, Token {request.Token} - room info not found!!");
 
             if (signInPerfMax < test.Elapsed)
             {
                 signInPerfMax = test.Elapsed;
-                Logger?.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Info, $"perfMax {signInPerfMax.TotalMilliseconds}ms");
+                Logger?.Append(LoggerLevel.Info, $"perfMax {signInPerfMax.TotalMilliseconds}ms");
             }
             result.WriteFullTo(response);
 

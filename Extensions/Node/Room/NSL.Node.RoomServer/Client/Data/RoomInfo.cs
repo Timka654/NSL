@@ -2,8 +2,10 @@
 using NSL.Node.Core;
 using NSL.Node.Core.Enums;
 using NSL.Node.Core.Models.Message;
+using NSL.SocketCore;
 using NSL.SocketCore.Utils;
 using NSL.SocketCore.Utils.Buffer;
+using NSL.SocketCore.Utils.Logger.Enums;
 using NSL.UDP;
 using NSL.Utils;
 using System;
@@ -222,11 +224,11 @@ namespace NSL.Node.RoomServer.Client.Data
                 else
                     SendTo(node, CreateReadyRoomPacket());
 
-                Entry.Logger?.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Debug, $"connectPlayer {node.Id} send ready on {test.ElapsedMilliseconds}ms");
+                Entry.Logger?.Append(LoggerLevel.Debug, $"connectPlayer {node.Id} send ready on {test.ElapsedMilliseconds}ms");
             }
             else
             {
-                Entry.Logger?.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Debug, $"connectPlayer {node.Id} not equals");
+                Entry.Logger?.Append(LoggerLevel.Debug, $"connectPlayer {node.Id} not equals");
             }
 
             if (isLocked)
@@ -519,7 +521,7 @@ namespace NSL.Node.RoomServer.Client.Data
             }
             catch (Exception ex)
             {
-                Entry.Logger.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Error, $"{nameof(Execute)} {nameof(client.Id)} throw error\r\n{ex}");
+                Entry.Logger.Append(LoggerLevel.Error, $"{nameof(Execute)} {nameof(client.Id)} throw error\r\n{ex}");
             }
         }
 

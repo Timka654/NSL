@@ -483,7 +483,7 @@ namespace NSL.TCP
                 ResetBuffer();
 #if DEBUGEXAMPLES
                 if (c % 10000 == 0)
-                    options.HelperLogger?.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Debug, $"{c}, {sw.Elapsed.TotalMilliseconds}");
+                    options.HelperLogger?.Append(LoggerLevel.Debug, $"{c}, {sw.Elapsed.TotalMilliseconds}");
 #endif
             }
         }

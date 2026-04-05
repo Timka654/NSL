@@ -15,6 +15,8 @@ using System.Threading;
 using NSL.SocketCore.Utils.Logger;
 using System.Collections.Generic;
 using NSL.SocketCore.Utils.Request;
+using NSL.SocketCore;
+using NSL.SocketCore.Utils.Logger.Enums;
 
 namespace NSL.Node.RoomServer.Bridge
 {
@@ -94,13 +96,13 @@ namespace NSL.Node.RoomServer.Bridge
 
                 if (!(await TrySign()).Result)
                 {
-                    Logger?.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Error, "Invalid identity data");
+                    Logger?.Append(LoggerLevel.Error, "Invalid identity data");
                     client.Network.Disconnect();
                     return;
                 }
 
 
-                Logger?.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Info, "Success connected");
+                Logger?.Append(LoggerLevel.Info, "Success connected");
 
                 OnStateChanged(State);
             });

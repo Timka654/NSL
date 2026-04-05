@@ -10,6 +10,8 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using NSL.SocketCore.Utils.Request;
+using NSL.SocketCore;
+using NSL.SocketCore.Utils.Logger.Enums;
 
 namespace NSL.Node.BridgeLobbyClient
 {
@@ -92,12 +94,12 @@ namespace NSL.Node.BridgeLobbyClient
 
             if (!await TrySign(CancellationToken.None))
             {
-                network.Network.Options.HelperLogger?.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Error, "Invalid identity data");
+                network.Network.Options.HelperLogger?.Append(LoggerLevel.Error, "Invalid identity data");
                 client.Network.Disconnect();
                 return;
             }
 
-            network.Network.Options.HelperLogger?.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Info, "Success connected");
+            network.Network.Options.HelperLogger?.Append(LoggerLevel.Info, "Success connected");
 
             OnStateChanged(State);
         }

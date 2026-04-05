@@ -1,4 +1,5 @@
 ﻿using NSL.Logger.Interface;
+using NSL.SocketCore;
 using NSL.SocketCore.Utils.Logger.Enums;
 using System;
 using System.Threading.Channels;

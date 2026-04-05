@@ -6,12 +6,13 @@ using NSL.SocketCore.Utils.Buffer;
 using NSL.SocketCore.Utils.Request;
 using NSL.SocketCore.Utils.Exceptions;
 using NSL.SocketCore.Utils.Logger;
-using NSL.SocketCore.Utils.Logger.Enums;
+
 using NSL.SocketCore.Utils.Packet;
 using System;
 using System.Net.Sockets;
 using System.Reflection;
 using static NSL.SocketCore.Utils.Request.RequestExtensions;
+using NSL.SocketCore.Utils.Logger.Enums;
 
 namespace NSL.BuilderExtensions.SocketCore
 {

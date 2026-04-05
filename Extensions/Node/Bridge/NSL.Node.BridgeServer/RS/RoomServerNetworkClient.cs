@@ -1,4 +1,6 @@
-﻿using NSL.SocketServer.Utils;
+﻿using NSL.SocketCore;
+using NSL.SocketCore.Utils.Logger.Enums;
+using NSL.SocketServer.Utils;
 using NSL.WebSockets.Server.AspNetPoint;
 using System;
 using System.Collections.Concurrent;
@@ -32,7 +34,7 @@ namespace NSL.Node.BridgeServer.RS
         {
             while (!SessionMap.TryAdd(session.SessionId = Guid.NewGuid(), session)) ;
 
-            base.Network.Options.HelperLogger?.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Info, $"Create new session Active: {session.Active}, CreateTime: {session.CreateTime}, RoomIdentity: {session.RoomIdentity}, SessionId: {session.SessionId}");
+            base.Network.Options.HelperLogger?.Append(LoggerLevel.Info, $"Create new session Active: {session.Active}, CreateTime: {session.CreateTime}, RoomIdentity: {session.RoomIdentity}, SessionId: {session.SessionId}");
 
             session.OnDestroy += session => removeSession(session);
 
@@ -49,7 +51,7 @@ namespace NSL.Node.BridgeServer.RS
 
         private void removeSession(RoomSession session )
         {
-            base.Network.Options.HelperLogger?.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Info, $"Remove session Active: {session.Active}, CreateTime: {session.CreateTime}, RoomIdentity: {session.RoomIdentity}, SessionId: {session.SessionId} {Environment.StackTrace}");
+            base.Network.Options.HelperLogger?.Append(LoggerLevel.Info, $"Remove session Active: {session.Active}, CreateTime: {session.CreateTime}, RoomIdentity: {session.RoomIdentity}, SessionId: {session.SessionId} {Environment.StackTrace}");
 
         }
 

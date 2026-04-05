@@ -1,4 +1,6 @@
-﻿using NSL.SocketCore.Utils.Logger;
+﻿using NSL.SocketCore;
+using NSL.SocketCore.Utils.Logger;
+using NSL.SocketCore.Utils.Logger.Enums;
 using NSL.UDP;
 using NSL.UDP.Client;
 
@@ -31,12 +33,12 @@ namespace NSL.UDPExample
 
         private void Listener_OnSendPacket(UDPClient<NetworkClient> client, ushort pid, int len, string stacktrace)
         {
-            options.HelperLogger.Append(NSL.SocketCore.Utils.Logger.Enums.LoggerLevel.Debug, $"Send {pid}----{len}bytes to {client.GetRemotePoint()}");
+            options.HelperLogger.Append(LoggerLevel.Debug, $"Send {pid}----{len}bytes to {client.GetRemotePoint()}");
         }
 
         private void Listener_OnReceivePacket(UDPClient<NetworkClient> client, ushort pid, int len)
         {
-            options.HelperLogger.Append(NSL.SocketCore.Utils.Logger.Enums.LoggerLevel.Debug, $"Receive {pid}----{len}bytes from {client.GetRemotePoint()}");
+            options.HelperLogger.Append(LoggerLevel.Debug, $"Receive {pid}----{len}bytes from {client.GetRemotePoint()}");
         }
     }
 }

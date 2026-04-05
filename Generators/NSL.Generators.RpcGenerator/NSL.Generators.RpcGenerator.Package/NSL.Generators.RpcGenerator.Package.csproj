@@ -33,7 +33,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\NSL.Generators.RpcGenerator.Shared\NSL.Generators.RpcGenerator.Shared.csproj" />
 		<ProjectReference Include="..\NSL.Generators.RpcGenerator.Core\NSL.Generators.RpcGenerator.Core.csproj" />
 	</ItemGroup>
 

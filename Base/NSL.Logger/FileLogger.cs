@@ -2,6 +2,8 @@
 using System.IO;
 using NSL.Utils;
 using System.Threading.Channels;
+using NSL.SocketCore;
+using NSL.SocketCore.Utils.Logger.Enums;
 
 namespace NSL.Logger
 {
@@ -47,7 +49,7 @@ namespace NSL.Logger
                 catch (ChannelClosedException) { }
                 catch (System.Exception ex)
                 {
-                    ConsoleLog(SocketCore.Utils.Logger.Enums.LoggerLevel.Error, ex.ToString());
+                    ConsoleLog(LoggerLevel.Error, ex.ToString());
                 }
             }
         }

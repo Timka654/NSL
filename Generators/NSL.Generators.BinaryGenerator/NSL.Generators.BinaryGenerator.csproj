@@ -42,8 +42,30 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\Core\NSL.SocketCore\NSL.SocketCore.csproj" PrivateAssets="all" />
 		<ProjectReference Include="..\NSL.Generators.Utils\NSL.Generators.Utils.csproj" PrivateAssets="all" />
 	</ItemGroup>
+
+	<ItemGroup>
+		<Compile Include="..\..\Core\NSL.SocketCore\**\*.cs" Exclude="..\..\Core\NSL.SocketCore\**\bin\**;..\..\Core\NSL.SocketCore\**\obj\**;..\..\Core\NSL.SocketCore\**\Network\**">
+			<Link>NSL.SocketCore\%(RecursiveDir)%(FileName)%(Extension)</Link>
+		</Compile>
+
+
+		<Compile Include="..\..\Core\Utils\NSL.Utils\**\*.cs" Exclude="..\..\Core\Utils\NSL.Utils\**\bin\**;..\..\Core\Utils\NSL.Utils\**\obj\**">
+			<Link>NSL.Utils\%(RecursiveDir)%(FileName)%(Extension)</Link>
+		</Compile>
+	</ItemGroup>
+
+	<ItemGroup>
+		<Compile Remove="..\..\Core\Utils\NSL.Utils\CommandLine\**" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Compile Remove="..\..\Core\Utils\NSL.Utils\IOUtils.cs" />
+		<Compile Remove="..\..\Core\Utils\NSL.Utils\NSLConsoleOutput.cs" />
+		<Compile Remove="..\..\Core\Utils\NSL.Utils\PermissionUtils.cs" />
+		<Compile Remove="..\..\Core\Utils\NSL.Utils\Token.cs" />
+	</ItemGroup>
+
 
 </Project>

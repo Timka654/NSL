@@ -6,6 +6,7 @@ using NSL.Node.BridgeServer.Shared.Enums;
 using NSL.SocketServer.Utils;
 using NSL.EndPointBuilder;
 using NSL.SocketCore.Utils.Logger;
+using NSL.SocketCore;
 
 namespace NSL.Node.BridgeServer.RS
 {

@@ -6,6 +6,7 @@ using NSL.SocketServer.Utils;
 
 using NetworkClient = NSL.Node.BridgeServer.LS.LobbyServerNetworkClient;
 using NSL.SocketCore.Utils.Logger;
+using NSL.SocketCore;
 
 namespace NSL.Node.BridgeServer.LS
 {
