@@ -1,4 +1,4 @@
-﻿namespace NSL.Entity.SelectCycleGenerator.Shared
+﻿namespace NSL.Generators.SelectTypeCycleGenerator.Shared
 {
     public enum SqlCycleFilterTarget
     {

@@ -6,7 +6,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using NSL.Generators.BinaryGenerator;
-using NSL.Generators.BinaryTypeIOGenerator.Attributes;
+using NSL.Generators.BinaryTypeIOGenerator.Shared;
 using NSL.Generators.PacketHandleGenerator.Core.Utils;
 using NSL.Generators.PacketHandleGenerator.Shared;
 using NSL.Generators.Utils;

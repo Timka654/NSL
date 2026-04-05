@@ -1,6 +1,6 @@
 using System;
 
-namespace NSL.SocketCore.Utils.Buffer
+namespace NSL.SocketCore.Utils.Request
 {
     public class RequestPacketBuffer : OutputPacketBuffer
     {

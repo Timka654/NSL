@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace NSL.Generators.BinaryTypeIOGenerator.Attributes
+namespace NSL.Generators.BinaryTypeIOGenerator.Shared
 {
     [Obsolete("This attribute already not supported, use BinaryIOMethodsForAttribute", true)]
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]

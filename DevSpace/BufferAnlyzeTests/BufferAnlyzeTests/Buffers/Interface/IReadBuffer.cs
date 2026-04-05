@@ -1,8 +1,8 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace BufferAnlyzeTests.Buffers
+namespace BufferAnlyzeTests.Buffers.Interface
 {
     public interface IReadBuffer
     {

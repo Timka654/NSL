@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace NSL.SocketCore.Utils.Buffer
+namespace NSL.SocketCore.Utils.Request
 {
     /// <summary>
     /// Centralized request registry shared by one or more <see cref="RequestProcessor"/> instances.

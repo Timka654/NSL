@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace NSL.Generators.BinaryTypeIOGenerator.Attributes
+namespace NSL.Generators.BinaryTypeIOGenerator.Shared
 {
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
     public class NSLBIOIncludeAttribute : Attribute

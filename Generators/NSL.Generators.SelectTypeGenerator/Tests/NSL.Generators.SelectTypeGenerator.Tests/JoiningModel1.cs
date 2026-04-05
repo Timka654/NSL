@@ -1,6 +1,6 @@
 ﻿#if !DEVELOP
 
-using NSL.Generators.SelectTypeGenerator.Attributes;
+using NSL.Generators.SelectTypeGenerator.Shared;
 using System;
 using System.Collections.Generic;
 using System.Linq;

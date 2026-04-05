@@ -1,6 +1,6 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using NSL.Generators.SelectTypeGenerator.Attributes;
+using NSL.Generators.SelectTypeGenerator.Shared;
 using NSL.Generators.SelectTypeGenerator.Core.Utils;
 using NSL.Generators.Utils;
 using System;

@@ -1,6 +1,6 @@
 ﻿using NSL.Logger;
 using NSL.Logger.Interface;
-using NSL.Node.P2Proxy.Client;
+using NSL.Node.P2Proxy.Proxy;
 
 namespace NSL.Node.P2Proxy
 {

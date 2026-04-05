@@ -1,10 +1,11 @@
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using NSL.BuilderExtensions.SocketCore;
 using NSL.BuilderExtensions.TCPClient;
 using NSL.BuilderExtensions.TCPServer;
 using NSL.SocketClient.Utils.Version;
 using NSL.SocketServer.Utils.Version;
 using NSL.Logger;
+using NSL.SocketCore.Utils.Logger;
 using NSL.SocketClient;
 using NSL.SocketCore.Utils.Buffer;
 using NSL.SocketServer.Utils;

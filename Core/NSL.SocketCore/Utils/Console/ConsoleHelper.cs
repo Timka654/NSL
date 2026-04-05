@@ -1,8 +1,7 @@
-﻿using NSL.Extensions.ConsoleEngine;
-using NSL.SocketCore;
+﻿using NSL.SocketCore;
 using NSL.SocketCore.Utils;
 
-namespace NSL.ServerOptions.Extensions.Console
+namespace NSL.SocketCore.Utils.Console
 {
     public static class ConsoleHelper
     {

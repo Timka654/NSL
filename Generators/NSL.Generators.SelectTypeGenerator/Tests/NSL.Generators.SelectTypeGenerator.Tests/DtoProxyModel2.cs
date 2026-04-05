@@ -1,7 +1,7 @@
 ﻿#if !DEVELOP
-using NSL.Generators.SelectTypeGenerator.Attributes;
+using NSL.Generators.SelectTypeGenerator.Shared;
 
-namespace NSL.Generators.SelectTypeGenerator.Tests.Develop
+namespace NSL.Generators.SelectTypeGenerator.Tests
 {
     [SelectGenerate("dto", Dto = true)]
     [SelectGenerate("no_dto")]

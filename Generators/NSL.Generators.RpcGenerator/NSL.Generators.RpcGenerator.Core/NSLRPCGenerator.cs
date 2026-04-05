@@ -1,8 +1,8 @@
-using Microsoft.CodeAnalysis;
+﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using NSL.Generators.BinaryGenerator;
-using NSL.Generators.BinaryTypeIOGenerator.Attributes;
+using NSL.Generators.BinaryTypeIOGenerator.Shared;
 using NSL.Generators.RpcGenerator.Core.Utils;
 using NSL.Generators.RpcGenerator.Shared;
 using NSL.Generators.RpcGenerator.Shared.Attributes;

@@ -1,8 +1,8 @@
-﻿using NSL.SocketCore.Utils;
+using NSL.SocketCore.Utils;
 using System;
 using System.Collections.Concurrent;
 
-namespace NSL.Extensions.ConsoleEngine
+namespace NSL.SocketCore.Utils.Console
 {
     public class ConsoleStorage<T>
         where T : INetworkClient

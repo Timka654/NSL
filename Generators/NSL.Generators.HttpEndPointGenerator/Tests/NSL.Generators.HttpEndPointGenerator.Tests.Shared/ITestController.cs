@@ -9,7 +9,7 @@ using NSL.Generators.HttpEndPointGenerator.Shared.Fake.Interfaces;
 using NSL.HttpClient.Models;
 #endif
 
-using NSL.Generators.FillTypeGenerator.Tests.Develop.WithModelName;
+using NSL.Generators.HttpEndPointGenerator.Tests.Shared.Develop.WithModelName;
 using NSL.Generators.HttpEndPointGenerator.Shared.Attributes;
 using System;
 using System.Threading.Tasks;

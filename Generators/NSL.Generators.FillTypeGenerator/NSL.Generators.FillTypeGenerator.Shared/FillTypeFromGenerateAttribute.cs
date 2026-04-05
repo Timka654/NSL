@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace NSL.Generators.FillTypeGenerator.Attributes
+namespace NSL.Generators.FillTypeGenerator.Shared
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Interface | AttributeTargets.Struct, AllowMultiple = true)]
     public class FillTypeFromGenerateAttribute : Attribute

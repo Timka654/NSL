@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace NSL.Generators.FillTypeGenerator.Attributes
+namespace NSL.Generators.FillTypeGenerator.Shared
 {
     [Obsolete("Use FillTypeGenerateIgnoreAttribute", true)]
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = true)]

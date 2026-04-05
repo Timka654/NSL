@@ -1,4 +1,4 @@
-﻿using NSL.Generators.BinaryTypeIOGenerator.Attributes;
+﻿using NSL.Generators.BinaryTypeIOGenerator.Shared;
 using System;
 
 namespace NSL.Node.BridgeServer.Shared

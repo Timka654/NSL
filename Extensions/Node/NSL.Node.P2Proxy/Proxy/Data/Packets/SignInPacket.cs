@@ -3,7 +3,7 @@ using NSL.SocketCore.Utils.Buffer;
 
 using System;
 
-namespace NSL.Node.P2Proxy.Client
+namespace NSL.Node.P2Proxy.Proxy.Data.Packets
 {
     public partial class P2ProxyServerEntry
     {

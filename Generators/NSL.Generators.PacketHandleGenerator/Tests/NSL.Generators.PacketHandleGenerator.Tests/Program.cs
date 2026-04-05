@@ -1,5 +1,5 @@
-using NSL.BuilderExtensions.TCPClient;
-using NSL.Generators.BinaryTypeIOGenerator.Attributes;
+﻿using NSL.BuilderExtensions.TCPClient;
+using NSL.Generators.BinaryTypeIOGenerator.Shared;
 using NSL.SocketClient;
 using NSL.SocketServer.Utils;
 using NSL.SocketCore.Utils.Buffer;

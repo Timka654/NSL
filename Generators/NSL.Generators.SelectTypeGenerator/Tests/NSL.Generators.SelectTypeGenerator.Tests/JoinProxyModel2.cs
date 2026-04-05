@@ -1,6 +1,6 @@
 ﻿#if !DEVELOP
 
-using NSL.Generators.SelectTypeGenerator.Attributes;
+using NSL.Generators.SelectTypeGenerator.Shared;
 
 namespace NSL.Generators.SelectTypeGenerator.Tests
 {

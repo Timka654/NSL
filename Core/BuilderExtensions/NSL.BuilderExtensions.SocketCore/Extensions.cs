@@ -1,9 +1,10 @@
-using NSL.EndPointBuilder;
+﻿using NSL.EndPointBuilder;
 using NSL.Logger;
 using NSL.SocketClient;
 using NSL.SocketCore;
 using NSL.SocketCore.Utils;
 using NSL.SocketCore.Utils.Buffer;
+using NSL.SocketCore.Utils.Request;
 using NSL.SocketCore.Utils.Exceptions;
 using NSL.SocketCore.Utils.Logger;
 using NSL.SocketCore.Utils.Logger.Enums;

@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components;
 using NSL.ASPNET.Localization.Shared;
 using NSL.Database.EntityFramework.Filter.V2.Enums;
-using NSL.Entity.PathGenerator.Shared;
+using NSL.Generators.EntityPathGenerator.Shared;
 using System;
 using System.Collections.Generic;
 using System.IO;

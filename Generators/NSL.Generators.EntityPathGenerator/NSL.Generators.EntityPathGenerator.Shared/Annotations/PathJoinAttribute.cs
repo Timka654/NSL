@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace NSL.Entity.PathGenerator.Shared.Annotations
+namespace NSL.Generators.EntityPathGenerator.Shared.Annotations
 {
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
     public class PathJoinAttribute : Attribute

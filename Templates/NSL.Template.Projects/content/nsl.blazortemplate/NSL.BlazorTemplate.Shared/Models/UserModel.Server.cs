@@ -2,7 +2,7 @@
 #if NSL_SERVER
 
 using Microsoft.AspNetCore.Identity;
-using NSL.Generators.SelectTypeGenerator.Attributes;
+using NSL.Generators.SelectTypeGenerator.Shared;
 
 namespace NSL.BlazorTemplate.Shared.Models
 {

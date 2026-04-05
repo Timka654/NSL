@@ -3,7 +3,7 @@ using NSL.SocketCore.Utils.Buffer;
 using System;
 using System.Threading.Tasks;
 
-namespace NSL.SocketCore.Utils.Buffer
+namespace NSL.SocketCore.Utils.Request
 {
     public static class RequestExtensions
     {

@@ -1,4 +1,4 @@
-﻿using NSL.Generators.BinaryTypeIOGenerator.Attributes;
+﻿using NSL.Generators.BinaryTypeIOGenerator.Shared;
 //using ZergRush.ReactiveCore;
 
 namespace NSL.Generators.BinaryTypeIOGenerator.Tests

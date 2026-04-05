@@ -1,4 +1,4 @@
-﻿using NSL.Generators.FillTypeGenerator.Attributes;
+﻿using NSL.Generators.FillTypeGenerator.Shared;
 using System.ComponentModel.DataAnnotations;
 
 namespace NSL.BlazorTemplate.Shared.Models.RequestModels

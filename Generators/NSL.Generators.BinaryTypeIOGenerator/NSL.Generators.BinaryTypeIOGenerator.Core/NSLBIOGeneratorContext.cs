@@ -1,6 +1,6 @@
 ﻿using Microsoft.CodeAnalysis;
 using NSL.Generators.BinaryGenerator.Utils;
-using NSL.Generators.BinaryTypeIOGenerator.Attributes;
+using NSL.Generators.BinaryTypeIOGenerator.Shared;
 using NSL.Generators.Utils;
 using System;
 using System.Collections.Generic;

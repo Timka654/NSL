@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace NSL.Generators.SelectTypeGenerator.Attributes
+namespace NSL.Generators.SelectTypeGenerator.Shared
 {
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = true)]
     public class SelectGenerateIncludeAttribute : Attribute

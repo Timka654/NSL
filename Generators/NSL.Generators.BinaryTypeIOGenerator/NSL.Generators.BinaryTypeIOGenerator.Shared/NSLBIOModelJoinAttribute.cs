@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace NSL.Generators.BinaryTypeIOGenerator.Attributes
+namespace NSL.Generators.BinaryTypeIOGenerator.Shared
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, AllowMultiple = true, Inherited = false)]
     public class NSLBIOModelJoinAttribute : Attribute

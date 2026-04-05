@@ -1,6 +1,6 @@
 ﻿#if SERVER
 
-using NSL.Generators.SelectTypeGenerator.Attributes;
+using NSL.Generators.SelectTypeGenerator.Shared;
 
 namespace DevProject1
 {
@@ -17,7 +17,7 @@ namespace DevProject1
 
 #if CLIENT
 
-using NSL.Generators.SelectTypeGenerator.Attributes;
+using NSL.Generators.SelectTypeGenerator.Shared;
 
 namespace DevProject1
 {

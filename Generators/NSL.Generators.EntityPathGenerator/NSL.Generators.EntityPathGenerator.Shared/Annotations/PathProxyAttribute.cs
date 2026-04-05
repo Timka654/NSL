@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace NSL.Entity.PathGenerator.Shared.Annotations
+namespace NSL.Generators.EntityPathGenerator.Shared.Annotations
 {
     [AttributeUsage(AttributeTargets.Property, AllowMultiple = true)]
     public class PathProxyAttribute : Attribute

@@ -3,7 +3,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using NSL.Generators.BinaryGenerator;
 using NSL.Generators.BinaryGenerator.Utils;
-using NSL.Generators.BinaryTypeIOGenerator.Attributes;
+using NSL.Generators.BinaryTypeIOGenerator.Shared;
 using NSL.Generators.BinaryTypeIOGenerator.Core.Models;
 using NSL.Generators.Utils;
 using NSL.SocketCore.Utils.Buffer;

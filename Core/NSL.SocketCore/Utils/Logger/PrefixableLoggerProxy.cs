@@ -1,7 +1,7 @@
-﻿using NSL.SocketCore.Utils.Logger;
+using NSL.SocketCore.Utils.Logger;
 using NSL.SocketCore.Utils.Logger.Enums;
 
-namespace NSL.Logger
+namespace NSL.SocketCore.Utils.Logger
 {
     public class PrefixableLoggerProxy : IBasicLogger
     {

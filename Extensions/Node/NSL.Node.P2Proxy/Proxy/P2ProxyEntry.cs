@@ -1,4 +1,4 @@
-﻿using NSL.Logger;
+using NSL.Logger;
 using System;
 using System.Collections.Concurrent;
 using NSL.EndPointBuilder;
@@ -8,7 +8,7 @@ using NSL.Node.P2Proxy.Proxy.Data;
 using NSL.BuilderExtensions.SocketCore;
 using NSL.Node.Core.Enums;
 
-namespace NSL.Node.P2Proxy.Client
+namespace NSL.Node.P2Proxy.Proxy
 {
     public partial class P2ProxyServerEntry
     {

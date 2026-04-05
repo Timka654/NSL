@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using NSL.ASPNET.ModelBinders;
 using NSL.ASPNET.Mvc;
 using NSL.ASPNET.Mvc.Route.Attributes;
-using NSL.Generators.FillTypeGenerator.Tests.Develop.WithModelName;
+using NSL.Generators.HttpEndPointGenerator.Tests.Shared.Develop.WithModelName;
 using NSL.Generators.HttpEndPointGenerator.Shared.Attributes;
 using NSL.Generators.HttpEndPointGenerator.Tests.Shared;
 using System;

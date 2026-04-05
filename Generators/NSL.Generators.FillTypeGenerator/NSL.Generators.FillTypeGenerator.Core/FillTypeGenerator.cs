@@ -1,7 +1,7 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using NSL.Generators.FillTypeGenerator.Attributes;
+using NSL.Generators.FillTypeGenerator.Shared;
 using NSL.Generators.FillTypeGenerator.Core.Utils;
 using NSL.Generators.Utils;
 using System;

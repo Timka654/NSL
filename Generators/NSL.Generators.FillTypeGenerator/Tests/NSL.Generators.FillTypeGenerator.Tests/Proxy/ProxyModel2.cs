@@ -1,6 +1,6 @@
 ﻿#if !DEVELOP
 
-namespace NSL.Generators.FillTypeGenerator.Tests
+namespace NSL.Generators.FillTypeGenerator.Tests.Proxy
 {
     internal class ProxyModel2
     {

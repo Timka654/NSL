@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace NSL.Entity.SelectCycleGenerator.Shared
+namespace NSL.Generators.SelectTypeCycleGenerator.Shared
 {
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = true)]
     public class SqlCycleFilterAttribute : Attribute

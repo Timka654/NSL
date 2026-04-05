@@ -1,6 +1,6 @@
 using System;
 
-namespace NSL.SocketCore.Utils.Buffer
+namespace NSL.SocketCore.Utils.Request
 {
     /// <summary>
     /// Centralized hub that owns the request registry and routes incoming responses

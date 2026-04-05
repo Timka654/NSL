@@ -1,7 +1,7 @@
 ﻿#if !DEVELOP
-using NSL.Generators.FillTypeGenerator.Attributes;
+using NSL.Generators.FillTypeGenerator.Shared;
 
-namespace NSL.Generators.FillTypeGenerator.Tests
+namespace NSL.Generators.FillTypeGenerator.Tests.Proxy
 {
     [FillTypeGenerate(typeof(ProxyModel1), "InstanceUpdate")]
     internal partial class ProxyModel1

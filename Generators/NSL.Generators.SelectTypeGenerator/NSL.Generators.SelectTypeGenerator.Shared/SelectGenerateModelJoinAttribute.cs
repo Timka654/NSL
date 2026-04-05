@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace NSL.Generators.SelectTypeGenerator.Attributes
+namespace NSL.Generators.SelectTypeGenerator.Shared
 {
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
     public class SelectGenerateModelJoinAttribute : Attribute

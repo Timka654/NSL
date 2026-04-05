@@ -1,5 +1,5 @@
 ﻿#if !DEVELOP
-using NSL.Generators.FillTypeGenerator.Attributes;
+using NSL.Generators.FillTypeGenerator.Shared;
 using NSL.Generators.FillTypeGenerator.Tests.DuplicateName;
 using System;
 using System.Collections.Generic;
@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NSL.Generators.FillTypeGenerator.Tests.Develop
+namespace NSL.Generators.FillTypeGenerator.Tests.DuplicateName
 {
     [FillTypeGenerate(typeof(DuplicateNameToModel))]
     internal partial class DuplicateNameModel : IDuplicateNameModel

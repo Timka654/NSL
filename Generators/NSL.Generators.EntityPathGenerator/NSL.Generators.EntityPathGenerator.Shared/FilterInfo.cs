@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq.Expressions;
 
-namespace NSL.Entity.PathGenerator.Shared
+namespace NSL.Generators.EntityPathGenerator.Shared
 {
     public class FilterInfo
     {

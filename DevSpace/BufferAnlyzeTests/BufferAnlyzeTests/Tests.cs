@@ -1,4 +1,4 @@
-﻿using BufferAnlyzeTests.Buffers;
+﻿using BufferAnlyzeTests.Buffers.Interface;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;

@@ -1,6 +1,6 @@
 ﻿using NSL.Database.EntityFramework.Filter.V2.Enums;
 using NSL.Database.EntityFramework.Filter.V2.Models;
-using NSL.Entity.PathGenerator.Shared;
+using NSL.Generators.EntityPathGenerator.Shared;
 using System;
 using System.Collections.Generic;
 using System.Linq;

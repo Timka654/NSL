@@ -7,7 +7,7 @@ using NSL.Generators.HttpEndPointGenerator.Shared.Fake;
 #endif
 using NSL.ASPNET.ModelBinders;
 
-namespace NSL.Generators.FillTypeGenerator.Tests.Develop.WithModelName
+namespace NSL.Generators.HttpEndPointGenerator.Tests.Shared.Develop.WithModelName
 {
     public partial class WithModelName2
     {

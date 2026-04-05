@@ -5,7 +5,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace NSL.SocketCore.Utils.Buffer
+namespace NSL.SocketCore.Utils.Request
 {
     public class RequestProcessor : IResponsibleProcessor, IDisposable
     {

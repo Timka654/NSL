@@ -1,12 +1,12 @@
 ﻿#if !DEVELOP
-using NSL.Generators.FillTypeGenerator.Attributes;
+using NSL.Generators.FillTypeGenerator.Shared;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NSL.Generators.FillTypeGenerator.Tests
+namespace NSL.Generators.FillTypeGenerator.Tests.Enum
 {
     [FillTypeGenerate(typeof(EType2Model), "a1")]
     internal partial class EType1Model

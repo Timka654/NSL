@@ -1,8 +1,7 @@
-﻿using NSL.Extensions.ConsoleEngine;
-using NSL.SocketCore.Utils;
+﻿using NSL.SocketCore.Utils;
 using NSL.SocketCore.Utils.Buffer;
 
-namespace NSL.ServerOptions.Extensions.Console
+namespace NSL.SocketCore.Utils.Console
 {
     public class ConsoleMessage<T> : IPacket<T> where T : INetworkClient
     {

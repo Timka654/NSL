@@ -1,4 +1,4 @@
-﻿namespace NSL.Refactoring.FastAction.Core
+﻿namespace NSL.Refactoring.FastAction.UI
 {
     public class TemplateInputFieldData
     {

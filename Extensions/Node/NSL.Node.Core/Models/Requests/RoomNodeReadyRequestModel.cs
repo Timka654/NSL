@@ -1,4 +1,4 @@
-﻿using NSL.Generators.BinaryTypeIOGenerator.Attributes;
+﻿using NSL.Generators.BinaryTypeIOGenerator.Shared;
 using System.Collections.Generic;
 
 namespace NSL.Node.Core.Models.Requests

@@ -1,7 +1,7 @@
 ﻿#if !DEVELOP
-using NSL.Generators.FillTypeGenerator.Attributes;
+using NSL.Generators.FillTypeGenerator.Shared;
 
-namespace NSL.Generators.FillTypeGenerator.Tests.Develop
+namespace NSL.Generators.FillTypeGenerator.Tests.DuplicateName
 {
     [FillTypeGenerate(typeof(StaticModel))]
     partial class StaticModel
