@@ -33,6 +33,10 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<ProjectReference Include="..\..\..\Core\Utils\NSL.Utils\NSL.Utils.csproj" />
 	</ItemGroup>
 
