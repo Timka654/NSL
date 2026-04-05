@@ -1,6 +1,8 @@
 $ver = $args[0]
 dotnet build --version-suffix "$ver" --configuration Unity /p:Platform=x64 --output "build/Release/unity_dll_$ver" "NSL.sln"
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 dotnet pack --version-suffix "$ver" --configuration Unity --output "build/Release/unity_package_$ver" "NSL.sln"
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
 
 $buildPath = "build/Release/unity_dll_$ver"

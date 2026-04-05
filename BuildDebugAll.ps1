@@ -7,4 +7,6 @@ if (Test-Path $buildPath ) {
 }
 
 ./BuildDebug $ver
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 ./BuildDebugUnity $ver
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }

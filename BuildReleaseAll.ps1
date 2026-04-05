@@ -6,11 +6,9 @@ $buildPath = "build/Release"
 	}
 
 	./BuildRelease $ver
-	
-	if($LASTEXITCODE -eq 0)
-	{
-		./BuildReleaseUnity $ver
-	}
+	if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+	./BuildReleaseUnity $ver
+	if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
 
 # $patternHere  = 'Binary'
