@@ -5,7 +5,7 @@ using NSL.SocketCore.Utils.Version;
 
 namespace NSL.SocketServer.Utils.Version.Packets
 {
-    public class NSLVersionPacket<T> : IPacket<T> where T : IServerNetworkClient
+    public class NSLVersionPacketReceive<T> : IPacket<T> where T : IServerNetworkClient
     {
         public const ushort PacketId = (ushort)NSLSystemPacketEnum.Version;
 

@@ -10,10 +10,11 @@
     <Configurations>DebugExamples</Configurations>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\Base\NSL.Logger\NSL.Logger.csproj" />
-    <ProjectReference Include="..\..\..\..\Protocols\TCP\BuilderExtensions\NSL.BuilderExtensions.TCPClient\NSL.BuilderExtensions.TCPClient.csproj" />
-    <ProjectReference Include="..\..\..\..\Protocols\TCP\BuilderExtensions\NSL.BuilderExtensions.TCPServer\NSL.BuilderExtensions.TCPServer.csproj" />
-    <ProjectReference Include="..\..\NSL.Extensions.Session.Client\NSL.Extensions.Session.Client.csproj" />
-    <ProjectReference Include="..\..\NSL.Extensions.Session.Server\NSL.Extensions.Session.Server.csproj" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Base\NSL.Logger\NSL.Logger.csproj" />
+    <ProjectReference Include="..\..\..\Protocols\TCP\BuilderExtensions\NSL.BuilderExtensions.TCPClient\NSL.BuilderExtensions.TCPClient.csproj" />
+    <ProjectReference Include="..\..\..\Protocols\TCP\BuilderExtensions\NSL.BuilderExtensions.TCPServer\NSL.BuilderExtensions.TCPServer.csproj" />
   </ItemGroup>
 </Project>

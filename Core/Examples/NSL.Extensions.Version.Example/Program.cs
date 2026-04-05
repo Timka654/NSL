@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json;
-using NSL.BuilderExtensions.SocketCore;
+﻿using NSL.BuilderExtensions.SocketCore;
 using NSL.BuilderExtensions.TCPClient;
 using NSL.BuilderExtensions.TCPServer;
 using NSL.SocketClient.Utils.Version;
@@ -9,6 +8,9 @@ using NSL.SocketCore.Utils.Logger;
 using NSL.SocketClient;
 using NSL.SocketCore.Utils.Buffer;
 using NSL.SocketServer.Utils;
+using NSL.SocketCore.Utils.Request;
+using NSL.SocketClient.Utils.Version.Packets;
+using Newtonsoft.Json;
 
 namespace NSL.Extensions.Version.Example
 {

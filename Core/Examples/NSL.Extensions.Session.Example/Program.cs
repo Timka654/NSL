@@ -11,6 +11,9 @@ using NSL.SocketCore.Utils.Buffer;
 using NSL.SocketCore.Utils.Logger;
 using NSL.SocketServer.Utils;
 using NSL.TCP.Client;
+using NSL.SocketCore.Utils.Session;
+using NSL.SocketCore.Utils.Request;
+using NSL.SocketClient.Utils.Session.Packets;
 
 namespace NSL.Extensions.Session.Example
 {

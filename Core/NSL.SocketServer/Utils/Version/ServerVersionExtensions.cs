@@ -19,7 +19,7 @@ namespace NSL.SocketServer.Utils.Version
             where TClient : IServerNetworkClient
         {
             options.ObjectBag.Set(NSLVersionInfo.ObjectBagKey, versionInfo);
-            options.AddPacket(NSLVersionPacket<TClient>.PacketId, new NSLVersionPacket<TClient>());
+            options.AddPacket(NSLVersionPacketReceive<TClient>.PacketId, new NSLVersionPacketReceive<TClient>());
             return options;
         }
     }

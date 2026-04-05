@@ -403,6 +403,39 @@ namespace NSLLibProjectFileFormatter.Project.CSPROJ
                 bool analyzerPackage = false;
 
                 bool analyzerUtils = false;
+                if (!NSLProjectTypes.Any())
+                {
+                    if (unityOnly && aspNetOnly)
+                        throw new Exception($"{path} cannot contains multiple '*Only' types");
+
+                    if (unityOnly)
+                    {
+                        NSLProjectTypes.Add("UnityTarget");
+                        NSLProjectTypes.Add("UnitySupport");
+                    }
+                    else if (aspNetOnly)
+                    {
+                        NSLProjectTypes.Add("ASPTarget");
+                    }
+                    else
+                    {
+                        NSLProjectTypes.Add("UnitySupport");
+                    }
+
+                    if (isRoslyn)
+                    {
+                        NSLProjectTypes.Add("Analyzer");
+                    }
+
+                    if (unityRef != null)
+                        NSLProjectTypes.Add("UnityReference");
+                }
+
+                analyzerPackage = HasAnalyzerPackageTarget(NSLProjectTypes);
+                analyzerUtils = HasAnalyzerUtils(NSLProjectTypes);
+                var analyzerCore = HasAnalyzerCoreTarget(NSLProjectTypes);
+                var isCore = NSLProjectTypes.Contains("Core", StringComparer.OrdinalIgnoreCase);
+
 
                 CSProjBuilder tb = new CSProjBuilder();
 
@@ -410,34 +443,6 @@ namespace NSLLibProjectFileFormatter.Project.CSPROJ
                 {
                     tb.WritePropertyGroup(() =>
                     {
-                        if (!NSLProjectTypes.Any())
-                        {
-                            if (unityOnly && aspNetOnly)
-                                throw new Exception($"{path} cannot contains multiple '*Only' types");
-
-                            if (unityOnly)
-                            {
-                                NSLProjectTypes.Add("UnityTarget");
-                                NSLProjectTypes.Add("UnitySupport");
-                            }
-                            else if (aspNetOnly)
-                            {
-                                NSLProjectTypes.Add("ASPTarget");
-                            }
-                            else
-                            {
-                                NSLProjectTypes.Add("UnitySupport");
-                            }
-
-                            if (isRoslyn)
-                            {
-                                NSLProjectTypes.Add("Analyzer");
-                            }
-
-                            if (unityRef != null)
-                                NSLProjectTypes.Add("UnityReference");
-                        }
-
                         var tf = "net10.0";
 
                         if (HasUnityTarget(NSLProjectTypes))
@@ -445,16 +450,11 @@ namespace NSLLibProjectFileFormatter.Project.CSPROJ
                             tf = "netstandard2.1";
                         }
 
-                        analyzerPackage = HasAnalyzerPackageTarget(NSLProjectTypes);
-                        analyzerUtils = HasAnalyzerUtils(NSLProjectTypes);
-                        var analyzerCore = HasAnalyzerCoreTarget(NSLProjectTypes);
-
-                        if (analyzerUtils)
+                        // Pure analyzer/shared projects (no Core) require netstandard2.0 for Roslyn host compat.
+                        // Core library projects compile for net10.0 only; Unity configs override to netstandard2.1.
+                        if (analyzerUtils && !isCore)
                         {
                             tf = "netstandard2.0";
-                            if(NSLProjectTypes.Contains("Core", StringComparer.OrdinalIgnoreCase))
-                                tf += ";net10.0";
-
                         }
                         tb.WritePropertyItem("NSLProjectTypes", string.Join(';', NSLProjectTypes))
                         .AppendLine();
@@ -534,18 +534,22 @@ namespace NSLLibProjectFileFormatter.Project.CSPROJ
 
                     if (HasUnitySupport(NSLProjectTypes))
                     {
+                        // Emit TargetFramework override to netstandard2.1 for Unity configs
+                        // unless this is a pure analyzer/shared project (AnalyzerUtils without Core)
+                        var emitUnityTf = !analyzerUtils || isCore;
+
                         tb.AppendLine()
                         .WritePropertyGroup("'$(Configuration)'=='UnityDebug'", () => tb
                             .WritePropertyItem("AssemblyName", "Unity.$(MSBuildProjectName)", !HasUnityTarget(NSLProjectTypes))
-                            .WritePropertyItem("TargetFramework", "netstandard2.1", !HasAnalyzerUtils(NSLProjectTypes))
+                            .WritePropertyItem("TargetFramework", "netstandard2.1", emitUnityTf)
                             .WritePropertyItem("DefineConstants", "DEBUG;TRACE")
                         );
 
-                        if (!HasUnityTarget(NSLProjectTypes) || !HasAnalyzerUtils(NSLProjectTypes))
+                        if (!HasUnityTarget(NSLProjectTypes) || emitUnityTf)
                             tb.AppendLine()
                             .WritePropertyGroup("'$(Configuration)'=='Unity'", () => tb
                                 .WritePropertyItem("AssemblyName", "Unity.$(MSBuildProjectName)", !HasUnityTarget(NSLProjectTypes))
-                                .WritePropertyItem("TargetFramework", "netstandard2.1", !HasAnalyzerUtils(NSLProjectTypes))
+                                .WritePropertyItem("TargetFramework", "netstandard2.1", emitUnityTf)
                             );
 
                     }
