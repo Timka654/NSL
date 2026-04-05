@@ -11,7 +11,6 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\..\..\Core\Extensions\NSL.SocketCore.Extensions.Buffer\NSL.SocketCore.Extensions.Buffer.csproj" />
 		<ProjectReference Include="..\..\..\..\Core\NSL.SocketCore\NSL.SocketCore.csproj" />
 		<ProjectReference Include="..\..\..\..\Core\NSL.SocketClient\NSL.SocketClient.csproj" />
 		<ProjectReference Include="..\..\..\..\Core\NSL.SocketServer\NSL.SocketServer.csproj" />

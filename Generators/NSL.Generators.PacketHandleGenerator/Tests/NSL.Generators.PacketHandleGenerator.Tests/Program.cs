@@ -1,8 +1,8 @@
-﻿using NSL.BuilderExtensions.TCPClient;
+using NSL.BuilderExtensions.TCPClient;
 using NSL.Generators.BinaryTypeIOGenerator.Attributes;
 using NSL.SocketClient;
 using NSL.SocketServer.Utils;
-using NSL.SocketCore.Extensions.Buffer;
+using NSL.SocketCore.Utils.Buffer;
 
 namespace NSL.Generators.PacketHandleGenerator.Tests
 {

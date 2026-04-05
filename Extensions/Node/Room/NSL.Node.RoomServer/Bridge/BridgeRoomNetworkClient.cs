@@ -1,5 +1,5 @@
-﻿using NSL.SocketClient;
-using NSL.SocketCore.Extensions.Buffer;
+using NSL.SocketClient;
+using NSL.SocketCore.Utils.Buffer;
 
 namespace NSL.Node.RoomServer.Bridge
 {

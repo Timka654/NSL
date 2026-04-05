@@ -1,4 +1,4 @@
-﻿using NSL.UDP.Enums;
+﻿using NSL.SocketCore.Utils;
 
 namespace NSL.UDP.Interface
 {

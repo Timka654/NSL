@@ -1,7 +1,7 @@
-﻿using NSL.Cipher.RC.RC4;
+using NSL.Cipher.RC.RC4;
 using NSL.SocketClient;
-using NSL.SocketCore.Extensions.Buffer;
 using NSL.SocketCore.Utils.Buffer;
+
 using NSL.TCP.BaseClientExample;
 using NSL.TCP.Client;
 

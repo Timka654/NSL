@@ -11,7 +11,6 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\Base\NSL.Logger\NSL.Logger.csproj" />
-    <ProjectReference Include="..\..\..\..\Core\Extensions\NSL.SocketCore.Extensions.Buffer\NSL.SocketCore.Extensions.Buffer.csproj" />
     <ProjectReference Include="..\..\..\..\Protocols\TCP\BuilderExtensions\NSL.BuilderExtensions.TCPClient\NSL.BuilderExtensions.TCPClient.csproj" />
     <ProjectReference Include="..\..\..\..\Protocols\TCP\BuilderExtensions\NSL.BuilderExtensions.TCPServer\NSL.BuilderExtensions.TCPServer.csproj" />
     <ProjectReference Include="..\..\NSL.Extensions.Session.Client\NSL.Extensions.Session.Client.csproj" />

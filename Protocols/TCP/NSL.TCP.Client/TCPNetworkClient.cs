@@ -86,11 +86,16 @@ namespace NSL.TCP.Client
 
                 client.NoDelay = true;
 
-                CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+                var connectTask = client.ConnectAsync(ip, ConnectionOptions.Port);
 
-                cancellationTokenSource.CancelAfter(connectionTimeOut);
+                if (await Task.WhenAny(connectTask, Task.Delay(connectionTimeOut)) != connectTask)
+                {
+                    // подавляем исключение из фоновой задачи после закрытия сокета в Release()
+                    connectTask.ContinueWith(t => { _ = t.Exception; }, TaskContinuationOptions.OnlyOnFaulted);
+                    throw new TaskCanceledException();
+                }
 
-                await client.ConnectAsync(ip, ConnectionOptions.Port, cancellationTokenSource.Token);
+                await connectTask;
 
                 Reconnect(client);
 

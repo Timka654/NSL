@@ -1,9 +1,4 @@
-﻿using NSL.SocketCore.Utils.Buffer;
-
+﻿// Moved to NSL.SocketCore.Utils.Buffer.IResponsibleProcessor
 namespace NSL.SocketCore.Extensions.Buffer.Interface
 {
-    public interface IResponsibleProcessor
-    {
-        void ProcessResponse(InputPacketBuffer data);
-    }
 }

@@ -48,6 +48,8 @@
 		<Compile Include="..\NSL.Generators.RpcGenerator.Shared\**\*.cs" Exclude="..\NSL.Generators.RpcGenerator.Shared\**\bin\**;..\NSL.Generators.RpcGenerator.Shared\**\obj\**">
 		  <Link>NSL.Generators.RpcGenerator.Shared\%(RecursiveDir)%(FileName)%(Extension)</Link>
 		</Compile>
+		<!-- DefaultRPCNetworkChannel needs Extensions.Buffer (RequestProcessor) — runtime-only, not needed by the generator itself -->
+		<Compile Remove="..\NSL.Generators.RpcGenerator.Shared\DefaultRPCNetworkChannel.cs" />
 	</ItemGroup>
 
 	<ItemGroup>

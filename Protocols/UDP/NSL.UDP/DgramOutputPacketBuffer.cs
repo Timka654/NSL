@@ -1,6 +1,6 @@
 ﻿using NSL.SocketCore;
+using NSL.SocketCore.Utils;
 using NSL.SocketCore.Utils.Buffer;
-using NSL.UDP.Enums;
 using NSL.UDP.Interface;
 using NSL.UDP.Packet;
 using System;

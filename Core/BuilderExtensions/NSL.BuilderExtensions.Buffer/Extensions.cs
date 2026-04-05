@@ -1,4 +1,4 @@
-﻿using NSL.SocketCore.Extensions.Buffer;
+using NSL.SocketCore.Utils.Buffer;
 using NSL.SocketCore.Utils;
 using static NSL.SocketCore.Extensions.Buffer.RequestExtensions;
 using System;

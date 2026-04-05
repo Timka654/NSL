@@ -1,4 +1,4 @@
-﻿using NSL.SocketCore.Extensions.Packet;
+using NSL.SocketCore.Utils.Packet;
 
 namespace NSL.Builder.UDP.BaseExample.Client
 {

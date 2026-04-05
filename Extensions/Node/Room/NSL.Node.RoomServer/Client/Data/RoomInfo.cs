@@ -2,9 +2,9 @@
 using NSL.Node.Core;
 using NSL.Node.Core.Enums;
 using NSL.Node.Core.Models.Message;
+using NSL.SocketCore.Utils;
 using NSL.SocketCore.Utils.Buffer;
 using NSL.UDP;
-using NSL.UDP.Enums;
 using NSL.Utils;
 using System;
 using System.Collections.Concurrent;

@@ -1,5 +1,5 @@
-﻿using NSL.SocketCore.Utils.Buffer;
-using NSL.UDP.Enums;
+﻿using NSL.SocketCore.Utils;
+using NSL.SocketCore.Utils.Buffer;
 
 namespace NSL.UDP
 {

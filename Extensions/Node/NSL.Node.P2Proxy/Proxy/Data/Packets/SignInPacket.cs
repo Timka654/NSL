@@ -1,6 +1,6 @@
-﻿using NSL.Node.P2Proxy.Proxy.Data;
-using NSL.SocketCore.Extensions.Buffer;
+using NSL.Node.P2Proxy.Proxy.Data;
 using NSL.SocketCore.Utils.Buffer;
+
 using System;
 
 namespace NSL.Node.P2Proxy.Client

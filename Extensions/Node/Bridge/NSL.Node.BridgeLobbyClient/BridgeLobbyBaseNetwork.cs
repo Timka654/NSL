@@ -1,10 +1,10 @@
-﻿using NSL.BuilderExtensions.SocketCore;
+using NSL.BuilderExtensions.SocketCore;
 using NSL.EndPointBuilder;
 using NSL.Node.BridgeLobbyClient.Models;
 using NSL.Node.BridgeServer.Shared.Enums;
 using NSL.Node.BridgeServer.Shared.Requests;
 using NSL.Node.BridgeServer.Shared.Response;
-using NSL.SocketCore.Extensions.Buffer;
+using NSL.SocketCore.Utils.Buffer;
 using NSL.SocketCore.Utils;
 using System;
 using System.Threading;

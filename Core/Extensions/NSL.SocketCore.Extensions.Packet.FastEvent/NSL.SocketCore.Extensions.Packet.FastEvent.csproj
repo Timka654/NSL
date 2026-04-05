@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<NSLProjectTypes>UnitySupport</NSLProjectTypes>
@@ -34,8 +34,6 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\..\NSL.SocketCore\NSL.SocketCore.csproj" />
-		<ProjectReference Include="..\NSL.SocketCore.Extensions.Buffer\NSL.SocketCore.Extensions.Buffer.csproj" />
-		<ProjectReference Include="..\NSL.SocketCore.Extensions.Packet\NSL.SocketCore.Extensions.Packet.csproj" />
 	</ItemGroup>
 
 </Project>

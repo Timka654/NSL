@@ -85,8 +85,4 @@
 		<Compile Remove="..\..\..\Core\Utils\NSL.Utils\Token.cs" />
 	</ItemGroup>
 
-	<ItemGroup>
-	  <PackageReference Include="System.Memory" Version="4.6.3" />
-	</ItemGroup>
-
 </Project>

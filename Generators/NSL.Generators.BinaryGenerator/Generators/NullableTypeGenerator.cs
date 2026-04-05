@@ -31,7 +31,7 @@ namespace NSL.Generators.BinaryGenerator.Generators
             var readSegment = BinaryReadMethodsGenerator.GetValueReadSegment(genericType, context, path);
             context.IOPath = outerIOPath;
 
-            return $"{outerIOPath}.{nameof(InputPacketBuffer.ReadNullable)}(static {readLambdaParam} => {{ return {readSegment}; }})";
+            return $"{outerIOPath}.{nameof(InputPacketBuffer.ReadNullable)}({readLambdaParam} => {{ return {readSegment}; }})";
         }
 
         public static string GetWriteLine(ISymbol parameter, BinaryGeneratorContext context, string path)
@@ -55,7 +55,7 @@ namespace NSL.Generators.BinaryGenerator.Generators
             var writeSegment = BinaryWriteMethodsGenerator.BuildParameterWriter(genericType, context, writeLambdaVal);
             context.IOPath = outerIOPath;
 
-            return $"{outerIOPath}.{nameof(OutputPacketBuffer.WriteNullable)}({path}, static ({writeLambdaBuf}, {writeLambdaVal}) => {{ {writeSegment} }});";
+            return $"{outerIOPath}.{nameof(OutputPacketBuffer.WriteNullable)}({path}, ({writeLambdaBuf}, {writeLambdaVal}) => {{ {writeSegment} }});";
         }
     }
 }

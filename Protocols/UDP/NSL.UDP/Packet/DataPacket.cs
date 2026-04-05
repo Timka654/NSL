@@ -1,4 +1,4 @@
-﻿using NSL.UDP.Enums;
+﻿using NSL.SocketCore.Utils;
 using NSL.UDP.Interface;
 using System;
 using System.Collections.Generic;

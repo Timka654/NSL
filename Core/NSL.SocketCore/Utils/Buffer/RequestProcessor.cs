@@ -1,13 +1,11 @@
-﻿using NSL.SocketCore.Extensions.Buffer.Interface;
 using NSL.SocketCore.Utils;
-using NSL.SocketCore.Utils.Buffer;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace NSL.SocketCore.Extensions.Buffer
+namespace NSL.SocketCore.Utils.Buffer
 {
     public class RequestProcessor : IResponsibleProcessor, IDisposable
     {
@@ -16,69 +14,74 @@ namespace NSL.SocketCore.Extensions.Buffer
 
         public const ushort DefaultResponsePacketId = 1;
 
-        public RequestProcessor(INetworkClient client)
+        /// <summary>
+        /// Create a processor that uses a shared <paramref name="hub"/> for request routing.
+        /// Multiple processors may share the same hub over one connection.
+        /// </summary>
+        public RequestProcessor(INetworkClient client, IRequestHub hub)
         {
             this.client = client;
-        }
-
-        private Dictionary<Guid, Action<InputPacketBuffer>> requests = new Dictionary<Guid, Action<InputPacketBuffer>>();
-
-        private readonly INetworkClient client;
-
-        protected bool TryAdd(Guid id, Action<InputPacketBuffer> action)
-        {
-            lock (this)
-            {
-                if (requests.ContainsKey(id))
-                    return false;
-
-                requests.Add(id, action);
-
-                return true;
-            }
+            this.hub = hub;
         }
 
         /// <summary>
-        /// Send request and handle response on receive
+        /// Create a processor with its own private <see cref="RequestProcessorHub"/>.
         /// </summary>
-        /// <param name="buffer"></param>
-        /// <param name="onResponse">Delegate must return <see langword="true"/> for dispose or input buffer must manual disposing after processing</param>
+        public RequestProcessor(INetworkClient client) : this(client, new RequestProcessorHub())
+        {
+            ownsHub = true;
+        }
+
+        private readonly INetworkClient client;
+        private readonly IRequestHub hub;
+        private readonly bool ownsHub;
+
+        // Tracks request ids owned by this processor so they can be cancelled on disposal.
+        private readonly HashSet<Guid> ownedRequests = new HashSet<Guid>();
+
+        private Guid RegisterRequest(Action<InputPacketBuffer> handler)
+        {
+            var id = hub.CreateRequest(handler);
+            lock (ownedRequests)
+                ownedRequests.Add(id);
+            return id;
+        }
+
+        private void UntrackRequest(Guid id)
+        {
+            lock (ownedRequests)
+                ownedRequests.Remove(id);
+        }
+
+        /// <summary>
+        /// Send request and handle response on receive.
+        /// </summary>
+        /// <param name="onResponse">Return <see langword="true"/> to auto-dispose the input buffer, or dispose it manually.</param>
         /// <returns>request id</returns>
         public Guid SendRequest(RequestPacketBuffer buffer, Func<InputPacketBuffer, bool> onResponse, CancellationToken cancellationToken, bool disposeOnSend = true)
         {
             Guid rid = default;
-            
+
             cancellationToken.Register(() =>
             {
-                lock (this)
-                {
-                    requests.Remove(rid);
-                }
+                UntrackRequest(rid);
+                hub.TryRemoveRequest(rid);
             });
 
-            Action<InputPacketBuffer> action = (input) =>
+            Action<InputPacketBuffer> action = input =>
             {
+                UntrackRequest(rid);
                 if (onResponse(input))
                     input?.Dispose();
-
-                lock (this)
-                {
-                    requests.Remove(rid);
-                }
             };
 
-            do
-            {
-                rid = Guid.NewGuid();
-            } while (!TryAdd(rid, action));
+            rid = RegisterRequest(action);
 
             buffer.WithRecvIdentity(rid);
-
             client.Send(buffer, disposeOnSend);
 
             return rid;
         }
-
 
         public Task SendRequestAsync(RequestPacketBuffer buffer, Func<InputPacketBuffer, Task<bool>> onResponse, bool disposeOnSend = true)
             => SendRequestAsync(buffer, onResponse, CancellationToken.None, disposeOnSend);
@@ -91,18 +94,15 @@ namespace NSL.SocketCore.Extensions.Buffer
             {
                 using (CancellationTokenSource cts = new CancellationTokenSource())
                 {
-
                     rid = SendRequest(buffer, input =>
                     {
                         try
                         {
                             data = input;
                             cts.Cancel();
-
                         }
-                        catch (Exception ex)
+                        catch (Exception)
                         {
-
                             throw;
                         }
 
@@ -112,7 +112,6 @@ namespace NSL.SocketCore.Extensions.Buffer
                     using (var linkedTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cts.Token, cancellationToken))
                         await Task.Delay(-1, linkedTokenSource.Token);
                 }
-                //data = await result.Task;
             }
             catch (OperationCanceledException)
             {
@@ -130,52 +129,34 @@ namespace NSL.SocketCore.Extensions.Buffer
             }
             finally
             {
-                lock (this)
-                {
-                    if (rid != default)
-                        requests.Remove(rid);
-                }
+                UntrackRequest(rid);
+                hub.TryRemoveRequest(rid);
 
                 data?.Dispose();
             }
         }
 
+        /// <summary>
+        /// Delegates to the hub's <see cref="IRequestHub.ProcessResponse"/>.
+        /// Register the hub directly on the connection when multiple processors share it.
+        /// </summary>
         public void ProcessResponse(InputPacketBuffer data)
-        {
-            var id = data.ReadGuid();
-
-            processResponse(id, data);
-        }
-
-        private void processResponse(Guid id, InputPacketBuffer data)
-        {
-            if (requests.TryGetValue(id, out var waitAction))
-            {
-                lock (this)
-                {
-                    requests.Remove(id);
-                }
-
-                if (data != null)
-                    data.ManualDisposing = true;
-
-                waitAction(data);
-            }
-        }
+            => hub.ProcessResponse(data);
 
         public void Dispose()
         {
-            Guid[] keys = default;
-
-            lock (this)
+            Guid[] keys;
+            lock (ownedRequests)
             {
-                keys = requests.Keys.ToArray();
+                keys = ownedRequests.ToArray();
+                ownedRequests.Clear();
             }
 
-            foreach (var item in keys)
-            {
-                processResponse(item, null);
-            }
+            foreach (var id in keys)
+                hub.CancelRequest(id);
+
+            if (ownsHub && hub is IDisposable disposable)
+                disposable.Dispose();
         }
 
         [Obsolete("Replace to RequestProcessor", true)]
@@ -186,5 +167,4 @@ namespace NSL.SocketCore.Extensions.Buffer
             }
         }
     }
-
 }

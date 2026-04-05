@@ -11,7 +11,6 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\Base\NSL.Cipher\NSL.Cipher.csproj" />
-    <ProjectReference Include="..\..\..\..\Core\Extensions\NSL.SocketCore.Extensions.Buffer\NSL.SocketCore.Extensions.Buffer.csproj" />
     <ProjectReference Include="..\..\NSL.TCP.Client\NSL.TCP.Client.csproj" />
   </ItemGroup>
 </Project>

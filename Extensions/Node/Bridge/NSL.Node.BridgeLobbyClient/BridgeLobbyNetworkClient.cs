@@ -1,6 +1,6 @@
-﻿using NSL.Node.BridgeLobbyClient.Models;
+using NSL.Node.BridgeLobbyClient.Models;
 using NSL.SocketClient;
-using NSL.SocketCore.Extensions.Buffer;
+using NSL.SocketCore.Utils.Buffer;
 
 namespace NSL.Node.BridgeLobbyClient
 {

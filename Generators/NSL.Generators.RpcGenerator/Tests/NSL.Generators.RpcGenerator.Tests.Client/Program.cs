@@ -3,7 +3,7 @@ using NSL.Generators.RpcGenerator.Shared;
 using NSL.Generators.RpcGenerator.Tests.Client;
 using NSL.Generators.RpcGenerator.Tests.Server;
 using NSL.Generators.RpcGenerator.Tests.Shared;
-using NSL.SocketCore.Extensions.Buffer;
+using NSL.SocketCore.Utils.Buffer;
 using System;
 using System.Threading.Tasks;
 
@@ -51,7 +51,8 @@ namespace NSL.Generators.RpcGenerator.Tests.Client
             Console.WriteLine("[Client] Connected");
 
             var requestProcessor = client.Data.GetRequestProcessor();
-            var rpc = new TestRpcClient(client.Data, requestProcessor);
+            var channel = new DefaultRPCNetworkChannel(client.Data, requestProcessor);
+            var rpc = new TestRpcClient(channel);
 
             // ── Scenario 1: Fire-and-forget ──────────────────────────────────
             Console.WriteLine("\n[Test] Scenario 1: FireAndForget");

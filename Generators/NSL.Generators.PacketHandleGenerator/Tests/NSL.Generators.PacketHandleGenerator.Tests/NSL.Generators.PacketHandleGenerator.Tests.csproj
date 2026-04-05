@@ -10,7 +10,6 @@
     <Configurations>DebugExamples</Configurations>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\Core\Extensions\NSL.SocketCore.Extensions.Buffer\NSL.SocketCore.Extensions.Buffer.csproj" />
     <ProjectReference Include="..\..\..\..\Core\NSL.SocketCore\NSL.SocketCore.csproj" />
     <ProjectReference Include="..\..\..\..\Protocols\TCP\BuilderExtensions\NSL.BuilderExtensions.TCPClient\NSL.BuilderExtensions.TCPClient.csproj" />
     <ProjectReference Include="..\..\..\..\Protocols\TCP\BuilderExtensions\NSL.BuilderExtensions.TCPServer\NSL.BuilderExtensions.TCPServer.csproj" />

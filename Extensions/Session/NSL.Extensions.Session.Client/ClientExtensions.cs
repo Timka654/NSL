@@ -1,6 +1,6 @@
-﻿using NSL.Extensions.Session.Client.Packets;
+using NSL.Extensions.Session.Client.Packets;
 using NSL.SocketClient;
-using NSL.SocketCore.Extensions.Buffer;
+using NSL.SocketCore.Utils.Buffer;
 using System;
 
 namespace NSL.Extensions.Session.Client

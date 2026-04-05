@@ -31,4 +31,9 @@
 		<AssemblyName>Unity.$(MSBuildProjectName)</AssemblyName>
 	</PropertyGroup>
 
+	<ItemGroup>
+		<ProjectReference Include="..\..\..\Core\NSL.SocketCore\NSL.SocketCore.csproj" />
+
+	</ItemGroup>
+
 </Project>

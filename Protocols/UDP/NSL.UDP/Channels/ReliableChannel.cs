@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using NSL.UDP.Enums;
+using NSL.SocketCore.Utils;
 using System;
 using NSL.UDP.Packet;
 using System.Threading.Tasks;

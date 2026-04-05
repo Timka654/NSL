@@ -1,6 +1,6 @@
-﻿using NSL.SocketClient;
-using NSL.SocketCore.Extensions.Buffer;
+using NSL.SocketClient;
 using NSL.SocketCore.Utils.Buffer;
+
 using System;
 using System.Threading;
 using System.Threading.Tasks;

@@ -1,4 +1,4 @@
-﻿using NSL.BuilderExtensions.SocketCore;
+using NSL.BuilderExtensions.SocketCore;
 using NSL.Logger;
 using NSL.Node.RoomServer.Client.Data;
 using System;
@@ -10,7 +10,7 @@ using NSL.Node.BridgeServer.Shared;
 using NSL.SocketServer;
 using NSL.Extensions.Session.Server;
 using NSL.SocketCore.Utils.Logger;
-using NSL.SocketCore.Extensions.Buffer;
+using NSL.SocketCore.Utils.Buffer;
 using NSL.Utils;
 using NSL.Node.Core.Enums;
 

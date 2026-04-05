@@ -1,5 +1,5 @@
-﻿using NSL.SocketServer.Utils;
-using NSL.UDP.Enums;
+﻿using NSL.SocketCore.Utils;
+using NSL.SocketServer.Utils;
 using System.Collections.Generic;
 
 namespace NSL.UDP.Channels

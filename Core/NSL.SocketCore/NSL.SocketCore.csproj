@@ -33,9 +33,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="System.Memory" Version="4.6.3" />
-		<PackageReference Include="System.Runtime" Version="4.3.1" />
 		<PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.1.2" />
-		<PackageReference Include="System.Runtime.Numerics" Version="4.3.0" />
 		<PackageReference Include="System.Threading.Channels" Version="10.0.5" />
 	</ItemGroup>
 

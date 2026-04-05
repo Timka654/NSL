@@ -76,10 +76,8 @@ namespace NSL.Generators.RpcGenerator.Core
                     .Where(x => x.GetAttributeFullName().Equals(NSLRPCImplementAttributeFullName))
                     .ToArray();
 
-                bool needNetworkClient = false;
-                bool needRequestProcessor = false;
-
                 var containers = new List<RpcContainerData>();
+                bool hasClientSide = false;
 
                 foreach (var attr in implAttrs)
                 {
@@ -89,22 +87,14 @@ namespace NSL.Generators.RpcGenerator.Core
                     containers.Add(container);
 
                     if (container.Direction.HasFlag(NSLRPCDirection.Client))
-                    {
-                        needNetworkClient   |= container.Methods.Any(m => m.IsFireAndForget);
-                        needRequestProcessor |= container.Methods.Any(m => !m.IsFireAndForget);
-                    }
+                        hasClientSide = true;
                 }
 
-                if (needNetworkClient)
+                if (hasClientSide)
                 {
-                    var c = containers.First(c2 => c2.Direction.HasFlag(NSLRPCDirection.Client) && c2.Methods.Any(m => m.IsFireAndForget));
-                    classBuilder.AppendLine($"protected partial {c.NetworkDataType.GetTypeFullName()} GetNetworkClient();");
-                }
-                if (needRequestProcessor)
-                    classBuilder.AppendLine($"protected partial NSL.SocketCore.Extensions.Buffer.RequestProcessor GetRequestProcessor();");
-
-                if (needNetworkClient || needRequestProcessor)
+                    classBuilder.AppendLine("protected partial NSL.Generators.RpcGenerator.Shared.IRPCNetworkChannel GetRpcChannel();");
                     classBuilder.AppendLine();
+                }
 
                 foreach (var container in containers)
                 {
@@ -149,7 +139,7 @@ namespace NSL.Generators.RpcGenerator.Core
 
             if (method.IsFireAndForget)
             {
-                // FAF: void return, OutputPacketBuffer, GetNetworkClient().Send()
+                // FAF: void return, OutputPacketBuffer, GetRpcChannel().Send()
                 var fafParams = method.Parameters.Select(p => $"{p.Type.GetTypeFullName()} {p.Name}").ToList();
                 classBuilder.AppendLine($"public void {method.Name}({string.Join(", ", fafParams)})");
                 classBuilder.AppendBodyTabContent(() =>
@@ -158,7 +148,7 @@ namespace NSL.Generators.RpcGenerator.Core
                     foreach (var p in method.Parameters)
                         classBuilder.AppendLine($"{BuildParamWriteSegment(sourceContext, p, p.Name, "__outputBuf")};");
                     classBuilder.AppendLine();
-                    classBuilder.AppendLine("GetNetworkClient().Send(__outputBuf);");
+                    classBuilder.AppendLine("GetRpcChannel().Send(__outputBuf);");
                 });
                 return;
             }
@@ -179,35 +169,20 @@ namespace NSL.Generators.RpcGenerator.Core
                 foreach (var p in method.Parameters)
                     classBuilder.AppendLine($"{BuildParamWriteSegment(sourceContext, p, p.Name, "__outputBuf")};");
 
-                if (hasResult)
+                classBuilder.AppendLine();
+                classBuilder.AppendLine("using var __response = await GetRpcChannel().RequestAsync(__outputBuf, __cancellationToken);");
+
+                if (method.HasExceptionHandler)
                 {
-                    classBuilder.AppendLine();
-                    classBuilder.AppendLine($"{method.Result.Type.GetTypeFullName()} ___result = default;");
+                    classBuilder.AppendLine("if (!__response.ReadBool())");
+                    classBuilder.AppendBodyTabContent(() =>
+                        classBuilder.AppendLine("throw new NSLRPCRemoteException(__response.ReadString(), __response.ReadString());"));
                 }
 
-                classBuilder.AppendLine();
-                classBuilder.AppendLine($"await GetRequestProcessor().SendRequestAsync(__outputBuf, async __response =>");
-                classBuilder.AppendBodyTabContent(() =>
-                {
-                    if (method.HasExceptionHandler)
-                    {
-                        classBuilder.AppendLine("var __success = __response.ReadBool();");
-                        classBuilder.AppendLine("if (!__success)");
-                        classBuilder.AppendBodyTabContent(() =>
-                            classBuilder.AppendLine("throw new NSLRPCRemoteException(__response.ReadString(), __response.ReadString());"));
-                    }
-
-                    if (hasResult)
-                        classBuilder.AppendLine($"___result = {BuildResultReadSegment(sourceContext, method.Result, method.Result.Type.GetTypeFullName(), "__response")};");
-
-                    classBuilder.AppendLine("return true;");
-                });
-                classBuilder.AppendLine(", __cancellationToken);");
-
                 if (hasResult)
                 {
                     classBuilder.AppendLine();
-                    classBuilder.AppendLine("return ___result;");
+                    classBuilder.AppendLine($"return {BuildResultReadSegment(sourceContext, method.Result, method.Result.Type.GetTypeFullName(), "__response")};");
                 }
             });
         }

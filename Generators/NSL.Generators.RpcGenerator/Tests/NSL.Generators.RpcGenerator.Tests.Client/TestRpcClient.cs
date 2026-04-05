@@ -2,7 +2,6 @@ using NSL.Generators.RpcGenerator.Shared;
 using NSL.Generators.RpcGenerator.Shared.Attributes;
 using NSL.Generators.RpcGenerator.Tests.Shared;
 using NSL.SocketClient;
-using NSL.SocketCore.Extensions.Buffer;
 
 namespace NSL.Generators.RpcGenerator.Tests.Client
 {
@@ -10,17 +9,13 @@ namespace NSL.Generators.RpcGenerator.Tests.Client
     [NSLRPCImplement(typeof(ITestChatService),  typeof(BasicNetworkClient), Direction = NSLRPCDirection.Client)]
     public partial class TestRpcClient
     {
-        private readonly BasicNetworkClient _client;
-        private readonly RequestProcessor _requestProcessor;
+        private readonly IRPCNetworkChannel _channel;
 
-        public TestRpcClient(BasicNetworkClient client, RequestProcessor requestProcessor)
+        public TestRpcClient(IRPCNetworkChannel channel)
         {
-            _client = client;
-            _requestProcessor = requestProcessor;
+            _channel = channel;
         }
 
-        protected partial BasicNetworkClient GetNetworkClient() => _client;
-
-        protected partial RequestProcessor GetRequestProcessor() => _requestProcessor;
+        protected partial IRPCNetworkChannel GetRpcChannel() => _channel;
     }
 }
