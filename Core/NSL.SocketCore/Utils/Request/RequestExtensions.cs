@@ -7,17 +7,6 @@ namespace NSL.SocketCore.Utils.Request
 {
     public static class RequestExtensions
     {
-        [Obsolete("Renamed to AddResponsePacketHandle", true)]
-        public static void AddReceivePacketHandle<TClient>(this CoreOptions<TClient> options, ushort packetId, Func<TClient, IResponsibleProcessor> handler)
-            where TClient : INetworkClient, new()
-            => AddResponsePacketHandle(options, packetId, handler);
-
-        [Obsolete("Renamed to AddResponsePacketHandle", true)]
-        public static void AddReceivePacketHandle<TClient, TEnum>(this CoreOptions<TClient> options, TEnum packetId, Func<TClient, IResponsibleProcessor> handler)
-            where TClient : INetworkClient, new()
-            where TEnum : struct, IConvertible
-            => AddResponsePacketHandle(options, packetId, handler);
-
         public static void AddResponsePacketHandle<TClient>(this CoreOptions<TClient> options, ushort packetId, Func<TClient, IResponsibleProcessor> handler)
             where TClient : INetworkClient
         {

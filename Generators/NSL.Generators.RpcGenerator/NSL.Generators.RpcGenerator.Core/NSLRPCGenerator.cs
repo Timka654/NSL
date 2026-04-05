@@ -62,7 +62,7 @@ namespace NSL.Generators.RpcGenerator.Core
             {
                 "NSL.SocketCore",
                 "NSL.SocketCore.Utils.Buffer",
-                "NSL.SocketCore.Request",
+                "NSL.SocketCore.Utils.Request",
                 "NSL.Generators.RpcGenerator.Shared",
                 "System",
                 "System.Threading",

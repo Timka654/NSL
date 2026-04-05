@@ -1,3 +1,4 @@
+using NSL.SocketCore.Utils.Buffer;
 using System;
 
 namespace NSL.SocketCore.Utils.Request

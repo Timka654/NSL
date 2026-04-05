@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NSL.Refactoring.FastAction.UI;
+using System;
 using System.Collections.Generic;
 
 namespace NSL.Refactoring.FastAction.Core

@@ -14,7 +14,7 @@ namespace NSL.ASPNET.Blazor.Components.EntityFilter
     {
         [Parameter] public IEntityFilterBuilderComponentRegistry ComponentRegistry { get; set; }
 
-        public IReadOnlyDictionary<Type, IReadOnlyDictionary<string, NSL.Entity.PathGenerator.Shared.FilterInfo>> TypeLibrary { get; set; }
+        public IReadOnlyDictionary<Type, IReadOnlyDictionary<string, FilterInfo>> TypeLibrary { get; set; }
 
         private EntityFilterBuilderAcceptDelegate acceptAction;
 
@@ -28,7 +28,7 @@ namespace NSL.ASPNET.Blazor.Components.EntityFilter
             data = new EntityFilterBuilderDataModel();
         }
 
-        public virtual async Task ShowAsync(Type type, IReadOnlyDictionary<Type, IReadOnlyDictionary<string, NSL.Entity.PathGenerator.Shared.FilterInfo>> typeLibrary, EntityFilterBuilderAcceptDelegate acceptAction)
+        public virtual async Task ShowAsync(Type type, IReadOnlyDictionary<Type, IReadOnlyDictionary<string, FilterInfo>> typeLibrary, EntityFilterBuilderAcceptDelegate acceptAction)
         {
             data.SetType(type, typeLibrary);
             TypeLibrary = typeLibrary;
@@ -109,7 +109,7 @@ namespace NSL.ASPNET.Blazor.Components.EntityFilter
             Update();
         }
 
-        private void SelectField(KeyValuePair<string, NSL.Entity.PathGenerator.Shared.FilterInfo> field)
+        private void SelectField(KeyValuePair<string, FilterInfo> field)
         {
             if (field.Key != Block.Field?.Key)
                 Block.Tree.Clear();
@@ -117,7 +117,7 @@ namespace NSL.ASPNET.Blazor.Components.EntityFilter
             SetField(field);
         }
 
-        private void SetField(KeyValuePair<string, NSL.Entity.PathGenerator.Shared.FilterInfo> field)
+        private void SetField(KeyValuePair<string, FilterInfo> field)
         {
             Block.Field = field;
 

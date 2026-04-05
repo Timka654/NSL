@@ -18,7 +18,7 @@ namespace NSL.Generators.FillTypeGenerator.Tests.Develop
 
     public partial class Ignore2Model
     {
-        [NSL.Generators.FillTypeGenerator.Attributes.FillTypeGenerateIgnore]
+        [FillTypeGenerateIgnore]
         public List<Ignore3Model> List2 { get; set; }
     }
 

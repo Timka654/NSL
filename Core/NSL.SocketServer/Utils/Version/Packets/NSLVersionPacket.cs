@@ -1,5 +1,6 @@
 using NSL.SocketCore.Utils;
 using NSL.SocketCore.Utils.Buffer;
+using NSL.SocketCore.Utils.Request;
 using NSL.SocketCore.Utils.Version;
 
 namespace NSL.SocketServer.Utils.Version.Packets

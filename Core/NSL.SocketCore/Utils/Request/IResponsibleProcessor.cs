@@ -1,3 +1,5 @@
+using NSL.SocketCore.Utils.Buffer;
+
 namespace NSL.SocketCore.Utils.Request
 {
     public interface IResponsibleProcessor

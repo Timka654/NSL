@@ -1,4 +1,5 @@
 ﻿using NSL.Database.EntityFramework.Filter.V2.Models;
+using NSL.Generators.EntityPathGenerator.Shared;
 using System;
 using System.Collections.Generic;
 
@@ -8,7 +9,7 @@ namespace NSL.ASPNET.Blazor.Components.EntityFilter
     {
         public Type EntityType { get; private set; }
 
-        public void SetType(Type entityType, IReadOnlyDictionary<Type, IReadOnlyDictionary<string, NSL.Entity.PathGenerator.Shared.FilterInfo>> library)
+        public void SetType(Type entityType, IReadOnlyDictionary<Type, IReadOnlyDictionary<string, FilterInfo>> library)
         {
             EntityType = entityType;
 
@@ -18,13 +19,13 @@ namespace NSL.ASPNET.Blazor.Components.EntityFilter
             FieldsData = _typeMap;
         }
 
-        public IReadOnlyDictionary<string, NSL.Entity.PathGenerator.Shared.FilterInfo>? FieldsData { get; set; }
+        public IReadOnlyDictionary<string, FilterInfo>? FieldsData { get; set; }
 
         public List<EntityFilterBuilderBlockDataModel> Tree { get; set; } = new();
 
 
 
-        protected virtual void Add(Type entityType, FilterLogic logic, IReadOnlyDictionary<Type, IReadOnlyDictionary<string, NSL.Entity.PathGenerator.Shared.FilterInfo>> typeLibrary)
+        protected virtual void Add(Type entityType, FilterLogic logic, IReadOnlyDictionary<Type, IReadOnlyDictionary<string, FilterInfo>> typeLibrary)
         {
             //var entityType = Field.Value.Value.ElementType ?? Field.Value.Value.PropertyType;
 
@@ -42,12 +43,12 @@ namespace NSL.ASPNET.Blazor.Components.EntityFilter
             Tree.Add(e);
         }
 
-        public virtual void AddOr(IReadOnlyDictionary<Type, IReadOnlyDictionary<string, NSL.Entity.PathGenerator.Shared.FilterInfo>> typeLibrary)
+        public virtual void AddOr(IReadOnlyDictionary<Type, IReadOnlyDictionary<string, FilterInfo>> typeLibrary)
         {
             Add(EntityType, FilterLogic.Or, typeLibrary);
         }
 
-        public virtual void AddAnd(IReadOnlyDictionary<Type, IReadOnlyDictionary<string, NSL.Entity.PathGenerator.Shared.FilterInfo>> typeLibrary)
+        public virtual void AddAnd(IReadOnlyDictionary<Type, IReadOnlyDictionary<string, FilterInfo>> typeLibrary)
         {
             Add(EntityType, FilterLogic.And, typeLibrary);
         }

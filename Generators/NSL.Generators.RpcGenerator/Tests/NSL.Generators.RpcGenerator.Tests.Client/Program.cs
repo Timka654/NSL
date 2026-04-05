@@ -4,6 +4,7 @@ using NSL.Generators.RpcGenerator.Tests.Client;
 using NSL.Generators.RpcGenerator.Tests.Server;
 using NSL.Generators.RpcGenerator.Tests.Shared;
 using NSL.SocketCore.Utils.Buffer;
+using NSL.SocketCore.Utils.Request;
 using System;
 using System.Threading.Tasks;
 

@@ -104,6 +104,7 @@ namespace NSL.Generators.PacketHandleGenerator.Core
             List<string> requiredUsings = new List<string> {
                 "NSL.SocketCore",
                 "NSL.SocketCore.Utils.Buffer",
+                "NSL.SocketCore.Utils.Request",
                 "System.Linq",
                 "System"
             };

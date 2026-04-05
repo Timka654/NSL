@@ -6,7 +6,7 @@ namespace NSL.Generators.HttpEndPointGenerator.Tests.Client;
 
 [HttpEndPointImplementGenerate(typeof(ITestController))]
 [HttpEndPointImplementGenerate(typeof(ITest1Controller))]
-[HttpEndPointIncludeUsing("NSL.Generators.FillTypeGenerator.Tests.Develop.WithModelName")]
+[HttpEndPointIncludeUsing("NSL.Generators.HttpEndPointGenerator.Tests.Shared.Develop.WithModelName")]
 //[HttpEndPointIncludeUsing("NSL.Generators.HttpEndPointGenerator.Tests.Shared22")]
 //[HttpEndPointExcludeUsing("NSL.Generators.HttpEndPointGenerator.Tests.Shared")]
 //[HttpEndPointExcludeUsing("NSL.HttpClient")]

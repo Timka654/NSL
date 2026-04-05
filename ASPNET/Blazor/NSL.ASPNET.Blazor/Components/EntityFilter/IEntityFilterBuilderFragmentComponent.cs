@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NSL.Generators.EntityPathGenerator.Shared;
+using System;
 using System.Collections.Generic;
 
 namespace NSL.ASPNET.Blazor.Components.EntityFilter
@@ -9,7 +10,7 @@ namespace NSL.ASPNET.Blazor.Components.EntityFilter
         void Remove(EntityFilterBuilderBlockDataModel block);
         bool IsFirst(EntityFilterBuilderBlockDataModel block);
 
-        IReadOnlyDictionary<Type, IReadOnlyDictionary<string, NSL.Entity.PathGenerator.Shared.FilterInfo>> TypeLibrary
+        IReadOnlyDictionary<Type, IReadOnlyDictionary<string, FilterInfo>> TypeLibrary
         {
             get;
         }

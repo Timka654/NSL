@@ -1,6 +1,7 @@
 using NSL.Generators.PacketHandleGenerator.Shared;
 using NSL.SocketClient;
 using NSL.SocketCore.Utils.Buffer;
+using NSL.SocketCore.Utils.Request;
 using NSL.SocketServer.Utils;
 using NSL.TCP.Client;
 

@@ -9,6 +9,7 @@ using NSL.SocketCore.Utils;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using NSL.SocketCore.Utils.Request;
 
 namespace NSL.Node.BridgeLobbyClient
 {

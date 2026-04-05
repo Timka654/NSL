@@ -2,7 +2,8 @@ using NSL.SocketCore.Utils.Buffer;
 using NSL.SocketCore.Utils;
 using System;
 using NSL.EndPointBuilder;
-using static NSL.SocketCore.Utils.Buffer.RequestExtensions;
+using static NSL.SocketCore.Utils.Request.RequestExtensions;
+using NSL.SocketCore.Utils.Request;
 
 namespace NSL.BuilderExtensions.Buffer
 {

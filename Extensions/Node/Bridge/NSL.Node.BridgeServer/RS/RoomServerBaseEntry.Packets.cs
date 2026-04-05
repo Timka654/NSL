@@ -4,6 +4,7 @@ using NSL.Node.BridgeServer.Shared.Message;
 using NSL.Node.BridgeServer.Shared.Requests;
 using NSL.Node.BridgeServer.Shared.Response;
 using NSL.SocketCore.Utils.Buffer;
+using NSL.SocketCore.Utils.Request;
 
 using System.Threading.Tasks;
 using NetworkClient = NSL.Node.BridgeServer.RS.RoomServerNetworkClient;

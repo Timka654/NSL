@@ -1,5 +1,4 @@
 ﻿using NSL.EndPointBuilder;
-using NSL.Logger;
 using NSL.SocketClient;
 using NSL.SocketCore;
 using NSL.SocketCore.Utils;
@@ -12,7 +11,7 @@ using NSL.SocketCore.Utils.Packet;
 using System;
 using System.Net.Sockets;
 using System.Reflection;
-using static NSL.SocketCore.Utils.Buffer.RequestExtensions;
+using static NSL.SocketCore.Utils.Request.RequestExtensions;
 
 namespace NSL.BuilderExtensions.SocketCore
 {

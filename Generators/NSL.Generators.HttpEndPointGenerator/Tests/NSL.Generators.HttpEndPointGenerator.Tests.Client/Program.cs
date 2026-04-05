@@ -1,4 +1,5 @@
-﻿using NSL.HttpClient;
+﻿using NSL.Generators.HttpEndPointGenerator.Tests.Shared.Develop.WithModelName;
+using NSL.HttpClient;
 using NSL.HttpClient.HttpContent;
 using NSL.HttpClient.Models;
 
@@ -18,14 +19,14 @@ namespace NSL.Generators.HttpEndPointGenerator.Tests.Client
         static StreamDataContent GetFile2()
             => new HttpClient.HttpContent.StreamDataContent() { FileName = "devContent2.file", Stream = GetStream2() };
 
-        static FillTypeGenerator.Tests.Develop.WithModelName.WithModelName3 GetModelN3()
-            => new FillTypeGenerator.Tests.Develop.WithModelName.WithModelName3 { Abc1 = 11, Abc2 = 22 };
+        static WithModelName3 GetModelN3()
+            => new WithModelName3 { Abc1 = 11, Abc2 = 22 };
 
-        static FillTypeGenerator.Tests.Develop.WithModelName.WithModelName2 GetModelN2()
-            => new FillTypeGenerator.Tests.Develop.WithModelName.WithModelName2() { Abc3 = GetModelN3() };
+        static WithModelName2 GetModelN2()
+            => new WithModelName2() { Abc3 = GetModelN3() };
 
-        static FillTypeGenerator.Tests.Develop.WithModelName.WithModelName4 GetModelN4()
-         => new FillTypeGenerator.Tests.Develop.WithModelName.WithModelName4()
+        static WithModelName4 GetModelN4()
+         => new WithModelName4()
          {
              Abc3 = GetModelN3()
          };

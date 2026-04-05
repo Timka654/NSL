@@ -3,6 +3,7 @@ using NSL.Generators.BinaryTypeIOGenerator.Shared;
 using NSL.SocketClient;
 using NSL.SocketServer.Utils;
 using NSL.SocketCore.Utils.Buffer;
+using NSL.SocketCore.Utils.Request;
 
 namespace NSL.Generators.PacketHandleGenerator.Tests
 {

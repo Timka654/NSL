@@ -3,6 +3,7 @@ using NSL.SocketCore.Utils;
 
 using System.Threading;
 using System.Threading.Tasks;
+using NSL.SocketCore.Utils.Request;
 
 namespace NSL.Generators.RpcGenerator.Shared
 {

@@ -1,4 +1,5 @@
 using NSL.SocketCore.Utils;
+using NSL.SocketCore.Utils.Buffer;
 using System;
 using System.Collections.Generic;
 using System.Linq;

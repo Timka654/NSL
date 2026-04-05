@@ -22,9 +22,9 @@ namespace NSL.ASPNET.Blazor.Components.EntityFilter
 
         public string? Value { get; set; }
 
-        public NSL.Database.EntityFramework.Filter.V2.Enums.FilterOperator? Operator { get; set; }
+        public FilterOperator? Operator { get; set; }
 
-        public KeyValuePair<string, NSL.Entity.PathGenerator.Shared.FilterInfo>? Field { get; set; }
+        public KeyValuePair<string, FilterInfo>? Field { get; set; }
 
         [JsonIgnore]
         public string FieldNameKey { get; set; }
