@@ -1,5 +1,6 @@
 ﻿using NSL.ConfigurationEngine.Info;
 using NSL.ConfigurationEngine.Providers;
+using NSL.SocketCore.Utils;
 using NSL.SocketCore.Utils.Logger.Enums;
 using System;
 using System.Collections.Generic;
@@ -8,7 +9,7 @@ using System.Linq;
 
 namespace NSL.ConfigurationEngine
 {
-    public abstract class BaseConfigurationManager : ConfigurationStorage
+    public abstract class BaseConfigurationManager : ConfigurationStorage, INSLConfiguration
     {
         public static readonly NoProviderLoadingProvider NoProvider = new NoProviderLoadingProvider();
 

@@ -6,7 +6,7 @@ namespace NSL.SocketServer.Utils.SystemPackets
 {
     public class SystemTime<T> : IPacket<T> where T : IServerNetworkClient
     {
-        public const ushort PacketId = ushort.MaxValue - 1;
+        public const ushort PacketId = (ushort)NSLSystemPacketEnum.SystemTime;
 
         public SystemTime()
         {

@@ -1,5 +1,6 @@
-﻿using NSL.SocketCore.Utils.SystemPackets;
-using NSL.SocketCore;
+﻿using NSL.SocketCore;
+using NSL.SocketCore.Utils;
+using NSL.SocketCore.Utils.SystemPackets;
 using NSL.SocketServer.Utils;
 using NSL.SocketServer.Utils.SystemPackets;
 using System.Net;
@@ -43,5 +44,21 @@ namespace NSL.SocketServer
         public IPAddress GetIPAddress() => IPAddress.Parse(IpAddress);
 
         public IPEndPoint GetIPEndPoint() => new IPEndPoint(GetIPAddress(), Port);
+    }
+
+    public static class NetworkConfigurationExtension
+    {
+        public static ServerOptions<T> LoadConfigurationServerOptions<T>(this INSLConfiguration configuration, string networkNodePath)
+            where T : IServerNetworkClient
+        {
+            var r = configuration.LoadConfigurationCoreOptions<ServerOptions<T>, T>(networkNodePath);
+
+            r.Backlog = configuration.GetValue<int>($"{networkNodePath}.io.backlog");
+
+            r.IpAddress = configuration.GetValue($"{networkNodePath}.io.ip");
+            r.Port = configuration.GetValue<int>($"{networkNodePath}.io.port");
+
+            return r;
+        }
     }
 }

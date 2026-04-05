@@ -1,4 +1,5 @@
-﻿using NSL.SocketServer;
+﻿using NSL.SocketCore.Utils;
+using NSL.SocketServer;
 using NSL.SocketServer.Utils;
 using System;
 using System.Threading;
@@ -9,8 +10,8 @@ namespace NSL.UDP.Packet
     public class UDPPingPacket<TClient> : IDisposable
     where TClient : IServerNetworkClient, IUDPClientWithPing<TClient>
     {
-        public const ushort ReceivePingPacketId = ushort.MaxValue - 100;
-        public const ushort SendPingPacketId = ushort.MaxValue - 101;
+        public const ushort ReceivePingPacketId = (ushort)NSLSystemPacketEnum.UDPReceivePing;
+        public const ushort SendPingPacketId    = (ushort)NSLSystemPacketEnum.UDPSendPing;
         private readonly TClient client;
         private readonly ushort requestPID;
 

@@ -4,7 +4,7 @@ namespace NSL.SocketCore.Utils.SystemPackets
 {
     public class AliveConnectionPacket
     {
-        public const ushort PacketId = ushort.MaxValue;
+        public const ushort PacketId = (ushort)NSLSystemPacketEnum.AliveConnection;
 
         public static void SendRequest(IClient client)
         {

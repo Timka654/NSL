@@ -2,17 +2,16 @@ using NSL.EndPointBuilder;
 using NSL.Logger;
 using NSL.SocketClient;
 using NSL.SocketCore;
-using NSL.SocketCore.Utils.Buffer;
-using NSL.SocketCore.Utils.Packet;
 using NSL.SocketCore.Utils;
 using NSL.SocketCore.Utils.Buffer;
 using NSL.SocketCore.Utils.Exceptions;
 using NSL.SocketCore.Utils.Logger;
 using NSL.SocketCore.Utils.Logger.Enums;
+using NSL.SocketCore.Utils.Packet;
 using System;
 using System.Net.Sockets;
 using System.Reflection;
-using static NSL.SocketCore.Extensions.Buffer.RequestExtensions;
+using static NSL.SocketCore.Utils.Buffer.RequestExtensions;
 
 namespace NSL.BuilderExtensions.SocketCore
 {

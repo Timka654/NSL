@@ -9,10 +9,10 @@ namespace NSL.SocketCore.Utils.Buffer
 {
     public class RequestProcessor : IResponsibleProcessor, IDisposable
     {
-        public const string DefaultObjectBagKey = "NSL__DEFAULT__REQUEST__PROCESSOR";
-        public const string DefaultResponsePIDObjectBagKey = "NSL__DEFAULT__RESPONSE_PID";
+        public const string DefaultObjectBagKey          = NSLObjectBagKeys.RequestProcessor;
+        public const string DefaultResponsePIDObjectBagKey = NSLObjectBagKeys.ResponsePID;
 
-        public const ushort DefaultResponsePacketId = 1;
+        public const ushort DefaultResponsePacketId = (ushort)NSLSystemPacketEnum.DefaultRequestResponse;
 
         /// <summary>
         /// Create a processor that uses a shared <paramref name="hub"/> for request routing.

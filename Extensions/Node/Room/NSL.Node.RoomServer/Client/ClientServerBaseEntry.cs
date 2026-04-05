@@ -8,7 +8,7 @@ using NSL.SocketServer.Utils;
 using System.Threading.Tasks;
 using NSL.Node.BridgeServer.Shared;
 using NSL.SocketServer;
-using NSL.Extensions.Session.Server;
+using NSL.SocketServer.Utils.Session;
 using NSL.SocketCore.Utils.Logger;
 using NSL.SocketCore.Utils.Buffer;
 using NSL.Utils;

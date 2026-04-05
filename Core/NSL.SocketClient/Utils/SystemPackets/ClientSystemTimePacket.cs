@@ -1,12 +1,13 @@
 ﻿using System;
 using NSL.SocketCore;
+using NSL.SocketCore.Utils;
 using NSL.SocketCore.Utils.Buffer;
 
 namespace NSL.SocketClient.Utils.SystemPackets
 {
     public class ClientSystemTimePacket
     {
-        public const ushort PacketId = ushort.MaxValue - 1;
+        public const ushort PacketId = (ushort)NSLSystemPacketEnum.SystemTime;
 
         public static void SendRequest(IClient client)
         {

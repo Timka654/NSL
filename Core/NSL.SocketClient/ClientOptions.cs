@@ -154,4 +154,17 @@ namespace NSL.SocketClient
             };
         }
     }
+    public static class NetworkConfigurationExtension
+    {
+        public static ClientOptions<T> LoadConfigurationClientOptions<T>(this INSLConfiguration configuration, string networkNodePath)
+            where T : BaseSocketNetworkClient
+        {
+            var r = configuration.LoadConfigurationCoreOptions<ClientOptions<T>, T>(networkNodePath);
+
+            r.IpAddress = configuration.GetValue($"{networkNodePath}.io.ip");
+            r.Port = configuration.GetValue<int>($"{networkNodePath}.io.port");
+
+            return r;
+        }
+    }
 }
