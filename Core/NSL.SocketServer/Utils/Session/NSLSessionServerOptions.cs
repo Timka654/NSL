@@ -1,3 +1,5 @@
+using NSL.SocketCore.Utils;
+using NSL.SocketCore.Utils.Session;
 using NSL.SocketServer.Utils;
 using System;
 using System.Threading.Tasks;

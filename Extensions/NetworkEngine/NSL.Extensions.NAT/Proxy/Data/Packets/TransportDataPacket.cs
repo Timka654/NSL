@@ -5,7 +5,19 @@ using NSL.SocketCore.Utils.Buffer;
 
 namespace NSL.Extensions.NAT.Proxy.Data.Packets
 {
-    internal class TransportDataPacket : IPacketMessage<NetworkProxyClient, (string, InputPacketBuffer)>
+    public class ProxyTransportData
+    {
+        public string PeerId { get; }
+        public InputPacketBuffer Buffer { get; }
+
+        public ProxyTransportData(string peerId, InputPacketBuffer buffer)
+        {
+            PeerId = peerId;
+            Buffer = buffer;
+        }
+    }
+
+    internal class TransportDataPacket : IPacketMessage<NetworkProxyClient, ProxyTransportData>
     {
         public TransportDataPacket(ClientOptions<NetworkProxyClient> options) : base(options)
         {
@@ -13,7 +25,7 @@ namespace NSL.Extensions.NAT.Proxy.Data.Packets
 
         protected override void Receive(InputPacketBuffer data)
         {
-            InvokeEvent((data.ReadString(), new InputPacketBuffer(data.Read(data.ReadInt32()))));
+            InvokeEvent(new ProxyTransportData(data.ReadString(), new InputPacketBuffer(data.Read(data.ReadInt32()))));
         }
 
         public void Send(byte[] data)

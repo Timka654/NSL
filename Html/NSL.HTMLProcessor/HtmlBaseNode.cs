@@ -90,30 +90,41 @@ namespace NSL.HTMLProcessor
 
         public virtual bool CanHaveAttributes => true;
 
+        internal void RecalculateSize() => calculatePosition();
+
         private void calculatePosition()
         {
-            var contentLen = string.Concat(ChildNodes.Select(x => x.BuildHtml())).Length;
+            // Sum children sizes arithmetically — no HTML strings built
+            var contentLen = 0;
+            foreach (var child in childNodes)
+                contentLen += child.Size.TotalLength;
 
             var openNodeLen = 0;
+            var closeNodeLen = 0;
 
-            if (attributes.Any())
-                openNodeLen = string.Join(' ', attributes.Select(x => x.BuildHtml())).Length + 1;// prepend space
-
-            if (NodeName != null)
+            if (!string.IsNullOrEmpty(NodeName))
             {
-                openNodeLen += $"<{NodeName}>".Length;
+                // Each attribute contributes its size + 1 leading space
+                // e.g. <div class="a" id="b"> → " class=\"a\" id=\"b\"" = sum(sizes) + count
+                var attrsTotal = attributes.Count > 0
+                    ? attributes.Sum(x => x.Size) + attributes.Count
+                    : 0;
 
-                if (!HasBody)
-                    openNodeLen += 1;
+                if (HasBody)
+                {
+                    openNodeLen  = NodeName.Length + attrsTotal + 2; // <name attrs>
+                    closeNodeLen = NodeName.Length + 3;              // </name>
+                }
+                else
+                {
+                    openNodeLen = NodeName.Length + attrsTotal + 4;  // <name attrs />
+                }
             }
-
-            var closeNodeLen = HasBody ? $"</{NodeName}>".Length : 0;
-
 
             Size = new NodeSize()
             {
-                OpenNodeLength = openNodeLen,
-                CloseNodeLength = closeNodeLen,
+                OpenNodeLength   = openNodeLen,
+                CloseNodeLength  = closeNodeLen,
                 InnerContentLength = contentLen
             };
         }
@@ -149,7 +160,10 @@ namespace NSL.HTMLProcessor
         {
             node.Parent = this;
 
-            node.Position = GetCurrentOffset();
+            // O(1): read last child's position+size instead of summing all children
+            node.Position = childNodes.Count > 0
+                ? childNodes[childNodes.Count - 1].Position!.Value + childNodes[childNodes.Count - 1].Size.TotalLength
+                : 0;
 
             childNodes.Add(node);
 
@@ -157,7 +171,9 @@ namespace NSL.HTMLProcessor
         }
 
         private int GetCurrentOffset()
-            => ChildNodes.Select(x => x.Size.TotalLength).DefaultIfEmpty(0).Sum();
+            => childNodes.Count > 0
+                ? childNodes[childNodes.Count - 1].Position!.Value + childNodes[childNodes.Count - 1].Size.TotalLength
+                : 0;
 
         public void PrependChildNode(HtmlBaseNode node)
         {
@@ -269,7 +285,11 @@ namespace NSL.HTMLProcessor
 
         public TValue? GetAttributeValue<TValue>(string key)
             where TValue : IConvertible
-            => (TValue?)Convert.ChangeType(GetAttributeValue(key), typeof(TValue));
+        {
+            var str = GetAttributeValue(key);
+            if (str == null) return default;
+            return (TValue)Convert.ChangeType(str, typeof(TValue));
+        }
 
         public bool TryGetAttributeValue(string key, out string? value)
         {

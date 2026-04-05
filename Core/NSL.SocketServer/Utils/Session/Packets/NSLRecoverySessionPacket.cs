@@ -1,10 +1,9 @@
 using NSL.SocketCore.Utils;
 using NSL.SocketCore.Utils.Buffer;
 using NSL.SocketCore.Utils.Session;
-using NSL.SocketServer.Utils;
 using System.Threading.Tasks;
 
-namespace NSL.SocketServer.Utils.Session
+namespace NSL.SocketServer.Utils.Session.Packets
 {
     public class NSLRecoverySessionPacket<T> : IAsyncPacket<T> where T : IServerNetworkClient
     {

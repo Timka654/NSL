@@ -1,5 +1,3 @@
-using NSL.SocketClient;
-using NSL.SocketClient.Utils.Session;
 using NSL.SocketCore;
 using NSL.SocketCore.Utils;
 using NSL.SocketCore.Utils.Buffer;
@@ -8,7 +6,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace NSL.SocketClient.Utils.Session
+namespace NSL.SocketClient.Utils.Session.Packets
 {
     public static class NSLRecoverySessionPacketExtension
     {

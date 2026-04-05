@@ -1,4 +1,5 @@
-﻿using NSL.SocketCore.Utils.Logger;
+﻿using NSL.SocketCore.Utils;
+using NSL.SocketCore.Utils.Logger;
 using NSL.UDP;
 using NSL.UDP.Client;
 
@@ -39,7 +40,7 @@ namespace NSL.UDPExample
 
             for (int i = 0; i < 10; i++)
             {
-                using (var packet = new DgramOutputPacketBuffer() { PacketId = 1, Channel = NSL.UDP.Enums.UDPChannelEnum.ReliableUnordered })
+                using (var packet = new DgramOutputPacketBuffer() { PacketId = 1, Channel = UDPChannelEnum.ReliableUnordered })
                 {
                     packet.WriteInt32((i * 3) + 1);
                     packet.WriteInt32((i * 3) + 2);

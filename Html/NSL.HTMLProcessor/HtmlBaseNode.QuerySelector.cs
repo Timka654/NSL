@@ -24,9 +24,17 @@ namespace NSL.HTMLProcessor
             }
         }
 
-        public HtmlBaseNode? NextSibling =>
-            Parent == null ? null :
-            Parent.ChildNodes.SkipWhile(x => x != this).Skip(1).FirstOrDefault();
+        public HtmlBaseNode? NextSibling
+        {
+            get
+            {
+                if (Parent == null) return null;
+                var list = Parent.ChildNodes;
+                for (int i = 0; i < list.Count - 1; i++)
+                    if (list[i] == this) return list[i + 1];
+                return null;
+            }
+        }
 
         public IEnumerable<HtmlBaseNode> FollowingSiblings()
         {
@@ -79,7 +87,7 @@ namespace NSL.HTMLProcessor
                 // SKIP SPACES → descendant combinator
                 if (char.IsWhiteSpace(c))
                 {
-                    if (tokens.Last().Type == TokenType.Combinator) { ++i; continue; }
+                    if (tokens.Count > 0 && tokens[tokens.Count - 1].Type == TokenType.Combinator) { ++i; continue; }
 
                     // Skip whitespace but DO NOT emit combinator until we know it's not followed by > + ~
                     int j = i;
@@ -289,9 +297,17 @@ namespace NSL.HTMLProcessor
         {
             var groups = ParseSelector(selector);
 
+            var seen   = new HashSet<HtmlBaseNode>(ReferenceEqualityComparer.Instance);
             var result = new List<HtmlBaseNode>();
+
             foreach (var g in groups)
-                result.AddRange(ApplySteps(root, g.Steps));
+            {
+                foreach (var node in ApplySteps(root, g.Steps))
+                {
+                    if (seen.Add(node))
+                        result.Add(node);
+                }
+            }
 
             return result.Where(x => x is T).Cast<T>();
         }
@@ -500,7 +516,7 @@ namespace NSL.HTMLProcessor
                 if (isFirstStep)
                 {
                     // первый шаг — ищем элемент в любом месте документа
-                    current = current.SelectMany(n => n.FindNodes(check, true)).Where(x => check.GetInvocationList().All(i => ((Func<HtmlBaseNode, bool>)i)(x)));
+                    current = current.SelectMany(n => n.FindNodes(check, true));
                     isFirstStep = false;
                     continue;
                 }
@@ -508,22 +524,22 @@ namespace NSL.HTMLProcessor
                 current = step.Combinator switch
                 {
                     Combinator.None =>
-                        current.Where(x => check.GetInvocationList().All(i => ((Func<HtmlBaseNode, bool>)i)(x))),
+                        current.Where(check),
 
                     Combinator.Descendant =>
-                        current.SelectMany(n => n.FindNodes(x => check.GetInvocationList().All(i => ((Func<HtmlBaseNode, bool>)i)(x)), true)),
+                        current.SelectMany(n => n.FindNodes(check, true)),
 
                     Combinator.Child =>
-                        current.SelectMany(n => n.ChildNodes.Where(x=>check.GetInvocationList().All(i=>((Func<HtmlBaseNode, bool>)i)(x)))),
+                        current.SelectMany(n => n.ChildNodes.Where(check)),
 
                     Combinator.Adjacent =>
                         current.SelectMany(n =>
-                            n.NextSibling != null && check.GetInvocationList().All(i => ((Func<HtmlBaseNode, bool>)i)(n.NextSibling))
+                            n.NextSibling != null && check(n.NextSibling)
                                 ? new[] { n.NextSibling }
                                 : Array.Empty<HtmlBaseNode>()),
 
                     Combinator.Sibling =>
-                        current.SelectMany(n => n.FollowingSiblings().Where(x => check.GetInvocationList().All(i => ((Func<HtmlBaseNode, bool>)i)(x)))),
+                        current.SelectMany(n => n.FollowingSiblings().Where(check)),
 
                     _ => current
                 };
@@ -539,53 +555,81 @@ namespace NSL.HTMLProcessor
 
         private static Func<HtmlBaseNode, bool> BuildCheck(SelectorStep step)
         {
-            Func<HtmlBaseNode, bool> f = _ => true;
+            var checks = new List<Func<HtmlBaseNode, bool>>();
 
             if (step.Tag != null)
-                f += n => string.Equals(n.NodeName, step.Tag, StringComparison.OrdinalIgnoreCase);
+            {
+                var tag = step.Tag;
+                checks.Add(n => string.Equals(n.NodeName, tag, StringComparison.OrdinalIgnoreCase));
+            }
 
             if (step.Id != null)
-                f += n => n.Id == step.Id;
+            {
+                var id = step.Id;
+                checks.Add(n => n.Id == id);
+            }
 
             if (step.Classes != null)
-                f += n => n.Class != null &&
-                    step.Classes.All(c => n.Class.Any(cc => string.Equals( cc,c, StringComparison.OrdinalIgnoreCase)));
+            {
+                var classes = step.Classes;
+                checks.Add(n => n.Class != null &&
+                    classes.All(c => n.Class.Any(cc => string.Equals(cc, c, StringComparison.OrdinalIgnoreCase))));
+            }
 
             if (step.Attributes != null)
-                f += n => step.Attributes.All(a =>
+            {
+                var attrs = step.Attributes;
+                checks.Add(n => attrs.All(a =>
                 {
                     if (!n.TryGetAttributeValue(a.Name, out var v)) return false;
 
                     return a.Mode switch
                     {
-                        AttributeMatchMode.Exists => true,
-                        AttributeMatchMode.Equals => v == a.Value,
-                        AttributeMatchMode.StartsWith => v.StartsWith(a.Value),
-                        AttributeMatchMode.EndsWith => v.EndsWith(a.Value),
-                        AttributeMatchMode.Contains => v.Contains(a.Value),
-                        AttributeMatchMode.ContainsWord => v.Split(' ').Contains(a.Value),
-                        AttributeMatchMode.EqualsOrStartsWith => v == a.Value || v.StartsWith(a.Value + "-"),
+                        AttributeMatchMode.Exists              => true,
+                        AttributeMatchMode.Equals              => v == a.Value,
+                        AttributeMatchMode.StartsWith          => v!.StartsWith(a.Value!),
+                        AttributeMatchMode.EndsWith            => v!.EndsWith(a.Value!),
+                        AttributeMatchMode.Contains            => v!.Contains(a.Value!),
+                        AttributeMatchMode.ContainsWord        => v!.Split(' ').Contains(a.Value),
+                        AttributeMatchMode.EqualsOrStartsWith  => v == a.Value || v!.StartsWith(a.Value + "-"),
                         _ => false
                     };
-                });
+                }));
+            }
 
             if (step.Not != null)
-                f += n => step.Not.All(g => !MatchSingle(n, g));
+            {
+                var not = step.Not;
+                checks.Add(n => not.All(g => !MatchSingle(n, g)));
+            }
 
             if (step.Is != null)
-                f += n => step.Is.Any(g => MatchGroup(n, g));
+            {
+                var isList = step.Is;
+                checks.Add(n => isList.Any(g => MatchGroup(n, g)));
+            }
 
             if (step.Where != null)
-                f += n => step.Where.Any(g => MatchGroup(n, g));
+            {
+                var where = step.Where;
+                checks.Add(n => where.Any(g => MatchGroup(n, g)));
+            }
 
             if (step.Has != null)
-                f += n => step.Has.Any(g =>
-                    n.FindNodes(child => MatchGroup(child, g), true).Any());
+            {
+                var has = step.Has;
+                checks.Add(n => has.Any(g => n.FindNodes(child => MatchGroup(child, g), true).Any()));
+            }
 
             if (step.Pseudo != null)
-                f += n => step.Pseudo.All(p => CheckPseudo(n, p));
+            {
+                var pseudo = step.Pseudo;
+                checks.Add(n => pseudo.All(p => CheckPseudo(n, p)));
+            }
 
-            return f;
+            if (checks.Count == 0) return _ => true;
+            if (checks.Count == 1) return checks[0];
+            return n => { foreach (var c in checks) if (!c(n)) return false; return true; };
         }
         private static bool MatchSingle(HtmlBaseNode node, SelectorGroup group)
         {
@@ -680,18 +724,26 @@ namespace NSL.HTMLProcessor
             };
         }
 
-        private static int ChildIndex(HtmlBaseNode node) =>
-            node.Parent?.ChildNodes.OrderBy(x => x.Position.Value).ToList().IndexOf(node) + 1 ?? 0;
+        private static int ChildIndex(HtmlBaseNode node)
+        {
+            if (node.Parent == null) return 0;
+            var list = node.Parent.ChildNodes;
+            for (int i = 0; i < list.Count; i++)
+                if (list[i] == node) return i + 1;
+            return 0;
+        }
 
         private static int TypeIndex(HtmlBaseNode node)
         {
             if (node.Parent == null) return 0;
-
-            return node.Parent.ChildNodes
-                .Where(n => n.NodeName == node.NodeName)
-                .OrderBy(x => x.Position.Value)
-                .ToList()
-                .IndexOf(node) + 1;
+            var list = node.Parent.ChildNodes;
+            int idx = 1;
+            foreach (var child in list)
+            {
+                if (child == node) return idx;
+                if (child.NodeName == node.NodeName) idx++;
+            }
+            return 0;
         }
 
         private static bool CheckNth(int pos, int a, int b)

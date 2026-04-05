@@ -34,7 +34,15 @@ namespace NSL.HTMLProcessor
 
         private void modify()
         {
-            Size = BuildHtml().Length;
+            // Compute length arithmetically — no string allocation needed
+            var len = Key.Length;
+            if (_value != null)
+            {
+                len += 1 + _value.Length; // '=' + value
+                if (hasQuote != HtmlAttributeQuoteType.None)
+                    len += 2; // opening + closing quote chars
+            }
+            Size = len;
         }
 
         internal void _SetPosition(int pos)

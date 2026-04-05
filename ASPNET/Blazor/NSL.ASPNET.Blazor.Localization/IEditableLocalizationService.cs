@@ -1,10 +1,11 @@
 ﻿using Microsoft.AspNetCore.Components;
+using NSL.ASPNET.Localization.Shared;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace NSL.ASPNET.Localization.Shared
+namespace NSL.ASPNET.Blazor.Localization
 {
     public delegate void EditableLocalizationChangeEditModeDelegate(bool mode);
     public delegate void EditableLocalizationSearchCallbackDelegate(string key);

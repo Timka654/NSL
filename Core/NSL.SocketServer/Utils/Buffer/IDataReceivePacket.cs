@@ -3,7 +3,7 @@ using NSL.SocketCore.Utils.Buffer;
 using System.Collections.Concurrent;
 using System.Threading;
 
-namespace NSL.SocketServer.Utils
+namespace NSL.SocketServer.Utils.Buffer
 {
     public abstract class IDataReceivePacket<T, TData> : IPacket<T>
            where T : IServerNetworkClient

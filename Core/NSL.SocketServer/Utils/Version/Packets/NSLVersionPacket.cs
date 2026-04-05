@@ -1,9 +1,8 @@
 using NSL.SocketCore.Utils;
 using NSL.SocketCore.Utils.Buffer;
 using NSL.SocketCore.Utils.Version;
-using NSL.SocketServer.Utils;
 
-namespace NSL.SocketServer.Utils.Version
+namespace NSL.SocketServer.Utils.Version.Packets
 {
     public class NSLVersionPacket<T> : IPacket<T> where T : IServerNetworkClient
     {

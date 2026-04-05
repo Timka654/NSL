@@ -6,6 +6,7 @@ using NSL.Extensions.NAT.Proxy.Data.Packets.Enums;
 using NSL.SocketCore.Utils.Buffer;
 using NSL.TCP.Client;
 using NSL.SocketClient;
+using System;
 
 namespace NSL.Extensions.NAT.Proxy
 {
@@ -20,6 +21,10 @@ namespace NSL.Extensions.NAT.Proxy
             remove => transportDataPacketInstanse.OnReceiveEvent -= value;
         }
 
+        public event Action OnDisconnected;
+
+        public bool IsConnected => client.GetState();
+
         ClientOptions<NetworkProxyClient> options;
 
         TCPNetworkClient<NetworkProxyClient, ClientOptions<NetworkProxyClient>> client;
@@ -29,7 +34,9 @@ namespace NSL.Extensions.NAT.Proxy
             options = new ClientOptions<NetworkProxyClient>();
 
             options.AddPacket((ushort)ClientPacketsEnum.SignInResult, signInPacketInstanse = new SignInPacket(options));
-            options.AddPacket((ushort)ClientPacketsEnum.SignInResult, transportDataPacketInstanse = new TransportDataPacket(options));
+            options.AddPacket((ushort)ClientPacketsEnum.Transport, transportDataPacketInstanse = new TransportDataPacket(options));
+
+            options.OnClientDisconnectEvent += _ => OnDisconnected?.Invoke();
 
             client = new TCPNetworkClient<NetworkProxyClient, ClientOptions<NetworkProxyClient>>(options);
         }
@@ -45,6 +52,8 @@ namespace NSL.Extensions.NAT.Proxy
 
             return await signInPacketInstanse.Send(data);
         }
+
+        public void Disconnect() => client.Disconnect();
 
         public void Transport(OutputPacketBuffer buffer) => Transport(buffer.GetBuffer());
 

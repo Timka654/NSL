@@ -68,16 +68,8 @@ namespace NSL.Extensions.NAT.uPnP
 
             foreach (ISearcher searcher in controllers)
             {
-                searcher.DeviceFound += delegate(object sender, DeviceEventArgs args)
-                {
-                    if (DeviceFound != null)
-                        DeviceFound(sender, args);
-                };
-                searcher.DeviceLost += delegate(object sender, DeviceEventArgs args)
-                {
-                    if (DeviceLost != null)
-                        DeviceLost(sender, args);
-                };
+                searcher.DeviceFound += (sender, args) => DeviceFound?.Invoke(sender, args);
+                searcher.DeviceLost += (sender, args) => DeviceLost?.Invoke(sender, args);
             }
             Thread t = new Thread((ThreadStart)delegate { SearchAndListen(); });
             t.IsBackground = true;
@@ -86,9 +78,7 @@ namespace NSL.Extensions.NAT.uPnP
 
 		internal static void Log(string format, params object[] args)
 		{
-			TextWriter logger = Logger;
-			if (logger != null)
-				logger.WriteLine(format, args);
+				Logger?.WriteLine(format, args);
 		}
 
         private static void SearchAndListen()
@@ -111,8 +101,7 @@ namespace NSL.Extensions.NAT.uPnP
                 }
                 catch (Exception e)
                 {
-                    if (UnhandledException != null)
-                        UnhandledException(typeof(NatUtility), new UnhandledExceptionEventArgs(e, false));
+                    UnhandledException?.Invoke(typeof(NatUtility), new UnhandledExceptionEventArgs(e, false));
                 }
 				System.Threading.Thread.Sleep(10);
             }
@@ -120,7 +109,7 @@ namespace NSL.Extensions.NAT.uPnP
 
 		static void Receive (ISearcher searcher, List<UdpClient> clients)
 		{
-			IPEndPoint received = new IPEndPoint(IPAddress.Parse("192.168.0.1"), 5351);
+			IPEndPoint received = new IPEndPoint(IPAddress.Any, 0);
 			foreach (UdpClient client in clients)
 			{
 				if (client.Available > 0)

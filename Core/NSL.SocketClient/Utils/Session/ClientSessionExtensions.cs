@@ -1,5 +1,5 @@
 using NSL.SocketClient;
-using NSL.SocketClient.Utils.Session;
+using NSL.SocketClient.Utils.Session.Packets;
 using NSL.SocketCore;
 using NSL.SocketCore.Utils;
 using NSL.SocketCore.Utils.Buffer;

@@ -19,7 +19,7 @@ namespace NSL.Generators.PacketHandleGenerator.Tests
         protected static BasicNetworkClient GetNetworkClient()
             => client.Data;
 
-        protected static NSL.SocketCore.Extensions.Buffer.RequestProcessor GetRequestProcessor()
+        protected static RequestProcessor GetRequestProcessor()
             => requestProcessor;
     }
 
@@ -37,7 +37,7 @@ namespace NSL.Generators.PacketHandleGenerator.Tests
         protected static BasicNetworkClient GetNetworkClient()
             => client.Data;
 
-        protected static NSL.SocketCore.Extensions.Buffer.RequestProcessor GetRequestProcessor()
+        protected static RequestProcessor GetRequestProcessor()
             => requestProcessor;
     }
 
@@ -74,7 +74,7 @@ namespace NSL.Generators.PacketHandleGenerator.Tests
         protected static BasicNetworkClient GetNetworkClient()
             => client.Data;
 
-        protected static NSL.SocketCore.Extensions.Buffer.RequestProcessor GetRequestProcessor()
+        protected static RequestProcessor GetRequestProcessor()
             => requestProcessor;
     }
 
@@ -93,7 +93,7 @@ namespace NSL.Generators.PacketHandleGenerator.Tests
         protected static BasicNetworkClient GetNetworkClient()
             => client.Data;
 
-        protected static NSL.SocketCore.Extensions.Buffer.RequestProcessor GetRequestProcessor()
+        protected static RequestProcessor GetRequestProcessor()
             => requestProcessor;
     }
 

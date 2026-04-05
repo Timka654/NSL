@@ -8,6 +8,7 @@ using System.Buffers;
 using NSL.SocketServer.Utils;
 using System.Collections.Concurrent;
 using System.Linq;
+using NSL.UDP.Enums;
 
 namespace NSL.UDP.Channels
 {

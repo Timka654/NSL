@@ -17,7 +17,6 @@ namespace NSL.HTMLProcessor
             { "col", (item) => new HtmlTableColNode() },
             { "br", (item) => new HtmlBrNode() },
             { "input", (item) => new HtmlInputNode() },
-            { "!--", (item) => new HtmlCommentNode() }
         };
 
         string content = default;
@@ -62,13 +61,28 @@ namespace NSL.HTMLProcessor
 
                             start = newContentOffset;
                         }
+
+                        // Skip the closing-tag content — do not fall through to element/comment handling
+                        continue;
                     }
 
                     if (!parent.Node.AllowSpecialCharacters)
                     {
                         if (contentOffset - start > 1) AppendTextContentNode(parent, start, contentOffset - 1);
 
-                        contentOffset = BeginReadElement(parent, contentOffset);
+                        // Check for HTML comment: <!--
+                        if (contentOffset + 2 < content.Length
+                            && content[contentOffset]     == '!'
+                            && content[contentOffset + 1] == '-'
+                            && content[contentOffset + 2] == '-')
+                        {
+                            contentOffset = BeginReadComment(parent, contentOffset + 3); // skip past "!--"
+                        }
+                        else
+                        {
+                            contentOffset = BeginReadElement(parent, contentOffset);
+                        }
+
                         start = contentOffset;
 
                         continue;
@@ -77,12 +91,7 @@ namespace NSL.HTMLProcessor
 
                 if (contentSpan[start..contentOffset].EndsWith("!--") && !parent.Node.AllowSpecialCharacters)
                 {
-                    if (contentOffset - start > 3) AppendTextContentNode(parent, start, contentOffset - 3);
-
-                    contentOffset = BeginReadComment(parent, contentOffset);
-                    start = contentOffset;
-
-                    continue;
+                    // dead code path — comments are handled above via <!-- detection
                 }
             }
 
@@ -190,8 +199,14 @@ namespace NSL.HTMLProcessor
             {
                 currentItem.Node.HasBody = true;
 
-                if (currentItem.Node.HasBody)
-                    contentOffset = BeginReadHtml(currentItem, contentOffset);
+                // Always call BeginReadHtml even if HasBody setter was a no-op (void elements
+                // like <input> may still be followed by a spurious closing tag e.g. </input>).
+                contentOffset = BeginReadHtml(currentItem, contentOffset);
+
+                // If HasBody was reset to false (void element with no-op setter), the spurious
+                // closing tag made TryCloseElement overwrite the size. Recalculate correctly.
+                if (!currentItem.Node.HasBody)
+                    currentItem.Node.RecalculateSize();
             }
 
             currentItem.InnerEndOffset = contentOffset;
@@ -394,26 +409,30 @@ namespace NSL.HTMLProcessor
 
         private int BeginReadComment(ParseItem item, int start)
         {
-
+            // start is positioned right after "<!--"
+            // Scan for "-->" using O(1) char comparison per step
             var contentOffset = start;
 
-            while (contentOffset < content.Length) // eof
+            while (contentOffset + 2 < content.Length)
             {
-                var c = content[contentOffset++];
-
-                if (contentSpan[start..contentOffset].EndsWith("-->"))
+                if (content[contentOffset] == '-' && content[contentOffset + 1] == '-' && content[contentOffset + 2] == '>')
                 {
+                    var commentText = contentSpan[start..contentOffset].ToString();
+                    contentOffset += 3; // consume "-->"
+
                     item.Node.parseAppendChildNode(new HtmlCommentNode()
                     {
-                        InnerHtmlContent = contentSpan[start..(contentOffset - 3)].ToString(),
-                        Position = start,
-                        Size = new NodeSize() { OpenNodeLength = 3, CloseNodeLength = 3, InnerContentLength = contentOffset - start }
+                        InnerHtmlContent = commentText,
+                        Size = new NodeSize() { OpenNodeLength = 4, CloseNodeLength = 3, InnerContentLength = commentText.Length }
                     });
+
                     return contentOffset;
                 }
+
+                contentOffset++;
             }
 
-            return contentOffset;
+            return content.Length;
         }
 
         public TElement parseDoc(string content, HtmlParserOptions options)

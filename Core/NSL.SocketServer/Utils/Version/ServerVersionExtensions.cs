@@ -1,5 +1,6 @@
 using NSL.SocketCore.Utils.Version;
 using NSL.SocketServer.Utils;
+using NSL.SocketServer.Utils.Version.Packets;
 using System;
 
 namespace NSL.SocketServer.Utils.Version

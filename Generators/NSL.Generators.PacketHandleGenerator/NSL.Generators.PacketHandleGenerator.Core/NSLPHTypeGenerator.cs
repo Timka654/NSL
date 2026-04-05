@@ -226,7 +226,7 @@ namespace NSL.Generators.PacketHandleGenerator.Core
 
                     if (haveReceiveRequest)
                     {
-                        requiredUsings.Add("NSL.SocketCore.Extensions.Buffer");
+                        requiredUsings.Add("NSL.SocketCore.Utils.Buffer");
                     }
 
                     var cbData = new CodeBuilderData();
@@ -260,7 +260,7 @@ namespace NSL.Generators.PacketHandleGenerator.Core
                             classBuilder.AppendLine($"{tm.BuildModifierForHandles(NSLAccessModifierEnum.Protected)} partial {tm.NetworkDataType.GetTypeFullName()} GetNetworkClient();");
 
                         if (!classMethodIdentifiers.Contains("GetRequestProcessor"))
-                            classBuilder.AppendLine($"{tm.BuildModifierForHandles(NSLAccessModifierEnum.Protected)} partial NSL.SocketCore.Extensions.Buffer.RequestProcessor GetRequestProcessor();");
+                            classBuilder.AppendLine($"{tm.BuildModifierForHandles(NSLAccessModifierEnum.Protected)} partial RequestProcessor GetRequestProcessor();");
                     }
 
                     if (cbData.HandlesBuilder.Length > 0)
@@ -329,7 +329,7 @@ namespace NSL.Generators.PacketHandleGenerator.Core
                 }
                 else if (packet.PacketType.HasFlag(NSLPacketTypeEnum.Request))
                 {
-                    _args = Enumerable.Repeat($"NSL.SocketCore.Extensions.Buffer.RequestProcessor requestProcessor", 1).Concat(_args).ToArray();
+                    _args = Enumerable.Repeat($"RequestProcessor requestProcessor", 1).Concat(_args).ToArray();
 
 
                 }

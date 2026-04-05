@@ -28,8 +28,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\..\Extensions\NetworkEngine\RPC\NSL.Extensions.RPC.EndPointBuilder\NSL.Extensions.RPC.EndPointBuilder.csproj" />
-		<ProjectReference Include="..\..\..\Extensions\NetworkEngine\RPC\NSL.Extensions.RPC.Generator.Core\NSL.Extensions.RPC.Generator.Core.csproj" ReferenceOutputAssembly="false" PrivateAssets="all" OutputItemType="Analyzer" />
 		<ProjectReference Include="..\..\..\Protocols\WebSockets\BuilderExtensions\NSL.BuilderExtensions.WebSocketsClient\NSL.BuilderExtensions.WebSocketsClient.csproj" />
 		<ProjectReference Include="..\NSL.BuilderExtensions.WebSocketsServer.AspNet\NSL.BuilderExtensions.WebSocketsServer.AspNet.csproj" />
 	</ItemGroup>

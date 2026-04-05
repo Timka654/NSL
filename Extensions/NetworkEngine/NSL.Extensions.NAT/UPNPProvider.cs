@@ -3,31 +3,35 @@ using NSL.Extensions.NAT.uPnP.Enums;
 using NSL.Extensions.NAT.uPnP.EventArgs;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace NSL.Extensions.NAT
 {
     public class UPNPProvider
     {
-        static List<INatDevice> DeviceList = new List<INatDevice>();
-
-        static List<Mapping> MapList = new List<Mapping>();
+        static readonly object _lock = new object();
+        static readonly List<INatDevice> DeviceList = new List<INatDevice>();
+        static readonly List<Mapping> MapList = new List<Mapping>();
 
         static Timer checkTimer;
 
-        public static List<INatDevice> GetDevices() => DeviceList;
+        public static List<INatDevice> GetDevices()
+        {
+            lock (_lock)
+                return DeviceList.ToList();
+        }
 
         static UPNPProvider()
         {
             NatUtility.DeviceFound += DeviceFound;
-
             NatUtility.DeviceLost += DeviceLost;
 
             NatUtility.StartDiscovery();
 
             checkTimer = new Timer(CheckTick);
-
             checkTimer.Change(TimeSpan.FromSeconds(5), TimeSpan.FromSeconds(15));
         }
 
@@ -37,10 +41,8 @@ namespace NSL.Extensions.NAT
         {
             var mapping = new Mapping(protocol, port, publicPort ?? port) { Description = description };
 
-            MapList.Add(mapping);
-
-            if (!MapList.Any())
-                return false;
+            lock (_lock)
+                MapList.Add(mapping);
 
             ProcessAppendMapping(mapping);
 
@@ -49,60 +51,71 @@ namespace NSL.Extensions.NAT
 
         public static void RemoveMapping(Func<Mapping, bool> func)
         {
-            foreach (var item in MapList.Where(x=>func(x)).ToArray())
+            Mapping[] toRemove;
+            lock (_lock)
             {
-                RemoveMapping(item);
+                toRemove = MapList.Where(func).ToArray();
+                foreach (var item in toRemove)
+                    MapList.Remove(item);
             }
+
+            foreach (var item in toRemove)
+                _ = RemoveMappingAsync(item);
         }
 
-        public static async void RemoveMapping(Mapping mapping)
+        public static Task RemoveMappingAsync(Mapping mapping)
         {
-            foreach (var device in DeviceList)
-            {
-                await device.DeletePortMapAsync(mapping);
-            }
+            INatDevice[] devices;
+            lock (_lock)
+                devices = DeviceList.ToArray();
+
+            return Task.WhenAll(devices.Select(d => d.DeletePortMapAsync(mapping)));
         }
 
         private static void ProcessAppendMapping(Mapping map)
         {
-            foreach (var device in DeviceList.ToArray())
-            {
-                ProcessDeviceMapping(device, map);
-            }
+            INatDevice[] devices;
+            lock (_lock)
+                devices = DeviceList.ToArray();
+
+            foreach (var device in devices)
+                _ = ProcessDeviceMappingAsync(device, map);
         }
 
         private static void ProcessAppendDevice(INatDevice device)
         {
-            foreach (var item in MapList.ToArray())
-            {
-                ProcessDeviceMapping(device, item);
-            }
+            Mapping[] mappings;
+            lock (_lock)
+                mappings = MapList.ToArray();
+
+            foreach (var item in mappings)
+                _ = ProcessDeviceMappingAsync(device, item);
         }
 
-        private static async void ProcessDeviceMapping(INatDevice device, Mapping mapping)
+        private static async Task ProcessDeviceMappingAsync(INatDevice device, Mapping mapping)
         {
             try
             {
                 await device.CreatePortMapAsync(mapping);
             }
-#if DEBUG
             catch (Exception ex)
             {
+                Debug.WriteLine($"[UPNPProvider] CreatePortMap failed: {ex.Message}");
             }
-#else
-            catch { }
-#endif
         }
 
         private static void DeviceFound(object sender, DeviceEventArgs args)
         {
-            DeviceList.Add(args.Device);
+            lock (_lock)
+                DeviceList.Add(args.Device);
+
             ProcessAppendDevice(args.Device);
         }
 
         private static void DeviceLost(object sender, DeviceEventArgs args)
         {
-            DeviceList.Remove(args.Device);
+            lock (_lock)
+                DeviceList.Remove(args.Device);
         }
     }
 }

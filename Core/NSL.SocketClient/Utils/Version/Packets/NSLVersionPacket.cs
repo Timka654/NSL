@@ -1,4 +1,3 @@
-using NSL.SocketClient;
 using NSL.SocketCore;
 using NSL.SocketCore.Utils;
 using NSL.SocketCore.Utils.Buffer;
@@ -7,7 +6,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace NSL.SocketClient.Utils.Version
+namespace NSL.SocketClient.Utils.Version.Packets
 {
     public class NSLVersionPacket<T> where T : BaseSocketNetworkClient
     {

@@ -1,4 +1,5 @@
 ﻿using NSL.SocketCore.Utils;
+using NSL.UDP.Enums;
 using System;
 using System.Runtime.CompilerServices;
 
