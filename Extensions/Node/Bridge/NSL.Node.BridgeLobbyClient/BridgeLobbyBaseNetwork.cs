@@ -24,7 +24,7 @@ namespace NSL.Node.BridgeLobbyClient
 
         protected Action<BridgeLobbyNetworkHandlesConfigurationModel> OnHandleConfiguration { get; }
 
-        protected INetworkClient network { get; private set; }
+        protected BaseNetworkConnection network { get; private set; }
 
         protected RequestProcessor PacketWaitBuffer { get; private set; }
 

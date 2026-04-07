@@ -1,8 +1,9 @@
-﻿using NSL.SocketCore.Utils.Buffer;
+using NSL.SocketCore.Utils;
+using NSL.SocketCore.Utils.Buffer;
 
 namespace NSL.SocketClient.Utils.SystemPackets
 {
-    public class ClientAliveConnectionPacket<T> : IClientPacket<T> where T: BaseSocketNetworkClient
+    public class ClientAliveConnectionPacket<T> : IClientPacket<T> where T : BaseNetworkConnection
     {
         protected override void Receive(InputPacketBuffer data)
         {

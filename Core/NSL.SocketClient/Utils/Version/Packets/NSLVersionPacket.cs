@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace NSL.SocketClient.Utils.Version.Packets
 {
-    public class NSLVersionPacket<T> where T : BaseSocketNetworkClient
+    public class NSLVersionPacket<T> where T : BaseNetworkConnection
     {
         public const ushort PacketId = (ushort)NSLSystemPacketEnum.Version;
 

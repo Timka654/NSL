@@ -23,7 +23,7 @@ namespace NSL.UDPExample
             options.AddPacket(1, new TestPacket());
 
             options.OnClientConnectEvent += c => {
-                c.PingPacket.PingPongEnabled = true;
+                c.PingPongEnabled = true;
             };
 
 

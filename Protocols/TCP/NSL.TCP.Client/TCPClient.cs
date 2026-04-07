@@ -10,7 +10,7 @@ namespace NSL.TCP.Client
     /// Класс обработки клиента
     /// </summary>
     public class TCPClient<T> : BaseTcpClient<T, TCPClient<T>>
-        where T : BaseSocketNetworkClient, new()
+        where T : BaseNetworkConnection, new()
     {
         public long Version { get; set; }
 
@@ -47,9 +47,9 @@ namespace NSL.TCP.Client
             ConnectionOptions.RunClientConnect();
         }
 
-        public override void ChangeUserData(INetworkClient newClientData) => SetClientData((T)newClientData);
+        public override void ChangeUserData(BaseNetworkConnection newClientData) => SetClientData((T)newClientData);
 
-        public override void SetClientData(INetworkClient from) => ConnectionOptions.InitializeClient((T)from);
+        public override void SetClientData(BaseNetworkConnection from) => ConnectionOptions.InitializeClient((T)from);
 
         protected override void RunDisconnect() => ConnectionOptions.RunClientDisconnect();
 

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace NSL.WebSockets.Server.AspNetPoint
 {
-    public class AspNetWSNetworkServerClient : IServerNetworkClient
+    public class AspNetWSNetworkServerClient : BaseNetworkConnection
     {
         public HttpContext HttpContext { get; private set; }
 

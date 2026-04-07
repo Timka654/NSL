@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.ObjectPool;
+using Microsoft.Extensions.ObjectPool;
 using NSL.SocketCore;
 using NSL.SocketCore.Utils;
 using NSL.SocketCore.Utils.Buffer;
@@ -19,7 +19,7 @@ using System.Threading.Tasks;
 namespace NSL.TCP
 {
     public abstract class BaseTcpClient<TClient, TParent> : IClient<OutputPacketBuffer>
-        where TClient : INetworkClient
+        where TClient : BaseNetworkConnection
         where TParent : BaseTcpClient<TClient, TParent>
     {
         public abstract TClient Data { get; }
@@ -752,9 +752,9 @@ namespace NSL.TCP
 
         public CoreOptions Options => options;
 
-        public abstract void ChangeUserData(INetworkClient data);
+        public abstract void ChangeUserData(BaseNetworkConnection data);
 
-        public abstract void SetClientData(INetworkClient from);
+        public abstract void SetClientData(BaseNetworkConnection from);
 
         public object GetUserData() => Data;
 

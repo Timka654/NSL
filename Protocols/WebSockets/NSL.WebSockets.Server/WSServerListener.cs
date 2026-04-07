@@ -7,7 +7,7 @@ using NSL.SocketCore;
 namespace NSL.WebSockets.Server
 {
     public class WSServerListener<T> : INetworkListener<T>
-        where T : IServerNetworkClient, new()
+        where T : BaseNetworkConnection, new()
     {
         /// <summary>
         /// Слушатель порта (сервер)

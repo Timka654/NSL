@@ -1,4 +1,4 @@
-﻿using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using NSL.Generators.BinaryGenerator;
@@ -202,7 +202,7 @@ namespace NSL.Generators.RpcGenerator.Core
                     BuildServerHandler(sourceContext, classBuilder, container, method);
                     classBuilder.AppendLine();
 
-                    configureBuilder.AppendLine($"options.{nameof(CoreOptions<INetworkClient>.AddAsyncHandle)}({method.Pid}, NSLRpcHandle_{method.Name});");
+                    configureBuilder.AppendLine($"options.{nameof(CoreOptions<BaseNetworkConnection>.AddAsyncHandle)}({method.Pid}, NSLRpcHandle_{method.Name});");
                 }
             });
 

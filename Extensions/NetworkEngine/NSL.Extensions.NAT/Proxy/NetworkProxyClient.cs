@@ -2,7 +2,7 @@
 
 namespace NSL.Extensions.NAT.Proxy
 {
-    public class NetworkProxyClient : BaseSocketNetworkClient
+    public class NetworkProxyClient : BaseNetworkConnection
     {
     }
 }

@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using NSL.BuilderExtensions.SocketCore;
 using NSL.BuilderExtensions.TCPClient;
 using NSL.BuilderExtensions.TCPServer;
@@ -106,12 +106,12 @@ namespace NSL.Extensions.Session.Example
 
         }
 
-        static TCPNetworkClient<BasicNetworkClient, ClientOptions<BasicNetworkClient>> client;
+        static TCPNetworkClient<ClientNetworkConnection, ClientOptions<ClientNetworkConnection>> client;
 
         static void ClientInit(IBasicLogger conLog)
         {
             client = TCPClientEndPointBuilder.Create()
-               .WithClientProcessor<BasicNetworkClient>()
+               .WithClientProcessor<ClientNetworkConnection>()
                .WithOptions()
                .WithEndPoint("127.0.0.1", 1555)
                .WithCode(b =>

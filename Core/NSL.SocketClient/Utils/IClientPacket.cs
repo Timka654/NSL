@@ -4,7 +4,7 @@ using NSL.SocketCore.Utils.Buffer;
 
 namespace NSL.SocketClient.Utils
 {
-    public class IClientPacket<TClient> : IPacket<TClient> where TClient : BaseSocketNetworkClient
+    public class IClientPacket<TClient> : IPacket<TClient> where TClient : BaseNetworkConnection
     {
         public IClientPacket(ClientOptions<TClient> options)
         {

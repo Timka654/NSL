@@ -11,13 +11,13 @@ namespace NSL.SocketCore.Utils.Packet
     public static class PacketDelegateHelper
     {
         public static int Load<TClient, TContainer, TAttribute>(this CoreOptions<TClient> client)
-            where TClient : INetworkClient
+            where TClient : BaseNetworkConnection
             where TContainer : PacketDelegateContainerAttribute
             where TAttribute : PacketAttribute
             => Load<TClient, TContainer, TAttribute>(client, Assembly.GetCallingAssembly());
 
         public static int Load<TClient, TContainer, TAttribute>(this CoreOptions<TClient> client, Assembly assembly)
-            where TClient : INetworkClient
+            where TClient : BaseNetworkConnection
             where TContainer : PacketDelegateContainerAttribute
             where TAttribute : PacketAttribute
         {
@@ -50,7 +50,7 @@ namespace NSL.SocketCore.Utils.Packet
         }
     }
 
-    internal class DelegatePacket<T> : IPacket<T> where T : INetworkClient
+    internal class DelegatePacket<T> : IPacket<T> where T : BaseNetworkConnection
     {
         public CoreOptions<T>.PacketHandle Delegate = null;
 

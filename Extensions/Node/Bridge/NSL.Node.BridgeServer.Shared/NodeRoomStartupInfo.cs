@@ -1,4 +1,4 @@
-﻿using NSL.SocketCore.Utils;
+using NSL.SocketCore.Utils;
 using NSL.SocketCore;
 using System;
 using System.Collections.Generic;
@@ -120,7 +120,7 @@ namespace NSL.Node.BridgeServer.Shared
     public delegate void NodeConfiguringDelegate<TClient>(object builder);
 
     public class NodeNetworkHandles<TClient>
-        where TClient : INetworkClient, new()
+        where TClient : BaseNetworkConnection, new()
     {
         public CoreOptions<TClient>.ClientConnectAsync OnConnectAsync = (client) => Task.CompletedTask;
 

@@ -7,7 +7,7 @@ using System;
 namespace NSL.WebSockets.Client.Blazor
 {
     public class BlazorWSNetworkClient<T, TOptions> : WSNetworkClient<T, TOptions>
-        where T : BaseSocketNetworkClient, new()
+        where T : BaseNetworkConnection, new()
         where TOptions : WSClientOptions<T>
     {
         public BlazorWSNetworkClient(TOptions options) : base(options)

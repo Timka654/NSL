@@ -2,7 +2,7 @@
 
 namespace NSL.Builder.UDP.BaseExample.Client
 {
-    public class UDPTestNetworkClient : IServerNetworkClient
+    public class UDPTestNetworkClient : BaseNetworkConnection
     {
 
     }

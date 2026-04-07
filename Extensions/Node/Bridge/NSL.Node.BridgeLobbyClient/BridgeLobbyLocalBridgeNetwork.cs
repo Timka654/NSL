@@ -1,4 +1,4 @@
-﻿using NSL.BuilderExtensions.LocalBridge;
+using NSL.BuilderExtensions.LocalBridge;
 using NSL.BuilderExtensions.WebSocketsClient;
 using NSL.LocalBridge;
 using NSL.Node.BridgeLobbyClient.Models;
@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace NSL.Node.BridgeLobbyClient
 {
     public class BridgeLobbyLocalBridgeNetwork<TServerClient> : BridgeLobbyBaseNetwork
-        where TServerClient : INetworkClient, new()
+        where TServerClient : BaseNetworkConnection, new()
     {
         private readonly Action<WebSocketsClientEndPointBuilder<BridgeLobbyNetworkClient, WSClientOptions<BridgeLobbyNetworkClient>>> onBuild;
         LocalBridgeClient<TServerClient, BridgeLobbyNetworkClient> serverNetwork;

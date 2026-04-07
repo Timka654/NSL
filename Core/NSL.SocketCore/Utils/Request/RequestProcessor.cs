@@ -19,7 +19,7 @@ namespace NSL.SocketCore.Utils.Request
         /// Create a processor that uses a shared <paramref name="hub"/> for request routing.
         /// Multiple processors may share the same hub over one connection.
         /// </summary>
-        public RequestProcessor(INetworkClient client, IRequestHub hub)
+        public RequestProcessor(BaseNetworkConnection client, IRequestHub hub)
         {
             this.client = client;
             this.hub = hub;
@@ -28,12 +28,12 @@ namespace NSL.SocketCore.Utils.Request
         /// <summary>
         /// Create a processor with its own private <see cref="RequestProcessorHub"/>.
         /// </summary>
-        public RequestProcessor(INetworkClient client) : this(client, new RequestProcessorHub())
+        public RequestProcessor(BaseNetworkConnection client) : this(client, new RequestProcessorHub())
         {
             ownsHub = true;
         }
 
-        private readonly INetworkClient client;
+        private readonly BaseNetworkConnection client;
         private readonly IRequestHub hub;
         private readonly bool ownsHub;
 
@@ -163,7 +163,7 @@ namespace NSL.SocketCore.Utils.Request
         [Obsolete("Replace to RequestProcessor", true)]
         public class PacketWaitBuffer : RequestProcessor
         {
-            public PacketWaitBuffer(INetworkClient client) : base(client)
+            public PacketWaitBuffer(BaseNetworkConnection client) : base(client)
             {
             }
         }

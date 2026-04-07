@@ -62,7 +62,7 @@ namespace NSL.Node.BridgeServer.RS
             return session;
         }
 
-        public override void ChangeOwner(IServerNetworkClient from)
+        public override void ChangeOwner(BaseNetworkConnection from)
         {
             if (from is not RoomServerNetworkClient other)
                 throw new InvalidOperationException($"{nameof(ChangeOwner)} invalid {nameof(from)} type");

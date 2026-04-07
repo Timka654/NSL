@@ -7,7 +7,7 @@ using System.Net.Sockets;
 namespace NSL.UDP.Client
 {
     public class UDPClient<TClient> : BaseUDPClient<TClient, UDPClient<TClient>>
-        where TClient : IServerNetworkClient, new()
+        where TClient : BaseNetworkConnection, new()
     {
         private TClient clientData;
 
@@ -28,7 +28,7 @@ namespace NSL.UDP.Client
 
             //обзятельная переменная в NetworkClient, для отправки данных, можно использовать привидения типов (Client)NetworkClient но это никому не поможет
             Data.Network = this;
-            //Data.ServerOptions = options;
+            //Data.Options = options;
 
             //установка криптографии для дешифровки входящих данных, указана в общих настройках сервера
             inputCipher = options.InputCipher.CreateEntry();
@@ -40,10 +40,10 @@ namespace NSL.UDP.Client
             options.CallClientConnectEvent(Data);
         }
 
-        public override void ChangeUserData(INetworkClient newClientData)
+        public override void ChangeUserData(BaseNetworkConnection newClientData)
             => SetClientData(newClientData);
 
-        public override void SetClientData(INetworkClient from)
+        public override void SetClientData(BaseNetworkConnection from)
         {
             if (from == null)
             {

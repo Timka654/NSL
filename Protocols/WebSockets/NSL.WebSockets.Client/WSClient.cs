@@ -9,7 +9,7 @@ using System.Net.WebSockets;
 namespace NSL.WebSockets.Client
 {
     public class WSClient<T> : BaseWSClient<T, WSClient<T>>
-        where T : BaseSocketNetworkClient, new()
+        where T : BaseNetworkConnection, new()
     {
         public override T Data => ConnectionOptions.ClientData;
 
@@ -65,9 +65,9 @@ namespace NSL.WebSockets.Client
             ConnectionOptions.RunClientConnect();
         }
 
-        public override void ChangeUserData(INetworkClient newClientData) => SetClientData((T)newClientData);
+        public override void ChangeUserData(BaseNetworkConnection newClientData) => SetClientData((T)newClientData);
 
-        public override void SetClientData(INetworkClient from) => ConnectionOptions.InitializeClient((T)from);
+        public override void SetClientData(BaseNetworkConnection from) => ConnectionOptions.InitializeClient((T)from);
 
         protected override void RunDisconnect() => ConnectionOptions.RunClientDisconnect();
 

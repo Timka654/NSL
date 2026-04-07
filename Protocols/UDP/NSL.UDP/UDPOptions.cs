@@ -1,5 +1,4 @@
-﻿using NSL.SocketServer;
-using NSL.SocketServer.Utils;
+﻿using NSL.SocketCore;
 using NSL.UDP.Info;
 using NSL.UDP.Interface;
 using STUN;
@@ -8,8 +7,8 @@ using System.Net;
 
 namespace NSL.UDP
 {
-    public class UDPClientOptions<TClient> : ServerOptions<TClient>, IBindingUDPOptions, IUDPOptions
-        where TClient : IServerNetworkClient
+    public class UDPClientOptions<TClient> : CoreOptions<TClient>, IBindingUDPOptions, IUDPOptions
+        where TClient : BaseNetworkConnection
     {
         public string BindingIP { get; set; }
 
@@ -50,13 +49,16 @@ namespace NSL.UDP
         /// <summary>
         /// Connection IpAddress (0.0.0.0 - all)
         /// </summary>
-        public override string IpAddress { get; set; } = "0.0.0.0";
+        public virtual string IpAddress { get; set; } = "0.0.0.0";
 
         /// <summary>
         /// Порт - используется для инициализации слушателя на определенном порту 1 - 65,535
         /// </summary>
-        public override int Port { get; set; }
+        public virtual int Port { get; set; }
 
-        protected override void LoadOptions() { }
+        public System.Net.IPAddress GetIPAddress() => System.Net.IPAddress.Parse(IpAddress);
+
+        public System.Net.IPEndPoint GetIPEndPoint() => new System.Net.IPEndPoint(GetIPAddress(), Port);
     }
 }
+

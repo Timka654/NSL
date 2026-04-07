@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 namespace NSL.UDP.Client
 {
     public abstract class UDPListener<TClient, TOptions>
-        where TClient : IServerNetworkClient, new()
+        where TClient : BaseNetworkConnection, new()
         where TOptions : UDPClientOptions<TClient>, IBindingUDPOptions
     {
         private static readonly IPEndPoint _blankEndpoint = new IPEndPoint(IPAddress.Any, 0);

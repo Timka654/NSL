@@ -43,7 +43,7 @@ namespace NSL.SocketCore.Utils
 
         public static T LoadConfigurationCoreOptions<T, TType>(this INSLConfiguration configuration, string networkNodePath)
             where T : CoreOptions<TType>, new()
-            where TType : INetworkClient
+            where TType : BaseNetworkConnection
         {
             return new T
             {

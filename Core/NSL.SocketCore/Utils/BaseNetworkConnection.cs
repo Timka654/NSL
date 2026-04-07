@@ -1,16 +1,18 @@
-﻿#if NSL_LIBRARY
+#if NSL_LIBRARY
 using Microsoft.Extensions.DependencyInjection;
 #endif
 using NSL.SocketCore.Utils.Buffer;
+using NSL.SocketCore.Utils.SystemPackets;
 using System;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace NSL.SocketCore.Utils
 {
     /// <summary>
     /// Класс для хранения пользовательских данных
     /// </summary>
-    public abstract class INetworkClient : IDisposable
+    public abstract class BaseNetworkConnection : IDisposable
     {
         public DateTime? LastReceiveMessage { get; set; }
 
@@ -23,6 +25,68 @@ namespace NSL.SocketCore.Utils
         public bool GetState(bool ignoreAlive = false) => Network?.GetState() == true && (ignoreAlive || AliveState);
 
         public int AliveCheckTimeOut { get; set; } = 3000;
+
+        #region PingPong
+
+        private bool _pingPongEnabled;
+        private CancellationTokenSource _pingPongCts;
+        private volatile int _pingPending;
+        private DateTime _pingRequestTime;
+
+        public bool PingPongEnabled
+        {
+            get => _pingPongEnabled;
+            set
+            {
+                if (value == _pingPongEnabled) return;
+                _pingPongEnabled = value;
+                _pingPongCts?.Cancel();
+                _pingPongCts = null;
+                if (_pingPongEnabled)
+                {
+                    _pingPongCts = new CancellationTokenSource();
+                    RunAliveChecker(_pingPongCts.Token);
+                }
+                else
+                {
+                    Ping = 0;
+                }
+            }
+        }
+
+        public int Ping { get; protected set; }
+
+        public bool IsPingPending => _pingPending != 0;
+
+        public void RequestPing()
+        {
+            if (Interlocked.CompareExchange(ref _pingPending, 1, 0) == 0 && Network != null)
+            {
+                _pingRequestTime = DateTime.UtcNow;
+                Network.SendEmpty(AliveConnectionPacket.PacketId);
+            }
+        }
+
+        public void PongProcess()
+        {
+            Ping = (int)((DateTime.UtcNow - _pingRequestTime).TotalMilliseconds / 2.0);
+            Interlocked.Exchange(ref _pingPending, 0);
+        }
+
+        private async void RunAliveChecker(CancellationToken token)
+        {
+            try
+            {
+                while (!token.IsCancellationRequested && Network?.GetState() == true)
+                {
+                    RequestPing();
+                    await Task.Delay(AliveCheckTimeOut / 2, token);
+                }
+            }
+            catch (OperationCanceledException) { }
+        }
+
+        #endregion
 
         public DateTime? DisconnectTime { get; set; }
 
@@ -62,6 +126,19 @@ namespace NSL.SocketCore.Utils
         /// </summary>
         public IClient Network { get; set; }
 
+        /// <summary>
+        /// Ссылка на параметры, с которыми поднято подключение.
+        /// Эквивалентно <see cref="Network"/>?.Options, но также допускает явную установку
+        /// до того, как <see cref="Network"/> будет назначен (например на серверной стороне).
+        /// </summary>
+        public CoreOptions Options
+        {
+            get => _options ?? Network?.Options;
+            set => _options = value;
+        }
+
+        private CoreOptions _options;
+
         public bool ObjectBagInitialized() => ObjectBag != null;
 
         public void ThrowIfObjectBagNull() { if (!ObjectBagInitialized()) throw new Exception($"{nameof(ObjectBag)} not initialized"); }
@@ -79,7 +156,7 @@ namespace NSL.SocketCore.Utils
         /// Перенос склада объектов из другого подключения
         /// </summary>
         /// <param name="other_client"></param>
-        public void InitializeObjectBag(INetworkClient otherClient)
+        public void InitializeObjectBag(BaseNetworkConnection otherClient)
         {
             if (otherClient.ObjectBag == null)
                 return;
@@ -133,13 +210,14 @@ namespace NSL.SocketCore.Utils
         ///
         /// </summary>
         /// <param name="from">copy from</param>
-        public virtual void ChangeOwner(INetworkClient from)
+        public virtual void ChangeOwner(BaseNetworkConnection from)
         {
             //InitializeObjectBag(from);
         }
 
         public virtual void Dispose()
         {
+            PingPongEnabled = false;
             ObjectBag?.Dispose();
 #if NSL_LIBRARY
             _serviceScope?.Dispose();

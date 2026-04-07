@@ -13,7 +13,7 @@ namespace NSL.SocketCore.Utils.Packet
         /// from the given assembly into <paramref name="coreOptions"/>.
         /// </summary>
         public static int LoadPackets<T>(this CoreOptions<T> coreOptions, Assembly assembly, Type selectAttributeType, Func<Type, IPacket<T>> initAction)
-            where T : INetworkClient
+            where T : BaseNetworkConnection
         {
             if (!typeof(PacketAttribute).IsAssignableFrom(selectAttributeType))
                 throw new Exception($"{selectAttributeType.FullName} must be assignable from {typeof(PacketAttribute).FullName}");
@@ -38,7 +38,7 @@ namespace NSL.SocketCore.Utils.Packet
         }
 
         public static int LoadPackets<T>(this CoreOptions<T> coreOptions, Type selectAttributeType, Func<Type, IPacket<T>> initAction)
-            where T : INetworkClient
+            where T : BaseNetworkConnection
             => LoadPackets(coreOptions, Assembly.GetCallingAssembly(), selectAttributeType, initAction);
     }
 }

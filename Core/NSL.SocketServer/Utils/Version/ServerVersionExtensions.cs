@@ -9,7 +9,7 @@ namespace NSL.SocketServer.Utils.Version
     public static class ServerVersionExtensions
     {
         public static ServerOptions<TClient> AddNSLVersion<TClient>(this ServerOptions<TClient> options, Action<NSLServerVersionInfo> configure = null)
-            where TClient : IServerNetworkClient
+            where TClient : BaseNetworkConnection
         {
             var info = new NSLServerVersionInfo();
             configure?.Invoke(info);
@@ -17,7 +17,7 @@ namespace NSL.SocketServer.Utils.Version
         }
 
         public static ServerOptions<TClient> AddNSLVersion<TClient>(this ServerOptions<TClient> options, NSLServerVersionInfo versionInfo)
-            where TClient : IServerNetworkClient
+            where TClient : BaseNetworkConnection
         {
             options.ObjectBag.Set(NSLVersionInfo.ObjectBagKey, versionInfo);
             options.AddPacket(NSLVersionPacketReceive<TClient>.PacketId, new NSLVersionPacketReceive<TClient>());
@@ -25,7 +25,7 @@ namespace NSL.SocketServer.Utils.Version
         }
 
         public static ServerOptions<TClient> AddNSLVersion<TClient>(this ServerOptions<TClient> options, IServiceCollection services, Action<NSLServerVersionInfo> configure = null)
-            where TClient : IServerNetworkClient
+            where TClient : BaseNetworkConnection
         {
             var info = new NSLServerVersionInfo();
             configure?.Invoke(info);
@@ -34,7 +34,7 @@ namespace NSL.SocketServer.Utils.Version
         }
 
         public static ServerOptions<TClient> AddNSLVersion<TClient>(this ServerOptions<TClient> options, IServiceCollection services, NSLServerVersionInfo versionInfo)
-            where TClient : IServerNetworkClient
+            where TClient : BaseNetworkConnection
         {
             services.AddSingleton(versionInfo);
             return options.AddNSLVersion(versionInfo);

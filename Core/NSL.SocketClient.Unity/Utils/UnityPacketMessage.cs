@@ -4,7 +4,7 @@ using NSL.Utils.Unity;
 namespace NSL.SocketClient.Unity.Utils
 {
     public class IUnityPacketMessage<TClient, RDType> : IPacketMessage<TClient,RDType>
-        where TClient : BaseSocketNetworkClient
+        where TClient : BaseNetworkConnection
     {
         public IUnityPacketMessage(ClientOptions<TClient> options) : base(options)
         {
@@ -17,7 +17,7 @@ namespace NSL.SocketClient.Unity.Utils
     }
 
     public class IUnityPacketMessage<TClient> : IPacketMessage<TClient>
-        where TClient : BaseSocketNetworkClient
+        where TClient : BaseNetworkConnection
     {
         public IUnityPacketMessage(ClientOptions<TClient> options) : base(options)
         {

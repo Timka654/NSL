@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace NSL.SocketClient.Utils
 {
-    public class IPacketReceive<TClient, RData, SPType> : IPacketReceive<TClient, RData> where TClient : BaseSocketNetworkClient where SPType : struct, IConvertible
+    public class IPacketReceive<TClient, RData, SPType> : IPacketReceive<TClient, RData> where TClient : BaseNetworkConnection where SPType : struct, IConvertible
     {
         public IPacketReceive(ClientOptions<TClient> options) : base(options)
         {
@@ -27,7 +27,7 @@ namespace NSL.SocketClient.Utils
         }
     }
 
-    public class IPacketReceive<TClient, RData> : IClientPacket<TClient>, ILockedPacket where TClient : BaseSocketNetworkClient
+    public class IPacketReceive<TClient, RData> : IClientPacket<TClient>, ILockedPacket where TClient : BaseNetworkConnection
     {
         public IPacketReceive(ClientOptions<TClient> options) : base(options)
         {

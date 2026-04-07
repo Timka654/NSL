@@ -20,5 +20,10 @@ namespace NSL.SocketCore.Utils
         public const string SessionInfo          = "NSL__SESSION__INFO";
         public const string SessionManager       = "NSL__SESSION__MANAGER";
         public const string SessionClientOptions = "NSL__SESSION__CLIENTOPTIONS";
+
+        // ── ServerTime ──────────────────────────────────────────────────────
+        public const string ServerTimeOffset = "NSL__SERVERTIME__OFFSET";
+        public const string ServerDateTime   = "NSL__SERVERTIME__SERVER_DT";
+        public const string LocalDateTime    = "NSL__SERVERTIME__LOCAL_DT";
     }
 }

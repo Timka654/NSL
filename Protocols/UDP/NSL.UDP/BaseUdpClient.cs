@@ -17,7 +17,7 @@ using System.Threading.Tasks;
 namespace NSL.UDP
 {
     public abstract class BaseUDPClient<TClient, TParent> : IClient<DgramOutputPacketBuffer>, IUDPClient
-        where TClient : IServerNetworkClient
+        where TClient : BaseNetworkConnection
         where TParent : BaseUDPClient<TClient, TParent>
     {
         public abstract TClient Data { get; }
@@ -138,9 +138,9 @@ namespace NSL.UDP
 
         public CoreOptions Options => options;
 
-        public abstract void ChangeUserData(INetworkClient data);
+        public abstract void ChangeUserData(BaseNetworkConnection data);
 
-        public abstract void SetClientData(INetworkClient from);
+        public abstract void SetClientData(BaseNetworkConnection from);
 
         public object GetUserData() => Data;
 

@@ -14,7 +14,7 @@ namespace NSL.SocketServer.Utils
     }
 
     public interface INetworkListener<TClient> : INetworkListener
-        where TClient : IServerNetworkClient
+        where TClient : BaseNetworkConnection
     {
         ServerOptions<TClient> GetServerOptions();
     }

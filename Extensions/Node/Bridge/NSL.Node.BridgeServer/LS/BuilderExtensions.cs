@@ -1,4 +1,4 @@
-﻿using NSL.LocalBridge;
+using NSL.LocalBridge;
 using NSL.Node.BridgeServer.Shared;
 using NSL.SocketCore.Utils;
 using NetworkClient = NSL.Node.BridgeServer.LS.LobbyServerNetworkClient;
@@ -12,7 +12,7 @@ namespace NSL.Node.BridgeServer.LS
             out LocalBridgeClient<NetworkClient, TAnotherClient> bridge,
             NodeNetworkHandles<NetworkClient> handles,
             string logPrefix = null)
-            where TAnotherClient : INetworkClient, new()
+            where TAnotherClient : BaseNetworkConnection, new()
         {
             var local = new LobbyServerLocalBridgeEntry(builder.Entry, handles, logPrefix);
 

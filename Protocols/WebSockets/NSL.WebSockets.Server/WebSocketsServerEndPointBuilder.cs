@@ -17,14 +17,14 @@ namespace NSL.BuilderExtensions.WebSocketsServer
         }
 
         public WebSocketsServerEndPointBuilder<TClient> WithClientProcessor<TClient>()
-            where TClient : IServerNetworkClient, new()
+            where TClient : BaseNetworkConnection, new()
         {
             return WebSocketsServerEndPointBuilder<TClient>.Create();
         }
     }
 
     public class WebSocketsServerEndPointBuilder<TClient>
-        where TClient : IServerNetworkClient, new()
+        where TClient : BaseNetworkConnection, new()
     {
         private WebSocketsServerEndPointBuilder() { }
 
@@ -44,7 +44,7 @@ namespace NSL.BuilderExtensions.WebSocketsServer
     }
 
     public class WebSocketsServerEndPointBuilder<TClient, TOptions> : IOptionableEndPointServerBuilder<TClient>, IHandleIOBuilder<TClient>
-        where TClient : IServerNetworkClient, new()
+        where TClient : BaseNetworkConnection, new()
         where TOptions : WSServerOptions<TClient>, new()
     {
         TOptions options = new TOptions();

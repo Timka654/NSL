@@ -18,14 +18,14 @@ namespace NSL.BuilderExtensions.TCPClient
         }
 
         public TCPClientEndPointBuilder<TClient> WithClientProcessor<TClient>()
-            where TClient : BaseSocketNetworkClient, new()
+            where TClient : BaseNetworkConnection, new()
         {
             return TCPClientEndPointBuilder<TClient>.Create();
         }
     }
 
     public class TCPClientEndPointBuilder<TClient>
-        where TClient : BaseSocketNetworkClient, new()
+        where TClient : BaseNetworkConnection, new()
     {
         private TCPClientEndPointBuilder() { }
 
@@ -45,7 +45,7 @@ namespace NSL.BuilderExtensions.TCPClient
     }
 
     public class TCPClientEndPointBuilder<TClient, TOptions> : IOptionableEndPointClientBuilder<TClient>, IHandleIOBuilder<TClient>
-        where TClient : BaseSocketNetworkClient, new()
+        where TClient : BaseNetworkConnection, new()
         where TOptions : ClientOptions<TClient>, new()
     {
         TOptions options = new TOptions();

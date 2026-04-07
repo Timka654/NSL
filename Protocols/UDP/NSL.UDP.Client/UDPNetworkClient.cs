@@ -8,7 +8,7 @@ using System.Threading;
 namespace NSL.UDP.Client
 {
     public class UDPNetworkClient<TClient> : UDPListener<TClient, UDPClientOptions<TClient>>
-        where TClient : IServerNetworkClient, new()
+        where TClient : BaseNetworkConnection, new()
     {
         public event ReceivePacketDebugInfo<UDPClient<TClient>> OnReceivePacket;
         public event SendPacketDebugInfo<UDPClient<TClient>> OnSendPacket;

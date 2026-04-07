@@ -6,9 +6,9 @@ using System.Threading;
 namespace NSL.SocketServer.Utils.Buffer
 {
     public abstract class IDataReceivePacket<T, TData> : IPacket<T>
-           where T : IServerNetworkClient
+           where T : BaseNetworkConnection
     {
-        protected ConcurrentDictionary<IServerNetworkClient, (AutoResetEvent Locker, TData Data)> Lockers = new ConcurrentDictionary<IServerNetworkClient, (AutoResetEvent, TData)>();
+        protected ConcurrentDictionary<BaseNetworkConnection, (AutoResetEvent Locker, TData Data)> Lockers = new ConcurrentDictionary<BaseNetworkConnection, (AutoResetEvent, TData)>();
 
         protected void SetReceiveData(T client, TData data)
         {

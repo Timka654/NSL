@@ -1,4 +1,4 @@
-﻿using NSL.BuilderExtensions.SocketCore;
+using NSL.BuilderExtensions.SocketCore;
 using NSL.BuilderExtensions.TCPClient;
 using NSL.BuilderExtensions.TCPServer;
 using NSL.SocketClient.Utils.Version;
@@ -53,7 +53,7 @@ namespace NSL.Extensions.Version.Example
             server.Run();
 
             var client = TCPClientEndPointBuilder.Create()
-                .WithClientProcessor<BasicNetworkClient>()
+                .WithClientProcessor<ClientNetworkConnection>()
                 .WithOptions()
                 .WithEndPoint("127.0.0.1", 1555)
                 .WithCode(b =>
@@ -79,7 +79,7 @@ namespace NSL.Extensions.Version.Example
 
             client.Connect();
 
-            var versionInfo = await NSLVersionPacket<BasicNetworkClient>.SendRequestAsync(client.Data);
+            var versionInfo = await NSLVersionPacket<ClientNetworkConnection>.SendRequestAsync(client.Data);
 
             cl.AppendInfo($"{JsonConvert.SerializeObject(versionInfo)}");
 

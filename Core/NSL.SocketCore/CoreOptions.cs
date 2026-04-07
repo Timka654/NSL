@@ -1,4 +1,4 @@
-﻿using NSL.SocketCore.Utils;
+using NSL.SocketCore.Utils;
 using NSL.SocketCore.Utils.Buffer;
 using NSL.SocketCore.Utils.Cipher;
 using NSL.SocketCore.Utils.Logger;
@@ -16,7 +16,7 @@ namespace NSL.SocketCore
 
         /// <summary>
         /// DI service provider — набрасывается через билдер (<c>WithServices</c>) или вручную.
-        /// Используется для создания Scoped-контейнера на клиент через <see cref="NSL.SocketCore.Utils.INetworkClient.InitializeServiceScope"/>.
+        /// Используется для создания Scoped-контейнера на клиент через <see cref="NSL.SocketCore.Utils.BaseNetworkConnection.InitializeServiceScope"/>.
         /// </summary>
         public IServiceProvider ServiceProvider { get; set; }
 
@@ -93,9 +93,9 @@ namespace NSL.SocketCore
     /// <summary>
     /// Содержит функции для которых необходимо явное указывание типа клиента наследуется <see cref="CoreOptions"/>
     /// </summary>
-    /// <typeparam name="TClient">INetworkClient</typeparam>
+    /// <typeparam name="TClient">BaseNetworkConnection</typeparam>
     public abstract class CoreOptions<TClient> : CoreOptions
-        where TClient : INetworkClient
+        where TClient : BaseNetworkConnection
     {
         /// <summary>
         /// Пакеты которые будет принимать и обрабатывать текущий узел

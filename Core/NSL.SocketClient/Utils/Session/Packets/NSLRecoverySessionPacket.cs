@@ -12,7 +12,7 @@ namespace NSL.SocketClient.Utils.Session.Packets
     public static class NSLRecoverySessionPacketExtension
     {
         public static async Task<NSLRecoverySessionResult> NSLSessionSendRequestAsync<TClient>(this TClient client, CancellationToken cancellationToken, string SOObjectKey = NSLSessionClientOptions.ObjectBagKey, string RPObjectKey = NSLObjectBagKeys.RequestProcessor)
-            where TClient : BaseSocketNetworkClient
+            where TClient : BaseNetworkConnection
         {
             client.ThrowIfObjectBagNull();
 
@@ -25,7 +25,7 @@ namespace NSL.SocketClient.Utils.Session.Packets
         }
 
         public static void NSLSessionSendRequest<TClient>(this TClient client, Action<NSLRecoverySessionResult> onResponse, CancellationToken cancellationToken, string SOObjectKey = NSLSessionClientOptions.ObjectBagKey, string RPObjectKey = NSLObjectBagKeys.RequestProcessor)
-            where TClient : BaseSocketNetworkClient
+            where TClient : BaseNetworkConnection
         {
             client.ThrowIfObjectBagNull();
 
@@ -38,7 +38,7 @@ namespace NSL.SocketClient.Utils.Session.Packets
         }
 
         public static async Task<NSLRecoverySessionResult> NSLSessionSendRequestAsync<TClient>(this TClient client, NSLSessionClientOptions sessionOptions, CancellationToken cancellationToken, string RPObjectKey = NSLObjectBagKeys.RequestProcessor)
-            where TClient : BaseSocketNetworkClient
+            where TClient : BaseNetworkConnection
         {
             client.ThrowIfObjectBagNull();
 
@@ -51,7 +51,7 @@ namespace NSL.SocketClient.Utils.Session.Packets
         }
 
         public static void NSLSessionSendRequest<TClient>(this TClient client, Action<NSLRecoverySessionResult> onResponse, NSLSessionClientOptions sessionOptions, CancellationToken cancellationToken, string RPObjectKey = NSLObjectBagKeys.RequestProcessor)
-            where TClient : BaseSocketNetworkClient
+            where TClient : BaseNetworkConnection
         {
             client.ThrowIfObjectBagNull();
 
@@ -64,7 +64,7 @@ namespace NSL.SocketClient.Utils.Session.Packets
         }
 
         public static async Task<NSLRecoverySessionResult> NSLSessionSendRequestAsync<TClient>(this TClient client, NSLSessionInfo sessionInfo, CancellationToken cancellationToken, string RPObjectKey = NSLObjectBagKeys.RequestProcessor)
-            where TClient : BaseSocketNetworkClient
+            where TClient : BaseNetworkConnection
         {
             client.ThrowIfObjectBagNull();
 
@@ -80,7 +80,7 @@ namespace NSL.SocketClient.Utils.Session.Packets
         }
 
         public static void NSLSessionSendRequest<TClient>(this TClient client, Action<NSLRecoverySessionResult> onResponse, NSLSessionInfo sessionInfo, CancellationToken cancellationToken, string RPObjectKey = NSLObjectBagKeys.RequestProcessor)
-            where TClient : BaseSocketNetworkClient
+            where TClient : BaseNetworkConnection
         {
             client.ThrowIfObjectBagNull();
 

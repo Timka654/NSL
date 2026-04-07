@@ -1,4 +1,4 @@
-﻿using NSL.SocketCore.Utils.Buffer;
+using NSL.SocketCore.Utils.Buffer;
 using NSL.SocketCore;
 using NSL.SocketCore.Utils;
 using System.Net;
@@ -10,8 +10,8 @@ using System.Threading;
 namespace NSL.LocalBridge
 {
     public class LocalBridgeClient<TClient, TOClient> : IClient<OutputPacketBuffer>
-        where TClient : INetworkClient, new()
-        where TOClient : INetworkClient, new()
+        where TClient : BaseNetworkConnection, new()
+        where TOClient : BaseNetworkConnection, new()
     {
         public LocalBridgeClient(CoreOptions<TClient> options) : this(options, null, null)
         { }
@@ -67,10 +67,10 @@ namespace NSL.LocalBridge
 
         private Dictionary<ushort, CoreOptions<TClient>.PacketHandle> PacketHandles;
 
-        public void ChangeUserData(INetworkClient newClientData)
+        public void ChangeUserData(BaseNetworkConnection newClientData)
             => SetClientData(newClientData);
 
-        public void SetClientData(INetworkClient from)
+        public void SetClientData(BaseNetworkConnection from)
         {
             if (from == null)
             {

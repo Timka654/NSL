@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace NSL.WebSockets.UnityClient
 {
     public class WGLWSNetworkClient<T, TOptions> : WSNetworkClient<T, TOptions>
-        where T : BaseSocketNetworkClient, new()
+        where T : BaseNetworkConnection, new()
         where TOptions : WSClientOptions<T>
     {
         public WGLWSNetworkClient(TOptions options) : base(options)

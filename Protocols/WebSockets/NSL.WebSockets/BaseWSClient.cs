@@ -1,4 +1,4 @@
-﻿using NSL.SocketCore.Utils.Buffer;
+using NSL.SocketCore.Utils.Buffer;
 using NSL.SocketCore.Utils.Exceptions;
 using NSL.SocketCore.Utils;
 using NSL.SocketCore;
@@ -17,7 +17,7 @@ using System.Buffers;
 namespace NSL.WebSockets
 {
     public abstract class BaseWSClient<TClient, TParent> : IClient<OutputPacketBuffer>
-        where TClient : INetworkClient
+        where TClient : BaseNetworkConnection
         where TParent : BaseWSClient<TClient, TParent>
     {
         public event ReceivePacketDebugInfo<TParent> OnReceivePacket;
@@ -344,9 +344,9 @@ namespace NSL.WebSockets
 
         public CoreOptions Options => options;
 
-        public abstract void ChangeUserData(INetworkClient data);
+        public abstract void ChangeUserData(BaseNetworkConnection data);
 
-        public abstract void SetClientData(INetworkClient from);
+        public abstract void SetClientData(BaseNetworkConnection from);
 
         public object GetUserData() => Data;
 

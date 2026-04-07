@@ -3,7 +3,7 @@ using System;
 
 namespace NSL.Node.P2Proxy.Proxy.Data
 {
-    public class P2PNetworkClient : IServerNetworkClient
+    public class P2PNetworkClient : BaseNetworkConnection
     {
         public Guid Id { get; set; }
 

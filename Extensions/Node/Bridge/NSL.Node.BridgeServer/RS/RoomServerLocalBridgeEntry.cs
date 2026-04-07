@@ -1,4 +1,4 @@
-﻿using NSL.BuilderExtensions.WebSocketsServer;
+using NSL.BuilderExtensions.WebSocketsServer;
 
 using NetworkClient = NSL.Node.BridgeServer.RS.RoomServerNetworkClient;
 using NetworkOptions = NSL.WebSockets.Server.WSServerOptions<NSL.Node.BridgeServer.RS.RoomServerNetworkClient>;
@@ -19,7 +19,7 @@ namespace NSL.Node.BridgeServer.RS
         }
 
         public LocalBridgeClient<NetworkClient, TAnotherClient> CreateLocalBridge<TAnotherClient>()
-            where TAnotherClient : INetworkClient, new()
+            where TAnotherClient : BaseNetworkConnection, new()
         {
             return handles.Fill(Fill(WebSocketsServerEndPointBuilder.Create()
                 .WithClientProcessor<NetworkClient>()

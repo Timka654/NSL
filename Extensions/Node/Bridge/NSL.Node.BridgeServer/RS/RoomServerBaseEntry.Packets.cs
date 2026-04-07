@@ -1,4 +1,4 @@
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using NSL.Logger;
 using NSL.Node.BridgeServer.Shared.Message;
 using NSL.Node.BridgeServer.Shared.Requests;
@@ -81,7 +81,7 @@ namespace NSL.Node.BridgeServer.RS
 
             result.WriteFullTo(response);
 
-            client.ServerOptions.HelperLogger?.Append(LoggerLevel.Info, JsonConvert.SerializeObject(result));
+            client.Options.HelperLogger?.Append(LoggerLevel.Info, JsonConvert.SerializeObject(result));
 
             client.Network?.Send(response);
         }

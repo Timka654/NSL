@@ -9,7 +9,7 @@ using System.Linq;
 namespace NSL.UDP.Channels
 {
     internal class OrderedChannel<TClient, TParent> : BaseChannel<TClient, TParent>
-        where TClient : IServerNetworkClient
+        where TClient : BaseNetworkConnection
         where TParent : BaseUDPClient<TClient, TParent>
     {
         private readonly BaseChannel<TClient, TParent> parent;

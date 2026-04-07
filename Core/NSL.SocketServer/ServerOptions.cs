@@ -8,7 +8,7 @@ using System.Net;
 namespace NSL.SocketServer
 {
     public class ServerOptions<TClient> : CoreOptions<TClient>
-        where TClient : IServerNetworkClient
+        where TClient : BaseNetworkConnection
     {
         #region ServerSettings
         //Данные для настройки сервера
@@ -49,7 +49,7 @@ namespace NSL.SocketServer
     public static class NetworkConfigurationExtension
     {
         public static ServerOptions<T> LoadConfigurationServerOptions<T>(this INSLConfiguration configuration, string networkNodePath)
-            where T : IServerNetworkClient
+            where T : BaseNetworkConnection
         {
             var r = configuration.LoadConfigurationCoreOptions<ServerOptions<T>, T>(networkNodePath);
 

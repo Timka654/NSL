@@ -14,10 +14,10 @@ namespace NSL.Generators.PacketHandleGenerator.Tests
     [NSLPHGenImpl(Direction = NSLHPDirTypeEnum.Send)]
     internal partial class StaticSendRepository
     {
-        internal static TCPNetworkClient<BasicNetworkClient, ClientOptions<BasicNetworkClient>> client;
+        internal static TCPNetworkClient<ClientNetworkConnection, ClientOptions<ClientNetworkConnection>> client;
         internal static RequestProcessor requestProcessor;
 
-        protected static BasicNetworkClient GetNetworkClient()
+        protected static ClientNetworkConnection GetNetworkClient()
             => client.Data;
 
         protected static RequestProcessor GetRequestProcessor()
@@ -32,10 +32,10 @@ namespace NSL.Generators.PacketHandleGenerator.Tests
     [NSLPHGenImpl(Direction = NSLHPDirTypeEnum.Send)]
     internal partial class StaticAsyncSendRepository
     {
-        internal static TCPNetworkClient<BasicNetworkClient, ClientOptions<BasicNetworkClient>> client;
+        internal static TCPNetworkClient<ClientNetworkConnection, ClientOptions<ClientNetworkConnection>> client;
         internal static RequestProcessor requestProcessor;
 
-        protected static BasicNetworkClient GetNetworkClient()
+        protected static ClientNetworkConnection GetNetworkClient()
             => client.Data;
 
         protected static RequestProcessor GetRequestProcessor()
@@ -69,10 +69,10 @@ namespace NSL.Generators.PacketHandleGenerator.Tests
     [NSLPHGenImpl(Direction = NSLHPDirTypeEnum.Send)]
     internal partial class StaticDelegateSendRepository
     {
-        internal static TCPNetworkClient<BasicNetworkClient, ClientOptions<BasicNetworkClient>> client;
+        internal static TCPNetworkClient<ClientNetworkConnection, ClientOptions<ClientNetworkConnection>> client;
         internal static RequestProcessor requestProcessor;
 
-        protected static BasicNetworkClient GetNetworkClient()
+        protected static ClientNetworkConnection GetNetworkClient()
             => client.Data;
 
         protected static RequestProcessor GetRequestProcessor()
@@ -88,10 +88,10 @@ namespace NSL.Generators.PacketHandleGenerator.Tests
     [NSLPHGenImpl(Direction = NSLHPDirTypeEnum.Send)]
     internal partial class StaticAsyncDelegateSendRepository
     {
-        internal static TCPNetworkClient<BasicNetworkClient, ClientOptions<BasicNetworkClient>> client;
+        internal static TCPNetworkClient<ClientNetworkConnection, ClientOptions<ClientNetworkConnection>> client;
         internal static RequestProcessor requestProcessor;
 
-        protected static BasicNetworkClient GetNetworkClient()
+        protected static ClientNetworkConnection GetNetworkClient()
             => client.Data;
 
         protected static RequestProcessor GetRequestProcessor()

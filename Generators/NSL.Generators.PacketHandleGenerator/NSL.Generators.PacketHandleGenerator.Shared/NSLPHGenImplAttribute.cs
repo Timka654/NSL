@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace NSL.Generators.PacketHandleGenerator.Shared
 {
@@ -21,7 +21,7 @@ namespace NSL.Generators.PacketHandleGenerator.Shared
         public Type PacketsEnum { get; set; }
 
         /// <summary>
-        /// INetworkClient client data class
+        /// BaseNetworkConnection client data class
         /// </summary>
         public Type NetworkDataType { get; set; }
 

@@ -6,13 +6,13 @@ using System.Threading.Tasks;
 
 namespace NSL.SocketServer.Utils.Session.Packets
 {
-    public class NSLRecoverySessionPacket<T> : IAsyncPacket<T> where T : IServerNetworkClient
+    public class NSLRecoverySessionPacket<T> : IAsyncPacket<T> where T : BaseNetworkConnection
     {
         public const ushort PacketId = (ushort)NSLSystemPacketEnum.Session;
 
         public override async Task ReceiveAsync(T client, InputPacketBuffer data)
         {
-            var pid = client.ServerOptions.ObjectBag.Get<ushort>(NSLObjectBagKeys.ResponsePID, true);
+            var pid = client.Options.ObjectBag.Get<ushort>(NSLObjectBagKeys.ResponsePID, true);
 
             var response = data.CreateResponse(pid);
 
@@ -23,7 +23,7 @@ namespace NSL.SocketServer.Utils.Session.Packets
 
             client.ThrowIfObjectBagNull();
 
-            var serverOptions  = client.ServerOptions;
+            var serverOptions  = client.Options;
             var sessionManager = serverOptions.ObjectBag.Get<NSLSessionManager<T>>(NSLSessionManager<T>.ObjectBagKey);
             var result         = await sessionManager.TryRecovery(client, request.Session, request.RestoreKeys);
 

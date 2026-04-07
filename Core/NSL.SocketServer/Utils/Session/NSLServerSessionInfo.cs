@@ -4,7 +4,7 @@ using System;
 
 namespace NSL.SocketServer.Utils.Session
 {
-    public class NSLServerSessionInfo<T> : NSLSessionInfo where T : IServerNetworkClient
+    public class NSLServerSessionInfo<T> : NSLSessionInfo where T : BaseNetworkConnection
     {
         public DateTime? DisconnectTime { get; set; }
         public T         Client         { get; set; }

@@ -2,7 +2,7 @@
 
 namespace NSL.Builder.WebSockets.BaseExample.Server
 {
-    public class WebSocketsServerNetworkClient : IServerNetworkClient
+    public class WebSocketsServerNetworkClient : BaseNetworkConnection
     {
 
     }

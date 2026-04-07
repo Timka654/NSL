@@ -4,7 +4,7 @@ using NSL.SocketCore.Utils.SystemPackets;
 
 namespace NSL.SocketServer.Utils.SystemPackets
 {
-    public class ServerAliveConnectionPacket<T> : IPacket<T> where T : IServerNetworkClient
+    public class ServerAliveConnectionPacket<T> : IPacket<T> where T : BaseNetworkConnection
     {
         public override void Receive(T client, InputPacketBuffer data)
         {

@@ -1,123 +1,27 @@
-﻿using NSL.SocketCore.Utils;
-using NSL.SocketServer;
-using NSL.SocketServer.Utils;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using NSL.SocketCore;
+using NSL.SocketCore.Utils;
+using NSL.SocketCore.Utils.SystemPackets;
 
 namespace NSL.UDP.Packet
 {
-    public class UDPPingPacket<TClient> : IDisposable
-    where TClient : IServerNetworkClient, IUDPClientWithPing<TClient>
-    {
-        public const ushort ReceivePingPacketId = (ushort)NSLSystemPacketEnum.UDPReceivePing;
-        public const ushort SendPingPacketId    = (ushort)NSLSystemPacketEnum.UDPSendPing;
-        private readonly TClient client;
-        private readonly ushort requestPID;
-
-        public UDPPingPacket(TClient client, ushort requestPID = SendPingPacketId)
-        {
-            this.client = client;
-            this.requestPID = requestPID;
-        }
-
-        private bool pingPongEnabled;
-
-        private CancellationTokenSource pingPongTokenSource;
-
-        private DateTime aliveRequestTime;
-
-        public int Ping { get; protected set; }
-
-        public bool PingPongEnabled
-        {
-            get
-            {
-                return pingPongEnabled;
-            }
-            set
-            {
-                if (value == pingPongEnabled)
-                {
-                    return;
-                }
-
-                pingPongEnabled = value;
-
-                if (pingPongTokenSource != null)
-                {
-                    pingPongTokenSource.Cancel();
-                    pingPongTokenSource = null;
-                }
-
-                if (pingPongEnabled)
-                {
-                    pingPongTokenSource = new CancellationTokenSource();
-
-                    RunAliveChecker(pingPongTokenSource.Token);
-                }
-                else
-                {
-                    Ping = 0;
-                }
-            }
-        }
-
-        private ManualResetEvent aliveLocker { get; set; } = new ManualResetEvent(initialState: true);
-
-        private async void RunAliveChecker(CancellationToken token)
-        {
-            do
-            {
-                RequestPing();
-                await Task.Delay(client.AliveCheckTimeOut / 2, token);
-            }
-            while (!token.IsCancellationRequested && pingPongEnabled && (client.Network?.GetState() ?? false));
-        }
-
-        public void RequestPing()
-        {
-            if (aliveLocker.WaitOne(0) && client.Network != null)
-            {
-                aliveLocker.Reset();
-                client.Network.SendEmpty(requestPID);
-                aliveRequestTime = DateTime.UtcNow;
-            }
-        }
-
-        internal void PongProcess()
-        {
-            Ping = (int)((DateTime.UtcNow - aliveRequestTime.AddMilliseconds(-2.0)).TotalMilliseconds / 2.0);
-            aliveLocker.Set();
-        }
-
-        public void Dispose()
-        {
-            if (PingPongEnabled)
-                PingPongEnabled = false;
-        }
-    }
-
     public static class UDPPingPacketExtensions
     {
-        public static void RegisterUDPPingHandle<TClient>(this ServerOptions<TClient> options, ushort requestPID = UDPPingPacket<TClient>.SendPingPacketId, ushort responsePID = UDPPingPacket<TClient>.ReceivePingPacketId)
-        where TClient : IServerNetworkClient, IUDPClientWithPing<TClient>
+        /// <summary>
+        /// Registers a combined ping/pong handler on <see cref="AliveConnectionPacket.PacketId"/>.
+        /// Both sides of a UDP connection can call this — the handler automatically distinguishes
+        /// between an incoming ping request (echoes back) and an incoming pong response (records RTT).
+        /// Enable ping loop on the initiating side via <see cref="NSL.SocketCore.Utils.BaseNetworkConnection.PingPongEnabled"/>.
+        /// </summary>
+        public static void RegisterUDPPingHandle<TClient>(this CoreOptions<TClient> options)
+            where TClient : BaseNetworkConnection
         {
-            options.AddHandle(requestPID, (client, data) =>
+            options.AddHandle(AliveConnectionPacket.PacketId, (client, data) =>
             {
-                client.Network.SendEmpty(responsePID);
-            });
-
-            options.AddHandle(responsePID, (client, data) =>
-            {
-                client.PingPacket?.PongProcess();
+                if (client.IsPingPending)
+                    client.PongProcess();
+                else
+                    client.Network.SendEmpty(AliveConnectionPacket.PacketId);
             });
         }
-    }
-
-    public interface IUDPClientWithPing<TClient>
-        where TClient : IServerNetworkClient, IUDPClientWithPing<TClient>
-    {
-        UDPPingPacket<TClient> PingPacket { get; }
     }
 }

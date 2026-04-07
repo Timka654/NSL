@@ -1,10 +1,10 @@
-using NSL.SocketClient;
+﻿using NSL.SocketClient;
 using NSL.SocketCore.Utils.Buffer;
 using NSL.SocketCore.Utils.Request;
 
 namespace NSL.Node.RoomServer.Bridge
 {
-    public class BridgeRoomNetworkClient : BaseSocketNetworkClient
+    public class BridgeRoomNetworkClient : BaseNetworkConnection
     {
         public RequestProcessor PacketWaitBuffer { get; }
 

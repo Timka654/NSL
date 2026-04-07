@@ -8,7 +8,7 @@ using System.Net.Sockets;
 namespace NSL.TCP.Server
 {
     public class TCPServerListener<T> : TCPServerListener<T, ServerOptions<T>>
-        where T : IServerNetworkClient, new()
+        where T : BaseNetworkConnection, new()
     {
         public TCPServerListener(ServerOptions<T> options, bool legacyThread = false) : base(options, legacyThread)
         {
@@ -16,7 +16,7 @@ namespace NSL.TCP.Server
         }
     }
     public class TCPServerListener<T, TOptions> : INetworkListener<T>
-        where T : IServerNetworkClient, new()
+        where T : BaseNetworkConnection, new()
         where TOptions : ServerOptions<T>
     {
         public event ReceivePacketDebugInfo<TCPServerClient<T>> OnReceivePacket;

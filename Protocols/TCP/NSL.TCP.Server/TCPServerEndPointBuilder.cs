@@ -18,14 +18,14 @@ namespace NSL.BuilderExtensions.TCPServer
         }
 
         public TCPServerEndPointBuilder<TClient> WithClientProcessor<TClient>()
-            where TClient : IServerNetworkClient, new()
+            where TClient : BaseNetworkConnection, new()
         {
             return TCPServerEndPointBuilder<TClient>.Create();
         }
     }
 
     public class TCPServerEndPointBuilder<TClient>
-        where TClient : IServerNetworkClient, new()
+        where TClient : BaseNetworkConnection, new()
     {
         private TCPServerEndPointBuilder() { }
 
@@ -45,7 +45,7 @@ namespace NSL.BuilderExtensions.TCPServer
     }
 
     public class TCPServerEndPointBuilder<TClient, TOptions> : IOptionableEndPointServerBuilder<TClient>, IHandleIOBuilder<TClient>
-        where TClient : IServerNetworkClient, new()
+        where TClient : BaseNetworkConnection, new()
         where TOptions : ServerOptions<TClient>, new()
     {
         TOptions options = new TOptions();

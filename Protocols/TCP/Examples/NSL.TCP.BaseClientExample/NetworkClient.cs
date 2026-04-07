@@ -2,7 +2,7 @@
 
 namespace NSL.TCP.BaseClientExample
 {
-    internal class NetworkClient : BaseSocketNetworkClient
+    internal class NetworkClient : BaseNetworkConnection
     {
     }
 }

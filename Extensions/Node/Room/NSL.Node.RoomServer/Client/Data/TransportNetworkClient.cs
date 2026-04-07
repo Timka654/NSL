@@ -130,7 +130,7 @@ namespace NSL.Node.RoomServer.Client.Data
             _object.SetOwner(Room, this);
         }
 
-        public override void ChangeOwner(IServerNetworkClient from)
+        public override void ChangeOwner(BaseNetworkConnection from)
         {
             if (Room?.TryRecoverySession(this) != true)
             {

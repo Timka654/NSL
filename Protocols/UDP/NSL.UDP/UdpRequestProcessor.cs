@@ -1,4 +1,4 @@
-﻿using NSL.SocketCore.Utils;
+using NSL.SocketCore.Utils;
 using NSL.SocketCore.Utils.Buffer;
 using NSL.SocketCore.Utils.Request;
 using System;
@@ -21,7 +21,7 @@ namespace NSL.UDP
         /// <summary>
         /// Create a processor bound to <paramref name="channel"/>, sharing the given <paramref name="hub"/>.
         /// </summary>
-        public UdpRequestProcessor(INetworkClient client, UDPChannelEnum channel, IRequestHub hub)
+        public UdpRequestProcessor(BaseNetworkConnection client, UDPChannelEnum channel, IRequestHub hub)
             : base(client, hub)
         {
             Channel = channel;
@@ -30,7 +30,7 @@ namespace NSL.UDP
         /// <summary>
         /// Create a processor bound to <paramref name="channel"/> with its own private hub.
         /// </summary>
-        public UdpRequestProcessor(INetworkClient client, UDPChannelEnum channel)
+        public UdpRequestProcessor(BaseNetworkConnection client, UDPChannelEnum channel)
             : base(client)
         {
             Channel = channel;

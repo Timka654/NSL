@@ -44,7 +44,7 @@ namespace NSL.SocketCore.Utils.WaitBuffer
             locker?.Set();
         }
 
-        public void Process(INetworkClient client)
+        public void Process(BaseNetworkConnection client)
         {
             locker?.WaitOne();
 

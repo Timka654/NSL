@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Routing;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NSL.BuilderExtensions.SocketCore;
@@ -51,7 +51,7 @@ namespace NSL.Node.BridgeLobbyClient.AspNetCore
             Action<IServiceProvider, BridgeLobbyNetworkHandlesConfigurationModel> onHandleConfiguration,
             Action<IServiceProvider, WebSocketsClientEndPointBuilder<BridgeLobbyNetworkClient, WSClientOptions<BridgeLobbyNetworkClient>>> onBuild = null
             )
-            where TServerClient : INetworkClient, new()
+            where TServerClient : BaseNetworkConnection, new()
             => services.AddSingleton(services => new BridgeLobbyLocalBridgeNetwork<TServerClient>(
                 serverIdentity,
                 identityKey,
@@ -64,7 +64,7 @@ namespace NSL.Node.BridgeLobbyClient.AspNetCore
             }));
 
         public static void RunNodeBridgeLobbyLocalBridgeClient<TServerClient>(this IEndpointRouteBuilder host, LocalBridgeClient<TServerClient, BridgeLobbyNetworkClient> serverClient)
-            where TServerClient : INetworkClient, new()
+            where TServerClient : BaseNetworkConnection, new()
             => GetNodeBridgeLobbyClient<BridgeLobbyLocalBridgeNetwork<TServerClient>>(host)
             .WithServerClient(serverClient)
             .Initialize();

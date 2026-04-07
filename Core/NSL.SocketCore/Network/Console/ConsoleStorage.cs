@@ -5,7 +5,7 @@ using System.Collections.Concurrent;
 namespace NSL.SocketCore.Utils.Console
 {
     public class ConsoleStorage<T>
-        where T : INetworkClient
+        where T : BaseNetworkConnection
     {
         protected ConcurrentDictionary<string, Func<T, string[],string>> command_map;
 

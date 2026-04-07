@@ -1,4 +1,4 @@
-﻿using NSL.LocalBridge;
+using NSL.LocalBridge;
 using NetworkClient = NSL.Node.BridgeServer.RS.RoomServerNetworkClient;
 using NSL.SocketCore.Utils;
 using NSL.Node.BridgeServer.Shared;
@@ -12,7 +12,7 @@ namespace NSL.Node.BridgeServer.RS
             , NodeNetworkHandles<NetworkClient> handles
             , out LocalBridgeClient<NetworkClient, TAnotherClient> bridge
             , string logPrefix = null)
-            where TAnotherClient : INetworkClient, new()
+            where TAnotherClient : BaseNetworkConnection, new()
         {
             var local = new RoomServerLocalBridgeEntry(builder.Entry, handles, logPrefix);
 

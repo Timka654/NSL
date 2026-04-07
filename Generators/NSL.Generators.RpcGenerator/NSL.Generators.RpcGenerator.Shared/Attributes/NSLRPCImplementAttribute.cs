@@ -14,7 +14,7 @@ namespace NSL.Generators.RpcGenerator.Shared.Attributes
         public Type Interface { get; }
 
         /// <summary>
-        /// The <see cref="NSL.SocketCore.INetworkClient"/> implementation type used as the client data handle.
+        /// The <see cref="NSL.SocketCore.BaseNetworkConnection"/> implementation type used as the client data handle.
         /// Required for server-side handler signatures and client-side partial stubs.
         /// </summary>
         public Type NetworkDataType { get; }

@@ -7,7 +7,7 @@ using System.Net.WebSockets;
 namespace NSL.WebSockets.Client
 {
     public class WSNetworkClient<T, TOptions> : WSClient<T>
-        where T : BaseSocketNetworkClient, new()
+        where T : BaseNetworkConnection, new()
         where TOptions : WSClientOptions<T>
     {
         protected WebSocket client;

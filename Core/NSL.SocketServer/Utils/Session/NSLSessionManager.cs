@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace NSL.SocketServer.Utils.Session
 {
-    public class NSLSessionManager<TClient> : IDisposable where TClient : IServerNetworkClient
+    public class NSLSessionManager<TClient> : IDisposable where TClient : BaseNetworkConnection
     {
         public const string ObjectBagKey = NSLObjectBagKeys.SessionManager;
 

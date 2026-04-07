@@ -1,9 +1,9 @@
-﻿using NSL.SocketCore.Utils;
+using NSL.SocketCore.Utils;
 using NSL.SocketCore.Utils.Buffer;
 
 namespace NSL.SocketCore.Utils.Console
 {
-    public class ConsoleMessage<T> : IPacket<T> where T : INetworkClient
+    public class ConsoleMessage<T> : IPacket<T> where T : BaseNetworkConnection
     {
         private readonly IConsoleManager<T> manager;
         private readonly ushort responsePacketId;
@@ -22,7 +22,7 @@ namespace NSL.SocketCore.Utils.Console
             Send(client, responsePacketId, manager.InvokeCommand(client, data.ReadString()));
         }
 
-        public static void Send(INetworkClient client, ushort packetId, string result)
+        public static void Send(BaseNetworkConnection client, ushort packetId, string result)
         {
             var packet = new OutputPacketBuffer()
             {

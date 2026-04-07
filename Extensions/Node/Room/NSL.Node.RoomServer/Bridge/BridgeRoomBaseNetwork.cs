@@ -28,7 +28,7 @@ namespace NSL.Node.RoomServer.Bridge
         private Dictionary<string, string> identityData;
         private readonly string publicEndPoint;
 
-        protected INetworkClient network { get; private set; }
+        protected BaseNetworkConnection network { get; private set; }
 
         protected RequestProcessor PacketWaitBuffer { get; private set; }
 

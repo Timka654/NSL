@@ -36,7 +36,7 @@ namespace NSL.Generators.RpcGenerator.Tests.Client
 
             // ── Connect TCP client ───────────────────────────────────────────
             var client = TCPClientEndPointBuilder.Create()
-                .WithClientProcessor<NSL.SocketClient.BasicNetworkClient>()
+                .WithClientProcessor<NSL.SocketClient.ClientNetworkConnection>()
                 .WithOptions()
                 .WithEndPoint("127.0.0.1", port)
                 .WithCode(b =>

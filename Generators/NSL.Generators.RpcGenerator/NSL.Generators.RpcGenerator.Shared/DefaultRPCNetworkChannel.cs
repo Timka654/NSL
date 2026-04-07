@@ -13,10 +13,10 @@ namespace NSL.Generators.RpcGenerator.Shared
     /// </summary>
     public class DefaultRPCNetworkChannel : IRPCNetworkChannel
     {
-        private readonly INetworkClient _client;
+        private readonly BaseNetworkConnection _client;
         private readonly RequestProcessor _requestProcessor;
 
-        public DefaultRPCNetworkChannel(INetworkClient client, RequestProcessor requestProcessor)
+        public DefaultRPCNetworkChannel(BaseNetworkConnection client, RequestProcessor requestProcessor)
         {
             _client = client;
             _requestProcessor = requestProcessor;

@@ -5,8 +5,8 @@ using NSL.SocketClient;
 
 namespace NSL.Generators.RpcGenerator.Tests.Client
 {
-    [NSLRPCImplement(typeof(ITestRpcService), typeof(BasicNetworkClient), Direction = NSLRPCDirection.Client)]
-    [NSLRPCImplement(typeof(ITestChatService),  typeof(BasicNetworkClient), Direction = NSLRPCDirection.Client)]
+    [NSLRPCImplement(typeof(ITestRpcService), typeof(ClientNetworkConnection), Direction = NSLRPCDirection.Client)]
+    [NSLRPCImplement(typeof(ITestChatService),  typeof(ClientNetworkConnection), Direction = NSLRPCDirection.Client)]
     public partial class TestRpcClient
     {
         private readonly IRPCNetworkChannel _channel;

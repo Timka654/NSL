@@ -5,7 +5,7 @@ using System.Net.Sockets;
 namespace NSL.WebSockets.Client
 {
     public class WSClientOptions<TClient> : ClientOptions<TClient>
-        where TClient : BaseSocketNetworkClient
+        where TClient : BaseNetworkConnection
     {
         public override AddressFamily AddressFamily
         {

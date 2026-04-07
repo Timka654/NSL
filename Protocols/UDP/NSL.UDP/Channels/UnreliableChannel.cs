@@ -5,7 +5,7 @@ using System.Collections.Generic;
 namespace NSL.UDP.Channels
 {
     public class UnreliableChannel<TClient, TParent> : UnorderedChannel<TClient, TParent>
-        where TClient : IServerNetworkClient
+        where TClient : BaseNetworkConnection
         where TParent : BaseUDPClient<TClient, TParent>
     {
         public override UDPChannelEnum Channel => UDPChannelEnum.Unreliable | UDPChannelEnum.Unordered;

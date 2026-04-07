@@ -4,7 +4,7 @@ using System;
 namespace NSL.SocketCore.Utils.Console
 {
     public class ConsoleManager<T> : ConsoleStorage<T>, IConsoleManager<T>
-        where T : INetworkClient
+        where T : BaseNetworkConnection
     {
         public string InvokeCommand(T client, string text)
         {

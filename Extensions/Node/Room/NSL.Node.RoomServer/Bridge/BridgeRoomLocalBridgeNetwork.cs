@@ -1,4 +1,4 @@
-﻿using NSL.BuilderExtensions.LocalBridge;
+using NSL.BuilderExtensions.LocalBridge;
 using NSL.BuilderExtensions.WebSocketsClient;
 using NSL.LocalBridge;
 using NSL.Node.BridgeServer.Shared;
@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace NSL.Node.RoomServer.Bridge
 {
     public class BridgeRoomLocalBridgeNetwork<TServerClient> : BridgeRoomBaseNetwork
-        where TServerClient : INetworkClient, new()
+        where TServerClient : BaseNetworkConnection, new()
     {
         private readonly NodeNetworkHandles<BridgeRoomNetworkClient> handles;
         private LocalBridgeClient<TServerClient, BridgeRoomNetworkClient> serverNetwork;

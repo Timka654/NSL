@@ -8,7 +8,7 @@ using System.Net.Sockets;
 namespace NSL.TCP.Server
 {
     public class TCPServerClient<TClient> : BaseTcpClient<TClient, TCPServerClient<TClient>>
-        where TClient : IServerNetworkClient, new()
+        where TClient : BaseNetworkConnection, new()
     {
         private TClient clientData;
         private readonly bool legacyThread;
@@ -27,7 +27,7 @@ namespace NSL.TCP.Server
             clientData = new TClient();
 
             Data.Network = this;
-            Data.ServerOptions = options;
+            Data.Options = options;
 
             sclient = client;
             this.endPoint = (IPEndPoint)sclient?.RemoteEndPoint;
@@ -51,10 +51,10 @@ namespace NSL.TCP.Server
 
         public virtual void RunPacketReceiver() => RunReceive();
 
-        public override void ChangeUserData(INetworkClient newClientData)
+        public override void ChangeUserData(BaseNetworkConnection newClientData)
             => SetClientData(newClientData);
 
-        public override void SetClientData(INetworkClient from)
+        public override void SetClientData(BaseNetworkConnection from)
         {
             if (from == null)
             {

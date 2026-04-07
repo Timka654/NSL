@@ -4,7 +4,7 @@ using System;
 
 namespace NSL.SocketServer.Utils.SystemPackets
 {
-    public class SystemTime<T> : IPacket<T> where T : IServerNetworkClient
+    public class SystemTime<T> : IPacket<T> where T : BaseNetworkConnection
     {
         public const ushort PacketId = (ushort)NSLSystemPacketEnum.SystemTime;
 
@@ -17,7 +17,7 @@ namespace NSL.SocketServer.Utils.SystemPackets
             Send(client, data.ReadDateTime());
         }
 
-        private static void Send(IServerNetworkClient client, DateTime clientTime)
+        private static void Send(BaseNetworkConnection client, DateTime clientTime)
         {
             var packet = new OutputPacketBuffer()
             {

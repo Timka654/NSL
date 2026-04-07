@@ -1,4 +1,4 @@
-﻿using NSL.BuilderExtensions.TCPClient;
+using NSL.BuilderExtensions.TCPClient;
 using NSL.Generators.BinaryTypeIOGenerator.Shared;
 using NSL.SocketClient;
 using NSL.SocketServer.Utils;
@@ -24,7 +24,7 @@ namespace NSL.Generators.PacketHandleGenerator.Tests
             l.Start();
 
             var c = TCPClientEndPointBuilder.Create()
-                .WithClientProcessor<BasicNetworkClient>()
+                .WithClientProcessor<ClientNetworkConnection>()
                 .WithOptions()
                 .WithEndPoint("127.0.0.1", 9996)
                 .WithCode(b =>

@@ -7,7 +7,7 @@ using System.Net.Sockets;
 namespace NSL.WebSockets.Server
 {
     public class WSServerOptions<TClient> : ServerOptions<TClient>
-        where TClient : IServerNetworkClient
+        where TClient : BaseNetworkConnection
     {
         public override AddressFamily AddressFamily
         {

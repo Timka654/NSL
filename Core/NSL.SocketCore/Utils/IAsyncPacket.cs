@@ -1,10 +1,10 @@
-﻿using NSL.SocketCore.Utils.Buffer;
+using NSL.SocketCore.Utils.Buffer;
 using System.Threading.Tasks;
 
 namespace NSL.SocketCore.Utils
 {
     public abstract class IAsyncPacket<TClient> : IPacket<TClient>
-        where TClient : INetworkClient
+        where TClient : BaseNetworkConnection
     {
         public override void Receive(TClient client, InputPacketBuffer data)
         {

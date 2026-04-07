@@ -4,7 +4,7 @@ using NSL.SocketServer.Utils;
 namespace NSL.UDP.Channels
 {
     public class UnorderedChannel<TClient, TParent> : BaseChannel<TClient, TParent>
-        where TClient : IServerNetworkClient
+        where TClient : BaseNetworkConnection
         where TParent : BaseUDPClient<TClient, TParent>
     {
         public override UDPChannelEnum Channel => UDPChannelEnum.Unordered;

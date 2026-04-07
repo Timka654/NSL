@@ -5,6 +5,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-internal class wsclient : BaseSocketNetworkClient
+internal class wsclient : BaseNetworkConnection
 {
 }

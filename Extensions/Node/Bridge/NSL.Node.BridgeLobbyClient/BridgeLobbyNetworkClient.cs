@@ -1,11 +1,11 @@
-using NSL.Node.BridgeLobbyClient.Models;
+﻿using NSL.Node.BridgeLobbyClient.Models;
 using NSL.SocketClient;
 using NSL.SocketCore.Utils.Buffer;
 using NSL.SocketCore.Utils.Request;
 
 namespace NSL.Node.BridgeLobbyClient
 {
-    public class BridgeLobbyNetworkClient : BaseSocketNetworkClient
+    public class BridgeLobbyNetworkClient : BaseNetworkConnection
     {
         internal BridgeLobbyNetworkHandlesConfigurationModel HandlesConfiguration { get; set; }
 

@@ -15,7 +15,7 @@ namespace NSL.SocketServer.Utils.Session
         public TimeSpan CloseSessionDelay   { get; set; } = TimeSpan.FromSeconds(20);
     }
 
-    public class NSLSessionServerOptions<TClient> : NSLSessionServerOptions where TClient : IServerNetworkClient
+    public class NSLSessionServerOptions<TClient> : NSLSessionServerOptions where TClient : BaseNetworkConnection
     {
         public delegate Task<bool> ClientValidateDelegate(TClient client);
         public delegate Task ChangeSessionDelegate(TClient client, NSLSessionInfo sessionInfo);

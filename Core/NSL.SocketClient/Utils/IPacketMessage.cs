@@ -1,7 +1,7 @@
 ﻿namespace NSL.SocketClient.Utils
 {
     public class IPacketMessage<TClient, RDType> : IClientPacket<TClient>
-        where TClient : BaseSocketNetworkClient
+        where TClient : BaseNetworkConnection
     {
         public IPacketMessage(ClientOptions<TClient> options) : base(options)
         {
@@ -17,7 +17,7 @@
     }
 
     public class IPacketMessage<TClient> : IClientPacket<TClient>
-        where TClient : BaseSocketNetworkClient
+        where TClient : BaseNetworkConnection
     {
         public IPacketMessage(ClientOptions<TClient> options) : base(options)
         {

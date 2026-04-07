@@ -2,7 +2,7 @@
 
 namespace NSL.LocalBridge.Example.Shared
 {
-    public class TCPExampleServer : IServerNetworkClient
+    public class TCPExampleServer : BaseNetworkConnection
     {
 
     }

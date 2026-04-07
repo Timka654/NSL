@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace NSL.WebSockets.Server
 {
     public class WSServerClient<TClient> : BaseWSClient<TClient, WSServerClient<TClient>>
-        where TClient : IServerNetworkClient, new()
+        where TClient : BaseNetworkConnection, new()
     {
         private TClient clientData;
 
@@ -49,7 +49,7 @@ namespace NSL.WebSockets.Server
 
             //обзятельная переменная в NetworkClient, для отправки данных, можно использовать привидения типов (Client)NetworkClient но это никому не поможет
             Data.Network = this;
-            Data.ServerOptions = options;
+            Data.Options = options;
 
             //установка массива для приема данных, размер указан в общих настройках сервера
             receiveBuffer = new byte[options.ReceiveBufferSize];
@@ -77,10 +77,10 @@ namespace NSL.WebSockets.Server
                 Disconnect();
             }
         }
-        public override void ChangeUserData(INetworkClient newClientData)
+        public override void ChangeUserData(BaseNetworkConnection newClientData)
             => SetClientData(newClientData);
 
-        public override void SetClientData(INetworkClient from)
+        public override void SetClientData(BaseNetworkConnection from)
         {
             if (from == null)
             {

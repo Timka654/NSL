@@ -1,6 +1,4 @@
 ﻿using NSL.SocketCore;
-using NSL.SocketServer;
-using NSL.SocketServer.Utils;
 using System;
 using System.Collections.Concurrent;
 using System.Net;
@@ -10,7 +8,7 @@ using System.Threading;
 namespace NSL.UDP.Client
 {
     public class UDPServer<TClient> : UDPListener<TClient, UDPClientOptions<TClient>>, INetworkListener
-        where TClient : IServerNetworkClient, new()
+        where TClient : BaseNetworkConnection, new()
     {
         public event ReceivePacketDebugInfo<UDPClient<TClient>> OnReceivePacket;
 
@@ -78,6 +76,6 @@ namespace NSL.UDP.Client
 
         public CoreOptions GetOptions() => options;
 
-        public ServerOptions<TClient> GetServerOptions() => options;
+        public UDPClientOptions<TClient> GetServerOptions() => options;
     }
 }
