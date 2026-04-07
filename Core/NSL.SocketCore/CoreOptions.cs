@@ -20,6 +20,18 @@ namespace NSL.SocketCore
     {
         void AddHandle(ushort pid, Action<TConnection, InputPacketBuffer> handle);
     }
+
+    /// <summary>
+    /// Common registration interface shared by <see cref="CoreOptions"/> and pipeline middleware
+    /// (e.g. <c>PacketHandleRouterMiddleware</c>). Allows code generators to register handlers
+    /// into multiple stores with a single call.
+    /// </summary>
+    public interface IPacketHandleRegistry
+    {
+        bool AddHandle(ushort packetId, CoreOptions.PacketHandle handle);
+        bool AddPacket(ushort packetId, IPacket packet);
+    }
+
     public class TypedCoreOptions<TConnection> : CoreOptions, ITypedCoreOptions<TConnection>
         where TConnection : BaseNetworkConnection, new()
     {
@@ -29,7 +41,7 @@ namespace NSL.SocketCore
         }
     }
 
-    public class CoreOptions
+    public class CoreOptions : IPacketHandleRegistry
     {
         public ObjectBag ObjectBag { get; } = new ObjectBag();
 
@@ -83,24 +95,6 @@ namespace NSL.SocketCore
                 outputCipher = value ?? new PacketNoneCipher();
             }
         }
-
-        /// <summary>
-        /// IP адрес. Для слушателя — адрес привязки (0.0.0.0 для всех), для клиента — адрес назначения.
-        /// </summary>
-        public virtual string IpAddress { get; set; } = "0.0.0.0";
-
-        /// <summary>
-        /// Порт. Для слушателя — порт привязки, для клиента — порт назначения.
-        /// </summary>
-        public virtual int Port { get; set; }
-
-        /// <summary>
-        /// Длина очереди для приема подключения (TCP-серверы; игнорируется другими протоколами).
-        /// </summary>
-        public virtual int Backlog { get; set; }
-
-        public IPAddress GetIPAddress() => IPAddress.Parse(IpAddress);
-        public IPEndPoint GetIPEndPoint() => new IPEndPoint(GetIPAddress(), Port);
 
         // ── Connection factory ───────────────────────────────────────────────
         /// <summary>
@@ -249,6 +243,10 @@ namespace NSL.SocketCore
         public static bool AddHandle<TClient>(this CoreOptions options, ushort packetId, Action<TClient, InputPacketBuffer> handle)
             where TClient : BaseNetworkConnection
             => options.AddHandle(packetId, (c, buf) => handle((TClient)c, buf));
+
+        public static bool AddHandle<TClient>(this IPacketHandleRegistry registry, ushort packetId, Action<TClient, InputPacketBuffer> handle)
+            where TClient : BaseNetworkConnection
+            => registry.AddHandle(packetId, (c, buf) => handle((TClient)c, buf));
 
         public static bool AddAsyncHandle<TClient>(this CoreOptions options, ushort packetId, Func<TClient, InputPacketBuffer, Task> handle)
             where TClient : BaseNetworkConnection

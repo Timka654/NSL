@@ -29,8 +29,7 @@ namespace NSL.TCP.Client
 
         public bool Connect(string ip, int port, int connectionTimeOut = DefaultConnectionTimeout)
         {
-            ConnectionOptions.IpAddress = ip;
-            ConnectionOptions.Port = port;
+            ConnectionOptions.WithRemoteEndPoint(ip, port);
             return Connect(connectionTimeOut);
         }
 
@@ -46,8 +45,7 @@ namespace NSL.TCP.Client
 
         public async Task<bool> ConnectAsync(string ip, int port, int connectionTimeOut = DefaultConnectionTimeout)
         {
-            ConnectionOptions.IpAddress = ip;
-            ConnectionOptions.Port = port;
+            ConnectionOptions.WithRemoteEndPoint(ip, port);
             return await ConnectAsync(connectionTimeOut);
         }
 
@@ -58,8 +56,10 @@ namespace NSL.TCP.Client
 
             try
             {
-                if (!IPAddress.TryParse(ConnectionOptions.IpAddress, out var ip))
-                    throw new ArgumentException($"invalid connection ip {ConnectionOptions.IpAddress}", nameof(ConnectionOptions.IpAddress));
+                var remoteEp = ConnectionOptions.GetRemoteEndPoint();
+
+                if (!IPAddress.TryParse(remoteEp.IpAddress, out var ip))
+                    throw new ArgumentException($"invalid connection ip {remoteEp.IpAddress}", nameof(remoteEp.IpAddress));
 
                 if (ConnectionOptions.AddressFamily == AddressFamily.Unspecified)
                     ConnectionOptions.AddressFamily = ip.AddressFamily;
@@ -71,7 +71,7 @@ namespace NSL.TCP.Client
                 client.ReceiveBufferSize = ConnectionOptions.ReceiveBufferSize;
                 client.NoDelay = true;
 
-                var connectTask = client.ConnectAsync(ip, ConnectionOptions.Port);
+                var connectTask = client.ConnectAsync(ip, remoteEp.Port);
 
                 if (await Task.WhenAny(connectTask, Task.Delay(connectionTimeOut)) != connectTask)
                 {

@@ -35,8 +35,7 @@ static void Log(string tag, string msg)
 // ── Server setup ─────────────────────────────────────────────────────────────
 
 var serverOptions = new ServerOptions<BaseNetworkConnection>();
-serverOptions.IpAddress = "0.0.0.0";
-serverOptions.Port      = Port;
+serverOptions.WithBindingEndPoint("0.0.0.0", Port);
 serverOptions.OnExceptionEvent += (ex, _) => Log("SRV ERR", ex.Message);
 
 // pid=10: plain backward-compat — uses AddHandle; pipeline terminal is auto-registered

@@ -2,7 +2,6 @@
 using NSL.SocketCore.Utils.Buffer;
 using System;
 using System.Buffers;
-using System.Buffers.Binary;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -117,31 +116,8 @@ namespace NSL.SocketCore.Utils.Pipeline
             };
         }
 
-        /// <summary>
-        /// Creates an <see cref="InputPacketBuffer"/> from the pipeline receive context.
-        /// The virtual packetLength reported to the handler only counts the body (not channel headers),
-        /// so existing handlers see the same DataLength they expect.
-        /// </summary>
         private static InputPacketBuffer CreateInputPacketBuffer(ReceiveChannelContext ctx)
-        {
-            var bodyLen = ctx.Body.Length;
-            var pool = ArrayPool<byte>.Shared;
-
-            // Reconstruct a 7-byte base header where packetLength only covers body (not channel headers).
-            Span<byte> headerBuf = stackalloc byte[InputPacketBuffer.DefaultHeaderLength];
-            BinaryPrimitives.WriteInt32LittleEndian(headerBuf, InputPacketBuffer.DefaultHeaderLength + bodyLen);
-            BinaryPrimitives.WriteUInt16LittleEndian(headerBuf.Slice(4), ctx.PacketId);
-
-            var rBuff = new InputPacketBuffer(headerBuf);
-
-            var data = pool.Rent(bodyLen);
-            if (bodyLen > 0)
-                ctx.Body.CopyTo(data);
-            rBuff.SetData(data);
-            rBuff.OnDispose += b => pool.Return(b.Data);
-
-            return rBuff;
-        }
+            => InputPacketBuffer.FromBody(ctx.Body, ctx.PacketId);
 
         // ── Internal: send chain construction ────────────────────────────────
 

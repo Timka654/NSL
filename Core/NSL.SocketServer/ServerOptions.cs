@@ -31,9 +31,10 @@ namespace NSL.SocketServer
         {
             var r = configuration.LoadConfigurationCoreOptions<ServerOptions<T>>(networkNodePath);
 
-            r.Backlog   = configuration.GetValue<int>($"{networkNodePath}.io.backlog");
-            r.IpAddress = configuration.GetValue($"{networkNodePath}.io.ip");
-            r.Port      = configuration.GetValue<int>($"{networkNodePath}.io.port");
+            r.WithBindingEndPoint(
+                configuration.GetValue($"{networkNodePath}.io.ip"),
+                configuration.GetValue<int>($"{networkNodePath}.io.port"),
+                configuration.GetValue<int>($"{networkNodePath}.io.backlog"));
 
             return r;
         }

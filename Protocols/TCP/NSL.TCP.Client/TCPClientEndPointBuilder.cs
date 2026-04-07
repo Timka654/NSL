@@ -80,8 +80,7 @@ namespace NSL.BuilderExtensions.TCPClient
 
         public TCPClientEndPointBuilder<TClient, TOptions> WithEndPoint(string ip, int port)
         {
-            options.IpAddress = ip;
-            options.Port = port;
+            options.WithRemoteEndPoint(ip, port);
 
             return this;
         }

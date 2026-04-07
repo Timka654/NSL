@@ -50,12 +50,12 @@ namespace NSL.UDP
         /// <summary>
         /// Connection IpAddress (0.0.0.0 - all)
         /// </summary>
-        public virtual string IpAddress { get; set; } = "0.0.0.0";
+        public string IpAddress { get; set; } = "0.0.0.0";
 
         /// <summary>
         /// Порт - используется для инициализации слушателя на определенном порту 1 - 65,535
         /// </summary>
-        public virtual int Port { get; set; }
+        public int Port { get; set; }
 
         public System.Net.IPAddress GetIPAddress() => System.Net.IPAddress.Parse(IpAddress);
 

@@ -19,7 +19,7 @@ namespace NSL.SocketCore.Utils.Pipeline.Middleware
     /// </list>
     /// </para>
     /// </summary>
-    public class PacketHandleRouterMiddleware : IChannelReceiveMiddleware
+    public class PacketHandleRouterMiddleware : IChannelReceiveMiddleware, IPacketHandleRegistry
     {
         public int ReceiveHeaderSize => 0;
 
@@ -48,13 +48,24 @@ namespace NSL.SocketCore.Utils.Pipeline.Middleware
         {
             _routes[pid] = ctx =>
             {
-                var buf = ctx.CreateReader();
+                var buf = InputPacketBuffer.FromBody(ctx.Body, ctx.PacketId);
                 try   { handler(ctx.Connection, buf); }
                 finally { if (!buf.ManualDisposing) buf.Dispose(); }
                 return default(ValueTask);
             };
             return this;
         }
+
+        // ── IPacketHandleRegistry ────────────────────────────────────────────
+
+        public bool AddHandle(ushort packetId, CoreOptions.PacketHandle handle)
+        {
+            AddRoute(packetId, (conn, buf) => handle(conn, buf));
+            return true;
+        }
+
+        public bool AddPacket(ushort packetId, IPacket packet)
+            => AddHandle(packetId, packet.Receive);
 
         // ── Dispatch ─────────────────────────────────────────────────────────
 

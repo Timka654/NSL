@@ -2,7 +2,6 @@
 using NSL.SocketCore.Utils.Buffer;
 using System;
 using System.Buffers;
-using System.Buffers.Binary;
 using System.Collections.Generic;
 
 namespace NSL.SocketCore.Utils.Pipeline
@@ -51,26 +50,21 @@ namespace NSL.SocketCore.Utils.Pipeline
         }
 
         /// <summary>
-        /// Creates an <see cref="InputPacketBuffer"/> backed by the body of this context.
-        /// The buffer's <c>DataLength</c> equals <see cref="Body.Length"/> and position starts at 0.
-        /// The caller is responsible for disposing the returned buffer (or setting <c>ManualDisposing</c>).
+        /// Creates a <see cref="PacketBodyReader"/> backed by the body of this context.
+        /// <c>DataLength</c> equals <see cref="Body"/>.Length and position starts at 0.
+        /// No packet header metadata is present (use <see cref="InputPacketBuffer.FromBody"/> if you need it).
+        /// The caller is responsible for disposing the returned reader (pool return is hooked on Dispose).
         /// </summary>
-        public InputPacketBuffer CreateReader()
+        public PacketBodyReader CreateReader()
         {
             var bodyLen = Body.Length;
             var pool = ArrayPool<byte>.Shared;
-
-            Span<byte> headerBuf = stackalloc byte[InputPacketBuffer.DefaultHeaderLength];
-            BinaryPrimitives.WriteInt32LittleEndian(headerBuf, InputPacketBuffer.DefaultHeaderLength + bodyLen);
-            BinaryPrimitives.WriteUInt16LittleEndian(headerBuf.Slice(4), PacketId);
-
-            var rBuff = new InputPacketBuffer(headerBuf);
             var data = pool.Rent(bodyLen);
-            if (bodyLen > 0)
-                Body.CopyTo(data);
-            rBuff.SetData(data);
-            rBuff.OnDispose += b => pool.Return(b.Data);
-            return rBuff;
+            if (bodyLen > 0) Body.CopyTo(data);
+            var reader = new PacketBodyReader();
+            reader.SetData(data, bodyLen);
+            reader.OnDispose += _ => pool.Return(data);
+            return reader;
         }
     }
 }

@@ -18,9 +18,7 @@ services.AddScoped<ClientSession>();
 ServerOptions<BaseNetworkConnection> options = new ServerOptions<BaseNetworkConnection>();
 options.ServiceProvider = services.BuildServiceProvider();
 
-options.Port = 20008;
-
-options.IpAddress = "0.0.0.0";
+options.WithBindingEndPoint("0.0.0.0", 20008);
 
 options.ReceiveBufferSize = 1024;
 

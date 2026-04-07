@@ -81,8 +81,9 @@ namespace NSL.SocketClient
             where T : BaseNetworkConnection, new()
         {
             var r = configuration.LoadConfigurationCoreOptions<ClientOptions<T>>(networkNodePath);
-            r.IpAddress = configuration.GetValue($"{networkNodePath}.io.ip");
-            r.Port = configuration.GetValue<int>($"{networkNodePath}.io.port");
+            r.WithRemoteEndPoint(
+                configuration.GetValue($"{networkNodePath}.io.ip"),
+                configuration.GetValue<int>($"{networkNodePath}.io.port"));
             return r;
         }
     }

@@ -83,15 +83,16 @@ namespace NSL.BuilderExtensions.TCPServer
 
         public TCPServerEndPointBuilder<TClient, TOptions> WithBindingPoint(string ip, int port)
         {
-            options.IpAddress = ip;
-            options.Port = port;
+            options.WithBindingEndPoint(ip, port);
 
             return this;
         }
 
         public TCPServerEndPointBuilder<TClient, TOptions> WithBacklog(int maxWaitConnectionCount)
         {
-            options.Backlog = maxWaitConnectionCount;
+            var ep = options.GetBindingEndPoint();
+            ep.Backlog = maxWaitConnectionCount;
+            options.ObjectBag.SetBindingEndPoint(ep);
 
             return this;
         }

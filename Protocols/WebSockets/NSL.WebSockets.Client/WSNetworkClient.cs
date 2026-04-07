@@ -1,4 +1,5 @@
 ﻿using NSL.SocketClient;
+using NSL.SocketCore;
 using NSL.SocketCore.Utils;
 using System;
 using System.Threading.Tasks;
@@ -24,8 +25,7 @@ namespace NSL.WebSockets.Client
 
         public bool Connect(string ip, int port, int connectionTimeOut = DefaultConnectionTimeout)
         {
-            Options.IpAddress = ip;
-            Options.Port = port;
+            Options.WithRemoteEndPoint(ip, port);
             return Connect(connectionTimeOut);
         }
 
@@ -51,8 +51,7 @@ namespace NSL.WebSockets.Client
 
         public async Task<bool> ConnectAsync(string ip, int port, int connectionTimeOut = DefaultConnectionTimeout)
         {
-            Options.IpAddress = ip;
-            Options.Port = port;
+            Options.WithRemoteEndPoint(ip, port);
 
             return await ConnectAsync(connectionTimeOut);
         }

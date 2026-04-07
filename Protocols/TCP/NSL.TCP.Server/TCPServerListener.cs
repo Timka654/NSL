@@ -36,8 +36,10 @@ namespace NSL.TCP.Server
 
         private void Initialize()
         {
-            if (!IPAddress.TryParse(serverOptions.IpAddress, out var ip))
-                throw new ArgumentException($"invalid connection ip {serverOptions.IpAddress}", nameof(serverOptions.IpAddress));
+            var bindEp = serverOptions.GetBindingEndPoint();
+
+            if (!IPAddress.TryParse(bindEp.IpAddress, out var ip))
+                throw new ArgumentException($"invalid connection ip {bindEp.IpAddress}", nameof(bindEp.IpAddress));
 
             if (serverOptions.AddressFamily == AddressFamily.Unspecified)
                 serverOptions.AddressFamily = ip.AddressFamily;
@@ -46,11 +48,15 @@ namespace NSL.TCP.Server
                 serverOptions.ProtocolType = ProtocolType.Tcp;
 
             listener = new Socket(serverOptions.AddressFamily, SocketType.Stream, serverOptions.ProtocolType);
-            listener.Bind(new IPEndPoint(IPAddress.Parse(serverOptions.IpAddress), serverOptions.Port));
+            listener.Bind(new IPEndPoint(ip, bindEp.Port));
 
-            serverOptions.Port = listener.LocalEndPoint is IPEndPoint ipep ? ipep.Port : serverOptions.Port;
+            if (listener.LocalEndPoint is IPEndPoint ipep)
+            {
+                bindEp.Port = ipep.Port;
+                serverOptions.ObjectBag.SetBindingEndPoint(bindEp);
+            }
 
-            listener.Listen(serverOptions.Backlog);
+            listener.Listen(bindEp.Backlog);
         }
 
         public void Run()
@@ -94,7 +100,7 @@ namespace NSL.TCP.Server
             }
         }
 
-        public int GetListenerPort() => serverOptions.Port;
+        public int GetListenerPort() => serverOptions.GetBindingEndPoint().Port;
 
         public void Start() => Run();
 
