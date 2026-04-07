@@ -20,7 +20,7 @@ namespace NSL.UDPExample
         {
             options = new TOptions();
 
-            options.BindingIP = "0.0.0.0";
+            options.WithBindingEndPoint("0.0.0.0", 5553);
 
             options.ReceiveBufferSize = 1024;
 

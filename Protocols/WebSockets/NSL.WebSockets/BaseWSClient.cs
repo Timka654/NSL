@@ -215,7 +215,7 @@ namespace NSL.WebSockets
         /// <param name="buffer"></param>
         public async void Send(byte[] buffer)
         {
-            try { await sendChannel.Writer.WriteAsync(buffer); } catch (InvalidOperationException) { Data?.OnPacketSendFail(buffer, 0, buffer.Length); }
+            try { await sendChannel.Writer.WriteAsync(buffer); } catch (InvalidOperationException) {  }
         }
 
         /// <summary>
@@ -236,7 +236,7 @@ namespace NSL.WebSockets
 
                 await sendChannel.Writer.WriteAsync(buf[offset..(offset + length)]);
             }
-            catch (InvalidOperationException) { Data?.OnPacketSendFail(buf, offset, length); }
+            catch (InvalidOperationException) {  }
 
         }
 
@@ -265,9 +265,6 @@ namespace NSL.WebSockets
             }
             catch (Exception ex)
             {
-                if (buf != null)
-                    Data?.OnPacketSendFail(buf, 0, buf.Length);
-
                 Disconnect(ex);
             }
         }

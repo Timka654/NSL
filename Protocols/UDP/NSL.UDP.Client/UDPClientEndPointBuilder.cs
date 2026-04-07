@@ -60,16 +60,14 @@ namespace NSL.BuilderExtensions.UDPClient
 
         public UDPClientEndPointBuilder<TClient, TOptions> UseBindingPoint(string ipAddress, int port)
         {
-            options.BindingIP = ipAddress;
-            options.BindingPort = port;
+            options.WithBindingEndPoint(ipAddress, port);
 
             return this;
         }
 
         public UDPClientEndPointBuilder<TClient, TOptions> UseEndPoint(string ipAddress, int port)
         {
-            options.IpAddress = ipAddress;
-            options.Port = port;
+            options.WithRemoteEndPoint(ipAddress, port);
 
             return this;
         }

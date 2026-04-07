@@ -53,7 +53,7 @@ namespace NSL.TCP.Server
             if (listener.LocalEndPoint is IPEndPoint ipep)
             {
                 bindEp.Port = ipep.Port;
-                serverOptions.ObjectBag.SetBindingEndPoint(bindEp);
+                serverOptions.WithBindingEndPoint(bindEp);
             }
 
             listener.Listen(bindEp.Backlog);

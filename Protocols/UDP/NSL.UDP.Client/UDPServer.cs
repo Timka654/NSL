@@ -74,7 +74,7 @@ namespace NSL.UDP.Client
         public UDPClient<TClient> CreateClientConnection(IPEndPoint endPoint)
             => GetClient(endPoint);
 
-        public int GetListenerPort() => options.BindingPort;
+        public int GetListenerPort() => options.GetBindingEndPoint().Port;
 
         public CoreOptions GetOptions() => options;
     }

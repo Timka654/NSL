@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using NSL.Cipher.RC.RC4;
 using NSL.Logger;
+using NSL.SocketCore;
 using NSL.SocketCore.Utils;
 using NSL.SocketCore.Utils.Buffer;
 using NSL.SocketServer;

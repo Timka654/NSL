@@ -14,7 +14,7 @@ namespace NSL.UDPExample
         {
             base.Initialize(logger);
 
-            options.BindingPort = 5553;
+            options.WithBindingEndPoint("0.0.0.0", 5553);
 
             options.AddPacket(1, new TestPacketS());
 

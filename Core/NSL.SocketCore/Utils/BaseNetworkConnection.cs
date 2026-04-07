@@ -191,15 +191,6 @@ namespace NSL.SocketCore.Utils
             otherClient.ObjectBag = null;
         }
 
-        /// <summary>
-        /// Добавить пакет в список ожидания восстановления подключения
-        /// </summary>
-        /// <param name="packet_data"></param>
-        /// <param name="length"></param>
-        public virtual void OnPacketSendFail(byte[] packet_data, int offset, int length)
-        {
-        }
-
         public virtual void Send(OutputPacketBuffer packet, bool disposeOnSend = true)
         {
             var _network = Network;
@@ -211,8 +202,6 @@ namespace NSL.SocketCore.Utils
                 var buf = packet.CompilePacket();
 
                 if (disposeOnSend) packet.Dispose();
-
-                OnPacketSendFail(buf, 0, buf.Length);
             }
         }
 
@@ -221,11 +210,6 @@ namespace NSL.SocketCore.Utils
             var _network = Network;
 
             _network?.Send(buf, offset, len);
-
-            if (_network == null)
-            {
-                OnPacketSendFail(buf, offset, len);
-            }
         }
 
         /// <summary>

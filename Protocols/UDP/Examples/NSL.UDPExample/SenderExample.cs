@@ -14,11 +14,9 @@ namespace NSL.UDPExample
         {
             base.Initialize(logger);
 
-            options.IpAddress = "127.0.0.1";
+            options.WithRemoteEndPoint("127.0.0.1", 5553);
 
-            options.Port = 5553;
-
-            options.BindingPort = 9994;
+            options.WithBindingEndPoint("0.0.0.0", 9994);
 
             options.AddPacket(1, new TestPacket());
 

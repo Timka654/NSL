@@ -92,7 +92,7 @@ namespace NSL.BuilderExtensions.TCPServer
         {
             var ep = options.GetBindingEndPoint();
             ep.Backlog = maxWaitConnectionCount;
-            options.ObjectBag.SetBindingEndPoint(ep);
+            options.WithBindingEndPoint(ep);
 
             return this;
         }

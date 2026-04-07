@@ -649,7 +649,7 @@ namespace NSL.TCP
         /// <param name="buffer"></param>
         public async void Send(byte[] buffer)
         {
-            try { await sendChannel.Writer.WriteAsync(buffer); } catch (InvalidOperationException) { Data?.OnPacketSendFail(buffer, 0, buffer.Length); }
+            try { await sendChannel.Writer.WriteAsync(buffer); } catch (InvalidOperationException) {  }
         }
 
         /// <summary>
@@ -669,7 +669,7 @@ namespace NSL.TCP
                 }
                 await sendChannel.Writer.WriteAsync(buf[offset..(offset + length)]);
             }
-            catch (InvalidOperationException) { Data?.OnPacketSendFail(buf, offset, length); }
+            catch (InvalidOperationException) {  }
 
         }
 
@@ -721,8 +721,6 @@ namespace NSL.TCP
             {
                 if (args.SocketError != SocketError.Success)
                 {
-                    Data?.OnPacketSendFail(args.BufferList[0].Array, 0, args.BufferList[0].Count);
-
                     if (pooledObject)
                     {
                         returnBufferPool(args);
@@ -782,8 +780,6 @@ namespace NSL.TCP
             }
             finally
             {
-                if (buf != null)
-                    Data?.OnPacketSendFail(buf, 0, buf.Length);
             }
 
             return true;
@@ -867,11 +863,6 @@ namespace NSL.TCP
 
             if (outputCipher != null)
                 outputCipher.Dispose();
-
-            while (sendChannel.Reader.TryRead(out var buf))
-            {
-                Data?.OnPacketSendFail(buf, 0, buf.Length);
-            }
 
             if (sclient != null)
             {

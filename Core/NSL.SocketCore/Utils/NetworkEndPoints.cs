@@ -9,25 +9,36 @@ namespace NSL.SocketCore
     /// </summary>
     public static class CoreOptionsNetworkEndPointExtensions
     {
+        private const string RemoteEndPointKey = "NSL.Network.RemoteEndPoint";
+        private const string BindingEndPointKey = "NSL.Network.BindingEndPoint";
+
         public static TOptions WithRemoteEndPoint<TOptions>(this TOptions options, string ip, int port)
             where TOptions : CoreOptions
+            => options.WithRemoteEndPoint(new NetworkRemoteEndPoint(ip, port));
+
+        public static TOptions WithRemoteEndPoint<TOptions>(this TOptions options, NetworkRemoteEndPoint ep)
+            where TOptions : CoreOptions
         {
-            options.ObjectBag.SetRemoteEndPoint(ip, port);
+            options.ObjectBag.Set(RemoteEndPointKey, ep);
             return options;
         }
 
         public static NetworkRemoteEndPoint GetRemoteEndPoint(this CoreOptions options)
-            => options.ObjectBag.GetRemoteEndPoint();
+            => options.ObjectBag.Get<NetworkRemoteEndPoint>(RemoteEndPointKey);
 
         public static TOptions WithBindingEndPoint<TOptions>(this TOptions options, string ip, int port, int backlog = 100)
             where TOptions : CoreOptions
+            => options.WithBindingEndPoint(new NetworkBindingEndPoint(ip, port, backlog));
+
+        public static TOptions WithBindingEndPoint<TOptions>(this TOptions options, NetworkBindingEndPoint ep)
+            where TOptions : CoreOptions
         {
-            options.ObjectBag.SetBindingEndPoint(ip, port, backlog);
+            options.ObjectBag.Set(BindingEndPointKey, ep);
             return options;
         }
 
         public static NetworkBindingEndPoint GetBindingEndPoint(this CoreOptions options)
-            => options.ObjectBag.GetBindingEndPoint();
+            => options.ObjectBag.Get<NetworkBindingEndPoint>(BindingEndPointKey);
     }
 }
 
@@ -69,39 +80,5 @@ namespace NSL.SocketCore.Utils
 
         public IPAddress GetIPAddress() => IPAddress.Parse(IpAddress);
         public IPEndPoint GetIPEndPoint() => new IPEndPoint(GetIPAddress(), Port);
-    }
-
-    /// <summary>
-    /// Extension methods for storing/retrieving <see cref="NetworkRemoteEndPoint"/> and
-    /// <see cref="NetworkBindingEndPoint"/> in an <see cref="ObjectBag"/>.
-    /// </summary>
-    public static class NetworkEndPointObjectBagExtensions
-    {
-        private const string RemoteEndPointKey = "NSL.Network.RemoteEndPoint";
-        private const string BindingEndPointKey = "NSL.Network.BindingEndPoint";
-
-        public static ObjectBag SetRemoteEndPoint(this ObjectBag bag, string ip, int port)
-            => bag.SetRemoteEndPoint(new NetworkRemoteEndPoint(ip, port));
-
-        public static ObjectBag SetRemoteEndPoint(this ObjectBag bag, NetworkRemoteEndPoint ep)
-        {
-            bag.Set(RemoteEndPointKey, ep);
-            return bag;
-        }
-
-        public static NetworkRemoteEndPoint GetRemoteEndPoint(this ObjectBag bag)
-            => bag.Get<NetworkRemoteEndPoint>(RemoteEndPointKey);
-
-        public static ObjectBag SetBindingEndPoint(this ObjectBag bag, string ip, int port, int backlog = 100)
-            => bag.SetBindingEndPoint(new NetworkBindingEndPoint(ip, port, backlog));
-
-        public static ObjectBag SetBindingEndPoint(this ObjectBag bag, NetworkBindingEndPoint ep)
-        {
-            bag.Set(BindingEndPointKey, ep);
-            return bag;
-        }
-
-        public static NetworkBindingEndPoint GetBindingEndPoint(this ObjectBag bag)
-            => bag.Get<NetworkBindingEndPoint>(BindingEndPointKey);
     }
 }

@@ -286,14 +286,10 @@ namespace NSL.UDP
             }
             catch (ObjectDisposedException)
             {
-                PacketFailProd(packet);
-
                 Disconnect();
             }
             catch (Exception ex)
             {
-                PacketFailProd(packet);
-
                 Disconnect(ex);
             }
         }
@@ -320,27 +316,6 @@ namespace NSL.UDP
             {
                 Disconnect(ex);
             }
-        }
-
-        private void PacketFailProd(PacketWaitTemp packet)
-        {
-            var parts = packet.Parts?.ToArray() ?? Array.Empty<Memory<byte>>();
-
-            var dataArray = new byte[packet.Head.Length + parts.Sum(x => x.Length)];
-
-            var data = new Memory<byte>(dataArray);
-
-            packet.Head.CopyTo(data);
-
-            var offset = packet.Head.Length;
-
-            foreach (var item in parts)
-            {
-                item.CopyTo(data[offset..]);
-                offset += item.Length;
-            }
-
-            Data?.OnPacketSendFail(dataArray, 0, dataArray.Length);
         }
 
         public void SendEmpty(ushort packetId)

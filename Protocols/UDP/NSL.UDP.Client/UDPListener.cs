@@ -1,4 +1,5 @@
-﻿using NSL.SocketCore.Utils;
+﻿using NSL.SocketCore;
+using NSL.SocketCore.Utils;
 using NSL.SocketServer.Utils;
 using NSL.UDP.Info;
 using NSL.UDP.Interface;
@@ -51,9 +52,10 @@ namespace NSL.UDP.Client
 
             ListenerCTS = new CancellationTokenSource();
 
-            if (!IPAddress.TryParse(options.BindingIP, out var ip))
-                throw new ArgumentException($"invalid connection ip {options.BindingIP}", nameof(options.BindingIP));
+            var bindEp = options.GetBindingEndPoint();
 
+            if (!IPAddress.TryParse(bindEp.IpAddress, out var ip))
+                throw new ArgumentException($"invalid connection ip {bindEp.IpAddress}", nameof(bindEp.IpAddress));
 
             if (options.AddressFamily == AddressFamily.Unspecified)
                 options.AddressFamily = ip.AddressFamily;
@@ -63,13 +65,16 @@ namespace NSL.UDP.Client
 
             listener = new Socket(options.AddressFamily, SocketType.Dgram, options.ProtocolType);
 
-
             //         listener.ExclusiveAddressUse = false;
             //listener.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
 
-            listener.Bind(options.GetBindingIPEndPoint());
+            listener.Bind(bindEp.GetIPEndPoint());
 
-            options.BindingPort = listener.LocalEndPoint is IPEndPoint ipep ? ipep.Port : options.BindingPort;
+            if (listener.LocalEndPoint is IPEndPoint ipep)
+            {
+                bindEp.Port = ipep.Port;
+                options.WithBindingEndPoint(bindEp);
+            }
 
             STUNClient.ReceiveTimeout = 1700;
 

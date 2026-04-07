@@ -24,10 +24,13 @@ namespace NSL.UDP.Client
 
         public void Connect()
         {
-            if (!IPAddress.TryParse(options.IpAddress, out var ip))
-                throw new ArgumentException($"invalid connection ip {options.IpAddress}", nameof(options.IpAddress));
+            var remoteEp = options.GetRemoteEndPoint();
+
+            if (!IPAddress.TryParse(remoteEp.IpAddress, out _))
+                throw new ArgumentException($"invalid connection ip {remoteEp.IpAddress}", nameof(remoteEp.IpAddress));
+
             StartReceive(() => {
-                client = new UDPClient<TClient>(options.GetIPEndPoint(), listener, options, deferConnect: true);
+                client = new UDPClient<TClient>(remoteEp.GetIPEndPoint(), listener, options, deferConnect: true);
 
                 client.OnReceivePacket += OnReceivePacket;
                 client.OnSendPacket += OnSendPacket;
@@ -46,7 +49,7 @@ namespace NSL.UDP.Client
 
             RunReceiveIntern(token);
 
-            if (e.RemoteEndPoint.Equals(options.GetIPEndPoint()))
+            if (e.RemoteEndPoint.Equals(options.GetRemoteEndPoint().GetIPEndPoint()))
                 client.Receive(data);
         }
     }
