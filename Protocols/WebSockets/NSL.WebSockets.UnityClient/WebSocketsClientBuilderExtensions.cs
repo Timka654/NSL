@@ -1,4 +1,5 @@
 ﻿using NSL.SocketClient;
+using NSL.SocketCore.Utils;
 using NSL.WebSockets.Client;
 using NSL.WebSockets.UnityClient;
 

@@ -71,7 +71,7 @@ namespace NSL.SocketClient.Utils.SystemPackets
             => serverDateTime + client.GetServerDateTimeOffset();
 
         public static DateTime? GetClientDateTime(this BaseNetworkConnection client, DateTime? serverDateTime)
-            => serverDateTime.HasValue ? client.GetClientDateTime(serverDateTime.Value) : null;
+            => serverDateTime.HasValue ? (DateTime?)client.GetClientDateTime(serverDateTime.Value) : null;
 
         public static void RequestServerTimeOffset(this BaseNetworkConnection client)
             => ClientSystemTimePacket.SendRequest(client.Network);

@@ -1,4 +1,5 @@
 ﻿using NSL.SocketClient;
+using NSL.SocketCore.Utils;
 using NSL.WebSockets.Client;
 using System;
 using System.Net.WebSockets;
@@ -7,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace NSL.WebSockets.UnityClient
 {
-    public class WGLWSNetworkClient<T, TOptions> : WSNetworkClient<T, TOptions>
+    public class WGLWSNetworkClient<T, TOptions> : WSNetworkClient<T>
         where T : BaseNetworkConnection, new()
         where TOptions : WSClientOptions<T>
     {
