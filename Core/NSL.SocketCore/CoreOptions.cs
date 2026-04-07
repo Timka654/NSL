@@ -2,6 +2,9 @@ using NSL.SocketCore.Utils;
 using NSL.SocketCore.Utils.Buffer;
 using NSL.SocketCore.Utils.Cipher;
 using NSL.SocketCore.Utils.Logger;
+#if NSL_LIBRARY
+using NSL.SocketCore.Utils.Pipeline;
+#endif
 using NSL.Utils;
 using System;
 using System.Collections.Generic;
@@ -112,6 +115,37 @@ namespace NSL.SocketCore
         protected Dictionary<ushort, IPacket> Packets = new Dictionary<ushort, IPacket>();
         protected Dictionary<ushort, PacketHandle> PacketHandles = new Dictionary<ushort, PacketHandle>();
 
+#if NSL_LIBRARY
+        // ── Channel pipelines ────────────────────────────────────────────────
+        private Dictionary<ushort, ChannelPipelineBuilder> _channelBuilders = new Dictionary<ushort, ChannelPipelineBuilder>();
+
+        /// <summary>
+        /// Returns the <see cref="ChannelPipelineBuilder"/> for the given channel id (= packetId),
+        /// creating it if it does not yet exist. Use this to attach middleware to a channel:
+        /// <code>
+        /// options.GetOrCreateChannel(MyPid).UseReceive(myMw).UseSend(myMw);
+        /// </code>
+        /// </summary>
+        public ChannelPipelineBuilder GetOrCreateChannel(ushort channelId)
+        {
+            if (!_channelBuilders.TryGetValue(channelId, out var builder))
+                _channelBuilders[channelId] = builder = new ChannelPipelineBuilder(channelId);
+            return builder;
+        }
+
+        /// <summary>
+        /// Builds all registered channel pipelines and returns a per-connection snapshot.
+        /// Called once per connection setup (e.g. in the transport's RunReceive).
+        /// </summary>
+        public Dictionary<ushort, ChannelPipeline> GetChannelPipelineMap()
+        {
+            var result = new Dictionary<ushort, ChannelPipeline>(_channelBuilders.Count);
+            foreach (var entry in _channelBuilders)
+                result[entry.Key] = entry.Value.Build();
+            return result;
+        }
+#endif
+
         public Dictionary<ushort, PacketHandle> GetHandleMap()
             => new Dictionary<ushort, PacketHandle>(PacketHandles);
 
@@ -120,6 +154,9 @@ namespace NSL.SocketCore
             if (PacketHandles.ContainsKey(packetId)) return false;
             Packets[packetId] = packet;
             PacketHandles[packetId] = packet.Receive;
+#if NSL_LIBRARY
+            GetOrCreateChannel(packetId).SetTerminal(packet.Receive);
+#endif
             return true;
         }
 
@@ -127,6 +164,9 @@ namespace NSL.SocketCore
         {
             if (PacketHandles.ContainsKey(packetId)) return false;
             PacketHandles[packetId] = handle;
+#if NSL_LIBRARY
+            GetOrCreateChannel(packetId).SetTerminal(handle);
+#endif
             return true;
         }
 

@@ -3,6 +3,10 @@ using Microsoft.Extensions.DependencyInjection;
 #endif
 using NSL.SocketCore.Utils.Buffer;
 using NSL.SocketCore.Utils.SystemPackets;
+#if NSL_LIBRARY
+using NSL.SocketCore.Utils.Pipeline;
+using System.Collections.Generic;
+#endif
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -126,6 +130,25 @@ namespace NSL.SocketCore.Utils
         /// </summary>
         public IClient Network { get; set; }
 
+#if NSL_LIBRARY
+        /// <summary>
+        /// Per-channel pipelines built by the transport on connect.
+        /// Use <see cref="GetChannel"/> to retrieve a channel pipeline by id.
+        /// </summary>
+        public IReadOnlyDictionary<ushort, ChannelPipeline> Channels { get; private set; }
+
+        public void SetChannels(Dictionary<ushort, ChannelPipeline> channels)
+            => Channels = channels;
+
+        /// <summary>Returns the <see cref="ChannelPipeline"/> for <paramref name="channelId"/>, or <c>null</c> if not registered.</summary>
+        public ChannelPipeline GetChannel(ushort channelId)
+        {
+            ChannelPipeline ch = null;
+            Channels?.TryGetValue(channelId, out ch);
+            return ch;
+        }
+#endif
+
         /// <summary>
         /// Ссылка на параметры, с которыми поднято подключение.
         /// Эквивалентно <see cref="Network"/>?.Options, но также допускает явную установку
@@ -175,7 +198,6 @@ namespace NSL.SocketCore.Utils
         /// <param name="length"></param>
         public virtual void OnPacketSendFail(byte[] packet_data, int offset, int length)
         {
-
         }
 
         public virtual void Send(OutputPacketBuffer packet, bool disposeOnSend = true)
@@ -212,7 +234,6 @@ namespace NSL.SocketCore.Utils
         /// <param name="from">copy from</param>
         public virtual void ChangeOwner(BaseNetworkConnection from)
         {
-            //InitializeObjectBag(from);
         }
 
         public virtual void Dispose()

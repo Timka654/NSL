@@ -13,8 +13,11 @@ namespace NSL.UDP.Client
 
         public override TClient Data => clientData;
 
-        public UDPClient(IPEndPoint receivePoint, Socket listenerSocket, UDPClientOptions<TClient> options) : base(receivePoint, listenerSocket, options)
+        private bool connectDeferred;
+
+        public UDPClient(IPEndPoint receivePoint, Socket listenerSocket, UDPClientOptions<TClient> options, bool deferConnect = false) : base(receivePoint, listenerSocket, options)
         {
+            connectDeferred = deferConnect;
             Initialize();
         }
 
@@ -36,8 +39,8 @@ namespace NSL.UDP.Client
             outputCipher = options.OutputCipher.CreateEntry();
 
             disconnected = false;
-            //Начало приема пакетов от клиента
-            options.CallClientConnectEvent(Data);
+            if (!connectDeferred)
+                options.CallClientConnectEvent(Data);
         }
 
         public override void ChangeUserData(BaseNetworkConnection newClientData)
@@ -74,6 +77,12 @@ namespace NSL.UDP.Client
         protected override void OnReceive(ushort pid, int len)
         {
             Data.LastReceiveMessage = DateTime.UtcNow;
+
+            if (connectDeferred)
+            {
+                connectDeferred = false;
+                options.CallClientConnectEvent(Data);
+            }
 
             base.OnReceive(pid, len);
         }

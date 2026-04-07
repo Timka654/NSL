@@ -5,8 +5,10 @@ using NSL.SocketCore.Utils.Buffer;
 using NSL.SocketCore.Utils.Cipher;
 using NSL.SocketCore.Utils.Exceptions;
 using NSL.SocketCore.Utils.Logger.Enums;
+using NSL.SocketCore.Utils.Pipeline;
 using System;
 using System.Buffers;
+using System.Buffers.Binary;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -57,6 +59,7 @@ namespace NSL.TCP
         private readonly bool legacyTransport;
         private uint segmentSize;
         private Dictionary<ushort, CoreOptions.PacketHandle> PacketHandles;
+        private Dictionary<ushort, ChannelPipeline> ChannelPipelines;
 
         public IPEndPoint GetRemotePoint()
         {
@@ -70,6 +73,8 @@ namespace NSL.TCP
             disconnected = false;
 
             PacketHandles = options.GetHandleMap();
+            ChannelPipelines = options.GetChannelPipelineMap();
+            Data.SetChannels(ChannelPipelines);
 
             if (!legacyTransport)
             {
@@ -81,7 +86,8 @@ namespace NSL.TCP
 
                 startSend();
 
-                asyncReceive();
+                pipelineReceiveCts = new CancellationTokenSource();
+                startPipelineReceive(pipelineReceiveCts.Token);
 
                 return;
             }
@@ -93,6 +99,145 @@ namespace NSL.TCP
             threadReceive();
         }
 
+
+        private CancellationTokenSource pipelineReceiveCts;
+
+        private async void startPipelineReceive(CancellationToken ct)
+        {
+            try
+            {
+                await pipelineReceiveLoopAsync(ct);
+            }
+            catch (NullReferenceException) { Disconnect(); }
+            catch (ObjectDisposedException) { Disconnect(); }
+            catch (ConnectionLostException clex) { Disconnect(clex); }
+            catch (OperationCanceledException) { }
+            catch (Exception ex) { Disconnect(new ConnectionLostException(GetRemotePoint(), true, ex)); }
+        }
+
+        private async Task pipelineReceiveLoopAsync(CancellationToken ct)
+        {
+            var baseHeaderBuf = new byte[InputPacketBuffer.DefaultHeaderLength];
+
+            // Pre-allocate a discard buffer for segment-alignment padding.
+            // sendBuf pads every outgoing packet to a multiple of segmentSize;
+            // we need to consume that padding after each exact-read packet.
+            byte[] paddingBuf = byteArrayPool.Rent((int)rpSegmentSize);
+
+            try
+            {
+                while (!disconnected && !ct.IsCancellationRequested)
+                {
+                    // 1. Read exact 7-byte base header
+                    if (!await WaitFillAsync(baseHeaderBuf, 0, InputPacketBuffer.DefaultHeaderLength, ct))
+                        return;
+
+                    if (!inputCipher.DecodeHeaderRef(ref baseHeaderBuf, 0))
+                        throw new CipherCodingException();
+
+                    int totalLength = BinaryPrimitives.ReadInt32LittleEndian(baseHeaderBuf);
+                    ushort packetId = BinaryPrimitives.ReadUInt16LittleEndian(baseHeaderBuf.AsSpan(4));
+
+                    if (totalLength < InputPacketBuffer.DefaultHeaderLength)
+                        throw new NSLInvalidDataException(totalLength, 0, baseHeaderBuf, null);
+
+                    // 2. Look up channel pipeline to determine channel header size
+                    ChannelPipelines.TryGetValue(packetId, out var pipeline);
+                    int chHeaderSize = pipeline?.TotalReceiveHeaderSize ?? 0;
+
+                    // 3. Read remaining bytes (channel headers + body) in one shot
+                    int remaining = totalLength - InputPacketBuffer.DefaultHeaderLength;
+                    byte[] buf = byteArrayPool.Rent(Math.Max(remaining, 1));
+
+                    try
+                    {
+                        if (remaining > 0)
+                        {
+                            if (!await WaitFillAsync(buf, 0, remaining, ct))
+                                return;
+
+                            if (!inputCipher.DecodeRef(ref buf, 0, remaining))
+                                throw new CipherCodingException();
+                        }
+
+                        OnReceive(packetId, remaining - chHeaderSize);
+
+#if DEBUGEXAMPLES
+                        ++c;
+                        sw ??= Stopwatch.StartNew();
+                        if (c % 10000 == 0)
+                            Options.HelperLogger?.Append(LoggerLevel.Debug, $"Received packets {c} in {sw.Elapsed.TotalMilliseconds} ms");
+#endif
+
+                        if (pipeline != null)
+                        {
+                            // 4a. Dispatch through channel pipeline (middleware chain)
+                            var ctx = new ReceiveChannelContext(
+                                Data,
+                                packetId,
+                                totalLength,
+                                buf.AsMemory(0, chHeaderSize),
+                                buf.AsMemory(chHeaderSize, remaining - chHeaderSize));
+
+                            await pipeline.HandleReceiveAsync(ctx);
+                        }
+                        else
+                        {
+                            // 4b. Fallback: unknown channel — skip packet gracefully
+                            OnUnknownPacket(packetId);
+                        }
+                    }
+                    finally
+                    {
+                        byteArrayPool.Return(buf);
+                    }
+
+                    // 5. Consume segment-alignment padding added by sendBuf.
+                    // sendBuf appends (segmentSize - packetBytes % segmentSize) zero bytes
+                    // so the total wire size is always a multiple of segmentSize.
+                    int packetTotal = InputPacketBuffer.DefaultHeaderLength + remaining;
+                    int rem = (int)((uint)packetTotal % rpSegmentSize);
+                    if (rem > 0)
+                    {
+                        int paddingSize = (int)rpSegmentSize - rem;
+                        if (!await WaitFillAsync(paddingBuf, 0, paddingSize, ct))
+                            return;
+                    }
+                }
+            }
+            finally
+            {
+                byteArrayPool.Return(paddingBuf);
+            }
+        }
+
+        /// <summary>
+        /// Reads exactly <paramref name="count"/> bytes from the socket into <paramref name="buf"/>
+        /// starting at <paramref name="offset"/>. Returns <c>false</c> (and calls Disconnect) if the
+        /// remote side closes the connection before all bytes arrive.
+        /// </summary>
+        protected async Task<bool> WaitFillAsync(byte[] buf, int offset, int count, CancellationToken ct)
+        {
+            if (count == 0) return true;
+
+            var sclient = this.sclient;
+            if (sclient == null) return false;
+
+            while (count > 0)
+            {
+                int n = await sclient.ReceiveAsync(buf.AsMemory(offset, count), SocketFlags.None, ct);
+                if (n == 0)
+                {
+                    Disconnect();
+                    return false;
+                }
+                offset += n;
+                count -= n;
+            }
+            return true;
+        }
+
+        protected virtual void OnUnknownPacket(ushort packetId) { }
 
         private void asyncReceive()
         {
@@ -664,7 +809,7 @@ namespace NSL.TCP
             args.BufferList = args.BufferList;
 
 
-            return sclient.SendAsync(args);
+            return sclient?.SendAsync(args) ?? false;
         }
 
         public void SendEmpty(ushort packetId)
@@ -705,6 +850,10 @@ namespace NSL.TCP
         {
             if (Interlocked.CompareExchange(ref _disconnectedFlag, 1, 0) != 0)
                 return;
+
+            pipelineReceiveCts?.Cancel();
+            pipelineReceiveCts?.Dispose();
+            pipelineReceiveCts = null;
 
             if (rBuff != null)
             {

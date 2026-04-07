@@ -105,6 +105,16 @@ namespace NSL.SocketCore.Utils.Buffer
         }
 
         /// <summary>
+        /// Protected constructor for subclasses that manage their own header layout (e.g. <see cref="PacketBodyBuffer"/>).
+        /// Allocates <paramref name="len"/> bytes with Position at 0 — no header region is reserved.
+        /// </summary>
+        protected OutputPacketBuffer(int len, bool noHeader) : base()
+        {
+            SetLength(len);
+            base.Position = 0;
+        }
+
+        /// <summary>
         /// Write float value (4 bytes)
         /// </summary>
         /// <param name="value">value</param>

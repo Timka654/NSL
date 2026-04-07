@@ -47,11 +47,11 @@ namespace NSL.Node.BridgeServer.RS
                 Entry.RoomManager.OnDisconnectedRoomServer(client);
             });
 
-            builder.AddAsyncPacketHandle(NodeBridgeRoomPacketEnum.SignServerRequest, (c,p)=> SignServerReceiveHandle((NetworkClient)c,p));
-            builder.AddPacketHandle(NodeBridgeRoomPacketEnum.SignSessionRequest, (c,p)=> SignSessionReceiveHandle((NetworkClient)c,p));
-            builder.AddPacketHandle(NodeBridgeRoomPacketEnum.FinishRoomMessage, (c,p)=> FinishRoomReceiveHandle((NetworkClient)c,p));
-            builder.AddPacketHandle(NodeBridgeRoomPacketEnum.RoomMessage, (c,p)=> RoomMessageReceiveHandle((NetworkClient)c,p));
-            builder.AddPacketHandle(NodeBridgeRoomPacketEnum.SignSessionPlayerRequest, (c,p)=> SignSessionPlayerReceiveHandle((NetworkClient)c,p));
+            builder.AddAsyncPacketHandle(NodeBridgeRoomPacketEnum.SignServerRequest, (c, p) => SignServerReceiveHandle((NetworkClient)c, p));
+            builder.AddPacketHandle(NodeBridgeRoomPacketEnum.SignSessionRequest, (c, p) => SignSessionReceiveHandle((NetworkClient)c, p));
+            builder.AddPacketHandle(NodeBridgeRoomPacketEnum.FinishRoomMessage, (c, p) => FinishRoomReceiveHandle((NetworkClient)c, p));
+            builder.AddPacketHandle(NodeBridgeRoomPacketEnum.RoomMessage, (c, p) => RoomMessageReceiveHandle((NetworkClient)c, p));
+            builder.AddPacketHandle(NodeBridgeRoomPacketEnum.SignSessionPlayerRequest, (c, p) => SignSessionPlayerReceiveHandle((NetworkClient)c, p));
 
             return builder;
         }

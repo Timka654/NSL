@@ -13,7 +13,7 @@ namespace NSL.SocketCore.Utils.WaitBuffer
         public WaitPacketBuffer(bool useLocker = true)
         {
             if (useLocker)
-                locker = new AutoResetEvent(false);
+                locker = new AutoResetEvent(true);
         }
 
         public WaitPacketBuffer(WaitPacketBuffer other, bool useLocker = true) : this(useLocker)

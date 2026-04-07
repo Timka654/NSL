@@ -17,6 +17,10 @@
 		<Authors>Relife87</Authors>
 	</PropertyGroup>
 
+	<PropertyGroup>
+		<DefineConstants>$(DefineConstants);NSL_LIBRARY</DefineConstants>
+	</PropertyGroup>
+
 	<PropertyGroup Condition="'$(Configuration)'=='Debug'">
 		<PackageId>$(MSBuildProjectName)_Debug</PackageId>
 	</PropertyGroup>

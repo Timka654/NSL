@@ -177,7 +177,7 @@ namespace NSL.UDP
         public Socket GetSocket() => null;
 
         public bool GetState()
-            => Data.AliveState;
+            => !disconnected && Data?.LastReceiveMessage != null && Data.AliveState;
 
         public void Receive(Span<byte> receivedBytes)
         {

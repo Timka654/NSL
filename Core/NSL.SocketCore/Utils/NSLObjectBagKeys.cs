@@ -21,6 +21,9 @@ namespace NSL.SocketCore.Utils
         public const string SessionManager       = "NSL__SESSION__MANAGER";
         public const string SessionClientOptions = "NSL__SESSION__CLIENTOPTIONS";
 
+        // ── SafeStorage ─────────────────────────────────────────────────────
+        public const string SendPacketStorage = "NSL__DEFAULT__SEND_STORAGE";
+
         // ── ServerTime ──────────────────────────────────────────────────────
         public const string ServerTimeOffset = "NSL__SERVERTIME__OFFSET";
         public const string ServerDateTime   = "NSL__SERVERTIME__SERVER_DT";
