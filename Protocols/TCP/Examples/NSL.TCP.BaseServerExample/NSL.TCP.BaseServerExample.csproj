@@ -10,6 +10,7 @@
     <Configurations>DebugExamples</Configurations>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.4" />
     <ProjectReference Include="..\..\..\..\Base\NSL.Cipher\NSL.Cipher.csproj" />
     <ProjectReference Include="..\..\..\..\Base\NSL.Logger\NSL.Logger.csproj" />
     <ProjectReference Include="..\..\NSL.TCP.Server\NSL.TCP.Server.csproj" />

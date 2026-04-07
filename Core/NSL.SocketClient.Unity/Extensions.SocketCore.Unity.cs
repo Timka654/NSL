@@ -1,4 +1,4 @@
-﻿using NSL.SocketCore;
+using NSL.SocketCore;
 using NSL.EndPointBuilder;
 using NSL.SocketCore.Utils;
 using NSL.Utils.Unity;

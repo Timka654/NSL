@@ -1,4 +1,5 @@
-﻿using NSL.SocketCore.Utils;
+﻿using Microsoft.Extensions.DependencyInjection;
+using NSL.SocketCore.Utils;
 using NSL.SocketCore.Network.Session;
 using NSL.SocketServer;
 using NSL.SocketServer.Utils;
@@ -20,6 +21,14 @@ namespace NSL.SocketServer.Utils.Session
             options.ObjectBag.Set(NSLSessionManager<TClient>.ObjectBagKey, manager);
             manager.RegisterServer(options);
 
+            return manager;
+        }
+
+        public static NSLSessionManager<TClient> AddNSLSessions<TClient>(this ServerOptions<TClient> options, IServiceCollection services, Action<NSLSessionServerOptions<TClient>> configure = null)
+            where TClient : IServerNetworkClient
+        {
+            var manager = options.AddNSLSessions(configure);
+            services.AddSingleton(manager);
             return manager;
         }
     }

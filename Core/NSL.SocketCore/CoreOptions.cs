@@ -14,6 +14,12 @@ namespace NSL.SocketCore
     {
         public ObjectBag ObjectBag { get; } = new ObjectBag();
 
+        /// <summary>
+        /// DI service provider — набрасывается через билдер (<c>WithServices</c>) или вручную.
+        /// Используется для создания Scoped-контейнера на клиент через <see cref="NSL.SocketCore.Utils.INetworkClient.InitializeServiceScope"/>.
+        /// </summary>
+        public IServiceProvider ServiceProvider { get; set; }
+
         public IBasicLogger HelperLogger { get; set; }
 
         /// <summary>

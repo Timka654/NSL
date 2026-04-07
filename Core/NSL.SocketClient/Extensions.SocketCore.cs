@@ -1,4 +1,5 @@
-﻿using NSL.EndPointBuilder;
+using Microsoft.Extensions.DependencyInjection;
+using NSL.EndPointBuilder;
 using NSL.SocketClient;
 using NSL.SocketCore;
 using NSL.SocketCore.Utils;
@@ -223,12 +224,65 @@ namespace NSL.BuilderExtensions.SocketCore
             builder.GetCoreOptions().OnClientConnectEvent += c => c.InitializeObjectBag();
         }
 
+        /// <summary>
+        /// Устанавливает существующий <see cref="IServiceProvider"/> для данного endpoint-а.
+        /// Используется когда сервисы уже созданы (например, разделяются с ASP.NET или другим протоколом).
+        /// </summary>
+        public static void WithServices<TClient>(this IOptionableEndPointBuilder<TClient> builder, IServiceProvider serviceProvider)
+            where TClient : INetworkClient, new()
+        {
+            builder.GetCoreOptions().ServiceProvider = serviceProvider;
+        }
+
+        /// <summary>
+        /// Регистрирует DI-сервисы и создаёт <see cref="IServiceProvider"/> для данного endpoint-а.
+        /// Должен вызываться до <c>Build()</c>.
+        /// </summary>
+        public static void WithServices<TClient>(this IOptionableEndPointBuilder<TClient> builder, Action<IServiceCollection> configure)
+            where TClient : INetworkClient, new()
+        {
+            var services = new ServiceCollection();
+            configure(services);
+            builder.GetCoreOptions().ServiceProvider = services.BuildServiceProvider();
+        }
+
+        /// <summary>
+        /// Регистрирует обработчик connect, который автоматически вызывает <see cref="INetworkClient.InitializeServiceScope"/>
+        /// при подключении клиента. <c>WithServices</c> должен быть вызван ДО этого метода.
+        /// </summary>
+        public static void AddScopedConnect<TClient>(this IOptionableEndPointBuilder<TClient> builder)
+            where TClient : INetworkClient, new()
+        {
+            var opts = builder.GetCoreOptions();
+            builder.GetCoreOptions().OnClientConnectEvent += c =>
+            {
+                var provider = opts.ServiceProvider;
+                if (provider == null)
+                    throw new InvalidOperationException($"ServiceProvider is not configured. Call WithServices before AddScopedConnect.");
+                c.InitializeServiceScope(provider);
+            };
+        }
+
         public static void SetLogger<TClient>(this IOptionableEndPointBuilder<TClient> builder, IBasicLogger logger)
             where TClient : INetworkClient, new()
         {
             builder.GetCoreOptions().HelperLogger = logger;
         }
 
+        /// <summary>
+        /// Create <see cref="RequestProcessor"/> with <paramref name="objectKey"/> in Client.ObjectBag and register handle for execute wait receive packet in buffer
+        /// </summary>
+        public static void ConfigureRequestProcessor<TClient, TEnum>(this IOptionableEndPointBuilder<TClient> builder, TEnum responsePacketId, string objectKey = RequestProcessor.DefaultObjectBagKey)
+            where TClient : INetworkClient, new()
+            where TEnum : struct, IConvertible
+            => builder.GetCoreOptions().ConfigureRequestProcessor(responsePacketId, objectKey);
+
+        /// <summary>
+        /// Create <see cref="RequestProcessor"/> with <paramref name="objectKey"/> in Client.ObjectBag and register handle for execute wait receive packet in buffer
+        /// </summary>
+        public static void ConfigureRequestProcessor<TClient>(this IOptionableEndPointBuilder<TClient> builder, ushort responsePacketId = RequestProcessor.DefaultResponsePacketId, string objectKey = RequestProcessor.DefaultObjectBagKey)
+            where TClient : INetworkClient, new()
+            => builder.GetCoreOptions().ConfigureRequestProcessor(responsePacketId, objectKey);
 
         #region DefaultHandles
 

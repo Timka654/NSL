@@ -1,4 +1,5 @@
-﻿using NSL.SocketCore.Network.Version;
+﻿using Microsoft.Extensions.DependencyInjection;
+using NSL.SocketCore.Network.Version;
 using NSL.SocketServer.Utils;
 using NSL.SocketServer.Utils.Version.Packets;
 using System;
@@ -21,6 +22,22 @@ namespace NSL.SocketServer.Utils.Version
             options.ObjectBag.Set(NSLVersionInfo.ObjectBagKey, versionInfo);
             options.AddPacket(NSLVersionPacketReceive<TClient>.PacketId, new NSLVersionPacketReceive<TClient>());
             return options;
+        }
+
+        public static ServerOptions<TClient> AddNSLVersion<TClient>(this ServerOptions<TClient> options, IServiceCollection services, Action<NSLServerVersionInfo> configure = null)
+            where TClient : IServerNetworkClient
+        {
+            var info = new NSLServerVersionInfo();
+            configure?.Invoke(info);
+            services.AddSingleton(info);
+            return options.AddNSLVersion(info);
+        }
+
+        public static ServerOptions<TClient> AddNSLVersion<TClient>(this ServerOptions<TClient> options, IServiceCollection services, NSLServerVersionInfo versionInfo)
+            where TClient : IServerNetworkClient
+        {
+            services.AddSingleton(versionInfo);
+            return options.AddNSLVersion(versionInfo);
         }
     }
 }

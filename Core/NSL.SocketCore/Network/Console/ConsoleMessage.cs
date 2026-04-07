@@ -5,26 +5,28 @@ namespace NSL.SocketCore.Utils.Console
 {
     public class ConsoleMessage<T> : IPacket<T> where T : INetworkClient
     {
-        private readonly ConsoleManager<T> manager;
+        private readonly IConsoleManager<T> manager;
+        private readonly ushort responsePacketId;
 
         public static ConsoleMessage<T> Instance { get; private set; }
 
-        public ConsoleMessage(ConsoleManager<T> manager)
+        public ConsoleMessage(IConsoleManager<T> manager, ushort responsePacketId)
         {
             Instance = this;
             this.manager = manager;
+            this.responsePacketId = responsePacketId;
         }
 
         public override void Receive(T client, InputPacketBuffer data)
         {
-            Send(client, manager.InvokeCommand(client, data.ReadString()));
+            Send(client, responsePacketId, manager.InvokeCommand(client, data.ReadString()));
         }
 
-        public static void Send(INetworkClient client, string result)
+        public static void Send(INetworkClient client, ushort packetId, string result)
         {
             var packet = new OutputPacketBuffer()
             {
-                PacketId = ConsoleHelper.DefaultClientPacketId
+                PacketId = packetId
             };
 
             packet.WriteString(result);

@@ -1,5 +1,9 @@
-﻿using NSL.SocketCore.Utils.Buffer;
+﻿#if NSL_LIBRARY
+using Microsoft.Extensions.DependencyInjection;
+#endif
+using NSL.SocketCore.Utils.Buffer;
 using System;
+using System.Threading;
 
 namespace NSL.SocketCore.Utils
 {
@@ -23,6 +27,35 @@ namespace NSL.SocketCore.Utils
         public DateTime? DisconnectTime { get; set; }
 
         public ClientObjectBag ObjectBag { get; private set; }
+
+#if NSL_LIBRARY
+
+        private IServiceScope _serviceScope;
+
+        /// <summary>
+        /// Scoped DI-контейнер клиента. Равен <c>null</c> до явного вызова <see cref="InitializeServiceScope"/>.
+        /// Как правило инициализируется после успешной авторизации.
+        /// </summary>
+        public IServiceScope ServiceScope => _serviceScope;
+
+        public bool ServiceScopeInitialized() => _serviceScope != null;
+
+        /// <summary>
+        /// Инициализирует Scoped DI-контейнер. Безопасно для параллельных вызовов: первый вызов выигрывает, остальные игнорируются.
+        /// </summary>
+        /// <returns><c>true</c> если scope был создан, <c>false</c> если уже был инициализирован.</returns>
+        public bool InitializeServiceScope(IServiceProvider provider)
+        {
+            var newScope = provider.CreateScope();
+            if (Interlocked.CompareExchange(ref _serviceScope, newScope, null) != null)
+            {
+                newScope.Dispose();
+                return false;
+            }
+            return true;
+        }
+
+#endif
 
         /// <summary>
         /// Клиент для отправки данных, эта переменная обязательна
@@ -108,6 +141,9 @@ namespace NSL.SocketCore.Utils
         public virtual void Dispose()
         {
             ObjectBag?.Dispose();
+#if NSL_LIBRARY
+            _serviceScope?.Dispose();
+#endif
             Network?.Disconnect();
         }
     }

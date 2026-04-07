@@ -10,7 +10,7 @@
     <Configurations>DebugExamples</Configurations>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\Core\BuilderExtensions\NSL.BuilderExtensions.SocketCore\NSL.BuilderExtensions.SocketCore.csproj" />
+    <ProjectReference Include="..\..\..\..\Core\NSL.SocketClient\NSL.SocketClient.csproj" />
     <ProjectReference Include="..\..\BuilderExtensions\NSL.BuilderExtensions.UDPClient\NSL.BuilderExtensions.UDPClient.csproj" />
     <ProjectReference Include="..\..\BuilderExtensions\NSL.BuilderExtensions.UDPServer\NSL.BuilderExtensions.UDPServer.csproj" />
   </ItemGroup>

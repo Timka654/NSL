@@ -34,7 +34,10 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\NSL.EndPointBuilder\NSL.EndPointBuilder.csproj" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.4" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<ProjectReference Include="..\NSL.SocketCore\NSL.SocketCore.csproj" />
 	</ItemGroup>
 

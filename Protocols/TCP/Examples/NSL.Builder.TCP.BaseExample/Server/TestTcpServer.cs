@@ -1,4 +1,5 @@
-﻿using NSL.BuilderExtensions.SocketCore;
+﻿using Microsoft.Extensions.DependencyInjection;
+using NSL.BuilderExtensions.SocketCore;
 using NSL.BuilderExtensions.TCPServer;
 
 namespace NSL.Builder.TCP.BaseExample.Server
@@ -15,59 +16,78 @@ namespace NSL.Builder.TCP.BaseExample.Server
                 .WithBacklog(1)
                 .WithCode(builder =>
                 {
-                    // builder.WithAddressFamily(System.Net.Sockets.AddressFamily.InterNetwork); //optional(setted on initialize to valid)
-                    // builder.WithProtocolType(System.Net.Sockets.ProtocolType.Tcp); //optional(setted on initialize to valid)
                     builder.WithBufferSize(8192); //optional
+                })
+                .WithCode(builder =>
+                {
+                    // Регистрация DI-сервисов через extension из BuilderExtensions.SocketCore:
+                    // - Singleton живёт на весь срок работы сервера
+                    // - Scoped создаётся на каждого клиента после InitializeServiceScope
+                    builder.WithServices(services =>
+                    {
+                        services.AddSingleton<ServerStats>();
+                        services.AddScoped<ClientSession>();
+                    });
                 })
                 .WithCode(builder =>
                 {
                     builder.AddConnectHandle(client =>
                     {
-                        Console.WriteLine($"[Server] Success connected");
+                        // Scope НЕ инициализируется на connect — только после авторизации.
+                        // Singleton доступен напрямую через options.ServiceProvider.
+                        Console.WriteLine($"[Server] Client connected from {client.Network?.GetRemotePoint()}");
                     });
 
                     builder.AddDisconnectHandle(client =>
                     {
-                        Console.WriteLine($"[Server] Client disconnected");
+                        // Scope (если был) освобождается автоматически в Dispose клиента.
+                        var sessionInfo = client.ServiceScopeInitialized()
+                            ? $"UserId={client.ServiceScope.ServiceProvider.GetRequiredService<ClientSession>().UserId}"
+                            : "not authorized";
+                        Console.WriteLine($"[Server] Client disconnected ({sessionInfo})");
                     });
 
                     builder.AddExceptionHandle((ex, client) =>
                     {
                         Console.WriteLine($"[Server] Exception error handle - {ex}");
                     });
-
-                    builder.AddSendHandle((client, pid, packet, stackTrace) =>
-                    {
-                        //Console.WriteLine($"[Server] Send packet({pid}) to {client.GetRemotePoint()} from\r\n{stackTrace}");
-                        Console.WriteLine($"[Server] Send packet({pid}) to {client.Network?.GetRemotePoint()}");
-                    });
-
-                    builder.AddReceiveHandle((client, pid, packet) =>
-                    {
-                        Console.WriteLine($"[Server] Receive packet({pid}) from {client.Network?.GetRemotePoint()}");
-                    });
                 })
                 .WithCode(builder =>
                 {
                     builder.AddPacket(1, new ServerTestPacket1());
 
-                    //builder.AddPacket(1, new testPacket1());
-
-                    //builder.AddPacketHandle(2, (client, data) =>
-                    //{
-                    //    Console.WriteLine($"[Client] receive from packet handle(2) - {data.ReadString()}");
-
-                    //    cts.Cancel();
-                    //});
-
-                    //builder.LoadPackets(typeof(PacketTestLoadAttribute));
+                    // Пример авторизационного пакета (packet 2):
+                    // builder.AddPacketHandle(2, (client, data) =>
+                    // {
+                    //     var userId = data.ReadInt32();
+                    //     // InitializeServiceScope — thread-safe, повторный вызов игнорируется
+                    //     if (client.InitializeServiceScope(builder.GetCoreOptions().ServiceProvider))
+                    //     {
+                    //         var session = client.ServiceScope.ServiceProvider.GetRequiredService<ClientSession>();
+                    //         session.UserId = userId;
+                    //     }
+                    // });
                 })
                 .Build();
-
 
             server.Start();
 
             return Task.CompletedTask;
         }
+    }
+
+    /// <summary>Singleton: общая статистика сервера.</summary>
+    class ServerStats
+    {
+        private int _connections;
+        public int Connections => _connections;
+        public void OnConnect() => Interlocked.Increment(ref _connections);
+        public void OnDisconnect() => Interlocked.Decrement(ref _connections);
+    }
+
+    /// <summary>Scoped: сессия конкретного клиента, создаётся после авторизации.</summary>
+    class ClientSession
+    {
+        public int UserId { get; set; }
     }
 }

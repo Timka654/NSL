@@ -33,7 +33,6 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\..\..\Core\NSL.EndPointBuilder\NSL.EndPointBuilder.csproj" />
 		<ProjectReference Include="..\..\NSL.LocalBridge\NSL.LocalBridge.csproj" />
 	</ItemGroup>
 

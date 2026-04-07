@@ -32,8 +32,4 @@
 		<TargetFramework>netstandard2.1</TargetFramework>
 	</PropertyGroup>
 
-	<ItemGroup>
-		<ProjectReference Include="..\..\..\..\Core\NSL.EndPointBuilder\NSL.EndPointBuilder.csproj" />
-	</ItemGroup>
-
 </Project>

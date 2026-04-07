@@ -34,7 +34,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\..\..\Base\NSL.Logger\NSL.Logger.csproj" />
-		<ProjectReference Include="..\..\..\Core\BuilderExtensions\NSL.BuilderExtensions.SocketCore\NSL.BuilderExtensions.SocketCore.csproj" />
+		<ProjectReference Include="..\..\..\Core\NSL.SocketClient\NSL.SocketClient.csproj" />
 		<ProjectReference Include="..\..\..\Protocols\UDP\BuilderExtensions\NSL.BuilderExtensions.UDPServer\NSL.BuilderExtensions.UDPServer.csproj" />
 		<ProjectReference Include="..\NSL.Node.Core\NSL.Node.Core.csproj" />
 	</ItemGroup>
