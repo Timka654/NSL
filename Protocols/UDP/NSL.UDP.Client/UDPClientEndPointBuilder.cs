@@ -1,5 +1,6 @@
 ﻿using NSL.EndPointBuilder;
 using NSL.SocketCore;
+using NSL.SocketCore.Utils;
 using NSL.UDP;
 using NSL.UDP.Client;
 using System;
@@ -42,13 +43,13 @@ namespace NSL.BuilderExtensions.UDPClient
         }
     }
 
-    public class UDPClientEndPointBuilder<TClient, TOptions> : IOptionableEndPointBuilder<TClient>, IHandleIOBuilder<TClient>
+    public class UDPClientEndPointBuilder<TClient, TOptions> : IOptionableEndPointBuilder, IHandleIOBuilder<TClient>
         where TClient : BaseNetworkConnection, new()
         where TOptions : UDPClientOptions<TClient>, new()
     {
         TOptions options = new TOptions();
 
-        public CoreOptions<TClient> GetCoreOptions() => options;
+        public CoreOptions GetCoreOptions() => options;
 
         private UDPClientEndPointBuilder() { }
 
@@ -79,12 +80,12 @@ namespace NSL.BuilderExtensions.UDPClient
             return this;
         }
 
-        public void AddReceiveHandle(CoreOptions<TClient>.ReceivePacketHandle handle)
+        public void AddReceiveHandle(CoreOptions.ReceivePacketHandle handle)
         {
             options.OnReceivePacket += handle;
         }
 
-        public void AddSendHandle(CoreOptions<TClient>.SendPacketHandle handle)
+        public void AddSendHandle(CoreOptions.SendPacketHandle handle)
         {
             options.OnSendPacket += handle;
         }

@@ -56,4 +56,8 @@
 		</Compile>
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Compile Remove="..\NSL.Generators.FillTypeGenerator.Shared\MergeToTypeAttribute.cs" />
+	</ItemGroup>
+
 </Project>

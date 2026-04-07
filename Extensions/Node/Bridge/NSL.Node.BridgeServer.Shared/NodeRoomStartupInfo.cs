@@ -122,20 +122,20 @@ namespace NSL.Node.BridgeServer.Shared
     public class NodeNetworkHandles<TClient>
         where TClient : BaseNetworkConnection, new()
     {
-        public CoreOptions<TClient>.ClientConnectAsync OnConnectAsync = (client) => Task.CompletedTask;
+        public CoreOptions.ClientConnectAsync OnConnectAsync = (client) => Task.CompletedTask;
 
-        public CoreOptions<TClient>.ClientDisconnectAsync OnDisconnectAsync = (client) => Task.CompletedTask;
+        public CoreOptions.ClientDisconnectAsync OnDisconnectAsync = (client) => Task.CompletedTask;
 
-        public CoreOptions<TClient>.ReceivePacketHandle OnReceive = (client, pid, len) => { };
+        public CoreOptions.ReceivePacketHandle OnReceive = (client, pid, len) => { };
 
-        public CoreOptions<TClient>.SendPacketHandle OnSend = (client, pid, len, stack) => { };
+        public CoreOptions.SendPacketHandle OnSend = (client, pid, len, stack) => { };
 
-        public CoreOptions<TClient>.ExceptionHandle OnException = (ex, client) => { };
+        public CoreOptions.ExceptionHandle OnException = (ex, client) => { };
 
         public NodeConfiguringDelegate<TClient> OnConfiguring = (builder) => { };
 
         public TBuilder Fill<TBuilder>(TBuilder builder)
-            where TBuilder : IOptionableEndPointBuilder<TClient>
+            where TBuilder : IOptionableEndPointBuilder
         {
             var options = builder.GetCoreOptions();
 
@@ -153,19 +153,19 @@ namespace NSL.Node.BridgeServer.Shared
         public static NodeNetworkHandles<TClient> Create()
             => new NodeNetworkHandles<TClient>();
 
-        public NodeNetworkHandles<TClient> WithConnectHandle(CoreOptions<TClient>.ClientConnectAsync value)
+        public NodeNetworkHandles<TClient> WithConnectHandle(CoreOptions.ClientConnectAsync value)
             => Set(() => OnConnectAsync = value);
 
-        public NodeNetworkHandles<TClient> WithDisconnectHandle(CoreOptions<TClient>.ClientDisconnectAsync value)
+        public NodeNetworkHandles<TClient> WithDisconnectHandle(CoreOptions.ClientDisconnectAsync value)
             => Set(() => OnDisconnectAsync = value);
 
-        public NodeNetworkHandles<TClient> WithReceiveHandle(CoreOptions<TClient>.ReceivePacketHandle value)
+        public NodeNetworkHandles<TClient> WithReceiveHandle(CoreOptions.ReceivePacketHandle value)
             => Set(() => OnReceive = value);
 
-        public NodeNetworkHandles<TClient> WithSendHandle(CoreOptions<TClient>.SendPacketHandle value)
+        public NodeNetworkHandles<TClient> WithSendHandle(CoreOptions.SendPacketHandle value)
             => Set(() => OnSend = value);
 
-        public NodeNetworkHandles<TClient> WithExceptionHandle(CoreOptions<TClient>.ExceptionHandle value)
+        public NodeNetworkHandles<TClient> WithExceptionHandle(CoreOptions.ExceptionHandle value)
             => Set(() => OnException = value);
 
         public NodeNetworkHandles<TClient> WithConfiguringHandle(NodeConfiguringDelegate<TClient> value)

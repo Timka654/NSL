@@ -1,11 +1,12 @@
-﻿using NSL.SocketCore.Utils.Buffer;
+﻿using NSL.SocketCore.Utils;
+using NSL.SocketCore.Utils.Buffer;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace NSL.SocketClient.Utils
 {
-    public class IPacketReceive<TClient, RData, SPType> : IPacketReceive<TClient, RData> where TClient : BaseNetworkConnection where SPType : struct, IConvertible
+    public class IPacketReceive<TClient, RData, SPType> : IPacketReceive<TClient, RData> where TClient : BaseNetworkConnection, new() where SPType : struct, IConvertible
     {
         public IPacketReceive(ClientOptions<TClient> options) : base(options)
         {
@@ -27,11 +28,11 @@ namespace NSL.SocketClient.Utils
         }
     }
 
-    public class IPacketReceive<TClient, RData> : IClientPacket<TClient>, ILockedPacket where TClient : BaseNetworkConnection
+    public class IPacketReceive<TClient, RData> : IClientPacket<TClient>, ILockedPacket where TClient : BaseNetworkConnection, new()
     {
         public IPacketReceive(ClientOptions<TClient> options) : base(options)
         {
-            options.OnClientDisconnectEvent += Options_OnClientDisconnectEvent;
+            options.OnClientDisconnectEvent += c => Options_OnClientDisconnectEvent((TClient)c);
         }
 
         private void Options_OnClientDisconnectEvent(TClient client)

@@ -10,13 +10,13 @@ namespace NSL.SocketCore.Utils.Packet
 
     public static class PacketDelegateHelper
     {
-        public static int Load<TClient, TContainer, TAttribute>(this CoreOptions<TClient> client)
+        public static int Load<TClient, TContainer, TAttribute>(this CoreOptions client)
             where TClient : BaseNetworkConnection
             where TContainer : PacketDelegateContainerAttribute
             where TAttribute : PacketAttribute
             => Load<TClient, TContainer, TAttribute>(client, Assembly.GetCallingAssembly());
 
-        public static int Load<TClient, TContainer, TAttribute>(this CoreOptions<TClient> client, Assembly assembly)
+        public static int Load<TClient, TContainer, TAttribute>(this CoreOptions client, Assembly assembly)
             where TClient : BaseNetworkConnection
             where TContainer : PacketDelegateContainerAttribute
             where TAttribute : PacketAttribute
@@ -40,7 +40,7 @@ namespace NSL.SocketCore.Utils.Packet
                 {
                     if (client.AddPacket(method.attr.PacketId, new DelegatePacket<TClient>
                     {
-                        Delegate = (CoreOptions<TClient>.PacketHandle)method.x.CreateDelegate(typeof(CoreOptions<TClient>.PacketHandle))
+                        Delegate = (Action<TClient, InputPacketBuffer>)method.x.CreateDelegate(typeof(Action<TClient, InputPacketBuffer>))
                     }))
                         result++;
                 }
@@ -52,7 +52,7 @@ namespace NSL.SocketCore.Utils.Packet
 
     internal class DelegatePacket<T> : IPacket<T> where T : BaseNetworkConnection
     {
-        public CoreOptions<T>.PacketHandle Delegate = null;
+        public Action<T, InputPacketBuffer> Delegate = null;
 
         public override void Receive(T client, InputPacketBuffer data)
             => Delegate(client, data);

@@ -1,14 +1,15 @@
 using NSL.Generators.RpcGenerator.Shared;
 using NSL.Generators.RpcGenerator.Shared.Attributes;
 using NSL.Generators.RpcGenerator.Tests.Shared;
+using NSL.SocketCore.Utils;
 using NSL.SocketServer.Utils;
 using System;
 using System.Threading.Tasks;
 
 namespace NSL.Generators.RpcGenerator.Tests.Server
 {
-    [NSLRPCImplement(typeof(ITestRpcService), typeof(BaseServerNetworkClient), Direction = NSLRPCDirection.Server)]
-    [NSLRPCImplement(typeof(ITestChatService),  typeof(BaseServerNetworkClient), Direction = NSLRPCDirection.Server)]
+    [NSLRPCImplement(typeof(ITestRpcService), typeof(BaseNetworkConnection), Direction = NSLRPCDirection.Server)]
+    [NSLRPCImplement(typeof(ITestChatService),  typeof(BaseNetworkConnection), Direction = NSLRPCDirection.Server)]
     public partial class TestRpcServer : ITestRpcService, ITestChatService
     {
         // ── ITestRpcService ──────────────────────────────────────────────────────

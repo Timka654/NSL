@@ -245,7 +245,7 @@ namespace NSL.Generators.PacketHandleGenerator.Core
                         cbData.HandlesBuilder.AppendLine(typeCBData.HandlesBuilder.ToString());
                         if (item.Direction == NSLHPDirTypeEnum.Receive)
                         {
-                            cbData.ConfigureBuilder.AppendLine($"{item.BuildModifierForHandles(NSLAccessModifierEnum.Protected)} void NSLConfigurePacketHandles({nameof(CoreOptions)}<{item.NetworkDataType.GetTypeFullName()}> options)");
+                            cbData.ConfigureBuilder.AppendLine($"{item.BuildModifierForHandles(NSLAccessModifierEnum.Protected)} void NSLConfigurePacketHandles({nameof(CoreOptions)} options)");
                             cbData.ConfigureBuilder.AppendBodyTabContent(() =>
                             {
                                 cbData.ConfigureBuilder.AppendLine(typeCBData.ConfigureBuilder.ToString());
@@ -589,9 +589,9 @@ namespace NSL.Generators.PacketHandleGenerator.Core
             var cb = buildData.ConfigureBuilder;
 
             if (isAsync)
-                cb.AppendLine($"options.{nameof(CoreOptions<BaseNetworkConnection>.AddAsyncHandle)}((ushort){packet.HandlesData.Type.GetTypeFullName()}.{packet.Name}, NSLPacketHandle_{packet.Name});");
+                cb.AppendLine($"options.AddAsyncHandle((ushort){packet.HandlesData.Type.GetTypeFullName()}.{packet.Name}, NSLPacketHandle_{packet.Name});");
             else
-                cb.AppendLine($"options.{nameof(CoreOptions<BaseNetworkConnection>.AddHandle)}((ushort){packet.HandlesData.Type.GetTypeFullName()}.{packet.Name}, NSLPacketHandle_{packet.Name});");
+                cb.AppendLine($"options.AddHandle((ushort){packet.HandlesData.Type.GetTypeFullName()}.{packet.Name}, NSLPacketHandle_{packet.Name});");
         }
 
 

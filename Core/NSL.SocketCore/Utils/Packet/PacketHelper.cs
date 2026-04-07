@@ -12,8 +12,7 @@ namespace NSL.SocketCore.Utils.Packet
         /// Load all IPacket implementations marked with an attribute derived from <see cref="PacketAttribute"/>
         /// from the given assembly into <paramref name="coreOptions"/>.
         /// </summary>
-        public static int LoadPackets<T>(this CoreOptions<T> coreOptions, Assembly assembly, Type selectAttributeType, Func<Type, IPacket<T>> initAction)
-            where T : BaseNetworkConnection
+        public static int LoadPackets(this CoreOptions coreOptions, Assembly assembly, Type selectAttributeType, Func<Type, IPacket> initAction)
         {
             if (!typeof(PacketAttribute).IsAssignableFrom(selectAttributeType))
                 throw new Exception($"{selectAttributeType.FullName} must be assignable from {typeof(PacketAttribute).FullName}");
@@ -27,8 +26,8 @@ namespace NSL.SocketCore.Utils.Packet
             {
                 Debug.WriteLine($"Loading Packet: packet: {item.attr.PacketId} type: {item.type.FullName}");
 
-                if (!typeof(IPacket<T>).IsAssignableFrom(item.type))
-                    throw new Exception($"Packet type {typeof(IPacket<T>)} is not assignable from {item.type}");
+                if (!typeof(IPacket).IsAssignableFrom(item.type))
+                    throw new Exception($"Packet type {typeof(IPacket)} is not assignable from {item.type}");
 
                 bool r = coreOptions.AddPacket(item.attr.PacketId, initAction(item.type));
                 Debug.WriteLine($"Loading Packet: packet: {item.attr.PacketId} type: {item.type.FullName} result: {r}");
@@ -37,8 +36,7 @@ namespace NSL.SocketCore.Utils.Packet
             return types.Count();
         }
 
-        public static int LoadPackets<T>(this CoreOptions<T> coreOptions, Type selectAttributeType, Func<Type, IPacket<T>> initAction)
-            where T : BaseNetworkConnection
+        public static int LoadPackets(this CoreOptions coreOptions, Type selectAttributeType, Func<Type, IPacket> initAction)
             => LoadPackets(coreOptions, Assembly.GetCallingAssembly(), selectAttributeType, initAction);
     }
 }

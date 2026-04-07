@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
+using NSL.SocketCore.Utils;
 using NSL.WebSockets.Server;
 using System;
 using System.Threading.Tasks;

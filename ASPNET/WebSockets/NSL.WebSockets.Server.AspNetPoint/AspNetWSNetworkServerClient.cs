@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NSL.ASPNET;
+using NSL.SocketCore.Utils;
 using NSL.SocketServer.Utils;
 using System;
 using System.Threading.Tasks;

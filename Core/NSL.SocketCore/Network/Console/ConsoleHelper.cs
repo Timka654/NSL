@@ -6,7 +6,7 @@ namespace NSL.SocketCore.Utils.Console
 {
     public static class ConsoleHelper
     {
-        public static IConsoleManager<T> AddConsoleEngine<T>(this CoreOptions<T> options, ushort packetId, IServiceCollection services, IConsoleManager<T> manager)
+        public static IConsoleManager<T> AddConsoleEngine<T>(this CoreOptions options, ushort packetId, IServiceCollection services, IConsoleManager<T> manager)
             where T : BaseNetworkConnection
         {
             options.AddPacket(packetId, new ConsoleMessage<T>(manager, packetId));
@@ -14,7 +14,7 @@ namespace NSL.SocketCore.Utils.Console
             return manager;
         }
 
-        public static ConsoleManager<T> AddConsoleEngine<T>(this CoreOptions<T> options, ushort packetId, IServiceCollection services)
+        public static ConsoleManager<T> AddConsoleEngine<T>(this CoreOptions options, ushort packetId, IServiceCollection services)
             where T : BaseNetworkConnection
         {
             var m = new ConsoleManager<T>();
@@ -24,8 +24,8 @@ namespace NSL.SocketCore.Utils.Console
             return m;
         }
 
-        public static ConsoleManager<T> AddDefaultConsoleEngine<T>(this CoreOptions<T> options, IServiceCollection services)
+        public static ConsoleManager<T> AddDefaultConsoleEngine<T>(this CoreOptions options, IServiceCollection services)
             where T : BaseNetworkConnection
-            => options.AddConsoleEngine((ushort)NSLSystemPacketEnum.Console, services);
+            => options.AddConsoleEngine<T>((ushort)NSLSystemPacketEnum.Console, services);
     }
 }

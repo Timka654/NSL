@@ -2,6 +2,7 @@
 using NSL.SocketClient;
 using NSL.SocketClient.Utils;
 using NSL.SocketCore;
+using NSL.SocketCore.Utils;
 using NSL.TCP.Client;
 using System;
 using System.Net;
@@ -38,21 +39,21 @@ namespace NSL.BuilderExtensions.TCPClient
             => WithOptions<ClientOptions<TClient>>();
 
         public TCPClientEndPointBuilder<TClient, TOptions> WithOptions<TOptions>()
-            where TOptions : ClientOptions<TClient>, new()
+            where TOptions : CoreOptions, new()
         {
             return TCPClientEndPointBuilder<TClient, TOptions>.Create();
         }
     }
 
-    public class TCPClientEndPointBuilder<TClient, TOptions> : IOptionableEndPointClientBuilder<TClient>, IHandleIOBuilder<TClient>
+    public class TCPClientEndPointBuilder<TClient, TOptions> : IOptionableEndPointBuilder, IHandleIOBuilder<TClient>
         where TClient : BaseNetworkConnection, new()
-        where TOptions : ClientOptions<TClient>, new()
+        where TOptions : CoreOptions, new()
     {
         TOptions options = new TOptions();
 
-        public ClientOptions<TClient> GetOptions() => options;
+        public TOptions GetOptions() => options;
 
-        public CoreOptions<TClient> GetCoreOptions() => options;
+        public CoreOptions GetCoreOptions() => options;
 
         private TCPClientEndPointBuilder() { }
 
@@ -85,17 +86,17 @@ namespace NSL.BuilderExtensions.TCPClient
             return this;
         }
 
-        public void AddReceiveHandle(CoreOptions<TClient>.ReceivePacketHandle handle)
+        public void AddReceiveHandle(CoreOptions.ReceivePacketHandle handle)
         {
             options.OnReceivePacket += handle;
         }
 
-        public void AddSendHandle(CoreOptions<TClient>.SendPacketHandle handle)
+        public void AddSendHandle(CoreOptions.SendPacketHandle handle)
         {
             options.OnSendPacket += handle;
         }
 
-        public TCPNetworkClient<TClient, TOptions> Build(bool legacyThread = false)
-            => new TCPNetworkClient<TClient, TOptions>(options, legacyThread);
+        public TCPNetworkClient<TClient> Build(bool legacyThread = false)
+            => new TCPNetworkClient<TClient>(options, legacyThread);
     }
 }

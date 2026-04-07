@@ -12,7 +12,7 @@ namespace NSL.SocketClient.Utils.Session
     public static class ClientSessionExtensions
     {
         public static void AddNSLSessions<TClient>(this ClientOptions<TClient> options, Action<NSLSessionClientOptions> configure = null, string SOObjectKey = NSLSessionClientOptions.ObjectBagKey, string RPObjectKey = NSLObjectBagKeys.RequestProcessor)
-            where TClient : BaseNetworkConnection
+            where TClient : BaseNetworkConnection, new()
         {
             var o = new NSLSessionClientOptions();
             configure?.Invoke(o);
@@ -36,8 +36,7 @@ namespace NSL.SocketClient.Utils.Session
         public static NSLSessionClientOptions GetNSLSessionOptions<TClient>(this TClient client, string optionsObjectKey = NSLSessionClientOptions.ObjectBagKey)
             where TClient : BaseNetworkConnection
         {
-            var co = client.Options as ClientOptions<TClient>;
-            return co.ObjectBag.Get<NSLSessionClientOptions>(optionsObjectKey, true);
+            return client.Options.ObjectBag.Get<NSLSessionClientOptions>(optionsObjectKey, true);
         }
 
         public static void SetNSLSessionInfo<TClient>(this TClient client, NSLSessionInfo info, string optionsObjectKey = NSLSessionClientOptions.ObjectBagKey)

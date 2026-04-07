@@ -13,13 +13,13 @@ namespace NSL.LocalBridge
         where TClient : BaseNetworkConnection, new()
         where TOClient : BaseNetworkConnection, new()
     {
-        public LocalBridgeClient(CoreOptions<TClient> options) : this(options, null, null)
+        public LocalBridgeClient(CoreOptions options) : this(options, null, null)
         { }
 
-        public LocalBridgeClient(CoreOptions<TClient> options, IPEndPoint connectionEndPoint) : this(options, connectionEndPoint, null)
+        public LocalBridgeClient(CoreOptions options, IPEndPoint connectionEndPoint) : this(options, connectionEndPoint, null)
         { }
 
-        public LocalBridgeClient(CoreOptions<TClient> options, IPEndPoint connectionEndPoint, LocalBridgeClient<TOClient, TClient> otherClient)
+        public LocalBridgeClient(CoreOptions options, IPEndPoint connectionEndPoint, LocalBridgeClient<TOClient, TClient> otherClient)
         {
             normalOptions = options;
 
@@ -58,14 +58,14 @@ namespace NSL.LocalBridge
 
         public CoreOptions Options => normalOptions;
 
-        private CoreOptions<TClient> normalOptions;
+        private CoreOptions normalOptions;
 
         private TClient clientData;
         private LocalBridgeClient<TOClient, TClient> otherClient;
         private readonly IPEndPoint connectionEndPoint;
 
 
-        private Dictionary<ushort, CoreOptions<TClient>.PacketHandle> PacketHandles;
+        private Dictionary<ushort, CoreOptions.PacketHandle> PacketHandles;
 
         public void ChangeUserData(BaseNetworkConnection newClientData)
             => SetClientData(newClientData);

@@ -1,118 +1,76 @@
 ﻿using NSL.SocketServer.Utils;
-using NSL.SocketServer;
-using System;
-using System.Net;
 using NSL.SocketCore;
+using NSL.SocketCore.Utils;
+using System;
+using System.Collections.Generic;
+using System.Net;
 
 namespace NSL.WebSockets.Server
 {
-    public class WSServerListener<T> : INetworkListener<T>
+    /// <summary>Типизированная обёртка первого уровня — принимает WSServerOptions&lt;T&gt; и передаёт в движок.</summary>
+    public class WSServerListener<T> : WSServerListener
         where T : BaseNetworkConnection, new()
     {
-        /// <summary>
-        /// Слушатель порта (сервер)
-        /// </summary>
+        public WSServerListener(WSServerOptions<T> options) : base(options, options.EndPoints) { }
+    }
+
+    /// <summary>Не-дженериковый движок WS-сервера. Работает с CoreOptions, создаёт соединения через ConnectionFactory.</summary>
+    public class WSServerListener : INetworkListener
+    {
         private HttpListener listener;
-
         private bool state;
+        public bool State => state;
 
-        /// <summary>
-        /// Текущее состояния сервера (вкл/выкл)
-        /// </summary>
-        public bool State { get { return state; } }
+        private readonly CoreOptions serverOptions;
+        private readonly IEnumerable<string> endPoints;
 
-        /// <summary>
-        /// Настройки сервера
-        /// </summary>
-        private WSServerOptions<T> serverOptions;
-
-        /// <summary>
-        /// Инициализация сервера
-        /// </summary>
-        /// <param name="options">Настройки</param>
-        public WSServerListener(WSServerOptions<T> options)
+        public WSServerListener(CoreOptions options, IEnumerable<string> endPoints)
         {
             serverOptions = options;
+            this.endPoints = endPoints;
         }
 
-        /// <summary>
-        /// Инициализация слушателя
-        /// </summary>
         private void Initialize()
         {
-            //Иницализация сокета, установка семейства адрессов, поточного сокета, протокола приема данных
             listener = new HttpListener();
-            //Инициализация прослушивания на определенном адресе адаптера, порте
-
-            foreach (var endPoint in serverOptions.EndPoints)
-            {
+            foreach (var endPoint in endPoints)
                 listener.Prefixes.Add(endPoint);
-            }
-
             listener.Start();
         }
 
-        /// <summary>
-        /// Запустить сервер
-        /// </summary>
         public void Run()
         {
-            // Нельзя запустить если сервер уже запущен
             if (state)
                 throw new Exception();
-            //инициализация прослушивания
             Initialize();
-            //Запуск ожидания приема клиентов
             listener.BeginGetContext(Accept, listener);
-            // установка статуса сервер = вкл
             state = true;
         }
 
-        /// <summary>
-        /// Остановить сервер (важно, все подключенные клиенты не будут отключены)
-        /// </summary>
         public void Stop()
         {
-            // установка статуса сервер = выкл
             state = false;
-            try
-            {
-                //Закрытие и уничножения слушателя
-                listener.Close();
-            }
-            catch (Exception ex)
-            {
-                serverOptions.CallExceptionEvent(ex, null);
-            }
+            try { listener.Close(); }
+            catch (Exception ex) { serverOptions.CallExceptionEvent(ex, null); }
             listener = null;
         }
 
-        /// <summary>
-        /// Синхронно принимаем входящие запросы на подключение
-        /// </summary>
-        /// <param name="result"></param>
         private async void Accept(IAsyncResult result)
         {
-            //завершить цикл приема если сервер выключен
             if (!state)
                 return;
 
-            //клиент
             HttpListenerContext client = null;
 
             try
             {
-                //получения ожидающего подключения
                 client = listener.EndGetContext(result);
-                //инициализация слушателя клиента клиента
-
-                await new WSServerClient<T>(client, serverOptions).RunPacketReceiver();
+                await new WSServerClient(client, serverOptions).RunPacketReceiver();
             }
             catch (Exception ex)
             {
                 serverOptions.CallExceptionEvent(ex, null);
             }
-            //продолжаем принимать запросы
             listener.BeginGetContext(Accept, listener);
         }
 
@@ -121,7 +79,5 @@ namespace NSL.WebSockets.Server
         public void Start() => Run();
 
         public CoreOptions GetOptions() => serverOptions;
-
-        public ServerOptions<T> GetServerOptions() => serverOptions;
     }
 }

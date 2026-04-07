@@ -41,9 +41,8 @@ namespace NSL.SocketCore.Utils
             }
         }
 
-        public static T LoadConfigurationCoreOptions<T, TType>(this INSLConfiguration configuration, string networkNodePath)
-            where T : CoreOptions<TType>, new()
-            where TType : BaseNetworkConnection
+        public static T LoadConfigurationCoreOptions<T>(this INSLConfiguration configuration, string networkNodePath)
+            where T : CoreOptions, new()
         {
             return new T
             {

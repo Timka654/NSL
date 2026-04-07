@@ -12,6 +12,7 @@ using NSL.SocketCore.Utils.Request;
 using NSL.SocketClient.Utils.Version.Packets;
 using Newtonsoft.Json;
 using NSL.SocketCore.Network;
+using NSL.SocketCore.Utils;
 
 namespace NSL.Extensions.Version.Example
 {
@@ -25,7 +26,7 @@ namespace NSL.Extensions.Version.Example
             var cl = new PrefixableLoggerProxy(conLog, "[Client]");
 
             var server = TCPServerEndPointBuilder.Create()
-                .WithClientProcessor<BaseServerNetworkClient>()
+                .WithClientProcessor<BaseNetworkConnection>()
                 .WithOptions()
                 .WithBindingPoint(1555)
                 .WithCode(b =>
@@ -79,7 +80,7 @@ namespace NSL.Extensions.Version.Example
 
             client.Connect();
 
-            var versionInfo = await NSLVersionPacket<ClientNetworkConnection>.SendRequestAsync(client.Data);
+            var versionInfo = await NSLVersionPacket.SendRequestAsync(client.Data);
 
             cl.AppendInfo($"{JsonConvert.SerializeObject(versionInfo)}");
 

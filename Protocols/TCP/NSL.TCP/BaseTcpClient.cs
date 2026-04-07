@@ -18,14 +18,9 @@ using System.Threading.Tasks;
 
 namespace NSL.TCP
 {
-    public abstract class BaseTcpClient<TClient, TParent> : IClient<OutputPacketBuffer>
-        where TClient : BaseNetworkConnection
-        where TParent : BaseTcpClient<TClient, TParent>
+    public abstract class BaseTcpClient : IClient<OutputPacketBuffer>
     {
-        public abstract TClient Data { get; }
-
-        public event ReceivePacketDebugInfo<TParent> OnReceivePacket;
-        public event SendPacketDebugInfo<TParent> OnSendPacket;
+        public abstract BaseNetworkConnection Data { get; }
 
         #region Network
 
@@ -52,22 +47,16 @@ namespace NSL.TCP
 
         #endregion
 
-        public BaseTcpClient(CoreOptions<TClient> options, bool legacyTransport)
+        public BaseTcpClient(CoreOptions options, bool legacyTransport)
         {
             this.options = options;
             this.legacyTransport = legacyTransport;
-            OnReceivePacket += (client, pid, len) => options.CallReceivePacketEvent(client.Data, pid, len);
-            OnSendPacket += (client, pid, len, st) => options.CallSendPacketEvent(client.Data, pid, len, st);
-
-            this.parent = GetParent();
         }
 
-        protected abstract TParent GetParent();
-
-        protected CoreOptions<TClient> options;
+        protected CoreOptions options;
         private readonly bool legacyTransport;
         private uint segmentSize;
-        private Dictionary<ushort, CoreOptions<TClient>.PacketHandle> PacketHandles;
+        private Dictionary<ushort, CoreOptions.PacketHandle> PacketHandles;
 
         public IPEndPoint GetRemotePoint()
         {
@@ -746,10 +735,6 @@ namespace NSL.TCP
             sclient = null;
         }
 
-
-
-        private readonly TParent parent;
-
         public CoreOptions Options => options;
 
         public abstract void ChangeUserData(BaseNetworkConnection data);
@@ -760,15 +745,11 @@ namespace NSL.TCP
 
         public Socket GetSocket() => sclient;
 
-        protected virtual void OnSend(OutputPacketBuffer rbuff, string stackTrace = "")
-        {
-            OnSendPacket?.Invoke(parent, rbuff.PacketId, rbuff.PacketLength, stackTrace);
-        }
+        protected virtual void OnSend(OutputPacketBuffer rbuff, string stackTrace)
+            => options.CallSendPacketEvent(Data, rbuff.PacketId, rbuff.PacketLength, stackTrace);
 
         protected virtual void OnReceive(ushort pid, int len)
-        {
-            OnReceivePacket?.Invoke(parent, pid, len);
-        }
+            => options.CallReceivePacketEvent(Data, pid, len);
 
         protected abstract void RunDisconnect();
 

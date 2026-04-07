@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace NSL.SocketServer.Utils.Session
 {
-    public class NSLSessionManager<TClient> : IDisposable where TClient : BaseNetworkConnection
+    public class NSLSessionManager<TClient> : IDisposable where TClient : BaseNetworkConnection, new()
     {
         public const string ObjectBagKey = NSLObjectBagKeys.SessionManager;
 
@@ -151,8 +151,8 @@ namespace NSL.SocketServer.Utils.Session
 
         internal void RegisterServer(ServerOptions<TClient> server)
         {
-            server.AddAsyncPacket(NSLRecoverySessionPacket<TClient>.PacketId, new NSLRecoverySessionPacket<TClient>());
-            server.OnClientDisconnectAsyncEvent += Server_OnClientDisconnectAsyncEvent;
+            server.AddPacket(NSLRecoverySessionPacket<TClient>.PacketId, new NSLRecoverySessionPacket<TClient>());
+            server.OnClientDisconnectAsyncEvent += client => Server_OnClientDisconnectAsyncEvent((TClient)client);
         }
 
         public NSLServerSessionInfo<TClient> CreateSession(TClient client)

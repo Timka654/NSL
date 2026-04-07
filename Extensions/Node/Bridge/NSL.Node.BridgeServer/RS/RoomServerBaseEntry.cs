@@ -31,23 +31,27 @@ namespace NSL.Node.BridgeServer.RS
 
         protected TBuilder Fill<TBuilder>(TBuilder builder)
             //where TBuilder : WebSocketsServerEndPointBuilder<NetworkClient, NetworkOptions>
-            where TBuilder : IOptionableEndPointBuilder<NetworkClient>, IHandleIOBuilder<NetworkClient>
+            where TBuilder : IOptionableEndPointBuilder, IHandleIOBuilder<NetworkClient>
         {
             builder.SetLogger(Logger);
 
             builder.AddConnectHandle(client =>
             {
                 if (client != null)
-                    client.Entry = Entry;
+                    ((NetworkClient)client).Entry = Entry;
             });
 
-            builder.AddDisconnectHandle(Entry.RoomManager.OnDisconnectedRoomServer);
+            builder.AddDisconnectHandle(_client =>
+            {
+                var client = (NetworkClient)_client;
+                Entry.RoomManager.OnDisconnectedRoomServer(client);
+            });
 
-            builder.AddAsyncPacketHandle(NodeBridgeRoomPacketEnum.SignServerRequest, SignServerReceiveHandle);
-            builder.AddPacketHandle(NodeBridgeRoomPacketEnum.SignSessionRequest, SignSessionReceiveHandle);
-            builder.AddPacketHandle(NodeBridgeRoomPacketEnum.FinishRoomMessage, FinishRoomReceiveHandle);
-            builder.AddPacketHandle(NodeBridgeRoomPacketEnum.RoomMessage, RoomMessageReceiveHandle);
-            builder.AddPacketHandle(NodeBridgeRoomPacketEnum.SignSessionPlayerRequest, SignSessionPlayerReceiveHandle);
+            builder.AddAsyncPacketHandle(NodeBridgeRoomPacketEnum.SignServerRequest, (c,p)=> SignServerReceiveHandle((NetworkClient)c,p));
+            builder.AddPacketHandle(NodeBridgeRoomPacketEnum.SignSessionRequest, (c,p)=> SignSessionReceiveHandle((NetworkClient)c,p));
+            builder.AddPacketHandle(NodeBridgeRoomPacketEnum.FinishRoomMessage, (c,p)=> FinishRoomReceiveHandle((NetworkClient)c,p));
+            builder.AddPacketHandle(NodeBridgeRoomPacketEnum.RoomMessage, (c,p)=> RoomMessageReceiveHandle((NetworkClient)c,p));
+            builder.AddPacketHandle(NodeBridgeRoomPacketEnum.SignSessionPlayerRequest, (c,p)=> SignSessionPlayerReceiveHandle((NetworkClient)c,p));
 
             return builder;
         }

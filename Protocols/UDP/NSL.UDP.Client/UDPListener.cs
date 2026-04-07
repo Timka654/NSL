@@ -1,4 +1,5 @@
-﻿using NSL.SocketServer.Utils;
+﻿using NSL.SocketCore.Utils;
+using NSL.SocketServer.Utils;
 using NSL.UDP.Info;
 using NSL.UDP.Interface;
 using STUN;
@@ -33,7 +34,7 @@ namespace NSL.UDP.Client
         {
             this.options = options;
 
-            options.OnClientDisconnectEvent += Options_OnClientDisconnectEvent;
+            options.OnClientDisconnectEvent += c => Options_OnClientDisconnectEvent((TClient)c);
         }
 
         protected virtual void Options_OnClientDisconnectEvent(TClient client)

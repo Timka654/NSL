@@ -12,7 +12,7 @@ namespace NSL.SocketCore.Utils
     /// <summary>
     /// Класс для хранения пользовательских данных
     /// </summary>
-    public abstract class BaseNetworkConnection : IDisposable
+    public class BaseNetworkConnection : IDisposable
     {
         public DateTime? LastReceiveMessage { get; set; }
 

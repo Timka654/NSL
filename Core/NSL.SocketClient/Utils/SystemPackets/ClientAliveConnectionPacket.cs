@@ -3,7 +3,7 @@ using NSL.SocketCore.Utils.Buffer;
 
 namespace NSL.SocketClient.Utils.SystemPackets
 {
-    public class ClientAliveConnectionPacket<T> : IClientPacket<T> where T : BaseNetworkConnection
+    public class ClientAliveConnectionPacket<T> : IClientPacket<T> where T : BaseNetworkConnection, new()
     {
         protected override void Receive(InputPacketBuffer data)
         {

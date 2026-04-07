@@ -1,47 +1,44 @@
-﻿using NSL.SocketCore.Utils;
-using NSL.SocketServer;
-using NSL.SocketServer.Utils;
+﻿using NSL.SocketCore;
+using NSL.SocketCore.Utils;
+using NSL.SocketCore.Utils.Buffer;
 using System;
 using System.Net;
 using System.Net.Sockets;
 
 namespace NSL.TCP.Server
 {
-    public class TCPServerClient<TClient> : BaseTcpClient<TClient, TCPServerClient<TClient>>
-        where TClient : BaseNetworkConnection, new()
+    public class TCPServerClient : BaseTcpClient
     {
-        private TClient clientData;
-        private readonly bool legacyThread;
+        private BaseNetworkConnection clientData;
 
-        public override TClient Data => clientData;
+        public override BaseNetworkConnection Data => clientData;
 
-        public ServerOptions<TClient> ServerOptions => (ServerOptions<TClient>)base.options;
+        public CoreOptions ServerOptions => base.options;
 
-        public TCPServerClient(Socket client, ServerOptions<TClient> options,bool legacyTransport = false) : base(options, legacyTransport)
+        public event ReceivePacketDebugInfo<TCPServerClient> OnReceivePacket;
+        public event SendPacketDebugInfo<TCPServerClient> OnSendPacket;
+
+        public TCPServerClient(Socket client, CoreOptions options, bool legacyTransport = false) : base(options, legacyTransport)
         {
             Initialize(client);
         }
 
         protected void Initialize(Socket client)
         {
-            clientData = new TClient();
+            clientData = options.ConnectionFactory();
 
             Data.Network = this;
             Data.Options = options;
 
             sclient = client;
-            this.endPoint = (IPEndPoint)sclient?.RemoteEndPoint;
+            endPoint = (IPEndPoint)sclient?.RemoteEndPoint;
 
             receiveBuffer = new byte[options.ReceiveBufferSize];
 
             inputCipher = options.InputCipher.CreateEntry();
-
             outputCipher = options.OutputCipher.CreateEntry();
 
-            //Bug fix, в системе Windows это значение берется из реестра, мы не сможем принять больше за раз чем прописанно в нем, если данных будет больше, то цикл приема зависнет
             sclient.ReceiveBufferSize = options.ReceiveBufferSize;
-
-            //Bug fix, отключение буфферизации пакетов для уменьшения трафика, если не отключить то получим фризы, в случае с игровым соединением эту опцию обычно нужно отключать
             sclient.NoDelay = true;
 
             disconnected = false;
@@ -51,42 +48,30 @@ namespace NSL.TCP.Server
 
         public virtual void RunPacketReceiver() => RunReceive();
 
-        public override void ChangeUserData(BaseNetworkConnection newClientData)
-            => SetClientData(newClientData);
+        public override void ChangeUserData(BaseNetworkConnection newClientData) => SetClientData(newClientData);
 
         public override void SetClientData(BaseNetworkConnection from)
         {
-            if (from == null)
-            {
-                clientData = null;
-                return;
-            }
+            if (from == null) { clientData = null; return; }
 
-            if (from is TClient td)
-            {
-                // current data for dispose and move data
-                var oldData = clientData;
-
-                clientData = td;
-                clientData.Network = this;
-
-                oldData.Network = null;
-
-                from.ChangeOwner(oldData);
-
-                return;
-            }
-
-            throw new Exception($"{nameof(from)} must have type {typeof(TClient)}");
+            var oldData = clientData;
+            clientData = from;
+            clientData.Network = this;
+            oldData.Network = null;
+            from.ChangeOwner(oldData);
         }
-
-        protected override TCPServerClient<TClient> GetParent() => this;
 
         protected override void OnReceive(ushort pid, int len)
         {
             Data.LastReceiveMessage = DateTime.UtcNow;
-
             base.OnReceive(pid, len);
+            OnReceivePacket?.Invoke(this, pid, len);
+        }
+
+        protected override void OnSend(OutputPacketBuffer rbuff, string stackTrace)
+        {
+            base.OnSend(rbuff, stackTrace);
+            OnSendPacket?.Invoke(this, rbuff.PacketId, rbuff.PacketLength, stackTrace);
         }
 
         protected override void RunDisconnect() => ServerOptions.CallClientDisconnectEvent(Data);
@@ -94,3 +79,4 @@ namespace NSL.TCP.Server
         protected override void RunException(Exception ex) => ServerOptions.CallExceptionEvent(ex, Data);
     }
 }
+

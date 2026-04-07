@@ -4,166 +4,85 @@ using NSL.SocketCore;
 using NSL.SocketCore.Utils;
 using NSL.SocketCore.Utils.SystemPackets;
 using System;
-using System.Net;
+using System.Net.Sockets;
 
 namespace NSL.SocketClient
 {
-    public class ClientOptions<TClient> : CoreOptions<TClient>
-        where TClient : BaseNetworkConnection
+    public class ClientOptions<TClient> : TypedCoreOptions<TClient>
+        where TClient : BaseNetworkConnection, new()
     {
         #region EventDelegates
 
-        /// <summary>
-        /// Делегат для регистрации события перехвата сетевых ошибок
-        /// </summary>
-        /// <param name="ex">Возникшая ошибка</param>
-        /// <param name="s">Сокет с которым произошла ошибка</param>
         public delegate void ExtensionHandleDelegate(Exception ex, TClient client);
-
-        /// <summary>
-        /// Делегат для регистрации события уведомлении о новой попытке переподключится
-        /// </summary>
-        /// <param name="ex"></param>
-        /// <param name="client"></param>
         public delegate void ReconnectDelegate(int currentTry, bool result);
-
-        /// <summary>
-        /// Делегат для регистрации события перехвата подключения клиента
-        /// </summary>
-        /// <param name="client">Данные клиента</param>
         public delegate void ClientConnectedDelegate(TClient client);
-
-        /// <summary>
-        /// Делегат для регистрации события перехвата отключения клиента
-        /// </summary>
-        /// <param name="client">Данные клиента</param>
         public delegate void ClientDisconnectedDelegate(TClient client);
 
         #endregion
 
         public ClientOptions()
         {
-            AddPacket(ClientSystemTimePacket.PacketId,
-                    new ClientSystemTimePacket<TClient>(this));
+            ConnectionFactory = () => new TClient();
 
-            AddPacket(AliveConnectionPacket.PacketId,
-                new ClientAliveConnectionPacket<TClient>(this));
+            AddPacket(ClientSystemTimePacket.PacketId, new ClientSystemTimePacket<TClient>(this));
+            AddPacket(AliveConnectionPacket.PacketId, new ClientAliveConnectionPacket<TClient>(this));
         }
 
-        /// <summary>
-        /// Вызов события ошибка
-        /// </summary>
-        public virtual void RunException(Exception ex)
-        {
-            base.CallExceptionEvent(ex, ClientData);
-        }
+        public override void RunException(Exception ex) => base.CallExceptionEvent(ex, ClientData);
 
-        public virtual void RunClientConnect()
-        {
-            base.CallClientConnectEvent(ClientData);
-        }
+        public override void RunClientConnect() => base.CallClientConnectEvent(ClientData);
 
-        /// <summary>
-        /// Вызов события отключения клиента
-        /// </summary>
-        /// <param name="client"></param>
-        public void RunClientDisconnect()
+        public override void RunClientDisconnect()
         {
             foreach (var packet in Packets.Values)
-            {
-                var lockedPacket = packet as ILockedPacket;
-                lockedPacket?.UnlockPacket();
-            }
+                (packet as ILockedPacket)?.UnlockPacket();
 
             OnRunClientDisconnect();
-
-            //if (EnableAutoRecovery)
-            //    OldSessionClientData?.RunRecovery();
         }
 
-        protected virtual void OnRunClientDisconnect()
-        {
-            CallClientDisconnectEvent(ClientData);
-        }
+        protected virtual void OnRunClientDisconnect() => CallClientDisconnectEvent(ClientData);
 
-        #region ServerSettings
-        //Данные для настройки сервера
+        public IClient NetworkClient => ClientData?.Network;
 
-        #endregion
-
-        #region Network
-
-        public TClient ClientData { get; private set; }
-
-        public IClient NetworkClient => ClientData.Network;
-
-        public void InitializeClient(TClient newClientData)
+        public override void InitializeClient(BaseNetworkConnection newClientData)
         {
             if (newClientData == null)
             {
-                ClientData = null;
+                base.ClientData = null;
                 return;
             }
 
             var oldCD = ClientData;
 
-            ClientData = newClientData;
+            base.ClientData = (TClient)newClientData;
 
             if (oldCD != null)
             {
                 ClientData.Network = oldCD.Network;
-
                 oldCD.Network = null;
-
                 ClientData.ChangeOwner(oldCD);
             }
         }
 
-        /// <summary>
-        /// Ип адресс - используется для подключения к случателю
-        /// </summary>
-        public string IpAddress { get; set; }
+        public void InitializeClient(TClient newClientData) => InitializeClient((BaseNetworkConnection)newClientData);
 
-        /// <summary>
-        /// Порт - используется для подключению к слушателю (по умолчанию - должен соответствовать порту слушателя)
-        /// </summary>
-        public int Port { get; set; }
-
-        public IPAddress GetIPAddress() => IPAddress.Parse(IpAddress);
-
-        public IPEndPoint GetIPEndPoint() => new IPEndPoint(GetIPAddress(), Port);
-
-        #endregion
-
-        /// <summary>
-        /// Добавить пакет для обработки сервером
-        /// </summary>
-        /// <param name="packetId">Индификатор пакета в системе</param>
-        /// <param name="packet">Обработчик пакета</param>
-        /// <returns></returns>
         public bool AddPacket(ushort packetId, IClientPacket<TClient> packet)
-        {
-            return AddPacket(packetId, (IPacket<TClient>)packet);
-        }
+            => AddPacket(packetId, (IPacket<TClient>)packet);
 
         public void InitializeClientObjectBagOnConnect()
         {
-            this.OnClientConnectEvent += (c) =>
-            {
-                c.InitializeObjectBag();
-            };
+            base.OnClientConnectEvent += c => c.InitializeObjectBag();
         }
     }
+
     public static class NetworkConfigurationExtension
     {
         public static ClientOptions<T> LoadConfigurationClientOptions<T>(this INSLConfiguration configuration, string networkNodePath)
-            where T : BaseNetworkConnection
+            where T : BaseNetworkConnection, new()
         {
-            var r = configuration.LoadConfigurationCoreOptions<ClientOptions<T>, T>(networkNodePath);
-
+            var r = configuration.LoadConfigurationCoreOptions<ClientOptions<T>>(networkNodePath);
             r.IpAddress = configuration.GetValue($"{networkNodePath}.io.ip");
             r.Port = configuration.GetValue<int>($"{networkNodePath}.io.port");
-
             return r;
         }
     }

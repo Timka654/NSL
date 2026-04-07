@@ -16,14 +16,9 @@ using System.Buffers;
 
 namespace NSL.WebSockets
 {
-    public abstract class BaseWSClient<TClient, TParent> : IClient<OutputPacketBuffer>
-        where TClient : BaseNetworkConnection
-        where TParent : BaseWSClient<TClient, TParent>
+    public abstract class BaseWSClient : IClient<OutputPacketBuffer>
     {
-        public event ReceivePacketDebugInfo<TParent> OnReceivePacket;
-        public event SendPacketDebugInfo<TParent> OnSendPacket;
-
-        public abstract TClient Data { get; }
+        public abstract BaseNetworkConnection Data { get; }
 
         #region Network
 
@@ -71,21 +66,14 @@ namespace NSL.WebSockets
 
         #endregion
 
-        public BaseWSClient(CoreOptions<TClient> options)
+        public BaseWSClient(CoreOptions options)
         {
             this.options = options;
-
-            OnReceivePacket += (client, pid, len) => options.CallReceivePacketEvent(client.Data, pid, len);
-            OnSendPacket += (client, pid, len, st) => options.CallSendPacketEvent(client.Data, pid, len, st);
-
-            this.parent = GetParent();
         }
 
-        protected abstract TParent GetParent();
+        protected CoreOptions options;
 
-        protected CoreOptions<TClient> options;
-
-        private Dictionary<ushort, CoreOptions<TClient>.PacketHandle> PacketHandles;
+        private Dictionary<ushort, CoreOptions.PacketHandle> PacketHandles;
 
         public virtual IPEndPoint GetRemotePoint()
         {
@@ -340,8 +328,6 @@ namespace NSL.WebSockets
             sclient = null;
         }
 
-        private readonly TParent parent;
-
         public CoreOptions Options => options;
 
         public abstract void ChangeUserData(BaseNetworkConnection data);
@@ -353,14 +339,10 @@ namespace NSL.WebSockets
         public Socket GetSocket() => default;
 
         protected virtual void OnSend(OutputPacketBuffer rbuff, string stackTrace = "")
-        {
-            OnSendPacket?.Invoke(parent, rbuff.PacketId, rbuff.PacketLength, stackTrace);
-        }
+            => options.CallSendPacketEvent(Data, rbuff.PacketId, rbuff.PacketLength, stackTrace);
 
         protected virtual void OnReceive(ushort pid, int len)
-        {
-            OnReceivePacket?.Invoke(parent, pid, len);
-        }
+            => options.CallReceivePacketEvent(Data, pid, len);
 
         protected abstract void RunDisconnect();
 

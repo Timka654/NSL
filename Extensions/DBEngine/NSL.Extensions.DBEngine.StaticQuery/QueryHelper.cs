@@ -1,5 +1,6 @@
 ﻿
 using NSL.SocketCore;
+using NSL.SocketCore.Utils;
 using NSL.SocketCore.Utils.Logger.Enums;
 using NSL.SocketServer;
 using NSL.SocketServer.Utils;
@@ -58,7 +59,7 @@ namespace NSL.Extensions.DBEngine.StaticQuery
         /// <param name="assembly">Сборка из которой нужно выбрать классы запросов</param>
         /// <param name="selectAttrbuteType">Аттрибут по которому будут выбираться классы запросов</param>
         /// <returns>Кол-во запросов которые были выполнены</returns>
-        public static int LoadQuerys<T>(this ServerOptions<T> serverOptions, DbConnectionPool conPull, Assembly assembly, Type selectAttrbuteType) where T : BaseNetworkConnection
+        public static int LoadQuerys<T>(this ServerOptions<T> serverOptions, DbConnectionPool conPull, Assembly assembly, Type selectAttrbuteType) where T : BaseNetworkConnection, new()
         {
             return LoadQuerys(conPull, assembly, selectAttrbuteType, (type, attr) => serverOptions.HelperLogger.Append(LoggerLevel.Info, $"{attr.Name} Loaded"));
         }
@@ -71,7 +72,7 @@ namespace NSL.Extensions.DBEngine.StaticQuery
         /// <param name="assembly">Сборка из которой нужно выбрать классы запросов</param>
         /// <param name="selectAttrbuteType">Аттрибут по которому будут выбираться классы запросов</param>
         /// <returns>Кол-во запросов которые были выполнены</returns>
-        public static int LoadQuerys<T>(this ServerOptions<T> serverOptions, DbConnectionPool conPull, Type selectAttrbuteType) where T : BaseNetworkConnection
+        public static int LoadQuerys<T>(this ServerOptions<T> serverOptions, DbConnectionPool conPull, Type selectAttrbuteType) where T : BaseNetworkConnection, new()
         {
             return LoadQuerys(serverOptions, conPull, Assembly.GetCallingAssembly(), selectAttrbuteType);
         }

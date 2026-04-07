@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using NSL.Cipher.RC.RC4;
 using NSL.Logger;
+using NSL.SocketCore.Utils;
 using NSL.SocketCore.Utils.Buffer;
 using NSL.SocketServer;
 using NSL.SocketServer.Utils;
@@ -14,7 +15,7 @@ services.AddSingleton<ConnectionCounter>();
 // Scoped-сервисы создаются на каждого клиента после инициализации scope:
 services.AddScoped<ClientSession>();
 
-ServerOptions<BaseServerNetworkClient> options = new ServerOptions<BaseServerNetworkClient>();
+ServerOptions<BaseNetworkConnection> options = new ServerOptions<BaseNetworkConnection>();
 options.ServiceProvider = services.BuildServiceProvider();
 
 options.Port = 20008;
@@ -102,7 +103,7 @@ options.OnClientDisconnectEvent += (client) =>
     Console.WriteLine($"Client disconnected ({sessionInfo})");
 };
 
-var t = new TCPServerListener<BaseServerNetworkClient>(options, false);
+var t = new TCPServerListener<BaseNetworkConnection>(options, false);
 
 t.Start();
 

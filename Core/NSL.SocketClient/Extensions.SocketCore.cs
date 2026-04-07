@@ -12,6 +12,7 @@ using NSL.SocketCore.Utils.Packet;
 using System;
 using System.Net.Sockets;
 using System.Reflection;
+using System.Threading.Tasks;
 using static NSL.SocketCore.Utils.Request.RequestExtensions;
 using NSL.SocketCore.Utils.Logger.Enums;
 using NSL.SocketCore.Network;
@@ -20,28 +21,24 @@ namespace NSL.BuilderExtensions.SocketCore
 {
     public static class Extensions
     {
-        public static void AddPacketHandle<TClient>(this IOptionableEndPointBuilder<TClient> builder, ushort packetId, ClientOptions<TClient>.PacketHandle handle)
-            where TClient : BaseNetworkConnection, new()
+        public static void AddPacketHandle(this IOptionableEndPointBuilder builder, ushort packetId, Action<BaseNetworkConnection, InputPacketBuffer> handle)
         {
             builder.GetCoreOptions().AddHandle(packetId, handle);
         }
 
-        public static void AddPacketHandle<TClient, TEnum>(this IOptionableEndPointBuilder<TClient> builder, TEnum packetId, ClientOptions<TClient>.PacketHandle packet)
+        public static void AddPacketHandle<TEnum>(this IOptionableEndPointBuilder builder, TEnum packetId, Action<BaseNetworkConnection, InputPacketBuffer> packet)
             where TEnum : struct, IConvertible
-            where TClient : BaseNetworkConnection, new()
         {
             AddPacketHandle(builder, packetId.ToUInt16(null), packet);
         }
 
-        public static void AddAsyncPacketHandle<TClient>(this IOptionableEndPointBuilder<TClient> builder, ushort packetId, ClientOptions<TClient>.AsyncPacketHandle handle)
-            where TClient : BaseNetworkConnection, new()
+        public static void AddAsyncPacketHandle(this IOptionableEndPointBuilder builder, ushort packetId, Func<BaseNetworkConnection, InputPacketBuffer, Task> handle)
         {
             builder.GetCoreOptions().AddAsyncHandle(packetId, handle);
         }
 
-        public static void AddAsyncPacketHandle<TClient, TEnum>(this IOptionableEndPointBuilder<TClient> builder, TEnum packetId, ClientOptions<TClient>.AsyncPacketHandle packet)
+        public static void AddAsyncPacketHandle<TEnum>(this IOptionableEndPointBuilder builder, TEnum packetId, Func<BaseNetworkConnection, InputPacketBuffer, Task> packet)
             where TEnum : struct, IConvertible
-            where TClient : BaseNetworkConnection, new()
         {
             AddAsyncPacketHandle(builder, packetId.ToUInt16(null), packet);
         }

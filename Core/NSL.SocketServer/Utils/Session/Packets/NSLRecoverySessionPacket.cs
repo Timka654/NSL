@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace NSL.SocketServer.Utils.Session.Packets
 {
-    public class NSLRecoverySessionPacket<T> : IAsyncPacket<T> where T : BaseNetworkConnection
+    public class NSLRecoverySessionPacket<T> : IAsyncPacket<T> where T : BaseNetworkConnection, new()
     {
         public const ushort PacketId = (ushort)NSLSystemPacketEnum.Session;
 

@@ -1,61 +1,45 @@
-﻿using NSL.SocketCore.Utils;
-using NSL.SocketServer;
-using NSL.SocketServer.Utils;
+﻿using NSL.SocketCore;
+using NSL.SocketCore.Utils;
+using NSL.SocketCore.Utils.Buffer;
 using System;
 using System.Net;
 using System.Threading.Tasks;
 
 namespace NSL.WebSockets.Server
 {
-    public class WSServerClient<TClient> : BaseWSClient<TClient, WSServerClient<TClient>>
-        where TClient : BaseNetworkConnection, new()
+    public class WSServerClient : BaseWSClient
     {
-        private TClient clientData;
+        private BaseNetworkConnection clientData;
 
-        public override TClient Data => clientData;
+        public override BaseNetworkConnection Data => clientData;
 
-        /// <summary>
-        /// Общие настройки сервера
-        /// </summary>
-        public ServerOptions<TClient> ServerOptions => (ServerOptions<TClient>)base.options;
+        public CoreOptions ServerOptions => base.options;
 
+        public event ReceivePacketDebugInfo<WSServerClient> OnReceivePacket;
+        public event SendPacketDebugInfo<WSServerClient> OnSendPacket;
 
-        protected WSServerClient(ServerOptions<TClient> options) : base(options)
-        {
+        protected WSServerClient(CoreOptions options) : base(options) { }
 
-        }
-
-        /// <summary>
-        /// Инициализация прослушивания клиента
-        /// </summary>
-        /// <param name="client">клиент</param>
-        /// <param name="options">общие настройки сервера</param>
-        public WSServerClient(HttpListenerContext client, ServerOptions<TClient> options) : this(options)
+        public WSServerClient(HttpListenerContext client, CoreOptions options) : this(options)
         {
             if (!client.Request.IsWebSocketRequest)
                 throw new Exception($"{client.Request.UserHostAddress} is not WebSocket request");
 
             base.context = client;
-
             base.remoteEndPoint = context?.Request.RemoteEndPoint;
 
             Initialize();
-
         }
 
         protected void Initialize()
         {
-            clientData = new TClient();
+            clientData = options.ConnectionFactory();
 
-            //обзятельная переменная в NetworkClient, для отправки данных, можно использовать привидения типов (Client)NetworkClient но это никому не поможет
             Data.Network = this;
             Data.Options = options;
 
-            //установка массива для приема данных, размер указан в общих настройках сервера
             receiveBuffer = new byte[options.ReceiveBufferSize];
-            //установка криптографии для дешифровки входящих данных, указана в общих настройках сервера
             inputCipher = options.InputCipher.CreateEntry();
-            //установка криптографии для шифровки исходящих данных, указана в общих настройках сервера
             outputCipher = options.OutputCipher.CreateEntry();
 
             disconnected = false;
@@ -66,10 +50,7 @@ namespace NSL.WebSockets.Server
             try
             {
                 sclient = (await context.AcceptWebSocketAsync(null))?.WebSocket;
-
-                //Начало приема пакетов от клиента
                 options.CallClientConnectEvent(Data);
-
                 RunReceive();
             }
             catch (Exception)
@@ -77,42 +58,31 @@ namespace NSL.WebSockets.Server
                 Disconnect();
             }
         }
-        public override void ChangeUserData(BaseNetworkConnection newClientData)
-            => SetClientData(newClientData);
+
+        public override void ChangeUserData(BaseNetworkConnection newClientData) => SetClientData(newClientData);
 
         public override void SetClientData(BaseNetworkConnection from)
         {
-            if (from == null)
-            {
-                clientData = null;
-                return;
-            }
+            if (from == null) { clientData = null; return; }
 
-            if (from is TClient td)
-            {
-                // current data for dispose and move data
-                var oldData = clientData;
-
-                clientData = td;
-                clientData.Network = this;
-
-                oldData.Network = null;
-
-                from.ChangeOwner(oldData);
-
-                return;
-            }
-
-            throw new Exception($"{nameof(from)} must have type {typeof(TClient)}");
+            var oldData = clientData;
+            clientData = from;
+            clientData.Network = this;
+            oldData.Network = null;
+            from.ChangeOwner(oldData);
         }
-
-        protected override WSServerClient<TClient> GetParent() => this;
 
         protected override void OnReceive(ushort pid, int len)
         {
             Data.LastReceiveMessage = DateTime.UtcNow;
-
             base.OnReceive(pid, len);
+            OnReceivePacket?.Invoke(this, pid, len);
+        }
+
+        protected override void OnSend(OutputPacketBuffer rbuff, string stackTrace)
+        {
+            base.OnSend(rbuff, stackTrace);
+            OnSendPacket?.Invoke(this, rbuff.PacketId, rbuff.PacketLength, stackTrace);
         }
 
         protected override void RunDisconnect() => ServerOptions.CallClientDisconnectEvent(Data);

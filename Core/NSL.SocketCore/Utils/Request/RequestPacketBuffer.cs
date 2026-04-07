@@ -51,10 +51,4 @@ namespace NSL.SocketCore.Utils.Request
         public static RequestPacketBuffer Create()
             => new RequestPacketBuffer();
     }
-
-    [Obsolete("Replace to RequestPacketBuffer", true)]
-    public class WaitablePacketBuffer : RequestPacketBuffer
-    {
-        public WaitablePacketBuffer(Guid rid, int len = 48) : base(rid, len) { }
-    }
 }

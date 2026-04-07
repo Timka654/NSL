@@ -12,7 +12,7 @@ namespace NSL.Node.BridgeLobbyClient
     {
         private readonly Uri wsUrl;
         private readonly Action<WebSocketsClientEndPointBuilder<BridgeLobbyNetworkClient, WSClientOptions<BridgeLobbyNetworkClient>>> onBuild;
-        private WSNetworkClient<BridgeLobbyNetworkClient, WSClientOptions<BridgeLobbyNetworkClient>> wsNetwork;
+        private WSNetworkClient<BridgeLobbyNetworkClient> wsNetwork;
 
         public BridgeLobbyNetwork(Uri wsUrl, string serverIdentity, string identityKey, Action<BridgeLobbyNetworkHandlesConfigurationModel> onHandleConfiguration, Action<WebSocketsClientEndPointBuilder<BridgeLobbyNetworkClient, WSClientOptions<BridgeLobbyNetworkClient>>> onBuild = null) : base(serverIdentity, identityKey, onHandleConfiguration)
         {

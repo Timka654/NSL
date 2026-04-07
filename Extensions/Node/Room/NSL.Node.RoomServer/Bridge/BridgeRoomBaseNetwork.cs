@@ -65,14 +65,14 @@ namespace NSL.Node.RoomServer.Bridge
         }
 
         protected TBuilder FillOptions<TBuilder>(TBuilder builder)
-            where TBuilder : IOptionableEndPointBuilder<BridgeRoomNetworkClient>, IHandleIOBuilder<BridgeRoomNetworkClient>
+            where TBuilder : IOptionableEndPointBuilder, IHandleIOBuilder<BridgeRoomNetworkClient>
         {
 
             builder.SetLogger(Logger);
 
             builder.AddResponsePacketHandle(
                 NodeBridgeRoomPacketEnum.Response,
-                c => c.PacketWaitBuffer);
+                c => ((BridgeRoomNetworkClient)c).PacketWaitBuffer);
 
             CancellationTokenSource rcts = default;
 
@@ -93,7 +93,7 @@ namespace NSL.Node.RoomServer.Bridge
 
                 network = client;
 
-                PacketWaitBuffer = client.PacketWaitBuffer;
+                PacketWaitBuffer = ((BridgeRoomNetworkClient)client).PacketWaitBuffer;
 
                 if (!(await TrySign()).Result)
                 {

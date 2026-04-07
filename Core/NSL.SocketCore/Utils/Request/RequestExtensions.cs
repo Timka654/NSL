@@ -7,43 +7,36 @@ namespace NSL.SocketCore.Utils.Request
 {
     public static class RequestExtensions
     {
-        public static void AddResponsePacketHandle<TClient>(this CoreOptions<TClient> options, ushort packetId, Func<TClient, IResponsibleProcessor> handler)
-            where TClient : BaseNetworkConnection
+        public static void AddResponsePacketHandle(this CoreOptions options, ushort packetId, Func<BaseNetworkConnection, IResponsibleProcessor> handler)
         {
             options.AddHandle(packetId, (client, packet) => handler(client).ProcessResponse(packet));
         }
 
-        public static void AddResponsePacketHandle<TClient, TEnum>(this CoreOptions<TClient> options, TEnum packetId, Func<TClient, IResponsibleProcessor> handler)
-            where TClient : BaseNetworkConnection, new()
+        public static void AddResponsePacketHandle<TEnum>(this CoreOptions options, TEnum packetId, Func<BaseNetworkConnection, IResponsibleProcessor> handler)
             where TEnum : struct, IConvertible
         {
             options.AddResponsePacketHandle(packetId.ToUInt16(null), handler);
         }
 
-        public delegate OutputPacketBuffer RequestPacketHandle<TClient>(TClient client, InputPacketBuffer data)
-            where TClient : BaseNetworkConnection;
+        public delegate OutputPacketBuffer RequestPacketHandle(BaseNetworkConnection client, InputPacketBuffer data);
 
-        public delegate bool RequestPacketHandle2<TClient>(TClient client, InputPacketBuffer data, OutputPacketBuffer response)
-            where TClient : BaseNetworkConnection;
+        public delegate bool RequestPacketHandle2(BaseNetworkConnection client, InputPacketBuffer data, OutputPacketBuffer response);
 
-        public delegate Task<OutputPacketBuffer> RequestPacketAsyncHandle<TClient>(TClient client, InputPacketBuffer data)
-            where TClient : BaseNetworkConnection;
+        public delegate Task<OutputPacketBuffer> RequestPacketAsyncHandle(BaseNetworkConnection client, InputPacketBuffer data);
 
-        public delegate Task<bool> RequestPacketAsyncHandle2<TClient>(TClient client, InputPacketBuffer data, OutputPacketBuffer response)
-            where TClient : BaseNetworkConnection;
+        public delegate Task<bool> RequestPacketAsyncHandle2(BaseNetworkConnection client, InputPacketBuffer data, OutputPacketBuffer response);
 
-        public static void AddRequestPacketHandle<TClient, TEnum>(this CoreOptions<TClient> builder, TEnum packetId, RequestPacketHandle<TClient> packet)
-            where TClient : BaseNetworkConnection, new() where TEnum : struct, IConvertible
+        public static void AddRequestPacketHandle<TEnum>(this CoreOptions builder, TEnum packetId, RequestPacketHandle packet)
+            where TEnum : struct, IConvertible
             => builder.AddRequestPacketHandle(packetId.ToUInt16(null), packet);
 
-        public static void AddRequestPacketHandle<TClient, TEnum>(this CoreOptions<TClient> builder, TEnum packetId, RequestPacketHandle2<TClient> packet, ushort responsePacketId = 1)
-            where TClient : BaseNetworkConnection, new() where TEnum : struct, IConvertible
+        public static void AddRequestPacketHandle<TEnum>(this CoreOptions builder, TEnum packetId, RequestPacketHandle2 packet, ushort responsePacketId = 1)
+            where TEnum : struct, IConvertible
             => builder.AddRequestPacketHandle(packetId.ToUInt16(null), packet, responsePacketId);
 
-        public static void AddRequestPacketHandle<TClient>(this CoreOptions<TClient> builder, ushort packetId, RequestPacketHandle<TClient> packet)
-            where TClient : BaseNetworkConnection, new()
+        public static void AddRequestPacketHandle(this CoreOptions builder, ushort packetId, RequestPacketHandle packet)
         {
-            builder.AddHandle(packetId, (client, data) =>
+            builder.AddHandle<BaseNetworkConnection>(packetId, (client, data) =>
             {
                 var result = packet.Invoke(client, data);
                 if (result != null)
@@ -51,8 +44,7 @@ namespace NSL.SocketCore.Utils.Request
             });
         }
 
-        public static void AddRequestPacketHandle<TClient>(this CoreOptions<TClient> builder, ushort packetId, RequestPacketHandle2<TClient> packet, ushort responsePacketId = 1)
-            where TClient : BaseNetworkConnection
+        public static void AddRequestPacketHandle(this CoreOptions builder, ushort packetId, RequestPacketHandle2 packet, ushort responsePacketId = 1)
         {
             builder.AddHandle(packetId, (client, data) =>
             {
@@ -64,8 +56,8 @@ namespace NSL.SocketCore.Utils.Request
             });
         }
 
-        public static void AddAsyncRequestPacketHandle<TClient, TEnum>(this CoreOptions<TClient> builder, TEnum packetId, RequestPacketAsyncHandle<TClient> packet)
-            where TClient : BaseNetworkConnection, new() where TEnum : struct, IConvertible
+        public static void AddAsyncRequestPacketHandle<TEnum>(this CoreOptions builder, TEnum packetId, RequestPacketAsyncHandle packet)
+            where TEnum : struct, IConvertible
         {
             builder.AddAsyncHandle(packetId.ToUInt16(null), async (client, data) =>
             {
@@ -75,8 +67,8 @@ namespace NSL.SocketCore.Utils.Request
             });
         }
 
-        public static void AddAsyncRequestPacketHandle<TClient, TEnum>(this CoreOptions<TClient> builder, TEnum packetId, RequestPacketAsyncHandle2<TClient> packet, ushort responsePacketId = 1)
-            where TClient : BaseNetworkConnection, new() where TEnum : struct, IConvertible
+        public static void AddAsyncRequestPacketHandle<TEnum>(this CoreOptions builder, TEnum packetId, RequestPacketAsyncHandle2 packet, ushort responsePacketId = 1)
+            where TEnum : struct, IConvertible
         {
             builder.AddAsyncHandle(packetId.ToUInt16(null), async (client, data) =>
             {
@@ -88,23 +80,20 @@ namespace NSL.SocketCore.Utils.Request
             });
         }
 
-        public static void ConfigureRequestProcessor<TClient, TEnum>(this CoreOptions<TClient> options, TEnum responsePacketId, string objectKey = RequestProcessor.DefaultObjectBagKey)
-            where TClient : BaseNetworkConnection, new()
+        public static void ConfigureRequestProcessor<TEnum>(this CoreOptions options, TEnum responsePacketId, string objectKey = RequestProcessor.DefaultObjectBagKey)
             where TEnum : struct, IConvertible
         {
             options.OnClientConnectEvent += client => CreateRequestProcessor(client, objectKey);
-            options.AddResponsePacketHandle(responsePacketId, c => c.GetRequestProcessor(objectKey));
+            options.AddResponsePacketHandle<TEnum>(responsePacketId, c => c.GetRequestProcessor(objectKey));
         }
 
-        public static void ConfigureRequestProcessor<TClient>(this CoreOptions<TClient> options, ushort responsePacketId = RequestProcessor.DefaultResponsePacketId, string objectKey = RequestProcessor.DefaultObjectBagKey)
-            where TClient : BaseNetworkConnection, new()
+        public static void ConfigureRequestProcessor(this CoreOptions options, ushort responsePacketId = RequestProcessor.DefaultResponsePacketId, string objectKey = RequestProcessor.DefaultObjectBagKey)
         {
             options.OnClientConnectEvent += client => CreateRequestProcessor(client, objectKey);
             options.AddResponsePacketHandle(responsePacketId, c => c.GetRequestProcessor(objectKey));
         }
 
-        public static void SetDefaultResponsePID<TClient>(this CoreOptions<TClient> options, ushort responsePacketId = RequestProcessor.DefaultResponsePacketId)
-            where TClient : BaseNetworkConnection, new()
+        public static void SetDefaultResponsePID(this CoreOptions options, ushort responsePacketId = RequestProcessor.DefaultResponsePacketId)
         {
             options.ObjectBag[RequestProcessor.DefaultResponsePIDObjectBagKey] = responsePacketId;
         }
@@ -120,8 +109,7 @@ namespace NSL.SocketCore.Utils.Request
             return response;
         }
 
-        public static RequestProcessor CreateRequestProcessor<TClient>(this TClient client, string objectKey = RequestProcessor.DefaultObjectBagKey)
-            where TClient : BaseNetworkConnection
+        public static RequestProcessor CreateRequestProcessor(this BaseNetworkConnection client, string objectKey = RequestProcessor.DefaultObjectBagKey)
         {
             client.ThrowIfObjectBagNull();
             var requestProcessor = new RequestProcessor(client);
@@ -129,8 +117,7 @@ namespace NSL.SocketCore.Utils.Request
             return requestProcessor;
         }
 
-        public static RequestProcessor GetRequestProcessor<TClient>(this TClient client, string objectKey = RequestProcessor.DefaultObjectBagKey, bool throwIfNotExists = true)
-            where TClient : BaseNetworkConnection
+        public static RequestProcessor GetRequestProcessor(this BaseNetworkConnection client, string objectKey = RequestProcessor.DefaultObjectBagKey, bool throwIfNotExists = true)
         {
             client.ThrowIfObjectBagNull();
             return client.ObjectBag.Get<RequestProcessor>(objectKey, throwIfNotExists);

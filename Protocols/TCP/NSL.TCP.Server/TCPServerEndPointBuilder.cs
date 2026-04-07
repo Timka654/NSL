@@ -4,6 +4,7 @@ using NSL.TCP.Server;
 using NSL.SocketServer.Utils;
 using NSL.SocketServer;
 using NSL.SocketCore;
+using NSL.SocketCore.Utils;
 using NSL.EndPointBuilder;
 
 namespace NSL.BuilderExtensions.TCPServer
@@ -38,21 +39,21 @@ namespace NSL.BuilderExtensions.TCPServer
             => WithOptions<ServerOptions<TClient>>();
 
         public TCPServerEndPointBuilder<TClient, TOptions> WithOptions<TOptions>()
-            where TOptions : ServerOptions<TClient>, new()
+            where TOptions : CoreOptions, new()
         {
             return TCPServerEndPointBuilder<TClient, TOptions>.Create();
         }
     }
 
-    public class TCPServerEndPointBuilder<TClient, TOptions> : IOptionableEndPointServerBuilder<TClient>, IHandleIOBuilder<TClient>
+    public class TCPServerEndPointBuilder<TClient, TOptions> : IOptionableEndPointBuilder, IHandleIOBuilder<TClient>
         where TClient : BaseNetworkConnection, new()
-        where TOptions : ServerOptions<TClient>, new()
+        where TOptions : CoreOptions, new()
     {
         TOptions options = new TOptions();
 
-        public ServerOptions<TClient> GetOptions() => options;
+        public TOptions GetOptions() => options;
 
-        public CoreOptions<TClient> GetCoreOptions() => options;
+        public CoreOptions GetCoreOptions() => options;
 
         private TCPServerEndPointBuilder() { }
 
@@ -95,12 +96,12 @@ namespace NSL.BuilderExtensions.TCPServer
             return this;
         }
 
-        public void AddReceiveHandle(CoreOptions<TClient>.ReceivePacketHandle handle)
+        public void AddReceiveHandle(CoreOptions.ReceivePacketHandle handle)
         {
             options.OnReceivePacket += handle;
         }
 
-        public void AddSendHandle(CoreOptions<TClient>.SendPacketHandle handle)
+        public void AddSendHandle(CoreOptions.SendPacketHandle handle)
         {
             options.OnSendPacket += handle;
         }

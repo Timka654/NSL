@@ -1,4 +1,6 @@
 ﻿using NSL.SocketCore;
+using NSL.SocketCore.Utils;
+using NSL.SocketServer.Utils;
 using System;
 using System.Collections.Concurrent;
 using System.Net;
@@ -75,7 +77,5 @@ namespace NSL.UDP.Client
         public int GetListenerPort() => options.BindingPort;
 
         public CoreOptions GetOptions() => options;
-
-        public UDPClientOptions<TClient> GetServerOptions() => options;
     }
 }

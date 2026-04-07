@@ -1,55 +1,49 @@
-﻿using NSL.SocketClient;
+﻿using NSL.SocketCore;
 using NSL.SocketCore.Utils;
+using NSL.SocketCore.Utils.Buffer;
 using System;
 using System.Net;
 using System.Net.Sockets;
 
 namespace NSL.TCP.Client
 {
-    /// <summary>
-    /// Класс обработки клиента
-    /// </summary>
-    public class TCPClient<T> : BaseTcpClient<T, TCPClient<T>>
-        where T : BaseNetworkConnection, new()
+    /// <summary>Не-дженериковый движок TCP-клиента.</summary>
+    public class TCPClient : BaseTcpClient
     {
         public long Version { get; set; }
 
-        public override T Data => ConnectionOptions.ClientData;
+        public override BaseNetworkConnection Data => options.ClientData;
 
-        public ClientOptions<T> ConnectionOptions => base.options as ClientOptions<T>;
+        public CoreOptions ConnectionOptions => base.options;
 
+        public event ReceivePacketDebugInfo<TCPClient> OnReceivePacket;
+        public event SendPacketDebugInfo<TCPClient> OnSendPacket;
 
-        public TCPClient(ClientOptions<T> options, bool legacyTransport = false) : base(options, legacyTransport)
+        public TCPClient(CoreOptions options, bool legacyTransport = false) : base(options, legacyTransport)
         {
         }
-
 
         public void Reconnect(Socket client)
         {
             disconnected = false;
 
-            ConnectionOptions.InitializeClient(new T());
-
+            ConnectionOptions.InitializeClient(ConnectionOptions.ConnectionFactory());
             ConnectionOptions.ClientData.Network = this;
 
-            //установка переменной содержащую поток клиента
-            this.sclient = client;
-            this.endPoint = (IPEndPoint)sclient?.RemoteEndPoint;
+            sclient = client;
+            endPoint = (IPEndPoint)sclient?.RemoteEndPoint;
 
-            //this.receiveBuffer = new byte[ConnectionOptions.ReceiveBufferSize];
-
-            this.inputCipher = ConnectionOptions.InputCipher.CreateEntry();
-
-            this.outputCipher = ConnectionOptions.OutputCipher.CreateEntry();
+            inputCipher = ConnectionOptions.InputCipher.CreateEntry();
+            outputCipher = ConnectionOptions.OutputCipher.CreateEntry();
 
             RunReceive();
 
             ConnectionOptions.RunClientConnect();
         }
 
-        public override void ChangeUserData(BaseNetworkConnection newClientData) => SetClientData((T)newClientData);
+        public override void ChangeUserData(BaseNetworkConnection newClientData) => SetClientData(newClientData);
 
-        public override void SetClientData(BaseNetworkConnection from) => ConnectionOptions.InitializeClient((T)from);
+        public override void SetClientData(BaseNetworkConnection from) => ConnectionOptions.InitializeClient(from);
 
         protected override void RunDisconnect() => ConnectionOptions.RunClientDisconnect();
 
@@ -59,8 +53,14 @@ namespace NSL.TCP.Client
         {
             ConnectionOptions.ClientData.LastReceiveMessage = DateTime.UtcNow;
             base.OnReceive(pid, len);
+            OnReceivePacket?.Invoke(this, pid, len);
         }
 
-        protected override TCPClient<T> GetParent() => this;
+        protected override void OnSend(OutputPacketBuffer rbuff, string stackTrace)
+        {
+            base.OnSend(rbuff, stackTrace);
+            OnSendPacket?.Invoke(this, rbuff.PacketId, rbuff.PacketLength, stackTrace);
+        }
     }
 }
+

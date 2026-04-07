@@ -2,6 +2,7 @@
 using System;
 using System.Net.Sockets;
 using NSL.SocketCore;
+using NSL.SocketCore.Utils;
 using NSL.SocketServer.Utils;
 using System.Threading;
 

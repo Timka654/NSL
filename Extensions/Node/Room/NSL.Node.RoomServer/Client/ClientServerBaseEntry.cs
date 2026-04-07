@@ -76,7 +76,7 @@ namespace NSL.Node.RoomServer.Client
         protected NSLSessionManager<TransportNetworkClient> sessionManager;
 
         protected TBuilder Fill<TBuilder>(TBuilder builder)
-            where TBuilder : IOptionableEndPointBuilder<TransportNetworkClient>, IHandleIOBuilder<TransportNetworkClient>
+            where TBuilder : IOptionableEndPointBuilder, IHandleIOBuilder<TransportNetworkClient>
         {
             builder.AddConnectHandle(client => client.InitializeObjectBag());
 
@@ -145,22 +145,22 @@ namespace NSL.Node.RoomServer.Client
             builder.SetLogger(Logger);
 
             builder.AddAsyncPacketHandle(
-                RoomPacketEnum.SignSessionRequest, SignInPacketHandle);
+                RoomPacketEnum.SignSessionRequest, (c,p) => SignInPacketHandle((TransportNetworkClient)c, p));
             builder.AddPacketHandle(
-                RoomPacketEnum.TransportMessage, TransportPacketHandle);
+                RoomPacketEnum.TransportMessage, (c,p) => TransportPacketHandle((TransportNetworkClient)c, p));
             builder.AddPacketHandle(
-                RoomPacketEnum.BroadcastMessage, BroadcastPacketHandle);
+                RoomPacketEnum.BroadcastMessage, (c,p) => BroadcastPacketHandle((TransportNetworkClient)c, p));
             //builder.AddAsyncPacketHandle(
             //    RoomPacketEnum.ReadyNodeRequest, ReadyPacketHandle);
             builder.AddPacketHandle(
-                RoomPacketEnum.ExecuteMessage, ExecutePacketHandle);
+                RoomPacketEnum.ExecuteMessage, (c,p) => ExecutePacketHandle((TransportNetworkClient)c, p));
             builder.AddPacketHandle(
-                RoomPacketEnum.DisconnectMessage, DisconnectMessagePacketHandle);
+                RoomPacketEnum.DisconnectMessage, (c,p) => DisconnectMessagePacketHandle((TransportNetworkClient)c, p));
             builder.AddPacketHandle(
-                RoomPacketEnum.NodeChangeEndPointMessage, ChangeConnectionPointPacketHandle);
-
-            builder.AddDisconnectHandle(client =>
+                RoomPacketEnum.NodeChangeEndPointMessage, (c,p) => ChangeConnectionPointPacketHandle((TransportNetworkClient)c, p));
+            builder.AddDisconnectHandle(_client =>
             {
+                var client = (TransportNetworkClient)_client;
                 var room = client.Room;
                 if (room != null)
                 {

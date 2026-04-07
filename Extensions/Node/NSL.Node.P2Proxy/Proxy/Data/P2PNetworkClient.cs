@@ -1,4 +1,5 @@
-﻿using NSL.SocketServer.Utils;
+﻿using NSL.SocketCore.Utils;
+using NSL.SocketServer.Utils;
 using System;
 
 namespace NSL.Node.P2Proxy.Proxy.Data

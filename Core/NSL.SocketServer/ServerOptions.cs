@@ -3,60 +3,37 @@ using NSL.SocketCore.Utils;
 using NSL.SocketCore.Utils.SystemPackets;
 using NSL.SocketServer.Utils;
 using NSL.SocketServer.Utils.SystemPackets;
-using System.Net;
 
 namespace NSL.SocketServer
 {
-    public class ServerOptions<TClient> : CoreOptions<TClient>
-        where TClient : BaseNetworkConnection
+    public class ServerOptions : ServerOptions<BaseNetworkConnection> { }
+
+    public class ServerOptions<TClient> : TypedCoreOptions<TClient>
+        where TClient : BaseNetworkConnection, new()
     {
-        #region ServerSettings
-        //Данные для настройки сервера
-
-        /// <summary>
-        /// Длина очереди для приема подключения
-        /// </summary>
-        public virtual int Backlog { get; set; }
-
-        #endregion
-
         public ServerOptions()
         {
+            ConnectionFactory = () => new TClient();
             LoadOptions();
         }
 
         protected virtual void LoadOptions()
-        { 
+        {
             AddPacket(AliveConnectionPacket.PacketId, new ServerAliveConnectionPacket<TClient>());
             AddPacket(SystemTime<TClient>.PacketId, new SystemTime<TClient>());
         }
-
-        /// <summary>
-        /// Ип адресс - используется для инициализации слушателя на определенном адаптере (0.0.0.0 - для всех)
-        /// </summary>
-        public virtual string IpAddress { get; set; } = "0.0.0.0";
-
-        /// <summary>
-        /// Порт - используется для инициализации слушателя на определенном порту 1 - 65,535
-        /// </summary>
-        public virtual int Port { get; set; }
-
-        public IPAddress GetIPAddress() => IPAddress.Parse(IpAddress);
-
-        public IPEndPoint GetIPEndPoint() => new IPEndPoint(GetIPAddress(), Port);
     }
 
     public static class NetworkConfigurationExtension
     {
         public static ServerOptions<T> LoadConfigurationServerOptions<T>(this INSLConfiguration configuration, string networkNodePath)
-            where T : BaseNetworkConnection
+            where T : BaseNetworkConnection, new()
         {
-            var r = configuration.LoadConfigurationCoreOptions<ServerOptions<T>, T>(networkNodePath);
+            var r = configuration.LoadConfigurationCoreOptions<ServerOptions<T>>(networkNodePath);
 
-            r.Backlog = configuration.GetValue<int>($"{networkNodePath}.io.backlog");
-
+            r.Backlog   = configuration.GetValue<int>($"{networkNodePath}.io.backlog");
             r.IpAddress = configuration.GetValue($"{networkNodePath}.io.ip");
-            r.Port = configuration.GetValue<int>($"{networkNodePath}.io.port");
+            r.Port      = configuration.GetValue<int>($"{networkNodePath}.io.port");
 
             return r;
         }

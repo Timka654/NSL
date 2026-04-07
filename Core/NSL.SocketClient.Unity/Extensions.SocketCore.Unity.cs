@@ -7,34 +7,34 @@ namespace NSL.BuilderExtensions.SocketCore.Unity
 {
     public static class Extensions
     {
-        public static void AddConnectHandleForUnity<TClient>(this IOptionableEndPointBuilder<TClient> builder, CoreOptions<TClient>.ClientConnect handle)
+        public static void AddConnectHandleForUnity<TClient>(this IOptionableEndPointBuilder<TClient> builder, Action<TClient> handle)
             where TClient : BaseNetworkConnection, new()
         {
-            builder.GetCoreOptions().OnClientConnectEvent += (client) => ThreadHelper.InvokeOnMain(() => handle(client));
+            builder.GetCoreOptions().OnClientConnectEvent += (client) => ThreadHelper.InvokeOnMain(() => handle((TClient)client));
         }
 
-        public static void AddDisconnectHandleForUnity<TClient>(this IOptionableEndPointBuilder<TClient> builder, CoreOptions<TClient>.ClientDisconnect handle)
+        public static void AddDisconnectHandleForUnity<TClient>(this IOptionableEndPointBuilder<TClient> builder, Action<TClient> handle)
             where TClient : BaseNetworkConnection, new()
         {
-            builder.GetCoreOptions().OnClientDisconnectEvent += (client) => ThreadHelper.InvokeOnMain(() => handle(client));
+            builder.GetCoreOptions().OnClientDisconnectEvent += (client) => ThreadHelper.InvokeOnMain(() => handle((TClient)client));
         }
 
-        public static void AddExceptionHandleForUnity<TClient>(this IOptionableEndPointBuilder<TClient> builder, CoreOptions<TClient>.ExceptionHandle handle)
+        public static void AddExceptionHandleForUnity<TClient>(this IOptionableEndPointBuilder<TClient> builder, Action<Exception, TClient> handle)
             where TClient : BaseNetworkConnection, new()
         {
-            builder.GetCoreOptions().OnExceptionEvent += (ex, client) => ThreadHelper.InvokeOnMain(() => handle(ex, client));
+            builder.GetCoreOptions().OnExceptionEvent += (ex, client) => ThreadHelper.InvokeOnMain(() => handle(ex, (TClient)client));
         }
 
-        public static void AddReceiveHandleForUnity<TClient>(this IHandleIOBuilder<TClient> builder, CoreOptions<TClient>.ReceivePacketHandle handle)
+        public static void AddReceiveHandleForUnity<TClient>(this IHandleIOBuilder<TClient> builder, Action<TClient, ushort, int> handle)
             where TClient : BaseNetworkConnection, new()
         {
-            builder.AddReceiveHandle((client, pid, len) => ThreadHelper.InvokeOnMain(() => handle(client, pid, len)));
+            builder.AddReceiveHandle((client, pid, len) => ThreadHelper.InvokeOnMain(() => handle((TClient)client, pid, len)));
         }
 
-        public static void AddSendHandleForUnity<TClient>(this IHandleIOBuilder<TClient> builder, CoreOptions<TClient>.SendPacketHandle handle)
+        public static void AddSendHandleForUnity<TClient>(this IHandleIOBuilder<TClient> builder, Action<TClient, ushort, int, string> handle)
             where TClient : BaseNetworkConnection, new()
         {
-            builder.AddSendHandle((client, pid, len, stackTrace) => ThreadHelper.InvokeOnMain(() => handle(client, pid, len, stackTrace)));
+            builder.AddSendHandle((client, pid, len, stackTrace) => ThreadHelper.InvokeOnMain(() => handle((TClient)client, pid, len, stackTrace)));
         }
     }
 }

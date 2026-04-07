@@ -12,8 +12,7 @@ namespace NSL.UDP.Packet
         /// between an incoming ping request (echoes back) and an incoming pong response (records RTT).
         /// Enable ping loop on the initiating side via <see cref="NSL.SocketCore.Utils.BaseNetworkConnection.PingPongEnabled"/>.
         /// </summary>
-        public static void RegisterUDPPingHandle<TClient>(this CoreOptions<TClient> options)
-            where TClient : BaseNetworkConnection
+        public static void RegisterUDPPingHandle(this CoreOptions options)
         {
             options.AddHandle(AliveConnectionPacket.PacketId, (client, data) =>
             {

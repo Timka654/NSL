@@ -82,7 +82,7 @@ namespace NSL.Builder.WebSockets.AspNetCoreIntegrationExample
                     builder.AddConnectHandle(c =>
                     {
                         Console.WriteLine($"[Client] Client connected handle");
-                        connection = c;
+                        connection = ((WSNetworkClientInfo)c);
                         c.InitializeObjectBag();
                         //c.PingPongEnabled = true;
                     });

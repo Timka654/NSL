@@ -1,4 +1,5 @@
-﻿using NSL.SocketServer;
+﻿using NSL.SocketCore.Utils;
+using NSL.SocketServer;
 using NSL.SocketServer.Utils;
 using System;
 using System.Collections.Generic;
@@ -7,7 +8,7 @@ using System.Net.Sockets;
 namespace NSL.WebSockets.Server
 {
     public class WSServerOptions<TClient> : ServerOptions<TClient>
-        where TClient : BaseNetworkConnection
+        where TClient : BaseNetworkConnection, new()
     {
         public override AddressFamily AddressFamily
         {

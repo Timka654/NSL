@@ -1,10 +1,12 @@
 using NSL.BuilderExtensions.TCPClient;
+using NSL.BuilderExtensions.TCPServer;
 using NSL.Generators.RpcGenerator.Shared;
 using NSL.Generators.RpcGenerator.Tests.Client;
 using NSL.Generators.RpcGenerator.Tests.Server;
 using NSL.Generators.RpcGenerator.Tests.Shared;
 using NSL.SocketCore.Utils.Buffer;
 using NSL.SocketCore.Utils.Request;
+using NSL.SocketServer.Utils;
 using System;
 using System.Threading.Tasks;
 
@@ -17,8 +19,8 @@ namespace NSL.Generators.RpcGenerator.Tests.Client
             const int port = 17777;
 
             // ── Start TCP server ─────────────────────────────────────────────
-            var server = NSL.BuilderExtensions.TCPServer.TCPServerEndPointBuilder.Create()
-                .WithClientProcessor<NSL.SocketServer.Utils.BaseServerNetworkClient>()
+            var server = TCPServerEndPointBuilder.Create()
+                .WithClientProcessor<ServerNetworkConnection>()
                 .WithOptions()
                 .WithBindingPoint(port)
                 .WithCode(b =>

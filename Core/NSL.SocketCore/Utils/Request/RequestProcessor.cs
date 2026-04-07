@@ -159,13 +159,5 @@ namespace NSL.SocketCore.Utils.Request
             if (ownsHub && hub is IDisposable disposable)
                 disposable.Dispose();
         }
-
-        [Obsolete("Replace to RequestProcessor", true)]
-        public class PacketWaitBuffer : RequestProcessor
-        {
-            public PacketWaitBuffer(BaseNetworkConnection client) : base(client)
-            {
-            }
-        }
     }
 }

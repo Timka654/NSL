@@ -48,23 +48,22 @@ namespace NSL.Node.BridgeLobbyClient
 
 
         protected TBuilder FillOptions<TBuilder>(TBuilder builder, Action<TBuilder> onBuild)
-            where TBuilder : IOptionableEndPointBuilder<BridgeLobbyNetworkClient>, IHandleIOBuilder<BridgeLobbyNetworkClient>
+            where TBuilder : IOptionableEndPointBuilder, IHandleIOBuilder<BridgeLobbyNetworkClient>
         {
             builder.AddResponsePacketHandle(
                 NodeBridgeLobbyPacketEnum.Response,
-                c => c.PacketWaitBuffer);
+                c => ((BridgeLobbyNetworkClient)c).PacketWaitBuffer);
 
             builder.AddPacketHandle(
                 NodeBridgeLobbyPacketEnum.FinishRoomMessage,
-                Packets.FinishRoomMessagePacket.Handle);
+               (c,p) => Packets.FinishRoomMessagePacket.Handle((BridgeLobbyNetworkClient)c, p));
 
             builder.AddPacketHandle(
                 NodeBridgeLobbyPacketEnum.RoomMessage,
-                Packets.RoomMessagePacket.Handle);
-
+                (c,p) => Packets.RoomMessagePacket.Handle((BridgeLobbyNetworkClient)c, p));
             builder.AddDisconnectHandle(DisconnectHandle);
 
-            builder.AddConnectHandle(ConnectHandle);
+            builder.AddConnectHandle(c => ConnectHandle((BridgeLobbyNetworkClient)c));
 
             if (onBuild != null)
                 onBuild(builder);
@@ -72,7 +71,7 @@ namespace NSL.Node.BridgeLobbyClient
             return builder;
         }
 
-        private async void DisconnectHandle(BridgeLobbyNetworkClient client)
+        private async void DisconnectHandle(BaseNetworkConnection client)
         {
             signResult = false;
 

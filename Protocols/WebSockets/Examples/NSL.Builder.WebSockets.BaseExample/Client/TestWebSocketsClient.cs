@@ -11,7 +11,7 @@ namespace NSL.Builder.WebSockets.BaseExample.Client
     {
         static CancellationTokenSource cts;
 
-        static WSNetworkClient<WebSocketsNetworkClient, WSClientOptions<WebSocketsNetworkClient>> client;
+        static WSNetworkClient<WebSocketsNetworkClient> client;
 
         public static async Task RunClient()
         {

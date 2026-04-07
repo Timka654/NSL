@@ -12,11 +12,11 @@ using NSL.SocketServer.Utils;
 namespace NSL.UDP.Channels
 {
     public delegate void OnSendDelegate<TClient, TParent>(BaseChannel<TClient, TParent> fromChannel, PacketWaitTemp packet)
-        where TClient : BaseNetworkConnection
+        where TClient : BaseNetworkConnection, new()
         where TParent : BaseUDPClient<TClient, TParent>;
 
     public abstract class BaseChannel<TClient, TParent>
-        where TClient : BaseNetworkConnection
+        where TClient : BaseNetworkConnection, new()
         where TParent : BaseUDPClient<TClient, TParent>
     {
         protected readonly BaseUDPClient<TClient, TParent> udpClient;

@@ -30,26 +30,30 @@ namespace NSL.Node.BridgeServer.LS
         public abstract void Run();
 
         protected TBuilder Fill<TBuilder>(TBuilder builder)
-            where TBuilder : IOptionableEndPointBuilder<NetworkClient>, IHandleIOBuilder<NetworkClient>
+            where TBuilder : IOptionableEndPointBuilder, IHandleIOBuilder<NetworkClient>
         {
             builder.SetLogger(Logger);
 
             builder.AddConnectHandle(client =>
             {
                 if (client != null)
-                    client.Entry = Entry;
+                    ((NetworkClient)client).Entry = Entry;
             });
 
-            builder.AddDisconnectHandle(Entry.LobbyManager.OnDisconnectedLobbyServer);
+            builder.AddDisconnectHandle(_client =>
+            {
+                var client = (NetworkClient)_client;
+                Entry.LobbyManager.OnDisconnectedLobbyServer(client);
+            });
 
-            builder.AddPacketHandle(NodeBridgeLobbyPacketEnum.SignServerRequest, SignSessionRequestReceiveHandle);
-            builder.AddAsyncPacketHandle(NodeBridgeLobbyPacketEnum.CreateRoomSessionRequest, CreateRoomSessionRequestReceiveHandle);
-            builder.AddPacketHandle(NodeBridgeLobbyPacketEnum.AddPlayerRequest, AddPlayerRequestReceiveHandle);
-            builder.AddPacketHandle(NodeBridgeLobbyPacketEnum.RemovePlayerRequest, RemovePlayerRequestReceiveHandle);
+            builder.AddPacketHandle(NodeBridgeLobbyPacketEnum.SignServerRequest, (c,p)=> SignSessionRequestReceiveHandle((NetworkClient)c,p));
+            builder.AddAsyncPacketHandle(NodeBridgeLobbyPacketEnum.CreateRoomSessionRequest, (c,p)=> CreateRoomSessionRequestReceiveHandle((NetworkClient)c,p));
+            builder.AddPacketHandle(NodeBridgeLobbyPacketEnum.AddPlayerRequest, (c,p)=> AddPlayerRequestReceiveHandle((NetworkClient)c,p));
+            builder.AddPacketHandle(NodeBridgeLobbyPacketEnum.RemovePlayerRequest, (c,p)=> RemovePlayerRequestReceiveHandle((NetworkClient)c,p));
 
             builder.AddResponsePacketHandle(
                 NodeBridgeLobbyPacketEnum.Response,
-                client => client.RequestBuffer);
+                client => ((NetworkClient)client).RequestBuffer);
 
             return builder;
         }

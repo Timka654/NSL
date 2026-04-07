@@ -7,7 +7,7 @@ namespace NSL.BuilderExtensions.LocalBridge
 {
     public static class Extensions
     {
-        public static LocalBridgeClient<TClient, TAnotherClient> CreateLocalBridge<TClient, TAnotherClient>(this IOptionableEndPointBuilder<TClient> builder, IPEndPoint connectionEndPoint = null, LocalBridgeClient<TAnotherClient, TClient> anotherClient = null)
+        public static LocalBridgeClient<TClient, TAnotherClient> CreateLocalBridge<TClient, TAnotherClient>(this IOptionableEndPointBuilder builder, IPEndPoint connectionEndPoint = null, LocalBridgeClient<TAnotherClient, TClient> anotherClient = null)
             where TClient : BaseNetworkConnection, new()
             where TAnotherClient : BaseNetworkConnection, new()
         {

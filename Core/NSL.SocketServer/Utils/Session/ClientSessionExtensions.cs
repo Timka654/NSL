@@ -8,21 +8,21 @@ namespace NSL.SocketServer.Utils.Session
     public static class ClientSessionExtensions
     {
         public static NSLSessionServerOptions GetSessionOptions<TClient>(this TClient client)
-            where TClient : BaseNetworkConnection
+            where TClient : BaseNetworkConnection, new()
         {
             var so = client.Options as ServerOptions<TClient>;
             return so.ObjectBag.Get<NSLSessionServerOptions>(NSLSessionServerOptions.ObjectBagKey, true);
         }
 
         public static NSLServerSessionInfo<TClient> GetSessionInfo<TClient>(this TClient client)
-            where TClient : BaseNetworkConnection
+            where TClient : BaseNetworkConnection, new()
         {
             var options = client.GetSessionOptions();
             return GetSessionInfo(client, options.ClientSessionBagKey);
         }
 
         public static NSLServerSessionInfo<TClient> GetSessionInfo<TClient>(this TClient client, string clientBagKey = NSLSessionServerOptions.DefaultSessionBagKey)
-            where TClient : BaseNetworkConnection
+            where TClient : BaseNetworkConnection, new()
         {
             client.ThrowIfObjectBagNull();
             return client.ObjectBag.Get<NSLServerSessionInfo<TClient>>(clientBagKey);

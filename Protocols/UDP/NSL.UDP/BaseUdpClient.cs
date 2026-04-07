@@ -17,7 +17,7 @@ using System.Threading.Tasks;
 namespace NSL.UDP
 {
     public abstract class BaseUDPClient<TClient, TParent> : IClient<DgramOutputPacketBuffer>, IUDPClient
-        where TClient : BaseNetworkConnection
+        where TClient : BaseNetworkConnection, new()
         where TParent : BaseUDPClient<TClient, TParent>
     {
         public abstract TClient Data { get; }
@@ -128,7 +128,7 @@ namespace NSL.UDP
 
         protected UDPClientOptions<TClient> options;
 
-        protected Dictionary<ushort, CoreOptions<TClient>.PacketHandle> PacketHandles;
+        protected Dictionary<ushort, CoreOptions.PacketHandle> PacketHandles;
 
         protected bool disconnected;
 

@@ -27,7 +27,7 @@ namespace NSL.Extensions.NAT.Proxy
 
         ClientOptions<NetworkProxyClient> options;
 
-        TCPNetworkClient<NetworkProxyClient, ClientOptions<NetworkProxyClient>> client;
+        TCPNetworkClient<NetworkProxyClient> client;
 
         public NetworkProxy()
         {
@@ -38,14 +38,14 @@ namespace NSL.Extensions.NAT.Proxy
 
             options.OnClientDisconnectEvent += _ => OnDisconnected?.Invoke();
 
-            client = new TCPNetworkClient<NetworkProxyClient, ClientOptions<NetworkProxyClient>>(options);
+            client = new TCPNetworkClient<NetworkProxyClient>(options);
         }
 
         public async Task<ProxySignInPacketResultData> TrySignIn(
             string serverIp, 
             int serverPort, 
             ProxySignInPacketData data, 
-            int connectionTimeout = TCPNetworkClient<NetworkProxyClient, ClientOptions<NetworkProxyClient>>.DefaultConnectionTimeout)
+            int connectionTimeout = TCPNetworkClient.DefaultConnectionTimeout)
         {
             if (!await client.ConnectAsync(serverIp, serverPort, connectionTimeout))
                 return new ProxySignInPacketResultData() { Result = ProxySignInResultEnum.CannotConnected };

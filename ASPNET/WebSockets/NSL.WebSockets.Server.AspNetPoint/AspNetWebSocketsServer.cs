@@ -1,4 +1,5 @@
 ﻿using NSL.SocketCore;
+using NSL.SocketCore.Utils;
 using NSL.SocketServer.Utils;
 using NSL.SocketServer;
 using System;
@@ -83,6 +84,6 @@ namespace NSL.WebSockets.Server.AspNetPoint
 
         public CoreOptions GetOptions() => serverOptions;
 
-        public ServerOptions<T> GetServerOptions() => serverOptions;
+        public CoreOptions GetServerOptions() => serverOptions;
     }
 }

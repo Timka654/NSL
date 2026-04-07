@@ -22,7 +22,7 @@ namespace NSL.SocketClient.Utils.SystemPackets
         }
     }
 
-    public class ClientSystemTimePacket<T> : IClientPacket<T> where T : BaseNetworkConnection
+    public class ClientSystemTimePacket<T> : IClientPacket<T> where T : BaseNetworkConnection, new()
     {
         public ClientSystemTimePacket(ClientOptions<T> options) : base(options)
         {
@@ -62,10 +62,10 @@ namespace NSL.SocketClient.Utils.SystemPackets
             => client.ObjectBag?.Get<TimeSpan>(NSLObjectBagKeys.ServerTimeOffset) ?? TimeSpan.Zero;
 
         public static DateTime GetServerDateTime(this BaseNetworkConnection client)
-            => client.ObjectBag?.Get<DateTime>(NSLObjectBagKeys.ServerDateTime);
+            => client.ObjectBag?.Get<DateTime>(NSLObjectBagKeys.ServerDateTime) ?? default;
 
         public static DateTime GetLocalDateTime(this BaseNetworkConnection client)
-            => client.ObjectBag?.Get<DateTime>(NSLObjectBagKeys.LocalDateTime);
+            => client.ObjectBag?.Get<DateTime>(NSLObjectBagKeys.LocalDateTime) ?? default;
 
         public static DateTime GetClientDateTime(this BaseNetworkConnection client, DateTime serverDateTime)
             => serverDateTime + client.GetServerDateTimeOffset();

@@ -13,7 +13,7 @@ using NSL.UDP.Enums;
 namespace NSL.UDP.Channels
 {
     public class ReliableChannel<TClient, TParent> : BaseChannel<TClient, TParent>
-        where TClient : BaseNetworkConnection
+        where TClient : BaseNetworkConnection, new()
         where TParent : BaseUDPClient<TClient, TParent>
     {
         public override UDPChannelEnum Channel => UDPChannelEnum.Reliable;

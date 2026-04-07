@@ -9,13 +9,13 @@ namespace NSL.SocketServer.Utils.Packet
     public static class PacketHelper
     {
         public static int LoadPackets<T>(this ServerOptions<T> serverOptions, Assembly assembly, Type selectAttributeType)
-            where T : BaseNetworkConnection
+            where T : BaseNetworkConnection, new()
             => NSL.SocketCore.Utils.Packet.PacketHelper.LoadPackets(
                 serverOptions, assembly, selectAttributeType,
                 type => Activator.CreateInstance(type) as IPacket<T>);
 
         public static int LoadPackets<T>(this ServerOptions<T> serverOptions, Type selectAttributeType)
-            where T : BaseNetworkConnection
+            where T : BaseNetworkConnection, new()
             => LoadPackets(serverOptions, Assembly.GetCallingAssembly(), selectAttributeType);
     }
 }

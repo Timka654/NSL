@@ -2,6 +2,7 @@
 using NSL.SocketClient;
 using NSL.SocketClient.Utils;
 using NSL.SocketCore;
+using NSL.SocketCore.Utils;
 using NSL.WebSockets.Client;
 using System;
 
@@ -43,15 +44,15 @@ namespace NSL.BuilderExtensions.WebSocketsClient
         }
     }
 
-    public class WebSocketsClientEndPointBuilder<TClient, TOptions> : IOptionableEndPointClientBuilder<TClient>, IHandleIOBuilder<TClient>
+    public class WebSocketsClientEndPointBuilder<TClient, TOptions> : IOptionableEndPointBuilder, IHandleIOBuilder<TClient>
         where TClient : BaseNetworkConnection, new()
         where TOptions : WSClientOptions<TClient>, new()
     {
         TOptions options = new TOptions();
 
-        public ClientOptions<TClient> GetOptions() => options;
+        public CoreOptions GetOptions() => options;
 
-        public CoreOptions<TClient> GetCoreOptions() => options;
+        public CoreOptions GetCoreOptions() => options;
 
         public TOptions GetWSClientOptions() => options;
 
@@ -74,17 +75,17 @@ namespace NSL.BuilderExtensions.WebSocketsClient
             return this;
         }
 
-        public void AddReceiveHandle(CoreOptions<TClient>.ReceivePacketHandle handle)
+        public void AddReceiveHandle(CoreOptions.ReceivePacketHandle handle)
         {
             options.OnReceivePacket += handle;
         }
 
-        public void AddSendHandle(CoreOptions<TClient>.SendPacketHandle handle)
+        public void AddSendHandle(CoreOptions.SendPacketHandle handle)
         {
             options.OnSendPacket += handle;
         }
 
-        public WSNetworkClient<TClient, TOptions> Build()
-            => new WSNetworkClient<TClient, TOptions>(options);
+        public WSNetworkClient<TClient> Build()
+            => new WSNetworkClient<TClient>(options);
     }
 }

@@ -1,9 +1,10 @@
 using NSL.BuilderExtensions.TCPClient;
 using NSL.Generators.BinaryTypeIOGenerator.Shared;
 using NSL.SocketClient;
-using NSL.SocketServer.Utils;
+using NSL.SocketCore.Utils;
 using NSL.SocketCore.Utils.Buffer;
 using NSL.SocketCore.Utils.Request;
+using NSL.SocketServer.Utils;
 
 namespace NSL.Generators.PacketHandleGenerator.Tests
 {
@@ -12,7 +13,7 @@ namespace NSL.Generators.PacketHandleGenerator.Tests
         static async Task Main(string[] args)
         {
             var l = NSL.BuilderExtensions.TCPServer.TCPServerEndPointBuilder.Create()
-                .WithClientProcessor<BaseServerNetworkClient>()
+                .WithClientProcessor<BaseNetworkConnection>()
                 .WithOptions()
                 .WithBindingPoint(9996)
                 .WithCode(b =>

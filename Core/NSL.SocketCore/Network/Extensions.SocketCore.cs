@@ -1,71 +1,59 @@
+using Microsoft.Extensions.DependencyInjection;
 using NSL.EndPointBuilder;
 using NSL.SocketCore;
+using NSL.SocketCore.Network;
 using NSL.SocketCore.Utils;
 using NSL.SocketCore.Utils.Buffer;
-using NSL.SocketCore.Utils.Request;
 using NSL.SocketCore.Utils.Exceptions;
 using NSL.SocketCore.Utils.Logger;
-
+using NSL.SocketCore.Utils.Logger.Enums;
 using NSL.SocketCore.Utils.Packet;
+using NSL.SocketCore.Utils.Request;
 using System;
 using System.Net.Sockets;
 using System.Reflection;
+using System.Threading.Tasks;
+using static NSL.SocketCore.CoreOptions;
 using static NSL.SocketCore.Utils.Request.RequestExtensions;
-using NSL.SocketCore.Utils.Logger.Enums;
-using Microsoft.Extensions.DependencyInjection;
-using NSL.SocketCore.Network;
 
 namespace NSL.SocketCore.Network
 {
     public static class Extensions
     {
-        public static void AddPacket<TClient>(this IOptionableEndPointBuilder<TClient> builder, ushort packetId, IPacket<TClient> packet)
-            where TClient : BaseNetworkConnection, new()
+        public static void AddPacket(this IOptionableEndPointBuilder builder, ushort packetId, IPacket packet)
         {
             builder.GetCoreOptions().AddPacket(packetId, packet);
         }
 
-        public static void AddPacket<TClient, TEnum>(this IOptionableEndPointBuilder<TClient> builder, TEnum packetId, IPacket<TClient> packet)
+        public static void AddPacket<TEnum>(this IOptionableEndPointBuilder builder, TEnum packetId, IPacket packet)
             where TEnum : struct, IConvertible
-            where TClient : BaseNetworkConnection, new()
         {
             builder.GetCoreOptions().AddPacket(packetId.ToUInt16(null), packet);
         }
 
-        [Obsolete("Renamed to AddResponsePacketHandle", true)]
-        public static void AddReceivePacketHandle<TClient>(this IOptionableEndPointBuilder<TClient> builder, ushort packetId, Func<TClient, IResponsibleProcessor> handler)
-            where TClient : BaseNetworkConnection, new()
-            => AddResponsePacketHandle(builder, packetId, handler);
-
-        public static void AddResponsePacketHandle<TClient>(this IOptionableEndPointBuilder<TClient> builder, ushort packetId, Func<TClient, IResponsibleProcessor> handler)
-            where TClient : BaseNetworkConnection, new()
+        public static void AddResponsePacketHandle(this IOptionableEndPointBuilder builder, ushort packetId, Func<BaseNetworkConnection, IResponsibleProcessor> handler)
         {
             builder.GetCoreOptions().AddResponsePacketHandle(packetId, handler);
         }
 
-        [Obsolete("Renamed to AddResponsePacketHandle", true)]
-        public static void AddReceivePacketHandle<TClient, TEnum>(this IOptionableEndPointBuilder<TClient> builder, TEnum packetId, Func<TClient, IResponsibleProcessor> handler)
+        public static void AddResponsePacketHandle<TEnum>(this IOptionableEndPointBuilder builder, TEnum packetId, Func<BaseNetworkConnection, IResponsibleProcessor> handler)
             where TEnum : struct, IConvertible
-            where TClient : BaseNetworkConnection, new()
-            => AddResponsePacketHandle(builder, packetId, handler);
-
-        public static void AddResponsePacketHandle<TClient, TEnum>(this IOptionableEndPointBuilder<TClient> builder, TEnum packetId, Func<TClient, IResponsibleProcessor> handler)
-            where TEnum : struct, IConvertible
-            where TClient : BaseNetworkConnection, new()
         {
             AddResponsePacketHandle(builder, packetId.ToUInt16(null), handler);
         }
 
-        public static void AddRequestPacketHandle<TClient, TEnum>(this IOptionableEndPointBuilder<TClient> builder, TEnum packetId, RequestPacketHandle<TClient> packet) where TClient : BaseNetworkConnection, new() where TEnum : struct, IConvertible
+        public static void AddRequestPacketHandle<BaseNetworkConnection, TEnum>(this IOptionableEndPointBuilder builder, TEnum packetId, RequestPacketHandle packet)
+            where TEnum : struct, IConvertible
             => builder.GetCoreOptions().AddRequestPacketHandle(packetId, packet);
 
-        public static void AddRequestPacketHandle<TClient, TEnum>(this IOptionableEndPointBuilder<TClient> builder, TEnum packetId, RequestPacketHandle2<TClient> packet, ushort responsePacketId = 1) where TClient : BaseNetworkConnection, new() where TEnum : struct, IConvertible
+        public static void AddRequestPacketHandle<TEnum>(this IOptionableEndPointBuilder builder, TEnum packetId, RequestPacketHandle2 packet, ushort responsePacketId = 1) 
+            where TEnum : struct, IConvertible
             => builder.GetCoreOptions().AddRequestPacketHandle(packetId, packet, responsePacketId);
 
-        public static void AddAsyncRequestPacketHandle<TClient, TEnum>(this IOptionableEndPointBuilder<TClient> builder, TEnum packetId, RequestPacketAsyncHandle<TClient> packet) where TClient : BaseNetworkConnection, new() where TEnum : struct, IConvertible
+        public static void AddAsyncRequestPacketHandle<TEnum>(this IOptionableEndPointBuilder builder, TEnum packetId, RequestPacketAsyncHandle packet) where TEnum : struct, IConvertible
             => builder.GetCoreOptions().AddAsyncRequestPacketHandle(packetId, packet);
 
-        public static void AddAsyncRequestPacketHandle<TClient, TEnum>(this IOptionableEndPointBuilder<TClient> builder, TEnum packetId, RequestPacketAsyncHandle2<TClient> packet, ushort responsePacketId = 1) where TClient : BaseNetworkConnection, new() where TEnum : struct, IConvertible
+        public static void AddAsyncRequestPacketHandle<TEnum>(this IOptionableEndPointBuilder builder, TEnum packetId, RequestPacketAsyncHandle2 packet, ushort responsePacketId = 1) where TEnum : struct, IConvertible
             => builder.GetCoreOptions().AddAsyncRequestPacketHandle(packetId, packet, responsePacketId);
 
         /// <summary>
@@ -74,11 +62,10 @@ namespace NSL.SocketCore.Network
         /// <typeparam name="TPacket">PacketAttribute impl</typeparam>
         /// <param name="assembly"></param>
         /// <returns></returns>
-        public static void LoadPackets<TClient, TPacket>(this IOptionableEndPointBuilder<TClient> builder, Assembly assembly)
+        public static void LoadPackets<TPacket>(this IOptionableEndPointBuilder builder, Assembly assembly)
             where TPacket : PacketAttribute
-            where TClient : BaseNetworkConnection, new()
         {
-            builder.GetCoreOptions().LoadPackets(assembly, typeof(TPacket), t => (IPacket<TClient>)Activator.CreateInstance(t));
+            builder.GetCoreOptions().LoadPackets(assembly, typeof(TPacket), t => (IPacket)Activator.CreateInstance(t));
         }
 
         /// <summary>
@@ -86,11 +73,10 @@ namespace NSL.SocketCore.Network
         /// </summary>
         /// <typeparam name="TPacket">PacketAttribute impl</typeparam>
         /// <returns></returns>
-        public static void LoadPackets<TClient, TPacket>(this IOptionableEndPointBuilder<TClient> builder)
+        public static void LoadPackets<TPacket>(this IOptionableEndPointBuilder builder)
             where TPacket : PacketAttribute
-            where TClient : BaseNetworkConnection, new()
         {
-            LoadPackets<TClient, TPacket>(builder, Assembly.GetCallingAssembly());
+            LoadPackets<TPacket>(builder, Assembly.GetCallingAssembly());
         }
 
         /// <summary>
@@ -99,14 +85,13 @@ namespace NSL.SocketCore.Network
         /// <typeparam name="TPacket">PacketAttribute impl</typeparam>
         /// <param name="assembly"></param>
         /// <returns></returns>
-        public static void LoadPackets<TClient>(this IOptionableEndPointBuilder<TClient> builder, Assembly assembly, Type packetAttributeSelectType)
-            where TClient : BaseNetworkConnection, new()
+        public static void LoadPackets(this IOptionableEndPointBuilder builder, Assembly assembly, Type packetAttributeSelectType)
         {
             if (packetAttributeSelectType.IsAssignableFrom(typeof(PacketAttribute)))
                 throw new ArgumentOutOfRangeException($"paameter {nameof(packetAttributeSelectType)} must be assgnable from {nameof(PacketAttribute)}");
 
 
-            builder.GetCoreOptions().LoadPackets(assembly, packetAttributeSelectType, t => (IPacket<TClient>)Activator.CreateInstance(t));
+            builder.GetCoreOptions().LoadPackets(assembly, packetAttributeSelectType, t => (IPacket)Activator.CreateInstance(t));
         }
 
         /// <summary>
@@ -114,86 +99,72 @@ namespace NSL.SocketCore.Network
         /// </summary>
         /// <typeparam name="TPacket">PacketAttribute impl</typeparam>
         /// <returns></returns>
-        public static void LoadPackets<TClient>(this IOptionableEndPointBuilder<TClient> builder, Type packetAttributeSelectType)
-            where TClient : BaseNetworkConnection, new()
+        public static void LoadPackets(this IOptionableEndPointBuilder builder, Type packetAttributeSelectType)
         {
             LoadPackets(builder, Assembly.GetCallingAssembly(), packetAttributeSelectType);
         }
 
-        public static void WithInputCipher<TClient>(this IOptionableEndPointBuilder<TClient> builder, IPacketCipher cipher)
-            where TClient : BaseNetworkConnection, new()
+        public static void WithInputCipher(this IOptionableEndPointBuilder builder, IPacketCipher cipher)
         {
             builder.GetCoreOptions().InputCipher = cipher;
         }
 
-        public static void WithOutputCipher<TClient>(this IOptionableEndPointBuilder<TClient> builder, IPacketCipher cipher)
-            where TClient : BaseNetworkConnection, new()
+        public static void WithOutputCipher(this IOptionableEndPointBuilder builder, IPacketCipher cipher)
         {
             builder.GetCoreOptions().OutputCipher = cipher;
         }
 
-        public static void WithAddressFamily<TClient>(this IOptionableEndPointBuilder<TClient> builder, AddressFamily family)
-            where TClient : BaseNetworkConnection, new()
+        public static void WithAddressFamily(this IOptionableEndPointBuilder builder, AddressFamily family)
         {
             builder.GetCoreOptions().AddressFamily = family;
         }
 
-        public static void WithProtocolType<TClient>(this IOptionableEndPointBuilder<TClient> builder, ProtocolType type)
-            where TClient : BaseNetworkConnection, new()
+        public static void WithProtocolType(this IOptionableEndPointBuilder builder, ProtocolType type)
         {
             builder.GetCoreOptions().ProtocolType = type;
         }
 
-        public static void WithBufferSize<TClient>(this IOptionableEndPointBuilder<TClient> builder, int size)
-            where TClient : BaseNetworkConnection, new()
+        public static void WithBufferSize(this IOptionableEndPointBuilder builder, int size)
         {
             builder.GetCoreOptions().ReceiveBufferSize = size;
         }
 
-        public static void AddConnectHandle<TClient>(this IOptionableEndPointBuilder<TClient> builder, CoreOptions<TClient>.ClientConnect handle)
-            where TClient : BaseNetworkConnection, new()
+        public static void AddConnectHandle(this IOptionableEndPointBuilder builder, CoreOptions.ClientConnect handle)
         {
             builder.GetCoreOptions().OnClientConnectEvent += handle;
         }
 
-        public static void AddDisconnectHandle<TClient>(this IOptionableEndPointBuilder<TClient> builder, CoreOptions<TClient>.ClientDisconnect handle)
-            where TClient : BaseNetworkConnection, new()
+        public static void AddDisconnectHandle(this IOptionableEndPointBuilder builder, CoreOptions.ClientDisconnect handle)
         {
             builder.GetCoreOptions().OnClientDisconnectEvent += handle;
         }
 
-        public static void AddExceptionHandle<TClient>(this IOptionableEndPointBuilder<TClient> builder, CoreOptions<TClient>.ExceptionHandle handle)
-            where TClient : BaseNetworkConnection, new()
+        public static void AddExceptionHandle(this IOptionableEndPointBuilder builder, CoreOptions.ExceptionHandle handle)
         {
             builder.GetCoreOptions().OnExceptionEvent += handle;
         }
 
-        public static void AddConnectAsyncHandle<TClient>(this IOptionableEndPointBuilder<TClient> builder, CoreOptions<TClient>.ClientConnectAsync handle)
-            where TClient : BaseNetworkConnection, new()
+        public static void AddConnectAsyncHandle(this IOptionableEndPointBuilder builder, CoreOptions.ClientConnectAsync handle)
         {
             builder.GetCoreOptions().OnClientConnectAsyncEvent += handle;
         }
 
-        public static void AddDisconnectAsyncHandle<TClient>(this IOptionableEndPointBuilder<TClient> builder, CoreOptions<TClient>.ClientDisconnectAsync handle)
-            where TClient : BaseNetworkConnection, new()
+        public static void AddDisconnectAsyncHandle(this IOptionableEndPointBuilder builder, CoreOptions.ClientDisconnectAsync handle)
         {
             builder.GetCoreOptions().OnClientDisconnectAsyncEvent += handle;
         }
 
-        public static void AddSendHandle<TClient>(this IOptionableEndPointBuilder<TClient> builder, CoreOptions<TClient>.SendPacketHandle handle)
-            where TClient : BaseNetworkConnection, new()
+        public static void AddSendHandle(this IOptionableEndPointBuilder builder, CoreOptions.SendPacketHandle handle)
         {
             builder.GetCoreOptions().OnSendPacket += handle;
         }
 
-        public static void AddReceiveHandle<TClient>(this IOptionableEndPointBuilder<TClient> builder, CoreOptions<TClient>.ReceivePacketHandle handle)
-            where TClient : BaseNetworkConnection, new()
+        public static void AddReceiveHandle(this IOptionableEndPointBuilder builder, ReceivePacketHandle handle)
         {
             builder.GetCoreOptions().OnReceivePacket += handle;
         }
 
-        public static void AddClientObjectBag<TClient>(this IOptionableEndPointBuilder<TClient> builder)
-            where TClient : BaseNetworkConnection, new()
+        public static void AddClientObjectBag(this IOptionableEndPointBuilder builder)
         {
             builder.GetCoreOptions().OnClientConnectEvent += c => c.InitializeObjectBag();
         }
@@ -202,8 +173,7 @@ namespace NSL.SocketCore.Network
         /// Устанавливает существующий <see cref="IServiceProvider"/> для данного endpoint-а.
         /// Используется когда сервисы уже созданы (например, разделяются с ASP.NET или другим протоколом).
         /// </summary>
-        public static void WithServices<TClient>(this IOptionableEndPointBuilder<TClient> builder, IServiceProvider serviceProvider)
-            where TClient : BaseNetworkConnection, new()
+        public static void WithServices(this IOptionableEndPointBuilder builder, IServiceProvider serviceProvider)
         {
             builder.GetCoreOptions().ServiceProvider = serviceProvider;
         }
@@ -212,8 +182,7 @@ namespace NSL.SocketCore.Network
         /// Регистрирует DI-сервисы и создаёт <see cref="IServiceProvider"/> для данного endpoint-а.
         /// Должен вызываться до <c>Build()</c>.
         /// </summary>
-        public static void WithServices<TClient>(this IOptionableEndPointBuilder<TClient> builder, Action<IServiceCollection> configure)
-            where TClient : BaseNetworkConnection, new()
+        public static void WithServices(this IOptionableEndPointBuilder builder, Action<IServiceCollection> configure)
         {
             var services = new ServiceCollection();
             configure(services);
@@ -224,8 +193,7 @@ namespace NSL.SocketCore.Network
         /// Регистрирует обработчик connect, который автоматически вызывает <see cref="BaseNetworkConnection.InitializeServiceScope"/>
         /// при подключении клиента. <c>WithServices</c> должен быть вызван ДО этого метода.
         /// </summary>
-        public static void AddScopedConnect<TClient>(this IOptionableEndPointBuilder<TClient> builder)
-            where TClient : BaseNetworkConnection, new()
+        public static void AddScopedConnect(this IOptionableEndPointBuilder builder)
         {
             var opts = builder.GetCoreOptions();
             builder.GetCoreOptions().OnClientConnectEvent += c =>
@@ -237,8 +205,7 @@ namespace NSL.SocketCore.Network
             };
         }
 
-        public static void SetLogger<TClient>(this IOptionableEndPointBuilder<TClient> builder, IBasicLogger logger)
-            where TClient : BaseNetworkConnection, new()
+        public static void SetLogger(this IOptionableEndPointBuilder builder, IBasicLogger logger)
         {
             builder.GetCoreOptions().HelperLogger = logger;
         }
@@ -246,16 +213,14 @@ namespace NSL.SocketCore.Network
         /// <summary>
         /// Create <see cref="RequestProcessor"/> with <paramref name="objectKey"/> in Client.ObjectBag and register handle for execute wait receive packet in buffer
         /// </summary>
-        public static void ConfigureRequestProcessor<TClient, TEnum>(this IOptionableEndPointBuilder<TClient> builder, TEnum responsePacketId, string objectKey = RequestProcessor.DefaultObjectBagKey)
-            where TClient : BaseNetworkConnection, new()
+        public static void ConfigureRequestProcessor<TEnum>(this IOptionableEndPointBuilder builder, TEnum responsePacketId, string objectKey = RequestProcessor.DefaultObjectBagKey)
             where TEnum : struct, IConvertible
-            => builder.GetCoreOptions().ConfigureRequestProcessor(responsePacketId, objectKey);
+            => builder.GetCoreOptions().ConfigureRequestProcessor<TEnum>(responsePacketId, objectKey);
 
         /// <summary>
         /// Create <see cref="RequestProcessor"/> with <paramref name="objectKey"/> in Client.ObjectBag and register handle for execute wait receive packet in buffer
         /// </summary>
-        public static void ConfigureRequestProcessor<TClient>(this IOptionableEndPointBuilder<TClient> builder, ushort responsePacketId = RequestProcessor.DefaultResponsePacketId, string objectKey = RequestProcessor.DefaultObjectBagKey)
-            where TClient : BaseNetworkConnection, new()
+        public static void ConfigureRequestProcessor(this IOptionableEndPointBuilder builder, ushort responsePacketId = RequestProcessor.DefaultResponsePacketId, string objectKey = RequestProcessor.DefaultObjectBagKey)
             => builder.GetCoreOptions().ConfigureRequestProcessor(responsePacketId, objectKey);
 
         #region DefaultHandles
@@ -264,12 +229,11 @@ namespace NSL.SocketCore.Network
 
         #endregion
 
-        public static void AddDefaultEventHandlers<TClient>(this IOptionableEndPointBuilder<TClient> builder,
+        public static void AddDefaultEventHandlers(this IOptionableEndPointBuilder builder,
             string prefix = default,
             DefaultEventHandlersEnum handleOptions = DefaultEventHandlersEnum.All,
             Func<ushort, string> getNameSendPacket = default,
             Func<ushort, string> getNameReceivePacket = default)
-            where TClient : BaseNetworkConnection, new()
         {
             var logger = builder
                .GetCoreOptions()
@@ -281,12 +245,11 @@ namespace NSL.SocketCore.Network
             builder.AddDefaultEventHandlers(logger, handleOptions, getNameSendPacket, getNameReceivePacket);
         }
 
-        public static void AddDefaultEventHandlers<TClient>(this IOptionableEndPointBuilder<TClient> builder,
+        public static void AddDefaultEventHandlers(this IOptionableEndPointBuilder builder,
             IBasicLogger logger,
             DefaultEventHandlersEnum handleOptions = DefaultEventHandlersEnum.All,
             Func<ushort, string> getNameSendPacket = default,
             Func<ushort, string> getNameReceivePacket = default)
-            where TClient : BaseNetworkConnection, new()
         {
             if (logger == default)
                 throw new InvalidOperationException($"{nameof(CoreOptions.HelperLogger)} must be installed before invoke this method");

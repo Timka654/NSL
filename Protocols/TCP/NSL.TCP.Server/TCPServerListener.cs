@@ -1,4 +1,5 @@
-﻿using NSL.SocketCore;
+using NSL.SocketCore;
+using NSL.SocketCore.Utils;
 using NSL.SocketServer;
 using NSL.SocketServer.Utils;
 using System;
@@ -7,51 +8,32 @@ using System.Net.Sockets;
 
 namespace NSL.TCP.Server
 {
-    public class TCPServerListener<T> : TCPServerListener<T, ServerOptions<T>>
+    /// <summary>Типизированная обёртка первого уровня — принимает ServerOptions&lt;T&gt; и передаёт в движок.</summary>
+    public class TCPServerListener<T> : TCPServerListener
         where T : BaseNetworkConnection, new()
     {
-        public TCPServerListener(ServerOptions<T> options, bool legacyThread = false) : base(options, legacyThread)
-        {
-            //BitConverter.ToInt16(new ReadOnlySpan<byte>(new byte[] { 0, 0 }), 0);   
-        }
+        public TCPServerListener(CoreOptions options, bool legacyThread = false) : base(options, legacyThread) { }
     }
-    public class TCPServerListener<T, TOptions> : INetworkListener<T>
-        where T : BaseNetworkConnection, new()
-        where TOptions : ServerOptions<T>
+
+    /// <summary>Не-дженериковый движок TCP-сервера. Работает с CoreOptions, создаёт соединения через ConnectionFactory.</summary>
+    public class TCPServerListener : INetworkListener
     {
-        public event ReceivePacketDebugInfo<TCPServerClient<T>> OnReceivePacket;
-        public event SendPacketDebugInfo<TCPServerClient<T>> OnSendPacket;
-        /// <summary>
-        /// Слушатель порта (сервер)
-        /// </summary>
+        public event ReceivePacketDebugInfo<TCPServerClient> OnReceivePacket;
+        public event SendPacketDebugInfo<TCPServerClient> OnSendPacket;
+
         private Socket listener;
-
         private bool state;
+        public bool State => state;
 
-        /// <summary>
-        /// Текущее состояния сервера (вкл/выкл)
-        /// </summary>
-        public bool State { get { return state; } }
-
-        /// <summary>
-        /// Настройки сервера
-        /// </summary>
-        private TOptions serverOptions;
+        private CoreOptions serverOptions;
         private readonly bool legacyThread;
 
-        /// <summary>
-        /// Инициализация сервера
-        /// </summary>
-        /// <param name="options">Настройки</param>
-        public TCPServerListener(TOptions options, bool legacyThread = false)
+        public TCPServerListener(CoreOptions options, bool legacyThread = false)
         {
             serverOptions = options;
             this.legacyThread = legacyThread;
         }
 
-        /// <summary>
-        /// Инициализация слушателя
-        /// </summary>
         private void Initialize()
         {
             if (!IPAddress.TryParse(serverOptions.IpAddress, out var ip))
@@ -63,86 +45,48 @@ namespace NSL.TCP.Server
             if (serverOptions.ProtocolType == ProtocolType.Unspecified)
                 serverOptions.ProtocolType = ProtocolType.Tcp;
 
-            //Иницализация сокета, установка семейства адрессов, поточного сокета, протокола приема данных
             listener = new Socket(serverOptions.AddressFamily, SocketType.Stream, serverOptions.ProtocolType);
-            //Инициализация прослушивания на определенном адресе адаптера, порте
             listener.Bind(new IPEndPoint(IPAddress.Parse(serverOptions.IpAddress), serverOptions.Port));
 
             serverOptions.Port = listener.LocalEndPoint is IPEndPoint ipep ? ipep.Port : serverOptions.Port;
 
-            // Запуск прослушивания
             listener.Listen(serverOptions.Backlog);
         }
 
-        /// <summary>
-        /// Запустить сервер
-        /// </summary>
         public void Run()
         {
-            // Нельзя запустить если сервер уже запущен
-            if (state)
-                throw new Exception();
-            //инициализация прослушивания
+            if (state) throw new Exception();
             Initialize();
-            //Запуск ожидания приема клиентов
             listener.BeginAccept(Accept, listener);
-            // установка статуса сервер = вкл
             state = true;
         }
 
-        /// <summary>
-        /// Остановить сервер (важно, все подключенные клиенты не будут отключены)
-        /// </summary>
         public void Stop()
         {
-            // установка статуса сервер = выкл
             state = false;
-            try
-            {
-                //Закрытие и уничножения слушателя
-                listener.Close();
-                listener.Dispose();
-            }
-            catch (Exception ex)
-            {
-                serverOptions.CallExceptionEvent(ex, null);
-            }
+            try { listener.Close(); listener.Dispose(); }
+            catch (Exception ex) { serverOptions.CallExceptionEvent(ex, null); }
             listener = null;
         }
 
-        /// <summary>
-        /// Синхронно принимаем входящие запросы на подключение
-        /// </summary>
-        /// <param name="result"></param>
         private void Accept(IAsyncResult result)
         {
-            //завершить цикл приема если сервер выключен
-            if (!state)
-                return;
+            if (!state) return;
 
-            //клиент
             Socket client = null;
-
             try
             {
-                //получения ожидающего подключения
                 client = listener.EndAccept(result);
-                //инициализация слушателя клиента клиента
-                //#if DEBUG
-                var c = new TCPServerClient<T>(client, serverOptions, legacyThread);
+                var c = new TCPServerClient(client, serverOptions, legacyThread);
                 c.OnReceivePacket += OnReceivePacket;
                 c.OnSendPacket += OnSendPacket;
                 c.RunPacketReceiver();
-                //#else
-                //                new ServerClient<T>(client, serverOptions).RunPacketReceiver();
-                //#endif
             }
             catch (Exception ex)
             {
                 serverOptions.CallExceptionEvent(ex, null);
             }
 
-            //продолжаем принимать запросы
             if (state)
             {
                 try { listener.BeginAccept(Accept, listener); }
@@ -155,7 +99,5 @@ namespace NSL.TCP.Server
         public void Start() => Run();
 
         public CoreOptions GetOptions() => serverOptions;
-
-        public ServerOptions<T> GetServerOptions() => serverOptions;
     }
 }

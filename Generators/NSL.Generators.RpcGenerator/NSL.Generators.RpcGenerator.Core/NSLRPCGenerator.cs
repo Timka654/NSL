@@ -194,7 +194,7 @@ namespace NSL.Generators.RpcGenerator.Core
         {
             var configureBuilder = new CodeBuilder();
 
-            configureBuilder.AppendLine($"public void NSLConfigureRpcHandles_{container.InterfaceType.Name}({nameof(CoreOptions)}<{container.NetworkDataType.GetTypeFullName()}> options)");
+            configureBuilder.AppendLine($"public void NSLConfigureRpcHandles_{container.InterfaceType.Name}({nameof(CoreOptions)} options)");
             configureBuilder.AppendBodyTabContent(() =>
             {
                 foreach (var method in container.Methods)
@@ -202,7 +202,7 @@ namespace NSL.Generators.RpcGenerator.Core
                     BuildServerHandler(sourceContext, classBuilder, container, method);
                     classBuilder.AppendLine();
 
-                    configureBuilder.AppendLine($"options.{nameof(CoreOptions<BaseNetworkConnection>.AddAsyncHandle)}({method.Pid}, NSLRpcHandle_{method.Name});");
+                    configureBuilder.AppendLine($"options.AddAsyncHandle({method.Pid}, NSLRpcHandle_{method.Name});");
                 }
             });
 

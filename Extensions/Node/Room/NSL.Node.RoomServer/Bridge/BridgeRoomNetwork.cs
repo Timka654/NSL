@@ -12,7 +12,7 @@ namespace NSL.Node.RoomServer.Bridge
     public class BridgeRoomNetwork : BridgeRoomBaseNetwork
     {
         private readonly Uri wsUrl;
-        private WSNetworkClient<BridgeRoomNetworkClient, WSClientOptions<BridgeRoomNetworkClient>> wsNetwork;
+        private WSNetworkClient<BridgeRoomNetworkClient> wsNetwork;
 
         public BridgeRoomNetwork(NodeRoomServerEntry entry, Uri wsUrl, Dictionary<string, string> identityData, string publicEndPoint, Guid serverId = default, string logPrefix = null) : base(entry, identityData, publicEndPoint, serverId, logPrefix)
         {

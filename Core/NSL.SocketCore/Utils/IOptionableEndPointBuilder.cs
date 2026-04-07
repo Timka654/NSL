@@ -3,9 +3,8 @@ using NSL.SocketCore;
 
 namespace NSL.EndPointBuilder
 {
-    public interface IOptionableEndPointBuilder<TClient>
-        where TClient : BaseNetworkConnection, new()
+    public interface IOptionableEndPointBuilder
     {
-        CoreOptions<TClient> GetCoreOptions();
+        CoreOptions GetCoreOptions();
     }
 }

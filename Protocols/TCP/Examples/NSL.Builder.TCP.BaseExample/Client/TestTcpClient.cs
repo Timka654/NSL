@@ -12,7 +12,7 @@ namespace NSL.Builder.TCP.BaseExample.Client
     {
         static CancellationTokenSource cts;
 
-        static TCPNetworkClient<TCPNetworkClient, ClientOptions<TCPNetworkClient>> client;
+        static TCPNetworkClient<TCPNetworkClient> client;
 
         public static async Task RunClient()
         {

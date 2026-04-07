@@ -1,4 +1,5 @@
 ﻿using NSL.SocketCore;
+using NSL.SocketCore.Utils;
 using NSL.UDP.Info;
 using NSL.UDP.Interface;
 using STUN;
@@ -7,8 +8,8 @@ using System.Net;
 
 namespace NSL.UDP
 {
-    public class UDPClientOptions<TClient> : CoreOptions<TClient>, IBindingUDPOptions, IUDPOptions
-        where TClient : BaseNetworkConnection
+    public class UDPClientOptions<TClient> : CoreOptions, IBindingUDPOptions, IUDPOptions
+        where TClient : BaseNetworkConnection, new()
     {
         public string BindingIP { get; set; }
 

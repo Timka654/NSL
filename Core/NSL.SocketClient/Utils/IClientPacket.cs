@@ -4,7 +4,7 @@ using NSL.SocketCore.Utils.Buffer;
 
 namespace NSL.SocketClient.Utils
 {
-    public class IClientPacket<TClient> : IPacket<TClient> where TClient : BaseNetworkConnection
+    public class IClientPacket<TClient> : IPacket<TClient> where TClient : BaseNetworkConnection, new()
     {
         public IClientPacket(ClientOptions<TClient> options)
         {
@@ -15,14 +15,10 @@ namespace NSL.SocketClient.Utils
 
         public bool SuccessSend { get; protected set; }
 
-        protected TClient Client => Options.ClientData;
+        protected TClient Client => (TClient)Options.ClientData;
 
         protected virtual void Receive(InputPacketBuffer data)
         {
-        }
-        public ClientOptions<TClient>.PacketHandle GetReceiveHandle()
-        {
-            return Receive;
         }
 
         protected void Send(OutputPacketBuffer packet)

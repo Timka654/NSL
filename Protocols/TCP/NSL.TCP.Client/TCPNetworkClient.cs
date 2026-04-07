@@ -1,4 +1,6 @@
-﻿using NSL.SocketClient;
+using NSL.SocketClient;
+using NSL.SocketCore;
+using NSL.SocketCore.Utils;
 using System;
 using System.Net;
 using System.Net.Sockets;
@@ -7,58 +9,45 @@ using System.Threading.Tasks;
 
 namespace NSL.TCP.Client
 {
-    public class TCPNetworkClient<T> : TCPNetworkClient<T, ClientOptions<T>>
+    /// <summary>Типизированная обёртка первого уровня. Хранит ClientOptions&lt;T&gt; и обеспечивает typed доступ.</summary>
+    public class TCPNetworkClient<T> : TCPNetworkClient
         where T : BaseNetworkConnection, new()
     {
-        public TCPNetworkClient(ClientOptions<T> options, bool legacyThread = false) : base(options, legacyThread)
-        {
-        }
+        public new T Data => (T)base.options.ClientData;
+
+        public TCPNetworkClient(CoreOptions options, bool legacyThread = false) : base(options, legacyThread) { }
     }
 
-    public class TCPNetworkClient<T, TOptions> : TCPClient<T>
-        where T : BaseNetworkConnection, new()
-        where TOptions : ClientOptions<T>
+    /// <summary>Не-дженериковый движок TCP-клиента с логикой подключения.</summary>
+    public class TCPNetworkClient : TCPClient
     {
-        Socket client;
-
         public const int DefaultConnectionTimeout = 8_000;
 
-        public TCPNetworkClient(TOptions options, bool legacyThread = false) : base(options, legacyThread)
+        public TCPNetworkClient(CoreOptions options, bool legacyThread = false) : base(options, legacyThread)
         {
         }
 
         public bool Connect(string ip, int port, int connectionTimeOut = DefaultConnectionTimeout)
         {
-            this.ConnectionOptions.IpAddress = ip;
-            this.ConnectionOptions.Port = port;
+            ConnectionOptions.IpAddress = ip;
+            ConnectionOptions.Port = port;
             return Connect(connectionTimeOut);
         }
 
         public bool Connect(int connectionTimeOut = DefaultConnectionTimeout)
         {
-            using (ManualResetEvent _lock = new ManualResetEvent(false))
+            using (var _lock = new ManualResetEvent(false))
             {
-                Task.Run(async () =>
-                {
-                    if (await ConnectAsync())
-                        _lock.Set();
-                });
-
-                if (!_lock.WaitOne(connectionTimeOut))
-                {
-                    Release();
-                    return false;
-                }
-
+                Task.Run(async () => { if (await ConnectAsync()) _lock.Set(); });
+                if (!_lock.WaitOne(connectionTimeOut)) { Release(); return false; }
                 return true;
             }
         }
 
         public async Task<bool> ConnectAsync(string ip, int port, int connectionTimeOut = DefaultConnectionTimeout)
         {
-            this.ConnectionOptions.IpAddress = ip;
-            this.ConnectionOptions.Port = port;
-
+            ConnectionOptions.IpAddress = ip;
+            ConnectionOptions.Port = port;
             return await ConnectAsync(connectionTimeOut);
         }
 
@@ -67,8 +56,6 @@ namespace NSL.TCP.Client
             if (base.disconnected == false)
                 throw new InvalidOperationException("Client must be disconnected before reconnecting");
 
-            //return await Task.Run(() =>
-            //{
             try
             {
                 if (!IPAddress.TryParse(ConnectionOptions.IpAddress, out var ip))
@@ -80,17 +67,14 @@ namespace NSL.TCP.Client
                 if (ConnectionOptions.ProtocolType == ProtocolType.Unspecified)
                     ConnectionOptions.ProtocolType = ProtocolType.Tcp;
 
-                client = new Socket(ConnectionOptions.AddressFamily, SocketType.Stream, ConnectionOptions.ProtocolType);
-
+                var client = new Socket(ConnectionOptions.AddressFamily, SocketType.Stream, ConnectionOptions.ProtocolType);
                 client.ReceiveBufferSize = ConnectionOptions.ReceiveBufferSize;
-
                 client.NoDelay = true;
 
                 var connectTask = client.ConnectAsync(ip, ConnectionOptions.Port);
 
                 if (await Task.WhenAny(connectTask, Task.Delay(connectionTimeOut)) != connectTask)
                 {
-                    // подавляем исключение из фоновой задачи после закрытия сокета в Release()
                     connectTask.ContinueWith(t => { _ = t.Exception; }, TaskContinuationOptions.OnlyOnFaulted);
                     throw new TaskCanceledException();
                 }
@@ -114,16 +98,14 @@ namespace NSL.TCP.Client
             }
 
             return false;
-            //});
         }
+
+        private Socket _connectingSocket;
 
         private void Release()
         {
-            if (client == null)
-                return;
-
-            client.Dispose();
-            client = null;
+            _connectingSocket?.Dispose();
+            _connectingSocket = null;
         }
     }
 }

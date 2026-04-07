@@ -9,11 +9,11 @@ using System.Threading.Tasks;
 
 namespace NSL.SocketClient.Utils.Version.Packets
 {
-    public class NSLVersionPacket<T> where T : BaseNetworkConnection
+    public class NSLVersionPacket
     {
         public const ushort PacketId = (ushort)NSLSystemPacketEnum.Version;
 
-        private static NSLVersionInfo GetClientVersionInfo(T client)
+        private static NSLVersionInfo GetClientVersionInfo(BaseNetworkConnection client)
         {
             client.ThrowIfObjectBagNull();
             return client.Network.Options.ObjectBag.Get<NSLVersionInfo>(NSLVersionInfo.ObjectBagKey, true);
@@ -30,13 +30,13 @@ namespace NSL.SocketClient.Utils.Version.Packets
             return packet;
         }
 
-        public static void SendRequest(T client, Action<NSLVersionResult> onResponse, CancellationToken cancellationToken, string RPObjectKey = NSLObjectBagKeys.RequestProcessor)
+        public static void SendRequest(BaseNetworkConnection client, Action<NSLVersionResult> onResponse, CancellationToken cancellationToken, string RPObjectKey = NSLObjectBagKeys.RequestProcessor)
         {
             client.ThrowIfObjectBagNull();
             SendRequest(client, GetClientVersionInfo(client), onResponse, cancellationToken, RPObjectKey);
         }
 
-        public static void SendRequest(T client, NSLVersionInfo versionInfo, Action<NSLVersionResult> onResponse, CancellationToken cancellationToken, string RPObjectKey = NSLObjectBagKeys.RequestProcessor)
+        public static void SendRequest(BaseNetworkConnection client, NSLVersionInfo versionInfo, Action<NSLVersionResult> onResponse, CancellationToken cancellationToken, string RPObjectKey = NSLObjectBagKeys.RequestProcessor)
         {
             client.ThrowIfObjectBagNull();
             SendRequest(client.GetRequestProcessor(RPObjectKey), versionInfo, onResponse, cancellationToken);
@@ -49,13 +49,13 @@ namespace NSL.SocketClient.Utils.Version.Packets
             processor.SendRequest(request, data => { onResponse(NSLVersionResult.ReadResponseFrom(data)); return true; }, cancellationToken);
         }
 
-        public static async Task<NSLVersionResult> SendRequestAsync(T client, string RPObjectKey = NSLObjectBagKeys.RequestProcessor)
+        public static async Task<NSLVersionResult> SendRequestAsync(BaseNetworkConnection client, string RPObjectKey = NSLObjectBagKeys.RequestProcessor)
         {
             client.ThrowIfObjectBagNull();
             return await SendRequestAsync(client, GetClientVersionInfo(client), RPObjectKey);
         }
 
-        public static async Task<NSLVersionResult> SendRequestAsync(T client, NSLVersionInfo versionInfo, string RPObjectKey = NSLObjectBagKeys.RequestProcessor)
+        public static async Task<NSLVersionResult> SendRequestAsync(BaseNetworkConnection client, NSLVersionInfo versionInfo, string RPObjectKey = NSLObjectBagKeys.RequestProcessor)
         {
             client.ThrowIfObjectBagNull();
             return await SendRequestAsync(client.GetRequestProcessor(RPObjectKey), versionInfo);

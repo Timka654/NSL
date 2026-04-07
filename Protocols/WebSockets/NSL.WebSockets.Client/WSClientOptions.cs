@@ -1,11 +1,12 @@
 ﻿using NSL.SocketClient;
+using NSL.SocketCore.Utils;
 using System;
 using System.Net.Sockets;
 
 namespace NSL.WebSockets.Client
 {
     public class WSClientOptions<TClient> : ClientOptions<TClient>
-        where TClient : BaseNetworkConnection
+        where TClient : BaseNetworkConnection, new()
     {
         public override AddressFamily AddressFamily
         {

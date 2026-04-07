@@ -1,4 +1,5 @@
 ﻿using NSL.SocketClient;
+using NSL.SocketCore;
 using NSL.SocketCore.Utils;
 using System;
 using System.Linq;
@@ -8,27 +9,18 @@ using System.Net.WebSockets;
 
 namespace NSL.WebSockets.Client
 {
-    public class WSClient<T> : BaseWSClient<T, WSClient<T>>
-        where T : BaseNetworkConnection, new()
+    public class WSClient : BaseWSClient
     {
-        public override T Data => ConnectionOptions.ClientData;
+        public override BaseNetworkConnection Data => options.ClientData;
 
         public long Version { get; set; }
 
-       public WSClientOptions<T> ConnectionOptions => (WSClientOptions<T>)base.options;
+        public CoreOptions ConnectionOptions => base.options;
 
-        /// <summary>
-        /// Инициализация прослушивания клиента
-        /// </summary>
-        /// <param name="options">общие настройки сервера</param>
-        public WSClient(ClientOptions<T> options) : base(options)
+        public WSClient(CoreOptions options) : base(options)
         {
         }
 
-        /// <summary>
-        /// Запуск цикла приема пакетов
-        /// </summary>
-        /// <param name="client">клиент</param>
         public void Reconnect(WebSocket client, Uri endPoint)
         {
             if (!IPAddress.TryParse(endPoint.Host, out var ip))
@@ -47,17 +39,13 @@ namespace NSL.WebSockets.Client
 
             disconnected = false;
 
-            ConnectionOptions.InitializeClient(new T());
+            ConnectionOptions.InitializeClient(ConnectionOptions.ConnectionFactory());
             ConnectionOptions.ClientData.Network = this;
 
-            //установка переменной содержащую поток клиента
             this.sclient = client;
 
-            //установка массива для приема данных, размер указан в общих настройках сервера
             this.receiveBuffer = new byte[ConnectionOptions.ReceiveBufferSize];
-            //установка криптографии для дешифровки входящих данных, указана в общих настройках сервера
             this.inputCipher = ConnectionOptions.InputCipher.CreateEntry();
-            //установка криптографии для шифровки исходящих данных, указана в общих настройках сервера
             this.outputCipher = ConnectionOptions.OutputCipher.CreateEntry();
 
             RunReceive();
@@ -65,9 +53,9 @@ namespace NSL.WebSockets.Client
             ConnectionOptions.RunClientConnect();
         }
 
-        public override void ChangeUserData(BaseNetworkConnection newClientData) => SetClientData((T)newClientData);
+        public override void ChangeUserData(BaseNetworkConnection newClientData) => SetClientData(newClientData);
 
-        public override void SetClientData(BaseNetworkConnection from) => ConnectionOptions.InitializeClient((T)from);
+        public override void SetClientData(BaseNetworkConnection from) => ConnectionOptions.InitializeClient(from);
 
         protected override void RunDisconnect() => ConnectionOptions.RunClientDisconnect();
 
@@ -79,11 +67,7 @@ namespace NSL.WebSockets.Client
             base.OnReceive(pid, len);
         }
 
-        protected override WSClient<T> GetParent() => this;
-
-        public override IPEndPoint GetRemotePoint()
-        {
-            return remoteEndPoint;
-        }
+        public override IPEndPoint GetRemotePoint() => remoteEndPoint;
     }
 }
+

@@ -1,4 +1,5 @@
 ﻿using NSL.SocketClient;
+using NSL.SocketCore.Utils;
 using System;
 using System.Threading.Tasks;
 using System.Threading;
@@ -6,24 +7,25 @@ using System.Net.WebSockets;
 
 namespace NSL.WebSockets.Client
 {
-    public class WSNetworkClient<T, TOptions> : WSClient<T>
+    public class WSNetworkClient<T> : WSClient
         where T : BaseNetworkConnection, new()
-        where TOptions : WSClientOptions<T>
     {
         protected WebSocket client;
 
         public const int DefaultConnectionTimeout = 8_000;
 
-        public WSClientOptions<T> Options => base.options as WSClientOptions<T>;
+        public new T Data => (T)base.options.ClientData;
 
-        public WSNetworkClient(TOptions options) : base(options)
+        public WSClientOptions<T> Options => (WSClientOptions<T>)base.options;
+
+        public WSNetworkClient(WSClientOptions<T> options) : base(options)
         {
         }
 
         public bool Connect(string ip, int port, int connectionTimeOut = DefaultConnectionTimeout)
         {
-            this.ConnectionOptions.IpAddress = ip;
-            this.ConnectionOptions.Port = port;
+            Options.IpAddress = ip;
+            Options.Port = port;
             return Connect(connectionTimeOut);
         }
 
@@ -49,8 +51,8 @@ namespace NSL.WebSockets.Client
 
         public async Task<bool> ConnectAsync(string ip, int port, int connectionTimeOut = DefaultConnectionTimeout)
         {
-            this.ConnectionOptions.IpAddress = ip;
-            this.ConnectionOptions.Port = port;
+            Options.IpAddress = ip;
+            Options.Port = port;
 
             return await ConnectAsync(connectionTimeOut);
         }
@@ -67,8 +69,8 @@ namespace NSL.WebSockets.Client
             catch (Exception ex)
             {
                 Release();
-                ConnectionOptions.RunException(ex);
-                ConnectionOptions.RunClientDisconnect();
+                Options.RunException(ex);
+                Options.RunClientDisconnect();
             }
 
             return false;
@@ -84,12 +86,12 @@ namespace NSL.WebSockets.Client
 
                 cts.CancelAfter(connectionTimeOut);
 
-                await ConnectAsync(ConnectionOptions.EndPoint, cts.Token);
+                await ConnectAsync(Options.EndPoint, cts.Token);
             }
             catch (TaskCanceledException)
             {
                 Release();
-                ConnectionOptions.RunClientDisconnect();
+                Options.RunClientDisconnect();
                 return false;
             }
 
@@ -116,10 +118,9 @@ namespace NSL.WebSockets.Client
 
             Release();
 
-            ConnectionOptions.RunClientDisconnect();
+            Options.RunClientDisconnect();
 
             return false;
-
         }
 
         private void Release()
@@ -132,3 +133,5 @@ namespace NSL.WebSockets.Client
         }
     }
 }
+
+

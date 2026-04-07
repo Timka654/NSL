@@ -1,4 +1,5 @@
-﻿using NSL.SocketServer.Utils;
+﻿using NSL.SocketCore.Utils;
+using NSL.SocketServer.Utils;
 
 namespace NSL.Builder.UDP.BaseExample.Server
 {

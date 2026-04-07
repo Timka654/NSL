@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
+using NSL.SocketCore;
+using NSL.SocketCore.Utils;
 using NSL.SocketServer;
 using System;
 using System.Net;
@@ -6,10 +8,12 @@ using System.Threading.Tasks;
 
 namespace NSL.WebSockets.Server.AspNetPoint
 {
-    public class AspNetWSServerClient<T> : WSServerClient<T>
+    public class AspNetWSServerClient<T> : WSServerClient
         where T : AspNetWSNetworkServerClient, new()
     {
         private new readonly HttpContext context;
+
+        public new T Data => (T)base.Data;
 
         public AspNetWSServerClient(HttpContext context, ServerOptions<T> options) : base(options)
         {
@@ -27,7 +31,7 @@ namespace NSL.WebSockets.Server.AspNetPoint
                 sclient = await context.WebSockets.AcceptWebSocketAsync();
 
                 //Начало приема пакетов от клиента
-                options.CallClientConnectEvent(Data);
+                ServerOptions.CallClientConnectEvent(Data);
 
                 await base.ReceiveLoop();
 

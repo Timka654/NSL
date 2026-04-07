@@ -1,4 +1,5 @@
 ﻿using NSL.SocketCore;
+using NSL.SocketCore.Utils;
 
 namespace NSL.SocketServer.Utils
 {
@@ -16,6 +17,6 @@ namespace NSL.SocketServer.Utils
     public interface INetworkListener<TClient> : INetworkListener
         where TClient : BaseNetworkConnection
     {
-        ServerOptions<TClient> GetServerOptions();
+        CoreOptions GetServerOptions();
     }
 }

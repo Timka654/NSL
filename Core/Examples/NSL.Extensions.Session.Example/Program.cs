@@ -16,6 +16,7 @@ using NSL.SocketCore.Utils.Request;
 using NSL.SocketClient.Utils.Session.Packets;
 using NSL.SocketCore;
 using NSL.SocketCore.Network;
+using NSL.SocketCore.Utils;
 
 namespace NSL.Extensions.Session.Example
 {
@@ -25,10 +26,10 @@ namespace NSL.Extensions.Session.Example
 
         static void ServerInit(IBasicLogger conLog)
         {
-            NSLSessionManager<BaseServerNetworkClient> serverSessionManager;
+            NSLSessionManager<BaseNetworkConnection> serverSessionManager;
 
             var server = TCPServerEndPointBuilder.Create()
-                .WithClientProcessor<BaseServerNetworkClient>()
+                .WithClientProcessor<BaseNetworkConnection>()
                 .WithOptions()
                 .WithBindingPoint(1555)
                 .WithCode(b =>
@@ -106,7 +107,7 @@ namespace NSL.Extensions.Session.Example
 
         }
 
-        static TCPNetworkClient<ClientNetworkConnection, ClientOptions<ClientNetworkConnection>> client;
+        static TCPNetworkClient<ClientNetworkConnection> client;
 
         static void ClientInit(IBasicLogger conLog)
         {

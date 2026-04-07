@@ -1,4 +1,5 @@
 ﻿using NSL.SocketClient;
+using NSL.SocketCore.Utils;
 
 namespace NSL.TCP.BaseClientExample
 {

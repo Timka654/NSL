@@ -10,7 +10,7 @@ namespace NSL.SocketServer.Utils.Session
     public static class ServerSessionExtensions
     {
         public static NSLSessionManager<TClient> AddNSLSessions<TClient>(this ServerOptions<TClient> options, Action<NSLSessionServerOptions<TClient>> configure = null)
-            where TClient : BaseNetworkConnection
+            where TClient : BaseNetworkConnection, new()
         {
             var sOptions = new NSLSessionServerOptions<TClient>();
             configure?.Invoke(sOptions);
@@ -25,7 +25,7 @@ namespace NSL.SocketServer.Utils.Session
         }
 
         public static NSLSessionManager<TClient> AddNSLSessions<TClient>(this ServerOptions<TClient> options, IServiceCollection services, Action<NSLSessionServerOptions<TClient>> configure = null)
-            where TClient : BaseNetworkConnection
+            where TClient : BaseNetworkConnection, new()
         {
             var manager = options.AddNSLSessions(configure);
             services.AddSingleton(manager);

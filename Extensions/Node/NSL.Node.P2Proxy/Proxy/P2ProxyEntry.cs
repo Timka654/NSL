@@ -54,17 +54,16 @@ namespace NSL.Node.P2Proxy.Proxy
         }
 
         private TBuilder Fill<TBuilder>(TBuilder builder)
-            where TBuilder : IOptionableEndPointBuilder<P2PNetworkClient>, IHandleIOBuilder<P2PNetworkClient>
+            where TBuilder : IOptionableEndPointBuilder, IHandleIOBuilder<P2PNetworkClient>
         {
             builder.SetLogger(Logger);
 
             builder.AddPacketHandle(
-                RoomPacketEnum.SignSessionRequest, SignInPacketHandle);
+                RoomPacketEnum.SignSessionRequest, (c,p) => SignInPacketHandle((P2PNetworkClient)c, p));
             builder.AddPacketHandle(
-                RoomPacketEnum.TransportMessage, TransportPacketHandle);
+                RoomPacketEnum.TransportMessage, (c,p) => TransportPacketHandle((P2PNetworkClient)c, p));
             builder.AddPacketHandle(
-                RoomPacketEnum.BroadcastMessage, BroadcastPacketHandle);
-
+                RoomPacketEnum.BroadcastMessage, (c,p) => BroadcastPacketHandle((P2PNetworkClient)c, p));
             return builder;
         }
 
