@@ -65,6 +65,7 @@ namespace NSL.Generators.RpcGenerator.Core
                 "NSL.SocketCore.Utils.Request",
                 "NSL.Generators.RpcGenerator.Shared",
                 "System",
+                "System.Linq",
                 "System.Threading",
                 "System.Threading.Tasks"
             };
