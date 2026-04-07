@@ -11,7 +11,7 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\Core\NSL.SocketClient\NSL.SocketClient.csproj" />
-    <ProjectReference Include="..\..\BuilderExtensions\NSL.BuilderExtensions.WebSocketsClient\NSL.BuilderExtensions.WebSocketsClient.csproj" />
-    <ProjectReference Include="..\..\BuilderExtensions\NSL.BuilderExtensions.WebSocketsServer\NSL.BuilderExtensions.WebSocketsServer.csproj" />
+    <ProjectReference Include="..\..\NSL.WebSockets.Client\NSL.WebSockets.Client.csproj" />
+    <ProjectReference Include="..\..\NSL.WebSockets.Server\NSL.WebSockets.Server.csproj" />
   </ItemGroup>
 </Project>

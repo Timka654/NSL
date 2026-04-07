@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <NSLProjectTypes>Test</NSLProjectTypes>
     <TargetFramework>net10.0</TargetFramework>
@@ -11,8 +11,8 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\Core\NSL.SocketCore\NSL.SocketCore.csproj" />
-    <ProjectReference Include="..\..\..\..\Protocols\TCP\BuilderExtensions\NSL.BuilderExtensions.TCPClient\NSL.BuilderExtensions.TCPClient.csproj" />
-    <ProjectReference Include="..\..\..\..\Protocols\TCP\BuilderExtensions\NSL.BuilderExtensions.TCPServer\NSL.BuilderExtensions.TCPServer.csproj" />
+    <ProjectReference Include="..\..\..\..\Protocols\TCP\NSL.TCP.Client\NSL.TCP.Client.csproj" />
+    <ProjectReference Include="..\..\..\..\Protocols\TCP\NSL.TCP.Server\NSL.TCP.Server.csproj" />
     <ProjectReference Include="..\..\..\NSL.Generators.BinaryTypeIOGenerator\NSL.Generators.BinaryTypeIOGenerator.Shared\NSL.Generators.BinaryTypeIOGenerator.Shared.csproj" />
     <ProjectReference Include="..\..\NSL.Generators.PacketHandleGenerator.Shared\NSL.Generators.PacketHandleGenerator.Shared.csproj" />
     <ProjectReference Include="..\..\NSL.Generators.PacketHandleGenerator.Core\NSL.Generators.PacketHandleGenerator.Core.csproj" ReferenceOutputAssembly="false" PrivateAssets="all" OutputItemType="Analyzer" />

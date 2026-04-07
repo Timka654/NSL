@@ -11,6 +11,7 @@ using NSL.SocketServer.Utils;
 using NSL.SocketCore.Utils.Request;
 using NSL.SocketClient.Utils.Version.Packets;
 using Newtonsoft.Json;
+using NSL.SocketCore.Network;
 
 namespace NSL.Extensions.Version.Example
 {

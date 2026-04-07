@@ -1,5 +1,6 @@
 ﻿using NSL.BuilderExtensions.SocketCore;
 using NSL.BuilderExtensions.WebSocketsServer;
+using NSL.SocketCore.Network;
 using NSL.WebSockets.Server;
 
 namespace NSL.Builder.WebSockets.BaseExample.Server

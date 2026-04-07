@@ -1,6 +1,7 @@
 ﻿using NSL.Builder.WebSockets.BaseExample.Client;
 using NSL.BuilderExtensions.SocketCore;
 using NSL.BuilderExtensions.WebSocketsClient;
+using NSL.SocketCore.Network;
 using NSL.SocketCore.Utils.Buffer;
 using NSL.WebSockets.Client;
 

@@ -15,6 +15,7 @@ using NSL.SocketCore.Network.Session;
 using NSL.SocketCore.Utils.Request;
 using NSL.SocketClient.Utils.Session.Packets;
 using NSL.SocketCore;
+using NSL.SocketCore.Network;
 
 namespace NSL.Extensions.Session.Example
 {

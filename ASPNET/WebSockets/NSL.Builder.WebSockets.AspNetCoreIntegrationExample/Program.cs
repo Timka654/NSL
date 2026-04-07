@@ -4,6 +4,7 @@ using NSL.Builder.WebSockets.AspNetCoreIntegrationExample.NetworkClient;
 using NSL.BuilderExtensions.SocketCore;
 using NSL.BuilderExtensions.WebSocketsClient;
 using NSL.BuilderExtensions.WebSocketsServer.AspNet;
+using NSL.SocketCore.Network;
 using NSL.SocketCore.Utils.Buffer;
 using NSL.WebSockets.Client;
 using System;

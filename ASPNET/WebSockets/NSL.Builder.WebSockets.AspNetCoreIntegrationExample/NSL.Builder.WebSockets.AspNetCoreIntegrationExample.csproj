@@ -28,12 +28,12 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\..\Protocols\WebSockets\BuilderExtensions\NSL.BuilderExtensions.WebSocketsClient\NSL.BuilderExtensions.WebSocketsClient.csproj" />
-		<ProjectReference Include="..\NSL.BuilderExtensions.WebSocketsServer.AspNet\NSL.BuilderExtensions.WebSocketsServer.AspNet.csproj" />
+		<Content Remove="Properties\launchSettings.json" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<Content Remove="Properties\launchSettings.json" />
+	  <ProjectReference Include="..\..\..\Protocols\WebSockets\NSL.WebSockets.Client\NSL.WebSockets.Client.csproj" />
+	  <ProjectReference Include="..\NSL.WebSockets.Server.AspNetPoint\NSL.WebSockets.Server.AspNetPoint.csproj" />
 	</ItemGroup>
 
 </Project>

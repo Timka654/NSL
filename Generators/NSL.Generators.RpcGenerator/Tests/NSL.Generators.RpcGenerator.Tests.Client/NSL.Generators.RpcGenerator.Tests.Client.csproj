@@ -14,19 +14,16 @@
 		<ProjectReference Include="..\..\..\..\Core\NSL.SocketCore\NSL.SocketCore.csproj" />
 		<ProjectReference Include="..\..\..\..\Core\NSL.SocketClient\NSL.SocketClient.csproj" />
 		<ProjectReference Include="..\..\..\..\Core\NSL.SocketServer\NSL.SocketServer.csproj" />
-		<ProjectReference Include="..\..\..\..\Protocols\TCP\BuilderExtensions\NSL.BuilderExtensions.TCPClient\NSL.BuilderExtensions.TCPClient.csproj" />
-		<ProjectReference Include="..\..\..\..\Protocols\TCP\BuilderExtensions\NSL.BuilderExtensions.TCPServer\NSL.BuilderExtensions.TCPServer.csproj" />
+		<ProjectReference Include="..\..\..\..\Protocols\TCP\NSL.TCP.Client\NSL.TCP.Client.csproj" />
 		<!-- Server-side implementation for integration test -->
 		<ProjectReference Include="..\NSL.Generators.RpcGenerator.Tests.Server\NSL.Generators.RpcGenerator.Tests.Server.csproj" />
 		<ProjectReference Include="..\..\NSL.Generators.RpcGenerator.Shared\NSL.Generators.RpcGenerator.Shared.csproj" />
 		<ProjectReference Include="..\NSL.Generators.RpcGenerator.Tests.Shared\NSL.Generators.RpcGenerator.Tests.Shared.csproj" />
 		<!-- BinaryTypeIOGenerator для генерации read/write методов моделей -->
 		<ProjectReference Include="..\..\..\NSL.Generators.BinaryTypeIOGenerator\NSL.Generators.BinaryTypeIOGenerator.Shared\NSL.Generators.BinaryTypeIOGenerator.Shared.csproj" />
-		<ProjectReference Include="..\..\..\NSL.Generators.BinaryTypeIOGenerator\NSL.Generators.BinaryTypeIOGenerator.Core\NSL.Generators.BinaryTypeIOGenerator.Core.csproj"
-		                  ReferenceOutputAssembly="false" PrivateAssets="all" OutputItemType="Analyzer" />
+		<ProjectReference Include="..\..\..\NSL.Generators.BinaryTypeIOGenerator\NSL.Generators.BinaryTypeIOGenerator.Core\NSL.Generators.BinaryTypeIOGenerator.Core.csproj" ReferenceOutputAssembly="false" PrivateAssets="all" OutputItemType="Analyzer" />
 		<!-- RPC Generator itself as analyzer -->
-		<ProjectReference Include="..\..\NSL.Generators.RpcGenerator.Core\NSL.Generators.RpcGenerator.Core.csproj"
-		                  ReferenceOutputAssembly="false" PrivateAssets="all" OutputItemType="Analyzer" />
+		<ProjectReference Include="..\..\NSL.Generators.RpcGenerator.Core\NSL.Generators.RpcGenerator.Core.csproj" ReferenceOutputAssembly="false" PrivateAssets="all" OutputItemType="Analyzer" />
 	</ItemGroup>
 
 </Project>

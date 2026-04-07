@@ -23,7 +23,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\..\..\Protocols\TCP\BuilderExtensions\NSL.BuilderExtensions.TCPServer\NSL.BuilderExtensions.TCPServer.csproj" />
+		<ProjectReference Include="..\..\..\..\Protocols\TCP\NSL.TCP.Server\NSL.TCP.Server.csproj" />
 		<ProjectReference Include="..\NSL.Node.RoomServer\NSL.Node.RoomServer.csproj" />
 	</ItemGroup>
 

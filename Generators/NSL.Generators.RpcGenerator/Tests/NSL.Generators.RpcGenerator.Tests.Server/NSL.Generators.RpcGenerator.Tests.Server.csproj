@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<NSLProjectTypes>Test</NSLProjectTypes>
@@ -26,7 +26,7 @@
 	<ItemGroup>
 		<ProjectReference Include="..\..\..\..\Core\NSL.SocketCore\NSL.SocketCore.csproj" />
 		<ProjectReference Include="..\..\..\..\Core\NSL.SocketServer\NSL.SocketServer.csproj" />
-		<ProjectReference Include="..\..\..\..\Protocols\TCP\BuilderExtensions\NSL.BuilderExtensions.TCPServer\NSL.BuilderExtensions.TCPServer.csproj" />
+		<ProjectReference Include="..\..\..\..\Protocols\TCP\NSL.TCP.Server\NSL.TCP.Server.csproj" />
 		<ProjectReference Include="..\..\NSL.Generators.RpcGenerator.Shared\NSL.Generators.RpcGenerator.Shared.csproj" />
 		<ProjectReference Include="..\NSL.Generators.RpcGenerator.Tests.Shared\NSL.Generators.RpcGenerator.Tests.Shared.csproj" />
 		<ProjectReference Include="..\..\..\NSL.Generators.BinaryTypeIOGenerator\NSL.Generators.BinaryTypeIOGenerator.Shared\NSL.Generators.BinaryTypeIOGenerator.Shared.csproj" />

@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using NSL.BuilderExtensions.SocketCore;
 using NSL.BuilderExtensions.TCPServer;
+using NSL.SocketCore.Network;
 
 namespace NSL.Builder.TCP.BaseExample.Server
 {

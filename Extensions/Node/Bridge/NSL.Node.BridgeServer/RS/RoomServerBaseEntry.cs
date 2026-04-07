@@ -7,6 +7,7 @@ using NSL.SocketServer.Utils;
 using NSL.EndPointBuilder;
 using NSL.SocketCore.Utils.Logger;
 using NSL.SocketCore;
+using NSL.SocketCore.Network;
 
 namespace NSL.Node.BridgeServer.RS
 {

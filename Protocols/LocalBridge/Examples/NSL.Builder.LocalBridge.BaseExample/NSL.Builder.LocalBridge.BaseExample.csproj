@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <NSLProjectTypes>Example</NSLProjectTypes>
     <OutputType>Exe</OutputType>
@@ -8,9 +8,6 @@
     <Configurations>DebugExamples</Configurations>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\TCP\BuilderExtensions\NSL.BuilderExtensions.TCPClient\NSL.BuilderExtensions.TCPClient.csproj" />
-    <ProjectReference Include="..\..\..\TCP\BuilderExtensions\NSL.BuilderExtensions.TCPServer\NSL.BuilderExtensions.TCPServer.csproj" />
-    <ProjectReference Include="..\..\BuilderExtensions\NSL.BuilderExtensions.LocalBridge\NSL.BuilderExtensions.LocalBridge.csproj" />
     <ProjectReference Include="..\NSL.LocalBridge.Example.Shared\NSL.LocalBridge.Example.Shared.csproj" />
   </ItemGroup>
 </Project>

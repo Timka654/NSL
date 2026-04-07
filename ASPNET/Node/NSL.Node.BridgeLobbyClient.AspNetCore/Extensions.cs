@@ -6,6 +6,7 @@ using NSL.BuilderExtensions.WebSocketsClient;
 using NSL.LocalBridge;
 using NSL.Logger.AspNet;
 using NSL.Node.BridgeLobbyClient.Models;
+using NSL.SocketCore.Network;
 using NSL.SocketCore.Utils;
 using NSL.WebSockets.Client;
 using System;

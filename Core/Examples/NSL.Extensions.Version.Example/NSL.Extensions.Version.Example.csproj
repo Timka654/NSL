@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <NSLProjectTypes>Example</NSLProjectTypes>
     <OutputType>Exe</OutputType>
@@ -14,7 +14,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\Base\NSL.Logger\NSL.Logger.csproj" />
-    <ProjectReference Include="..\..\..\Protocols\TCP\BuilderExtensions\NSL.BuilderExtensions.TCPClient\NSL.BuilderExtensions.TCPClient.csproj" />
-    <ProjectReference Include="..\..\..\Protocols\TCP\BuilderExtensions\NSL.BuilderExtensions.TCPServer\NSL.BuilderExtensions.TCPServer.csproj" />
+    <ProjectReference Include="..\..\..\Protocols\TCP\NSL.TCP.Client\NSL.TCP.Client.csproj" />
+    <ProjectReference Include="..\..\..\Protocols\TCP\NSL.TCP.Server\NSL.TCP.Server.csproj" />
   </ItemGroup>
 </Project>

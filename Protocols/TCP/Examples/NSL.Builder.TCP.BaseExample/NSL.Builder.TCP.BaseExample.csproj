@@ -10,7 +10,7 @@
     <Configurations>DebugExamples</Configurations>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\BuilderExtensions\NSL.BuilderExtensions.TCPClient\NSL.BuilderExtensions.TCPClient.csproj" />
-    <ProjectReference Include="..\..\BuilderExtensions\NSL.BuilderExtensions.TCPServer\NSL.BuilderExtensions.TCPServer.csproj" />
+    <ProjectReference Include="..\..\NSL.TCP.Client\NSL.TCP.Client.csproj" />
+    <ProjectReference Include="..\..\NSL.TCP.Server\NSL.TCP.Server.csproj" />
   </ItemGroup>
 </Project>

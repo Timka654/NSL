@@ -1,11 +1,11 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
 using NSL.WebSockets.Server;
-using NSL.BuilderExtensions.SocketCore;
 using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using NSL.WebSockets.Server.AspNetPoint;
+using NSL.SocketCore.Network;
 
 namespace NSL.BuilderExtensions.WebSocketsServer.AspNet
 {

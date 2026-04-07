@@ -34,8 +34,8 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\..\..\..\Core\NSL.SocketClient\NSL.SocketClient.csproj" />
-		<ProjectReference Include="..\..\..\..\Protocols\LocalBridge\BuilderExtensions\NSL.BuilderExtensions.LocalBridge\NSL.BuilderExtensions.LocalBridge.csproj" />
-		<ProjectReference Include="..\..\..\..\Protocols\WebSockets\BuilderExtensions\NSL.BuilderExtensions.WebSocketsClient\NSL.BuilderExtensions.WebSocketsClient.csproj" />
+		<ProjectReference Include="..\..\..\..\Protocols\LocalBridge\NSL.LocalBridge\NSL.LocalBridge.csproj" />
+		<ProjectReference Include="..\..\..\..\Protocols\WebSockets\NSL.WebSockets.Client\NSL.WebSockets.Client.csproj" />
 		<ProjectReference Include="..\NSL.Node.BridgeServer.Shared\NSL.Node.BridgeServer.Shared.csproj" />
 	</ItemGroup>
 

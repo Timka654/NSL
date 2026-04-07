@@ -2,6 +2,7 @@
 using NSL.BuilderExtensions.SocketCore;
 using NSL.BuilderExtensions.TCPClient;
 using NSL.SocketClient;
+using NSL.SocketCore.Network;
 using NSL.SocketCore.Utils.Buffer;
 using NSL.TCP.Client;
 

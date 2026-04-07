@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using NSL.SocketCore.Utils.Request;
 using NSL.SocketCore;
 using NSL.SocketCore.Utils.Logger.Enums;
+using NSL.SocketCore.Network;
 
 namespace NSL.Node.BridgeLobbyClient
 {
