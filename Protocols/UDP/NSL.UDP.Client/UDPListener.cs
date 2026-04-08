@@ -174,17 +174,39 @@ namespace NSL.UDP.Client
             }
             catch (SocketException sex)
             {
+                ArrayPool<byte>.Shared.Return(poolMem);
+                poolMem = null;
+
+                // Socket was intentionally closed or operation aborted — exit silently.
+                if (!state || token.IsCancellationRequested)
+                    return;
+
+                // ICMP "Port Unreachable" (10054 on Windows): the remote endpoint is not listening.
+                // This is a transient condition — restart the receive loop so probes can continue.
+                if (sex.SocketErrorCode == SocketError.ConnectionReset)
+                {
+                    RunReceiveIntern(token);
+                    return;
+                }
+
                 options.CallExceptionEvent(sex, null);
                 StopReceive();
             }
             catch (Exception ex)
             {
+                ArrayPool<byte>.Shared.Return(poolMem);
+                poolMem = null;
+
+                if (!state || token.IsCancellationRequested)
+                    return;
+
                 options.CallExceptionEvent(ex, null);
                 StopReceive();
             }
             finally
             {
-                ArrayPool<byte>.Shared.Return(poolMem);
+                if (poolMem != null)
+                    ArrayPool<byte>.Shared.Return(poolMem);
             }
         }
 

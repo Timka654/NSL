@@ -12,6 +12,9 @@ namespace NSL.SocketCore.Utils
         /// <summary>Lower boundary of the NSL-reserved PID range (ushort.MaxValue - 235 = 65300).</summary>
         NSLSystemMinPID = ushort.MaxValue - 235,
 
+        /// <summary>UDP: client → server connection handshake probe / server → client ack (ushort.MaxValue - 103 = 65432).</summary>
+        UDPConnectHandshake = ushort.MaxValue - 103,
+
         /// <summary>UDP: client → server ping send packet (ushort.MaxValue - 101 = 65434).</summary>
         UDPSendPing = ushort.MaxValue - 101,
 

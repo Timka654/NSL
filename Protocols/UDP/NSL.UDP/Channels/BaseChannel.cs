@@ -165,7 +165,7 @@ namespace NSL.UDP.Channels
                 .SelectMany(x => x[2..].ToArray())
                 .ToArray(), channel);
 
-                OnReceive(packet.PID);
+                OnReceive?.Invoke(packet.PID);
             }
         }
 

@@ -1,8 +1,10 @@
 ﻿using NSL.SocketCore;
 using NSL.SocketCore.Utils;
 using NSL.SocketServer.Utils;
+using NSL.UDP.Packet;
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
@@ -18,6 +20,37 @@ namespace NSL.UDP.Client
 
         public UDPServer(UDPClientOptions<TClient> options) : base(options)
         {
+            // Transparently echo the client connect-handshake probe so that
+            // UDPNetworkClient.ConnectAsync / Connect(timeout) can detect server availability.
+            //
+            // Each connect attempt on the client generates a fresh session GUID which is embedded
+            // in every probe packet.  The server compares it with the last acknowledged GUID:
+            //   • Different GUID (new connect attempt or reconnect) → ReinitializeChannels + store new GUID.
+            //   • Same  GUID  (repeated probe from the same attempt) → echo only, channels untouched.
+            options.AddHandle(
+                (ushort)NSLSystemPacketEnum.UDPConnectHandshake,
+                (client, packet) =>
+                {
+                    var udpClient = client.Network as UDPClient<TClient>;
+                    if (udpClient != null)
+                    {
+                        var sessionId = packet.ReadGuid();
+                        if (sessionId != udpClient.LastHandshakeSessionId)
+                        {
+                            udpClient.LastHandshakeSessionId = sessionId;
+                            udpClient.ReinitializeChannels();
+                        }
+                        else
+                        {
+                            options.CallExceptionEvent(new Exception($"[UDP-DIAG] Handshake probe ignored (same session GUID) ep={udpClient.GetRemotePoint()}"), null);
+                        }
+                    }
+                    client.Network.SendEmpty((ushort)NSLSystemPacketEnum.UDPConnectHandshake);
+                });
+
+            // Auto-register combined ping/pong handler: receives client pings and echoes back,
+            // keeping both sides' AliveState alive without explicit calls in user code.
+            options.RegisterUDPPingHandle();
         }
 
         public void Start()
@@ -34,8 +67,17 @@ namespace NSL.UDP.Client
 
         protected override void Options_OnClientDisconnectEvent(TClient client)
         {
-            if (client?.Network != null)
-                clients.TryRemove((client.Network as UDPClient<TClient>).GetRemotePoint(), out var _);
+            // Intentionally do NOT remove the dict entry here.
+            //
+            // Removing on disconnect races with Reinitialize(): if a packet arrives between
+            // Disconnect() setting disconnected=true and RunDisconnect() TryRemove-ing the entry,
+            // Reinitialize() reactivates the client, but the subsequent TryRemove kills the live
+            // entry.  The next packet then creates a fresh UDPClient, firing a spurious connect
+            // event — producing the constant connect/disconnect cycle observed with 2+ clients.
+            //
+            // With the entry retained, GetClient() will call Reinitialize() on the next arriving
+            // packet and the client is seamlessly reactivated without any dict churn.
+            // Stale entries (clients that never reconnect) can be cleaned up separately if needed.
         }
 
         protected override void Args_Completed(Span<byte> buffer, SocketReceiveFromResult e, CancellationToken token)
@@ -54,21 +96,34 @@ namespace NSL.UDP.Client
             var lazy = clients.GetOrAdd(endPoint, ipep =>
                 new Lazy<UDPClient<TClient>>(() =>
                 {
+                    options.CallExceptionEvent(new Exception($"[UDP-DIAG] GetClient: NEW UDPClient ep={ipep}"), null);
                     var client = new UDPClient<TClient>(ipep, listener, options);
                     client.OnReceivePacket += OnReceivePacket;
                     client.OnSendPacket += OnSendPacket;
                     return client;
                 }));
 
+            UDPClient<TClient> value;
             try
             {
-                return lazy.Value;
+                value = lazy.Value;
             }
             catch
             {
                 clients.TryRemove(endPoint, out _);
                 throw;
             }
+
+            // If the client reconnected from the same endpoint before the server-side
+            // AliveState eviction removed the entry, reinitialize the existing object instead
+            // of replacing the dictionary entry (avoids netstandard compatibility issues).
+            if (value.IsDisconnected)
+            {
+                options.CallExceptionEvent(new Exception($"[UDP-DIAG] GetClient: IsDisconnected=true, calling Reinitialize ep={endPoint}"), null);
+                value.Reinitialize();
+            }
+
+            return value;
         }
 
         public UDPClient<TClient> CreateClientConnection(IPEndPoint endPoint)

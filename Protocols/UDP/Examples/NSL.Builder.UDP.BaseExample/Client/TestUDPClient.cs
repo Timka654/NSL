@@ -15,6 +15,15 @@ namespace NSL.Builder.UDP.BaseExample.Client
 
         static UDPClient<UDPTestNetworkClient> GetNetworkClient() => client.GetClient();
 
+        public static Task RebuildClient()
+        {
+            client?.Disconnect();
+            return RunClient();
+        }
+
+        public static Task<bool> TryConnect(int timeoutMs = UDPNetworkClient<UDPTestNetworkClient>.DefaultConnectionTimeout)
+            => client.ConnectAsync(timeoutMs);
+
         public static async Task RunClient()
         {
             client = UDPClientEndPointBuilder
@@ -73,7 +82,6 @@ namespace NSL.Builder.UDP.BaseExample.Client
                 .Build();
 
 
-            client.Connect();
         }
 
         public static async Task RunTest()
@@ -95,8 +103,7 @@ namespace NSL.Builder.UDP.BaseExample.Client
 
         public static void Disconnect()
         {
-
-            client.Connect();
+            client?.Disconnect();
         }
     }
 }

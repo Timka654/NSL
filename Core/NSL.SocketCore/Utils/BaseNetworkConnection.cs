@@ -64,11 +64,13 @@ namespace NSL.SocketCore.Utils
 
         public void RequestPing()
         {
-            if (Interlocked.CompareExchange(ref _pingPending, 1, 0) == 0 && Network != null)
-            {
-                _pingRequestTime = DateTime.UtcNow;
-                Network.SendEmpty(AliveConnectionPacket.PacketId);
-            }
+            if (Network == null) return;
+            // Always reset and send — if the previous pong was lost (unreliable transport),
+            // CompareExchange would keep _pingPending=1 forever, silently stopping all future
+            // heartbeats and causing AliveState to expire after AliveCheckTimeOut.
+            _pingRequestTime = DateTime.UtcNow;
+            Interlocked.Exchange(ref _pingPending, 1);
+            Network.SendEmpty(AliveConnectionPacket.PacketId);
         }
 
         public void PongProcess()

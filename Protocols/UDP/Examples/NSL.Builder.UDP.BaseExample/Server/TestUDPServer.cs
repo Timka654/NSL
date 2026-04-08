@@ -2,11 +2,20 @@
 using NSL.BuilderExtensions.UDPServer;
 using NSL.SocketCore.Network;
 using NSL.UDP;
+using NSL.UDP.Client;
 
 namespace NSL.Builder.UDP.BaseExample.Server
 {
     internal class TestUDPServer
     {
+        static UDPServer<UDPServerNetworkClient>? server;
+
+        public static void Stop()
+        {
+            server?.Stop();
+            server = null;
+        }
+
         public static Task RunServer()
         {
             var server = UDPServerEndPointBuilder
@@ -65,7 +74,7 @@ namespace NSL.Builder.UDP.BaseExample.Server
                 })
                 .Build();
 
-
+            TestUDPServer.server = server;
             server.Start();
 
             return Task.CompletedTask;

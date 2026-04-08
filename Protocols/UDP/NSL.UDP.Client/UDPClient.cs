@@ -15,6 +15,16 @@ namespace NSL.UDP.Client
 
         private bool connectDeferred;
 
+        /// <summary>
+        /// The session GUID most recently acknowledged via UDPConnectHandshake.
+        /// When a new handshake arrives with a different GUID (meaning the client started a fresh
+        /// connect attempt) channels and ciphers are rebuilt.  Repeated probes from the same
+        /// connect attempt carry the same GUID and are ignored.
+        /// Reset to <see cref="Guid.Empty"/> by <see cref="Reinitialize"/> so the very first
+        /// handshake after a reconnect always triggers a rebuild.
+        /// </summary>
+        internal Guid LastHandshakeSessionId;
+
         public UDPClient(IPEndPoint receivePoint, Socket listenerSocket, UDPClientOptions<TClient> options, bool deferConnect = false) : base(receivePoint, listenerSocket, options)
         {
             connectDeferred = deferConnect;
@@ -39,6 +49,9 @@ namespace NSL.UDP.Client
             outputCipher = options.OutputCipher.CreateEntry();
 
             disconnected = false;
+
+            RunException(new Exception($"[UDP-DIAG] Initialize ep={GetRemotePoint()} deferred={connectDeferred}"));
+
             if (!connectDeferred)
                 options.CallClientConnectEvent(Data);
         }
@@ -91,5 +104,54 @@ namespace NSL.UDP.Client
 
         protected override void RunException(Exception ex) => base.options.CallExceptionEvent(ex, Data);
 
+        /// <summary>
+        /// Resets this <see cref="UDPClient{TClient}"/> to a freshly-connected state so it can be
+        /// reused when the remote endpoint reconnects without reallocating the dictionary entry on
+        /// the server side.  Safe to call concurrently — the first caller wins via lock(this).
+        /// </summary>
+        internal void Reinitialize()
+        {
+            RunException(new Exception($"[UDP-DIAG] Reinitialize called ep={GetRemotePoint()}"));
+
+            lock (this)
+            {
+                if (!IsDisconnected)
+                {
+                    RunException(new Exception($"[UDP-DIAG] Reinitialize skipped (not disconnected) ep={GetRemotePoint()}"));
+                    return;
+                }
+
+                if (clientData != null)
+                    clientData.Network = null;
+
+                clientData = new TClient();
+                clientData.Network = this;
+
+                PacketHandles = options.GetHandleMap();
+                connectDeferred = false;
+
+                // Ciphers are disposed in Disconnect() — recreate them immediately so the very
+                // first arriving packet can be decrypted.  Cipher instances carry no sequence
+                // state, so this is safe and cannot cause desync.
+                // Channels are intentionally NOT reset here; they are reset only when a genuine
+                // UDPConnectHandshake is received (via ReinitializeChannels()), to avoid
+                // flushing the reliable-channel sequence numbers on spurious reconnect paths.
+                if (inputCipher != null) inputCipher.Dispose();
+                if (outputCipher != null) outputCipher.Dispose();
+                inputCipher = options.InputCipher.CreateEntry();
+                outputCipher = options.OutputCipher.CreateEntry();
+
+                ReinitializeBase();
+            }
+
+            // Reset session ID so the first handshake from the new connect attempt is always
+            // treated as a new session, regardless of what GUID the client sends.
+            LastHandshakeSessionId = Guid.Empty;
+
+            RunException(new Exception($"[UDP-DIAG] Reinitialize done ep={GetRemotePoint()}"));
+
+            // Fire connect event outside the lock.
+            options.CallClientConnectEvent(clientData);
+        }
     }
 }
