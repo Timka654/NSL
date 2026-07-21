@@ -53,8 +53,6 @@ namespace NSL.WebSockets.Client
             ConnectionOptions.RunClientConnect();
         }
 
-        public override void ChangeUserData(BaseNetworkConnection newClientData) => SetClientData(newClientData);
-
         public override void SetClientData(BaseNetworkConnection from) => ConnectionOptions.InitializeClient(from);
 
         protected override void RunDisconnect() => ConnectionOptions.RunClientDisconnect();

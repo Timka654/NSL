@@ -30,6 +30,7 @@ namespace NSL.SocketCore
     {
         bool AddHandle(ushort packetId, CoreOptions.PacketHandle handle);
         bool AddPacket(ushort packetId, IPacket packet);
+        bool AddAsyncHandle(ushort packetId, Func<BaseNetworkConnection, InputPacketBuffer, Task> handle);
     }
 
     public class TypedCoreOptions<TConnection> : CoreOptions, ITypedCoreOptions<TConnection>
@@ -248,17 +249,8 @@ namespace NSL.SocketCore
             where TClient : BaseNetworkConnection
             => registry.AddHandle(packetId, (c, buf) => handle((TClient)c, buf));
 
-        public static bool AddAsyncHandle<TClient>(this CoreOptions options, ushort packetId, Func<TClient, InputPacketBuffer, Task> handle)
+        public static bool AddAsyncHandle<TClient>(this IPacketHandleRegistry registry, ushort packetId, Func<TClient, InputPacketBuffer, Task> handle)
             where TClient : BaseNetworkConnection
-            => options.AddHandle(packetId, (client, input) =>
-            {
-                input.ManualDisposing = true;
-                Task.Run(async () =>
-                {
-                    try { await handle((TClient)client, input); }
-                    catch (Exception ex) { options.CallExceptionEvent(ex, client); }
-                    if (input.AsyncDisposing) input.Dispose();
-                });
-            });
+            => registry.AddAsyncHandle(packetId, (c, buf) => handle((TClient)c, buf));
     }
 }

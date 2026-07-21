@@ -9,13 +9,13 @@ namespace NSL.ASPNET.Mvc
 
     public class BaseResponse : ObjectResult
     {
-        public override Task ExecuteResultAsync(ActionContext context)
-        {
-            if (base.StatusCode != 200 && context.ModelState.Count > 0)
-                Value = ControllerResults.formatModelState(context.ModelState);
+        //public override Task ExecuteResultAsync(ActionContext context)
+        //{
+        //    if (base.StatusCode != 200 && context.ModelState.Count > 0)
+        //        Value = ControllerResults.formatModelState(context.ModelState);
 
-            return base.ExecuteResultAsync(context);
-        }
+        //    return base.ExecuteResultAsync(context);
+        //}
 
         public BaseResponse() : this(200, null)
         {

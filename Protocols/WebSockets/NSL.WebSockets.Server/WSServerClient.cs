@@ -59,8 +59,6 @@ namespace NSL.WebSockets.Server
             }
         }
 
-        public override void ChangeUserData(BaseNetworkConnection newClientData) => SetClientData(newClientData);
-
         public override void SetClientData(BaseNetworkConnection from)
         {
             if (from == null) { clientData = null; return; }

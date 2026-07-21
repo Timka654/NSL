@@ -17,9 +17,6 @@ namespace NSL.SocketCore
 
         IPEndPoint GetRemotePoint();
 
-        [Obsolete("Use SetClientData")]
-        void ChangeUserData(BaseNetworkConnection newClientData);
-
         /// <summary>
         /// Set old or another instance of client data to current network, and disconnect from old
         /// </summary>

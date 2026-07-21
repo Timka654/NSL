@@ -50,14 +50,11 @@ namespace NSL.UDP.Client
 
             disconnected = false;
 
-            RunException(new Exception($"[UDP-DIAG] Initialize ep={GetRemotePoint()} deferred={connectDeferred}"));
+            //RunException(new Exception($"[UDP-DIAG] Initialize ep={GetRemotePoint()} deferred={connectDeferred}"));
 
             if (!connectDeferred)
                 options.CallClientConnectEvent(Data);
         }
-
-        public override void ChangeUserData(BaseNetworkConnection newClientData)
-            => SetClientData(newClientData);
 
         public override void SetClientData(BaseNetworkConnection from)
         {
@@ -111,13 +108,13 @@ namespace NSL.UDP.Client
         /// </summary>
         internal void Reinitialize()
         {
-            RunException(new Exception($"[UDP-DIAG] Reinitialize called ep={GetRemotePoint()}"));
+            //RunException(new Exception($"[UDP-DIAG] Reinitialize called ep={GetRemotePoint()}"));
 
             lock (this)
             {
                 if (!IsDisconnected)
                 {
-                    RunException(new Exception($"[UDP-DIAG] Reinitialize skipped (not disconnected) ep={GetRemotePoint()}"));
+                    //RunException(new Exception($"[UDP-DIAG] Reinitialize skipped (not disconnected) ep={GetRemotePoint()}"));
                     return;
                 }
 
@@ -148,7 +145,7 @@ namespace NSL.UDP.Client
             // treated as a new session, regardless of what GUID the client sends.
             LastHandshakeSessionId = Guid.Empty;
 
-            RunException(new Exception($"[UDP-DIAG] Reinitialize done ep={GetRemotePoint()}"));
+            //RunException(new Exception($"[UDP-DIAG] Reinitialize done ep={GetRemotePoint()}"));
 
             // Fire connect event outside the lock.
             options.CallClientConnectEvent(clientData);

@@ -48,8 +48,6 @@ namespace NSL.TCP.Server
 
         public virtual void RunPacketReceiver() => RunReceive();
 
-        public override void ChangeUserData(BaseNetworkConnection newClientData) => SetClientData(newClientData);
-
         public override void SetClientData(BaseNetworkConnection from)
         {
             if (from == null) { clientData = null; return; }

@@ -38,6 +38,26 @@ namespace NSL.Generators.Utils
             AppendLine($"{string.Concat(Enumerable.Range(0, Tabs).Select(i => $"\t"))}");
         }
 
+        public void Append(string text)
+        {
+            if (text.IndexOf('\n') == -1)
+            {
+                sb.Append(text);
+                return;
+            }
+
+            var lines = text.Split(new[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
+            foreach (var line in lines)
+            {
+                sb.Append(line.Trim());
+                AppendLine();
+            }
+
+        }
+
+        public void AppendContent(string content)
+            => sb.Append(content);
+
         public void AppendLine(string text)
         {
             string tabs = string.Concat(Enumerable.Range(0, Tabs).Select(i => $"\t"));
@@ -204,7 +224,9 @@ namespace NSL.Generators.Utils
         {
             var body = new CodeBuilder();
 
+            body.NextTab();
             bodyBuild(body);
+            body.PrevTab();
 
             var @namespace = (classDecl.Parent as NamespaceDeclarationSyntax)?.Name.ToString();
 
@@ -273,11 +295,11 @@ namespace NSL.Generators.Utils
 
             AppendLine("{");
 
-            NextTab();
+            //NextTab();
 
             AppendLine(body.ToString());
 
-            PrevTab();
+            //PrevTab();
 
             AppendLine("}");
 

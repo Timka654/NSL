@@ -245,7 +245,7 @@ namespace NSL.Generators.PacketHandleGenerator.Core
                         cbData.HandlesBuilder.AppendLine(typeCBData.HandlesBuilder.ToString());
                         if (item.Direction == NSLHPDirTypeEnum.Receive)
                         {
-                            cbData.ConfigureBuilder.AppendLine($"{item.BuildModifierForHandles(NSLAccessModifierEnum.Protected)} void NSLConfigurePacketHandles({nameof(CoreOptions)} options)");
+                            cbData.ConfigureBuilder.AppendLine($"{item.BuildModifierForHandles(NSLAccessModifierEnum.Protected)} void NSLConfigurePacketHandles({nameof(IPacketHandleRegistry)} options)");
                             cbData.ConfigureBuilder.AppendBodyTabContent(() =>
                             {
                                 cbData.ConfigureBuilder.AppendLine(typeCBData.ConfigureBuilder.ToString());
@@ -367,9 +367,9 @@ namespace NSL.Generators.PacketHandleGenerator.Core
                     rType = packet.Result?.Type.GetTypeFullName();
 
                     if (rType != null)
-                        rType = $"async Task<{rType}>";
+                        rType = $"async System.Threading.Tasks.Task<{rType}>";
                     else
-                        rType = $"async Task";
+                        rType = $"async System.Threading.Tasks.Task";
                 }
                 //else
                 //    rType = "async void";
@@ -463,7 +463,7 @@ namespace NSL.Generators.PacketHandleGenerator.Core
                         if (packet.HandlesData.DelegateOutputResponse)
                             bodyBuilder.AppendLine($"return true;");
                         else
-                            bodyBuilder.AppendLine($"return Task.FromResult(true);");
+                            bodyBuilder.AppendLine($"return System.Threading.Tasks.Task.FromResult(true);");
                     });
 
 
@@ -512,14 +512,14 @@ namespace NSL.Generators.PacketHandleGenerator.Core
 
 
 
-                var rType = isAsync ? "Task" : "void";
+                var rType = isAsync ? "System.Threading.Tasks.Task" : "void";
 
                 if (packet.PacketType.HasFlag(NSLPacketTypeEnum.Request) && packet.Result != null)
                 {
                     rType = packet.Result.Type.GetTypeFullName();
 
                     if (isAsync)
-                        rType = $"Task<{rType}>";
+                        rType = $"System.Threading.Tasks.Task<{rType}>";
                 }
 
                 //Debugger.Break();
@@ -534,14 +534,14 @@ namespace NSL.Generators.PacketHandleGenerator.Core
 
             var phb = buildData.PacketHandlesBuilder;
 
-            phb.AppendLine($"{packet.HandlesData.BuildModifierForHandles()} {(isAsync ? "async Task" : "void")} NSLPacketHandle_{packet.Name}({packet.HandlesData.NetworkDataType.GetTypeFullName()} client, {nameof(InputPacketBuffer)} data)");
+            phb.AppendLine($"{packet.HandlesData.BuildModifierForHandles()} {(isAsync ? "async System.Threading.Tasks.Task" : "void")} NSLPacketHandle_{packet.Name}({packet.HandlesData.NetworkDataType.GetTypeFullName()} client, {nameof(InputPacketBuffer)} ___inputData)");
 
 
             phb.AppendBodyTabContent(() =>
             {
                 if (packet.PacketType.HasFlag(NSLPacketTypeEnum.Request))
                 {
-                    phb.AppendLine("var __response = data.CreateResponse();");
+                    phb.AppendLine("var __response = ___inputData.CreateResponse();");
                     phb.AppendLine();
                     if (packet.Parameters.Any())
                         phb.AppendLine();
@@ -589,9 +589,9 @@ namespace NSL.Generators.PacketHandleGenerator.Core
             var cb = buildData.ConfigureBuilder;
 
             if (isAsync)
-                cb.AppendLine($"options.AddAsyncHandle((ushort){packet.HandlesData.Type.GetTypeFullName()}.{packet.Name}, NSLPacketHandle_{packet.Name});");
+                cb.AppendLine($"options.AddAsyncHandle<{packet.HandlesData.NetworkDataType}>((ushort){packet.HandlesData.Type.GetTypeFullName()}.{packet.Name}, NSLPacketHandle_{packet.Name});");
             else
-                cb.AppendLine($"options.AddHandle((ushort){packet.HandlesData.Type.GetTypeFullName()}.{packet.Name}, NSLPacketHandle_{packet.Name});");
+                cb.AppendLine($"options.AddHandle<{packet.HandlesData.NetworkDataType}>((ushort){packet.HandlesData.Type.GetTypeFullName()}.{packet.Name}, NSLPacketHandle_{packet.Name});");
         }
 
 
@@ -618,15 +618,15 @@ namespace NSL.Generators.PacketHandleGenerator.Core
             if (typeModels.Contains(model))
             {
                 if (item.BinaryModel == null)
-                    return $"{tname}.ReadFullFrom(data)";
+                    return $"{tname}.ReadFullFrom(___inputData)";
                 else
-                    return $"{tname}.Read{item.BinaryModel}From(data)";
+                    return $"{tname}.Read{item.BinaryModel}From(___inputData)";
             }
 
             return BinaryReadMethodsGenerator.GetValueReadSegment(item.Type, new BinaryGeneratorContext()
             {
                 Context = packet.HandlesData.Context,
-                IOPath = "data",
+                IOPath = "___inputData",
                 For = model
             }, "data");
         }

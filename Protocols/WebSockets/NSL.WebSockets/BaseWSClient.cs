@@ -327,8 +327,6 @@ namespace NSL.WebSockets
 
         public CoreOptions Options => options;
 
-        public abstract void ChangeUserData(BaseNetworkConnection data);
-
         public abstract void SetClientData(BaseNetworkConnection from);
 
         public object GetUserData() => Data;

@@ -40,10 +40,10 @@ namespace NSL.UDP.Client
                             udpClient.LastHandshakeSessionId = sessionId;
                             udpClient.ReinitializeChannels();
                         }
-                        else
-                        {
-                            options.CallExceptionEvent(new Exception($"[UDP-DIAG] Handshake probe ignored (same session GUID) ep={udpClient.GetRemotePoint()}"), null);
-                        }
+                        //else
+                        //{
+                        //    options.CallExceptionEvent(new Exception($"[UDP-DIAG] Handshake probe ignored (same session GUID) ep={udpClient.GetRemotePoint()}"), null);
+                        //}
                     }
                     client.Network.SendEmpty((ushort)NSLSystemPacketEnum.UDPConnectHandshake);
                 });
@@ -96,7 +96,7 @@ namespace NSL.UDP.Client
             var lazy = clients.GetOrAdd(endPoint, ipep =>
                 new Lazy<UDPClient<TClient>>(() =>
                 {
-                    options.CallExceptionEvent(new Exception($"[UDP-DIAG] GetClient: NEW UDPClient ep={ipep}"), null);
+                    //options.CallExceptionEvent(new Exception($"[UDP-DIAG] GetClient: NEW UDPClient ep={ipep}"), null);
                     var client = new UDPClient<TClient>(ipep, listener, options);
                     client.OnReceivePacket += OnReceivePacket;
                     client.OnSendPacket += OnSendPacket;
@@ -119,7 +119,7 @@ namespace NSL.UDP.Client
             // of replacing the dictionary entry (avoids netstandard compatibility issues).
             if (value.IsDisconnected)
             {
-                options.CallExceptionEvent(new Exception($"[UDP-DIAG] GetClient: IsDisconnected=true, calling Reinitialize ep={endPoint}"), null);
+                //options.CallExceptionEvent(new Exception($"[UDP-DIAG] GetClient: IsDisconnected=true, calling Reinitialize ep={endPoint}"), null);
                 value.Reinitialize();
             }
 

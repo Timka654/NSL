@@ -57,13 +57,13 @@ namespace NSL.ASPNET.Mvc
 
     public class DataResponse<TData> : ObjectResult
     {
-        public override Task ExecuteResultAsync(ActionContext context)
-        {
-            if (StatusCode != 200 && context.ModelState.Count > 0)
-                Value = ControllerResults.formatModelState(context.ModelState);
+        //public override Task ExecuteResultAsync(ActionContext context)
+        //{
+        //    if (StatusCode != 200 && context.ModelState.Count > 0)
+        //        Value = ControllerResults.formatModelState(context.ModelState);
 
-            return base.ExecuteResultAsync(context);
-        }
+        //    return base.ExecuteResultAsync(context);
+        //}
 
         public DataResponse(TData data) : this(200, new { data })
         {

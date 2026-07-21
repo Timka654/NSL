@@ -1,6 +1,5 @@
 ./BuildReleaseAll
-# Evaluate success/failure
-if($LASTEXITCODE -eq 0)
-{
-	NU.SimpleClient --d "build" -upload -closeOnSuccess
-}
+
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+NU.SimpleClient --d "build" -upload -closeOnSuccess

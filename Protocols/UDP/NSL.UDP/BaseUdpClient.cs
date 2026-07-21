@@ -171,7 +171,7 @@ namespace NSL.UDP
         /// </summary>
         public void ReinitializeChannels()
         {
-            RunException(new Exception($"[UDP-DIAG] ReinitializeChannels ep={GetRemotePoint()}"));
+            //RunException(new Exception($"[UDP-DIAG] ReinitializeChannels ep={GetRemotePoint()}"));
 
             reliableChannel = new ReliableChannel<TClient, TParent>(this);
             unreliableChannel = new UnreliableChannel<TClient, TParent>(this);
@@ -185,8 +185,6 @@ namespace NSL.UDP
         private readonly Socket listenerSocket;
 
         public CoreOptions Options => options;
-
-        public abstract void ChangeUserData(BaseNetworkConnection data);
 
         public abstract void SetClientData(BaseNetworkConnection from);
 
@@ -221,11 +219,11 @@ namespace NSL.UDP
             // down the new session.
             if (!ReferenceEquals(ctsToCancel, liveStateTokenSource))
             {
-                RunException(new Exception($"[UDP-DIAG] Disconnect suppressed - Reinitialize won race ep={GetRemotePoint()}"));
+                //RunException(new Exception($"[UDP-DIAG] Disconnect suppressed - Reinitialize won race ep={GetRemotePoint()}"));
                 return;
             }
 
-            RunException(new Exception($"[UDP-DIAG] Disconnect ep={GetRemotePoint()}\n{Environment.StackTrace}"));
+            //RunException(new Exception($"[UDP-DIAG] Disconnect ep={GetRemotePoint()}\n{Environment.StackTrace}"));
 
             RunDisconnect();
 

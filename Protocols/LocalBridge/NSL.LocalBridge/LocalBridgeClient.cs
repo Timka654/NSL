@@ -67,9 +67,6 @@ namespace NSL.LocalBridge
 
         private Dictionary<ushort, CoreOptions.PacketHandle> PacketHandles;
 
-        public void ChangeUserData(BaseNetworkConnection newClientData)
-            => SetClientData(newClientData);
-
         public void SetClientData(BaseNetworkConnection from)
         {
             if (from == null)

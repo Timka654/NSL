@@ -67,6 +67,21 @@ namespace NSL.SocketCore.Utils.Pipeline.Middleware
         public bool AddPacket(ushort packetId, IPacket packet)
             => AddHandle(packetId, packet.Receive);
 
+        public bool AddAsyncHandle(ushort packetId, Func<BaseNetworkConnection, InputPacketBuffer, Task> handle)
+        {
+            AddRoute(packetId, (conn, buf) =>{
+
+                buf.ManualDisposing = true;
+                Task.Run(async () =>
+                {
+                    try { await handle(conn, buf); }
+                    catch (Exception ex) { conn.Options.CallExceptionEvent(ex, conn); }
+                    if (buf.AsyncDisposing) buf.Dispose();
+                });
+            });
+            return true;
+        }
+
         // ── Dispatch ─────────────────────────────────────────────────────────
 
         public ValueTask InvokeAsync(ReceiveChannelContext ctx, PacketReceiveDelegate next)
