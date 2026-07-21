@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/Core/">
+    <Project Path="NSL.ShaderVM.Core/NSL.ShaderVM.Core.csproj" Id="a1b2c3d4-0002-4000-8000-000000000002" />
+    <Project Path="NSL.ShaderVM.Shared/NSL.ShaderVM.Shared.csproj" Id="a1b2c3d4-0001-4000-8000-000000000001" />
+  </Folder>
+  <Folder Name="/Vulkan/">
+    <Project Path="NSL.ShaderVM.Vulkan.Package/NSL.ShaderVM.Vulkan.Package.csproj" />
+    <Project Path="NSL.ShaderVM.Vulkan.Shared/NSL.ShaderVM.Vulkan.Shared.csproj" Id="f9593b94-44f5-49b5-ba74-3f3a1dc9b99e" />
+    <Project Path="NSL.ShaderVM.Vulkan.Core/NSL.ShaderVM.Vulkan.Core.csproj" Id="a1b2c3d4-0003-4000-8000-000000000003" />
+  </Folder>
+  <Project Path="NSL.ShaderVM.Experiments/NSL.ShaderVM.Experiments.csproj" Id="a1b2c3d4-0005-4000-8000-000000000005" />
+</Solution>
