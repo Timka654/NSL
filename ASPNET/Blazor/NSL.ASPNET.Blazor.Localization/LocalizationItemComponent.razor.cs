@@ -72,7 +72,7 @@ namespace NSL.ASPNET.Blazor.Localization
 
             var result = LocalizationService.GetLocalizationValue(_key, Parameters, IsRequired, defaultValue: LDefaultValue);
 
-            if (result == null && FallbackToChildContent)
+            if (result == Key && FallbackToChildContent)
             {
                 CurrentFragment = ChildContent;
             }
