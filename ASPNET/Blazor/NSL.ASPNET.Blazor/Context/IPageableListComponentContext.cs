@@ -11,8 +11,8 @@ namespace NSL.ASPNET.Blazor.Context
 
         int ItemsPerPage { get; }
 
-        Task LoadItems(int page, bool requiredUpdate = false);
+        //ValueTask<bool> LoadItems(int page, bool requiredUpdate = false);
 
-        Task LoadItems(int page, int skip, int take);
+        //ValueTask<bool> LoadItems(int page, int skip, int take);
     }
 }

@@ -19,6 +19,8 @@ namespace NSL.ASPNET.Blazor.Localization
 
         [Parameter] public string? Key { get => _key; set => _key = value?.ToLower().Trim(); }
 
+        [Parameter] public bool FallbackToChildContent { get; set; } = false;
+
         [Parameter] public string? LDefaultValue { get; set; } = null;
 
         [Parameter] public bool IsRequired { get; set; }
@@ -70,10 +72,17 @@ namespace NSL.ASPNET.Blazor.Localization
 
             var result = LocalizationService.GetLocalizationValue(_key, Parameters, IsRequired, defaultValue: LDefaultValue);
 
-            CurrentFragment = new RenderFragment(b =>
+            if (result == null && FallbackToChildContent)
             {
-                b.AddMarkupContent(0, result);
-            });
+                CurrentFragment = ChildContent;
+            }
+            else
+            {
+                CurrentFragment = new RenderFragment(b =>
+                {
+                    b.AddMarkupContent(0, result);
+                });
+            }
 
 
             StateHasChanged();

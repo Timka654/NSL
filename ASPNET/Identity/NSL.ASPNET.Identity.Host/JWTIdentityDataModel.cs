@@ -3,6 +3,7 @@ using NSL.Utils.JsonSchemeGen.Attributes;
 using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace NSL.ASPNET.Identity.Host
@@ -11,16 +12,16 @@ namespace NSL.ASPNET.Identity.Host
     public class JWTIdentityDataModel
     {
         [NSLJsonSchemeProperty(Name = "Issuer")]
-        public string Issuer { get; set; }
+        public string Issuer { get; set; } = "default";
 
         [NSLJsonSchemeProperty()]
-        public string Audience { get; set; }
+        public string Audience { get; set; } = "default";
 
         /// <summary>
         /// Exp lifetime for token in minutes
         /// </summary>
         [NSLJsonSchemeProperty()]
-        public long Expires { get; set; }
+        public long Expires { get; set; } = 3600;
 
         [NSLJsonSchemeProperty()]
         public string SecurityKey { get; set; }
@@ -29,12 +30,25 @@ namespace NSL.ASPNET.Identity.Host
         public string SecurityAlgorithm { get; set; } = SecurityAlgorithms.HmacSha256;
 
 
+        SymmetricSecurityKey? key;
+        SigningCredentials? credentials;
+
         public SymmetricSecurityKey GetSymSecurityKey()
-            => new SymmetricSecurityKey(
-                      Encoding.ASCII.GetBytes(SecurityKey));
+            => key ??= GenerateOrLoadKey();
+
+        private SymmetricSecurityKey GenerateOrLoadKey()
+        {
+            if (!string.IsNullOrWhiteSpace(SecurityKey))
+            {
+                return new SymmetricSecurityKey(Encoding.UTF8.GetBytes(SecurityKey));
+            }
+
+            byte[] randomKeyBytes = RandomNumberGenerator.GetBytes(32);
+            return new SymmetricSecurityKey(randomKeyBytes);
+        }
 
         public SigningCredentials GetSignCredentials()
-            => new SigningCredentials(
+            => credentials ??= new SigningCredentials(
                   GetSymSecurityKey(), SecurityAlgorithm);
 
         public TimeSpan GetExpiresTimeSpan()

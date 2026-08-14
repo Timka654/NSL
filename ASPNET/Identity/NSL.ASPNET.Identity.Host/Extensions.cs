@@ -37,10 +37,10 @@ namespace NSL.ASPNET.Identity.Host
             });
         }
 
-        public static AuthenticationBuilder AddAPIBaseJWTBearer(this AuthenticationBuilder builder, IConfiguration configuration, Action<JwtBearerOptions> configureBearer = null, string path = BaseConfigurationPath)
+        public static AuthenticationBuilder AddAPIBaseJWTBearer(this AuthenticationBuilder builder, IConfiguration configuration, Action<JwtBearerOptions, JWTIdentityDataModel> configureBearer = null, string path = BaseConfigurationPath)
             => builder.AddAPIBaseJWTBearer(configuration.GetAPIBaseJWTData(path), configureBearer);
 
-        public static AuthenticationBuilder AddAPIBaseJWTBearer(this AuthenticationBuilder builder, JWTIdentityDataModel data, Action<JwtBearerOptions> configureBearer = null)
+        public static AuthenticationBuilder AddAPIBaseJWTBearer(this AuthenticationBuilder builder, JWTIdentityDataModel data, Action<JwtBearerOptions, JWTIdentityDataModel> configureBearer = null)
             => builder.AddJwtBearer(c =>
                 {
                     c.TokenValidationParameters = new TokenValidationParameters()
@@ -51,7 +51,7 @@ namespace NSL.ASPNET.Identity.Host
                     };
 
                     if (configureBearer != null)
-                        configureBearer.Invoke(c);
+                        configureBearer.Invoke(c, data);
                 });
 
         public static IdentityBuilder AddAPIBaseIdentity<TUser, TRole>(

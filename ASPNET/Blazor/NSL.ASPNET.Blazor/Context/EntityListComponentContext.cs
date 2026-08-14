@@ -4,7 +4,8 @@ using System.Threading.Tasks;
 
 namespace NSL.ASPNET.Blazor.Context
 {
-    public abstract class EntityListComponentContext<TEntity> : IPageableListComponentContext<TEntity>, IInitializingComponentContext, IUpdatableComponentContext 
+    public abstract class EntityListComponentContext<TEntity, TRequest> : IPageableListComponentContext<TEntity>, IInitializingComponentContext, IUpdatableComponentContext
+        where TRequest : class
     {
         public event Action OnUpdate = () => { };
 
@@ -19,31 +20,40 @@ namespace NSL.ASPNET.Blazor.Context
 
         public virtual int ItemsPerPage { get; } = 25;
 
-        public async Task InitializeAsync()
-        {
-            if (ItemsPage > 0) return;
+        public TRequest Request { get; protected set; }
 
-            await LoadItems(1, true);
+        public async ValueTask<bool> InitializeAsync()
+        {
+            if (ItemsPage > 0) return true;
+
+            return await LoadItems(1, null, true);
         }
 
-        public async Task LoadItems(int page, bool requiredUpdate = false)
+        public async ValueTask<bool> LoadItems(int page, TRequest request, bool requiredUpdate = false)
         {
-            if (page == ItemsPage && !requiredUpdate)
-                return;
+            if (page == ItemsPage
+                && object.Equals(Request, request)
+                && !requiredUpdate)
+                return true;
 
-            var result = await LoadItemsInternal(page);
 
-            if (result == default) return;
+            var result = await LoadItemsInternal(page, request);
 
+            if (result == default) return false;
+
+            Request = request;
             ItemsPage = page;
             Items = result.Value.Items;
             ItemsCount = result.Value.ItemsCount;
             Update();
+            return true;
         }
 
-        protected abstract Task<(List<TEntity> Items, long ItemsCount)?> LoadItemsInternal(int page);
+        protected abstract ValueTask<(List<TEntity> Items, long ItemsCount)?> LoadItemsInternal(int page, TRequest request);
 
-        public virtual Task LoadItems(int page, int skip, int take)
-            => LoadItems(page, false);
+        public virtual ValueTask<bool> LoadItems(int page, int skip, int take, TRequest request = null)
+            => LoadItems(page, request, false);
     }
+
+    public abstract class EntityListComponentContext<TEntity> : EntityListComponentContext<TEntity, object>;
 }

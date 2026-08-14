@@ -14,7 +14,7 @@ namespace NSL.Database.EntityFramework.Filter.V2.Builders
         {
             return new FilteredQueryBuilder<TModel, TEntity>();
         }
-        public static FilteredQueryBuilder<TModel,object> Create<TModel>()
+        public static FilteredQueryBuilder<TModel, object> Create<TModel>()
             where TModel : BaseFilteringQueryModel, new()
         {
             return new FilteredQueryBuilder<TModel, object>();
@@ -42,27 +42,27 @@ namespace NSL.Database.EntityFramework.Filter.V2.Builders
             return this;
         }
 
-        public FilteredQueryBuilder<TModel, TEntity> OrderBy(string property)
+        public FilteredQueryBuilder<TModel, TEntity> OrderBy(SortModel sortModel)
+            => AppendOrders(new[] { sortModel });
+
+        public FilteredQueryBuilder<TModel, TEntity> AppendOrders(IEnumerable<SortModel> sortModel)
         {
             if (model is not ISortedFilteringQueryModel s) throw new InvalidOperationException("Model does not support sorting");
 
             s.Sortings ??= new List<SortModel>();
-            s.Sortings.Add(new SortModel { Property = property, Descending = false });
+            s.Sortings.AddRange(sortModel);
 
             return this;
         }
+
+        public FilteredQueryBuilder<TModel, TEntity> OrderBy(string property)
+            => OrderBy(new SortModel { Property = property, Descending = false });
 
         public FilteredQueryBuilder<TModel, TEntity> OrderBy(Expression<Func<TEntity, object>> propertyExpression)
             => OrderBy(FilterUtils.GetPath<TEntity>(propertyExpression));
 
         public FilteredQueryBuilder<TModel, TEntity> OrderByDescending(string property)
-        {
-            if (model is not ISortedFilteringQueryModel s) throw new InvalidOperationException("Model does not support sorting");
-
-            s.Sortings ??= new List<SortModel>();
-            s.Sortings.Add(new SortModel { Property = property, Descending = true });
-            return this;
-        }
+            => OrderBy(new SortModel { Property = property, Descending = true });
 
         public FilteredQueryBuilder<TModel, TEntity> OrderByDescending(Expression<Func<TEntity, object>> propertyExpression)
             => OrderByDescending(FilterUtils.GetPath<TEntity>(propertyExpression));
@@ -84,7 +84,7 @@ namespace NSL.Database.EntityFramework.Filter.V2.Builders
         }
 
 
-        public  FilteredQueryBuilder<TModel, TEntity> SetPagePaging(int page, int pageSize)
+        public FilteredQueryBuilder<TModel, TEntity> SetPagePaging(int page, int pageSize)
         {
             Skip((page - 1) * pageSize);
             Take(pageSize);
@@ -92,7 +92,7 @@ namespace NSL.Database.EntityFramework.Filter.V2.Builders
             return this;
         }
 
-        public  FilteredQueryBuilder<TModel, TEntity> FillConditions( IEnumerable<EntityFilterBlockModel>? filters)
+        public FilteredQueryBuilder<TModel, TEntity> WithConditions(IEnumerable<EntityFilterBlockModel>? filters)
         {
             if (filters?.Any() == true)
                 WithFilter(c =>
@@ -129,7 +129,7 @@ namespace NSL.Database.EntityFramework.Filter.V2.Builders
         }
 
         public FilteredQueryBuilder<TModel, TEntity> Select(params Expression<Func<TEntity, object>>[] propertyExpression)
-            => Select(propertyExpression.Select(x=>FilterUtils.GetPath<TEntity>(x)).ToArray());
+            => Select(propertyExpression.Select(x => FilterUtils.GetPath<TEntity>(x)).ToArray());
 
 
         public TModel Build()
