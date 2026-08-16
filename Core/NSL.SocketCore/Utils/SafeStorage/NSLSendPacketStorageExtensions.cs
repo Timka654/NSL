@@ -20,7 +20,7 @@ namespace NSL.SocketCore.Utils.SafeStorage
             string objectBagKey = NSLSendPacketStorage.DefaultObjectBagKey)
             where TClient : BaseNetworkConnection
         {
-            options.AddHandle<TClient>(confirmPacketId, (client, data) =>
+            options.AddPacketHandle<TClient>(confirmPacketId, (client, data) =>
             {
                 var id = NSLTrackedOutputPacketBuffer.ReadTrackingId(data);
                 client.ObjectBag?.Get<NSLSendPacketStorage>(objectBagKey)?.Release(id);

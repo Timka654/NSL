@@ -58,16 +58,16 @@ namespace NSL.SocketCore.Utils.Pipeline.Middleware
 
         // ── IPacketHandleRegistry ────────────────────────────────────────────
 
-        public bool AddHandle(ushort packetId, CoreOptions.PacketHandle handle)
+        public bool AddPacketHandle(ushort packetId, CoreOptions.PacketHandle handle)
         {
             AddRoute(packetId, (conn, buf) => handle(conn, buf));
             return true;
         }
 
-        public bool AddPacket(ushort packetId, IPacket packet)
-            => AddHandle(packetId, packet.Receive);
+        public bool AddPacketHandle(ushort packetId, IPacket packet)
+            => AddPacketHandle(packetId, packet.Receive);
 
-        public bool AddAsyncHandle(ushort packetId, Func<BaseNetworkConnection, InputPacketBuffer, Task> handle)
+        public bool AddAsyncPacketHandle(ushort packetId, Func<BaseNetworkConnection, InputPacketBuffer, Task> handle)
         {
             AddRoute(packetId, (conn, buf) =>{
 

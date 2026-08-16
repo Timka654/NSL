@@ -151,7 +151,7 @@ namespace NSL.SocketServer.Utils.Session
 
         internal void RegisterServer(ServerOptions<TClient> server)
         {
-            server.AddPacket(NSLRecoverySessionPacket<TClient>.PacketId, new NSLRecoverySessionPacket<TClient>());
+            server.AddPacketHandle(NSLRecoverySessionPacket<TClient>.PacketId, new NSLRecoverySessionPacket<TClient>());
             server.OnClientDisconnectAsyncEvent += client => Server_OnClientDisconnectAsyncEvent((TClient)client);
         }
 

@@ -9,7 +9,7 @@ namespace NSL.SocketCore.Utils.Console
         public static IConsoleManager<T> AddConsoleEngine<T>(this CoreOptions options, ushort packetId, IServiceCollection services, IConsoleManager<T> manager)
             where T : BaseNetworkConnection
         {
-            options.AddPacket(packetId, new ConsoleMessage<T>(manager, packetId));
+            options.AddPacketHandle(packetId, new ConsoleMessage<T>(manager, packetId));
             services.AddSingleton(manager);
             return manager;
         }
@@ -18,7 +18,7 @@ namespace NSL.SocketCore.Utils.Console
             where T : BaseNetworkConnection
         {
             var m = new ConsoleManager<T>();
-            options.AddPacket(packetId, new ConsoleMessage<T>(m, packetId));
+            options.AddPacketHandle(packetId, new ConsoleMessage<T>(m, packetId));
             services.AddSingleton<IConsoleManager<T>>(m);
             services.AddSingleton(m);
             return m;

@@ -21,7 +21,7 @@ namespace NSL.SocketServer.Utils.Version
             where TClient : BaseNetworkConnection, new()
         {
             options.ObjectBag.Set(NSLVersionInfo.ObjectBagKey, versionInfo);
-            options.AddPacket(NSLVersionPacketReceive<TClient>.PacketId, new NSLVersionPacketReceive<TClient>());
+            options.AddPacketHandle(NSLVersionPacketReceive<TClient>.PacketId, new NSLVersionPacketReceive<TClient>());
             return options;
         }
 

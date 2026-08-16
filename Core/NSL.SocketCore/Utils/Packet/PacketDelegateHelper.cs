@@ -38,7 +38,7 @@ namespace NSL.SocketCore.Utils.Packet
 
                 foreach (var method in methods)
                 {
-                    if (client.AddPacket(method.attr.PacketId, new DelegatePacket<TClient>
+                    if (client.AddPacketHandle(method.attr.PacketId, new DelegatePacket<TClient>
                     {
                         Delegate = (Action<TClient, InputPacketBuffer>)method.x.CreateDelegate(typeof(Action<TClient, InputPacketBuffer>))
                     }))

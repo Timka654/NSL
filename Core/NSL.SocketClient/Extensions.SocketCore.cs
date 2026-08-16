@@ -23,7 +23,7 @@ namespace NSL.BuilderExtensions.SocketCore
     {
         public static void AddPacketHandle(this IOptionableEndPointBuilder builder, ushort packetId, Action<BaseNetworkConnection, InputPacketBuffer> handle)
         {
-            builder.GetCoreOptions().AddHandle(packetId, handle);
+            builder.GetCoreOptions().AddPacketHandle(packetId, handle);
         }
 
         public static void AddPacketHandle<TEnum>(this IOptionableEndPointBuilder builder, TEnum packetId, Action<BaseNetworkConnection, InputPacketBuffer> packet)
@@ -34,7 +34,7 @@ namespace NSL.BuilderExtensions.SocketCore
 
         public static void AddAsyncPacketHandle(this IOptionableEndPointBuilder builder, ushort packetId, Func<BaseNetworkConnection, InputPacketBuffer, Task> handle)
         {
-            builder.GetCoreOptions().AddAsyncHandle(packetId, handle);
+            builder.GetCoreOptions().AddAsyncPacketHandle(packetId, handle);
         }
 
         public static void AddAsyncPacketHandle<TEnum>(this IOptionableEndPointBuilder builder, TEnum packetId, Func<BaseNetworkConnection, InputPacketBuffer, Task> packet)

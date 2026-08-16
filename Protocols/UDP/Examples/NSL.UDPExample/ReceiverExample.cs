@@ -16,7 +16,7 @@ namespace NSL.UDPExample
 
             options.WithBindingEndPoint("0.0.0.0", 5553);
 
-            options.AddPacket(1, new TestPacketS());
+            options.AddPacketHandle(1, new TestPacketS());
 
             Run();
         }

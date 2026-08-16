@@ -9,7 +9,7 @@ namespace NSL.SocketCore.Utils.Request
     {
         public static void AddResponsePacketHandle(this CoreOptions options, ushort packetId, Func<BaseNetworkConnection, IResponsibleProcessor> handler)
         {
-            options.AddHandle(packetId, (client, packet) => handler(client).ProcessResponse(packet));
+            options.AddPacketHandle(packetId, (client, packet) => handler(client).ProcessResponse(packet));
         }
 
         public static void AddResponsePacketHandle<TEnum>(this CoreOptions options, TEnum packetId, Func<BaseNetworkConnection, IResponsibleProcessor> handler)
@@ -36,7 +36,7 @@ namespace NSL.SocketCore.Utils.Request
 
         public static void AddRequestPacketHandle(this CoreOptions builder, ushort packetId, RequestPacketHandle packet)
         {
-            builder.AddHandle<BaseNetworkConnection>(packetId, (client, data) =>
+            builder.AddPacketHandle<BaseNetworkConnection>(packetId, (client, data) =>
             {
                 var result = packet.Invoke(client, data);
                 if (result != null)
@@ -46,7 +46,7 @@ namespace NSL.SocketCore.Utils.Request
 
         public static void AddRequestPacketHandle(this CoreOptions builder, ushort packetId, RequestPacketHandle2 packet, ushort responsePacketId = 1)
         {
-            builder.AddHandle(packetId, (client, data) =>
+            builder.AddPacketHandle(packetId, (client, data) =>
             {
                 using (var response = data.CreateResponse(responsePacketId))
                 {
@@ -59,7 +59,7 @@ namespace NSL.SocketCore.Utils.Request
         public static void AddAsyncRequestPacketHandle<TEnum>(this CoreOptions builder, TEnum packetId, RequestPacketAsyncHandle packet)
             where TEnum : struct, IConvertible
         {
-            builder.AddAsyncHandle(packetId.ToUInt16(null), async (client, data) =>
+            builder.AddAsyncPacketHandle(packetId.ToUInt16(null), async (client, data) =>
             {
                 var result = await packet.Invoke(client, data);
                 if (result != null)
@@ -70,7 +70,7 @@ namespace NSL.SocketCore.Utils.Request
         public static void AddAsyncRequestPacketHandle<TEnum>(this CoreOptions builder, TEnum packetId, RequestPacketAsyncHandle2 packet, ushort responsePacketId = 1)
             where TEnum : struct, IConvertible
         {
-            builder.AddAsyncHandle(packetId.ToUInt16(null), async (client, data) =>
+            builder.AddAsyncPacketHandle(packetId.ToUInt16(null), async (client, data) =>
             {
                 using (var response = data.CreateResponse(responsePacketId))
                 {

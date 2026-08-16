@@ -14,7 +14,7 @@ namespace NSL.UDP.Packet
         /// </summary>
         public static void RegisterUDPPingHandle(this CoreOptions options)
         {
-            options.AddHandle(AliveConnectionPacket.PacketId, (client, data) =>
+            options.AddPacketHandle(AliveConnectionPacket.PacketId, (client, data) =>
             {
                 if (client.IsPingPending)
                     client.PongProcess();

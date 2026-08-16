@@ -67,7 +67,7 @@ namespace NSL.SocketClient
         public void InitializeClient(TClient newClientData) => InitializeClient((BaseNetworkConnection)newClientData);
 
         public bool AddPacket(ushort packetId, IClientPacket<TClient> packet)
-            => AddPacket(packetId, (IPacket<TClient>)packet);
+            => AddPacketHandle(packetId, (IPacket<TClient>)packet);
 
         public void InitializeClientObjectBagOnConnect()
         {

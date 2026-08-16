@@ -18,7 +18,7 @@ namespace NSL.UDPExample
 
             options.WithBindingEndPoint("0.0.0.0", 9994);
 
-            options.AddPacket(1, new TestPacket());
+            options.AddPacketHandle(1, new TestPacket());
 
             options.OnClientConnectEvent += c => {
                 c.PingPongEnabled = true;

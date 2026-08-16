@@ -22,13 +22,13 @@ namespace NSL.SocketCore.Network
     {
         public static void AddPacket(this IOptionableEndPointBuilder builder, ushort packetId, IPacket packet)
         {
-            builder.GetCoreOptions().AddPacket(packetId, packet);
+            builder.GetCoreOptions().AddPacketHandle(packetId, packet);
         }
 
         public static void AddPacket<TEnum>(this IOptionableEndPointBuilder builder, TEnum packetId, IPacket packet)
             where TEnum : struct, IConvertible
         {
-            builder.GetCoreOptions().AddPacket(packetId.ToUInt16(null), packet);
+            builder.GetCoreOptions().AddPacketHandle(packetId.ToUInt16(null), packet);
         }
 
         public static void AddResponsePacketHandle(this IOptionableEndPointBuilder builder, ushort packetId, Func<BaseNetworkConnection, IResponsibleProcessor> handler)

@@ -27,7 +27,7 @@ namespace NSL.UDP.Client
             // in every probe packet.  The server compares it with the last acknowledged GUID:
             //   • Different GUID (new connect attempt or reconnect) → ReinitializeChannels + store new GUID.
             //   • Same  GUID  (repeated probe from the same attempt) → echo only, channels untouched.
-            options.AddHandle(
+            options.AddPacketHandle(
                 (ushort)NSLSystemPacketEnum.UDPConnectHandshake,
                 (client, packet) =>
                 {

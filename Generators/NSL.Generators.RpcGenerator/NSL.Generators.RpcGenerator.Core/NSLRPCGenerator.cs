@@ -202,7 +202,7 @@ namespace NSL.Generators.RpcGenerator.Core
                     BuildServerHandler(sourceContext, classBuilder, container, method);
                     classBuilder.AppendLine();
 
-                    configureBuilder.AppendLine($"options.AddAsyncHandle({method.Pid}, NSLRpcHandle_{method.Name});");
+                    configureBuilder.AppendLine($"options.AddAsyncPacketHandle({method.Pid}, NSLRpcHandle_{method.Name});");
                 }
             });
 

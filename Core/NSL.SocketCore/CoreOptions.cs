@@ -28,9 +28,9 @@ namespace NSL.SocketCore
     /// </summary>
     public interface IPacketHandleRegistry
     {
-        bool AddHandle(ushort packetId, CoreOptions.PacketHandle handle);
-        bool AddPacket(ushort packetId, IPacket packet);
-        bool AddAsyncHandle(ushort packetId, Func<BaseNetworkConnection, InputPacketBuffer, Task> handle);
+        bool AddPacketHandle(ushort packetId, CoreOptions.PacketHandle handle);
+        bool AddPacketHandle(ushort packetId, IPacket packet);
+        bool AddAsyncPacketHandle(ushort packetId, Func<BaseNetworkConnection, InputPacketBuffer, Task> handle);
     }
 
     public class TypedCoreOptions<TConnection> : CoreOptions, ITypedCoreOptions<TConnection>
@@ -38,7 +38,7 @@ namespace NSL.SocketCore
     {
         public void AddHandle(ushort pid, Action<TConnection, InputPacketBuffer> handle)
         {
-            base.AddHandle(pid, (c, buf) => handle((TConnection)c, buf));
+            base.AddPacketHandle(pid, (c, buf) => handle((TConnection)c, buf));
         }
     }
 
@@ -144,7 +144,7 @@ namespace NSL.SocketCore
         public Dictionary<ushort, PacketHandle> GetHandleMap()
             => new Dictionary<ushort, PacketHandle>(PacketHandles);
 
-        public bool AddPacket(ushort packetId, IPacket packet)
+        public bool AddPacketHandle(ushort packetId, IPacket packet)
         {
             if (PacketHandles.ContainsKey(packetId)) return false;
             Packets[packetId] = packet;
@@ -155,7 +155,7 @@ namespace NSL.SocketCore
             return true;
         }
 
-        public bool AddHandle(ushort packetId, PacketHandle handle)
+        public bool AddPacketHandle(ushort packetId, PacketHandle handle)
         {
             if (PacketHandles.ContainsKey(packetId)) return false;
             PacketHandles[packetId] = handle;
@@ -165,8 +165,8 @@ namespace NSL.SocketCore
             return true;
         }
 
-        public bool AddAsyncHandle(ushort packetId, Func<BaseNetworkConnection, InputPacketBuffer, Task> handle)
-            => AddHandle(packetId, (client, input) =>
+        public bool AddAsyncPacketHandle(ushort packetId, Func<BaseNetworkConnection, InputPacketBuffer, Task> handle)
+            => AddPacketHandle(packetId, (client, input) =>
             {
                 input.ManualDisposing = true;
                 Task.Run(async () =>
@@ -241,16 +241,16 @@ namespace NSL.SocketCore
     /// </summary>
     public static class CoreOptionsExtensions
     {
-        public static bool AddHandle<TClient>(this CoreOptions options, ushort packetId, Action<TClient, InputPacketBuffer> handle)
+        public static bool AddPacketHandle<TClient>(this CoreOptions options, ushort packetId, Action<TClient, InputPacketBuffer> handle)
             where TClient : BaseNetworkConnection
-            => options.AddHandle(packetId, (c, buf) => handle((TClient)c, buf));
+            => options.AddPacketHandle(packetId, (c, buf) => handle((TClient)c, buf));
 
-        public static bool AddHandle<TClient>(this IPacketHandleRegistry registry, ushort packetId, Action<TClient, InputPacketBuffer> handle)
+        public static bool AddPacketHandle<TClient>(this IPacketHandleRegistry registry, ushort packetId, Action<TClient, InputPacketBuffer> handle)
             where TClient : BaseNetworkConnection
-            => registry.AddHandle(packetId, (c, buf) => handle((TClient)c, buf));
+            => registry.AddPacketHandle(packetId, (c, buf) => handle((TClient)c, buf));
 
-        public static bool AddAsyncHandle<TClient>(this IPacketHandleRegistry registry, ushort packetId, Func<TClient, InputPacketBuffer, Task> handle)
+        public static bool AddAsyncPacketHandle<TClient>(this IPacketHandleRegistry registry, ushort packetId, Func<TClient, InputPacketBuffer, Task> handle)
             where TClient : BaseNetworkConnection
-            => registry.AddAsyncHandle(packetId, (c, buf) => handle((TClient)c, buf));
+            => registry.AddAsyncPacketHandle(packetId, (c, buf) => handle((TClient)c, buf));
     }
 }
