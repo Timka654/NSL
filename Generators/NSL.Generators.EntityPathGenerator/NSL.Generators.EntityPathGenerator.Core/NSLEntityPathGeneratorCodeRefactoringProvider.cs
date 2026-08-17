@@ -23,7 +23,7 @@ namespace NSL.Generators.EntityPathGenerator.Core
         {
             var provider = context.SyntaxProvider
                 .ForAttributeWithMetadataName(
-                    "NSL.Entity.PathGenerator.Shared.Annotations.PathTableAttribute",
+                    "NSL.Generators.EntityPathGenerator.Shared.Annotations.PathTableAttribute",
                     predicate: (node, _) => node is ClassDeclarationSyntax,
                     transform: (ctx, _) => (INamedTypeSymbol)ctx.TargetSymbol)
                 .Where(symbol => symbol != null);
@@ -73,7 +73,7 @@ namespace NSL.Generators.EntityPathGenerator.Core
             sb.AppendLine("{");
             sb.AppendLine($"    public static class {entityName}PathTable");
             sb.AppendLine("    {");
-            sb.AppendLine("        public static readonly IReadOnlyDictionary<string, NSL.Entity.PathGenerator.Shared.FilterInfo> Map = new Dictionary<string, NSL.Entity.PathGenerator.Shared.FilterInfo>");
+            sb.AppendLine("        public static readonly IReadOnlyDictionary<string, NSL.Generators.EntityPathGenerator.Shared.FilterInfo> Map = new Dictionary<string, NSL.Generators.EntityPathGenerator.Shared.FilterInfo>");
             sb.AppendLine("        {");
 
             foreach (var prop in entity.GetMembers().OfType<IPropertySymbol>())
@@ -156,7 +156,7 @@ namespace NSL.Generators.EntityPathGenerator.Core
                     var cleanTypeName = prop.Type.ToDisplayString(TypeOfFormat);
                     var cleanElementTypeName = isCollection ? elementType.ToDisplayString(TypeOfFormat) : "null";
 
-                    sb.AppendLine($"            [\"{segmentName}\"] = new NSL.Entity.PathGenerator.Shared.FilterInfo(");
+                    sb.AppendLine($"            [\"{segmentName}\"] = new NSL.Generators.EntityPathGenerator.Shared.FilterInfo(");
                     sb.AppendLine($"                typeof({cleanTypeName}),");
                     sb.AppendLine($"                (Expression<Func<{entityName}, {prop.Type.ToDisplayString()}>>)(x => x.{prop.Name}),");
                     sb.AppendLine($"                {nestedMapFunc},");
@@ -189,7 +189,7 @@ namespace NSL.Generators.EntityPathGenerator.Core
             sb.AppendLine("{");
             sb.AppendLine("    public static class PathTableRegistry");
             sb.AppendLine("    {");
-            sb.AppendLine("        public static readonly IReadOnlyDictionary<Type, IReadOnlyDictionary<string, NSL.Entity.PathGenerator.Shared.FilterInfo>> AllMaps = new Dictionary<Type, IReadOnlyDictionary<string, NSL.Entity.PathGenerator.Shared.FilterInfo>>");
+            sb.AppendLine("        public static readonly IReadOnlyDictionary<Type, IReadOnlyDictionary<string, NSL.Generators.EntityPathGenerator.Shared.FilterInfo>> AllMaps = new Dictionary<Type, IReadOnlyDictionary<string, NSL.Generators.EntityPathGenerator.Shared.FilterInfo>>");
             sb.AppendLine("        {");
 
             // Избавляемся от дубликатов на всякий случай

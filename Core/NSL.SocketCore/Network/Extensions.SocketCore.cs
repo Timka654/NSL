@@ -27,13 +27,19 @@ namespace NSL.SocketCore.Network
             where TEnum : struct, IConvertible
             => builder.GetCoreOptions().AddPacketHandle(packetId.ToUInt16(null), packet);
 
+        public static bool AddPacketHandle(this IOptionableEndPointBuilder builder, ushort packetId, Action<BaseNetworkConnection, InputPacketBuffer> handle)
+            => builder.GetCoreOptions().AddPacketHandle(packetId, handle);
+
+        public static bool AddAsyncPacketHandle(this IOptionableEndPointBuilder builder, ushort packetId, Func<BaseNetworkConnection, InputPacketBuffer, Task> handle)
+            => builder.GetCoreOptions().AddAsyncPacketHandle(packetId, handle);
+
         public static bool AddPacketHandle<TClient>(this IOptionableEndPointBuilder builder, ushort packetId, Action<TClient, InputPacketBuffer> handle)
             where TClient : BaseNetworkConnection
-            => builder.GetCoreOptions().AddPacketHandle(packetId, (c, buf) => handle((TClient)c, buf));
+            => builder.AddPacketHandle(packetId, (c, buf) => handle((TClient)c, buf));
 
         public static bool AddAsyncPacketHandle<TClient>(this IOptionableEndPointBuilder builder, ushort packetId, Func<TClient, InputPacketBuffer, Task> handle)
             where TClient : BaseNetworkConnection
-            => builder.GetCoreOptions().AddAsyncPacketHandle(packetId, (c, buf) => handle((TClient)c, buf));
+            => builder.AddAsyncPacketHandle(packetId, (c, buf) => handle((TClient)c, buf));
 
         public static void AddResponsePacketHandle(this IOptionableEndPointBuilder builder, ushort packetId, Func<BaseNetworkConnection, IResponsibleProcessor> handler)
             => builder.GetCoreOptions().AddResponsePacketHandle(packetId, handler);
