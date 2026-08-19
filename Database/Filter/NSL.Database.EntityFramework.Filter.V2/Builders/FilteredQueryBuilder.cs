@@ -59,13 +59,13 @@ namespace NSL.Database.EntityFramework.Filter.V2.Builders
             => OrderBy(new SortModel { Property = property, Descending = false });
 
         public FilteredQueryBuilder<TModel, TEntity> OrderBy(Expression<Func<TEntity, object>> propertyExpression)
-            => OrderBy(FilterUtils.GetPath<TEntity>(propertyExpression));
+            => OrderBy(FilterUtils.GetPath(propertyExpression));
 
         public FilteredQueryBuilder<TModel, TEntity> OrderByDescending(string property)
             => OrderBy(new SortModel { Property = property, Descending = true });
 
         public FilteredQueryBuilder<TModel, TEntity> OrderByDescending(Expression<Func<TEntity, object>> propertyExpression)
-            => OrderByDescending(FilterUtils.GetPath<TEntity>(propertyExpression));
+            => OrderByDescending(FilterUtils.GetPath(propertyExpression));
 
         public FilteredQueryBuilder<TModel, TEntity> Skip(int count)
         {
@@ -116,7 +116,7 @@ namespace NSL.Database.EntityFramework.Filter.V2.Builders
         }
 
         public FilteredQueryBuilder<TModel, TEntity> Include(Expression<Func<TEntity, object>> propertyExpression)
-            => Include(FilterUtils.GetPath<TEntity>(propertyExpression));
+            => Include(FilterUtils.GetPath(propertyExpression));
 
         public FilteredQueryBuilder<TModel, TEntity> Select(params string[] paths)
         {
@@ -129,7 +129,7 @@ namespace NSL.Database.EntityFramework.Filter.V2.Builders
         }
 
         public FilteredQueryBuilder<TModel, TEntity> Select(params Expression<Func<TEntity, object>>[] propertyExpression)
-            => Select(propertyExpression.Select(x => FilterUtils.GetPath<TEntity>(x)).ToArray());
+            => Select(propertyExpression.Select(x => FilterUtils.GetPath(x)).ToArray());
 
 
         public TModel Build()

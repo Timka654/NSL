@@ -11,8 +11,11 @@ namespace NSL.ASPNET.Mvc
         public static DataResponse<TData> Ok<TData>(TData data)
             => new DataResponse<TData>(data);
 
-        public static DataResponse<TData> Ok<TData>(object data)
-            => new DataResponse<TData>(data);
+        //public static DataResponse<TData> Ok<TData>(object data)
+        //    => new DataResponse<TData>(data);
+
+        public static DataResponse<TData> Ok<TData>(dynamic data)
+            => new DataResponse<TData>((object)data);
 
         public static DataResponse<TData> NotFound<TData>(params string[] args)
             => NotFound<TData>("{...no_found}", args);
@@ -52,7 +55,7 @@ namespace NSL.ASPNET.Mvc
             => new DataResponse<TData>((int)code, default);
 
         public static DataResponse<TData> ModelState<TData>(ControllerBase controller, HttpStatusCode code)
-            => new DataResponse<TData>((int)code, ControllerResults.formatModelState(controller.ModelState));
+            => new DataResponse<TData>((int)code, ControllerResults.FormatModelState(controller.ModelState));
     }
 
     public class DataResponse<TData> : ObjectResult

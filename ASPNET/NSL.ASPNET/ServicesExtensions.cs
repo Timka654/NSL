@@ -1,4 +1,5 @@
 ﻿using HtmlAgilityPack;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using NSL.ASPNET.Attributes;
@@ -321,6 +322,42 @@ namespace NSL.ASPNET
 
             return services;
         }
+
+
+
+        public static void BindConfigurations(this IServiceCollection services, IConfiguration configuration, params string[] models)
+            => services.BindConfigurations(configuration, Assembly.GetCallingAssembly(), models);
+
+        public static void BindConfigurations(this IServiceCollection services, IConfiguration configuration, Assembly assembly, params string[] models)
+        {
+            var configurationTypes = assembly.GetTypes().Select(x => (type: x, attributes: x.GetCustomAttributes<BindConfigurationAttribute>()))
+                .Where(x => x.attributes?.Any() == true);
+
+            var t = typeof(OptionsConfigurationServiceCollectionExtensions).GetMethod(nameof(OptionsConfigurationServiceCollectionExtensions.Configure), BindingFlags.Public | BindingFlags.Static, [typeof(IServiceCollection), typeof(IConfiguration)]);
+
+            foreach (var item in configurationTypes)
+            {
+                foreach (var a in item.attributes)
+                {
+                    if (models.Length > 0 && !models.Any(x => a.Models.Contains(x))) continue;
+                    //MethodInfo.GetMethodFromHandle( services.Configure);
+
+                    var c = t.MakeGenericMethod(item.type);
+
+                    c.Invoke(null, [services, configuration.GetSection(a.Path)]);
+
+                }
+
+            }
+        }
+
+        public static IHost Action(this IHost host, Action<IHost> action)
+        {
+            action(host);
+
+            return host;
+        }
+
 
         static readonly Type[] registerServiceSkipped =
         [

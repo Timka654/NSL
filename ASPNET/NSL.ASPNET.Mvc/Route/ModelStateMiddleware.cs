@@ -10,7 +10,7 @@ namespace NSL.ASPNET.Mvc.Route
         {
             if (!context.ModelState.IsValid)
             {
-                context.Result = ControllerResults.ModelStateResponse(context.ModelState);
+                context.Result = BaseResponse.ModelState(context.ModelState, System.Net.HttpStatusCode.BadRequest);
             }
         }
     }

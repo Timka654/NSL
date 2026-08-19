@@ -29,7 +29,7 @@ namespace NSL.Database.EntityFramework.Filter.V2
         /// <typeparam name="T">The root type.</typeparam>
         /// <param name="propertyExpression">The expression representing the property path.</param>
         /// <returns>A dot-separated path string.</returns>
-        public static string GetPath<T>(Expression<Func<T, object>> propertyExpression)
+        public static string GetPath<T, TType>(Expression<Func<T, TType>> propertyExpression)
         {
             var parts = new List<string>();
             var currentExpression = propertyExpression.Body;

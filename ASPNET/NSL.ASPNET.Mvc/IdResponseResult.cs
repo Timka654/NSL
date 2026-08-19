@@ -10,8 +10,8 @@ namespace NSL.ASPNET.Mvc
         public static IdResponse<TId> Ok<TId>(TId id)
             => new IdResponse<TId>(id);
 
-        public static IdResponse<TId> Ok<TId>(object id)
-            => new IdResponse<TId>(id);
+        public static IdResponse<TId> Ok<TId>(dynamic id)
+            => new IdResponse<TId>((object)id);
 
         public static IdResponse<TData> NotFound<TData>(params string[] args)
             => NotFound<TData>("{...no_found}", args);
@@ -51,7 +51,7 @@ namespace NSL.ASPNET.Mvc
             => new IdResponse<TData>((int)code, default);
 
         public static IdResponse<TData> ModelState<TData>(ControllerBase controller, HttpStatusCode code)
-            => new IdResponse<TData>((int)code, ControllerResults.formatModelState(controller.ModelState));
+            => new IdResponse<TData>((int)code, ControllerResults.FormatModelState(controller.ModelState));
     }
 
     public class IdResponse<TId> : DataResponse<object>

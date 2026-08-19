@@ -10,8 +10,8 @@ namespace NSL.ASPNET.Mvc
         public static DataListResponse<TData> Ok<TData>(IEnumerable<TData> data)
             => new DataListResponse<TData>(data);
 
-        public static DataListResponse<TData> Ok<TData>(IEnumerable<object> data)
-            => new DataListResponse<TData>(data);
+        public static DataListResponse<TData> Ok<TData>(IEnumerable<dynamic> data)
+            => new DataListResponse<TData>(data.Cast<object>());
 
         public static DataListResponse<TData> NotFound<TData>(params string[] args)
             => NotFound<TData>("{...no_found}", args);
@@ -51,7 +51,7 @@ namespace NSL.ASPNET.Mvc
             => new DataListResponse<TData>((int)code, default);
 
         public static DataListResponse<TData> ModelState<TData>(ControllerBase controller, HttpStatusCode code)
-            => new DataListResponse<TData>((int)code, ControllerResults.formatModelState(controller.ModelState));
+            => new DataListResponse<TData>((int)code, ControllerResults.FormatModelState(controller.ModelState));
     }
 
     public class DataListResponse<TData> : DataResponse<object>

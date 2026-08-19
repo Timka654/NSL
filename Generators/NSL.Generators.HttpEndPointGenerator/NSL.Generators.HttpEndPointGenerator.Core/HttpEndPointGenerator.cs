@@ -165,6 +165,8 @@ namespace NSL.Generators.HttpEndPointGenerator.Core
 
                     var saveNames = fillArgs.ElementAtOrDefault(1)?.GetAttributeParameterValue<bool>(typeSem) ?? false;
 
+                    var fullTypePath = fillArgs.ElementAtOrDefault(2)?.GetAttributeParameterValue<bool>(typeSem) ?? true;
+
                     var containerAttributes = containerType.GetAttributes();
 
                     var containerAttr = containerAttributes.FirstOrDefault(x => x.AttributeClass.Name.Equals(ContainerGenerateAttributeFullName));
@@ -290,7 +292,7 @@ namespace NSL.Generators.HttpEndPointGenerator.Core
 
                                 var requestMethodName = saveNames ? ms.Name : $"{_vname}Request";
 
-                                methodBuilder.AppendLine($"public async Task<{returnType.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat)}> {requestMethodName}({string.Join(", ", _p)})");
+                                methodBuilder.AppendLine($"public async Task<{returnType.ToDisplayString(fullTypePath ? SymbolDisplayFormat.FullyQualifiedFormat : SymbolDisplayFormat.MinimallyQualifiedFormat)}> {requestMethodName}({string.Join(", ", _p)})");
                                 methodBuilder.NextTab();
                                 methodBuilder.AppendLine($"=> await (await CreateEndPointClient({_vname}Url))");
                                 methodBuilder.AppendLine($".FillClientOptions(__options)");
@@ -316,7 +318,7 @@ namespace NSL.Generators.HttpEndPointGenerator.Core
                                     }
                                 }
 
-                                methodBuilder.AppendLine($".ProcessResponseAsync<{returnType.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat)}>(__options);");
+                                methodBuilder.AppendLine($".ProcessResponseAsync<{returnType.ToDisplayString(fullTypePath ? SymbolDisplayFormat.FullyQualifiedFormat : SymbolDisplayFormat.MinimallyQualifiedFormat)}>(__options);");
 
                                 methodDeclarations.Add(methodBuilder.ToString());
                             }
